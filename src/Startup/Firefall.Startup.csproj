@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Firefall.Reconstruction.Startup</RootNamespace>
+    <DefaultItemExcludes>$(DefaultItemExcludes);Checks\**</DefaultItemExcludes>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\Shared\EngineByteHash32.cs" Link="Shared\EngineByteHash32.cs" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,45 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/Characters/">
+    <Project Path="src/Characters/Characters.Reconstruction.csproj" />
+  </Folder>
+  <Folder Name="/src/Characters/Checks/">
+    <Project Path="src/Characters/Checks/Characters.Checks.csproj" />
+  </Folder>
+  <Folder Name="/src/Collections/">
+    <Project Path="src/Collections/Firefall.Collections.csproj" />
+  </Folder>
+  <Folder Name="/src/Collections/Checks/">
+    <Project Path="src/Collections/Checks/CollectionsChecks.csproj" />
+  </Folder>
+  <Folder Name="/src/Containers/">
+    <Project Path="src/Containers/Firefall.Containers.csproj" />
+  </Folder>
+  <Folder Name="/src/Graphics/" />
+  <Folder Name="/src/Graphics/Nvapi/">
+    <Project Path="src/Graphics/Nvapi/Nvapi.Reconstruction.csproj" />
+  </Folder>
+  <Folder Name="/src/Scripting/" />
+  <Folder Name="/src/Scripting/LuaCache/">
+    <Project Path="src/Scripting/LuaCache/LuaCache.Reconstruction.csproj" />
+  </Folder>
+  <Folder Name="/src/Scripting/LuaCache/Checks/">
+    <Project Path="src/Scripting/LuaCache/Checks/LuaCache.Checks.csproj" />
+  </Folder>
+  <Folder Name="/src/Startup/">
+    <Project Path="src/Startup/Firefall.Startup.csproj" />
+  </Folder>
+  <Folder Name="/src/Startup/Checks/">
+    <Project Path="src/Startup/Checks/Startup.Checks.csproj" />
+  </Folder>
+  <Folder Name="/src/Serialization/">
+    <Project Path="src/Serialization/Firefall.Serialization.csproj" />
+  </Folder>
+  <Folder Name="/src/Serialization/Tools/">
+    <Project Path="src/Serialization/Tools/SdbInspect/SdbInspect.csproj" />
+  </Folder>
+  <Folder Name="/tests/" />
+  <Folder Name="/tests/Serialization/">
+    <Project Path="tests/Serialization/SerializationChecks.csproj" />
+  </Folder>
+</Solution>

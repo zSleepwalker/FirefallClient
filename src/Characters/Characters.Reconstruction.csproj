@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Firefall.Characters</RootNamespace>
+    <!-- Checks\ is a separate console project that references this one. -->
+    <DefaultItemExcludes>$(DefaultItemExcludes);Checks\**</DefaultItemExcludes>
+  </PropertyGroup>
+</Project>

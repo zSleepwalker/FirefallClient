@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="Tools\**\*.cs" />
+    <Compile Include="..\Shared\EngineByteHash32.cs" Link="Shared\EngineByteHash32.cs" />
+  </ItemGroup>
+</Project>
