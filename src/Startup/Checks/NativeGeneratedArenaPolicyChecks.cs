@@ -15,6 +15,13 @@ internal static class NativeGeneratedArenaPolicyChecks
             requests &= request.RequiredBlockSize == required[i] && request.PreferredListOffset == lists[i] && request.NewRegionSize == regions[i];
         }
         check("Native generated arena preserves16-byte headers,64/128/256 buckets,64KiB rounding and DWORD wrap", requests);
+        check("Native arena return facts stay path-scoped and distinguish generic VirtualFree from output-region release",
+            NativeGeneratedArenaPolicy.FreeListNodeInsertFileOffset == 0x1251BD0
+            && NativeGeneratedArenaPolicy.FreeListNodeAllocateFileOffset == 0x1251900
+            && NativeGeneratedArenaPolicy.GeneralAllocatorReleaseFileOffset == 0x12C8D60
+            && NativeGeneratedArenaPolicy.VirtualFreeImportSlotVirtualAddress == 0x1AC42B4
+            && !NativeGeneratedArenaPolicy.ObservedReturnBlockPathCoalescesBlocks
+            && !NativeGeneratedArenaPolicy.ObservedReturnBlockPathReleasesWholeRegion);
         NativeGeneratedArenaFreeBlock[] preferred = [new(0x1000, 63), new(0x2000, 64), new(0x3000, 64)];
         NativeGeneratedArenaFreeBlock[] large = [new(0x4000, 400), new(0x5000, 300), new(0x6000, 300)];
         var small = NativeGeneratedArenaPolicy.SelectCapturedFreeBlock(48, preferred, large);

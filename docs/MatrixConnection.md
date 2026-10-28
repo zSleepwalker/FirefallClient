@@ -1004,9 +1004,13 @@ model is not a complete atomic transition simulator.
 
 Current-mode method `0x64E210` has tfWorld-shaped offsets, including observer
 pointer+28E8. It conditionally calls `0x6E9C50(observer,0)` when observer
-DWORDs+120/+124 equal+8/+C. It calls `0x494A40` through mode+10; that method
-requires connection state5 and downstream+910, acts on nonzero downstream+8,
-then clears it if it remains nonzero after the external call.
+DWORDs+120/+124 equal+8/+C. It calls `0x494A40` through mode+10 at raw call
+offset `0x64E27D`. That helper compares connection+0x0C with5; mismatch
+reaches an assertion and rejoins the cleanup path, so the state is not a
+proven execution gate. A null connection+0x910 likewise reaches an assertion
+and rejoins. The nested action pointer at connection+0x910+8 controls whether
+`0x7FEB50` is called; after that call, the helper clears the nested pointer
+if it remains nonzero. It does not visibly clear connection+0x910 itself.
 
 The world method next posts runtime97 with two zero arguments at virtual+AC.
 Three virtual+24 getter calls are separate observations, not one assumed
@@ -1017,6 +1021,112 @@ object+770, invokes additional subsystem/local-client resets, detaches pointer
 `localClient.member4+5590`, and if nonnull invokes `0x861020` and the general
 free routine. Finally mode byte+2F1 becomes0. Formal identities of these raw
 members and deeper indirect effects remain unresolved.
+
+The `0x976430` helper first walks a linked structure rooted at `this+0x20`,
+following node+0 and reading node+0x10. It calls `0x977E20` for each node,
+even when that value is null; the null path reaches an assertion and continues
+toward a dereference. For non-null values it next calls `0x975020` and the
+general free routine. After this value pass, it self-links the head's+0/+4
+words and clears `this+0x24`; a second pass saves each node's next pointer
+before releasing the node. Value processing therefore precedes head reset,
+which precedes node release.
+
+For each non-null value, `0x975020` walks two more sentinel-based structures:
+one rooted at value+0x08 with per-node pointer+0x14, and another rooted at
+value+0 with per-node pointer+0x18. It calls `0x9751F0` or `0x88AD60` on those
+values respectively, then sends each value to the general free routine.
+`0x9751F0` releases refcounted pointers at its+0x08/+0x04 and processes the
+24-byte span range at+0x10 through `0x979A20`; `0x975020` also releases its
+own refcounted pointer at value+0x18. Tag `0x17` follows the previously
+described shared-text allocator path. These field accesses are proven, but the
+entry identities and `0x88AD60` callback effects remain unresolved.
+
+Two other direct callers pass an outer node's+0x10 value to `0x975020`.
+`0x976200` first passes the field to `0x977E20`, reloads it, skips cleanup if
+null, then calls `0x975020` and the general free routine. `0x977F20` selects a
+node through `0x979C80`, passes its+0x10 value to `0x977E20`, then waits for
+value+4 to clear before calling the same cleanup/free pair. The wait is a
+synchronous drain: `0x977630` calls `0x978440`, which decrements value+4 if
+nonzero, and the caller immediately rechecks it. This is not an observed
+callback wait. `0x977E20` has no direct write to the outer node+0x10 slot or
+value+4 in its visible body, but it does dispatch through virtual+0xAC with
+event0x169, so indirect effects remain possible; `0x978B20` is also untraced.
+The callers support a compatible cleanup-value shape, not a common semantic
+type.
+
+The two `0x975020` container-clear helpers (`0x97AE50`, `0x97AA70`) call node
+removal helpers (`0x97BCC0`, `0x978440`) before the outer routine releases the
+container heads. Those helpers manipulate node pointers at+0/+4/+8, bytes at
++0x0C/+0x0D, rebalance links and release a removed node. This is tree-like
+structure evidence, not a recovered standard-library container identity.
+
+It then walks a second linked structure rooted at `this+0`, following node+0.
+For each node it calls `0x976D30` with node+0x10; that helper reads two DWORDs
+there and dispatches through a virtual slot at+0xAC with event367. The callback
+meaning is unresolved. Helper `0x9795B0` then resets the second head links and
+clears `this+0x04`; its node pass saves next, calls `0x3F7680` with the address
+of node+0x20, then rereads and releases the current slot value before releasing
+the node. `0x3F7680` has a whole-range fast path to `0x3F7300`, which also
+handles an empty tree. In this caller, start is the head's first node and end
+is the head sentinel, so the full-range branch is taken. `0x3F7300` recursively
+clears node+8 child subtrees through `0x3F72C0`, advances through node+0 links,
+and frees each node. It then self-links header+0/+4/+8 and zeroes the adjacent
+owner count at the node's+0x24. `0x3F7430` is the partial-range node-erasure
+path; it rebalances
+the tree-like links, frees the removed node and decrements that same count, but
+is not reached for this full-range caller. The wrapper shows no release or slot
+transfer: the caller frees the retained node+0x20 value after it returns, then
+frees the outer node. This does not prove exclusive ownership or formal
+container types.
+
+Two adjacent ranges are also reset through `0x97CBB0` and `0x97C690`: the
+first uses `this+0x28` / `this+0x2C`, then stores7/8 at+0x34/+0x38; the second
+uses `this+0x08` / `this+0x0C`, then stores7/8 at+0x14/+0x18. Each helper
+receives count0x10 (16 four-byte entries); its range is a three-pointer group
+with begin/end/capacity-end at relative offsets+0/+4/+8. The caller first sets
+end=begin, but the helpers may reallocate and replace all three pointers; they
+are not simple pointer resets. On reallocation, the old begin pointer is sent
+to the general free routine when non-null. The values and purpose of the
+entries are unresolved.
+
+The local-client branch additionally calls `0x4A2FB0` and
+`0x431C90`; the latter clears member fields before unresolved virtual
+callbacks. The released pointer slot at `localClient.member4+0x5590` is
+cleared before the non-null check. For a saved non-null object, `0x861020`
+first handles a separate record pointer at object+0x328. It reads a global at
+PE VA `0x1DFFD98`, gets a record owner through virtual+0x24 on global+0xB98,
+then calls `0xD74A20` with owner+0x0C and the record. `0xD74A20` checks record
+leading DWORD `0x3C8`; when record+0x39C matches owner+4, it locks owner+0x38,
+removes the DWORD token at record+0x398 from the owner range+0xB8..+0xBC,
+calls `0xD935F0` and `0xD78900`, clears the token and decrements owner+0x68.
+It then calls the general free routine on the record whether or not that
+matching-state branch ran. This is bounded resource cleanup, not evidence of
+an application-mode transition. The separate object+0x32C field is zeroed in
+`0x860230` and later populated from a virtual+0x40 result in `0x860810`.
+`0x861020` invokes the resulting object's vtable slot0 with argument1, but its
+target is not a static address and the deleting-destructor interpretation is
+unproven. It then calls `0x424790` with object+4; that helper reads the pointer
+at object+0x320, whose allocation header is eight bytes
+before the payload and has its reference count four bytes before the payload.
+On final release, tag `0x17` calls the shared-text allocator singleton getter
+`0x12B9F70`, then `0x12CDEC0` releases the allocator node.
+That helper decrements allocator counter+0x10 and pushes the header node
+through `0x12CDA60`'s interlocked lock-free stack update. Other nonzero tags go
+to the general free routine with the header; tag0 frees the payload minus16.
+The owner field is cleared after release. This identifies the tag-0x17
+return-to-shared-text-allocator path, but does not establish the semantics of
+other tags or all values ever stored at object+0x320.
+
+IDA's current code-xref database lists one direct caller of `0x64E210`:
+`0x494B00` sets connection state5, calls it at `0x494BDD`, then returns.
+Inside cleanup, a guarded lookup of index0x6A can call `0x369A30` at raw
+`0x64E275`; that helper forwards a stack-local record to `0x101D710` only when
+a global flag is set. Its purpose is unresolved and it is not established as
+an app-mode request. The direct stores in `0x64E210` do not target the
+documented pending-mode queue fields, and this function does not call the
+pending-mode inserter `0x30DEB0`; indirect virtual effects remain outside this
+trace. This bounds the finding to the analyzed cleanup path, not the full
+client transition graph.
 
 `WorldZoneCleanupNativeLayout.cs` records these offsets/call boundaries and the
 two-word observer gate. No complete world cleanup, lifetime management, or

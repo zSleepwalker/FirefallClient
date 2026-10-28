@@ -1,9 +1,26 @@
 # Reverse-engineering handoff
 
-Paused at the user's request after finishing the supported generated
-transformation-provider reconstruction. Stop for today; resume only when the
-user requests more work. Overall client reconstruction remains incomplete.
-No recurring session automation is configured.
+The supported generated transformation-provider boundary was completed, then
+explicitly resumed by the user for another bounded reconstruction pass. The
+latest work extends the tfWorld zone-cleanup layout from static binary evidence;
+read-only IDA follow-up also verified four constructor callsites for the
+generated provider. Both caller paths use the constructor that writes mode
+DWORD+4=0 and control byte+0x18=1 before generation; no override store was
+found in those observed paths. This is not an exhaustive global writer search,
+so native non-default mode/control reachability remains unproven.
+Overall client reconstruction remains incomplete. No recurring session
+automation is configured.
+
+The latest arena lifetime follow-up confirms that the traced block-return path
+recycles spans through list metadata without coalescing or releasing the
+generated-output regions. `VirtualFree` is present in the generic allocator
+release path for other allocation classes; this does not prove output-region
+teardown. IDA xrefs undercount byte references, so the negative result remains
+limited to the inspected paths rather than a binary-wide claim.
+Two additional raw sites, `0x12ABD6C` and `0x12ABDBC`, contain identical
+`VirtualFree(ECX,0,MEM_RELEASE)` call sequences after a non-null test. IDA has
+no function boundary or xrefs for them, and the caller/ECX provenance is
+unknown; they are not evidence of generated-output region release.
 
 ## What is saved
 
@@ -577,8 +594,35 @@ No recurring session automation is configured.
   and terminal states assert. `GameSocketDestroyNativeLayout.cs` preserves
   this selection and the first atomic-marker gate. Deeper world cleanup
   (`0x64E210`, secondary connection cleanup `0x494A40`) is saved as raw
-  offsets/call boundaries in `WorldZoneCleanupNativeLayout.cs`; resource
-  identities and allocation lifetime remain unresolved. Deferred close is now
+  offsets/call boundaries in `WorldZoneCleanupNativeLayout.cs`. Follow-up
+  static evidence records that the state-5 test is assertion-only with visible
+  fallthrough; the downstream action pointer gates `0x7FEB50`; helper
+  `0x976430` records two link chains, value/node release order, an event367
+  callback, node+0x20 nested-range walking followed by separate slot release,
+  and two 16-entry range helpers that can replace their backing pointers. The
+  `0x9795B0` call takes the `0x3F7680` full-tree clear path; `0x3F7300` clears
+  child nodes and the owner count, while `0x3F7430` handles partial erasure.
+  `0x975020` adds two nested sentinel walks and tree-like node-removal helpers.
+  Two other callers pass node+0x10 values to it with different guards; the
+  `0x977F20` value+4 loop is a synchronous drain because `0x978440` directly
+  decrements that field. This supports a compatible shape, not a proven type.
+  Container identities and callback effects remain unresolved. Local-client
+  cleanup `0x64E210` has no observed direct pending-mode enqueue: its current
+  xref lists only caller `0x494B00` (state5), and the guarded `0x369A30` path
+  forwards an opaque local record to `0x101D710`. This is not a transition
+  proof or a binary-wide negative. Reset helpers `0x4A2FB0`/`0x431C90` are
+  bounded. The `0x861020` path also
+  releases a guarded record through `0xD74A20`; its `0x3C8` header, state
+  comparison, token-vector removal, and cleanup are saved without claiming an
+  app-mode transition. Its separate +0x32C virtual cleanup object is populated
+  by a runtime vtable result; slot0 argument1 is observed, but its target is
+  unknown and is not named as a destructor. `0x424790` atomically
+  releases the pointer at released-object+0x320. Its tag-0x17 final-release
+  branch routes the header to the shared-text allocator's lock-free free
+  stack; other tag meanings remain unresolved. General ownership remains
+  unresolved. Startup checks
+  against original and installed binaries and the full solution build passed.
+  Deferred close is now
   traced: Destroyed tick checks keepalive/retries, assembles data, then the
   assembler tail requests pump close if still Destroyed. The close callback
   sets+D94 and enqueues token1; queued dispatch changes Destroyed8 to Closed9
@@ -658,9 +702,11 @@ These updates supersede older next-step suggestions below where they overlap.
   catalog pointer to the optional catalog `+0x24` callback, calls it with the
   holder's count and exposed rows pointer, then releases/frees the holder.
   `SdbNativeMappedTableResult` models the verified 32-bit layout. Catalog
-  `+0x28` points to hex text matching the DWORD at `+0x2C` in both sampled
-  entries, but the value's identity, derivation, and consumers remain unknown;
-  the separate tree at database `this+0x28` is also unresolved.
+  compiled catalog. Its opaque tail shows 573/575 hex-string/DWORD pairs and
+  two exceptions; no semantic meaning or consumer is established. The separate
+  database tree at `this+0x28` is now laid out as an auxiliary buffer map whose
+  key is also used as a backing-buffer displacement; key/value semantics and
+  conditional value ownership remain unresolved.
 - **`tfLogin` mode behavior has a bounded native snapshot.** The `0xA58`-byte
   mode loads `LoginUI.xml`, registers 15 observed input actions, selects a
   background zone, and handles login, character-refresh, and zone-list
@@ -1342,8 +1388,10 @@ These updates supersede older next-step suggestions below where they overlap.
    with holder row count `+4` and exposed rows pointer `+0x0C`, releases its
    refcounted handle at `+0x18`, then frees it. This supersedes the earlier
    hypothesis that the mapped value's `+0x00` was a vtable: it is a catalog
-   entry pointer. The separate tree at `this+0x28` is still structurally
-   trivial and its insertion/business semantics remain unknown. Function
+   entry pointer. The separate tree at `this+0x28` is now modeled as an
+   auxiliary buffer map with a derived displacement key and pointer-like
+   value; key/value semantics and its conditional value ownership remain
+   unresolved. Function
    names and offsets for both tree cleanup paths are documented in
    `src\Serialization\README.md`.
 3. **Resolved**: the parser's database object has a static, compiled-in table
@@ -1373,13 +1421,14 @@ These updates supersede older next-step suggestions below where they overlap.
    exactly undoing what `+0x20`'s builder constructs. Example `0x4CCBB136`
    has `+0x24 = 0` (NULL), consistent with its `+0x20` also being NULL (no
    handle array is ever built for that table, so there is nothing to tear
-   down). `+0x28`/`+0x2C` do **not** echo the row stride: `+0x28` points to
-   lowercase hex text matching the DWORD at `+0x2C` in both examples
-   (`"0x2891ac46"` / `0x2891AC46`, and `"0x27c462d3"` / `0x27C462D3`).
-   This text/value consistency does not establish a name, checksum, hash
-   algorithm, or other semantics. The parser, mapper, and reset paths traced
-   so far do not consume `+0x28`/`+0x2C`. Remaining open item: determine their
-   meaning or leave them opaque if no consumer is found.
+   down). A full scan of all575 compiled catalog entries found573 cases where
+   `+0x28` points to lowercase `"0x"` plus eight hex digits parsing to the
+   `+0x2C` DWORD. Entry index10 instead points to `"hands"` and a relocated
+   `"backpack"` pointer; entry index19 is all-`0xFFFFFFFF`. The relocation
+   table confirms +0x28 is pointer-valued for574 entries and +0x2C for the
+   single `"backpack"` exception. The repeated pairing is not a universal
+   invariant or semantic name; traced parser/mapper/reset paths do not consume
+   either field, so retain them as opaque raw DWORDs.
    **(b) Resolved**: type codes 1/3/9/11 seen in example #2's field array
    were cross-checked field-by-field against the init callback's exact byte
    offsets (`src\Serialization\README.md`) — every write's offset and width
@@ -1527,7 +1576,8 @@ These updates supersede older next-step suggestions below where they overlap.
    uncertain fields as positional/opaque and avoid inferring wire encodings
    from native object constructors alone.
 
-The latest user instruction supersedes the earlier continuous-work request:
-stop for today after the generated-provider boundary. No recurring session
-automation is configured. Preserve saved source, evidence and IDB; do not
-resume automatically or start another subsystem without a new user request.
+The earlier stop-for-day boundary was explicitly resumed by subsequent user
+requests. Continue with bounded, evidence-backed static reconstruction as
+directed; preserve saved source and IDB state, and do not execute or patch the
+sample. No recurring session automation is configured. Overall reconstruction
+remains incomplete.

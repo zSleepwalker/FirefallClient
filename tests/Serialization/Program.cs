@@ -23,6 +23,52 @@ Check(Marshal.OffsetOf<SdbNativeMappedTableResult>(
 Check(Marshal.OffsetOf<SdbNativeMappedTableResult>(
     nameof(SdbNativeMappedTableResult.RefCountedHandlePointer32)).ToInt32() == 0x18,
     "Native result stores refcounted handle at +0x18");
+Check(Marshal.SizeOf<SdbNativeCatalogOpaqueFields>() == 0x08,
+    "Native catalog opaque tail size");
+Check(Marshal.OffsetOf<SdbNativeCatalogOpaqueFields>(
+    nameof(SdbNativeCatalogOpaqueFields.Field28Raw32)).ToInt32() == 0,
+    "Native catalog opaque field +0x28 offset");
+Check(Marshal.OffsetOf<SdbNativeCatalogOpaqueFields>(
+    nameof(SdbNativeCatalogOpaqueFields.Field2CRaw32)).ToInt32() == 4,
+    "Native catalog opaque field +0x2C offset");
+Check(Marshal.SizeOf<SdbNativeDatabaseTree28Member32>() == 0x08,
+    "Native database +0x28 tree member size");
+Check(Marshal.OffsetOf<SdbNativeDatabaseTree28Member32>(
+    nameof(SdbNativeDatabaseTree28Member32.HeaderPointer32)).ToInt32() == 0
+    && Marshal.OffsetOf<SdbNativeDatabaseTree28Member32>(
+        nameof(SdbNativeDatabaseTree28Member32.EntryCount)).ToInt32() == 4,
+    "Native database +0x28 tree member pointer/count offsets");
+Check(Marshal.SizeOf<SdbNativeDatabaseTree28Header32>() == 0x18
+    && Marshal.OffsetOf<SdbNativeDatabaseTree28Header32>(
+        nameof(SdbNativeDatabaseTree28Header32.RootNodePointer32)).ToInt32() == 4
+    && Marshal.OffsetOf<SdbNativeDatabaseTree28Header32>(
+        nameof(SdbNativeDatabaseTree28Header32.SentinelMarker)).ToInt32() == 0x0D,
+    "Native database +0x28 tree header size and offsets");
+Check(Marshal.SizeOf<SdbNativeDatabaseTree28Node32>() == 0x18
+    && Marshal.OffsetOf<SdbNativeDatabaseTree28Node32>(
+        nameof(SdbNativeDatabaseTree28Node32.Key32)).ToInt32() == 0x10
+    && Marshal.OffsetOf<SdbNativeDatabaseTree28Node32>(
+        nameof(SdbNativeDatabaseTree28Node32.ValuePointer32)).ToInt32() == 0x14
+    && Marshal.OffsetOf<SdbNativeDatabaseTree28Node32>(
+        nameof(SdbNativeDatabaseTree28Node32.SentinelMarker)).ToInt32() == 0x0D,
+    "Native database +0x28 tree node size and fields");
+Check(SdbNativeDatabaseTree28Layout.DatabaseMemberOffset == 0x28
+    && SdbNativeDatabaseTree28Layout.DatabaseEntryCountOffset == 0x2C
+    && SdbNativeDatabaseTree28Layout.DatabaseValueReleaseGateOffset == 0x1C
+    && SdbNativeDatabaseTree28Layout.DatabaseBackingBufferPointerOffset == 0x20
+    && SdbNativeDatabaseTree28Layout.DatabaseBackingBufferLengthOffset == 0x24
+    && SdbNativeDatabaseTree28Layout.DatabaseLookupContextPointerOffset == 0x30
+    && SdbNativeDatabaseTree28Layout.NodeKeyOffset == 0x10
+    && SdbNativeDatabaseTree28Layout.NodeValuePointerOffset == 0x14
+    && SdbNativeDatabaseTree28Layout.InitializerFileOffset == 0x130FCB0
+    && SdbNativeDatabaseTree28Layout.HeaderCreateFileOffset == 0x1314980
+    && SdbNativeDatabaseTree28Layout.LookupFileOffset == 0x13125F0
+    && SdbNativeDatabaseTree28Layout.KeyAndValueCallerFileOffset == 0x13122D0
+    && SdbNativeDatabaseTree28Layout.NodeCreateFileOffset == 0x1316120
+    && SdbNativeDatabaseTree28Layout.InsertFileOffset == 0x1316150
+    && SdbNativeDatabaseTree28Layout.ResetFileOffset == 0x1312030
+    && SdbNativeDatabaseTree28Layout.DestructorFileOffset == 0x130FE30,
+    "Native database +0x28 auxiliary tree offsets and call boundaries");
 
 var mt = new SdbCipher.Mt19937(5489);
 Check(mt.Next() == 3499211612u, "MT19937 reference vector #1");

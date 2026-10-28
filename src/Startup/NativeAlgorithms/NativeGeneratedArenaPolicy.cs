@@ -12,18 +12,28 @@ public readonly record struct NativeGeneratedArenaSelection(
 public readonly record struct NativeGeneratedArenaReuse(
     uint PayloadAddress, uint RetainedBlockSize, NativeGeneratedArenaFreeBlock? Remainder);
 
-/// <summary>Numerical arena request/search/split projection only. No locks, VirtualAlloc, native writes or releases.</summary>
+/// <summary>
+/// Numerical arena request/search/split projection only. The observed block-return
+/// path does not coalesce blocks or release whole regions; no native operations
+/// are performed by this model.
+/// </summary>
 public static class NativeGeneratedArenaPolicy
 {
     public const uint AllocateFileOffset = 0x1250F90;
     public const uint FindBestFitFileOffset = 0x1251050;
     public const uint AllocateRegionFileOffset = 0x12510F0;
     public const uint ReturnBlockFileOffset = 0x1251160;
+    public const uint FreeListNodeInsertFileOffset = 0x1251BD0;
+    public const uint FreeListNodeAllocateFileOffset = 0x1251900;
+    public const uint GeneralAllocatorReleaseFileOffset = 0x12C8D60;
+    public const uint VirtualFreeImportSlotVirtualAddress = 0x1AC42B4;
     public const uint HeaderSize = 16;
     public const uint MinimumSplitRemainder = 32;
     public const uint LargeListOffset = 100;
     public const uint NativeReserveAndCommit = 0x3000;
     public const uint NativePageExecuteReadWrite = 0x40;
+    public const bool ObservedReturnBlockPathCoalescesBlocks = false;
+    public const bool ObservedReturnBlockPathReleasesWholeRegion = false;
 
     public static NativeGeneratedArenaRequest ProjectRequest(uint payloadLength)
     {

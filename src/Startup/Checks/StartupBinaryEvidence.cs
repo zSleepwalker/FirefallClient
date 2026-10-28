@@ -50,6 +50,14 @@ internal static class StartupBinaryEvidence
             return ReadAt(VirtualAddressToFileOffset(checked(imageBase + hintNameRva)) + 2, name.Length)
                 .SequenceEqual(name);
         }
+        string ReadCStringAscii(uint virtualAddress, int maximumLength)
+        {
+            byte[] bytes = ReadAt(VirtualAddressToFileOffset(virtualAddress), maximumLength);
+            int terminator = Array.IndexOf(bytes, (byte)0);
+            if (terminator < 0)
+                throw new InvalidDataException($"String at VA {virtualAddress:X8} has no terminator in the bounded read.");
+            return Encoding.ASCII.GetString(bytes, 0, terminator);
+        }
         bool DecodedAdapterLiteral(uint address, int length, int step, int direction, byte key, string expected)
         {
             byte[] bytes = ReadAt(VirtualAddressToFileOffset(address), length);
@@ -93,6 +101,48 @@ internal static class StartupBinaryEvidence
         check("Binary native MD5 padding starts80 then63 zero bytes",
             ReadAt(VirtualAddressToFileOffset(0x1C0E4A0), 64)
                 .SequenceEqual(new byte[] { 0x80 }.Concat(new byte[63])));
+        const uint sdbCatalogEntryCount = 0x23F;
+        const uint sdbCatalogEntryArrayVirtualAddress = 0x1DD9EF0;
+        int sdbCatalogHexPairs = 0;
+        bool sdbCatalogExceptionsMatch = true;
+        if (sdbCatalogExceptionsMatch)
+        {
+            long entryArrayOffset = VirtualAddressToFileOffset(sdbCatalogEntryArrayVirtualAddress);
+            for (uint index = 0; index < sdbCatalogEntryCount; index++)
+            {
+                uint entryVirtualAddress = ReadUInt32(entryArrayOffset + index * 4);
+                long entryOffset = VirtualAddressToFileOffset(entryVirtualAddress);
+                uint field28VirtualAddress = ReadUInt32(entryOffset + 0x28);
+                uint field2CRaw = ReadUInt32(entryOffset + 0x2C);
+                if (index == 10)
+                {
+                    sdbCatalogExceptionsMatch &= ReadUInt32(entryOffset + 4) == 0x69CE585D
+                        && ReadCStringAscii(field28VirtualAddress, 16) == "hands"
+                        && ReadCStringAscii(field2CRaw, 16) == "backpack";
+                }
+                else if (index == 19)
+                {
+                    sdbCatalogExceptionsMatch &= ReadUInt32(entryOffset + 4) == 0xFDA606A8
+                        && field28VirtualAddress == uint.MaxValue
+                        && field2CRaw == uint.MaxValue;
+                }
+                else
+                {
+                    string text = ReadCStringAscii(field28VirtualAddress, 16);
+                    uint parsed = 0;
+                    bool parsedAsHex = text.Length == 10
+                        && text.StartsWith("0x", StringComparison.Ordinal)
+                        && uint.TryParse(text.AsSpan(2), System.Globalization.NumberStyles.HexNumber,
+                            System.Globalization.CultureInfo.InvariantCulture, out parsed);
+                    if (parsedAsHex && parsed == field2CRaw)
+                        sdbCatalogHexPairs++;
+                    else
+                        sdbCatalogExceptionsMatch = false;
+                }
+            }
+        }
+        check("Binary compiled SDB catalog tail has573 hex-string/DWORD pairs and two distinct exceptions",
+            sdbCatalogExceptionsMatch && sdbCatalogHexPairs == 573);
         check("Binary synchronization mode0 reads two DWORDs before requiring key1 and second DWORD8",
             Matches(0x124E6F5, "E82684FBFF")
             && Matches(0x124E705, "E81684FBFF")
@@ -414,8 +464,9 @@ internal static class StartupBinaryEvidence
                 == "7A953CCD5ECC8A51B85F6F80B9943BC34F0121ECAAFC0888C344D2494319C591"
             && Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(ReadAt(0x1257690, 0x82)))
                 == "23106B19B3AF7EFAE7F0FF141AF284669EC540764709DD81277FFB3D8314BA2F");
-        check("Binary generated arena import slots resolve VirtualAlloc and critical-section functions from original PE data",
+        check("Binary generated arena import slots resolve VirtualAlloc, VirtualFree and critical-section functions from original PE data",
             ImportSlotNames(0x1AC42B8, "VirtualAlloc")
+            && ImportSlotNames(NativeGeneratedArenaPolicy.VirtualFreeImportSlotVirtualAddress, "VirtualFree")
             && ImportSlotNames(0x1AC4278, "EnterCriticalSection")
             && ImportSlotNames(0x1AC427C, "LeaveCriticalSection")
             && ImportSlotNames(0x1AC4280, "InitializeCriticalSection"));
@@ -433,6 +484,76 @@ internal static class StartupBinaryEvidence
         check("Binary direct provider callback calls and following reload/queue-lock preparation preserve original bytes",
             Matches(NativeGeneratedProviderLifetimePlan.IncomingCallbackCallFileOffset, "FFD08B4D0C")
             && Matches(NativeGeneratedProviderLifetimePlan.OutgoingCallbackCallFileOffset, "FFD08D73045689750C"));
+        check("Binary tagged reference release routes shared-text nodes back through the allocator free stack",
+            Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(ReadAt(0x424790, 0x70)))
+                == "3093A4B83C89492FD5BDCFF60B76545C46E557E345CA85E35F123E731D319341"
+            && Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(ReadAt(0x12B9F70, 0x40)))
+                == "9F3358793B48E00216CE459ED698CB4DC5B3A4CDD89D9EFBC47F4C7A845AFCBC"
+            && Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(ReadAt(0x12CDEC0, 0x3F)))
+                == "6ABFCE0731ADC2584EB89DF9F08D1D68D683F9F3AFD02E1B7627956EC605DF7E"
+            && Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(ReadAt(0x12CDA60, 0x76)))
+                == "C83EC17B90BB2FA55931A1EBED457B34A2E5780F1C473C356E1623F4F577D89B");
+        check("Binary tfWorld nested value cleanup and tree-like node removal helpers match bounded original regions",
+            Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(ReadAt(0x975020, 0x1A2)))
+                == "6E8A75F6021DCA0B3CB1885E22A7B05C4BA722A0406EFE889F91D8476ADA56F5"
+            && Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(ReadAt(0x9751F0, 0xE0)))
+                == "812F8349E49CC6827FE4147BFB4FEB90DEF84B8758AA9F7CC799C31097ADC00B"
+            && Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(ReadAt(0x88AD60, 0xD4)))
+                == "17B206C911AE9E0BFB14382797912173C7E26934585FB046578EA41C7B1ED5D6"
+            && Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(ReadAt(0x97AE50, 0x9E)))
+                == "4A663C923CE53A8403E231B78C27314E47CF6307320477F85757C1D7A508762F"
+            && Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(ReadAt(0x97AA70, 0x9E)))
+                == "B9B051B9EFDA64096D84B820CE5B9E41B6089421F3CC9835C551D15CDEBDF3FB"
+            && Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(ReadAt(0x97BCC0, 0x244)))
+                == "30D11055E73D913F94C64B4643F05E1E47AE3E62D46C4A54B32195BDED8FD046"
+            && Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(ReadAt(0x978440, 0x244)))
+                == "9DECBA672F9DD47999DB2BF80EC5C529511B24CDA9BFE6F33C6CC918D439C28E"
+            && Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(ReadAt(0x979A20, 0x6B)))
+                == "5A9B857CDFB3368824B4B826DF005D2DE7DEFB91591FCCF9D63EDCE08D891F9F");
+        check("Binary tfWorld nested range clear, recursive node release and partial erase paths match bounded original regions",
+            Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(ReadAt(0x3F72C0, 0x35)))
+                == "2ADD837001B16E0E30F0779D61FB1B7BAA1E5D36A8F5A851CF25CC0DC794B2C7"
+            && Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(ReadAt(0x3F7300, 0x46)))
+                == "39F204C0CD7BFDD2CEEF661252A4EAF5014B0AD2803C998E3BE8AE304F3CECA0"
+            && Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(ReadAt(0x3F7430, 0x244)))
+                == "08C2BB5951A49BEA1637A5E7EF5731BB1454FB2C3A32068F644617D80471F361"
+            && Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(ReadAt(0x3F7680, 0x9E)))
+                == "6389E2C2AB9B68C09A7A66781F0D886C8AAAA2EE64DE39B5D290A6234CC15AFA"
+            && Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(ReadAt(0x9795B0, 0x59)))
+                == "540EB0C3C7269115BA5035092FF7384236DA5F2E56A93C134BA8A7D1398D30A4");
+        check("Binary alternate nested cleanup callers pass the same value slot with distinct null/pending guards",
+            Matches(0x976248, "8B46108945F085C0740F")
+            && Matches(TfWorldZoneCleanupNativeLayout.CleanupAdditionalValueCallerOneCallFileOffset, "E8C7EDFFFF")
+            && Matches(0x977F3F, "8B7E1057E8D8FEFFFF")
+            && Matches(0x977F55, "837F0400741B")
+            && Matches(TfWorldZoneCleanupNativeLayout.CleanupAdditionalValueCallerTwoCallFileOffset, "E8A3D0FFFF")
+            && Matches(TfWorldZoneCleanupNativeLayout.CleanupAdditionalValueCallerTwoWaitCallFileOffset, "E8C0F6FFFF")
+            && Matches(TfWorldZoneCleanupNativeLayout.CleanupAdditionalValueCallerTwoWaitRemovalCallFileOffset, "E8150D0000")
+            && Matches(0x977F70, "837F040075EA")
+            && Matches(0x978672, "48894304")
+            && Matches(TfWorldZoneCleanupNativeLayout.CleanupAdditionalValuePreCleanEventPushFileOffset,
+                "68690100008B01FF90AC000000"));
+        check("Binary tfWorld cleanup caller and guarded auxiliary dispatch match bounded original regions",
+            Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(ReadAt(0x64E210, 0x1AC)))
+                == "61E33C4847FE9313EA4C44AAC375DAC1523F5D3E4B73C20C903BF61ADD91101A"
+            && Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(ReadAt(0x494B00, 0xE6)))
+                == "CDA2F6536AA971DD4CA77E86D123B0C654F7798251D80C0C918DBCDBF86213AF"
+            && Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(ReadAt(0x369A30, 0x99)))
+                == "4D91FFD1C67674BD5873134DDE1D90E67EB3BAF23629A0BBF772A27863DE56D5"
+            && Matches(TfWorldZoneCleanupNativeLayout.EnteredZoneCleanupCallFileOffset, "E82E961B00")
+            && Matches(0x64E275, "E8B6B7D1FF")
+            && Matches(0x64E3B3, "C683F102000000"));
+        check("Binary released-object +0x32C pointer is runtime-produced and invoked through vtable slot zero",
+            Matches(TfWorldZoneCleanupNativeLayout.ReleasedObjectCleanupVirtualPointerInitializeFileOffset,
+                "C7832C03000000000000")
+            && Matches(TfWorldZoneCleanupNativeLayout.ReleasedObjectCleanupVirtualPointerFactoryCallFileOffset,
+                "FF5040F6450C0289872C030000")
+            && Matches(0x8610C4, "8B016A01FF10"));
+        check("Binary released-object manager cleanup and nested resource release match original functions",
+            Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(ReadAt(0x861020, 0xCA)))
+                == "A6CB493C6F27860DE8EFE93DD75E92BAC0D2EA647B424A3D5FB8B37C5F1B67C9"
+            && Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(ReadAt(0xD74A20, 0x1B3)))
+                == "913650BB63D692EB3218F46F5ACAFA458F064A1E770A5313A4C64B1A26D0524C");
         check("Binary mode1 direct/compressed scale tables preserve original PE targets and byte-index mapping",
             Matches(0x129A4C1, "FF248584B16901")
             && Matches(0x129A584, "C8B06901CDB06901E4B06901D7B06901E4B06901E4B06901E4B06901E1B06901")

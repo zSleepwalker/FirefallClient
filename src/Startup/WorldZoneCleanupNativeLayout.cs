@@ -1,15 +1,32 @@
 namespace Firefall.Reconstruction.Startup;
 
 /// <summary>
-/// Proven offsets and call boundaries in tfWorld's zone cleanup. Resource
-/// identities, ownership internals and indirect mode transitions remain unresolved.
+/// Proven offsets and call boundaries in tfWorld's zone cleanup. Some subordinate
+/// cleanup and nested reference-release behavior is known; resource identities,
+/// general ownership and indirect mode transitions remain unresolved.
 /// </summary>
 public static class TfWorldZoneCleanupNativeLayout
 {
     public const uint MethodFileOffset = 0x64E210;
+    public const uint EnteredZoneCleanupCallerFileOffset = 0x494B00;
+    public const uint EnteredZoneCleanupCallFileOffset = 0x494BDD;
+    public const uint CleanupGuardedMetadataLookupMethodFileOffset = 0x1010AC0;
+    public const uint CleanupGuardedRecordDispatchMethodFileOffset = 0x369A30;
+    public const uint CleanupGuardedRecordDispatchTargetFileOffset = 0x101D710;
+    public const uint CleanupGuardedMetadataLookupIndex = 0x6A;
     public const uint ConnectionCleanupMethodFileOffset = 0x494A40;
+    public const uint ConnectionCleanupCallFileOffset = 0x64E27D;
     public const int ConnectionPointerOffset = 0x10;
+    public const int ConnectionStateFieldOffset = 0x0C;
+    /// <summary>
+    /// State value checked by an assertion in the native helper; the visible
+    /// mismatch path rejoins cleanup, so this is not a proven execution gate.
+    /// </summary>
     public const int RequiredConnectionState = 5;
+    public const int ConnectionDownstreamPointerOffset = 0x910;
+    public const int DownstreamActionPointerOffset = 0x08;
+    public const uint ConnectionDownstreamHelperFileOffset = 0x7FEB50;
+    public const uint DownstreamHelperCallFileOffset = 0x494AB9;
     public const uint RuntimeMessageId = 97;
     public const int RuntimeReceiverVirtualOffset = 0xAC;
     public const int Byte2F1Offset = 0x2F1;
@@ -24,12 +41,129 @@ public static class TfWorldZoneCleanupNativeLayout
     public const int ModeObjectMember78Offset = 0x78;
     public const int Member78RequiredPointerOffset = 0x10;
     public const uint Member78CleanupMethodFileOffset = 0x976430;
+    public const int CleanupFirstListHeadOffset = 0x20;
+    public const int CleanupFirstNodeForwardOffset = 0x00;
+    public const int CleanupFirstNodeValuePointerOffset = 0x10;
+    public const int CleanupFirstListResetWordOffset = 0x24;
+    public const uint CleanupFirstNodeHelperFileOffset = 0x977E20;
+    public const uint CleanupFirstValueHelperFileOffset = 0x975020;
+    public const int CleanupSecondListHeadOffset = 0x00;
+    public const int CleanupSecondNodeForwardOffset = 0x00;
+    public const int CleanupSecondNodeDataOffset = 0x10;
+    public const int CleanupSecondNodePayloadOffset = 0x20;
+    public const int CleanupSecondListResetWordOffset = 0x04;
+    public const uint CleanupSecondNodeHelperFileOffset = 0x976D30;
+    public const uint CleanupSecondListHelperFileOffset = 0x9795B0;
+    public const uint CleanupSecondNestedRangeCleanupHelperFileOffset = 0x3F7680;
+    public const uint CleanupSecondNestedRangeWholeTreeClearHelperFileOffset = 0x3F7300;
+    public const uint CleanupSecondNestedRangeItemHelperFileOffset = 0x3F7430;
+    public const uint CleanupSecondNestedRangeRecursiveNodeHelperFileOffset = 0x3F72C0;
+    public const int CleanupSecondNodeNestedRangeOffset = 0x20;
+    public const int CleanupSecondNodeNestedRangeCountOffset = 0x24;
+    public const int CleanupSecondNestedRangeTreeHeaderFirstLinkOffset = 0x00;
+    public const int CleanupSecondNestedRangeTreeHeaderSecondLinkOffset = 0x04;
+    public const int CleanupSecondNestedRangeTreeHeaderThirdLinkOffset = 0x08;
+    public const int CleanupSecondNestedRangeNodeForwardLinkOffset = 0x00;
+    public const int CleanupSecondNestedRangeNodeRecursiveChildOffset = 0x08;
+    public const int CleanupSecondNestedRangeNodeSentinelByteOffset = 0x0D;
+    public const uint CleanupNestedValueMethodFileOffset = 0x975020;
+    public const uint CleanupAdditionalValueCallerOneFileOffset = 0x976200;
+    public const uint CleanupAdditionalValueCallerOneCallFileOffset = 0x976254;
+    public const uint CleanupAdditionalValueCallerTwoFileOffset = 0x977F20;
+    public const uint CleanupAdditionalValueCallerTwoCallFileOffset = 0x977F78;
+    public const int CleanupAdditionalValueCallerTwoGuardWordOffset = 0x04;
+    public const uint CleanupAdditionalValueCallerTwoWaitHelperFileOffset = 0x977630;
+    public const uint CleanupAdditionalValueCallerTwoWaitCallFileOffset = 0x977F6B;
+    public const uint CleanupAdditionalValueCallerTwoWaitRemovalCallFileOffset = 0x977726;
+    public const uint CleanupAdditionalValueCallerTwoGuardDecrementFileOffset = 0x978673;
+    public const uint CleanupAdditionalValuePreCleanVirtualCallFileOffset = 0x977ECC;
+    public const uint CleanupAdditionalValuePreCleanEventPushFileOffset = 0x977EC5;
+    public const int CleanupAdditionalValuePreCleanVirtualSlotOffset = 0xAC;
+    public const uint CleanupAdditionalValuePreCleanEventId = 0x169;
+    public const int CleanupNestedValueFirstTreeHeadOffset = 0x08;
+    public const int CleanupNestedValueSecondTreeHeadOffset = 0x00;
+    public const int CleanupNestedValueFirstTreeEntryPointerOffset = 0x14;
+    public const int CleanupNestedValueSecondTreeEntryPointerOffset = 0x18;
+    public const int CleanupNestedValueSharedTextPointerOffset = 0x18;
+    public const int CleanupNestedValueSpanRangeOffset = 0x10;
+    public const int CleanupNestedValueSpanElementStride = 24;
+    public const uint CleanupNestedValueFirstEntryHelperFileOffset = 0x9751F0;
+    public const uint CleanupNestedValueSecondEntryHelperFileOffset = 0x88AD60;
+    public const uint CleanupNestedValueFirstTreeClearFileOffset = 0x97AE50;
+    public const uint CleanupNestedValueSecondTreeClearFileOffset = 0x97AA70;
+    public const uint CleanupNestedValueFirstTreeRemoveNodeFileOffset = 0x97BCC0;
+    public const uint CleanupNestedValueSecondTreeRemoveNodeFileOffset = 0x978440;
+    public const uint CleanupNestedValueSpanRangeReleaseFileOffset = 0x979A20;
+    public const int CleanupNestedEntrySharedTextPointerAOffset = 0x04;
+    public const int CleanupNestedEntrySharedTextPointerBOffset = 0x08;
+    public const int CleanupNestedEntrySpanRangeOffset = 0x10;
+    public const int CleanupNestedTreeNodeLeftPointerOffset = 0x00;
+    public const int CleanupNestedTreeNodeParentPointerOffset = 0x04;
+    public const int CleanupNestedTreeNodeRightPointerOffset = 0x08;
+    public const int CleanupNestedTreeNodeColorByteOffset = 0x0C;
+    public const int CleanupNestedTreeNodeSentinelByteOffset = 0x0D;
+    public const int CleanupFirstRangeStartOffset = 0x28;
+    public const int CleanupFirstRangeEndOffset = 0x2C;
+    public const uint CleanupFirstRangeHelperFileOffset = 0x97CBB0;
+    public const int CleanupSecondRangeStartOffset = 0x08;
+    public const int CleanupSecondRangeEndOffset = 0x0C;
+    public const uint CleanupSecondRangeHelperFileOffset = 0x97C690;
+    public const int CleanupRangeBeginPointerOffset = 0x00;
+    public const int CleanupRangeEndPointerOffset = 0x04;
+    public const int CleanupRangeCapacityEndPointerOffset = 0x08;
+    public const int CleanupRangeRequestedCount = 0x10;
+    public const int CleanupRangeElementStride = 4;
+    public const bool CleanupRangeHelpersMayReplaceBackingStorage = true;
+    public const int CleanupFirstRangePostValueOffset = 0x34;
+    public const int CleanupFirstRangePostCountOffset = 0x38;
+    public const int CleanupSecondRangePostValueOffset = 0x14;
+    public const int CleanupSecondRangePostCountOffset = 0x18;
+    public const int CleanupRangePostValue = 7;
+    public const int CleanupRangePostCount = 8;
     public const int ModeObjectMember50Offset = 0x50;
     public const int Member50ClearedByteOffset = 0x1AB;
     public const int Member50SetByteOffset = 0x1A9;
     public const int LocalClientMember4Offset = 4;
     public const int LocalClientReleasedPointerOffset = 0x5590;
     public const uint ReleasedObjectCleanupMethodFileOffset = 0x861020;
+    public const uint ReleasedObjectCleanupManagerCallFileOffset = 0x8610B5;
+    public const int ReleasedObjectCleanupRecordPointerOffset = 0x328;
+    public const int ReleasedObjectCleanupVirtualPointerOffset = 0x32C;
+    public const uint ReleasedObjectCleanupVirtualPointerInitializeFileOffset = 0x8602CD;
+    public const uint ReleasedObjectCleanupVirtualPointerProviderFileOffset = 0x860810;
+    public const uint ReleasedObjectCleanupVirtualPointerFactoryCallFileOffset = 0x860F6F;
+    public const uint ReleasedObjectCleanupVirtualPointerStoreFileOffset = 0x860F76;
+    public const uint ReleasedObjectCleanupVirtualPointerCallFileOffset = 0x8610C8;
+    public const int ReleasedObjectCleanupVirtualPointerVtableSlotOffset = 0;
+    public const int ReleasedObjectCleanupVirtualPointerCallArgument = 1;
+    public const uint ReleasedObjectResourceManagerCleanupMethodFileOffset = 0xD74A20;
+    public const int ReleasedObjectCleanupRecordLeadingDword = 0x3C8;
+    public const int ReleasedObjectCleanupRecordTokenOffset = 0x398;
+    public const int ReleasedObjectCleanupRecordManagerStateByteOffset = 0x39C;
+    public const int CleanupResourceManagerStateByteOffset = 0x04;
+    public const int CleanupResourceManagerLockOffset = 0x38;
+    public const int CleanupResourceManagerActivityCountOffset = 0x68;
+    public const int CleanupResourceManagerTokenArrayBeginPointerOffset = 0xB8;
+    public const int CleanupResourceManagerTokenArrayEndPointerOffset = 0xBC;
+    public const uint CleanupResourceManagerGlobalPointerVirtualAddress = 0x1DFFD98;
+    public const int CleanupResourceManagerGlobalHolderOffset = 0xB98;
+    public const int CleanupResourceManagerGetterVirtualOffset = 0x24;
+    public const int CleanupResourceManagerResultMemberOffset = 0x0C;
+    public const uint CleanupResourceManagerTokenHookFileOffset = 0xD935F0;
+    public const uint CleanupResourceManagerPostRemovalHelperFileOffset = 0xD78900;
+    public const uint LocalClientResetMethodFileOffset = 0x4A2FB0;
+    public const uint LocalClientMember4ResetMethodFileOffset = 0x431C90;
+    public const uint ReferenceReleaseHelperFileOffset = 0x424790;
+    public const uint ReferenceReleaseHelperCallFileOffset = 0x8610D4;
+    public const int ReleasedObjectReferencePointerOffset = 0x320;
+    public const int ReferenceAllocationTagOffsetFromPayload = -8;
+    public const int ReferenceAllocationCountOffsetFromPayload = -4;
+    public const ushort SharedTextAllocatorNodeTag = 0x17;
+    public const uint SharedTextAllocatorSingletonMethodFileOffset = 0x12B9F70;
+    public const uint SharedTextAllocatorNodeReleaseMethodFileOffset = 0x12CDEC0;
+    public const uint SharedTextAllocatorNodePushMethodFileOffset = 0x12CDA60;
+    public const uint SharedTextAllocatorNodeReleaseCallFileOffset = 0x4247C2;
+    public const int SharedTextAllocatorNodeReferenceCountOffset = 0x10;
 
     public static bool SelectObserverCall(uint word08, uint word0C, uint word120, uint word124) =>
         word08 == word120 && word0C == word124;
