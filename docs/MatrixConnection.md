@@ -1020,7 +1020,7 @@ factory/callback ABI remain unresolved.
 `MatrixOtherChannelDecoderNativeLayout.cs` records dispatch only, not a
 replacement decoder.
 
-## Secondary command dispatcher and six verified class cases
+## Secondary command dispatcher and seven verified class cases
 
 The secondary-dispatch target `0x81CC50` is a large raw function
 (`0x4B9E` bytes) with two separate selector tables. It reads a leading byte
@@ -1047,14 +1047,14 @@ selector range return zero. Leading bytes `0x36..0xEF` also reach the
 zero-return path. These are dispatch boundaries only; the inputs’ semantic
 names and the 91 secondary targets are unresolved.
 
-Six nested selectors are mapped: route0 block `0x81CCAD` dispatches selector
+Seven nested selectors are mapped: route0 block `0x81CCAD` dispatches selector
 `0x53` through the table at VA `0xC22444` (raw `0x821844`) to raw case
 `0x81CCC3`. That case allocates `0x48` bytes, calls constructor `0x524C30`,
 then body reader `0x5F6B10`. Constructor RTTI identifies the object as
 `firefall::Character::MarketRequestComplete`. The reader stores, in order,
 a byte at object+`0x28`, raw QWORD at+`0x30`, byte at+`0x38`, and three
 NUL-terminated shared-text values at+`0x3C/+0x40/+0x44`. Field meanings
-remain unknown; these six selectors do not name the remaining table cases.
+remain unknown; these seven selectors do not name the remaining table cases.
 `MatrixSecondaryCommandDispatcherNativeLayout.cs` and
 `CharacterMarketRequestCompleteNativeLayout` preserve the route bounds and
 this bounded object layout without implementing a parser.
@@ -1177,6 +1177,28 @@ zeroes at `+0x30/+0x34` are overwritten by the QWORD read. Gaps at
 `+0x2A..+0x2F` and the final allocation bytes `+0x44..+0x47` are not written
 by this reader. Field meanings remain unknown; the RTTI name does not prove
 reward-related semantics.
+
+### Selector 0x59: `ProgressionXpRefresh`
+
+Entry6 maps selector `0x59` to VA `0xC1DA89` / raw case `0x81CE89`. It
+allocates `0x38` bytes, stores local DWORD `0x61` (role unknown), then calls
+constructor `0x5251B0` and reader `0x5F4170`. The constructor passes `0x59`
+to `0x5A06A0`, installs vtable VA `0x1C67228` (RTTI
+`firefall::Character::ProgressionXpRefresh`), and zeros the vector header at
+object `+0x28/+0x2C/+0x30`.
+
+The reader treats that header as begin/end/capacity pointers, resets end to
+begin, then reads count bytes. For each count it reads that many records of
+five raw DWORDs (`0x14` bytes each) and inserts them into the vector.
+`0x5200F0` copies the record as 16 bytes plus a DWORD and advances vector end
+by `0x14`. A count of `0xFF` reads 255 records and then causes another count
+byte; any count below `0xFF` terminates the sequence, with zero meaning no
+records in that block. Nominal input consumption is one count byte plus
+`count * 0x14` bytes per block. No per-reader cap on repeated `0xFF` blocks is
+established. The five DWORD meanings and the RTTI's semantic relation to
+progression remain unknown. `CharacterProgressionXpRefreshNativeLayout`
+records the vector header, record width, and count continuation marker
+without assigning field names or implementing a parser.
 
 ## Message35 application body
 

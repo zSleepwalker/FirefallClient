@@ -1056,6 +1056,22 @@ Check("RewardInfo selector 0x58 records its byte, QWORD, and DWORD fields",
     && CharacterRewardInfoNativeLayout.ReaderLastWrittenFieldEndOffset == 0x44
     && CharacterRewardInfoNativeLayout.ConstructorZeroedDwordField1Offset == 0x30
     && CharacterRewardInfoNativeLayout.ConstructorZeroedDwordField2Offset == 0x34);
+Check("ProgressionXpRefresh selector 0x59 records its count-blocked 20-byte vector",
+    CharacterProgressionXpRefreshNativeLayout.InnerSelector == 0x59
+    && CharacterProgressionXpRefreshNativeLayout.CaseFileOffset == 0x81CE89
+    && CharacterProgressionXpRefreshNativeLayout.CaseLocalDwordValue == 0x61
+    && CharacterProgressionXpRefreshNativeLayout.AllocationSize == 0x38
+    && CharacterProgressionXpRefreshNativeLayout.ConstructorFileOffset == 0x5251B0
+    && CharacterProgressionXpRefreshNativeLayout.BodyReaderFileOffset == 0x5F4170
+    && CharacterProgressionXpRefreshNativeLayout.RecordAppendFileOffset == 0x5200F0
+    && CharacterProgressionXpRefreshNativeLayout.VtableVirtualAddress == 0x1C67228
+    && CharacterProgressionXpRefreshNativeLayout.VectorBeginOffset == 0x28
+    && CharacterProgressionXpRefreshNativeLayout.VectorEndOffset == 0x2C
+    && CharacterProgressionXpRefreshNativeLayout.VectorCapacityOffset == 0x30
+    && CharacterProgressionXpRefreshNativeLayout.RecordDwordCount == 5
+    && CharacterProgressionXpRefreshNativeLayout.RecordByteCount == 0x14
+    && CharacterProgressionXpRefreshNativeLayout.CountFieldByteCount == 1
+    && CharacterProgressionXpRefreshNativeLayout.CountBlockRepeatMarker == 0xFF);
 Check("Shared channel-2/3 compact-code routing groups the observed native cases",
     Enumerable.Range(1, 6).All(code =>
         MatrixOtherChannelDecoderNativeLayout.SelectRoute(code)

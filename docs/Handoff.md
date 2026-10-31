@@ -1051,6 +1051,9 @@ These updates supersede older next-step suggestions below where they overlap.
   object offsets+0x28 through+0x36; their meanings are unknown.
   Selector0x58 constructs `RewardInfo` and reads two bytes, one QWORD, and
   three DWORDs at object offsets+0x28..+0x40; meanings remain unknown.
+  Selector0x59 constructs `ProgressionXpRefresh` and reads count-blocked
+  records of five raw DWORDs (20 bytes) into the vector at object+0x28; field
+  meanings remain unknown.
   Remaining case handlers, field meanings, and message semantics are open.
   RTTI names the results `nl::RoutedMessage` and
   `nl::RoutedMultipleMessage`; QWORD and message semantics remain unknown.
