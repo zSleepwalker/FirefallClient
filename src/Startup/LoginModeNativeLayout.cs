@@ -142,6 +142,13 @@ public static class LoginModeNativeLayout
     public const uint LoginMessageNotificationId = 0x146;
     public const uint AppModeLoginCtorCallArgumentsFileOffset = 0x30DC12;
     public const int AppModeLoginCtorCellOffsetInApp = 0x9E8;
+    // Observed: the only App+0x9E8 stores are the ctor/mode-apply zeroing sites; the App dtor
+    // funclet releases App+0x9E8 through a {ptr, refcount-block} release helper.
+    public const uint AppCtorCellZeroFileOffset = 0x303104;
+    public const uint AppModeApplyCellZeroFileOffset = 0x30DB8A;
+    public const uint AppDtorCellReleaseFileOffset = 0x16000E9;
+    public const uint RefCountedCellReleaseHelperFileOffset = 0x636B30;
+    public const uint AppModeLoginCellPassedToOtherModeCtorsFileOffset = 0x30DAF7;
     public const uint LoginUpdateGuardGlobalVa = 0x1E5CAA4;
     public const uint LoginUpdateGuardByteOffset = 0x40;
     public const uint LoginUpdateGuardReadFileOffset = 0x638ABC;

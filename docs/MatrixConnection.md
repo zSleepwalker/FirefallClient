@@ -3205,6 +3205,28 @@ write was performed.
 - `+0x20` is a pointer to a single-slot cell holding one polymorphic node
   pointer, not a node list; the "list" reading is not supported. Selector
   case 1 is the only provable name: "send text via notification 0x146".
+- **Producer search pass 2 (observation, bytes checked against `.original`):**
+  a displacement-`0x9E8` byte scan of `.text` found only these App-class
+  sites: ctor zeroing `0x303104` (`C787E8090000 00000000`, `+0x9EC` at
+  `0x30310E`), mode-apply clear `0x30DB8A`, reads `push [esi+9E8h]` at
+  `0x30DAF7`/`0x30DB6F` (value passed as arg to two other mode ctors
+  `0xA5AD90`/`0xA4BA40`), the `lea` at `0x30DC18` (tfLogin ctor), and the
+  App dtor funclet `0x16000E9` (`add ecx,9E8h; jmp 0xA37730`). Other
+  `+0x9E8` hits (`0x543488`, `0x54B1C6`, `0x636802`, `0x8E1296`,
+  `0xB5C457`, `0xB619C7`, `0xBFADA1`, `0xD4032D`, ...) belong to other
+  classes (different surrounding fields), not App.
+- `0xA37730` (raw `0x636B30`) is a ref-counted release: `ctrl=[ecx+4]`;
+  `lock xadd [ctrl+4],-1` -> `call [ctrl_vtbl+0]`; `lock xadd [ctrl+8],-1`
+  -> `jmp [ctrl_vtbl+4]`. Interpretation: App+0x9E8/+0x9EC is a
+  shared_ptr-like `{ptr, ctrl}` pair, so `[cell]` is the managed pointer.
+- tfLogin methods only read `[this+0x20]` (`0x638897`, `0x6388C5`; the
+  init path at `0x63694D..0x636970` asserts the cell pointer and `[cell]`
+  are non-null/empty, lines `0x117/0x118/0x119`); none store through it.
+  Node class/vtable/size, selector values and the triggering event remain
+  **unproven**: the producer must reach the cell by an indirect path
+  (SIB/computed address or a shared_ptr assignment helper) that the
+  displacement scan does not cover. Next step: xrefs to `0xA371B0`'s
+  arg3 (`App+0xBE4`) and shared_ptr assign helpers with `App` as target.
 - No producer of nodes was found: no writer of `App+0x9E8` besides the
   zeroing sites above, and `Login_HandleLoginResponse` was not traced to a
   node store. Selectors 0/2/3/4 and per-producer values remain unproven.

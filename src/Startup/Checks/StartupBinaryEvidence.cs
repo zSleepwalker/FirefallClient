@@ -894,6 +894,15 @@ internal static class StartupBinaryEvidence
                 "8B4E1C85C974068B016A01FF1083BE480A000006C7461C0000000075")
             && Matches(LoginModeNativeLayout.AppModeLoginCtorCallArgumentsFileOffset,
                 "FFB6280A00008D86E809000050E88C893200EB"));
+        check("Binary App+0x9E8 is a {ptr, refcount-block} cell: ctor/mode-apply zero it, dtor releases it, no other direct store",
+            Matches(LoginModeNativeLayout.AppCtorCellZeroFileOffset,
+                "C787E809000000000000C787EC09000000000000")
+            && Matches(LoginModeNativeLayout.AppModeApplyCellZeroFileOffset, "C786E809000000000000")
+            && Matches(LoginModeNativeLayout.AppDtorCellReleaseFileOffset,
+                "8B4DF081C1E8090000E9396A03FF")
+            && Matches(LoginModeNativeLayout.RefCountedCellReleaseHelperFileOffset,
+                "568B710485F674295783CFFF8D4E048BC7F00FC10175198B068BCEFF108D4608F00FC1384F75098B068BCE5F5EFF6004")
+            && Matches(LoginModeNativeLayout.AppModeLoginCellPassedToOtherModeCtorsFileOffset, "FFB6E8090000"));
         check("Binary tfLogin update switch selects on [node+0xC] with a five-entry table (case1 -> message 0x146)",
             Matches(LoginModeNativeLayout.LoginUpdateSwitchSelectorLoadFileOffset,
                 "8B500C83FA040F87CF010000FF24951C99A300")
