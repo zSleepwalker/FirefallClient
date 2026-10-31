@@ -104,6 +104,13 @@ public static class SceneFactoryNativeLayout
     public const string SceneRegistryFullMessage = "Too many scenes were allocated.  Max is %i\n";
     public const int RenderApiShutdownResetFileOffset = 0xED196B;
     public const int RenderApiShutdownDeleteFileOffset = 0xED194C;
+    public const int RenderApiInitializeFileOffset = 0xED1650;
+    public const int RenderApiInitializeVtableOffset = 0x34;
+    public const int RenderApiFailedInitMessageVirtualAddress = 0x1BE934C;
+    public const int RenderSystemShutdownFileOffset = 0xED1A10;
+    public const int RenderSystemShutdownVtableOffset = 0x38;
+    public const int RenderSystemShutdownPlaceholderStoreFileOffset = 0xED1AC4;
+    public const int RenderApiInitializedFlagVirtualAddress = 0x1E49B7F;
     public const int RenderApiStaticPlaceholderVirtualAddress = 0x1E72DF8;
     public const int SceneRegistryTableVirtualAddress = 0x1EDACD8;
     public const int SceneRegistryCapacity = 32;

@@ -3231,3 +3231,38 @@ write was performed.
   zeroing sites above, and `Login_HandleLoginResponse` was not traced to a
   node store. Selectors 0/2/3/4 and per-producer values remain unproven.
   The `0x9E8` scans were displacement-byte matches and are not exhaustive.
+
+### Store at raw 0xED1AC4 and name-keyed registry search (static, read-only)
+
+**Observed** (bytes checked against `.original`; disassembled from the file image):
+
+- `0xED1AC4` = `C705FC05DE01F82DE701` = `mov [0x1DE05FC], 0x1E72DF8`, inside the
+  function starting at raw `0xED1A10` (`cmp byte [0x1E49B7F],0; push edi; mov
+  edi,ecx; je end`; `ret`). That function is `oRenderSystem` vtable slot `+0x38`
+  (vtable `0x1C7870C`: slot `+0x34`=`0xED1650`, `+0x38`=`0xED1A10`, `+0x3C`=
+  `0xE96380`). No direct call xrefs exist.
+- Body: thread check (`[0x1AC43B0]` vs `[0x1E49B24]`, assert-like call); virtual
+  call `[[0x1DE05FC]+0xC](0)`; `[[0x1DFE9C8]+4]()`; then for `0x1DE0608`,
+  `0x1DE0604`, `0x1DE0600`, `0x1DE05FC` in order: load old pointer, store the
+  placeholder (`0x1E61E0C`, `0x1E73230`, `0x1E730E0`, `0x1E72DF8`), and if the old
+  pointer was non-null call virtual slot 0 with arg 1. Then `esi=[edi+4]`,
+  the `0xED1AC4` store, `[0x1E49B7F]=0`, and if `esi` non-null `call 0x11F3650`,
+  `call 0x16C9960`; finally `[edi+4]=0`. Condition: runs only if the byte
+  `0x1E49B7F` (initialized flag) is non-zero.
+- `0xED196B` is in `0xED1650` (slot `+0x34`, the init that publishes the new API
+  at `0xED17DC`), in a block with the same four-object delete/placeholder
+  sequence, followed by a log with `"Failed to initialize \"%s\" rendering API\n"`
+  (VA `0x1BE934C`). Both stores write the same value `0x1E72DF8`.
+- Raw search for the VAs of `RenderScene`/`WorldMapScene`/`SinvironmentScene`
+  finds only the factory at `0x9B7D23/0x9B7D42/0x9B7D62`; no other code
+  references them.
+
+**Interpreted** (not proven): `0xED1AC4` is the render-system shutdown that
+resets the API pointer to the placeholder; this corrects the earlier guess that
+`0xED196B` is a shutdown: it is the init-failure rollback. The name-keyed
+"lookup" remains a create-by-name call (`0xF255A0`) with index registration;
+no name-keyed registry was found.
+
+**Unresolved**: callers of slot `+0x38`/`+0x34` (indirect); what the
+`0x1DE0600/04/08` objects are; readers of `oScene+8`; a binary-wide negative
+for name-keyed registries (only direct string refs were searched).

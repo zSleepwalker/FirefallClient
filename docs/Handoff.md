@@ -33,6 +33,8 @@ unknown; they are not evidence of generated-output region release.
 
 Latest tfLogin pass: update `0x6385C0` reads a single pointer cell (`this+0x20` = ctor arg1 = `App+0x9E8`), not a node list; selector case 1 sends message `0x146` with `node+0xC/+0x10` and virtual-deletes the node. Pass 2: `App+0x9E8/+0x9EC` looks like a shared_ptr-like `{ptr, ctrl}` (App dtor funclet `0x16000E9` -> release helper raw `0x636B30`); only direct stores are zeroing (`0x303104`, `0x30DB8A`), so node producers/class/selector names are still unproven (indirect path); evidence check added. Producers of the cell and cases 0/2/3/4 are unproven; see `docs\MatrixConnection.md`.
 
+Latest scene pass: raw `0xED1AC4` is the placeholder store (`0x1E72DF8`) in oRenderSystem vtable slot `+0x38` (shutdown, `0xED1A10`, gated on byte `0x1E49B7F`); `0xED196B` is the init (`+0x34`, `0xED1650`) failure rollback, not shutdown. The scene-name strings are referenced only by the factory; no name-keyed registry found (direct refs only). See `docs\MatrixConnection.md`.
+
 ## What is saved
 
 - **Generated provider initialization prefix saved:** `NativeGeneratedTransformProviderPrefix`
