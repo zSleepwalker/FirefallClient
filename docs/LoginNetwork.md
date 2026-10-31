@@ -55,3 +55,16 @@
 
 ## Unresolved
 - Callers of `0x635E90` and the request queue struct layout; the JSON-to-field mapping in `0x4956C0`; who consumes type 5 from `0x3820E0`; actual host values.
+
+# Round 16: oracle parser internals, header-builder callers, sock:// consumer
+
+## Observed
+- `0x4956C0` is chunked (IDA decompile fails; disasm of the first chunk was followed via call targets, jumps into other chunks were not all followed). Calls: JSON accessors for `matrix_url`/`ticket`/`datacenter`/`operator_override`/`session_id`/`hostname`; for the ticket text it builds a stream object (vtable VA 0x1C80CC4) and calls `0x12CEB00` (decompiled): a standard-alphabet **Base64 decoder** (A-Z a-z 0-9 + /, `=` padding) that writes 3-byte groups through stream vtable+0x18. It then checks the decoded buffer: length > 2 and bytes `'R'`(0x52) `'5'`(0x35) at 0x4959CE; on mismatch the `Invalid decrypted oracle login ticket` / `Decode: invalid oracle login ticket` paths are used. After the prefix check it stores two strings into App+0xA34 and a second App field (matrix_url / hostname-derived, exact roles not proven), then calls `0x495F20 MatrixConnection_OpenTransport(...)` (4 args) at 0x495A43; success logs `Matrix connection initiated to %s (%s)`, failure `Could not initiate Matrix connection ...`. Cleanup path sets this+0x0C = 1 (state 1) and clears this+0x820 (`0xFD2C90` release).
+- `0x636550` is a thin wrapper around the ClientApi header builder `0x635E90`; callers: `0x3813A0` (replay-related), `0x388BD0` (hotfix downloader), `0x48E8B0`, `MatrixConnection_QueueOracleTicket` (0x495327), `0x4A4A70`, `0x4A4D50`, `Login_QueueLoginRequest` (0x63B65C), `Login_QueueCharacterRefreshRequest` (0x63EDC5), `0x7E3510`. Another wrapper at 0x3E05B0 has no code callers.
+- `0x381A10` is a replay/chunk source constructor (this+0 text, +4 arg, +8 type, +12 stripped path, +0x18 sub-object `0x380DF0`; log `unk_1B45258`), then runs the classifier `0x3820E0` and `0x3823F0`. Callers: `LookingGlass_CreateReplayReader` (0x65D7BF), `0x3D60A0`, `0x6AE3E0`, `0x6AF120`. `0x3823F0` switches on type with `cmp eax,4; ja default` (0x382423) and a 5-entry jump table at VA 0x783348 (types 0,1 -> 0x382433, 2 -> 0x38249E, 3 -> 0x382545, 4 -> 0x3825DE).
+
+## Interpreted
+- The oracle ticket is Base64 text whose decoded payload starts with `R5`; `Decode`/`decrypted` wording suggests further decryption, but no cipher call was identified in the chunk read. `sock://` (type 5) is therefore not handled by a case in the `0x3823F0` switch (goes to its default); `sock://` is a replay/LookingGlass stream source, consistent with `0x306050` queueing it as a looking-glass request.
+
+## Unresolved
+- Cipher/key for the ticket (if any), exact meaning of the two stored strings, the `0x495F20` argument roles and UDP host:port parse, the default-case handler of `0x3823F0` and whether type 5 is consumed elsewhere; the request struct/queue layout (`0x3233B0` 0x78 bytes) was not decoded.

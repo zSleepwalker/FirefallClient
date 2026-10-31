@@ -197,4 +197,12 @@ public static class ClientMainLoopNativeLayout
     public const long MatrixUrlKeyFileOffset = 0x1B52244 - 0x401400;
     public const long SessionIdHeaderFileOffset = 0x1B6168C - 0x401400;
     public const long SockSchemeFileOffset = 0x1B452C0 - 0x401400;
+    // Round 16: oracle ticket decode, header wrapper callers, URL source switch.
+    public const long Base64DecodeToStreamRaw = 0x12CEB00;
+    public const long MatrixOpenTransportRaw = 0x495F20;
+    public const long ReplaySourceCtorRaw = 0x381A10;
+    public const long HeaderBuilderWrapperRaw = 0x636550;
+    public const long ReplaySourceSwitchRaw = 0x3823F0;
+    public const long ReplaySourceSwitchCmpRaw = 0x382423; // cmp eax,4; ja default
+    public const long OracleTicketR5CheckRaw = 0x4959CE; // cmp byte [eax],0x52
 }
