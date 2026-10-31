@@ -1631,6 +1631,27 @@ internal static class StartupBinaryEvidence
             && RelativeBranchTargets(0x5F2103, 0xE8, 0x337180)
             && Matches(0x5F2108, "8D562D")
             && RelativeBranchTargets(0x5F210D, 0xE8, 0x337180));
+        check("Binary inner selector 0x62 routes Stumble's two WORDs and byte",
+            ReadUInt32(VirtualAddressToFileOffset(
+                CharacterStumbleNativeLayout.InnerSelectorTableVirtualAddress) + 60) == 0xC1DD20
+            && Matches(CharacterStumbleNativeLayout.CaseFileOffset, "6A30")
+            && Matches(0x81D12E, "C74424206A000000")
+            && RelativeBranchTargets(0x81D141, 0xE8,
+                CharacterStumbleNativeLayout.ConstructorFileOffset)
+            && RelativeBranchTargets(0x81D157, 0xE8,
+                CharacterStumbleNativeLayout.BodyReaderFileOffset)
+            && Matches(0x5258D2, "C70062000000")
+            && RelativeBranchTargets(0x5258D8, 0xE8,
+                CharacterStumbleNativeLayout.BaseConstructorHelperFileOffset)
+            && Matches(0x5258DD, "C7068871C601")
+            && VtableRttiName(CharacterStumbleNativeLayout.VtableVirtualAddress, 80)
+                == CharacterStumbleNativeLayout.RttiName
+            && Matches(0x5F1EDA, "8D4628")
+            && RelativeBranchTargets(0x5F1EDE, 0xE8, 0x336AC0)
+            && Matches(0x5F1EE3, "8D462A")
+            && RelativeBranchTargets(0x5F1EE9, 0xE8, 0x336AC0)
+            && Matches(0x5F1EEE, "8D562C")
+            && RelativeBranchTargets(0x5F1EF3, 0xE8, 0x337180));
         check("Binary matrix socket factory requests overlapped UDP",
             Matches(0xBE354A, "6A016A006A006A11B8170000006A020F44C150FF15684DAC01"));
         check("Binary matrix local binding uses seven or two attempts and final-two fallback",

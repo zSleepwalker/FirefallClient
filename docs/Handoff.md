@@ -1077,6 +1077,8 @@ These updates supersede older next-step suggestions below where they overlap.
   at +0x60 with presence at +0x58; meanings remain unknown.
   Selector0x61 constructs `ProjectileHitReported` and reads WORDs at
   object+0x28/+0x2A then bytes at +0x2C/+0x2D; meanings remain unknown.
+  Selector0x62 constructs `Stumble` and reads WORDs at object+0x28/+0x2A
+  and a byte at +0x2C; meanings remain unknown.
   Remaining case handlers, field meanings, and message semantics are open.
   RTTI names the results `nl::RoutedMessage` and
   `nl::RoutedMultipleMessage`; QWORD and message semantics remain unknown.

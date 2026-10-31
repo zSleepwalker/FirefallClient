@@ -1339,6 +1339,19 @@ then bytes into `+0x2C` and `+0x2D`. The observed nominal body length is
 six bytes. Field meanings remain unknown; the RTTI name does not establish
 projectile-hit semantics.
 
+### Selector 0x62: `Stumble`
+
+Entry15 maps selector `0x62` to VA `0xC1DD20` / raw case `0x81D120`. It
+allocates `0x30` bytes, stores local DWORD `0x6A` (role unknown), then calls
+constructor `0x5258C0`. The constructor passes `0x62` to helper `0x5A0AD0`
+and installs vtable VA `0x1C67188` (RTTI
+`firefall::Character::Stumble`).
+
+Body reader `0x5F1ED0` reads WORDs into object fields `+0x28` and `+0x2A`,
+then reads a byte into `+0x2C`. The observed nominal body length is five
+bytes. Field meanings remain unknown; the RTTI name does not establish
+stumble-event semantics.
+
 ## Message35 application body
 
 Factory case35 at `0x33D557` allocates a fresh0x50-byte descriptor through

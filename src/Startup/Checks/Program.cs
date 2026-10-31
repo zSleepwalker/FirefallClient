@@ -1222,6 +1222,20 @@ Check("ProjectileHitReported selector 0x61 records two WORDs and two bytes",
     && CharacterProjectileHitReportedNativeLayout.ByteField0Offset == 0x2C
     && CharacterProjectileHitReportedNativeLayout.ByteField1Offset == 0x2D
     && CharacterProjectileHitReportedNativeLayout.NominalInputByteCount == 6);
+Check("Stumble selector 0x62 records two WORDs and a byte",
+    CharacterStumbleNativeLayout.InnerSelector == 0x62
+    && CharacterStumbleNativeLayout.CaseFileOffset == 0x81D120
+    && CharacterStumbleNativeLayout.CaseLocalDwordValue == 0x6A
+    && CharacterStumbleNativeLayout.AllocationSize == 0x30
+    && CharacterStumbleNativeLayout.ConstructorFileOffset == 0x5258C0
+    && CharacterStumbleNativeLayout.BaseConstructorHelperFileOffset == 0x5A0AD0
+    && CharacterStumbleNativeLayout.BaseConstructorArgument == 0x62
+    && CharacterStumbleNativeLayout.BodyReaderFileOffset == 0x5F1ED0
+    && CharacterStumbleNativeLayout.VtableVirtualAddress == 0x1C67188
+    && CharacterStumbleNativeLayout.WordField0Offset == 0x28
+    && CharacterStumbleNativeLayout.WordField1Offset == 0x2A
+    && CharacterStumbleNativeLayout.ByteFieldOffset == 0x2C
+    && CharacterStumbleNativeLayout.NominalInputByteCount == 5);
 Check("Shared channel-2/3 compact-code routing groups the observed native cases",
     Enumerable.Range(1, 6).All(code =>
         MatrixOtherChannelDecoderNativeLayout.SelectRoute(code)
