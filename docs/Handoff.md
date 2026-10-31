@@ -1709,3 +1709,5 @@ Ctor is raw `0xE4DFA0` (sole caller `0xE4E660` = slot 1 of factory vtable `0x1C7
 
 ## Factory list consumers (engine systems)
 - Static pass: the factory lists (0x1E4B0A4 classes, 0x1E4B0A8 instances) have only a create walker (0x12C3A80, slot +4) and a teardown walker (0x12C3AF0, slot +8); no init loop calls oEngineSystem slot 0 (0xE54BF0). The list is a generic singleton registry (Network, SoundThread, fsAssetDB, uiManager, oParticleInterface, ...). Next: find the real caller of 0xE54BF0 (see docs\MatrixConnection.md 'Factory list consumers').
+
+Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller unresolved) and crash hook setter 0x12C38D0 / RedHanded trigger 0x2EAEBF; see MatrixConnection.md and CrashHandler.md.

@@ -1684,5 +1684,17 @@ internal static class StartupBinaryEvidence
             && Matches(CrashHandlerNativeLayout.DumpFormatAnsiVirtualAddress - 0x401400, Convert.ToHexString(Encoding.ASCII.GetBytes(CrashHandlerNativeLayout.DumpNameFormat + "\0")))
             && Matches(CrashHandlerNativeLayout.MiniDumpExportAnsiVirtualAddress - 0x401400, Convert.ToHexString(Encoding.ASCII.GetBytes(CrashHandlerNativeLayout.MiniDumpExportName + "\0")))
             && Matches(CrashHandlerNativeLayout.PureCallStubFileOffset, "BA0C60C101B90060C101E9")
-            && Matches(CrashHandlerNativeLayout.TerminateStubFileOffset, "BA545FC101B9485FC101E9"));    }
+            && Matches(CrashHandlerNativeLayout.TerminateStubFileOffset, "BA545FC101B9485FC101E9"));
+        check("Binary crash hook setter 12C38D0, installer wrapper 12C38B0, RedHanded call site 2EAEBF and fatal hook read match",
+            Matches(CrashHandlerNativeLayout.HookSetterFileOffset, "890D9CB0E401C3")
+            && Matches(CrashHandlerNativeLayout.HookInstallWrapperFileOffset, "8B1598B0E4018A0D94B0E401E90FFFFFFF")
+            && Matches(CrashHandlerNativeLayout.RedHandedLauncherCallSiteFileOffset, "E8CCFAFFFF")
+            && CrashHandlerNativeLayout.RedHandedLauncherCallSiteFileOffset + 5 + BitConverter.ToInt32(ReadAt(CrashHandlerNativeLayout.RedHandedLauncherCallSiteFileOffset + 1, 4)) == CrashHandlerNativeLayout.RedHandedLauncherFileOffset);
+        check("Binary engine-system slot cell 1DFC82C, accessor and slot +0x58/+0x60/+0x44/+4 call sequences match",
+            Matches(0x1DFC82C - 0x401C00, "7004E001")
+            && Matches(SceneFactoryNativeLayout.EngineSystemSlotAddressAccessorFileOffset, "B87004E001C3")
+            && Matches(0x46CA62, "A12CC8DF018B088B01FF5058")
+            && Matches(0xE651CC, "A12CC8DF01578B088B01FF5060")
+            && Matches(0xF5FF5E, "A12CC8DF018B088D45F0508B01FF5044")
+            && Matches(0x30C15F, "A1A40EE6018B088B01FF5004"));    }
 }

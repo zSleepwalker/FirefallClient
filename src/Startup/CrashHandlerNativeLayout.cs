@@ -51,6 +51,12 @@ public static class CrashHandlerNativeLayout
     public const int PureVirtualTextVirtualAddress = 0x1C1600C;
     public const int InvalidParameterTextVirtualAddress = 0x1C16034;
 
+    public const int HookSetterFileOffset = 0x12C38D0;
+    public const int HookInstallWrapperFileOffset = 0x12C38B0;
+    public const int RedHandedLauncherFileOffset = 0x2EA990;
+    public const int RedHandedLauncherCallSiteFileOffset = 0x2EAEBF;
+    public const int FatalHookVirtualAddress = 0x1E4B09C;
+
     public const string RedHandedX64 = @"64\RedHanded.exe";
     public const string RedHandedX86 = "RedHanded.exe";
     public const int RedHandedX64VirtualAddress = 0x1B3F170;

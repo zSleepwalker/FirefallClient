@@ -20,3 +20,11 @@ Addresses: file offsets (IDB addresses) unless marked VA. .text VA=raw+0x400C00,
 - Meaning of stream types 0x10002/4/5/7/0x1000B beyond inference; import slot 0x1AC41B0 assumed RaiseException.
 - Why WinMain installs with filter NULL; other SetUnhandledExceptionFilter sites (0x2FAA55, 0xE54955.., 0xF05AD2, 0xF66347) not examined.
 - Which condition adds each RedHanded argument; `last_crash.log` consumer (0xE5D04F) not analyzed.
+
+## Hook setter, wrapper and RedHanded trigger (static pass)
+
+Observed: `dword_1E4B09C` is read only by fatal 0x12C3550 (0x12C35AA). Its only writer is the unnamed setter at raw 0x12C38D0 (`89 0D 9C B0 E4 01 C3`). Wrapper 0x12C38B0 loads cells 1E4B098/1E4B094 and jumps to installer 0x12C37D0. Neither has an E8/E9 rel32 caller or absolute-VA reference. Dump writers 0x12C2F90/0x12C3250 likewise have no rel32 caller and no absolute-VA reference (checked in the .original image). RedHanded launcher 0x2EA990 has one rel32 caller: `ClientApplicationBootstrap` 0x2EAE70 at 0x2EAEBF.
+
+Interpreted: the hook is unset on the observed paths, so fatal calls nothing through it. Writers are probably reached by data or run-time paths not found.
+
+Unresolved: any caller of the dump writers, setter or wrapper (scoped to the scans above; computed or register-based calls were not searched).

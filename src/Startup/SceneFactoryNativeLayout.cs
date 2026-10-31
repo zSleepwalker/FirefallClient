@@ -177,6 +177,11 @@ public static class SceneFactoryNativeLayout
     public const int FactoryDestroyVtableSlotOffset = 8;
     public const int FactoryInstanceNextOffset = 0xC;
     public const int FactoryInstanceSlotOffset = 0x10;
+    public const int EngineSystemSlotAddressVirtualAddress = 0x1E00470;
+    public const int EngineSystemSlotAddressCellVirtualAddress = 0x1DFC82C;
+    public const int EngineSystemSlotAddressAliasVirtualAddress = 0x1E60EA4;
+    public const int EngineSystemSlotAddressAccessorFileOffset = 0xE4E630;
+    public const int EngineSystemSlot0FileOffset = 0xE54BF0;
 
     public static IReadOnlyList<int> PhysicsDrawInterfaceVtableSlots => PhysicsDrawInterfaceVtableSlotFileOffsets;
 

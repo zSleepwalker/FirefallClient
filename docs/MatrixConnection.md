@@ -3394,3 +3394,15 @@ for name-keyed registries (only direct string refs were searched).
 - **Unresolved.** The real caller of `0xE54BF0` (likely a virtual call through an interface pointer
   obtained elsewhere, e.g. a ctor-time global store or `oEngineInterface`); `Init` naming remains
   inferred from its log strings; init order of the other classes; classes without RTTI-resolved ctors.
+
+### Engine-system slot callers and crash-hook pass (static, FirefallClient.exe.original)
+
+Observed:
+- `dword_1DFC82C` (raw 0x19FAC2C, bytes `70 04 E0 01`) holds 0x1E00470 = `factory+0x10`, the oEngineSystem instance slot. Accessor 0xE4E630 is `mov eax,1E00470; ret`. 0x2D2D60/0x2D2D70 copy it into aliases `1E60E3C` and `1E60EA4` (478 raw immediate hits).
+- Consumers load `eax=[cell]; ecx=[eax]; eax=[ecx]; call [eax+disp]`. Slot calls found through `1DFC82C`: +0x44 (0xF5FF6B), +0x54 (0x46CC7A, 0x470F1B), +0x58 (0x46CA6B), +0x5C (0x3D32B6), +0x60 (0xE651D6, 0xE65233, 0xE65339, 0xE66D5C), +0x64 (0x3072B2 with arg 1 after init, 0x30979A with arg 0 in shutdown). Through `1E60EA4` a chain-tracking scan also found +4 (0x30C168), +0x1C, +0x24, +0x2C, +0x30, +0x38, +0x3C, +0x40, +0x44, +0x48, +0x4C, +0x54, +0x58.
+- Direct fields through the same object: +0x160 (byte), +0x164, +0x168, +0x24 (float), +0x78/+0x80 sub-objects; these are fields, not slots.
+- Slot 0 (0xE54BF0) appears only as the vtable literal at raw 0x187682C. No call with disp 0 through either cell was found by the chain scan (cells `1DFC82C` and `1E60EA4` only); the F54D82-area disp-0 hits are loads, not slot calls.
+
+Interpreted: slot +0x64 is a boolean-style toggle (1 at init, 0 at shutdown). +0x60 returns an object pointer that callers null-test. Roles of other slots are unproven.
+
+Unresolved: the caller of slot 0 (indirect calls through other copies of the instance pointer, or through registers not traced, were not searched); the writer that fills `1DFC82C`.
