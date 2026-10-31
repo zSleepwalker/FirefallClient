@@ -1608,6 +1608,29 @@ internal static class StartupBinaryEvidence
             && Matches(0x356FA3, "8B028901")
             && Matches(0x356FA7, "8B4204894104")
             && Matches(0x356FAD, "83460408"));
+        check("Binary inner selector 0x61 routes ProjectileHitReported's two WORDs and two bytes",
+            ReadUInt32(VirtualAddressToFileOffset(
+                CharacterProjectileHitReportedNativeLayout.InnerSelectorTableVirtualAddress) + 56) == 0xC1DCCF
+            && Matches(CharacterProjectileHitReportedNativeLayout.CaseFileOffset, "6A30")
+            && Matches(0x81D0DD, "C744242069000000")
+            && RelativeBranchTargets(0x81D0F0, 0xE8,
+                CharacterProjectileHitReportedNativeLayout.ConstructorFileOffset)
+            && RelativeBranchTargets(0x81D106, 0xE8,
+                CharacterProjectileHitReportedNativeLayout.BodyReaderFileOffset)
+            && Matches(0x525852, "C70061000000")
+            && RelativeBranchTargets(0x525858, 0xE8,
+                CharacterProjectileHitReportedNativeLayout.BaseConstructorHelperFileOffset)
+            && Matches(0x52585D, "C7069871C601")
+            && VtableRttiName(CharacterProjectileHitReportedNativeLayout.VtableVirtualAddress, 80)
+                == CharacterProjectileHitReportedNativeLayout.RttiName
+            && Matches(0x5F20EA, "8D4628")
+            && RelativeBranchTargets(0x5F20EE, 0xE8, 0x336AC0)
+            && Matches(0x5F20F3, "8D462A")
+            && RelativeBranchTargets(0x5F20F9, 0xE8, 0x336AC0)
+            && Matches(0x5F20FE, "8D562C")
+            && RelativeBranchTargets(0x5F2103, 0xE8, 0x337180)
+            && Matches(0x5F2108, "8D562D")
+            && RelativeBranchTargets(0x5F210D, 0xE8, 0x337180));
         check("Binary matrix socket factory requests overlapped UDP",
             Matches(0xBE354A, "6A016A006A006A11B8170000006A020F44C150FF15684DAC01"));
         check("Binary matrix local binding uses seven or two attempts and final-two fallback",

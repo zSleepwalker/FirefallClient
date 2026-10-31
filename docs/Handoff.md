@@ -1075,6 +1075,8 @@ These updates supersede older next-step suggestions below where they overlap.
   Selector0x60 constructs `AbilityProjectileFired`, reads its fixed scalar
   fields through object+0x50, then consumes a gate byte and optional QWORD
   at +0x60 with presence at +0x58; meanings remain unknown.
+  Selector0x61 constructs `ProjectileHitReported` and reads WORDs at
+  object+0x28/+0x2A then bytes at +0x2C/+0x2D; meanings remain unknown.
   Remaining case handlers, field meanings, and message semantics are open.
   RTTI names the results `nl::RoutedMessage` and
   `nl::RoutedMultipleMessage`; QWORD and message semantics remain unknown.

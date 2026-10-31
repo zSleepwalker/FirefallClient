@@ -1207,6 +1207,21 @@ Check("AbilityProjectileFired selector 0x60 records its fixed fields and optiona
     && CharacterAbilityProjectileFiredNativeLayout.OptionalQwordByteCount == 8
     && CharacterAbilityProjectileFiredNativeLayout.InputByteCountWithoutOptionalQword == 0x27
     && CharacterAbilityProjectileFiredNativeLayout.InputByteCountWithOptionalQword == 0x2F);
+Check("ProjectileHitReported selector 0x61 records two WORDs and two bytes",
+    CharacterProjectileHitReportedNativeLayout.InnerSelector == 0x61
+    && CharacterProjectileHitReportedNativeLayout.CaseFileOffset == 0x81D0CF
+    && CharacterProjectileHitReportedNativeLayout.CaseLocalDwordValue == 0x69
+    && CharacterProjectileHitReportedNativeLayout.AllocationSize == 0x30
+    && CharacterProjectileHitReportedNativeLayout.ConstructorFileOffset == 0x525840
+    && CharacterProjectileHitReportedNativeLayout.BaseConstructorHelperFileOffset == 0x5A0A60
+    && CharacterProjectileHitReportedNativeLayout.BaseConstructorArgument == 0x61
+    && CharacterProjectileHitReportedNativeLayout.BodyReaderFileOffset == 0x5F20E0
+    && CharacterProjectileHitReportedNativeLayout.VtableVirtualAddress == 0x1C67198
+    && CharacterProjectileHitReportedNativeLayout.WordField0Offset == 0x28
+    && CharacterProjectileHitReportedNativeLayout.WordField1Offset == 0x2A
+    && CharacterProjectileHitReportedNativeLayout.ByteField0Offset == 0x2C
+    && CharacterProjectileHitReportedNativeLayout.ByteField1Offset == 0x2D
+    && CharacterProjectileHitReportedNativeLayout.NominalInputByteCount == 6);
 Check("Shared channel-2/3 compact-code routing groups the observed native cases",
     Enumerable.Range(1, 6).All(code =>
         MatrixOtherChannelDecoderNativeLayout.SelectRoute(code)

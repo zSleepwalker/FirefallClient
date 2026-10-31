@@ -1326,6 +1326,19 @@ and `0x2F` bytes with it. The reader does not write object `+0x54..+0x57`;
 that gap and all field meanings remain unresolved. RTTI alone does not
 establish ability-projectile semantics.
 
+### Selector 0x61: `ProjectileHitReported`
+
+Entry14 maps selector `0x61` to VA `0xC1DCCF` / raw case `0x81D0CF`. It
+allocates `0x30` bytes, stores local DWORD `0x69` (role unknown), then calls
+constructor `0x525840`. The constructor passes `0x61` to helper `0x5A0A60`
+and installs vtable VA `0x1C67198` (RTTI
+`firefall::Character::ProjectileHitReported`).
+
+Body reader `0x5F20E0` reads WORDs into object fields `+0x28` and `+0x2A`,
+then bytes into `+0x2C` and `+0x2D`. The observed nominal body length is
+six bytes. Field meanings remain unknown; the RTTI name does not establish
+projectile-hit semantics.
+
 ## Message35 application body
 
 Factory case35 at `0x33D557` allocates a fresh0x50-byte descriptor through
