@@ -1661,6 +1661,13 @@ Global `0x1DFE970` is a statically initialized `oRenderSystem` (vtable
 (ctor raw `0xF05FE0`, published at `0xED17DC`). Its slot `+0x30` (raw
 `0xF255A0`) allocates a `0x18F48` scene and runs `0xF0FCD0(name)`, which
 registers it by index in the 32-slot table at VA `0x1EDACD8`. No name-keyed
-registry found; create-by-name reading is interpretation. Details in
+registry found; create-by-name reading is interpretation. Observed: scene
+is `oD3DScene` (vtable `0x1C7A334`, base `oScene` `0x1C77A94`); the name is
+copied to `oScene` shared text at `obj+8` by `0xE11E40` (no compare/hash in
+the ctor); full table logs "Too many scenes were allocated." but still
+returns the object. `0xED196B` stores static `0x1E72DF8` into `0x1DE05FC`
+after deleting the previous `0x1DE0600` object (teardown reading is
+interpretation); `0xED1AC4` also matches a store pattern but is undecoded.
+Details in
 `docs\MatrixConnection.md`; constants in `SceneFactoryNativeLayout`, pinned by
 `StartupBinaryEvidence`.

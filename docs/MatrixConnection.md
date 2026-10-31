@@ -3086,6 +3086,42 @@ write was performed.
   index (`893C85D8ACED01 89877C020000` at raw `0xF104C2`: table entry and
   `this+0x27C`).
 
+**Follow-up observations: scene class, name, ctor fields, `0xED196B`**
+(IDA static read-only; bytes checked against `.original`)
+
+- Vtable `0x1C7A334`: COL `0x1CD683C`, RTTI `.?AVoD3DScene@@`, hierarchy
+  base `.?AVoScene@@`. Base ctor `0xE11E40` stores `oScene` vtable `0x1C77A94`
+  (COL `0x1CD419C`, `.?AVoScene@@`), so `0xF0FCD0` is the `oD3DScene` ctor
+  (`C70734A3C701` at `+0x46` overwrites the base vtable).
+- Name: `0xF255E1` pushes name then `this`; `0xF0FCFE` forwards it
+  (`mov eax,[ebp+0xC]; push eax`) to `0xE11E40`, which calls
+  `VIBE_AssignSharedTextFromCString(obj+8, name)` (`E8F2B34DFF` at base `+0x19`)
+  and zeroes `+0xC/+0x10`. No compare or hash of the name appears in the
+  `0xF0FCD0` body or the base ctor (the only use of the name argument in
+  `0xF0FCD0` is the forward at `0xF0FD00`). Readers of `obj+8` were not traced.
+- Ctor fields: `+0x27C` registry index (`0xF104C9`); `+0x284`=0 byte;
+  `+0x290`=8; `+0x1758` array (6 x `0x188`); `+0x2090` = result of a
+  `[[0x1DFE970]+0x40]` object's slot `+0x60` call given
+  `"engine/textures/default_cube.dds"` (VA `0x1BEE1E4`; string verified);
+  `+0x17C28` = `0x12CE400()-1` if positive, else `lock xadd [obj+0x18F00]`;
+  `+0x18F38/+0x18F3C(-1)/+0x18F40`. On a full table the ctor logs
+  `"Too many scenes were allocated.  Max is %i\n"` (VA `0x1BEE208`) with `0x20`
+  via `[[0x1E60EA4]]` slot `+0x24` and still returns the object (`+0x27C`=32).
+- `0xED196B` is `mov [0x1DE05FC], 0x1E72DF8` (`C705FC05DE01F82DE701`) after
+  `0xED194C` deletes the old `0x1DE0600` object (`8B01 6A01 FF10` = slot 0
+  with arg 1) and reloads `0x1DE05FC`. File-image initial values:
+  `0x1DE05FC=0x1E72DF8`, `0x1DE0600=0x1E730E0`, `0x1DE0604=0x1E73230`.
+  Stores to `0x1DE05FC` by raw byte pattern: `0xED17DC`, `0xED196B`, and
+  `0xED1AC4` (inside a no-function byte region; not decoded).
+
+**Interpretation** (not proven)
+
+- `0xF255A0` is a by-name scene factory returning a new `oD3DScene`; the name
+  is only retained as `oScene` text, not used as a registry key. `0xED196B`
+  looks like the render API's shutdown path restoring the static placeholder
+  after virtual deletion of the previous object; that it is a teardown (vs
+  re-init) is inferred from `push 1; call [vtable+0]`, not proven.
+
 **Interpretation** (not proven)
 
 - The "lookup" is plausibly a create-by-name scene factory (allocation +

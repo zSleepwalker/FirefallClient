@@ -113,6 +113,33 @@ internal static class StartupBinaryEvidence
             && Matches(SceneFactoryNativeLayout.RenderApiCreateSceneFileOffset + 0x26, "68488F0100E8E0293900")
             && Matches(SceneFactoryNativeLayout.SceneConstructorFileOffset + 0x46, "C70734A3C701")
             && Matches(0xF104C2, "893C85D8ACED0189877C020000"));
+        check("Binary oD3DScene constructor forwards its name to oScene's shared-text field and the render API reset restores a static placeholder",
+            Matches(SceneFactoryNativeLayout.SceneCreateConstructorCallFileOffset, "FF75088BC856E8E4A6FEFF")
+            && Matches(SceneFactoryNativeLayout.SceneConstructorNameForwardFileOffset, "8BF98B450C5089BD5CFFFFFFE83121F0FF")
+            && Matches(SceneFactoryNativeLayout.SceneBaseConstructorFileOffset + 4,
+                "FF75088BF18D4E08C706947AC701C7460400000000E8F2B34DFF")
+            && ReadUInt32(VirtualAddressToFileOffset(SceneFactoryNativeLayout.SceneVtableVirtualAddress) - 4)
+                == SceneFactoryNativeLayout.SceneCompleteObjectLocatorVirtualAddress
+            && ReadUInt32(VirtualAddressToFileOffset(SceneFactoryNativeLayout.SceneBaseVtableVirtualAddress) - 4)
+                == SceneFactoryNativeLayout.SceneBaseCompleteObjectLocatorVirtualAddress
+            && ReadAt(VirtualAddressToFileOffset(ReadUInt32(VirtualAddressToFileOffset(
+                SceneFactoryNativeLayout.SceneCompleteObjectLocatorVirtualAddress) + 12)) + 8,
+                SceneFactoryNativeLayout.SceneRttiName.Length + 1)
+                .SequenceEqual(Encoding.ASCII.GetBytes(SceneFactoryNativeLayout.SceneRttiName + "\0"))
+            && ReadAt(VirtualAddressToFileOffset(ReadUInt32(VirtualAddressToFileOffset(
+                SceneFactoryNativeLayout.SceneBaseCompleteObjectLocatorVirtualAddress) + 12)) + 8,
+                SceneFactoryNativeLayout.SceneBaseRttiName.Length + 1)
+                .SequenceEqual(Encoding.ASCII.GetBytes(SceneFactoryNativeLayout.SceneBaseRttiName + "\0"))
+            && ReadAt(VirtualAddressToFileOffset(SceneFactoryNativeLayout.SceneDefaultCubeTexturePathVirtualAddress),
+                SceneFactoryNativeLayout.SceneDefaultCubeTexturePath.Length + 1)
+                .SequenceEqual(Encoding.ASCII.GetBytes(SceneFactoryNativeLayout.SceneDefaultCubeTexturePath + "\0"))
+            && ReadAt(VirtualAddressToFileOffset(SceneFactoryNativeLayout.SceneRegistryFullMessageVirtualAddress),
+                SceneFactoryNativeLayout.SceneRegistryFullMessage.Length + 1)
+                .SequenceEqual(Encoding.ASCII.GetBytes(SceneFactoryNativeLayout.SceneRegistryFullMessage + "\0"))
+            && Matches(SceneFactoryNativeLayout.RenderApiShutdownDeleteFileOffset,
+                "8B0DFC05DE01C7050006DE01E030E70185C974068B016A01FF10A114BCE601C705FC05DE01F82DE701")
+            && ReadUInt32(VirtualAddressToFileOffset(SceneFactoryNativeLayout.RenderApiGlobalVirtualAddress))
+                == SceneFactoryNativeLayout.RenderApiStaticPlaceholderVirtualAddress);
         check("Binary scene factory owns a RTTI-identified tfPhysicsDrawInterface and a disposable registration handle",
             Matches(0x9B8241, "6888010000E865FD8F00")
             && Matches(0x9B8255, "85C0740BFF378BC8E8DED1FFFF")
