@@ -420,8 +420,10 @@ state and destroys its socket but has no observed direct store to `+0xBA0`;
 the following character-metadata setter `0x490390` writes fields around
 `+0x848..+0x85C`.
 Therefore an earlier preferred matrix URL can survive this reset and still be
-sent on the nil-input path. The initial `+0xBA0` value for a freshly allocated
-connection remains unverified.
+sent on the nil-input path. On the new-object path, callsite `0x63F0EE`
+invokes constructor `0x48ED50`, which initializes `+0xBA0` to zero at raw
+`0x48F0F9`. Thus a fresh connection with no Lua URL, Login selection, or
+development override begins without a stored Matrix preference.
 
 This confirms the UI-to-Matrix connection initiation path, not a completed
 server handshake or a transition to `tfWorld`. It also does not resolve which

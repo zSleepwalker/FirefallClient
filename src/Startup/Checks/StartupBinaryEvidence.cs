@@ -2045,5 +2045,13 @@ internal static class StartupBinaryEvidence
                 0xE8, MatrixConnectionNativeLayout.CharacterMetadataApplyMethodFileOffset)
             && Matches(MatrixConnectionNativeLayout.CharacterMetadataApplyMethodFileOffset,
                 "558BEC83E4F85153568B75088BD9578B0E8BC18B56040BC2"));
+        check("Fresh SetupCharacter allocation zero-initializes the preferred Matrix URL",
+            Matches(LoginModeNativeLayout.CharacterConnectionConstructorCallSiteFileOffset,
+                "E85DFCE4FF")
+            && RelativeBranchTargets(LoginModeNativeLayout.CharacterConnectionConstructorCallSiteFileOffset,
+                0xE8, MatrixConnectionNativeLayout.ConstructorFileOffset)
+            && Matches(0x48ED78, "8BD9895DF0")
+            && Matches(MatrixConnectionNativeLayout.PreferredMatrixTextInitializationFileOffset,
+                "C783A00B000000000000C783A40B000000000000C783A80B000000000000"));
     }
 }

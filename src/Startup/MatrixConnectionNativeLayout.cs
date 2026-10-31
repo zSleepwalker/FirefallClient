@@ -8,6 +8,7 @@ public static class MatrixConnectionNativeLayout
 {
     public const int AllocationSize = 0xBB0;
     public const uint ConstructorFileOffset = 0x48ED50;
+    public const uint PreferredMatrixTextInitializationFileOffset = 0x48F0F9;
     public const int StateOffset = 0x0C;
     public const int ErrorTextOffset = 0x10;
     public const int OracleRetryDelaySecondsOffset = 0x18;

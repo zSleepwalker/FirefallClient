@@ -347,6 +347,7 @@ Check("Auto-login state 5 prepares selected character and requests matrix connec
     && LoginModeNativeLayout.SelectedCharacterPropertiesOffsetInRecord == 0xC8
     && LoginModeNativeLayout.CharacterConnectionObjectMemberOffset == 0x1C
     && LoginModeNativeLayout.CharacterConnectionObjectAllocationSize == 0xBB0
+    && LoginModeNativeLayout.CharacterConnectionConstructorCallSiteFileOffset == 0x63F0EE
     && LoginModeNativeLayout.CharacterConnectionStateOffset == 0x0C
     && LoginModeNativeLayout.CharacterConnectionRequiredStateUpperBoundExclusive == 2
     && LoginModeNativeLayout.MatrixConnectionRequestBoundaryFileOffset == 0x494CA0
@@ -389,6 +390,8 @@ Check("tfLogin default update branch queues World mode {2,0} behind the zero gua
     && LoginModeNativeLayout.LoginUpdateWorldModeQueueCallSiteFileOffset == 0x638BAF);
 Check("Matrix connection requests oracle tickets through a distinct callback wrapper",
     MatrixConnectionNativeLayout.AllocationSize == 0xBB0
+    && MatrixConnectionNativeLayout.PreferredMatrixTextOffset == 0xBA0
+    && MatrixConnectionNativeLayout.PreferredMatrixTextInitializationFileOffset == 0x48F0F9
     && MatrixConnectionNativeLayout.OracleCallbackPairOffset == 0xB98
     && MatrixConnectionNativeLayout.OracleRequestInFlightFlagOffset == 0x1C
     && MatrixConnectionNativeLayout.OracleCallbackAllocationSize == 0x10

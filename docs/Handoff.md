@@ -28,8 +28,9 @@ Login's selected URL or `Development/MatrixOverride` may take precedence.
 `SetupCharacter`'s existing-connection reset has no observed direct store to
 preferred Matrix text `+0xBA0`, so an earlier URL can survive and reach the
 oracle request.
-The fresh-object initial value of `+0xBA0`, the runtime cause/completion of
-the `tfWorld` request, and the dynamic name for message `0x145` remain open.
+Constructor `0x48ED50` zeros `+0xBA0` for a new connection. The runtime
+cause/completion of the `tfWorld` request and the dynamic name for message
+`0x145` remain open.
 Native API bindings and binary
 fingerprints are saved in `LoginModeNativeLayout.cs`; source hashes are in
 `MatrixConnection.md`, and flow details are in `LoginMode.md`.

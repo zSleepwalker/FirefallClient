@@ -34,8 +34,8 @@ connection entry to its oracle-ticket callsite. `JoinWorld` can pass a nil
 empty shared text, then prefers a nonempty Login-selected URL or
 `Development/MatrixOverride`. With no fallback, an empty destination is
 permitted, and a reused connection can retain its prior preferred matrix text
-at `+0xBA0`. The initial value on a fresh object remains unverified. This
-does not prove a completed handshake or a `tfWorld` request. See
+at `+0xBA0`. The new-object constructor initializes `+0xBA0` to zero at raw
+`0x48F0F9`. This does not prove a completed handshake or a `tfWorld` request. See
 [`LoginMode.md`](LoginMode.md#ui-preload-route-into-the-matrix-connection).
 
 Subscription names map to numeric IDs through `uiManager+0x6E8`.
@@ -134,7 +134,8 @@ the socket and resets connection state but has no observed direct store to
 `+0xBA0`; its following metadata setter `0x490390` writes other fields. A nil
 `StartInstanceConnection` argument therefore becomes empty text, but can leave
 and send an older preferred URL on a reused object. The initial preference on
-a freshly allocated connection is not established here.
+a freshly allocated connection is zeroed by constructor `0x48ED50` at raw
+`0x48F0F9`.
 
 The request is `0x78` bytes, initialized through `0x3233B0`, and formats
 `%s/api/v1/oracle/ticket` from `clientapi_host`. It sets type 2 (POST),
