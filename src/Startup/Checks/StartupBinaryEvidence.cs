@@ -1756,5 +1756,19 @@ internal static class StartupBinaryEvidence
             && Matches(ClientMainLoopNativeLayout.LocalAssetsFirefallIniStringFileOffset, "6C6F63616C6173736574732F6669726566616C6C2E696E69")
             && Matches(ClientMainLoopNativeLayout.HotfixIniStringFileOffset, "686F74666978 2E696E69".Replace(" ",""))
             && Matches(ClientMainLoopNativeLayout.LowMipTexturesPakStringFileOffset, "73797374656D2F76742F6C6F776D697074657874757265732E70616B")
-            && Matches(ClientMainLoopNativeLayout.BigDumpSwitchStringFileOffset, "2D2D62696764756D70"));    }
+            && Matches(ClientMainLoopNativeLayout.BigDumpSwitchStringFileOffset, "2D2D62696764756D70"));
+        check("Binary startup round 5 (cfg loader, LMTD pak, hotfix, plain strings)",
+            Matches(ClientMainLoopNativeLayout.CfgFileExpanderFn1361890FileOffset, "558BEC83E4F86AFF68") &&
+            Matches(ClientMainLoopNativeLayout.LowMipTexturePakLoaderFnEB38B0FileOffset, "558BEC6AFF68") &&
+            Matches(ClientMainLoopNativeLayout.DirectoryListFn12B6C60FileOffset, "558BEC6AFF68") &&
+            Matches(ClientMainLoopNativeLayout.EngineInitFn10D8A40FileOffset, "558BEC6AFF68") &&
+            Matches(ClientMainLoopNativeLayout.HotfixDownloadFn386D90FileOffset, "558BEC83E4F06AFF68") &&
+            Matches(ClientMainLoopNativeLayout.TextRegistryLookupFn12BE6E0FileOffset, "8B15FC04E001") &&
+            Matches(ClientMainLoopNativeLayout.LmtdMagicStringFileOffset, "4C4D5444") &&
+            Matches(ClientMainLoopNativeLayout.CfgPatternStringFileOffset, "2A2E636667") &&
+            Matches(ClientMainLoopNativeLayout.AdditionalIniStringFileOffset, "6164646974696F6E616C696E69") &&
+            Matches(ClientMainLoopNativeLayout.ConsoleStringFileOffset, "636F6E736F6C65") &&
+            Matches(ClientMainLoopNativeLayout.SwitchNameDirFileOffset, "64697200") &&
+            Matches(ClientMainLoopNativeLayout.SwitchNamePlatformFileOffset, "706C6174666F726D") &&
+            Matches(ClientMainLoopNativeLayout.SwitchNameDumpConfigFileOffset, "64756D702D636F6E666967"));    }
 }

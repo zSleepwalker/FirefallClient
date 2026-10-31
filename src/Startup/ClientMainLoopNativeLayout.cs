@@ -92,4 +92,20 @@ public static class ClientMainLoopNativeLayout
     public const int IniContainerLoaderFn12DA710FileOffset = 0x12DA710;
     public const int ArgvFirstArgDirReaderFnE51590FileOffset = 0xE51590;
     public const int AssetDbSearchPathsLoggerFn1318400FileOffset = 0x1318400;
-}
+    public const int CfgFileExpanderFn1361890FileOffset = 0x1361890;
+    public const int CfgFileExpanderCallSiteFileOffset = 0xF07FFB;
+    public const int CfgPatternStringFileOffset = 0x185BA4C;
+    public const int DirectoryListFn12B6C60FileOffset = 0x12B6C60;
+    public const int LowMipTexturePakLoaderFnEB38B0FileOffset = 0xEB38B0;
+    public const int LowMipTexturePakLoadCallSiteFileOffset = 0x3070E6;
+    public const int LmtdMagicStringFileOffset = 0x17E73D8;
+    public const int EngineInitFn10D8A40FileOffset = 0x10D8A40;
+    public const int HotfixDownloadFn386D90FileOffset = 0x386D90;
+    public const int AdditionalIniStringFileOffset = 0x173E9CC;
+    public const int ConsoleStringFileOffset = 0x173EA88;
+    public const int TextRegistryLookupFn12BE6E0FileOffset = 0x12BE6E0;
+    public const int ArgvRegistryPushFn12BDCA0FileOffset = 0x12BDCA0;
+    public const int ArgvRegistryPushFn12BE230FileOffset = 0x12BE230;
+    public const int SwitchNameDirFileOffset = 0x18559D4;
+    public const int SwitchNamePlatformFileOffset = 0x1855A98;
+    public const int SwitchNameDumpConfigFileOffset = 0x1855AC4;}
