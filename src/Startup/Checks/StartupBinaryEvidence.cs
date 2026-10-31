@@ -81,11 +81,11 @@ internal static class StartupBinaryEvidence
                     return true;
             return false;
         }
-        string VtableRttiName(uint vtableVa)
+        string VtableRttiName(uint vtableVa, int maximumNameLength = 40)
         {
             uint col = ReadUInt32(VirtualAddressToFileOffset(vtableVa) - 4);
             uint td = ReadUInt32(VirtualAddressToFileOffset(col) + 12);
-            var raw = ReadAt(VirtualAddressToFileOffset(td) + 8, 40);
+            var raw = ReadAt(VirtualAddressToFileOffset(td) + 8, maximumNameLength);
             int end = Array.IndexOf(raw, (byte)0);
             return Encoding.ASCII.GetString(raw, 0, end < 0 ? raw.Length : end);
         }        check("Binary world scene factory resolves all three named scenes, builds and returns its root, and is stored by tfWorld",
@@ -1063,6 +1063,48 @@ internal static class StartupBinaryEvidence
             && Matches(0xBD0B6E, "8B068943108B4604894314")
             && Matches(0xBD0BBC, "8B46088943108B460C894314")
             && Matches(0xBD0C0E, "8B46088943108B460C8DB718010000894314"));
+        check("Binary shared channel-2/3 decoder reads the compact code and dispatches through the byte map",
+            Matches(MatrixOtherChannelDecoderNativeLayout.MethodFileOffset, "558BEC6AFF68E06CA101")
+            && RelativeBranchTargets(0x821C97, 0xE8, 0x356F80)
+            && RelativeBranchTargets(0x821CA3, 0xE8, 0x34A020)
+            && RelativeBranchTargets(0x821CBA, 0xE8, 0x356F80)
+            && RelativeBranchTargets(0x821CC6, 0xE8, 0x34A020)
+            && Matches(0x821CDD, "8D46FF83F8080F8793000000")
+            && Matches(0x821CE9, "0FB680C829C200FF2485BC29C200")
+            && ReadAt(MatrixOtherChannelDecoderNativeLayout.CodeRouteMapFileOffset, 9)
+                .SequenceEqual(new byte[] { 0, 0, 0, 0, 0, 0, 2, 1, 0 })
+            && ReadUInt32(MatrixOtherChannelDecoderNativeLayout.DispatchTableFileOffset) == 0x00C228F7
+            && ReadUInt32(MatrixOtherChannelDecoderNativeLayout.DispatchTableFileOffset + 4) == 0x00C22941
+            && ReadUInt32(MatrixOtherChannelDecoderNativeLayout.DispatchTableFileOffset + 8) == 0x00C2297C
+            && RelativeBranchTargets(MatrixOtherChannelDecoderNativeLayout.GeneralRouteFileOffset + 6,
+                0xE8, 0x12CDE60)
+            && RelativeBranchTargets(MatrixOtherChannelDecoderNativeLayout.GeneralRouteFileOffset + 0x33,
+                0xE8, MatrixOtherChannelDecoderNativeLayout.RoutedMessageFactoryFileOffset)
+            && RelativeBranchTargets(MatrixOtherChannelDecoderNativeLayout.SpecialRouteFileOffset + 6,
+                0xE8, 0x12CDE60)
+            && RelativeBranchTargets(MatrixOtherChannelDecoderNativeLayout.SpecialRouteFileOffset + 0x24,
+                0xE8, MatrixOtherChannelDecoderNativeLayout.RoutedMultipleMessageFactoryFileOffset)
+            && RelativeBranchTargets(MatrixOtherChannelDecoderNativeLayout.FallbackRouteFileOffset + 0x0B,
+                0xE8, MatrixOtherChannelDecoderNativeLayout.UnrecognizedCodeFallbackFileOffset)
+            && VtableRttiName(MatrixOtherChannelDecoderNativeLayout.RoutedMessageBaseVtableVirtualAddress, 80)
+                == MatrixOtherChannelDecoderNativeLayout.RoutedMessageBaseRttiName
+            && VtableRttiName(MatrixOtherChannelDecoderNativeLayout.RoutedMultipleMessageBaseVtableVirtualAddress, 80)
+                == MatrixOtherChannelDecoderNativeLayout.RoutedMultipleMessageBaseRttiName
+            && VtableRttiName(MatrixOtherChannelDecoderNativeLayout.RoutedMessageVtableVirtualAddress)
+                == MatrixOtherChannelDecoderNativeLayout.RoutedMessageRttiName
+            && VtableRttiName(MatrixOtherChannelDecoderNativeLayout.RoutedMultipleMessageVtableVirtualAddress)
+                == MatrixOtherChannelDecoderNativeLayout.RoutedMultipleMessageRttiName);
+        check("Binary routed-message classes serialize blob-slice offsets and lengths by width",
+            Matches(MatrixOtherChannelDecoderNativeLayout.RoutedMessageSerializeMethodFileOffset,
+                "558BEC56578BF98B4D088D773C56")
+            && RelativeBranchTargets(0xBCB07E, 0xE8, 0x327310)
+            && Matches(0xBCB08B, "FF7738")
+            && RelativeBranchTargets(0xBCB095, 0xE8, 0x336CA0)
+            && Matches(MatrixOtherChannelDecoderNativeLayout.RoutedMultipleMessageSerializeMethodFileOffset,
+                "558BEC56578BF98B4D088D773A56")
+            && RelativeBranchTargets(0xBCB12E, 0xE8, 0x327210)
+            && Matches(0xBCB13C, "0FB74738")
+            && RelativeBranchTargets(0xBCB148, 0xE8, 0x336CA0));
         check("Binary matrix socket factory requests overlapped UDP",
             Matches(0xBE354A, "6A016A006A006A11B8170000006A020F44C150FF15684DAC01"));
         check("Binary matrix local binding uses seven or two attempts and final-two fallback",

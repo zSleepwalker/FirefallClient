@@ -928,6 +928,26 @@ Check("Matrix codec pairs map to the native GameSocket queue tag and decoder slo
     && MatrixChannelCodecNativeLayout.GameSocketChannel1QueueOffset == 0xD6C
     && MatrixChannelCodecNativeLayout.GameSocketChannel2QueueOffset == 0xD70
     && MatrixChannelCodecNativeLayout.GameSocketChannel3QueueOffset == 0xD74);
+Check("Shared channel-2/3 compact-code routing groups the observed native cases",
+    Enumerable.Range(1, 6).All(code =>
+        MatrixOtherChannelDecoderNativeLayout.SelectRoute(code)
+            == MatrixOtherChannelDecoderRoute.RoutedMessage)
+    && MatrixOtherChannelDecoderNativeLayout.SelectRoute(7)
+        == MatrixOtherChannelDecoderRoute.Fallback
+    && MatrixOtherChannelDecoderNativeLayout.SelectRoute(8)
+        == MatrixOtherChannelDecoderRoute.RoutedMultipleMessage
+    && MatrixOtherChannelDecoderNativeLayout.SelectRoute(9)
+        == MatrixOtherChannelDecoderRoute.RoutedMessage
+    && MatrixOtherChannelDecoderNativeLayout.SelectRoute(0)
+        == MatrixOtherChannelDecoderRoute.Fallback
+    && MatrixOtherChannelDecoderNativeLayout.SelectRoute(10)
+        == MatrixOtherChannelDecoderRoute.Fallback
+    && MatrixOtherChannelDecoderNativeLayout.RoutedMessageSerializeMethodFileOffset == 0xBCB070
+    && MatrixOtherChannelDecoderNativeLayout.RoutedMultipleMessageSerializeMethodFileOffset == 0xBCB120
+    && MatrixOtherChannelDecoderNativeLayout.RoutedMessageBlobSliceOffsetFieldOffset == 0x38
+    && MatrixOtherChannelDecoderNativeLayout.RoutedMessageBlobSliceLengthFieldOffset == 0x3C
+    && MatrixOtherChannelDecoderNativeLayout.RoutedMultipleMessageBlobSliceOffsetFieldOffset == 0x38
+    && MatrixOtherChannelDecoderNativeLayout.RoutedMultipleMessageBlobSliceLengthFieldOffset == 0x3A);
 bool controlCodecRejected = false;
 try { MatrixChannelCodecNativeLayout.GetForChannel(0); }
 catch (ArgumentOutOfRangeException) { controlCodecRejected = true; }

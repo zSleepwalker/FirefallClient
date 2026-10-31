@@ -974,6 +974,51 @@ All65535 supported values are round-trip checked. It reads only a header,
 does not discard trailing payload, and does not simulate cursor mutation
 or C++ exception unwinding.
 
+## Shared channel-2/3 compact-code dispatcher
+
+Decoder, case-block, factory, serializer and fallback function addresses
+below are raw file offsets; lookup arrays and vtables are labeled by VA,
+with raw offsets where available.
+Decoder `0x821BA0` compares primary-view size with `offset+length` and calls
+the native diagnostic if the slice is short; no early return for that mismatch
+is visible. It then reads a raw QWORD and a compact positive16 code. The
+QWORD is copied as two native DWORDs (little-endian on this x86 client); its
+semantic meaning is unknown. A nonnull alternate buffer is read from its own
+start for these fields, although the primary-slice diagnostic still runs.
+If both the primary length and alternate buffer are empty, this decoder
+returns0.
+
+Codes1..9 select a route by indexing byte map VA `0xC229C8` (raw `0x821DC8`)
+with `code-1`, then indexing the three-entry DWORD table VA `0xC229BC`
+(raw `0x821DBC`):
+
+| Compact code | Route-table index | Native case (raw file offset) | Observed result path |
+| ---: | ---: | ---: | --- |
+| 1-6, 9 | 0 | `0x821CF7` | Builds an RTTI `nl::RoutedMessage` via `0xBC9B80` |
+| 7 | 2 | `0x821D7C` | Calls fallback `0x81CC50` with the code |
+| 8 | 1 | `0x821D41` | Builds an RTTI `nl::RoutedMultipleMessage` via `0xBC9DB0` |
+
+Codes outside1..9 bypass the table and branch to fallback block `0x821D7C`,
+which calls `0x81CC50`; code7 reaches the same block through route index2.
+The two factories produce
+different result layouts. RTTI identifies the first vtable at VA `0x1C7394C`
+as `nl::RoutedMessage`; its embedded blob is at `+0x28`, with the source
+extent copied to `+0x34`, and a DWORD blob-slice offset/length pair at
+`+0x38/+0x3C`. Serializer `0xBCB070` writes the slice length then copies that
+slice from the embedded blob; its deserializer sets the offset to zero and
+reads a DWORD length.
+The second vtable at VA `0x1C7395C` is
+`nl::RoutedMultipleMessage`; its embedded blob is at `+0x28`, with source
+extent at `+0x34` and a WORD slice offset/length pair at `+0x38/+0x3A`.
+Serializer `0xBCB120` writes the WORD length and copies that slice; its
+deserializer resets the offset and reads a WORD length. RTTI for the base
+vtables identifies `nl::MessageBaseT<nl::RoutedMessage>` and
+`nl::MessageBaseT<nl::RoutedMultipleMessage>`. These names and slice shapes do
+not establish message semantics. The raw QWORD's identity and the complete
+factory/callback ABI remain unresolved.
+`MatrixOtherChannelDecoderNativeLayout.cs` records dispatch only, not a
+replacement decoder.
+
 ## Message35 application body
 
 Factory case35 at `0x33D557` allocates a fresh0x50-byte descriptor through

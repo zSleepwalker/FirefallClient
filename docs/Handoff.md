@@ -1032,6 +1032,13 @@ These updates supersede older next-step suggestions below where they overlap.
   channel1, pair2 to2/3 and tag WORDs to socket+30/+32 (POKE/KISS). Channel1
   decoder calls34A020 then33D4B0. Its decompiler reports bad SP: verify
   arguments/instruction framing before reconstructing wire fields.
+- **Shared channel2/3 dispatch is now mapped.** `0x821BA0` reads a raw QWORD
+  and compact positive16 code; codes1..6/9 reach factory `0xBC9B80`, code8
+  reaches `0xBC9DB0`, and code7/out-of-range reaches shared fallback block
+  `0x821D7C` then helper `0x81CC50`. The three route targets and
+  byte-map/table addresses are in MatrixConnection.md.
+  RTTI names the results `nl::RoutedMessage` and
+  `nl::RoutedMultipleMessage`; QWORD and message semantics remain unknown.
 - **Header/factory roles corrected by instructions.** 34A020 reads compact
   positive U16 (nonzero byte, or zero+LE WORD strictly>255); malformed
   extended0..255 throws. Matching writer320900 is reconstructed and all
