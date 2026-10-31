@@ -74,7 +74,14 @@ internal static class StartupBinaryEvidence
                     return true;
             return false;
         }
-        check("Binary world scene factory resolves all three named scenes, builds and returns its root, and is stored by tfWorld",
+        string VtableRttiName(uint vtableVa)
+        {
+            uint col = ReadUInt32(VirtualAddressToFileOffset(vtableVa) - 4);
+            uint td = ReadUInt32(VirtualAddressToFileOffset(col) + 12);
+            var raw = ReadAt(VirtualAddressToFileOffset(td) + 8, 40);
+            int end = Array.IndexOf(raw, (byte)0);
+            return Encoding.ASCII.GetString(raw, 0, end < 0 ? raw.Length : end);
+        }        check("Binary world scene factory resolves all three named scenes, builds and returns its root, and is stored by tfWorld",
             Matches(SceneFactoryNativeLayout.FactoryFileOffset + 0x2D, "68A0000000")
             && Matches(SceneFactoryNativeLayout.FactoryFileOffset + 0x4D, "E8AE0E0000")
             && Matches(0x9B7D22, "6828D1B9018B108B4230FFD08907")
@@ -87,7 +94,20 @@ internal static class StartupBinaryEvidence
                 "8BC78B4DF464890D00000000595F5E8BE55DC3")
             && Matches(SceneFactoryNativeLayout.TfWorldInitializeFileOffset + 0xA0,
                 "E8EBBE360083C408894714"));
-        check("Binary scene factory's named lookup goes through a statically initialized oRenderSystem getter to an oD3DRenderAPI create-scene slot",
+        check("Binary oRenderSystem init slot +0x34 has one direct caller and publishes oD3DRenderAPI plus texture/shader/model managers",
+            Matches(SceneFactoryNativeLayout.RenderSystemInitCallSiteFileOffset - 0x26, "A170E9DF01")
+            && Matches(SceneFactoryNativeLayout.RenderSystemInitCallSiteFileOffset, "FF5034")
+            && ReadUInt32(VirtualAddressToFileOffset(SceneFactoryNativeLayout.RenderSystemInitialVtableVirtualAddress) + 0x34)
+                == SceneFactoryNativeLayout.RenderSystemInitFileOffset + 0x400C00
+            && ReadUInt32(VirtualAddressToFileOffset(SceneFactoryNativeLayout.RenderSystemInitialVtableVirtualAddress) + 0x38)
+                == SceneFactoryNativeLayout.RenderSystemShutdownFileOffset + 0x400C00
+            && Matches(0xED180E, "A300 06DE01".Replace(" ", ""))
+            && Matches(0xED1840, "A304 06DE01".Replace(" ", ""))
+            && Matches(0xED1869, "A308 06DE01".Replace(" ", ""))
+            && Matches(SceneFactoryNativeLayout.RenderSystemShutdownFileOffset + 0x38, "8B0DFC05DE016A008B01FF500C")
+            && VtableRttiName(SceneFactoryNativeLayout.TextureManagerVtableVirtualAddress) == SceneFactoryNativeLayout.TextureManagerRttiName
+            && VtableRttiName(SceneFactoryNativeLayout.ShaderManagerVtableVirtualAddress) == SceneFactoryNativeLayout.ShaderManagerRttiName
+            && VtableRttiName(SceneFactoryNativeLayout.ModelManagerVtableVirtualAddress) == SceneFactoryNativeLayout.ModelManagerRttiName);        check("Binary scene factory's named lookup goes through a statically initialized oRenderSystem getter to an oD3DRenderAPI create-scene slot",
             ReadUInt32(VirtualAddressToFileOffset(SceneFactoryNativeLayout.SceneProviderGlobalVirtualAddress))
                 == SceneFactoryNativeLayout.RenderSystemInitialVtableVirtualAddress
             && ReadUInt32(VirtualAddressToFileOffset(SceneFactoryNativeLayout.RenderSystemInitialVtableVirtualAddress)

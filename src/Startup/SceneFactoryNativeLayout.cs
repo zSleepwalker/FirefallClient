@@ -132,6 +132,18 @@ public static class SceneFactoryNativeLayout
     public const int PhysicsDrawInterfaceColorFieldOffset = 0x50;
     public const int PhysicsDrawInterfaceColorSourceVirtualAddress = 0x1DFF438;
     public const int PhysicsDrawInterfaceBoundsFieldOffset = 0x16C;
+    public const int RenderSystemInitCallSiteFileOffset = 0xE53C72;
+    public const int RenderSystemInitFileOffset = 0xED1650;
+    public const int RenderSystemInitCallerFileOffset = 0xE53AC0;
+    public const int TextureManagerGlobalVirtualAddress = 0x1DE0600;
+    public const int ShaderManagerGlobalVirtualAddress = 0x1DE0604;
+    public const int ModelManagerGlobalVirtualAddress = 0x1DE0608;
+    public const int TextureManagerVtableVirtualAddress = 0x1C7A520;
+    public const int ShaderManagerVtableVirtualAddress = 0x1C7A618;
+    public const int ModelManagerVtableVirtualAddress = 0x1C7A874;
+    public const string TextureManagerRttiName = ".?AVoD3DTextureManager@@";
+    public const string ShaderManagerRttiName = ".?AVoD3DShaderManager@@";
+    public const string ModelManagerRttiName = ".?AVoD3DModelManager@@";
     public const int GlobalActiveSceneStoreFileOffset = 0x64B528;
     public const int GlobalActiveSceneFailureMessageVirtualAddress = 0x1B635CC;
 

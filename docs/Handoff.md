@@ -1695,3 +1695,6 @@ interpretation); `0xED1AC4` also matches a store pattern but is undecoded.
 Details in
 `docs\MatrixConnection.md`; constants in `SceneFactoryNativeLayout`, pinned by
 `StartupBinaryEvidence`.
+
+## oRenderSystem init/shutdown callers and manager objects (static)
+Single direct init caller: raw `0xE53C72` (in `0xE53AC0`, called from `0xE550D5`). Shutdown `0xED1A10` has no direct caller found. Init builds oD3DRenderAPI (`0x1DE05FC`), oD3DTextureManager (`0x1DE0600`), oD3DShaderManager (`0x1DE0604`), oD3DModelManager (`0x1DE0608`); see MatrixConnection.md. Constants in `SceneFactoryNativeLayout`, fingerprint check in `StartupBinaryEvidence`. Unresolved: shutdown caller, init argument meaning.

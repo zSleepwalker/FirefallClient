@@ -3266,3 +3266,31 @@ no name-keyed registry was found.
 **Unresolved**: callers of slot `+0x38`/`+0x34` (indirect); what the
 `0x1DE0600/04/08` objects are; readers of `oScene+8`; a binary-wide negative
 for name-keyed registries (only direct string refs were searched).
+### oRenderSystem init/shutdown callers and manager globals (static, read-only)
+- **Observed.** A scan of every function referencing `0x1DFE970` (537) for
+  `call [reg+0x34]`/`[reg+0x38]` whose register is the vtable loaded from, or
+  `ecx` set to, that global finds exactly one real init call: raw `0xE53C72`
+  (`mov eax,[0x1DFE970]; mov ecx,0x1DFE970; ... call [eax+0x34]` with six pushes;
+  `0xED1650` ends `retn 0x18`). It is inside `0xE53AC0`, whose only direct
+  caller is `0xE550D5` (in `0xE54BF0`, after `0xE546F0` returns true). Its next
+  step calls getter `+0x3C` and slot `+0x13C` on the result. Other `+0x34/+0x38`
+  hits are on objects returned by getter `+0x48`/`+0x3C`/`+0x44` or on
+  unrelated objects, not on oRenderSystem.
+- **Observed.** No direct `call [reg+0x38]` on oRenderSystem exists in any
+  function referencing the global; `0xED1A10` (no xrefs; undefined in the IDB,
+  decoded from file bytes) takes no stack args (`ret`). It is not called
+  directly by name either, so its caller is **unresolved** (likely via a copy of
+  the pointer or a path not tied to the global).
+- **Observed.** Init `0xED1650` allocates and publishes (raw offsets of stores):
+  `0x49B8` bytes via ctor `0xF05FE0` -> `0x1DE05FC` (vtable `0x1C79ED4`,
+  RTTI `oD3DRenderAPI`); `0x190` via `0xF4F7D0` -> `0x1DE0600` (vtable
+  `0x1C7A520`, `oD3DTextureManager`); `0x268` via `0xF5F880` -> `0x1DE0604`
+  (vtable `0x1C7A618`, `oD3DShaderManager`); `0x9C` via `0xF800C0` ->
+  `0x1DE0608` (vtable `0x1C7A874`, `oD3DModelManager`). Shutdown calls the render
+  API's slot `+0xC(0)`, `[0x1DFE9C8]` slot `+4`, deletes (slot 0, arg 1) the
+  model, shader, texture managers then the render API, restoring placeholders
+  `0x1E61E0C`, `0x1E73230`, `0x1E730E0`, `0x1E72DF8` and clearing `0x1E49B7F`.
+- **Interpreted.** `0xE53AC0` is an application/window start routine passing
+  window-size/fullscreen-like fields (`edi+0x138/0x13C/0x140`, `edi+0x130==1`).
+- **Unresolved.** Shutdown's caller, the meaning of the six init arguments, and
+  the `0x1DFE9C8` object type.
