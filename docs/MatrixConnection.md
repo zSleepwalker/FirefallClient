@@ -3406,3 +3406,22 @@ Observed:
 Interpreted: slot +0x64 is a boolean-style toggle (1 at init, 0 at shutdown). +0x60 returns an object pointer that callers null-test. Roles of other slots are unproven.
 
 Unresolved: the caller of slot 0 (indirect calls through other copies of the instance pointer, or through registers not traced, were not searched); the writer that fills `1DFC82C`.
+
+### oEngineSystem vtable slot table (static, FirefallClient.exe.original)
+
+Slot index = disp/4; raw targets as in the vtable at raw `0x187682C`. Consumer pattern `eax=[1DFC82C]; ecx=[eax]; eax=[ecx]; call [eax+disp]` passes the object as `this`.
+
+| Slot | Disp | Raw target | Role | Evidence |
+|---|---|---|---|---|
+| 17 | +0x44 | E4FB50 | `lea eax,[this+0xB8]; ret` - returns address of an embedded block (caller 0xF5FF6B reads `+0x1C` of it as a text/path part) | Observed bytes; block meaning unresolved |
+| 21 | +0x54 | E53FA0 (1717 B) | ApplyDisplayMode(mode, width, height, refresh): writes `this[76]` (+0x130) = mode, caches size in `this[78..82]`, drives window-style/resize through the render-system (`dword_1DFE970`) | Observed decompile; name Interpreted. Caller 0x46CC7A pushes 4 args (0,edx,ebx,0) |
+| 22 | +0x58 | E4FB20 | GetDisplayMode: `mov eax,[this+0x130]` (the field slot 21 writes) | Observed; caller 0x46CA6B stores the result to `[esi+0x7C]` |
+| 23 | +0x5C | E54660 | Out-param getter of three dwords `+0x14C/+0x150/+0x154` (each pointer null-checked, `ret 0xC`) | Observed; semantics of the triple unresolved; caller 0x3D32B6 |
+| 24 | +0x60 | E4FB10 | GetHandle: `mov eax,[this+0xB4]` (callers null-test; 0xE651D6 feeds it to an import thunk) | Observed bytes; "window handle" is Interpreted only |
+| 25 | +0x64 | E4FB00 | SetHandle: `[this+0xB4]=arg; ret 4` | Observed. **Correction:** init call 0x3072AE pushes global `dword_1E00128` (not literal 1); shutdown call 0x30979A pushes 0 |
+
+Other slots, bytes only (Observed, no consumer found, role unproven): 3 `E4E1E0` = `mov al,[this+0xBC]`; 4 `E4E1F0` = `mov al,[this+0xBD]`; 5 `E4E200` = `mov al,[this+0xDB]`; 6 `E55370` = returns constant 0x1E81D00; 12 `E55E60` = calls `[this+0x10C]` callback if set; 15 `E4FB80` = `mov eax,[this+0xAC]`; 16 `E4FB60` = bounds-checked (`idx<2`) getter of `[this+0x158+idx*4]`; 18 `E4FB40` getter `[this+0xB0]`; 19 `E4FB30` setter `[this+0xB0]`; 0,1,2,7-11,13,14,20 not characterised here (slot 0 = Init by log strings, earlier pass).
+
+Slot 0 callers (scoped negative): I scanned `ClientApplicationBootstrap` 0x2EAE70, `Initialize` 0x3063D0, `RunLoop` 0x3098C0, `Shutdown` 0x3095D0 and wrapper 0x2E9630 for `call [reg]` (disp 0) and references to cells `1DFC82C`/`1E60EA4`/`1E00470`. No slot-0 call through the engine-system cell exists in them. The only disp-0 call is 0x30976B (deleting-dtor style, `push 1; call [eax]`) on the App member `[esi+0xB98]`, not the engine object. `Initialize` has a direct field write `[[1DFC82C]]+0x164` at 0x3071B9 (field, not slot). Callers elsewhere (other copies of the pointer, other functions) were not searched: slot 0 caller remains Unresolved.
+
+Checks: `StartupBinaryEvidence` verifies slots 17/21-25 vtable entries, accessor bytes, and the +0x64 init/shutdown call-site bytes. Constants are in `SceneFactoryNativeLayout` (`EngineSystemSlot*`).

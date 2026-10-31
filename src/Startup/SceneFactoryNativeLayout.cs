@@ -183,6 +183,23 @@ public static class SceneFactoryNativeLayout
     public const int EngineSystemSlotAddressAccessorFileOffset = 0xE4E630;
     public const int EngineSystemSlot0FileOffset = 0xE54BF0;
 
+    public const int EngineSystemVtableFileOffset = 0x187682C;
+    public const int EngineSystemSlotDisplayModeApplyFileOffset = 0xE53FA0;
+    public const int EngineSystemSlotDisplayModeApplyVtableOffset = 0x54;
+    public const int EngineSystemSlotDisplayModeGetFileOffset = 0xE4FB20;
+    public const int EngineSystemSlotDisplayModeGetVtableOffset = 0x58;
+    public const int EngineSystemSlotSizeTripleGetFileOffset = 0xE54660;
+    public const int EngineSystemSlotSizeTripleGetVtableOffset = 0x5C;
+    public const int EngineSystemSlotHandleGetFileOffset = 0xE4FB10;
+    public const int EngineSystemSlotHandleGetVtableOffset = 0x60;
+    public const int EngineSystemSlotHandleSetFileOffset = 0xE4FB00;
+    public const int EngineSystemSlotHandleSetVtableOffset = 0x64;
+    public const int EngineSystemHandleFieldOffset = 0xB4;
+    public const int EngineSystemSlotBlockAddressFileOffset = 0xE4FB50;
+    public const int EngineSystemSlotBlockAddressVtableOffset = 0x44;
+    public const int EngineSystemBlockFieldOffset = 0xB8;
+    public const int EngineSystemHandleSetInitCallSiteFileOffset = 0x3072A3;
+    public const int EngineSystemHandleSetShutdownCallSiteFileOffset = 0x309785;
     public static IReadOnlyList<int> PhysicsDrawInterfaceVtableSlots => PhysicsDrawInterfaceVtableSlotFileOffsets;
 
     public static IReadOnlyList<SceneFactoryResourceSnapshot> KnownSceneResources => SceneResources;

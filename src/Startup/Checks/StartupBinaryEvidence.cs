@@ -1696,5 +1696,20 @@ internal static class StartupBinaryEvidence
             && Matches(0x46CA62, "A12CC8DF018B088B01FF5058")
             && Matches(0xE651CC, "A12CC8DF01578B088B01FF5060")
             && Matches(0xF5FF5E, "A12CC8DF018B088D45F0508B01FF5044")
-            && Matches(0x30C15F, "A1A40EE6018B088B01FF5004"));    }
+            && Matches(0x30C15F, "A1A40EE6018B088B01FF5004"));
+        check("Binary engine-system vtable slots 17/21/22/23/24/25 (+0x44/+0x54/+0x58/+0x5C/+0x60/+0x64) point at the verified accessor bodies and the +0x64 setter has init/shutdown call sites",
+            ReadUInt32(SceneFactoryNativeLayout.EngineSystemVtableFileOffset + 17 * 4) == SceneFactoryNativeLayout.EngineSystemSlotBlockAddressFileOffset + 0x400C00
+            && ReadUInt32(SceneFactoryNativeLayout.EngineSystemVtableFileOffset + 21 * 4) == SceneFactoryNativeLayout.EngineSystemSlotDisplayModeApplyFileOffset + 0x400C00
+            && ReadUInt32(SceneFactoryNativeLayout.EngineSystemVtableFileOffset + 22 * 4) == SceneFactoryNativeLayout.EngineSystemSlotDisplayModeGetFileOffset + 0x400C00
+            && ReadUInt32(SceneFactoryNativeLayout.EngineSystemVtableFileOffset + 23 * 4) == SceneFactoryNativeLayout.EngineSystemSlotSizeTripleGetFileOffset + 0x400C00
+            && ReadUInt32(SceneFactoryNativeLayout.EngineSystemVtableFileOffset + 24 * 4) == SceneFactoryNativeLayout.EngineSystemSlotHandleGetFileOffset + 0x400C00
+            && ReadUInt32(SceneFactoryNativeLayout.EngineSystemVtableFileOffset + 25 * 4) == SceneFactoryNativeLayout.EngineSystemSlotHandleSetFileOffset + 0x400C00
+            && Matches(SceneFactoryNativeLayout.EngineSystemSlotBlockAddressFileOffset, "8D81B8000000C3")
+            && Matches(SceneFactoryNativeLayout.EngineSystemSlotDisplayModeGetFileOffset, "8B8130010000C3")
+            && Matches(SceneFactoryNativeLayout.EngineSystemSlotHandleGetFileOffset, "8B81B4000000C3")
+            && Matches(SceneFactoryNativeLayout.EngineSystemSlotHandleSetFileOffset, "558BEC8B45088981B40000005DC20400")
+            && Matches(SceneFactoryNativeLayout.EngineSystemSlotSizeTripleGetFileOffset, "558BEC8B550885D274088B814C01000089028B550C85D274088B815001000089028B551085D274088B815401000089025DC20C00")
+            && Matches(SceneFactoryNativeLayout.EngineSystemSlotDisplayModeApplyFileOffset + 0x14, "803DDE95E40100")
+            && Matches(SceneFactoryNativeLayout.EngineSystemHandleSetInitCallSiteFileOffset, "A12CC8DF01FF352801E0018B088B01FF5064")
+            && Matches(SceneFactoryNativeLayout.EngineSystemHandleSetShutdownCallSiteFileOffset, "A12CC8DF01C786800B0000000000006A008B088B01FF5064"));    }
 }
