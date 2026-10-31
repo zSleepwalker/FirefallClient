@@ -100,3 +100,13 @@ Addresses: file offsets (= IDA addresses); VA code = raw+0x400C00, .rdata = raw+
 **Interpreted**: `clientdb.sd2` is a client DB reloaded after a hotfix.
 
 **Unresolved**: the AssetDB on-disk format and file-open routines; vtables of fs/ts/tfAssetDB; `.include?` exact semantics.
+## Round 10: directory resolver, `.include?`, engine start
+
+**Observed**
+- `0x1319520(this=dword_1DFFF5C, out vector, name)` reads the ordinary list (this+8): converts `/` to `\`, a leading `!` marks the name as already absolute (stripped, returned as-is); otherwise it joins each root with `name`, converts UTF-8 to UTF-16 (code page 65001), calls an inferred GetFileAttributesW and keeps entries that are directories (attr 0x10). Guarded by the lock at this+24. Callers: `0xEE5030`, `0xEE5790` and `0xF07FD6` (with "engine/autodetect" at 0xF07FD0; that site is a data-loading routine with 36-byte records, not a file-open routine).
+- `0x12B78F0` (the `.include?` gate): converts the name to UTF-16 and returns true if an inferred stat/GetFileAttributes-like call (`dword_1AC4714`) fails to find it or its flag bit 0x4000 is clear. In `0x12DD300` the `.include?` result is `!gate(name) || load(name)`, so a name for which the gate is false is skipped as success; if the gate is true the file is loaded and a load failure fails the directive.
+- `0xE54BF0` (oEngineSystem vtable slot 0, no direct xrefs because it is virtual) is the engine start routine: it logs "Operating System", "Total usable system memory", "Memory constrained mode", "Cinematic mode", "--- Initialization ---", "Initializing Main Window", queries monitors (inferred EnumDisplayDevices/EnumDisplaySettings), sets up window size at this+312..340, requires a windowing callback ("Required windowing callback not set"), then "--- Finished Initialization (%.2f seconds) ---".
+
+**Interpreted**: the `.include?` gate looks like a "skip if file bit set/absent" test; exact meaning of the 0x4000 flag is unproven.
+
+**Unresolved**: AssetDB on-disk format; vtables of fs/ts/tfAssetDB; the `.pak` handling at `0x1361890` (only one caller inside undefined code at 0xF07FFB; not decompiled). Negative claims are limited to IDA xrefs.

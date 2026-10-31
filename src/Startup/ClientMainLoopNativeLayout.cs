@@ -154,4 +154,11 @@ public static class ClientMainLoopNativeLayout
     public const int IniIncludeAllDirectiveStringFileOffset = 0x1C80D10 - 0x401400;
     public const int IniIncludeOptionalDirectiveStringFileOffset = 0x1C80D20 - 0x401400;
     public const int HotfixLastLevelKeyStringFileOffset = 0x1B455A0 - 0x401400;
-    public const int HotfixAppliedLevelStringFileOffset = 0x1B45608 - 0x401400;}
+    public const int HotfixAppliedLevelStringFileOffset = 0x1B45608 - 0x401400;
+
+    // Round 10: engine start slot 0, locale-gated include test, directory resolver strings.
+    public const int OEngineSystemStartFnE54BF0FileOffset = 0xE54BF0;
+    public const int IniLocaleGateFn12B78F0FileOffset = 0x12B78F0;
+    public const int EngineInitBannerStringFileOffset = 0x1BDF708 - 0x401400;
+    public const int EngineInitMainWindowStringFileOffset = 0x1BDF6E4 - 0x401400;
+    public const int EngineAutodetectDirStringFileOffset = 0x1BED3C0 - 0x401400;}

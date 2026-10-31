@@ -1806,5 +1806,11 @@ internal static class StartupBinaryEvidence
             Matches(ClientMainLoopNativeLayout.IniIncludeAllDirectiveStringFileOffset, "696E636C7564652D616C6C20") &&
             Matches(ClientMainLoopNativeLayout.IniIncludeOptionalDirectiveStringFileOffset, "696E636C7564653F20") &&
             Matches(ClientMainLoopNativeLayout.HotfixLastLevelKeyStringFileOffset, "4C617374486F746669784C65") &&
-            Matches(ClientMainLoopNativeLayout.HotfixAppliedLevelStringFileOffset, "486F746669783A206170706C"));    }
+            Matches(ClientMainLoopNativeLayout.HotfixAppliedLevelStringFileOffset, "486F746669783A206170706C"));
+        check("Binary startup round 10 (engine start slot 0, locale gate)",
+            Matches(ClientMainLoopNativeLayout.OEngineSystemStartFnE54BF0FileOffset, "558BEC6AFF6840F9A50164A1") &&
+            Matches(ClientMainLoopNativeLayout.IniLocaleGateFn12B78F0FileOffset, "558BEC81EC38080000A10050") &&
+            Matches(ClientMainLoopNativeLayout.EngineInitBannerStringFileOffset, "2D2D2D20496E697469616C69") &&
+            Matches(ClientMainLoopNativeLayout.EngineInitMainWindowStringFileOffset, "496E697469616C697A696E67") &&
+            Matches(ClientMainLoopNativeLayout.EngineAutodetectDirStringFileOffset, "656E67696E652F6175746F64"));    }
 }
