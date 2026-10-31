@@ -31,3 +31,25 @@ Static, read-only IDA analysis of `FirefallClient.exe`. Constants: `src\Startup\
 - Class identities of `dword_1E60EA4`, `dword_1E46774` and `dword_1E002B8`.
 - Producers of the `App+0x9E8` node (already indirect per `MatrixConnection.md`); the tfLogin selector cases 0/2/3/4 were not re-derived here.
 - Full Initialize field map.
+
+
+## Round 2: Initialize, engine step, helpers
+
+### Observed
+- `dword_1E60EA4` is a copy cell of the oEngineSystem instance slot (existing MatrixConnection.md notes). The vtable at file offset `0x187682C` has slot 8 (+0x20) = VA `0x1256590` = raw `0xE55990`, so the RunLoop engine-step call at `0x3099CD..0x3099DE` (arg = int ms delta) lands in `0xE55990` (`__thiscall(this, ms)`; vtable word checked in Startup checks).
+- `0xE55990` per call: returns 1 immediately if `[this+0x12C]` is set; accumulates `ms` into the u64 at `+0x18`, increments frame counter `+0x20`, derives float `+0x24` (seconds, from `u64/50e9` times a float constant), splits ms into `+0x0C` (sec) / `+0x10` (ms remainder). If byte `+0xBC` == 0 it runs a message pump: `while (PeekMessageW(msg,0,0,0,0) && ...)` using imports `PeekMessageW` (`dword_1AC4BA4`), `GetMessageW` (`dword_1AC4BA0`), `TranslateMessage` (`dword_1AC4C38`), `DispatchMessageW` (`dword_1AC4B9C`); when GetMessageW returns 0 (WM_QUIT) it calls `dword_1E69348` vtable +0xD4 and breaks out. Then calls render-system object (`dword_1DFE970` +0x3C getter) virtuals +0x20 and +0x160, `dword_1E6A4F0` slot +8, `dword_1E69348` slot +0xF8, an optional callback at `this+0x100(ms)`, `0xE4FE10(&unk_1E6A450)`, render virtuals +0xE8(-1), +0x14C when +0x134 returns 0, per-index +0x94 loop when byte `+0xD9`, then `0xE55C80(this)`, `0xE55750(this+0x28, +0x30, +0x2C)` and an import `dword_1DF975C()` when byte `+0xDA`. Returns 0.
+- So the message pump and render-side per-frame calls are in this slot, not inline in RunLoop. No `Sleep`/`timeBeginPeriod` call was seen in `0xE55990` itself (scope: that function body only, not its callees).
+- `0x3289D0`: gated by `byte_1E4677A`; handles `dword_1E68204` (1 -> call imported function pointer `dword_1AC5054`, which resolves to `twitchsdk_32_release.dll`; 2 -> lookup + `dword_1E69348` +0x98 call, clear), then switches on `dword_1E6819C-1` (cases 0..3, jump table VA `0x729CF4`). Decompile fails (alignment-stack prologue `53 8B DC 83 EC 08 83 E4 F0`). Also called from bootstrap shutdown when the gate byte is set.
+- `0x30E1D0`: periodic status/log text builder (float compares at `dword_1E7354C+44` / `dword_1E734E4+44`, throttle fields App+0xBD4..0xBE0, `dword_1E60EA4`, `0x2FCC90`, `0xE546A0`).
+- `0x386430` (this = `[App+0xC64]`): deferred load-state step. Fields: +8 pending object, +0x10 pending id byte, +0x14 current object (swap with +8), +0x18 object deleted via virtual dtor, +0x1C state (4 -> 5, 6 on failure), +0x60/+0x61 requested id / request flag. Calls `0x3891B0`, `0x3865C0`, `0x386900` (starts a load), asserts at lines 91 and 124 ("id mismatch"), then `dword_1E002B8` vtable +0xAC(136) after the swap.
+- Initialize `0x3063D0` ordered calls (from decompile): `App+0xBDC=(v==183)` (0x306441); `0x2FCC90`; `0x304170`; `0x30BE50`; `0x2EA410(0)`; `0xDD89B0`; `0x325350` (0x30695B); `0xBF2760(dword_1DFFDD8, App+0x2E8)`; `0xBEF040(dword_1DFFEF4)`; `0xBF1E70(dword_1DFFE2C)`; `0x31B2F0/0x31B370`; `0x311410(dword_1E00024+8)`; `0x3255E0`, `0x3047E0`, `0x304BB0`; `0xD713E0`, `0xDA3D40`; `0x384D90(dword_1E000D8)`; `0x3860A0`; `0x310B20(App+0xC64)` (constructs the load-state object); `0x38B310(dword_1DFFFD4,0,0,0)`; `0x3248F0/0x324850/0x3247A0`; `0xEB38B0(dword_1E00178)`; `0x38FFD0/0x38FDA0/0x3905D0(dword_1E00100)/0x390550`; `0x39A970(dword_1E00074+4)`; `0xBBD110(.., dword_1DFFF70, .., 1)` (network init); tail jump to `0x307224` (0x7F0 bytes; engine slot +0x24 and `[[1DFC82C]]+0x164`, slot +0x64 at 0x3072B2).
+
+### Interpreted
+- `0xE55990` is the oEngineSystem per-frame update (pump + render + callbacks). Name "EngineSystem_Step" is an interpretation.
+- `0x386430` is a world/zone load-state manager step (interpretation only).
+- `0x3289D0` is a platform/service state pump (interpretation only; Twitch import evidence is for the `dword_1E68204==1` branch only).
+
+### Unresolved
+- Writers of `dword_1E60EA4`, `dword_1E002B8`, `dword_1DFFF70` (no direct `mov ds:cell, reg` found by py_eval scan of xrefs; scoped to IDA xrefs).
+- Config/cvar loading steps in Initialize are not attributed: helpers `0x304170/0x304BB0/0x3047E0/0x325350` were not decompiled.
+- `0x3289D0` switch case bodies and frame limiter (no Sleep/limiter located; callees of the slot not searched).

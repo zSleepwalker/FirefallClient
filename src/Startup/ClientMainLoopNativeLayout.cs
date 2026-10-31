@@ -51,4 +51,19 @@ public static class ClientMainLoopNativeLayout
     public const int AppCurrentModeObjectOffset = 0xB98;
     public const int AppLoadStateObjectOffset = 0xC64;
     public const int AppPendingModeNodeOffset = 0x9E8;
+
+    public const int InitializeTailFileOffset = 0x307224;
+    public const int InitializeStoreFlag183FileOffset = 0x306441;
+    public const int PlatformStatePumpFileOffset = 0x3289D0;
+    public const int StatusTextBuilderFileOffset = 0x30E1D0;
+    public const int EngineSystemVtableSlot8FileOffset = 0x187682C + 0x20;
+    public const int EngineStepSlotIndex = 8;
+    public const int EngineStepSlotDisplacement = 0x20;
+    public const int EngineStepTargetFileOffset = 0xE55990;
+    public const int EngineStepPeekMessageLoopFileOffset = 0xE55A70;
+    public const int LoadStatePendingObjectOffset = 0x8;
+    public const int LoadStatePendingIdOffset = 0x10;
+    public const int LoadStateCurrentObjectOffset = 0x14;
+    public const int LoadStateDeleteObjectOffset = 0x18;
+    public const int LoadStateStateOffset = 0x1C;
 }

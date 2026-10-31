@@ -1727,5 +1727,13 @@ internal static class StartupBinaryEvidence
             && Matches(0x309B18, "8BCEE8B1460000")
             && Matches(0x309B1F, "83BE640C000000")
             && Matches(ClientMainLoopNativeLayout.RunLoopCurrentModeSlot24CallSiteFileOffset, "85C90F84430200008B018B4024FFD0")
-            && Matches(ClientMainLoopNativeLayout.ShutdownCurrentModeDeleteSiteFileOffset, "8B016A01FF108BCFC786980B00000000"));    }
+            && Matches(ClientMainLoopNativeLayout.ShutdownCurrentModeDeleteSiteFileOffset, "8B016A01FF108BCFC786980B00000000"));
+        check("Binary client main loop round 2: Initialize/engine step/helpers", Matches(ClientMainLoopNativeLayout.InitializeFileOffset, "558BEC6AFF68E04E9D0164A1")
+            && Matches(ClientMainLoopNativeLayout.InitializeTailFileOffset, "83EC188BC4C7001407C601C7")
+            && Matches(ClientMainLoopNativeLayout.PlatformStatePumpFileOffset, "538BDC83EC0883E4F083C404")
+            && Matches(ClientMainLoopNativeLayout.StatusTextBuilderFileOffset, "558BEC83EC2CA14C35E70153")
+            && Matches(ClientMainLoopNativeLayout.LoadStateStepFileOffset, "558BEC5153568BF157837E14")
+            && Matches(ClientMainLoopNativeLayout.EngineStepTargetFileOffset, "558BEC6AFF6870F9A50164A100000000")
+            && Matches(ClientMainLoopNativeLayout.EngineStepPeekMessageLoopFileOffset, "6A006A006A006A008D45C850FFD685C0")
+            && ReadUInt32(ClientMainLoopNativeLayout.EngineSystemVtableSlot8FileOffset) == 0x1256590);    }
 }
