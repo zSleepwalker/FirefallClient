@@ -1107,6 +1107,14 @@ These updates supersede older next-step suggestions below where they overlap.
   `0x30D850` drains it, mode 2 constructs `AppMode_World_Ctor`.
   Interpretation: this is a world-load request; trigger unresolved. Bytes are
   checked in `StartupBinaryEvidence`.
+- **tfLogin `0x6385C0` switch (static).** Observed: per-frame update; selector
+  `[[esi+0x1C]+0xC]` (`0x6388D8`), 5-entry table raw `0x638D1C` (VA `0xA3991C`):
+  case 1 -> `0x6389F2` (sends message `0x146`, string from `[node+0x10]`),
+  cases 0/2/3/4 -> `0x638C3A`, >4 -> `0x638AB3` (then `0x638AB5` guard).
+  `0x63C1E2` (msg `0x145`) is in a separate function and was not seen
+  producing a `[node+0xC]` value. `0x1E5CAA4` has one byte/reloc reference
+  (`0x638ABD`); its writer is indirect and unfound. Producer of the list at
+  `tfLogin+0x20` unresolved. Checked in `StartupBinaryEvidence`.
 - **World scene-factory return boundary.** Raw `0x9B73F0`, called from
   `TfWorld_Initialize` (`0x64B460`), returns `EDI` through `EAX` at raw
   `0x9B82B4` (`8B C7`); that epilogue returns at `0x9B82C6` (`C3`). The

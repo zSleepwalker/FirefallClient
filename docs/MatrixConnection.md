@@ -2963,10 +2963,41 @@ through `0x30D590`. `0x638B89` builds `{2,0}` and calls `0x30DEB0` on
 current-mode object `[this+0xA28]`), else pushes the pair into the queue at
 `this+0xB84` (`0x315060`). `0x30D850` drains it; mode 2 -> `AppMode_World_Ctor`.
 
-Not found: any writer of `0x1E5CAA4` (single code reference), the jump-table
-selector `[msg+0xC]` source, or a link from message `0x145`. Interpretation:
-`{2,0}` is a request to switch to World; the condition looks like a
-cvar/config flag, not login-response state, and remains unproven.
+Not found: any writer of `0x1E5CAA4`, or a link from message `0x145`.
+Interpretation: `{2,0}` is a request to switch to World; the condition looks
+like a cvar/config flag, not login-response state, and remains unproven.
+
+#### Switch selector, jump table and `0x1E5CAA4` writer search
+
+Observation (bytes checked against `.original`): `0x6385C0` is a per-frame
+update (`this=ecx->esi`, state `[esi+0x9C4]`), not a message handler. At
+`0x6388D8` `8B500C 83FA04 0F87CF010000 FF24951C99A300` loads
+`edx=[eax+0xC]` where `eax=[esi+0x1C]`, the first node of the list at
+`[esi+0x20]` (`mov ecx,[esi+0x20]; mov eax,[ecx]; mov [esi+0x1C],eax`), then
+`cmp edx,4; ja default; jmp [edx*4+0xA3991C]`. Table raw `0x638D1C` (5 DWORDs):
+cases 0,2,3,4 -> VA `0xA3983A` (raw `0x638C3A`); case 1 -> VA `0xA395F2` (raw
+`0x6389F2`). Values >4 take the `ja` target raw `0x638AB3` (`89 01` store, then
+`0x638AB5` `mov [esi+1Ch],0` and the `0x1E5CAA4` test).
+Case 1 builds a string from `[node+0x10]` (fallback `0x1C5EA68`), sends message
+`0x146` via `[0x1E002B8]` vtable `+0xAC` (`6846010000 8B01 FF90AC000000` at
+`0x638A3B`), destroys the node (`vtable[0](1)`), clears `[esi+1Ch]`, and if
+`[esi+0xA48]==6` sets it to 5 with a deadline of `GetTickCount+0xBB8`.
+Cases 0/2/3/4 share `0x638C3A` (tests `[esi+0x14]`, calls `0xAE3C60`, updates
+`[esi+0x9D0]`), no distinguishing code.
+The `0x63C1E2` site (message `0x145`) lies in a different function (after the
+`ret` at `0x63C0A7`); it switches on its own object's `[+8]-1` (0..3, table VA
+`0xA3D1D4`) to pick log strings, and I found no store of a `[node+0xC]` value
+or call into `0x6385C0` in it. So `0x145` provably emits no case of this
+switch directly; the producer of the `+0x20` list nodes was not located.
+`0x1E5CAA4`: the byte pattern `A4CAE501` occurs once in the file (raw
+`0x638ABD`), and `.reloc` has exactly one HIGHLOW entry for it (`0xA396BD`).
+So no direct `mov [0x1E5CAA4],...`, `lea`, `push`, or data pointer exists. The
+initial image holds `05050505`. Neighbouring `0x1E5CAAC..0x1E5CAD0`
+belong to a table wrapper whose initializer is at `0xB637F0`; sibling slots
+`0x1E5C8A4`/`0x1E5C9A4` pattern likewise have readers only. Interpretation:
+the slot is written indirectly (computed base/loop or struct copy), not found.
+Whether the case-1 node is an error/notification event is inferred from the
+`0x146` send only.
 
 ### World scene-factory root and owned renderer interface
 

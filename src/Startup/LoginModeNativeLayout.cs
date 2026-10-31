@@ -129,6 +129,17 @@ public static class LoginModeNativeLayout
     public const uint LoginUpdateGuardGlobalVa = 0x1E5CAA4;
     public const uint LoginUpdateGuardByteOffset = 0x40;
     public const uint LoginUpdateGuardReadFileOffset = 0x638ABC;
+    // Observed: selector is [[esi+0x20]->first node + 0xC]; cmp 4 / ja default; jmp [edx*4+table].
+    public const uint LoginUpdateSwitchSelectorLoadFileOffset = 0x6388D8;
+    public const uint LoginUpdateSwitchJumpTableVirtualAddress = 0xA3991C;
+    public const uint LoginUpdateSwitchJumpTableFileOffset = 0x638D1C;
+    public const uint LoginUpdateSwitchCaseCount = 5;
+    public const uint LoginUpdateSwitchCase1FileOffset = 0x6389F2;
+    public const uint LoginUpdateSwitchSharedCaseFileOffset = 0x638C3A;
+    // The ja target is 0x638AB3 (mov [ecx],eax); 0x638AB5 is the next instruction.
+    public const uint LoginUpdateSwitchDefaultTargetFileOffset = 0x638AB3;
+    public const uint LoginUpdateCase1MessageSendFileOffset = 0x638A3B;
+    public const uint LoginUpdateCase1MessageId = 0x146;
     public const uint LoginUpdateLookingGlassPathFileOffset = 0x638B1A;
     public const uint PendingRequestEnqueueActiveFlagOffset = 0xC;
     public const uint PendingRequestQueueOffset = 0xB84;

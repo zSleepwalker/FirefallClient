@@ -881,6 +881,16 @@ internal static class StartupBinaryEvidence
                 "8BD9807B0C008B4D080F84230100008339010F851A")
             && Matches(LoginModeNativeLayout.PendingRequestEnqueuePushFileOffset,
                 "8B71048B018945DCC745E00000000085F674178D4DE0E80BA5FA008975E08D4EFCB801000000F00FC1018D45DCC745FC00000000508D8B840B0000E8167000"));
+        check("Binary tfLogin update switch selects on [node+0xC] with a five-entry table (case1 -> message 0x146)",
+            Matches(LoginModeNativeLayout.LoginUpdateSwitchSelectorLoadFileOffset,
+                "8B500C83FA040F87CF010000FF24951C99A300")
+            && ReadUInt32(LoginModeNativeLayout.LoginUpdateSwitchJumpTableFileOffset) == 0xA3983A
+            && ReadUInt32(LoginModeNativeLayout.LoginUpdateSwitchJumpTableFileOffset + 4) == 0xA395F2
+            && ReadUInt32(LoginModeNativeLayout.LoginUpdateSwitchJumpTableFileOffset + 8) == 0xA3983A
+            && ReadUInt32(LoginModeNativeLayout.LoginUpdateSwitchJumpTableFileOffset + 12) == 0xA3983A
+            && ReadUInt32(LoginModeNativeLayout.LoginUpdateSwitchJumpTableFileOffset + 16) == 0xA3983A
+            && Matches(LoginModeNativeLayout.LoginUpdateSwitchDefaultTargetFileOffset, "8901C7461C00000000A1A4CAE501")
+            && Matches(LoginModeNativeLayout.LoginUpdateCase1MessageSendFileOffset, "6846010000" + "8B01FF90AC000000"));
         check("Binary worker registers the concrete WinHTTP status callback",
             Matches(0xBC31DE, "6A006AFF68E032FC00FF37FF150C4DAC01")
             && Matches(0xBC278E, "C21400"));
