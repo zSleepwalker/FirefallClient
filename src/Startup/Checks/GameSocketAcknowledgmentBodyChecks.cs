@@ -77,5 +77,20 @@ internal static class GameSocketAcknowledgmentBodyChecks
             && GameSocketAcknowledgmentBody.MaximumWordCount == 694
             && GameSocketReliableQueueNativeLayout.PeerWindowSequenceOffset == 0x2C
             && GameSocketReliableQueueNativeLayout.CumulativeAcknowledgmentSequenceOffset == 0x2E);
+
+        check("GameSocket ACK emitter records receive frontiers, selective-ring layout, and one-byte chunk bound",
+            GameSocketReliableQueueNativeLayout.DatagramAssemblerMethodFileOffset == 0xBD4340
+            && GameSocketReliableQueueNativeLayout.OutgoingAcknowledgmentBuilderFileOffset == 0xBE4F20
+            && GameSocketReliableQueueNativeLayout.NextReceiveSequenceOffset == 0x2A
+            && GameSocketReliableQueueNativeLayout.LocalCumulativeAcknowledgmentSequenceOffset == 0x30
+            && GameSocketReliableQueueNativeLayout.AcknowledgmentPendingFlagOffset == 0x32
+            && GameSocketReliableQueueNativeLayout.PendingReceivedSequenceTrackerOffset == 0x47C
+            && GameSocketReliableQueueNativeLayout.PendingReceivedSequenceTrackerCursorOffset == 0x488
+            && GameSocketReliableQueueNativeLayout.PendingReceivedSequenceTrackerCountOffset == 0x48C
+            && GameSocketReliableQueueNativeLayout.SelectiveAcknowledgmentBitmapOffset == 0x490
+            && GameSocketReliableQueueNativeLayout.SelectiveAcknowledgmentBitmapHeadOffset == 0x590
+            && GameSocketReliableQueueNativeLayout.EmittedAcknowledgmentBaseChunkLength == 7
+            && GameSocketReliableQueueNativeLayout.MaximumEmittedAcknowledgmentChunkLength == 0xFF
+            && GameSocketReliableQueueNativeLayout.MaximumEmittedSelectiveAcknowledgmentCount == 124);
     }
 }

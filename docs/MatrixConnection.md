@@ -263,8 +263,9 @@ retry delays, which are measured in seconds and capped at 300.
 Acknowledgment handler `0xBE43B0` reads network-byte-order WORDs, advances
 modular sequence frontiers, and removes acknowledged outstanding entries.
 It also feeds elapsed time back into the capped retry interval. Its
-two-frontier and optional exact-sequence interpretation is described below;
-the full peer-window semantics and receive-window behavior remain unresolved.
+peer frontiers, optional exact-sequence list, and matching outbound builder
+are described below; the remaining receive-window and reliability behavior
+is partial.
 `GameSocketReliableQueueNativeLayout.cs`
 preserves bounded retry growth and the exact modular send-window test,
 without implementing a timer or reliability engine.
@@ -507,6 +508,26 @@ Any remaining WORDs are selective acknowledgments: each is looked up by
 sequence in the outstanding tree and an exact match is retired. Comparisons
 use 16-bit modular ordering. `GameSocketAcknowledgmentBody.cs` decodes this
 bounded body without mutating queue state.
+
+Outbound ACK construction is `0xBE4F20`, called twice by datagram assembler
+`0xBD4340`: queue `+0xD6C` with opcode2, then queue `+0xD70` with opcode3.
+The chunk bytes are `[00][length][opcode][BE16 next-receive][BE16 cumulative]
+[BE16 selective-sequence...]`. The two frontier fields come from queue
+`+0x2A` (next receive sequence) and `+0x30` (last contiguous received
+sequence); those correspond to the peer-facing `+0x2C/+0x2E` fields updated
+by the incoming ACK handler. The builder emits only when its pending-sequence
+count at `+0x48C` or pending flag at `+0x32` is set.
+
+The builder consumes the received-sequence tracker at `+0x47C`. A sequence
+exactly one past `+0x30` advances the cumulative frontier and the ring head;
+other forward sequences are appended as individual selective WORDs and
+marked in a 256-entry bitmap at `+0x490`, with head index at `+0x590`.
+After writing the current `+0x30` frontier to the chunk, it collapses
+contiguous set bits for a later ACK. The one-byte total-length field starts
+at7 and allows at most124 selective entries (chunk length255). The assembler
+places these control chunks before queued data fragments. This documents the
+outbound ACK builder's observed projection only; it does not construct or send
+datagrams in C#.
 
 For acknowledged fragments with a valid elapsed-time sample, `0xBE43B0`
 updates the retry interval to

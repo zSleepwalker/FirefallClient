@@ -1841,5 +1841,16 @@ internal static class StartupBinaryEvidence
             && Matches(GameSocketAcknowledgmentBody.NativeHandlerFileOffset, "558BEC83EC20538BD9565789")
             && GameSocketReliableQueueNativeLayout.PeerWindowSequenceOffset == 0x2C
             && GameSocketReliableQueueNativeLayout.CumulativeAcknowledgmentSequenceOffset == 0x2E);
+        check("outbound ACK builder and channel-queue call sites",
+            Matches(GameSocketReliableQueueNativeLayout.DatagramAssemblerMethodFileOffset, "558BEC83EC2453568BF1")
+            && Matches(GameSocketReliableQueueNativeLayout.OutgoingAcknowledgmentBuilderFileOffset, "558BEC83EC10568BF157")
+            && Matches(0xBD43B4, "E8670B0100")
+            && Matches(0xBD43E9, "E8320B0100")
+            && Matches(0xBE4FB2, "884102")
+            && Matches(0xBE5124, "66894103")
+            && Matches(0xBE5136, "66894105")
+            && GameSocketReliableQueueNativeLayout.NextReceiveSequenceOffset == 0x2A
+            && GameSocketReliableQueueNativeLayout.LocalCumulativeAcknowledgmentSequenceOffset == 0x30
+            && GameSocketReliableQueueNativeLayout.MaximumEmittedAcknowledgmentChunkLength == 0xFF);
     }
 }
