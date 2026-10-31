@@ -221,4 +221,6 @@ public static class ClientMainLoopNativeLayout
     // Round 19: initial-packet serializer orchestrator.
     public const long MatrixInitialPacketSerializeRaw = 0x498A00;
     public const long WireWriteCompactUInt16Raw = 0x320900;
+    // Round 20: SubmitApplicationBuffer channel jump table (VA 0xFD4A3C = raw 0xBD3E3C).
+    public const long SubmitChannelJumpTableRaw = 0xBD3E3C;
 }

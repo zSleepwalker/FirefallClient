@@ -105,3 +105,15 @@
 
 ## Unresolved
 - The channel jump-table targets, the IOCP recv completion handler for the 1400-byte buffer, and the type-id to handler-name list were not re-derived (existing doc covers table raw 0x33D424). Scope: only these two functions were inspected this round.
+
+# Round 20: compact UInt16 is the message id; channel table
+
+## Observed
+- `0x320900` writes the DWORD at `*this` (asserts non-zero, line 50; asserts <= 0xFFFF, line 57): if <= 0xFF it writes ONE byte, else a 0x?? marker byte (from `0x1B57625`) plus a 16-bit value. In `0x498A00` the value is the local 17 (0x11), so the first byte emitted is 0x11 = `MatrixInitialPacket.MessageId`. It is the message-type id, not a length prefix.
+- `0xBD3B20` jump table: VA 0xFD4A3C = raw 0xBD3E3C (IDA's 'invalid jump table' label points at the VA; file offset = VA-0x400C00). Targets: ch0 -> raw 0xBD3C19 (asserts, line 0x4A1: invalid channel for submit); ch1 and ch2 -> 0xBD3C3C (shared path: helper `0x12CDE60`/`0x12CB8C0`, `GameSocketFragment_Enqueue` 0xBE47C0, `0xBD5C30`, `GameSocketFragment_PackHeader` 0xBCFE30, `0xBD5BA0`); ch3 -> 0xBD3DC6 (`PackHeader` then `0xBD5C00` and `0xBE5D10`, no enqueue seen in the listing, i.e. unreliable direct path).
+
+## Interpreted
+- Round-19 'possible mismatch' is withdrawn: `MatrixInitialPacket.cs` (first byte 0x11, FixedEncodedSize 30) matches; no src change. Channel 3 = unreliable, 1/2 = fragment/reliable queue is consistent with docs\MatrixConnection.md ~199-202; per-channel names beyond that are not proven.
+
+## Unresolved
+- IOCP recv completion handler for the this+632 buffer and the type-id -> handler list were not traced this round (existing doc: IOCP receive dispatch and table raw 0x33D424). Scope: only 0x320900 and 0xBD3B20 targets inspected.
