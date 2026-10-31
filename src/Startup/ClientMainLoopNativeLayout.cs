@@ -168,4 +168,12 @@ public static class ClientMainLoopNativeLayout
     public const int IniFileLoadFn12DCE00FileOffset = 0x12DCE00;
     public const int OEngineSystemCtorE4DFA0FileOffset = 0xE4DFA0;
     public const int OEngineSystemVtableFileOffset = 0x187682C;
-    public const int OEngineSystemVtableVa = 0x1C77C2C;}
+    public const int OEngineSystemVtableVa = 0x1C77C2C;    // Round 12: URI handler, UA string.
+    public const long UriHandlerRaw = 0x304F30;
+    public const long LookingGlassQueueRaw = 0x306050;
+    public const long AwesomiumInitRaw = 0xCBCA50;
+    public const long OracleTicketQueueRaw = 0x494E30;
+    public const long UserAgentFormatFileOffset = 0x17C4C84; // "firefall/%s (%s)"
+    public const long UriSchemeFileOffset = 0x1B40188 - 0x401400; // "firefall://"
+    public const long UriOperatorPrefixFileOffset = 0x1B402C4 - 0x401400; // "operator/"
+}

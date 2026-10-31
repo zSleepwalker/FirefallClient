@@ -1817,5 +1817,6 @@ internal static class StartupBinaryEvidence
             Matches(ClientMainLoopNativeLayout.FileListGlobExpandFn1361890FileOffset, "558BEC83E4F86AFF6863CAA9") &&
             Matches(ClientMainLoopNativeLayout.IniFileLoadFn12DCE00FileOffset, "558BEC83E4F86AFF68B461A9") &&
             Matches(ClientMainLoopNativeLayout.OEngineSystemCtorE4DFA0FileOffset, "558BEC6AFF6826F4A50164A1") &&
-            Matches(ClientMainLoopNativeLayout.OEngineSystemVtableFileOffset, "F0572501F05F250180612501"));    }
+            Matches(ClientMainLoopNativeLayout.OEngineSystemVtableFileOffset, "F0572501F05F250180612501"));
+        check("round12 uri/ua/login fingerprints", Matches(ClientMainLoopNativeLayout.UriHandlerRaw, "558BEC6AFF68614D") && Matches(ClientMainLoopNativeLayout.LookingGlassQueueRaw, "558BEC6AFF68A84D") && Matches(ClientMainLoopNativeLayout.AwesomiumInitRaw, "558BEC6AFF68C5FC") && Matches(ClientMainLoopNativeLayout.OracleTicketQueueRaw, "558BEC6AFF6861A4") && Matches(ClientMainLoopNativeLayout.UserAgentFormatFileOffset, "6669726566616C6C2F25732028257329") && Matches(ClientMainLoopNativeLayout.UriSchemeFileOffset, "6669726566616C6C3A2F2F00") && Matches(ClientMainLoopNativeLayout.UriOperatorPrefixFileOffset, "6F70657261746F722F"));    }
 }
