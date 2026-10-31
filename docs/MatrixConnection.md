@@ -976,9 +976,9 @@ or C++ exception unwinding.
 
 ## Shared channel-2/3 compact-code dispatcher
 
-Decoder, case-block, factory, serializer and fallback function addresses
-below are raw file offsets; lookup arrays and vtables are labeled by VA,
-with raw offsets where available.
+Decoder, case-block, factory, serializer and secondary-dispatch function
+addresses below are raw file offsets; lookup arrays and vtables are labeled
+by VA, with raw offsets where available.
 Decoder `0x821BA0` compares primary-view size with `offset+length` and calls
 the native diagnostic if the slice is short; no early return for that mismatch
 is visible. It then reads a raw QWORD and a compact positive16 code. The
@@ -995,12 +995,13 @@ with `code-1`, then indexing the three-entry DWORD table VA `0xC229BC`
 | Compact code | Route-table index | Native case (raw file offset) | Observed result path |
 | ---: | ---: | ---: | --- |
 | 1-6, 9 | 0 | `0x821CF7` | Builds an RTTI `nl::RoutedMessage` via `0xBC9B80` |
-| 7 | 2 | `0x821D7C` | Calls fallback `0x81CC50` with the code |
+| 7 | 2 | `0x821D7C` | Enters the secondary dispatcher `0x81CC50` |
 | 8 | 1 | `0x821D41` | Builds an RTTI `nl::RoutedMultipleMessage` via `0xBC9DB0` |
 
-Codes outside1..9 bypass the table and branch to fallback block `0x821D7C`,
-which calls `0x81CC50`; code7 reaches the same block through route index2.
-The two factories produce
+Codes outside1..9 bypass the table and branch to shared secondary-dispatch
+block `0x821D7C`, which calls `0x81CC50`; code7 reaches the same block
+through route index2. `0x81CC50` is a large separate dispatcher; its own
+byte/argument tables are not mapped here. The two factories produce
 different result layouts. RTTI identifies the first vtable at VA `0x1C7394C`
 as `nl::RoutedMessage`; its embedded blob is at `+0x28`, with the source
 extent copied to `+0x34`, and a DWORD blob-slice offset/length pair at

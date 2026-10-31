@@ -933,15 +933,15 @@ Check("Shared channel-2/3 compact-code routing groups the observed native cases"
         MatrixOtherChannelDecoderNativeLayout.SelectRoute(code)
             == MatrixOtherChannelDecoderRoute.RoutedMessage)
     && MatrixOtherChannelDecoderNativeLayout.SelectRoute(7)
-        == MatrixOtherChannelDecoderRoute.Fallback
+        == MatrixOtherChannelDecoderRoute.SecondaryDispatcher
     && MatrixOtherChannelDecoderNativeLayout.SelectRoute(8)
         == MatrixOtherChannelDecoderRoute.RoutedMultipleMessage
     && MatrixOtherChannelDecoderNativeLayout.SelectRoute(9)
         == MatrixOtherChannelDecoderRoute.RoutedMessage
     && MatrixOtherChannelDecoderNativeLayout.SelectRoute(0)
-        == MatrixOtherChannelDecoderRoute.Fallback
+        == MatrixOtherChannelDecoderRoute.SecondaryDispatcher
     && MatrixOtherChannelDecoderNativeLayout.SelectRoute(10)
-        == MatrixOtherChannelDecoderRoute.Fallback
+        == MatrixOtherChannelDecoderRoute.SecondaryDispatcher
     && MatrixOtherChannelDecoderNativeLayout.RoutedMessageSerializeMethodFileOffset == 0xBCB070
     && MatrixOtherChannelDecoderNativeLayout.RoutedMultipleMessageSerializeMethodFileOffset == 0xBCB120
     && MatrixOtherChannelDecoderNativeLayout.RoutedMessageBlobSliceOffsetFieldOffset == 0x38

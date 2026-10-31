@@ -1084,8 +1084,9 @@ internal static class StartupBinaryEvidence
                 0xE8, 0x12CDE60)
             && RelativeBranchTargets(MatrixOtherChannelDecoderNativeLayout.SpecialRouteFileOffset + 0x24,
                 0xE8, MatrixOtherChannelDecoderNativeLayout.RoutedMultipleMessageFactoryFileOffset)
-            && RelativeBranchTargets(MatrixOtherChannelDecoderNativeLayout.FallbackRouteFileOffset + 0x0B,
-                0xE8, MatrixOtherChannelDecoderNativeLayout.UnrecognizedCodeFallbackFileOffset)
+            && RelativeBranchTargets(
+                MatrixOtherChannelDecoderNativeLayout.SecondaryDispatcherRouteCaseFileOffset + 0x0B,
+                0xE8, MatrixOtherChannelDecoderNativeLayout.SecondaryDispatcherFileOffset)
             && VtableRttiName(MatrixOtherChannelDecoderNativeLayout.RoutedMessageBaseVtableVirtualAddress, 80)
                 == MatrixOtherChannelDecoderNativeLayout.RoutedMessageBaseRttiName
             && VtableRttiName(MatrixOtherChannelDecoderNativeLayout.RoutedMultipleMessageBaseVtableVirtualAddress, 80)

@@ -4,7 +4,7 @@ public enum MatrixOtherChannelDecoderRoute
 {
     RoutedMessage,
     RoutedMultipleMessage,
-    Fallback
+    SecondaryDispatcher
 }
 
 /// <summary>
@@ -22,8 +22,8 @@ public static class MatrixOtherChannelDecoderNativeLayout
     public const int MaximumDispatchedCode = 9;
     public const uint GeneralRouteFileOffset = 0x821CF7;
     public const uint SpecialRouteFileOffset = 0x821D41;
-    public const uint FallbackRouteFileOffset = 0x821D7C;
-    public const uint UnrecognizedCodeFallbackFileOffset = 0x81CC50;
+    public const uint SecondaryDispatcherRouteCaseFileOffset = 0x821D7C;
+    public const uint SecondaryDispatcherFileOffset = 0x81CC50;
     public const uint RoutedMessageFactoryFileOffset = 0xBC9B80;
     public const uint RoutedMultipleMessageFactoryFileOffset = 0xBC9DB0;
     public const uint RoutedMessageSerializeMethodFileOffset = 0xBCB070;
@@ -49,6 +49,6 @@ public static class MatrixOtherChannelDecoderNativeLayout
     {
         1 or 2 or 3 or 4 or 5 or 6 or 9 => MatrixOtherChannelDecoderRoute.RoutedMessage,
         8 => MatrixOtherChannelDecoderRoute.RoutedMultipleMessage,
-        _ => MatrixOtherChannelDecoderRoute.Fallback
+        _ => MatrixOtherChannelDecoderRoute.SecondaryDispatcher
     };
 }

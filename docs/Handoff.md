@@ -1034,9 +1034,10 @@ These updates supersede older next-step suggestions below where they overlap.
   arguments/instruction framing before reconstructing wire fields.
 - **Shared channel2/3 dispatch is now mapped.** `0x821BA0` reads a raw QWORD
   and compact positive16 code; codes1..6/9 reach factory `0xBC9B80`, code8
-  reaches `0xBC9DB0`, and code7/out-of-range reaches shared fallback block
-  `0x821D7C` then helper `0x81CC50`. The three route targets and
-  byte-map/table addresses are in MatrixConnection.md.
+  reaches `0xBC9DB0`, and code7/out-of-range reaches shared secondary-dispatch
+  block `0x821D7C` then `0x81CC50`. The three route targets and byte-map/table
+  addresses are in MatrixConnection.md; the larger secondary dispatch remains
+  to be mapped.
   RTTI names the results `nl::RoutedMessage` and
   `nl::RoutedMultipleMessage`; QWORD and message semantics remain unknown.
 - **Header/factory roles corrected by instructions.** 34A020 reads compact
