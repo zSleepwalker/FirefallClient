@@ -543,9 +543,17 @@ internal static class StartupBinaryEvidence
             && Matches(TfWorldZoneCleanupNativeLayout.EnteredZoneCleanupCallFileOffset, "E82E961B00")
             && Matches(0x64E275, "E8B6B7D1FF")
             && Matches(0x64E3B3, "C683F102000000"));
-        check("Binary released-object +0x32C pointer is runtime-produced and invoked through vtable slot zero",
+        check("Binary released-object factory/getter calls and +0x32C slot-zero invocation match original bytes",
             Matches(TfWorldZoneCleanupNativeLayout.ReleasedObjectCleanupVirtualPointerInitializeFileOffset,
                 "C7832C03000000000000")
+            && Matches(TfWorldZoneCleanupNativeLayout.ReleasedObjectCleanupResourceGetterSetupFileOffset,
+                "8B8E980B00008B01FF5024")
+            && Matches(TfWorldZoneCleanupNativeLayout.ReleasedObjectCleanupResourceGetterCallFileOffset,
+                "FF5024")
+            && Matches(TfWorldZoneCleanupNativeLayout.ReleasedObjectCleanupFactorySetupFileOffset,
+                "8B4E108D9510FFFFFF528B01FF5040")
+            && Matches(TfWorldZoneCleanupNativeLayout.ReleasedObjectCleanupVirtualPointerStoreFileOffset,
+                "89872C030000")
             && Matches(TfWorldZoneCleanupNativeLayout.ReleasedObjectCleanupVirtualPointerFactoryCallFileOffset,
                 "FF5040F6450C0289872C030000")
             && Matches(0x8610C4, "8B016A01FF10"));
@@ -751,6 +759,16 @@ internal static class StartupBinaryEvidence
         check("Binary outgoing runtime receiver is translated to zero-initialized .data",
             Matches(0x63CEF2, "8B0DB802E001")
             && ReadUInt32(LoginModeNativeLayout.CharacterRefreshRequestReceiverGlobalFileOffset) == 0);
+        check("Binary Login response dispatches message 0x145 through the shared runtime endpoint",
+            Matches(LoginModeNativeLayout.LoginResponseNotificationCallSiteFileOffset,
+                "8B0DB802E0018D55846A00526845010000"));
+        check("Binary tfLogin update queues World request pair {2,0}",
+            Matches(LoginModeNativeLayout.LoginUpdateMethodFileOffset,
+                "558BEC83E4F8")
+            && Matches(LoginModeNativeLayout.VtableFileOffset + LoginModeNativeLayout.LoginUpdateMethodVtableOffset,
+                "C091A300")
+            && Matches(LoginModeNativeLayout.LoginUpdateWorldModeQueueCallSiteFileOffset,
+                "C744241C02000000C7442420000000008D44241CC7842430010000060000008B0D98FDDF0150E8FC52CDFF"));
         check("Binary worker registers the concrete WinHTTP status callback",
             Matches(0xBC31DE, "6A006AFF68E032FC00FF37FF150C4DAC01")
             && Matches(0xBC278E, "C21400"));
@@ -858,6 +876,21 @@ internal static class StartupBinaryEvidence
             && Matches(NetworkIoCompletionNativeLayout.DequeueCompletionCallFileOffset, "FF55E8")
             && Matches(GameSocketReceiveNativeLayout.GetOverlappedResultCallFileOffset, "FF15644DAC01")
             && Matches(GameSocketReceiveNativeLayout.RepostReceiveCallFileOffset, "FF15544DAC01"));
+        check("Binary Network and GameSocket shutdown ownership and distinct WinHTTP close helpers are fingerprinted",
+            ReadUInt32(VirtualAddressToFileOffset(0x1C734B4)) == 0x00FBD900
+            && ReadUInt32(VirtualAddressToFileOffset(0x1C734B4) + 8) == 0x00FBE540
+            && ReadUInt32(VirtualAddressToFileOffset(0x1C73A5C)) == 0x00FD0FD0
+            && ReadUInt32(VirtualAddressToFileOffset(0x1C73A5C) + 0x1C) == 0x00FD3910
+            && Matches(0xBBD940, "558BEC837D0800578BF9")
+            && Matches(0xBBD9C7, "6A02FF36FF15D44DAC01FF36FF15C84DAC01C706FFFFFFFF")
+            && Matches(0xBD048E, "83BE18010000FF8D8E180100007405E80E320100")
+            && Matches(0xBE36E3, "6A02FF36FF15D44DAC01FF36FF15C84DAC01C706FFFFFFFF")
+            && Matches(0xBC3970, "568BF18B462085C0740E50FF15F84CAC01C74620000000005EC3")
+            && Matches(0xBC3990, "568BF18B0685C0740D50FF15F84CAC01C706000000005EC3")
+            && ImportSlotNames(0x1AC4CF8, "WinHttpCloseHandle")
+            && Matches(0xBBDA20, "558BEC83EC14535657")
+            && ReadUInt32(0x183CCFD) == 0x00BBDA20
+            && ReadUInt32(0x183CE7D) == 0x00BBE620);
         check("Binary oracle submission calls the shared matrix request wrapper",
             Matches(MatrixConnectionNativeLayout.OracleRequestSubmissionFileOffset, "E80C5B0000"));
         check("Binary packet admission uses unsigned count-minus-five and a network-order context word",

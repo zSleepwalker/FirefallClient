@@ -122,6 +122,11 @@ public static class LoginModeNativeLayout
     public const uint CharacterRefreshHandlerFileOffset = 0x63C5F0;
     public const int CharacterRefreshRequestMethodVtableOffset = 0xAC;
     public const int CharacterRefreshRequestMessageId = 0x89;
+    public const int LoginUpdateMethodVtableOffset = 0x0C;
+    public const uint LoginUpdateMethodFileOffset = 0x6385C0;
+    public const uint LoginUpdateWorldModeQueueCallSiteFileOffset = 0x638B89;
+    public const uint LoginResponseNotificationCallSiteFileOffset = 0x63C1E2;
+    public const int LoginResponseNotificationMessageId = 0x145;
     public const int ResponseCallbackObjectSize = 0x20;
     public const int ResponseCallbackOwnerPointerOffset = 0x04;
     public const int ResponseCallbackTargetPointerOffset = 0x10;

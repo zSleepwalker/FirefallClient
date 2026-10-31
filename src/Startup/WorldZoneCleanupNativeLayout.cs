@@ -131,9 +131,14 @@ public static class TfWorldZoneCleanupNativeLayout
     public const int ReleasedObjectCleanupVirtualPointerOffset = 0x32C;
     public const uint ReleasedObjectCleanupVirtualPointerInitializeFileOffset = 0x8602CD;
     public const uint ReleasedObjectCleanupVirtualPointerProviderFileOffset = 0x860810;
+    public const uint ReleasedObjectCleanupResourceGetterSetupFileOffset = 0x860F3C;
+    public const uint ReleasedObjectCleanupResourceGetterCallFileOffset = 0x860F44;
+    public const uint ReleasedObjectCleanupFactorySetupFileOffset = 0x860F63;
     public const uint ReleasedObjectCleanupVirtualPointerFactoryCallFileOffset = 0x860F6F;
     public const uint ReleasedObjectCleanupVirtualPointerStoreFileOffset = 0x860F76;
     public const uint ReleasedObjectCleanupVirtualPointerCallFileOffset = 0x8610C8;
+    public const int ReleasedObjectCleanupFactoryMemberOffset = 0x10;
+    public const int ReleasedObjectCleanupFactoryVirtualOffset = 0x40;
     public const int ReleasedObjectCleanupVirtualPointerVtableSlotOffset = 0;
     public const int ReleasedObjectCleanupVirtualPointerCallArgument = 1;
     public const uint ReleasedObjectResourceManagerCleanupMethodFileOffset = 0xD74A20;

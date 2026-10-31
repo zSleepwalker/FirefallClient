@@ -5,6 +5,9 @@ Addresses are raw file offsets unless marked VA. The `0xBB0`-byte
 Login-owned object at Login `+0x1C` is called a matrix connection object by
 observed logs and operations; its original class name is not established.
 It is distinct from the global polymorphic message endpoint at VA `0x1E002B8`.
+The Login response handler also calls that endpoint with message ID `0x145`
+at raw `0x63C1E2` (global raw `.data` offset `0x19FE6B8`). The endpoint's
+recipient and any causal connection to World-mode entry remain unproven.
 
 ## Oracle-ticket request
 
@@ -373,6 +376,37 @@ slots, and operation layout. This establishes a concrete OS-to-socket
 receive chain, separate from WinHTTP's callback mechanism. Queued delivery
 to the connection handler is described below; application packet dispatch
 and the complete World transition remain partial.
+
+## Shutdown and handle ownership
+
+The original PE's `nl::Network` vtable (VA `0x1C734B4`) has slot `+8` at
+VA `0xFBE540`, raw `0xBBD940`. That method receives a pointer to a socket
+handle, calls the optional callback at Network `+0xD8`, then calls
+`WSOCK32.dll` ordinals 22 and 3 with the handle (shutdown mode `2`, then
+close) and writes `-1` through the handle pointer. If Network `+0xDC` is
+valid, it posts a zero-byte/null-overlapped completion using the first
+argument as completion key. This is the observed Network socket-close and
+pump-wakeup path.
+
+GameSocket vtable slot `+0x1C` is raw `0xBD2D10`; it marks byte `+0xD94`
+and drains the queue, but does not close the socket. The GameSocket deleting
+destructor (`0xBD03D0` -> `0xBD0410`) checks socket handle `+0x118` and, when
+valid, calls `0xBE36B0` with its address. `0xBE36B0` performs the same
+shutdown-mode-2/close sequence and stores `-1`. Thus the GameSocket owns the
+socket field; Network's close path also closes a socket supplied by pointer.
+The Network destructor vtable slot `0` (`0xBBCD00` -> `0xBBCD30`) tears down
+its embedded pump thread and owned buffers, but the eventual close of its
+IOCP handle at `+0xDC` is not established by this trace.
+
+The requested helpers `0xBC3970` and `0xBC3990` have no direct `E8`/`E9`
+caller or `.rdata` VA/vtable pointer in the original-file scans. Their code calls the imported
+`WinHttpCloseHandle` at VA `0x1AC4CF8`, then clears `this+0x20` and `this`,
+respectively; no evidence ties those WinHTTP handles to Network or GameSocket.
+The standalone drain `0xBBDA20` likewise has no direct `E8`/`E9` caller or
+actual VA pointer/vtable slot found. Its raw value occurs at unaligned `.rdata`
+offset `0x183CCFD` among `+0x20`-stride values, and its RVA occurs at
+`0x183CE7D` in another such sequence; neither sequence is established as a
+vtable, so its owner remains unresolved.
 
 ## Outer packet admission
 
@@ -1105,7 +1139,18 @@ an application-mode transition. The separate object+0x32C field is zeroed in
 `0x860230` and later populated from a virtual+0x40 result in `0x860810`.
 `0x861020` invokes the resulting object's vtable slot0 with argument1, but its
 target is not a static address and the deleting-destructor interpretation is
-unproven. It then calls `0x424790` with object+4; that helper reads the pointer
+unproven. In the producer `0x860810`, raw bytes at `0x860F3C` are
+`8B 8E 98 0B 00 00 8B 01 FF 50 24`: it loads the object at global VA
+`0x1DFFD98`+`0xB98` and dispatches byte offset `+0x24`. At `0x860F63`,
+`8B 4E 10 8D 95 10 FF FF FF 52 8B 01 FF 50 40` loads the getter result's
+member `+0x10`, passes a local address, and dispatches byte offset `+0x40`;
+the return is stored at `+0x32C` by `89 87 2C 03 00 00` at `0x860F76`.
+These establish the indirect calls and offsets, not their target functions.
+No concrete vtable or static candidate target was resolved from the inspected
+references; consequently slot0 cannot be classified as a deleting destructor.
+The cleanup invocation at `0x8610C4` is `8B 01 6A 01 FF 10` (load vptr,
+push 1, call slot0), which is compatible with but does not prove that
+interpretation. It then calls `0x424790` with object+4; that helper reads the pointer
 at object+0x320, whose allocation header is eight bytes
 before the payload and has its reference count four bytes before the payload.
 On final release, tag `0x17` calls the shared-text allocator singleton getter

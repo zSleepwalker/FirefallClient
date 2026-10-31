@@ -23,6 +23,17 @@ Check(Marshal.OffsetOf<SdbNativeMappedTableResult>(
 Check(Marshal.OffsetOf<SdbNativeMappedTableResult>(
     nameof(SdbNativeMappedTableResult.RefCountedHandlePointer32)).ToInt32() == 0x18,
     "Native result stores refcounted handle at +0x18");
+Check(Marshal.SizeOf<SdbNativeRowHandle32>() == 0x08
+    && Marshal.OffsetOf<SdbNativeRowHandle32>(
+        nameof(SdbNativeRowHandle32.VTablePointer32)).ToInt32() == 0
+    && Marshal.OffsetOf<SdbNativeRowHandle32>(
+        nameof(SdbNativeRowHandle32.DataPointer32)).ToInt32() == 4,
+    "Native row handle stores vtable and data pointers at +0/+4");
+Check(SdbNativeRowHandleVTable32.VirtualAddress == 0x1C6883C
+    && SdbNativeRowHandleVTable32.FileOffset == 0x186743C
+    && SdbNativeRowHandleVTable32.Slot0TargetFileOffset == 0x70D3F0
+    && SdbNativeRowHandleVTable32.Slot1TargetFileOffset == 0x716B20,
+    "Native row-handle vtable and slot targets");
 Check(Marshal.SizeOf<SdbNativeCatalogOpaqueFields>() == 0x08,
     "Native catalog opaque tail size");
 Check(Marshal.OffsetOf<SdbNativeCatalogOpaqueFields>(

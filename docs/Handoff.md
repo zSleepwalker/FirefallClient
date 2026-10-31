@@ -11,6 +11,15 @@ so native non-default mode/control reachability remains unproven.
 Overall client reconstruction remains incomplete. No recurring session
 automation is configured.
 
+The latest bounded world-cleanup pass confirms the raw callsite bytes for the
+resource getter dispatch (`0x860F44`, vtable byte offset `+0x24`) and returned
+object factory (`0x860F6F`, member `+0x10`, vtable byte offset `+0x40`), plus
+the result store at `0x860F76`. Both targets remain indirect: no concrete
+vtable or static candidate was resolved, so slot0's deleting-destructor
+interpretation remains unproven. The slot0 cleanup call at `0x8610C8` passes
+argument1; this alone is not destructor evidence. Fingerprint checks now pin
+these observed instruction sequences without asserting their targets.
+
 The latest arena lifetime follow-up confirms that the traced block-return path
 recycles spans through list metadata without coalescing or releasing the
 generated-output regions. `VirtualFree` is present in the generic allocator
@@ -707,6 +716,22 @@ These updates supersede older next-step suggestions below where they overlap.
   database tree at `this+0x28` is now laid out as an auxiliary buffer map whose
   key is also used as a backing-buffer displacement; key/value semantics and
   conditional value ownership remain unresolved.
+- **SDB row-handle dispatch is bounded.** The example handle vtable at PE VA
+  `0x1C6883C` is at raw file offset `0x186743C` by the executable's section
+  table (the PE headers give this `.rdata` section a VA-minus-raw delta of
+  `0x401400`). Its first two pointers map to raw `0x70D3F0` (slot 0) and
+  `0x716B20` (slot 1). Slot 0 stamps `unk_1C68830` into the object and
+  conditionally calls raw offset `0x12C8D60`; slot 1 clears global state and a
+  16-bit member at `+8` for 12-byte records in a global range. The relationship of
+  those slot effects to row-handle ownership is not established.
+  `Sdb_InitConvertedTableResult` initializes holder `+0x18` to null; the
+  mapped-row path has no assignment after initialization, so the non-null
+  producer remains unknown. In the base-zero IDA database, `0x13122D0` is a
+  raw file offset with 283 code-call xrefs. That routine reads its tagged DWORD
+  from `*arg1` and uses an optional third-argument pointer to receive an output
+  DWORD (stored at raw `0x131236A`). The wrappers at raw offsets `0x2FE4D0` and
+  `0x2FE4F0` pass `this` and `this+4`, respectively, as `arg1`; the broad
+  callsite set has not been classified to a common owner/source.
 - **`tfLogin` mode behavior has a bounded native snapshot.** The `0xA58`-byte
   mode loads `LoginUI.xml`, registers 15 observed input actions, selects a
   background zone, and handles login, character-refresh, and zone-list
@@ -852,6 +877,16 @@ These updates supersede older next-step suggestions below where they overlap.
   and dispatch evidence. Error/suppression paths do not all repost.
   The read-only child is finished; continue at packet entry or handshake
   response routing, not by re-requesting its completed IOCP trace.
+- **Network shutdown ownership is partly bounded.** Network vtable slot+8
+  (`0xBBD940`) calls WSOCK32 ordinals22/3 (shutdown mode2, close) on a
+  socket handle supplied by pointer, writes `-1`, and posts a completion to
+  wake the pump. GameSocket deleting destruction closes its handle at+`0x118`
+  through `0xBE36B0`; slot+`0x1C` (`0xBD2D10`) is only the queue/close
+  notification. Helpers `0xBC3970`/`0xBC3990` call `WinHttpCloseHandle`
+  and clear `this+0x20`/`this`; no direct `E8`/`E9` caller or `.rdata`
+  VA/vtable pointer was found for those helpers. The eventual close of Network IOCP handle+`0xDC`
+  and standalone-drain owner remain unresolved. See
+  `docs\MatrixConnection.md` for exact references and caveats.
 - **Outer admission and zero-context handshake are saved.**
   `GameSocketPacketAdmission.cs` models exactly5..1400 bytes, BE context
   comparison, and sender-address/port gates. `GameSocketHandshake.cs`
@@ -1036,10 +1071,21 @@ These updates supersede older next-step suggestions below where they overlap.
   `+0xB84` (head/index `+0xB90`, count `+0xB94`). The character-refresh
   callback copies the first two DWORDs of a matched `0xD0`-byte record to
   `tfLogin+0xA40/+0xA44`, then crosses an indirect vtable `+0xAC` call with
-  message `0x89`. No direct callback-to-queue edge was demonstrated, so the
+  message `0x89`. Separately, raw `0x6385C0` is present in the `tfLogin`
+  vtable at raw `0x18662C0 + 0x0C`; its conditional branch at `0x638B89`
+  passes request pair `{2,0}` to `AppMode_EnqueuePendingModeRequest`
+  (`0x30DEB0`). The login response handler also calls the shared runtime
+  message endpoint at raw `0x63C1E2` with ID `0x145`. These establish a World
+  queue path and a response-side event dispatch, but not that this event causes
+  that update path or that successful login reaches its queue condition. The
   selected pair is not labeled a GUID and the complete successful transition
-  remains unresolved. Details and layout constants are in
-  `docs\LoginMode.md` and `src\Startup\`.
+  remains unresolved. Details and layout constants are in `docs\LoginMode.md`
+  and `src\Startup\`.
+- **World scene-factory return boundary.** Raw `0x9B73F0`, called from
+  `TfWorld_Initialize` (`0x64B460`), returns `EDI` through `EAX` at raw
+  `0x9B82B4` (`8B C7`); that epilogue returns at `0x9B82C6` (`C3`). The
+  factory's object construction and ownership beyond this return boundary are
+  not reconstructed.
 - **LookingGlass entry points expanded.** The shared mode-3 enqueue helper
   (`0x30D590`) has six static callers: `0x306050`, `0x3D60A0`, `0x6385C0`,
   `0x65D400`, `0x6AE3E0`, and `0x6AF120`. Several request paths update the
