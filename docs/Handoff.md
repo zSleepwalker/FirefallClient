@@ -1095,6 +1095,10 @@ These updates supersede older next-step suggestions below where they overlap.
   Selector0x69 constructs `TookHit` with a gated record at +0x28, bytes +0x50/+0x51, WORD +0x58, and byte +0x5A.
   Selector0x6A constructs `AlmostHit` and reads one QWORD at +0x28; allocation-failure behavior remains unresolved.
   Selector0x6B constructs `DealtHit` with the gated record at +0x28 and bytes +0x50/+0x51; allocation-failure behavior remains unresolved.
+  Selector0x6C constructs `Killed` and reads WORD +0x28, QWORD +0x30, and bytes +0x38..+0x3A; allocation-failure behavior remains unresolved.
+  Selector0x6D constructs `WarnLockTargeted`; the case has no body-reader call and allocation failure takes the zero-return switch epilogue.
+  Selector0x6E constructs `CurrentPoseUpdate` and reads variable scalar groups controlled by masks in byte +0x28; field meanings remain unresolved.
+  Selector0x6F constructs `ConfirmedPoseUpdate` and reads a conditional nested record at +0x28 plus WORD +0xB8; nested semantics remain unresolved.
   Remaining case handlers, field meanings, and message semantics are open.
   RTTI names the results `nl::RoutedMessage` and
   `nl::RoutedMultipleMessage`; QWORD and message semantics remain unknown.

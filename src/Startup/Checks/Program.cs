@@ -1425,6 +1425,119 @@ Check("DealtHit selector 0x6B records its conditional and trailing byte layout",
     && CharacterDealtHitNativeLayout.FirstTrailingByteFieldOffset == 0x50
     && CharacterDealtHitNativeLayout.SecondTrailingByteFieldOffset == 0x51
     && CharacterDealtHitNativeLayout.MinimumInputByteCount == 3);
+Check("Killed selector 0x6C records its word, QWORD, and trailing byte layout",
+    CharacterKilledNativeLayout.InnerSelector == 0x6C
+    && CharacterKilledNativeLayout.InnerSelectorTableVirtualAddress == 0xC22444
+    && CharacterKilledNativeLayout.InnerSelectorTableFileOffset == 0x821844
+    && CharacterKilledNativeLayout.CaseFileOffset == 0x81D3C6
+    && CharacterKilledNativeLayout.CaseLocalDwordValue == 0x74
+    && CharacterKilledNativeLayout.AllocationSize == 0x40
+    && CharacterKilledNativeLayout.AllocationFunctionFileOffset == 0x12B7FB0
+    && CharacterKilledNativeLayout.ConstructorFileOffset == 0x525F20
+    && CharacterKilledNativeLayout.BaseConstructorHelperFileOffset == 0x5A0F30
+    && CharacterKilledNativeLayout.BaseConstructorArgument == 0x6C
+    && CharacterKilledNativeLayout.AllocationFailureContinuationFileOffset == 0x81D3F0
+    && CharacterKilledNativeLayout.BodyReaderContinuationFileOffset == 0x81D3F2
+    && CharacterKilledNativeLayout.BodyReaderFileOffset == 0x5F0560
+    && CharacterKilledNativeLayout.WordReaderFileOffset == 0x336AC0
+    && CharacterKilledNativeLayout.QwordReaderFileOffset == 0x356F80
+    && CharacterKilledNativeLayout.ByteReaderFileOffset == 0x337180
+    && CharacterKilledNativeLayout.VtableVirtualAddress == 0x1C670E8
+    && CharacterKilledNativeLayout.RttiName == ".?AVKilled@Character@firefall@@"
+    && CharacterKilledNativeLayout.WordFieldOffset == 0x28
+    && CharacterKilledNativeLayout.QwordFieldOffset == 0x30
+    && CharacterKilledNativeLayout.FirstByteFieldOffset == 0x38
+    && CharacterKilledNativeLayout.SecondByteFieldOffset == 0x39
+    && CharacterKilledNativeLayout.ThirdByteFieldOffset == 0x3A
+    && CharacterKilledNativeLayout.NominalInputByteCount == 13);
+Check("WarnLockTargeted selector 0x6D records its constructor-only case",
+    CharacterWarnLockTargetedNativeLayout.InnerSelector == 0x6D
+    && CharacterWarnLockTargetedNativeLayout.InnerSelectorTableVirtualAddress == 0xC22444
+    && CharacterWarnLockTargetedNativeLayout.InnerSelectorTableFileOffset == 0x821844
+    && CharacterWarnLockTargetedNativeLayout.CaseFileOffset == 0x81D417
+    && CharacterWarnLockTargetedNativeLayout.CaseLocalDwordValue == 0x75
+    && CharacterWarnLockTargetedNativeLayout.AllocationSize == 0x28
+    && CharacterWarnLockTargetedNativeLayout.AllocationFunctionFileOffset == 0x12B7FB0
+    && CharacterWarnLockTargetedNativeLayout.ConstructorFileOffset == 0x525FB0
+    && CharacterWarnLockTargetedNativeLayout.BaseConstructorHelperFileOffset == 0x5A0FA0
+    && CharacterWarnLockTargetedNativeLayout.BaseConstructorArgument == 0x6D
+    && CharacterWarnLockTargetedNativeLayout.AllocationFailureContinuationFileOffset == 0x8217D9
+    && CharacterWarnLockTargetedNativeLayout.BodyReaderContinuationFileOffset == 0
+    && CharacterWarnLockTargetedNativeLayout.BodyReaderFileOffset == 0
+    && CharacterWarnLockTargetedNativeLayout.VtableVirtualAddress == 0x1C670C8
+    && CharacterWarnLockTargetedNativeLayout.RttiName == ".?AVWarnLockTargeted@Character@firefall@@");
+Check("CurrentPoseUpdate selector 0x6E records its gated scalar and block layout",
+    CharacterCurrentPoseUpdateNativeLayout.InnerSelector == 0x6E
+    && CharacterCurrentPoseUpdateNativeLayout.InnerSelectorTableVirtualAddress == 0xC22444
+    && CharacterCurrentPoseUpdateNativeLayout.InnerSelectorTableFileOffset == 0x821844
+    && CharacterCurrentPoseUpdateNativeLayout.CaseFileOffset == 0x81D454
+    && CharacterCurrentPoseUpdateNativeLayout.CaseLocalDwordValue == 0x76
+    && CharacterCurrentPoseUpdateNativeLayout.AllocationSize == 0x58
+    && CharacterCurrentPoseUpdateNativeLayout.AllocationFunctionFileOffset == 0x12B7FB0
+    && CharacterCurrentPoseUpdateNativeLayout.ConstructorFileOffset == 0x526030
+    && CharacterCurrentPoseUpdateNativeLayout.BaseConstructorHelperFileOffset == 0x5A1010
+    && CharacterCurrentPoseUpdateNativeLayout.BaseConstructorArgument == 0x6E
+    && CharacterCurrentPoseUpdateNativeLayout.AllocationFailureContinuationFileOffset == 0x81D47E
+    && CharacterCurrentPoseUpdateNativeLayout.BodyReaderContinuationFileOffset == 0x81D480
+    && CharacterCurrentPoseUpdateNativeLayout.BodyReaderFileOffset == 0x5EFE30
+    && CharacterCurrentPoseUpdateNativeLayout.WordReaderFileOffset == 0x336AC0
+    && CharacterCurrentPoseUpdateNativeLayout.ByteReaderFileOffset == 0x337180
+    && CharacterCurrentPoseUpdateNativeLayout.DwordReaderFileOffset == 0x3568E0
+    && CharacterCurrentPoseUpdateNativeLayout.ThreeByteReaderFileOffset == 0x336B50
+    && CharacterCurrentPoseUpdateNativeLayout.AlternateWordReaderFileOffset == 0x6097B0
+    && CharacterCurrentPoseUpdateNativeLayout.AlternateByteReaderFileOffset == 0x356CF0
+    && CharacterCurrentPoseUpdateNativeLayout.VtableVirtualAddress == 0x1C670D8
+    && CharacterCurrentPoseUpdateNativeLayout.RttiName == ".?AVCurrentPoseUpdate@Character@firefall@@"
+    && CharacterCurrentPoseUpdateNativeLayout.GateByteOffset == 0x28
+    && CharacterCurrentPoseUpdateNativeLayout.FirstConditionalByteOffset == 0x29
+    && CharacterCurrentPoseUpdateNativeLayout.FirstConditionalWordOffset == 0x2A
+    && CharacterCurrentPoseUpdateNativeLayout.AlwaysByteOffset == 0x2C
+    && CharacterCurrentPoseUpdateNativeLayout.SecondConditionalWordOffset == 0x2E
+    && CharacterCurrentPoseUpdateNativeLayout.ConditionalThreeByteBlockOffset == 0x30
+    && CharacterCurrentPoseUpdateNativeLayout.ConditionalDwordBlockOffset == 0x34
+    && CharacterCurrentPoseUpdateNativeLayout.MidModeSingleByteOffset == 0x40
+    && CharacterCurrentPoseUpdateNativeLayout.MidModeThreeByteBlockOffset == 0x41
+    && CharacterCurrentPoseUpdateNativeLayout.MidModeFourWordBlockOffset == 0x44
+    && CharacterCurrentPoseUpdateNativeLayout.TailModeThreeByteBlockOffset == 0x4C
+    && CharacterCurrentPoseUpdateNativeLayout.TailModeThreeWordBlockOffset == 0x50);
+Check("ConfirmedPoseUpdate selector 0x6F records its conditional nested layout",
+    CharacterConfirmedPoseUpdateNativeLayout.InnerSelector == 0x6F
+    && CharacterConfirmedPoseUpdateNativeLayout.InnerSelectorTableVirtualAddress == 0xC22444
+    && CharacterConfirmedPoseUpdateNativeLayout.InnerSelectorTableFileOffset == 0x821844
+    && CharacterConfirmedPoseUpdateNativeLayout.CaseFileOffset == 0x81D4A6
+    && CharacterConfirmedPoseUpdateNativeLayout.CaseLocalDwordValue == 0x77
+    && CharacterConfirmedPoseUpdateNativeLayout.AllocationSize == 0xC0
+    && CharacterConfirmedPoseUpdateNativeLayout.AllocationFunctionFileOffset == 0x12B7FB0
+    && CharacterConfirmedPoseUpdateNativeLayout.ConstructorFileOffset == 0x5260B0
+    && CharacterConfirmedPoseUpdateNativeLayout.BaseConstructorHelperFileOffset == 0x5A1090
+    && CharacterConfirmedPoseUpdateNativeLayout.BaseConstructorArgument == 0x6F
+    && CharacterConfirmedPoseUpdateNativeLayout.AllocationFailureContinuationFileOffset == 0x81D4D3
+    && CharacterConfirmedPoseUpdateNativeLayout.BodyReaderContinuationFileOffset == 0x81D4D5
+    && CharacterConfirmedPoseUpdateNativeLayout.BodyReaderFileOffset == 0x5EFAB0
+    && CharacterConfirmedPoseUpdateNativeLayout.ConditionalRecordReaderFileOffset == 0x5EF8D0
+    && CharacterConfirmedPoseUpdateNativeLayout.WordReaderFileOffset == 0x336AC0
+    && CharacterConfirmedPoseUpdateNativeLayout.ByteReaderFileOffset == 0x337180
+    && CharacterConfirmedPoseUpdateNativeLayout.DwordReaderFileOffset == 0x3568E0
+    && CharacterConfirmedPoseUpdateNativeLayout.FourDwordBlockReaderFileOffset == 0x384B40
+    && CharacterConfirmedPoseUpdateNativeLayout.AlternateWordReaderFileOffset == 0x6097B0
+    && CharacterConfirmedPoseUpdateNativeLayout.NestedFieldReaderFileOffset == 0x5FFB00
+    && CharacterConfirmedPoseUpdateNativeLayout.VtableVirtualAddress == 0x1C670B8
+    && CharacterConfirmedPoseUpdateNativeLayout.RttiName == ".?AVConfirmedPoseUpdate@Character@firefall@@"
+    && CharacterConfirmedPoseUpdateNativeLayout.InitialWordFieldOffset == 0xB4
+    && CharacterConfirmedPoseUpdateNativeLayout.FirstGateByteOffset == 0xA6
+    && CharacterConfirmedPoseUpdateNativeLayout.SecondGateByteOffset == 0xA7
+    && CharacterConfirmedPoseUpdateNativeLayout.FirstConditionalDwordBlockOffset == 0x2C
+    && CharacterConfirmedPoseUpdateNativeLayout.ConditionalSixteenByteBlockOffset == 0x78
+    && CharacterConfirmedPoseUpdateNativeLayout.ConditionalFollowingWordOffset == 0xA4
+    && CharacterConfirmedPoseUpdateNativeLayout.AlwaysDwordBlockOffset == 0x98
+    && CharacterConfirmedPoseUpdateNativeLayout.SecondConditionalDwordBlockOffset == 0x8C
+    && CharacterConfirmedPoseUpdateNativeLayout.TrailingWordBlockOffset == 0xA8
+    && CharacterConfirmedPoseUpdateNativeLayout.NestedFieldOffset == 0xB0
+    && CharacterConfirmedPoseUpdateNativeLayout.FinalWordFieldOffset == 0xB8
+    && CharacterConfirmedPoseUpdateNativeLayout.ConstructorInitializedWordOffset == 0x88
+    && CharacterConfirmedPoseUpdateNativeLayout.ConstructorInitializedWordValue == 0x0101
+    && CharacterConfirmedPoseUpdateNativeLayout.ConstructorInitializedDwordOffset == 0xB0
+    && CharacterConfirmedPoseUpdateNativeLayout.ConstructorInitializedDwordValue == 0);
 Check("Shared channel-2/3 compact-code routing groups the observed native cases",
     Enumerable.Range(1, 6).All(code =>
         MatrixOtherChannelDecoderNativeLayout.SelectRoute(code)

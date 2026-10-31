@@ -1517,6 +1517,79 @@ adds the record fields. Allocation failure branches at `0x81D38D` to
 runtime consequence is unresolved. Field meanings and message semantics
 remain unknown.
 
+### Selector 0x6C: `Killed`
+
+Entry25 maps selector `0x6C` to VA `0xC1DFC6` / raw case `0x81D3C6`. It
+allocates `0x40` bytes, stores local DWORD `0x74` (role unknown), then calls
+constructor `0x525F20`. The constructor passes `0x6C` to helper `0x5A0F30`,
+installs vtable VA `0x1C670E8` (RTTI
+`firefall::Character::Killed`), and clears the QWORD at `+0x30`.
+
+The success path joins reader setup at `0x81D3F2` and calls `0x5F0560`. In
+reader order it reads a WORD into `+0x28`, a QWORD into `+0x30`, then bytes
+into `+0x38`, `+0x39`, and `+0x3A` (13 nominal input bytes). Allocation
+failure branches to `0x81D3F0`, zeroes ESI, and reaches the same reader setup;
+the abnormal-path consequence is unresolved. The RTTI label does not prove
+message semantics, and all field meanings remain unknown.
+
+### Selector 0x6D: `WarnLockTargeted`
+
+Entry26 maps selector `0x6D` to VA `0xC1E017` / raw case `0x81D417`. It
+allocates `0x28` bytes, stores local DWORD `0x75` (role unknown), then calls
+constructor `0x525FB0`. The constructor passes `0x6D` to helper `0x5A0FA0`
+and installs vtable VA `0x1C670C8` (RTTI
+`firefall::Character::WarnLockTargeted`). This case path has no explicit
+body-reader call and returns after construction. Allocation failure branches
+to `0x8217D9`, the switch's zero-return epilogue. Body consumption outside
+this case and all field meanings remain unresolved.
+
+### Selector 0x6E: `CurrentPoseUpdate`
+
+Entry27 maps selector `0x6E` to VA `0xC1E054` / raw case `0x81D454`. It
+allocates `0x58` bytes, stores local DWORD `0x76` (role unknown), and calls
+constructor `0x526030`. The constructor passes `0x6E` to helper `0x5A1010`
+and installs vtable VA `0x1C670D8` (RTTI
+`firefall::Character::CurrentPoseUpdate`).
+
+Reader setup at `0x81D480` calls `0x5EFE30`. The reader uses the raw control
+byte at `+0x28`: bit `0x01` selects a byte at `+0x29` instead of a WORD at
+`+0x2A`; it always reads a byte at `+0x2C`; when bit `0x02` is clear it reads
+a WORD at `+0x2E`. If `(control & 0x0C) == 0`, it reads DWORDs at
+`+0x34/+0x38/+0x3C`; otherwise it copies three bytes into the field starting
+at `+0x30`. The `control & 0x30` cases select four WORDs at `+0x44..+0x4A`,
+one byte at `+0x40`, three bytes at `+0x41..+0x43`, or no mid-group read
+when the mask is `0x30`. Finally, `control & 0xC0` selects three WORDs at
+`+0x50/+0x52/+0x54` when clear, a three-byte copy at `+0x4C` for `0x40` or
+`0x80`, or no tail-group read for `0xC0`. Allocation failure zeroes ESI and
+uses the same reader setup. These are observed branch masks and field widths;
+their meanings and message semantics remain unknown.
+
+### Selector 0x6F: `ConfirmedPoseUpdate`
+
+Entry28 maps selector `0x6F` to VA `0xC1E0A6` / raw case `0x81D4A6`. It
+allocates `0xC0` bytes, stores local DWORD `0x77` (role unknown), and calls
+constructor `0x5260B0`. The constructor passes `0x6F` to helper `0x5A1090`,
+installs vtable VA `0x1C670B8` (RTTI
+`firefall::Character::ConfirmedPoseUpdate`), initializes WORD `+0x88` to
+`0x0101`, and clears DWORD `+0xB0`.
+
+Reader setup at `0x81D4D5` calls `0x5EFAB0`, which reads a record through
+`0x5EF8D0` at `object+0x28` and then a WORD at `+0xB8`. The record reader
+first reads a WORD at `+0xB4` and gate bytes at `+0xA6/+0xA7`. If bit `0x01`
+of `+0xA6` is set, it reads DWORDs at `+0x2C/+0x30/+0x34`, a four-DWORD
+block copied to `+0x78..+0x87`, and a WORD at `+0xA4`. It always reads
+DWORDs at `+0x98/+0x9C/+0xA0`; bit `0x02` of `+0xA6` adds DWORDs at
+`+0x8C/+0x90/+0x94`. It then reads WORDs at `+0xA8/+0xAA/+0xAC` and
+processes the field at `+0xB0` through byte-gated nested reader `0x5FFB00`.
+Allocation failure zeroes ESI before the same reader setup. Nested contents, field
+meanings, and message semantics remain unresolved.
+
+The nested table at raw `0x821844` has 40 four-byte entries for selectors
+`0x53` through `0x7A` inclusive; entry `0x7A` is the last one and points to
+VA `0xC1E3EF` / raw `0x81D7EF`. The decoder's secondary dispatch subtracts
+`0x20` and accepts values through `0x5A`, giving an inclusive upper bound of
+`0x7A`; values above it take the default path.
+
 ## Message35 application body
 
 Factory case35 at `0x33D557` allocates a fresh0x50-byte descriptor through
