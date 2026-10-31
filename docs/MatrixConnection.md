@@ -3294,3 +3294,36 @@ for name-keyed registries (only direct string refs were searched).
   window-size/fullscreen-like fields (`edi+0x138/0x13C/0x140`, `edi+0x130==1`).
 - **Unresolved.** Shutdown's caller, the meaning of the six init arguments, and
   the `0x1DFE9C8` object type.
+
+### Render init arguments, oEngineSystem, and the oShaderBuilderSystem global
+
+- **Observed.** `0xE53AC0` (non-virtual, `this`=edi) pushes the six `0xED1650`
+  args at `0xE53C42..0xE53C6F`: arg1 = `(this+0x130 == 1)`, arg2 = `this+0x138`,
+  arg3 = `this+0x13C`, arg4 = `this+0x140`, arg5/arg6 = window client
+  width/height from `GetClientRect` (clamped >= 1). `0xED1650` forwards all six
+  to oD3DRenderAPI vtable (`0x1C79ED4`) slot +8 = `0xF08680`, which stores them
+  at api `+0x4928` (byte), `+0x492C`, `+0x4930` (clamped >= 1), `+0x4934` (raw),
+  `+0x493C`, `+0x4940` (clamped >= 1). `this+0x130` is a window mode (1 and 3
+  are fullscreen-style: popup style, mode 3 sizes to `GetSystemMetrics(0/1)`;
+  mode 1 is promoted to 3 when `this+0xC0 > 1`). After init the code reads the
+  display values back via api slot +0xA4 and compares them with cvars whose
+  descriptor names are `rd.fullscreenWidth`, `rd.fullscreenHeight`,
+  `rd.fullscreenRefresh`, `rd.windowWidth`, `rd.windowHeight`, `rd.videoMode`
+  (descriptors at `0x1E6A830..0x1E6AA38`, constructed near `0xE53CF3..0xE53DC5`).
+- **Observed (class).** `0xE54BF0` is vtable slot 0 of `0x1C77C2C`; its COL names
+  `.?AVoEngineSystem@@` (bases: `oEngineSystem`, `oEngineInterface`). `0xE53AC0`
+  is a non-virtual helper (sole caller `0xE550D5` in `0xE54BF0`, after
+  `0xE546F0`); neighbouring slots 20/21 are `0xE53A40`/`0xE53FA0`. `0xE54BF0` logs
+  "Initializing Main Window", "Operating System", memory and
+  "--- Initialization ---"/"--- Finished Initialization (%.2f seconds) ---".
+  It has no direct callers (virtual); the vtable is stored by a ctor at `0xE4DFE0`.
+- **Observed (`0x1DFE9C8`).** Static by-value global whose initial vtable
+  `0x1C79E00` has COL -> `.?AVoShaderBuilderSystem@@`; `0xED1650` calls its
+  slot 0 with the render API pointer, `0xED1A10` calls slot +4.
+- **Interpreted.** arg1 = fullscreen flag; arg2/arg3 = back-buffer/display
+  width/height (`rd.fullscreenWidth/Height` or window values depending on mode);
+  arg4 = `rd.fullscreenRefresh`-style third display value (stored unclamped, so
+  not a dimension); arg5/arg6 = window client size. Pairing of each field with a
+  specific cvar is inferred from comparison order, not proven.
+- **Unresolved.** Exact cvar-to-field mapping; caller of ctor `0xE4DFE0` and the
+  path up to the app main loop; whether `oEngineSystem` slot 0 is `Init`.

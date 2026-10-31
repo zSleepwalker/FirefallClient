@@ -1,5 +1,8 @@
 # Reverse-engineering handoff
 
+
+The latest render-init pass identifies the six `0xED1650` args (fullscreen flag, display w/h, third display value, window client w/h, forwarded to oD3DRenderAPI slot +8 `0xF08680`), the host class `oEngineSystem` (`0xE54BF0` = vtable `0x1C77C2C` slot 0) and `0x1DFE9C8` as `oShaderBuilderSystem`; see MatrixConnection.md. Cvar-field mapping and the path to the main loop remain unresolved.
+
 The supported generated transformation-provider boundary was completed, then
 explicitly resumed by the user for another bounded reconstruction pass. The
 latest work extends the tfWorld zone-cleanup layout from static binary evidence;

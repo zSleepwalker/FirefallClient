@@ -107,7 +107,20 @@ internal static class StartupBinaryEvidence
             && Matches(SceneFactoryNativeLayout.RenderSystemShutdownFileOffset + 0x38, "8B0DFC05DE016A008B01FF500C")
             && VtableRttiName(SceneFactoryNativeLayout.TextureManagerVtableVirtualAddress) == SceneFactoryNativeLayout.TextureManagerRttiName
             && VtableRttiName(SceneFactoryNativeLayout.ShaderManagerVtableVirtualAddress) == SceneFactoryNativeLayout.ShaderManagerRttiName
-            && VtableRttiName(SceneFactoryNativeLayout.ModelManagerVtableVirtualAddress) == SceneFactoryNativeLayout.ModelManagerRttiName);        check("Binary scene factory's named lookup goes through a statically initialized oRenderSystem getter to an oD3DRenderAPI create-scene slot",
+            && VtableRttiName(SceneFactoryNativeLayout.ModelManagerVtableVirtualAddress) == SceneFactoryNativeLayout.ModelManagerRttiName);
+        check("Binary render init args come from oEngineSystem window state (+0x130/0x138/0x13C/0x140) and reach oD3DRenderAPI slot +8; oShaderBuilderSystem is a static global",
+            Matches(SceneFactoryNativeLayout.RenderSystemInitCallSiteFileOffset - 0x30,
+                "FF75E083BF3001000001A170E9DF0151FFB7400100000F94C3B970E9DF01FFB73C010000885DDCFFB738010000FF75DCFF5034")
+            && ReadUInt32(VirtualAddressToFileOffset(SceneFactoryNativeLayout.RenderApiVtableVirtualAddress) + 8)
+                == SceneFactoryNativeLayout.RenderApiInitSlotFileOffset + 0x400C00
+            && VtableRttiName(SceneFactoryNativeLayout.ShaderBuilderSystemInitialVtableVirtualAddress)
+                == SceneFactoryNativeLayout.ShaderBuilderSystemRttiName
+            && ReadUInt32(VirtualAddressToFileOffset(SceneFactoryNativeLayout.ShaderBuilderSystemGlobalVirtualAddress))
+                == SceneFactoryNativeLayout.ShaderBuilderSystemInitialVtableVirtualAddress
+            && VtableRttiName(SceneFactoryNativeLayout.EngineSystemVtableVirtualAddress)
+                == SceneFactoryNativeLayout.EngineSystemRttiName
+            && ReadUInt32(VirtualAddressToFileOffset(SceneFactoryNativeLayout.EngineSystemVtableVirtualAddress))
+                == SceneFactoryNativeLayout.EngineSystemInitializeSlotFileOffset + 0x400C00);        check("Binary scene factory's named lookup goes through a statically initialized oRenderSystem getter to an oD3DRenderAPI create-scene slot",
             ReadUInt32(VirtualAddressToFileOffset(SceneFactoryNativeLayout.SceneProviderGlobalVirtualAddress))
                 == SceneFactoryNativeLayout.RenderSystemInitialVtableVirtualAddress
             && ReadUInt32(VirtualAddressToFileOffset(SceneFactoryNativeLayout.RenderSystemInitialVtableVirtualAddress)

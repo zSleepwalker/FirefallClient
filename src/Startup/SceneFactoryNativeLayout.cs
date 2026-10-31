@@ -153,6 +153,14 @@ public static class SceneFactoryNativeLayout
         0x9B62C0, 0x9B6560, 0x9B6730, 0x9B56F0, 0x9B6740, 0x9B6860, 0x9B68F0
     ];
 
+    public const int RenderApiInitSlotFileOffset = 0xF08680;
+    public const int ShaderBuilderSystemGlobalVirtualAddress = 0x1DFE9C8;
+    public const int ShaderBuilderSystemInitialVtableVirtualAddress = 0x1C79E00;
+    public const string ShaderBuilderSystemRttiName = ".?AVoShaderBuilderSystem@@";
+    public const int EngineSystemVtableVirtualAddress = 0x1C77C2C;
+    public const int EngineSystemInitializeSlotFileOffset = 0xE54BF0;
+    public const string EngineSystemRttiName = ".?AVoEngineSystem@@";
+
     public static IReadOnlyList<int> PhysicsDrawInterfaceVtableSlots => PhysicsDrawInterfaceVtableSlotFileOffsets;
 
     public static IReadOnlyList<SceneFactoryResourceSnapshot> KnownSceneResources => SceneResources;
