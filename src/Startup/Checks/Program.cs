@@ -1236,6 +1236,20 @@ Check("Stumble selector 0x62 records two WORDs and a byte",
     && CharacterStumbleNativeLayout.WordField1Offset == 0x2A
     && CharacterStumbleNativeLayout.ByteFieldOffset == 0x2C
     && CharacterStumbleNativeLayout.NominalInputByteCount == 5);
+Check("QuickChat selector 0x63 records its DWORD field and shared reader continuation",
+    CharacterQuickChatNativeLayout.InnerSelector == 0x63
+    && CharacterQuickChatNativeLayout.CaseFileOffset == 0x81D171
+    && CharacterQuickChatNativeLayout.CaseLocalDwordValue == 0x6B
+    && CharacterQuickChatNativeLayout.AllocationSize == 0x30
+    && CharacterQuickChatNativeLayout.ConstructorFileOffset == 0x525940
+    && CharacterQuickChatNativeLayout.BaseConstructorHelperFileOffset == 0x5A0B40
+    && CharacterQuickChatNativeLayout.BaseConstructorArgument == 0x63
+    && CharacterQuickChatNativeLayout.AllocationFailureContinuationFileOffset == 0x8206E1
+    && CharacterQuickChatNativeLayout.BodyReaderContinuationFileOffset == 0x8206E3
+    && CharacterQuickChatNativeLayout.DwordReaderFileOffset == 0x3370A0
+    && CharacterQuickChatNativeLayout.VtableVirtualAddress == 0x1C67178
+    && CharacterQuickChatNativeLayout.DwordFieldOffset == 0x28
+    && CharacterQuickChatNativeLayout.NominalInputByteCount == 4);
 Check("Shared channel-2/3 compact-code routing groups the observed native cases",
     Enumerable.Range(1, 6).All(code =>
         MatrixOtherChannelDecoderNativeLayout.SelectRoute(code)

@@ -1079,6 +1079,9 @@ These updates supersede older next-step suggestions below where they overlap.
   object+0x28/+0x2A then bytes at +0x2C/+0x2D; meanings remain unknown.
   Selector0x62 constructs `Stumble` and reads WORDs at object+0x28/+0x2A
   and a byte at +0x2C; meanings remain unknown.
+  Selector0x63 constructs `QuickChat` and reads a DWORD at object+0x28
+  through shared continuation 0x8206E3; allocation-failure behavior remains
+  unresolved.
   Remaining case handlers, field meanings, and message semantics are open.
   RTTI names the results `nl::RoutedMessage` and
   `nl::RoutedMultipleMessage`; QWORD and message semantics remain unknown.

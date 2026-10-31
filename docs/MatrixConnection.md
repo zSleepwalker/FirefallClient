@@ -1352,6 +1352,22 @@ then reads a byte into `+0x2C`. The observed nominal body length is five
 bytes. Field meanings remain unknown; the RTTI name does not establish
 stumble-event semantics.
 
+### Selector 0x63: `QuickChat`
+
+Entry16 maps selector `0x63` to VA `0xC1DD71` / raw case `0x81D171`. It
+allocates `0x30` bytes, stores local DWORD `0x6B` (role unknown), then calls
+constructor `0x525940`. The constructor passes `0x63` to helper `0x5A0B40`
+and installs vtable VA `0x1C67178` (RTTI
+`firefall::Character::QuickChat`).
+
+On the successful allocation path, the case jumps to shared reader
+continuation `0x8206E3`, which reads a DWORD into object field `+0x28`
+through helper `0x3370A0`; nominal body length is four bytes. The allocation
+failure branch at `0x81D189` instead enters `0x8206E1`, zeroes ESI, and
+continues into the same field reader, which forms destination address
+`0x28`. The runtime consequence of that abnormal path is unresolved.
+Field meaning remains unknown; RTTI alone does not establish chat semantics.
+
 ## Message35 application body
 
 Factory case35 at `0x33D557` allocates a fresh0x50-byte descriptor through

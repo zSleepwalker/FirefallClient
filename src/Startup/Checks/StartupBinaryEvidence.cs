@@ -1652,6 +1652,25 @@ internal static class StartupBinaryEvidence
             && RelativeBranchTargets(0x5F1EE9, 0xE8, 0x336AC0)
             && Matches(0x5F1EEE, "8D562C")
             && RelativeBranchTargets(0x5F1EF3, 0xE8, 0x337180));
+        check("Binary inner selector 0x63 routes QuickChat to a shared DWORD reader",
+            ReadUInt32(VirtualAddressToFileOffset(
+                CharacterQuickChatNativeLayout.InnerSelectorTableVirtualAddress) + 64) == 0xC1DD71
+            && Matches(CharacterQuickChatNativeLayout.CaseFileOffset, "6A30")
+            && Matches(0x81D17F, "C74424206B000000")
+            && Matches(0x81D189, "0F8452350000")
+            && RelativeBranchTargets(0x81D196, 0xE8,
+                CharacterQuickChatNativeLayout.ConstructorFileOffset)
+            && Matches(0x81D19D, "E941350000")
+            && Matches(0x525952, "C70063000000")
+            && RelativeBranchTargets(0x525958, 0xE8,
+                CharacterQuickChatNativeLayout.BaseConstructorHelperFileOffset)
+            && Matches(0x52595D, "C7067871C601")
+            && VtableRttiName(CharacterQuickChatNativeLayout.VtableVirtualAddress, 80)
+                == CharacterQuickChatNativeLayout.RttiName
+            && Matches(CharacterQuickChatNativeLayout.AllocationFailureContinuationFileOffset, "33F68D4628")
+            && Matches(CharacterQuickChatNativeLayout.BodyReaderContinuationFileOffset, "8D4628")
+            && RelativeBranchTargets(0x8206F1, 0xE8,
+                CharacterQuickChatNativeLayout.DwordReaderFileOffset));
         check("Binary matrix socket factory requests overlapped UDP",
             Matches(0xBE354A, "6A016A006A006A11B8170000006A020F44C150FF15684DAC01"));
         check("Binary matrix local binding uses seven or two attempts and final-two fallback",
