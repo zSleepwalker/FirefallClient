@@ -1670,5 +1670,10 @@ internal static class StartupBinaryEvidence
             check($"Binary chat file text at VA {va:X}",
                 ReadAt(va - 0x401400, literal.Length).SequenceEqual(literal));
         }
-    }
+        check("Binary crash handler strings, SIGABRT/terminate/purecall installs and full-memory dump flag match",
+            Matches(CrashHandlerNativeLayout.DbgHelpAnsiNameVirtualAddress - 0x401400, Convert.ToHexString(Encoding.ASCII.GetBytes(CrashHandlerNativeLayout.DbgHelpDllName + "\0")))
+            && Matches(CrashHandlerNativeLayout.DumpFormatAnsiVirtualAddress - 0x401400, Convert.ToHexString(Encoding.ASCII.GetBytes(CrashHandlerNativeLayout.DumpNameFormat + "\0")))
+            && Matches(CrashHandlerNativeLayout.MiniDumpExportAnsiVirtualAddress - 0x401400, Convert.ToHexString(Encoding.ASCII.GetBytes(CrashHandlerNativeLayout.MiniDumpExportName + "\0")))
+            && Matches(CrashHandlerNativeLayout.PureCallStubFileOffset, "BA0C60C101B90060C101E9")
+            && Matches(CrashHandlerNativeLayout.TerminateStubFileOffset, "BA545FC101B9485FC101E9"));    }
 }
