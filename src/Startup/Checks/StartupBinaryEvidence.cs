@@ -74,6 +74,38 @@ internal static class StartupBinaryEvidence
                     return true;
             return false;
         }
+        check("Binary world scene factory resolves all three named scenes, builds and returns its root, and is stored by tfWorld",
+            Matches(SceneFactoryNativeLayout.FactoryFileOffset + 0x2D, "68A0000000")
+            && Matches(SceneFactoryNativeLayout.FactoryFileOffset + 0x4D, "E8AE0E0000")
+            && Matches(0x9B7D22, "6828D1B9018B108B4230FFD08907")
+            && Matches(0x9B7D41, "6838D2B9018B018B4030FFD0894704")
+            && Matches(0x9B7D61, "6848D2B9018B108B4230FFD0833F00894708")
+            && ReadAt(0x179BD28, 12).SequenceEqual("RenderScene\0"u8.ToArray())
+            && ReadAt(0x179BE38, 14).SequenceEqual("WorldMapScene\0"u8.ToArray())
+            && ReadAt(0x179BE48, 18).SequenceEqual("SinvironmentScene\0"u8.ToArray())
+            && Matches(SceneFactoryNativeLayout.RootReturnFileOffset,
+                "8BC78B4DF464890D00000000595F5E8BE55DC3")
+            && Matches(SceneFactoryNativeLayout.TfWorldInitializeFileOffset + 0xA0,
+                "E8EBBE360083C408894714"));
+        check("Binary scene factory owns a RTTI-identified tfPhysicsDrawInterface and a disposable registration handle",
+            Matches(0x9B8241, "6888010000E865FD8F00")
+            && Matches(0x9B8255, "85C0740BFF378BC8E8DED1FFFF")
+            && Matches(SceneFactoryNativeLayout.PhysicsDrawInterfaceConstructorFileOffset + 0x6A,
+                "C7066809C701")
+            && ReadUInt32(VirtualAddressToFileOffset(
+                SceneFactoryNativeLayout.PhysicsDrawInterfaceVtableVirtualAddress) - 4)
+                == SceneFactoryNativeLayout.PhysicsDrawInterfaceCompleteObjectLocatorVirtualAddress
+            && ReadUInt32(VirtualAddressToFileOffset(
+                SceneFactoryNativeLayout.PhysicsDrawInterfaceCompleteObjectLocatorVirtualAddress) + 12)
+                == SceneFactoryNativeLayout.PhysicsDrawInterfaceTypeDescriptorVirtualAddress
+            && VirtualAddressToFileOffset(
+                SceneFactoryNativeLayout.PhysicsDrawInterfaceTypeDescriptorVirtualAddress) + 8
+                == SceneFactoryNativeLayout.PhysicsDrawInterfaceRttiNameFileOffset
+            && ReadAt(SceneFactoryNativeLayout.PhysicsDrawInterfaceRttiNameFileOffset,
+                SceneFactoryNativeLayout.PhysicsDrawInterfaceRttiName.Length + 1)
+                .SequenceEqual(Encoding.ASCII.GetBytes(SceneFactoryNativeLayout.PhysicsDrawInterfaceRttiName + "\0"))
+            && Matches(0x9B7FE2, "518B0DA001E0018D45EC5068FCC4DF01E879BE3E00894710")
+            && Matches(0x9B8502, "C7461400000000"));
         foreach (var type in MatrixServerMessageNativeTypes.Entries)
         {
             var name = Encoding.ASCII.GetBytes(type.RttiText + "\0");

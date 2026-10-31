@@ -727,11 +727,25 @@ These updates supersede older next-step suggestions below where they overlap.
   `Sdb_InitConvertedTableResult` initializes holder `+0x18` to null; the
   mapped-row path has no assignment after initialization, so the non-null
   producer remains unknown. In the base-zero IDA database, `0x13122D0` is a
-  raw file offset with 283 code-call xrefs. That routine reads its tagged DWORD
-  from `*arg1` and uses an optional third-argument pointer to receive an output
-  DWORD (stored at raw `0x131236A`). The wrappers at raw offsets `0x2FE4D0` and
-  `0x2FE4F0` pass `this` and `this+4`, respectively, as `arg1`; the broad
-  callsite set has not been classified to a common owner/source.
+  raw file offset with 283 code-call xrefs. The decoder at raw `0x131233C`
+  uses bit 0 as an encoding selector: set means displacement `(value>>1)+2`
+  and a `u16` length read at `dword_1E4BAD0+value`; clear means displacement
+  `(value>>1)&0x7FFFFF` and length from the DWORD's high byte. Its fingerprint
+  is `8B 0B 8A 03 D1 E9 24 01 74 05 8D 79 02 EB 08 8B F9 81 E7 FF FF 7F 00
+  84 C0 74 0B A1 D0 BA E4 01 0F B7 34 01 EB 04 0F B6 73 03`. A 15-function
+  sample across the binary shows `arg1` pointing at runtime object/table
+  fields (including direct `this+offset`, table slots, and map-result fields),
+  not a consistent `.data` constant or a common type-tag class. The returned
+  values are used as string-like data in sampled callers; exact producer-side
+  meaning of the two encoded forms and common ownership remain unresolved.
+  Examples: table slots at raw `0x3090F0`; record field `+0x10` at `0x38BCD0`;
+  map/member sources at `0x63D160`, `0x4B6B40`, `0x6A8610`, `0xAB60C0`,
+  `0x1333080`, and `0x9E6C50`; direct fields `+0x94/+0xB0` at `0x1338B00`.
+  The wrappers at raw `0x2FE4D0`/`0x2FE4F0` pass `this` and `this+4`,
+  respectively, as `arg1`; wrapper fingerprints begin `55 8B EC 56 8B 75 08
+  56 51 51 E8` and `55 8B EC 56 8B 75 08 8D 41 04 56 50 51 E8`. This sample
+  classifies only observed callers, not all 283 xrefs. Full evidence and
+  uncertainty boundaries are in `src\Serialization\README.md`.
 - **`tfLogin` mode behavior has a bounded native snapshot.** The `0xA58`-byte
   mode loads `LoginUI.xml`, registers 15 observed input actions, selects a
   background zone, and handles login, character-refresh, and zone-list
@@ -1084,8 +1098,18 @@ These updates supersede older next-step suggestions below where they overlap.
 - **World scene-factory return boundary.** Raw `0x9B73F0`, called from
   `TfWorld_Initialize` (`0x64B460`), returns `EDI` through `EAX` at raw
   `0x9B82B4` (`8B C7`); that epilogue returns at `0x9B82C6` (`C3`). The
-  factory's object construction and ownership beyond this return boundary are
-  not reconstructed.
+  factory allocates a `0xA0` root aggregate (constructor `0x9B82F0`, cleanup
+  `0x9B8490`), loads `RenderScene`, `WorldMapScene`, and `SinvironmentScene`
+  into root offsets `0/4/8`, and owns multiple child allocations. The root has
+  no observed vfptr; its child at `+0x14` is `tfPhysicsDrawInterface`
+  (`0x188` bytes, vtable VA `0x1C70968`, RTTI `.?AVtfPhysicsDrawInterface@@`).
+  It passes a registration helper's result into root `+0x10`; teardown releases
+  that handle and the scene references. `TfWorld_Initialize` stores the root at
+  `tfWorld+0x14` (`0x64B508`) and publishes root `[0]` to global
+  `0x1E00060+0xF8`. Another static caller at `0x9B2D1A` stores the result at
+  its object base. Field meanings beyond these observed roles and registration
+  target semantics remain unresolved. Details and original-file fingerprints
+  are in `docs\MatrixConnection.md` and `SceneFactoryNativeLayout`.
 - **LookingGlass entry points expanded.** The shared mode-3 enqueue helper
   (`0x30D590`) has six static callers: `0x306050`, `0x3D60A0`, `0x6385C0`,
   `0x65D400`, `0x6AE3E0`, and `0x6AF120`. Several request paths update the

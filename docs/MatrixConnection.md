@@ -2950,3 +2950,65 @@ The constructor clears chat+8/+C/+10, so initial identity is zero/empty;
 this does not prove those fields remain unchanged by replay callbacks.
 No downstream LookingGlass identity producer was followed in this bounded
 initialization trace.
+
+### World scene-factory root and owned renderer interface
+
+The static sample is
+`D:\SteamLibrary\steamapps\common\Firefall\system\bin\FirefallClient.exe.original`
+(40,197,848 bytes; SHA-256
+`E0E8448393AC1CE05BE73E06F62DD70E3EFF3404CC2E7AAF3F04C79DEC0DE235`).
+The following raw code ranges and data bytes were re-read from that file;
+the database's flat/raw code addresses are not treated as PE VAs.
+
+**Observations**
+
+- Factory raw `0x9B73F0` allocates `0xA0` bytes and calls constructor
+  `0x9B82F0`. The constructor initializes most root child slots; scene
+  pointers at `+0/+4/+8` are populated later, and not every root byte is
+  initialized. No root vfptr store or root RTTI descriptor was observed. The
+  returned pointer is `EDI`, moved to `EAX` at `0x9B82B4`; `RET` is at
+  `0x9B82C6`.
+- Through indirect calls (global VA `0x1DFE970`, getter slot `+0x3C`, then
+  returned object's slot `+0x30`), it looks up the literal scene keys and
+  stores returned pointers at root `+0`, `+4`, and `+8`:
+  `RenderScene` (raw string `0x179BD28`), `WorldMapScene` (`0x179BE38`),
+  `SinvironmentScene` (`0x179BE48`). Each pointer is checked non-null before
+  setup continues. The actual virtual targets and resource-provider type are
+  unresolved.
+- Factory allocations are recorded as `(root field, byte count, conditional)`
+  in `SceneFactoryNativeLayout.KnownChildAllocations`; those records preserve
+  observed allocation sizes and field destinations, not semantic class names.
+  In the `TfWorld_Initialize` call, ECX is zero; the optional allocations at
+  root `+0x2C`, `+0x50`, and `+0x88` are therefore on the taken path.
+- Root `+0x14` receives a `0x188`-byte child. Constructor `0x9B5440` receives
+  root `[0]` and installs vtable VA `0x1C70968`; following the original PE
+  section/RTTI records identifies this child's type as
+  `.?AVtfPhysicsDrawInterface@@`. Its constructor stores the scene pointer at
+  child `+0x44`, clears `+0x48/+0x4C`, copies four floats from
+  `xmmword_1DFF438` to `+0x50..+0x5C`, clears byte `+0x60`, and initializes
+  bounds at `+0x16C..+0x180` to `FLT_MAX`/`-FLT_MAX`.
+- Root `+0x10` gets the result of a helper called with global VA `0x1E001A0`,
+  a per-call object, and static descriptor VA `0x1DFC4FC`. The destructor
+  `0x9B8490` invokes the handle's vtable slot 0 with argument 1 and clears the
+  field. It also destroys/releases child objects in their root slots and
+  releases the three scene references; this supports ownership, but does not
+  identify the registry's higher-level meaning. The factory also copies the
+  pair at root `+0x44` into an 8-byte temporary and passes it to an insertion
+  helper on the container at `[root+0x3C]+0x3C`; the registered object's type
+  and exact semantics remain unresolved.
+- `TfWorld_Initialize` calls the factory at `0x64B500`, stores its result in
+  `tfWorld+0x14` at `0x64B508`, and on success publishes root `[0]` to global
+  VA `0x1E00060+0xF8`. The other static callsite is `0x9B2D1A`; that caller
+  stores the result at its object base.
+
+**Fingerprint checks**
+
+`StartupBinaryEvidence` checks the allocation, constructor call, three
+lookup/store instruction sequences, exact NUL-terminated scene keys, return
+sequence, `tfWorld+0x14` store, child allocation/constructor and vtable write,
+RTTI chain/name, registration-handle sequence, and destructor clearing of
+root `+0x14`. The vtable VA is `0x1C70968` (file offset `0x186F568`); its
+complete-object-locator VA is `0x1CC7700`, type-descriptor VA `0x1E28A34`,
+and RTTI name file offset `0x1A26E3C`. These are checked using PE section
+mapping, not by subtracting a universal VA delta. No runtime execution or IDB
+write was performed.

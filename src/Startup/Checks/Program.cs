@@ -105,6 +105,52 @@ Check("tfWorld record-input size, state gate, and observed float offsets are rec
     && TfWorldNativeLayout.RecordInputStoredInModeOffset == 0x20
     && TfWorldNativeLayout.RecordInputFirstObservedFloatOffset == 8
     && TfWorldNativeLayout.RecordInputSecondObservedFloatOffset == 12);
+Check("World scene-factory resources, owned allocations, and tfPhysicsDrawInterface RTTI are recorded",
+    SceneFactoryNativeLayout.FactoryFileOffset == 0x9B73F0
+    && SceneFactoryNativeLayout.RootAllocationSize == 0xA0
+    && SceneFactoryNativeLayout.RootConstructorFileOffset == 0x9B82F0
+    && SceneFactoryNativeLayout.RootDestructorFileOffset == 0x9B8490
+    && SceneFactoryNativeLayout.RootReturnFileOffset == 0x9B82B4
+    && SceneFactoryNativeLayout.KnownSceneResources.SequenceEqual(
+    [
+        new SceneFactoryResourceSnapshot("RenderScene", 0x00, 0x179BD28),
+        new SceneFactoryResourceSnapshot("WorldMapScene", 0x04, 0x179BE38),
+        new SceneFactoryResourceSnapshot("SinvironmentScene", 0x08, 0x179BE48)
+    ])
+    && SceneFactoryNativeLayout.KnownChildAllocations.SequenceEqual(
+    [
+        new SceneFactoryChildAllocationSnapshot(0x0C, 0x138, false),
+        new SceneFactoryChildAllocationSnapshot(0x14, 0x188, false),
+        new SceneFactoryChildAllocationSnapshot(0x18, 0x060, false),
+        new SceneFactoryChildAllocationSnapshot(0x1C, 0x044, false),
+        new SceneFactoryChildAllocationSnapshot(0x20, 0x044, false),
+        new SceneFactoryChildAllocationSnapshot(0x24, 0x060, false),
+        new SceneFactoryChildAllocationSnapshot(0x28, 0x03C, false),
+        new SceneFactoryChildAllocationSnapshot(0x2C, 0x138, true),
+        new SceneFactoryChildAllocationSnapshot(0x30, 0x024, false),
+        new SceneFactoryChildAllocationSnapshot(0x34, 0x25C8, false),
+        new SceneFactoryChildAllocationSnapshot(0x3C, 0x058, false),
+        new SceneFactoryChildAllocationSnapshot(0x4C, 0x390, false),
+        new SceneFactoryChildAllocationSnapshot(0x50, 0x1B4, true),
+        new SceneFactoryChildAllocationSnapshot(0x54, 0xF28, false),
+        new SceneFactoryChildAllocationSnapshot(0x58, 0x080, false),
+        new SceneFactoryChildAllocationSnapshot(0x5C, 0x058, false),
+        new SceneFactoryChildAllocationSnapshot(0x60, 0x02C, false),
+        new SceneFactoryChildAllocationSnapshot(0x64, 0x2F4C, false),
+        new SceneFactoryChildAllocationSnapshot(0x68, 0x044, false),
+        new SceneFactoryChildAllocationSnapshot(0x6C, 0x008, false),
+        new SceneFactoryChildAllocationSnapshot(0x70, 0x0C0, false),
+        new SceneFactoryChildAllocationSnapshot(0x74, 0x0D8, false),
+        new SceneFactoryChildAllocationSnapshot(0x78, 0x21C, false),
+        new SceneFactoryChildAllocationSnapshot(0x84, 0x024, false),
+        new SceneFactoryChildAllocationSnapshot(0x88, 0x048, true),
+        new SceneFactoryChildAllocationSnapshot(0x90, 0x114, false)
+    ])
+    && SceneFactoryNativeLayout.PhysicsDrawInterfacePointerOffset == 0x14
+    && SceneFactoryNativeLayout.PhysicsDrawInterfaceAllocationSize == 0x188
+    && SceneFactoryNativeLayout.PhysicsDrawInterfaceVtableVirtualAddress == 0x1C70968
+    && SceneFactoryNativeLayout.PhysicsDrawInterfaceRttiName == ".?AVtfPhysicsDrawInterface@@"
+    && SceneFactoryNativeLayout.TfWorldScenePointerOffset == TfWorldNativeLayout.ScenePointerOffset);
 Check("tfLogin native layout and lifecycle addresses are recorded",
     LoginModeNativeLayout.AllocationSize == 0xA58
     && LoginModeNativeLayout.ConstructorFileOffset == 0x6365B0
