@@ -183,4 +183,10 @@ public static class ClientMainLoopNativeLayout
     public const long MatrixBeginConnectionRaw = 0x494CA0;
     public const long WsaStartupFailedStringFileOffset = 0x17B3870;
     public const long WinHttpWriteDataStringFileOffset = 0x17B3F50;
+    // Round 14: ClientApi worker, oracle strings, URI default branch.
+    public const long ClientApiPumpRequestWorkerRaw = 0xBC2B30;
+    public const long WinHttpSetStatusCallbackPushRaw = 0xBC31E0; // push -1; push 0xFC32E0 (=0xBC26E0+0x400C00)
+    public const long UriDefaultBranchRaw = 0x3054F9;
+    public const long ClientApiHostKeyFileOffset = 0x1B520A8 - 0x401400; // "clientapi_host"
+    public const long OracleTicketFormatFileOffset = 0x1B520E8 - 0x401400;
 }

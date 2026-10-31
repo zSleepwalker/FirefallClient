@@ -27,3 +27,17 @@
 
 ## Unresolved
 - Registration of `0xBC26E0` as the WinHTTP callback; the headers set by `0x494E30` (not re-decompiled; see MatrixConnection.md); body of `0x3054F9`; libcurl absence beyond the scope above.
+
+# Round 14: oracle request, WinHTTP callback registration, URI default branch
+
+## Observed
+- Strings in the earlier `asc_*` IDA labels were junk; decoding at VA-0x401400 gives: `clientapi_host` (0x1B520A8; host key looked up via `0x322CB0(App, this, key)`), `Keep-Alive`/`Connection`, `application/json`, `ver`, `%s/api/v1/oracle/ticket`, `Unable to resolve oracle URL %s`, `Oracle URL [%s] not configured for HTTPS (request must be secure)`, `Oracle auth not available (was cleared?)`, `Accept-Language`, `OS-Language`, `?`, `build`, `matrix`, `squad`, `platoon`, `group`, `Querying Oracle at '%s' with character 0x%016llx`.
+- `0x494E30` requires state 2 and in-flight flag this+0x1C clear. Needs App+0xA28 (2600) object with a flag at +52 set (else text `Oracle auth not available` into this+16 and state=1). Resolves the oracle host from config key `clientapi_host`, formats `%s/api/v1/oracle/ticket` (a request object of 0x78 bytes from `0x3233B0`; URL accepted by `0xBCE800`, HTTPS required: on failure state=1 with an error text at this+16). It then sets method type 2 (POST), copies this+0xB98 auth blob (`0x498680` from this+2968), adds `Connection: Keep-Alive` style header and `application/json` content-type, a timeout from this+0x18 when >0, writes a JSON body beginning with `ver`, (snprintf at `dword_1AC4870` into a 127-byte buffer) then fields through `0x49B050` (character id/`build`, session text this+2976 when non-empty, and chat `squad`/`platoon`/`group` when a current chat exists), adds Accept-Language/OS-Language headers, then submits via `0x49AEF0`; success sets this+0x1C=1. No Matrix UDP host/port is chosen here: they come from the oracle response (`matrix_url`/`ticket`, `0x4956C0`).
+- `0xBC2B30 ClientApi_PumpRequestWorker` contains at 0xBC31E0 `push 0; push -1; push 0xFC32E0; push [edi]; call [0x1AC4D0C]` - the callback VA 0xFC32E0 = `0xBC26E0` ClientApi_WinHttpStatusCallback, i.e. a runtime-resolved WinHttpSetStatusCallback(session, cb, ALL, 0) (name by shape; the pointer slot 0x1AC4D0C name was not read).
+- `0x3054F9` is the default branch of the URI handler: path `untrusted/<uri>` prompts `'%s' is an untrusted location. Are you sure...` (MessageBox-shaped call, caption `Firefall Launcher`) before continuing; `socket/host?port=N` builds `sock://host[:port]` and queues it through `0x306050` (error `Missing socket address: %s:%u`); anything else logs `Cannot open unknown URI: %s`.
+
+## Interpreted
+- The oracle HTTP flow is HTTPS-only, POST JSON, host from `clientapi_host`; the Matrix UDP endpoint is decided only by the oracle reply.
+
+## Unresolved
+- Actual `clientapi_host` value (config source), the exact field order/body of the JSON, and the slot `0x1AC4D0C` import identity.
