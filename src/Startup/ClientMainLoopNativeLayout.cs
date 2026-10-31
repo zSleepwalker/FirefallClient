@@ -119,4 +119,14 @@ public static class ClientMainLoopNativeLayout
     public const int HotfixSectionStringFileOffset = 0x17443A8;
     public const int HotfixHttpTransportFn388330FileOffset = 0x388330;
     public const int AssetDbSearchPathsHeaderStringFileOffset = 0x1C5A694 - 0x401400;
-    public const int OrdinarySearchPathsHeaderStringFileOffset = 0x1C5A6AC - 0x401400;}
+    public const int OrdinarySearchPathsHeaderStringFileOffset = 0x1C5A6AC - 0x401400;
+    // Round 7: asset search roots and hotfix file fetchers.
+    public const int FileSearchRootSetterFn1317810FileOffset = 0x1317810;
+    public const int FileSearchRootInitFn13178B0FileOffset = 0x13178B0;
+    public const int SearchPathResolveDirsFn1319520FileOffset = 0x1319520;
+    public const int Utf8FileOpenFn12BA030FileOffset = 0x12BA030;
+    public const int HotfixHttpFetchFn388BD0FileOffset = 0x388BD0;
+    public const int HotfixLocalCopyFn388800FileOffset = 0x388800;
+    public const int SearchRootLogStringFileOffset = 0x1C5A61C - 0x401400;
+    public const int HotfixBadMd5StringFileOffset = 0x1B45AA4 - 0x401400;
+    public const int HotfixHttpInitFailStringFileOffset = 0x1B45A78 - 0x401400;}

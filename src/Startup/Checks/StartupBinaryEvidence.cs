@@ -1777,5 +1777,13 @@ internal static class StartupBinaryEvidence
             Matches(ClientMainLoopNativeLayout.HotfixHttpTransportFn388330FileOffset, "558BEC6AFF6812B59D0164A1") &&
             Matches(ClientMainLoopNativeLayout.AssetDbSearchPathsLoggerFn1318400FileOffset, "558BEC6AFF685885A90164A1") &&
             Matches(ClientMainLoopNativeLayout.OpenSwitchStringFileOffset, "6F70656E") &&
-            Matches(ClientMainLoopNativeLayout.HotfixDownloadPathKeyStringFileOffset, "446F776E6C6F61642D50617468"));    }
+            Matches(ClientMainLoopNativeLayout.HotfixDownloadPathKeyStringFileOffset, "446F776E6C6F61642D50617468"));
+        check("Binary startup round 7 (asset search roots, hotfix fetchers)",
+            Matches(ClientMainLoopNativeLayout.FileSearchRootSetterFn1317810FileOffset, "558BEC51568B7508578BF985") &&
+            Matches(ClientMainLoopNativeLayout.FileSearchRootInitFn13178B0FileOffset, "558BEC6AFF688883A90164A1") &&
+            Matches(ClientMainLoopNativeLayout.SearchPathResolveDirsFn1319520FileOffset, "558BEC6AFF68C987A90164A1") &&
+            Matches(ClientMainLoopNativeLayout.Utf8FileOpenFn12BA030FileOffset, "558BEC81EC040A0000A10050") &&
+            Matches(ClientMainLoopNativeLayout.HotfixHttpFetchFn388BD0FileOffset, "558BEC6AFF68A3B59D0164A1") &&
+            Matches(ClientMainLoopNativeLayout.HotfixLocalCopyFn388800FileOffset, "558BEC6AFF6851B59D0164A1") &&
+            Matches(ClientMainLoopNativeLayout.HotfixBadMd5StringFileOffset, "426164206D64357375"));    }
 }

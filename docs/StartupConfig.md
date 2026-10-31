@@ -62,3 +62,16 @@ Addresses: file offsets (= IDA addresses); VA code = raw+0x400C00, .rdata = raw+
 ### Unresolved
 - The exact hotfix.ini section and key schema beyond `[Hotfix] Download-Path`, and the base URL value (config data, not a binary string).
 - The bodies of 0x388BD0, 0x388800 and 0x389090.
+## Round 7: hotfix fetchers (static)
+
+### Observed
+- 0x388330 selects the route: when the source string at `this[9]+36` starts with `http://` it calls 0x388BD0; otherwise 0x388800.
+- 0x388BD0 (HTTP route): converts `\` to `/` in the URL, builds a `ClientApiRequest` (ctor 0x3843F0) with a completion object, pumps routes with a growing wait (100 ms steps up to 5000 ms), and accepts only when status (this+108) == 200 and the body is non-empty. If a 16-byte expected digest is given, it hashes the body (0x12F14A0) and compares; mismatch logs "Bad md5sum: expected %s for %s". On success it opens the destination with `"wb"` through 0x12BA030, writes in chunks of at most 0x2000 bytes, closes, and deletes the file (0x12B76A0) on a short write. If the client API is not ready it logs "Hotfix download: unable to init http (%s)".
+- 0x388800 (local route): opens source and destination (modes at 0x1B45A44 / 0x1B45A48, not decoded), copies in 4096-byte blocks, updates a progress float, and sleeps 3 ms per block when progress is reported. It then re-reads the copy, hashes it and compares the digest, logging "Bad md5sum" on mismatch.
+- 0x389090 is a trivial accessor (`this+8`, asserts `*this`).
+
+### Interpreted
+- Hotfix files are fetched over the game's HTTP client API with md5 verification, or copied from a local path. The digest is the 16 bytes from the per-file entry (stride 120 in 0x411650). Digest algorithm "md5" is taken from the log text, not from the hash routine body.
+
+### Unresolved
+- Mode strings at 0x1B45A44/0x1B45A48, the hotfix.ini key schema, the base URL value.
