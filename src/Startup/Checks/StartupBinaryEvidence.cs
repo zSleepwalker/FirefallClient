@@ -1770,5 +1770,12 @@ internal static class StartupBinaryEvidence
             Matches(ClientMainLoopNativeLayout.ConsoleStringFileOffset, "636F6E736F6C65") &&
             Matches(ClientMainLoopNativeLayout.SwitchNameDirFileOffset, "64697200") &&
             Matches(ClientMainLoopNativeLayout.SwitchNamePlatformFileOffset, "706C6174666F726D") &&
-            Matches(ClientMainLoopNativeLayout.SwitchNameDumpConfigFileOffset, "64756D702D636F6E666967"));    }
+            Matches(ClientMainLoopNativeLayout.SwitchNameDumpConfigFileOffset, "64756D702D636F6E666967"));
+        check("Binary startup round 6 (uri registration, hotfix, AssetDB paths)",
+            Matches(ClientMainLoopNativeLayout.UriProtocolRegisterFn304BB0FileOffset, "558BEC6AFF68184C9D0164A1") &&
+            Matches(ClientMainLoopNativeLayout.HotfixDownloadFn386D90FileOffset, "558BEC83E4F06AFF6889B39D") &&
+            Matches(ClientMainLoopNativeLayout.HotfixHttpTransportFn388330FileOffset, "558BEC6AFF6812B59D0164A1") &&
+            Matches(ClientMainLoopNativeLayout.AssetDbSearchPathsLoggerFn1318400FileOffset, "558BEC6AFF685885A90164A1") &&
+            Matches(ClientMainLoopNativeLayout.OpenSwitchStringFileOffset, "6F70656E") &&
+            Matches(ClientMainLoopNativeLayout.HotfixDownloadPathKeyStringFileOffset, "446F776E6C6F61642D50617468"));    }
 }

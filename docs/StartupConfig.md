@@ -46,3 +46,19 @@ Addresses: file offsets (= IDA addresses); VA code = raw+0x400C00, .rdata = raw+
 - The generic (non-texture) asset mount / `fsAssetDB` path is not found; `lowmiptextures.pak` is a texture pak only.
 - Which `*.cfg` contents are parsed after 0xF07FFB, and the registry-key names of 0x304BB0, are not decoded.
 - Unreferenced wide-string twins of some switches exist; their users are unknown.
+
+## Round 6: URI registration and hotfix (static, partial)
+
+### Observed
+- 0x304BB0 registers a `firefall://` protocol handler under HKCU: key `Software\Classes\firefall`, value `URL Protocol`, `registered_build` compared with the build string `prod-1962`, and `shell\open\command` set to `%COMSPEC% /q /c start "%s" /D"%s" %s --open="%1"`. It also reads the `--open` switch and logs "Unable to open uri: %s". The earlier obfuscation claim was an addressing error (string raw = VA - 0x401400).
+- 0x386D90 (hotfix download, `__thiscall`, level byte at this+28) logs "Hotfix download starting: level %u", reads `[Hotfix] Download-Path` from the ini container at App+0xA6C, opens `hotfix.ini`, and uses the `.include "%u\%s"` format. Its error strings are listed in the round-5 notes.
+- 0x388330 builds `<this+12 root>\<%u level>\<name>` and a URL-or-path. It tests for the `http://` prefix on the string at `this[9]+36`. It then calls 0x388BD0 (which logs "unable to init http", "Bad md5sum: expected %s for %s") or 0x388800.
+- 0x3878F0 is the post-download step: it logs "Hotfix OnPostDownload()", copies binaries into `bin\`, renames the prior destination, and reports copy failures.
+
+### Interpreted
+- Transport is HTTP, with a local-path fallback, and downloaded files are md5-verified. 0x388BD0 is the HTTP route and 0x388800 is the non-HTTP route. Neither was fully decompiled.
+- The level key is the `%u` directory under the download root.
+
+### Unresolved
+- The exact hotfix.ini section and key schema beyond `[Hotfix] Download-Path`, and the base URL value (config data, not a binary string).
+- The bodies of 0x388BD0, 0x388800 and 0x389090.

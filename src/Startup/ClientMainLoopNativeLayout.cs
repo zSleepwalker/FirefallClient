@@ -108,4 +108,15 @@ public static class ClientMainLoopNativeLayout
     public const int ArgvRegistryPushFn12BE230FileOffset = 0x12BE230;
     public const int SwitchNameDirFileOffset = 0x18559D4;
     public const int SwitchNamePlatformFileOffset = 0x1855A98;
-    public const int SwitchNameDumpConfigFileOffset = 0x1855AC4;}
+    public const int SwitchNameDumpConfigFileOffset = 0x1855AC4;
+    // Round 6: firefall:// URI registration, hotfix, AssetDB search-path log (file offsets = VA - 0x400C00 for code, VA - 0x401400 for strings).
+    public const int UriProtocolRegisterFn304BB0FileOffset = 0x304BB0;
+    public const int OpenSwitchStringFileOffset = 0x173EC34;
+    public const int UriProtocolFirefallStringFileOffset = 0x173EC90;
+    public const int UriShellCommandTemplateStringFileOffset = 0x173ECE4;
+    public const int HotfixStartStringFileOffset = 0x1744244;
+    public const int HotfixDownloadPathKeyStringFileOffset = 0x1744398;
+    public const int HotfixSectionStringFileOffset = 0x17443A8;
+    public const int HotfixHttpTransportFn388330FileOffset = 0x388330;
+    public const int AssetDbSearchPathsHeaderStringFileOffset = 0x1C5A694 - 0x401400;
+    public const int OrdinarySearchPathsHeaderStringFileOffset = 0x1C5A6AC - 0x401400;}
