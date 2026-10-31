@@ -1020,7 +1020,7 @@ factory/callback ABI remain unresolved.
 `MatrixOtherChannelDecoderNativeLayout.cs` records dispatch only, not a
 replacement decoder.
 
-## Secondary command dispatcher and three verified class cases
+## Secondary command dispatcher and four verified class cases
 
 The secondary-dispatch target `0x81CC50` is a large raw function
 (`0x4B9E` bytes) with two separate selector tables. It reads a leading byte
@@ -1047,14 +1047,14 @@ selector range return zero. Leading bytes `0x36..0xEF` also reach the
 zero-return path. These are dispatch boundaries only; the inputs’ semantic
 names and the 91 secondary targets are unresolved.
 
-Three nested selectors are mapped: route0 block `0x81CCAD` dispatches selector
+Four nested selectors are mapped: route0 block `0x81CCAD` dispatches selector
 `0x53` through the table at VA `0xC22444` (raw `0x821844`) to raw case
 `0x81CCC3`. That case allocates `0x48` bytes, calls constructor `0x524C30`,
 then body reader `0x5F6B10`. Constructor RTTI identifies the object as
 `firefall::Character::MarketRequestComplete`. The reader stores, in order,
 a byte at object+`0x28`, raw QWORD at+`0x30`, byte at+`0x38`, and three
 NUL-terminated shared-text values at+`0x3C/+0x40/+0x44`. Field meanings
-remain unknown; these three selectors do not name the remaining table cases.
+remain unknown; these four selectors do not name the remaining table cases.
 `MatrixSecondaryCommandDispatcherNativeLayout.cs` and
 `CharacterMarketRequestCompleteNativeLayout` preserve the route bounds and
 this bounded object layout without implementing a parser.
@@ -1136,6 +1136,21 @@ meaning. Refill and short-input behavior of the scalar helpers is also not
 established. `CharacterTookDebugWeaponHitPublicNativeLayout` preserves the
 observed offsets, widths, branch boundaries, and record size without
 implementing a parser or naming semantic fields.
+
+### Selector 0x56: `TookDebugWeaponHit`
+
+Entry3 maps selector `0x56` to VA `0xC1D9BA` / raw case `0x81CDBA`. It
+allocates `0xA8` bytes, stores local DWORD `0x5E` (role unknown), then calls
+constructor `0x524FC0`. The constructor passes `0x56` to `0x5A0550`, installs
+vtable VA `0x1C67248` (RTTI `firefall::Character::TookDebugWeaponHit`), and
+zeros object bytes `+0x58` and `+0x88`. After construction, the case branches
+to shared body-reader setup `0x81CD94`; its call at `0x81CDA0` invokes the
+same reader `0x5F60F0` used by selector `0x55`.
+
+This proves the two selectors share the same observed field-reading routine,
+not that their distinct RTTI classes have identical semantics. The reader's
+offset/width ledger and conditional tails are recorded under selector
+`0x55`; no semantic field names are inferred for either class.
 
 ## Message35 application body
 

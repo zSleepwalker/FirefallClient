@@ -1015,6 +1015,19 @@ Check("TookDebugWeaponHitPublic selector 0x55 records its scalar prefix and cond
     && CharacterTookDebugWeaponHitPublicNativeLayout.SecondConditionalTailRecordDwordCount == 16
     && CharacterTookDebugWeaponHitPublicNativeLayout.SecondConditionalTailCountRepeatMarker == 0xFF
     && CharacterTookDebugWeaponHitPublicNativeLayout.SecondConditionalTailReaderByteCount == 0x121);
+Check("TookDebugWeaponHit selector 0x56 has a distinct RTTI type and shares selector 0x55's body reader",
+    CharacterTookDebugWeaponHitNativeLayout.InnerSelector == 0x56
+    && CharacterTookDebugWeaponHitNativeLayout.CaseFileOffset == 0x81CDBA
+    && CharacterTookDebugWeaponHitNativeLayout.CaseLocalDwordValue == 0x5E
+    && CharacterTookDebugWeaponHitNativeLayout.AllocationSize == 0xA8
+    && CharacterTookDebugWeaponHitNativeLayout.ConstructorFileOffset == 0x524FC0
+    && CharacterTookDebugWeaponHitNativeLayout.ConstructorHelperFileOffset == 0x5A0550
+    && CharacterTookDebugWeaponHitNativeLayout.BodyReaderFileOffset
+        == CharacterTookDebugWeaponHitPublicNativeLayout.BodyReaderFileOffset
+    && CharacterTookDebugWeaponHitNativeLayout.VtableVirtualAddress == 0x1C67248
+    && CharacterTookDebugWeaponHitNativeLayout.SharedBodyReaderSetupFileOffset == 0x81CD94
+    && CharacterTookDebugWeaponHitNativeLayout.ConstructorZeroedByteField1Offset == 0x58
+    && CharacterTookDebugWeaponHitNativeLayout.ConstructorZeroedByteField2Offset == 0x88);
 Check("Shared channel-2/3 compact-code routing groups the observed native cases",
     Enumerable.Range(1, 6).All(code =>
         MatrixOtherChannelDecoderNativeLayout.SelectRoute(code)

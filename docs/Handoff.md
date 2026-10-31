@@ -1044,6 +1044,9 @@ These updates supersede older next-step suggestions below where they overlap.
   39-byte scalar prefix and two conditional tails, including a count-blocked
   vector of 64-byte records. The copied third DWORD at object+0x70 has no
   observed input write in the reader path; its origin remains unresolved.
+  Selector0x56 constructs the distinct RTTI class `TookDebugWeaponHit` and
+  shares the same `0x5F60F0` body reader; this does not prove semantic
+  equivalence.
   Remaining case handlers, field meanings, and message semantics are open.
   RTTI names the results `nl::RoutedMessage` and
   `nl::RoutedMultipleMessage`; QWORD and message semantics remain unknown.

@@ -1244,6 +1244,25 @@ internal static class StartupBinaryEvidence
             && Matches(0x6087F2, "BB04000000")
             && RelativeBranchTargets(0x5F5EFC, 0xE8, 0x5F5880)
             && RelativeBranchTargets(0x5F5F3E, 0xE8, 0x5F5D70));
+        check("Binary inner selector 0x56 constructs TookDebugWeaponHit and joins the shared body reader",
+            ReadUInt32(VirtualAddressToFileOffset(
+                CharacterTookDebugWeaponHitNativeLayout.InnerSelectorTableVirtualAddress) + 12) == 0xC1D9BA
+            && Matches(CharacterTookDebugWeaponHitNativeLayout.CaseFileOffset, "68A8000000")
+            && RelativeBranchTargets(0x81CDBF, 0xE8, 0x12B7FB0)
+            && Matches(0x81CDCB, "C74424205E000000")
+            && RelativeBranchTargets(0x81CDDE, 0xE8,
+                CharacterTookDebugWeaponHitNativeLayout.ConstructorFileOffset)
+            && Matches(0x81CDE5, "EBAD")
+            && Matches(0x524FD2, "C70056000000")
+            && RelativeBranchTargets(0x524FD8, 0xE8,
+                CharacterTookDebugWeaponHitNativeLayout.ConstructorHelperFileOffset)
+            && Matches(0x524FDD, "C7064872C601")
+            && Matches(0x524FE5, "C6465800")
+            && Matches(0x524FE9, "C6868800000000")
+            && VtableRttiName(CharacterTookDebugWeaponHitNativeLayout.VtableVirtualAddress, 80)
+                == CharacterTookDebugWeaponHitNativeLayout.RttiName
+            && RelativeBranchTargets(0x81CDA0, 0xE8,
+                CharacterTookDebugWeaponHitNativeLayout.BodyReaderFileOffset));
         check("Binary matrix socket factory requests overlapped UDP",
             Matches(0xBE354A, "6A016A006A006A11B8170000006A020F44C150FF15684DAC01"));
         check("Binary matrix local binding uses seven or two attempts and final-two fallback",
