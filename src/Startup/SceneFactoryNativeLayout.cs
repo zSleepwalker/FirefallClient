@@ -160,6 +160,15 @@ public static class SceneFactoryNativeLayout
     public const int EngineSystemVtableVirtualAddress = 0x1C77C2C;
     public const int EngineSystemInitializeSlotFileOffset = 0xE54BF0;
     public const string EngineSystemRttiName = ".?AVoEngineSystem@@";
+    public const int EngineSystemConstructorFileOffset = 0xE4DFA0;
+    public const int EngineSystemConstructorCallSiteFileOffset = 0xE4E6E3;
+    public const int EngineSystemFactoryCreateFileOffset = 0xE4E660;
+    public const int EngineSystemFactoryVtableVirtualAddress = 0x1C77C1C;
+    public const int EngineSystemFactoryGlobalVirtualAddress = 0x1E00460;
+    public const int EngineSystemFactoryStaticInitFileOffset = 0xE4F630;
+    public const int FactoryListWalkerFileOffset = 0x12C3A80;
+    public const int FactoryListWalkerCallSiteFileOffset = 0x2EAF3B;
+    public const int EngineSystemVtableSlotCount = 26;
 
     public static IReadOnlyList<int> PhysicsDrawInterfaceVtableSlots => PhysicsDrawInterfaceVtableSlotFileOffsets;
 

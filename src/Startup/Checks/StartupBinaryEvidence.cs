@@ -108,6 +108,17 @@ internal static class StartupBinaryEvidence
             && VtableRttiName(SceneFactoryNativeLayout.TextureManagerVtableVirtualAddress) == SceneFactoryNativeLayout.TextureManagerRttiName
             && VtableRttiName(SceneFactoryNativeLayout.ShaderManagerVtableVirtualAddress) == SceneFactoryNativeLayout.ShaderManagerRttiName
             && VtableRttiName(SceneFactoryNativeLayout.ModelManagerVtableVirtualAddress) == SceneFactoryNativeLayout.ModelManagerRttiName);
+        check("Binary oEngineSystem is built by factory slot 1 (0xE4E660) from a static factory registered in a list that bootstrap walks",
+            Matches(SceneFactoryNativeLayout.EngineSystemConstructorFileOffset + 0x3E, "C7072C7CC701")
+            && Matches(SceneFactoryNativeLayout.EngineSystemConstructorCallSiteFileOffset, "E8B8F8FFFF")
+            && Matches(SceneFactoryNativeLayout.EngineSystemFactoryStaticInitFileOffset + 0x20, "C705A4B0E4016004E001")
+            && ReadUInt32(VirtualAddressToFileOffset(SceneFactoryNativeLayout.EngineSystemFactoryVtableVirtualAddress) + 4)
+                == SceneFactoryNativeLayout.EngineSystemFactoryCreateFileOffset + 0x400C00
+            && ReadUInt32(VirtualAddressToFileOffset(SceneFactoryNativeLayout.EngineSystemFactoryGlobalVirtualAddress)) == 0x1C77C1C
+            && ReadUInt32(VirtualAddressToFileOffset(SceneFactoryNativeLayout.EngineSystemVtableVirtualAddress))
+                == SceneFactoryNativeLayout.EngineSystemInitializeSlotFileOffset + 0x400C00
+            && Matches(SceneFactoryNativeLayout.FactoryListWalkerFileOffset + 0x43, "7414807E040075078B068BCEFF5004")
+            && Matches(SceneFactoryNativeLayout.FactoryListWalkerCallSiteFileOffset, "E8408BFD00"));
         check("Binary render init args come from oEngineSystem window state (+0x130/0x138/0x13C/0x140) and reach oD3DRenderAPI slot +8; oShaderBuilderSystem is a static global",
             Matches(SceneFactoryNativeLayout.RenderSystemInitCallSiteFileOffset - 0x30,
                 "FF75E083BF3001000001A170E9DF0151FFB7400100000F94C3B970E9DF01FFB73C010000885DDCFFB738010000FF75DCFF5034")

@@ -3327,3 +3327,41 @@ for name-keyed registries (only direct string refs were searched).
   specific cvar is inferred from comparison order, not proven.
 - **Unresolved.** Exact cvar-to-field mapping; caller of ctor `0xE4DFE0` and the
   path up to the app main loop; whether `oEngineSystem` slot 0 is `Init`.
+
+### oEngineSystem construction and vtable (static pass)
+
+- **Observed (addressing).** The IDB maps code at raw offsets; the doc's "ctor `0xE4DFE0`" is
+  imprecise: the constructor function starts at raw `0xE4DFA0` (size `0x15E`) and stores the
+  vtable VA `0x1C77C2C` at raw `0xE4DFDE` (`C7 07 2C 7C C7 01`). It zero/initialises
+  fields through `+0x168` (`+0x164 = 0x8F`, `+0x134 = 1`, `+0x158/0x15C = -1`).
+- **Observed (constructor caller).** Sole direct caller is `0xE4E660` (call at `0xE4E6E3`):
+  allocates `0x170` bytes via `0x12B7FB0`, runs the ctor, stores the object at `factory+0x10`,
+  copies old list head `dword_1E4B0A8` to `factory+0xC`, makes `factory` the new head, sets
+  `factory+4 = 1`. It has no direct callers: it is slot 1 of a factory vtable
+  (VA `0x1C77C1C`, raw `0x187681C` = `{0x124F410, 0x124F260(=0xE4E660), 0x124F320}`).
+- **Observed (factory).** The factory is a static `.data` object at VA `0x1E00460` (raw
+  `0x19FE860`, holds `0x1C77C1C`). Its static initializer at raw `0xE4F630` links it into
+  list head `dword_1E4B0A4` (`+8` = next) and sets vptr/flag. No `0x1E00470`
+  (instance slot) code reference exists except accessor `0xE4E630` (`mov eax,1E00470; ret`),
+  which has no direct call/jump xref.
+- **Observed (who runs the factories).** `0x12C3A80` (called from `ClientApplicationBootstrap`
+  `0x2EAE70` at `0x2EAF3B`) walks `dword_1E4B0A4` and calls vtable slot 1 (`+4`) of every
+  factory whose `+4` byte is 0, i.e. it creates `oEngineSystem` (and its siblings).
+  Upward chain: `0x2E9630` (wrapper) <- `0x136AEDA` in `CrtInitializeAndInvokeClient`
+  (`0x136ADBA`, the CRT start / WinMain-equivalent). `ClientApplicationBootstrap` then
+  runs `ClientApplicationInitialize(dword_1DFFD98)` (`0x3063D0`), `ClientApplicationRunLoop`
+  (`0x3098C0`), `ClientApplicationShutdown` (`0x3095D0`); `dword_1DFFD98` is the App object.
+- **Observed (vtable).** Vtable raw `0x187682C`, COL `0x1CD439C`, 26 slots (raw targets):
+  0 `E54BF0` (1412 B), 1 `E553F0`, 2 `E55580`, 3 `E4E1E0`, 4 `E4E1F0`, 5 `E4E200`,
+  6 `E55370`, 7 `E55380` (104), 8 `E55990` (746), 9 `E55E80` (601), 10 `E4E470` (34),
+  11 `E4E4A0` (15), 12 `E55E60` (25), 13 `E6EF70`, 14 `E6F0C0` (158), 15 `E4FB80`,
+  16 `E4FB60` (28), 17 `E4FB50`, 18 `E4FB40`, 19 `E4FB30` (16), 20 `E53A40` (120),
+  21 `E53FA0` (1717), 22 `E4FB20`, 23 `E54660` (52), 24 `E4FB10`, 25 `E4FB00` (16).
+  Slots without a size are not IDA-defined function starts. No slot name is proven by a string
+  beyond slot 0's log text.
+- **Interpreted.** Engine-system objects are created lazily by the bootstrap factory walk, not by
+  a direct call; AppMode objects (Login/World) are not on this path - they come from
+  `dword_1DFFD98` (App) during `ClientApplicationInitialize`/run loop.
+- **Unresolved.** The caller that invokes slot 0 (`E54BF0`) and the others (no direct call or
+  vtable-literal reference found; likely through `factory+0x10` / `0x1E4B0A8` list consumers
+  such as `0x110D060`, `0x2F1540`, `0x311090`; not traced); role names of slots 1-25.
