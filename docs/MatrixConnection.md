@@ -4,10 +4,14 @@ This trace continues auto-login state 5 after selected-character preparation.
 Addresses are raw file offsets unless marked VA. The `0xBB0`-byte
 Login-owned object at Login `+0x1C` is called a matrix connection object by
 observed logs and operations; its original class name is not established.
-It is distinct from the global polymorphic message endpoint at VA `0x1E002B8`.
-The Login response handler also calls that endpoint with message ID `0x145`
-at raw `0x63C1E2` (global raw `.data` offset `0x19FE6B8`). The endpoint's
-recipient and any causal connection to World-mode entry remain unproven.
+It is distinct from the global polymorphic message endpoint at VA `0x1E002B8`
+(raw `.data` offset `0x19FE6B8`). The Login response handler loads that
+endpoint at raw `0x63C1E2`, pushes message ID `0x145`, and invokes virtual
+slot `+0xAC` at raw `0x63C1F5`. The endpoint cell is zero in the original
+file. Raw code at `0x3EE8D4` stores zero to it and returns; a direct absolute
+store scan found no nonzero assignment, but indirect or external population
+is not ruled out. The endpoint's recipient and any causal connection to
+World-mode entry remain unproven.
 
 ## Oracle-ticket request
 

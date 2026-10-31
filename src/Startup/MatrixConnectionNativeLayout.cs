@@ -21,6 +21,10 @@ public static class MatrixConnectionNativeLayout
     public const uint OracleResponseHandlerFileOffset = 0x495460;
     public const uint OracleResponseParserFileOffset = 0x4956C0;
     public const uint OpenMatrixConnectionMethodFileOffset = 0x495F20;
+    public const uint LoginMessage145EndpointGlobalLoadFileOffset = 0x63C1E2;
+    public const uint LoginMessage145EndpointCallFileOffset = 0x63C1F5;
+    public const uint GlobalMessageEndpointNullStoreFileOffset = 0x3EE8D4;
+    public const uint GlobalMessageEndpointVirtualAddress = 0x1E002B8;
     public const int OracleCallbackAllocationSize = 0x10;
     public const int OracleCallbackOwnerPointerOffset = 0x04;
     public const int OracleCallbackTargetPointerOffset = 0x08;

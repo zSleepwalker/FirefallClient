@@ -374,6 +374,11 @@ Check("Matrix connection requests oracle tickets through a distinct callback wra
     && ClientApiRequestNativeLayout.ResolveHttpMethod(MatrixConnectionNativeLayout.OracleRequestType) == "POST"
     && MatrixConnectionNativeLayout.KnownResponseKeys.SequenceEqual(
         ["matrix_url", "ticket", "datacenter", "operator_override", "session_id", "hostname"]));
+Check("Matrix login notification uses the separately tracked global endpoint",
+    MatrixConnectionNativeLayout.LoginMessage145EndpointGlobalLoadFileOffset == 0x63C1E2
+    && MatrixConnectionNativeLayout.LoginMessage145EndpointCallFileOffset == 0x63C1F5
+    && MatrixConnectionNativeLayout.GlobalMessageEndpointNullStoreFileOffset == 0x3EE8D4
+    && MatrixConnectionNativeLayout.GlobalMessageEndpointVirtualAddress == 0x1E002B8);
 int retryDelay = 0;
 var retryDelays = new List<int>();
 for (int i = 0; i < 12; i++)

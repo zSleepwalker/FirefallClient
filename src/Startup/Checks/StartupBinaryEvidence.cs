@@ -1857,5 +1857,11 @@ internal static class StartupBinaryEvidence
             && Matches(GameSocketReliableQueueNativeLayout.AcknowledgmentPendingFlagClearSiteFileOffset, "C6463200")
             && Matches(0xBE56AC, "66FF432A")
             && Matches(GameSocketReliableQueueNativeLayout.AcknowledgmentPendingFlagSetSiteFileOffset, "C6433201"));
+        check("Login message-145 call uses a zero-initialized global endpoint",
+            Matches(MatrixConnectionNativeLayout.LoginMessage145EndpointGlobalLoadFileOffset,
+                "8B0DB802E0018D55846A005268450100008B01FF90AC000000")
+            && Matches(MatrixConnectionNativeLayout.GlobalMessageEndpointNullStoreFileOffset,
+                "C705B802E00100000000C3")
+            && ReadUInt32(VirtualAddressToFileOffset(MatrixConnectionNativeLayout.GlobalMessageEndpointVirtualAddress)) == 0);
     }
 }
