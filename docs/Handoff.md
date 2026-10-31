@@ -1082,6 +1082,9 @@ These updates supersede older next-step suggestions below where they overlap.
   Selector0x63 constructs `QuickChat` and reads a DWORD at object+0x28
   through shared continuation 0x8206E3; allocation-failure behavior remains
   unresolved.
+  Selector0x64 constructs `ProximityTextChat`, reads NUL-terminated shared
+  text at +0x28 and bytes at +0x2C..+0x2E, then consumes an optional
+  WORD-length-prefixed blob behind a gate byte at +0x30; meanings unknown.
   Remaining case handlers, field meanings, and message semantics are open.
   RTTI names the results `nl::RoutedMessage` and
   `nl::RoutedMultipleMessage`; QWORD and message semantics remain unknown.

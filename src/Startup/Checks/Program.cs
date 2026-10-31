@@ -1250,6 +1250,35 @@ Check("QuickChat selector 0x63 records its DWORD field and shared reader continu
     && CharacterQuickChatNativeLayout.VtableVirtualAddress == 0x1C67178
     && CharacterQuickChatNativeLayout.DwordFieldOffset == 0x28
     && CharacterQuickChatNativeLayout.NominalInputByteCount == 4);
+Check("ProximityTextChat selector 0x64 records shared text and optional blob framing",
+    CharacterProximityTextChatNativeLayout.InnerSelector == 0x64
+    && CharacterProximityTextChatNativeLayout.CaseFileOffset == 0x81D1A2
+    && CharacterProximityTextChatNativeLayout.CaseLocalDwordValue == 0x6C
+    && CharacterProximityTextChatNativeLayout.AllocationSize == 0x48
+    && CharacterProximityTextChatNativeLayout.ConstructorFileOffset == 0x5259C0
+    && CharacterProximityTextChatNativeLayout.BaseConstructorHelperFileOffset == 0x5A0BB0
+    && CharacterProximityTextChatNativeLayout.BaseConstructorArgument == 0x64
+    && CharacterProximityTextChatNativeLayout.BodyReaderFileOffset == 0x5F1BC0
+    && CharacterProximityTextChatNativeLayout.SharedTextReaderFileOffset == 0x12EE010
+    && CharacterProximityTextChatNativeLayout.OptionalBlobReaderFileOffset == 0x5F19A0
+    && CharacterProximityTextChatNativeLayout.WordLengthPrefixedBlobReaderFileOffset == 0x12EE170
+    && CharacterProximityTextChatNativeLayout.OptionalBlobUpdateHelperFileOffset == 0x5F1920
+    && CharacterProximityTextChatNativeLayout.OptionalBlobClearHelperFileOffset == 0x49AC30
+    && CharacterProximityTextChatNativeLayout.VtableVirtualAddress == 0x1C67158
+    && CharacterProximityTextChatNativeLayout.SharedTextFieldOffset == 0x28
+    && CharacterProximityTextChatNativeLayout.SharedTextTerminatorByte == 0
+    && CharacterProximityTextChatNativeLayout.SharedTextChunkByteLimit == 0x100
+    && CharacterProximityTextChatNativeLayout.SharedTextTemporaryBufferByteCount == 0x104
+    && CharacterProximityTextChatNativeLayout.ByteField0Offset == 0x2C
+    && CharacterProximityTextChatNativeLayout.ByteField1Offset == 0x2D
+    && CharacterProximityTextChatNativeLayout.ByteField2Offset == 0x2E
+    && CharacterProximityTextChatNativeLayout.OptionalBlobPresenceFieldOffset == 0x30
+    && CharacterProximityTextChatNativeLayout.FixedByteCountAfterSharedTextBeforeBlobGate == 3
+    && CharacterProximityTextChatNativeLayout.OptionalBlobGateByteCount == 1
+    && CharacterProximityTextChatNativeLayout.OptionalBlobLengthPrefixByteCount == 2
+    && CharacterProximityTextChatNativeLayout.MaximumOptionalBlobPayloadByteCount == 0xFFFF
+    && CharacterProximityTextChatNativeLayout.EmptyTextInputByteCountWithoutOptionalBlob == 5
+    && CharacterProximityTextChatNativeLayout.EmptyTextInputByteCountWithEmptyOptionalBlob == 7);
 Check("Shared channel-2/3 compact-code routing groups the observed native cases",
     Enumerable.Range(1, 6).All(code =>
         MatrixOtherChannelDecoderNativeLayout.SelectRoute(code)

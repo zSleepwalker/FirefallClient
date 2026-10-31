@@ -1368,6 +1368,32 @@ continues into the same field reader, which forms destination address
 `0x28`. The runtime consequence of that abnormal path is unresolved.
 Field meaning remains unknown; RTTI alone does not establish chat semantics.
 
+### Selector 0x64: `ProximityTextChat`
+
+Entry17 maps selector `0x64` to VA `0xC1DDA2` / raw case `0x81D1A2`. It
+allocates `0x48` bytes, stores local DWORD `0x6C` (role unknown), then calls
+constructor `0x5259C0`. The constructor passes `0x64` to helper `0x5A0BB0`,
+installs vtable VA `0x1C67158` (RTTI
+`firefall::Character::ProximityTextChat`), zeros the DWORD at object `+0x28`,
+and clears the optional-blob presence byte at `+0x30`.
+
+Body reader `0x5F1BC0` reads a NUL-terminated shared-text field at `+0x28`
+through `0x12EE010`, then bytes at `+0x2C`, `+0x2D`, and `+0x2E`. It calls
+`0x5F19A0` with `this = object+0x30`; that helper always consumes a gate
+byte. When nonzero, it reads a little-endian WORD length and that many bytes
+through `0x12EE170`, then updates the reference-backed blob field using
+`0x5F1920`. A zero gate clears an existing blob through `0x49AC30` when its
+presence marker is set.
+
+The nominal input length is the number of text bytes through and including
+the terminating NUL, plus three bytes and the gate byte, plus
+`2 + blobLength` when the gate is nonzero. Thus an empty text with no blob
+consumes five bytes; an empty text with an empty blob consumes seven. The
+text reader processes at most `0x100` bytes per chunk using a `0x104`-byte
+temporary buffer; no overall text limit or encoding is established. The WORD
+blob length permits at most `0xFFFF` payload bytes. Field meanings remain
+unknown; RTTI alone does not establish proximity-chat semantics.
+
 ## Message35 application body
 
 Factory case35 at `0x33D557` allocates a fresh0x50-byte descriptor through

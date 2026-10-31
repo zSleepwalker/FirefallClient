@@ -1671,6 +1671,49 @@ internal static class StartupBinaryEvidence
             && Matches(CharacterQuickChatNativeLayout.BodyReaderContinuationFileOffset, "8D4628")
             && RelativeBranchTargets(0x8206F1, 0xE8,
                 CharacterQuickChatNativeLayout.DwordReaderFileOffset));
+        check("Binary inner selector 0x64 constructs ProximityTextChat and routes its body fields",
+            ReadUInt32(VirtualAddressToFileOffset(
+                CharacterProximityTextChatNativeLayout.InnerSelectorTableVirtualAddress) + 68) == 0xC1DDA2
+            && Matches(CharacterProximityTextChatNativeLayout.CaseFileOffset, "6A48")
+            && Matches(0x81D1B0, "C74424206C000000")
+            && RelativeBranchTargets(0x81D1C3, 0xE8,
+                CharacterProximityTextChatNativeLayout.ConstructorFileOffset)
+            && RelativeBranchTargets(0x81D1D9, 0xE8,
+                CharacterProximityTextChatNativeLayout.BodyReaderFileOffset)
+            && Matches(0x5259D2, "C70064000000")
+            && RelativeBranchTargets(0x5259D8, 0xE8,
+                CharacterProximityTextChatNativeLayout.BaseConstructorHelperFileOffset)
+            && Matches(0x5259DD, "C7065871C601")
+            && Matches(0x5259E5, "C7462800000000")
+            && Matches(0x5259EC, "C6463000")
+            && VtableRttiName(CharacterProximityTextChatNativeLayout.VtableVirtualAddress, 80)
+                == CharacterProximityTextChatNativeLayout.RttiName
+            && Matches(0x5F1BCB, "8D5628")
+            && RelativeBranchTargets(0x5F1BCE, 0xE8,
+                CharacterProximityTextChatNativeLayout.SharedTextReaderFileOffset)
+            && Matches(0x5F1BD3, "8D562C")
+            && RelativeBranchTargets(0x5F1BD8, 0xE8, 0x337180)
+            && Matches(0x5F1BDD, "8D562D")
+            && RelativeBranchTargets(0x5F1BE2, 0xE8, 0x337180)
+            && Matches(0x5F1BE7, "8D562E")
+            && RelativeBranchTargets(0x5F1BEC, 0xE8, 0x337180)
+            && Matches(0x5F1BF1, "8D5630")
+            && RelativeBranchTargets(0x5F1BF6, 0xE8,
+                CharacterProximityTextChatNativeLayout.OptionalBlobReaderFileOffset));
+        check("Binary ProximityTextChat optional blob has a byte gate and WORD-length reader",
+            Matches(0x5F19EA, "8A0840837F0801")
+            && Matches(0x5F1A1E, "84C90F8487000000")
+            && RelativeBranchTargets(0x5F1A54, 0xE8,
+                CharacterProximityTextChatNativeLayout.WordLengthPrefixedBlobReaderFileOffset)
+            && RelativeBranchTargets(0x5F1A60, 0xE8,
+                CharacterProximityTextChatNativeLayout.OptionalBlobUpdateHelperFileOffset)
+            && Matches(0x5F1AAD, "803B0074")
+            && RelativeBranchTargets(0x5F1ABD, 0xE8,
+                CharacterProximityTextChatNativeLayout.OptionalBlobClearHelperFileOffset)
+            && Matches(0x12EE17E, "83F902")
+            && Matches(0x12EE195, "0FB730")
+            && Matches(0x12EE198, "83C002")
+            && Matches(0x12EE1C8, "6685F6"));
         check("Binary matrix socket factory requests overlapped UDP",
             Matches(0xBE354A, "6A016A006A006A11B8170000006A020F44C150FF15684DAC01"));
         check("Binary matrix local binding uses seven or two attempts and final-two fallback",
