@@ -79,4 +79,17 @@ public static class ClientMainLoopNativeLayout
     public const int EngineStepTargetFpsFieldOffset = 0x164;
     public const int EngineStepFpsCapFieldOffset = 0x168;
     public const int InitializeTailEngineSlot54CallSiteFileOffset = 0x307403;
+    public const int ArgvSwitchCheckFn2EA6F0FileOffset = 0x2EA6F0;
+    public const int CommandLineDiagnosticsFn2EA990FileOffset = 0x2EA990;
+    public const int GetCommandLineWCallSiteFileOffset = 0x2EAA69;
+    public const int FirefallIniStringFileOffset = 0x173E9BC;
+    public const int LocalAssetsFirefallIniStringFileOffset = 0x173E9A0;
+    public const int MissingWritePathStringFileOffset = 0x173EBD0;
+    public const int HotfixIniStringFileOffset = 0x1744318;
+    public const int LowMipTexturesPakStringFileOffset = 0x173F4A8;
+    public const int BigDumpSwitchStringFileOffset = 0x173DE3C;
+    public const int DumptruckAutosubmitSwitchStringFileOffset = 0x173DE70;
+    public const int IniContainerLoaderFn12DA710FileOffset = 0x12DA710;
+    public const int ArgvFirstArgDirReaderFnE51590FileOffset = 0xE51590;
+    public const int AssetDbSearchPathsLoggerFn1318400FileOffset = 0x1318400;
 }

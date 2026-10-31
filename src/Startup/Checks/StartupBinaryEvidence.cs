@@ -1745,5 +1745,16 @@ internal static class StartupBinaryEvidence
             && Matches(ClientMainLoopNativeLayout.EngineStepLimiterCallSiteFileOffset, "E83D000000")
             && Matches(ClientMainLoopNativeLayout.EngineStepFpsCallSiteFileOffset, "E8FEFAFFFF")
             && Matches(ClientMainLoopNativeLayout.EngineStepSleepCallSiteFileOffset, "8BF03B5C241872798B44241077043BF0766F8BCE2BC8B8D34D6210F7E1C1EA0652FF1574")
-            && Matches(ClientMainLoopNativeLayout.InitializeTailEngineSlot54CallSiteFileOffset, "FF5054"));    }
+            && Matches(ClientMainLoopNativeLayout.InitializeTailEngineSlot54CallSiteFileOffset, "FF5054"));
+        check("Binary startup config pipeline round 4 (argv, ini, asset strings)",
+            Matches(ClientMainLoopNativeLayout.ArgvSwitchCheckFn2EA6F0FileOffset, "558BEC51A17448AC015356BE")
+            && Matches(ClientMainLoopNativeLayout.CommandLineDiagnosticsFn2EA990FileOffset, "558BECB8B4440000E8632F2B")
+            && Matches(ClientMainLoopNativeLayout.IniContainerLoaderFn12DA710FileOffset, "558BEC6AFF68F45EA90164A1")
+            && Matches(ClientMainLoopNativeLayout.ArgvFirstArgDirReaderFnE51590FileOffset, "558BEC81EC04040000A10050")
+            && Matches(ClientMainLoopNativeLayout.AssetDbSearchPathsLoggerFn1318400FileOffset, "558BEC6AFF685885A90164A1")
+            && Matches(ClientMainLoopNativeLayout.FirefallIniStringFileOffset, "666972656661 6C6C2E696E69".Replace(" ",""))
+            && Matches(ClientMainLoopNativeLayout.LocalAssetsFirefallIniStringFileOffset, "6C6F63616C6173736574732F6669726566616C6C2E696E69")
+            && Matches(ClientMainLoopNativeLayout.HotfixIniStringFileOffset, "686F74666978 2E696E69".Replace(" ",""))
+            && Matches(ClientMainLoopNativeLayout.LowMipTexturesPakStringFileOffset, "73797374656D2F76742F6C6F776D697074657874757265732E70616B")
+            && Matches(ClientMainLoopNativeLayout.BigDumpSwitchStringFileOffset, "2D2D62696764756D70"));    }
 }
