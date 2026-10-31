@@ -1538,6 +1538,106 @@ Check("ConfirmedPoseUpdate selector 0x6F records its conditional nested layout",
     && CharacterConfirmedPoseUpdateNativeLayout.ConstructorInitializedWordValue == 0x0101
     && CharacterConfirmedPoseUpdateNativeLayout.ConstructorInitializedDwordOffset == 0xB0
     && CharacterConfirmedPoseUpdateNativeLayout.ConstructorInitializedDwordValue == 0);
+Check("PublicDebugMovementUpdate selector 0x70 records its seven-element nested layout",
+    CharacterPublicDebugMovementUpdateNativeLayout.InnerSelector == 0x70
+    && CharacterPublicDebugMovementUpdateNativeLayout.InnerSelectorTableEntryOffset == 0x74
+    && CharacterPublicDebugMovementUpdateNativeLayout.CaseVirtualAddress == 0xC1E0FA
+    && CharacterPublicDebugMovementUpdateNativeLayout.CaseFileOffset == 0x81D4FA
+    && CharacterPublicDebugMovementUpdateNativeLayout.CaseLocalDwordValue == 0x78
+    && CharacterPublicDebugMovementUpdateNativeLayout.AllocationSize == 0x5A0
+    && CharacterPublicDebugMovementUpdateNativeLayout.ConstructorFileOffset == 0x526180
+    && CharacterPublicDebugMovementUpdateNativeLayout.BaseConstructorHelperFileOffset == 0x5A1100
+    && CharacterPublicDebugMovementUpdateNativeLayout.BaseConstructorArgument == 0x70
+    && CharacterPublicDebugMovementUpdateNativeLayout.ArrayInitializerFileOffset == 0x60E6A0
+    && CharacterPublicDebugMovementUpdateNativeLayout.BodyReaderFileOffset == 0x5FF970
+    && CharacterPublicDebugMovementUpdateNativeLayout.ArrayOffset == 0x28
+    && CharacterPublicDebugMovementUpdateNativeLayout.ArrayElementCount == 7
+    && CharacterPublicDebugMovementUpdateNativeLayout.ArrayElementStride == 0xC8
+    && CharacterPublicDebugMovementUpdateNativeLayout.ElementFirstWordOffset == 0
+    && CharacterPublicDebugMovementUpdateNativeLayout.ElementNestedRecordOffset == 4
+    && CharacterPublicDebugMovementUpdateNativeLayout.ElementSecondWordOffset == 0x70
+    && CharacterPublicDebugMovementUpdateNativeLayout.ElementTaggedByteOffset == 0x74
+    && CharacterPublicDebugMovementUpdateNativeLayout.NestedRecordFourDwordBlockOffset == 0x50
+    && CharacterPublicDebugMovementUpdateNativeLayout.NestedRecordFourDwordBlockSize == 0x10
+    && CharacterPublicDebugMovementUpdateNativeLayout.NestedRecordPresenceWordOffset == 0x60
+    && CharacterPublicDebugMovementUpdateNativeLayout.NestedRecordTrailingDwordsOffset == 0x64
+    && CharacterPublicDebugMovementUpdateNativeLayout.NestedRecordTrailingDwordCount == 3
+    && CharacterPublicDebugMovementUpdateNativeLayout.ConstructorInitializedWordValue == 0x0101
+    && CharacterPublicDebugMovementUpdateNativeLayout.ReaderWrittenPresenceWordValue == 1
+    && CharacterPublicDebugMovementUpdateNativeLayout.ConstructorInitializedWordOffsets
+        .SequenceEqual([0x88, 0x150, 0x218, 0x2E0, 0x3A8, 0x470, 0x538])
+    && CharacterPublicDebugMovementUpdateNativeLayout.ConstructorInitializedByteOffsets
+        .SequenceEqual([0x9C, 0x164, 0x22C, 0x2F4, 0x3BC, 0x484, 0x54C]));
+Check("ForcedMovement selector 0x71 records its initialized nested state and trailing WORD",
+    CharacterForcedMovementNativeLayout.InnerSelector == 0x71
+    && CharacterForcedMovementNativeLayout.InnerSelectorTableEntryOffset == 0x78
+    && CharacterForcedMovementNativeLayout.CaseVirtualAddress == 0xC1E14F
+    && CharacterForcedMovementNativeLayout.CaseFileOffset == 0x81D54F
+    && CharacterForcedMovementNativeLayout.CaseLocalDwordValue == 0x79
+    && CharacterForcedMovementNativeLayout.AllocationSize == 0x1E8
+    && CharacterForcedMovementNativeLayout.ConstructorFileOffset == 0x526230
+    && CharacterForcedMovementNativeLayout.BaseConstructorHelperFileOffset == 0x5A1170
+    && CharacterForcedMovementNativeLayout.BaseConstructorArgument == 0x71
+    && CharacterForcedMovementNativeLayout.NestedStateInitializerFileOffset == 0x92B8A0
+    && CharacterForcedMovementNativeLayout.BodyReaderFileOffset == 0x5EF690
+    && CharacterForcedMovementNativeLayout.DiscriminatedStateReaderFileOffset == 0x92F800
+    && CharacterForcedMovementNativeLayout.ConditionalPairReaderFileOffset == 0x5FDA00
+    && CharacterForcedMovementNativeLayout.DwordReaderFileOffset == 0x3370A0
+    && CharacterForcedMovementNativeLayout.WordReaderFileOffset == 0x336AC0
+    && CharacterForcedMovementNativeLayout.NestedStateOffset == 0x28
+    && CharacterForcedMovementNativeLayout.NestedStateSize == 0x1B8
+    && CharacterForcedMovementNativeLayout.NestedStateDwordOffset == 0x2C
+    && CharacterForcedMovementNativeLayout.DiscriminatorByteOffset == 0x30
+    && CharacterForcedMovementNativeLayout.ConditionalPairOffset == 0x138
+    && CharacterForcedMovementNativeLayout.ConditionalPairSize == 8
+    && CharacterForcedMovementNativeLayout.DiscriminatorCaseCount == 14
+    && CharacterForcedMovementNativeLayout.TrailingWordOffset == 0x1E0
+    && CharacterForcedMovementNativeLayout.ConstructorInitializedDwords.SequenceEqual(
+        [(0x28, 0u), (0x2C, 0u), (0x30, 0u), (0x114, 0u), (0x118, 0u),
+            (0x138, 0u), (0x13C, 0u), (0x1B8, 0u), (0x1BC, 0u), (0x1C0, 0u), (0x1C4, 0u)])
+    && CharacterForcedMovementNativeLayout.ConstructorInitializedWords.SequenceEqual(
+        [(0x34, (ushort)0), (0x94, (ushort)0x0101), (0x100, (ushort)0x0101),
+            (0x110, (ushort)0), (0x19C, (ushort)0x0101), (0x1CC, (ushort)0)]));
+Check("ForcedMovementCancelled selector 0x72 records its DWORD and WORD body fields",
+    CharacterForcedMovementCancelledNativeLayout.InnerSelector == 0x72
+    && CharacterForcedMovementCancelledNativeLayout.InnerSelectorTableEntryOffset == 0x7C
+    && CharacterForcedMovementCancelledNativeLayout.CaseVirtualAddress == 0xC1E1A3
+    && CharacterForcedMovementCancelledNativeLayout.CaseFileOffset == 0x81D5A3
+    && CharacterForcedMovementCancelledNativeLayout.CaseLocalDwordValue == 0x7A
+    && CharacterForcedMovementCancelledNativeLayout.AllocationSize == 0x30
+    && CharacterForcedMovementCancelledNativeLayout.ConstructorFileOffset == 0x5262C0
+    && CharacterForcedMovementCancelledNativeLayout.BaseConstructorHelperFileOffset == 0x5A11E0
+    && CharacterForcedMovementCancelledNativeLayout.BaseConstructorArgument == 0x72
+    && CharacterForcedMovementCancelledNativeLayout.BodyReaderFileOffset == 0x5EF490
+    && CharacterForcedMovementCancelledNativeLayout.DwordReaderFileOffset == 0x3370A0
+    && CharacterForcedMovementCancelledNativeLayout.WordReaderFileOffset == 0x336AC0
+    && CharacterForcedMovementCancelledNativeLayout.FirstReaderFieldOffset == 0x28
+    && CharacterForcedMovementCancelledNativeLayout.SecondReaderFieldOffset == 0x2C);
+Check("GrappleClimbPermission selector 0x73 records its initialized nested state",
+    CharacterGrappleClimbPermissionNativeLayout.InnerSelector == 0x73
+    && CharacterGrappleClimbPermissionNativeLayout.InnerSelectorTableEntryOffset == 0x80
+    && CharacterGrappleClimbPermissionNativeLayout.CaseVirtualAddress == 0xC1E1F4
+    && CharacterGrappleClimbPermissionNativeLayout.CaseFileOffset == 0x81D5F4
+    && CharacterGrappleClimbPermissionNativeLayout.CaseLocalDwordValue == 0x7B
+    && CharacterGrappleClimbPermissionNativeLayout.AllocationSize == 0x1E0
+    && CharacterGrappleClimbPermissionNativeLayout.ConstructorFileOffset == 0x526340
+    && CharacterGrappleClimbPermissionNativeLayout.BaseConstructorHelperFileOffset == 0x5A1250
+    && CharacterGrappleClimbPermissionNativeLayout.BaseConstructorArgument == 0x73
+    && CharacterGrappleClimbPermissionNativeLayout.NestedStateInitializerFileOffset == 0x92B8A0
+    && CharacterGrappleClimbPermissionNativeLayout.BodyReaderFileOffset == 0x92F800
+    && CharacterGrappleClimbPermissionNativeLayout.ConditionalPairReaderFileOffset == 0x5FDA00
+    && CharacterGrappleClimbPermissionNativeLayout.DwordReaderFileOffset == 0x3370A0
+    && CharacterGrappleClimbPermissionNativeLayout.NestedStateOffset == 0x28
+    && CharacterGrappleClimbPermissionNativeLayout.NestedStateSize == 0x1B8
+    && CharacterGrappleClimbPermissionNativeLayout.NestedStateDwordOffset == 0x2C
+    && CharacterGrappleClimbPermissionNativeLayout.DiscriminatorByteOffset == 0x30
+    && CharacterGrappleClimbPermissionNativeLayout.ConditionalPairOffset == 0x138
+    && CharacterGrappleClimbPermissionNativeLayout.ConditionalPairSize == 8
+    && CharacterGrappleClimbPermissionNativeLayout.DiscriminatorCaseCount == 14
+    && CharacterGrappleClimbPermissionNativeLayout.ConstructorInitializedDwords
+        .SequenceEqual(CharacterForcedMovementNativeLayout.ConstructorInitializedDwords)
+    && CharacterGrappleClimbPermissionNativeLayout.ConstructorInitializedWords
+        .SequenceEqual(CharacterForcedMovementNativeLayout.ConstructorInitializedWords));
 Check("Shared channel-2/3 compact-code routing groups the observed native cases",
     Enumerable.Range(1, 6).All(code =>
         MatrixOtherChannelDecoderNativeLayout.SelectRoute(code)

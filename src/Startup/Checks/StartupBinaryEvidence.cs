@@ -2033,6 +2033,157 @@ internal static class StartupBinaryEvidence
                 "C786B000000000000000")
             && VtableRttiName(CharacterConfirmedPoseUpdateNativeLayout.VtableVirtualAddress, 80)
                 == CharacterConfirmedPoseUpdateNativeLayout.RttiName);
+        check("Binary inner selector 0x70 routes PublicDebugMovementUpdate through seven repeated records",
+            ReadUInt32(VirtualAddressToFileOffset(
+                CharacterPublicDebugMovementUpdateNativeLayout.InnerSelectorTableVirtualAddress)
+                + CharacterPublicDebugMovementUpdateNativeLayout.InnerSelectorTableEntryOffset)
+                == CharacterPublicDebugMovementUpdateNativeLayout.CaseVirtualAddress
+            && Matches(CharacterPublicDebugMovementUpdateNativeLayout.CaseFileOffset, "68A0050000")
+            && RelativeBranchTargets(CharacterPublicDebugMovementUpdateNativeLayout.CaseFileOffset + 5, 0xE8,
+                CharacterPublicDebugMovementUpdateNativeLayout.AllocationFunctionFileOffset)
+            && Matches(CharacterPublicDebugMovementUpdateNativeLayout.CaseFileOffset + 0x11, "C744242078000000")
+            && Matches(CharacterPublicDebugMovementUpdateNativeLayout.CaseFileOffset + 0x1B, "7410")
+            && Matches(CharacterPublicDebugMovementUpdateNativeLayout.AllocationFailureContinuationFileOffset,
+                "33F6")
+            && RelativeBranchTargets(CharacterPublicDebugMovementUpdateNativeLayout.ConstructorCallSiteFileOffset,
+                0xE8, CharacterPublicDebugMovementUpdateNativeLayout.ConstructorFileOffset)
+            && RelativeBranchTargets(CharacterPublicDebugMovementUpdateNativeLayout.BodyReaderCallSiteFileOffset,
+                0xE8, CharacterPublicDebugMovementUpdateNativeLayout.BodyReaderFileOffset)
+            && Matches(CharacterPublicDebugMovementUpdateNativeLayout.ConstructorFileOffset + 0x12,
+                "C70070000000")
+            && RelativeBranchTargets(CharacterPublicDebugMovementUpdateNativeLayout.ConstructorFileOffset + 0x18,
+                0xE8, CharacterPublicDebugMovementUpdateNativeLayout.BaseConstructorHelperFileOffset)
+            && Matches(CharacterPublicDebugMovementUpdateNativeLayout.ConstructorFileOffset + 0x20,
+                "C706A870C601")
+            && RelativeBranchTargets(CharacterPublicDebugMovementUpdateNativeLayout.ConstructorFileOffset + 0x26,
+                0xE8, CharacterPublicDebugMovementUpdateNativeLayout.ArrayInitializerFileOffset)
+            && Enumerable.Range(0, CharacterPublicDebugMovementUpdateNativeLayout.ArrayElementCount).All(i =>
+                RelativeBranchTargets(CharacterPublicDebugMovementUpdateNativeLayout.FirstWordReaderCallSiteFileOffset
+                    + i * CharacterPublicDebugMovementUpdateNativeLayout.ReaderCallSiteStride, 0xE8,
+                    CharacterPublicDebugMovementUpdateNativeLayout.WordReaderFileOffset)
+                && RelativeBranchTargets(
+                    CharacterPublicDebugMovementUpdateNativeLayout.FirstNestedRecordReaderCallSiteFileOffset
+                    + i * CharacterPublicDebugMovementUpdateNativeLayout.ReaderCallSiteStride, 0xE8,
+                    CharacterPublicDebugMovementUpdateNativeLayout.NestedRecordReaderFileOffset)
+                && RelativeBranchTargets(
+                    CharacterPublicDebugMovementUpdateNativeLayout.FirstSecondWordReaderCallSiteFileOffset
+                    + i * CharacterPublicDebugMovementUpdateNativeLayout.ReaderCallSiteStride, 0xE8,
+                    CharacterPublicDebugMovementUpdateNativeLayout.WordReaderFileOffset)
+                && RelativeBranchTargets(
+                    CharacterPublicDebugMovementUpdateNativeLayout.FirstTaggedFieldReaderCallSiteFileOffset
+                    + i * CharacterPublicDebugMovementUpdateNativeLayout.ReaderCallSiteStride, 0xE8,
+                    CharacterPublicDebugMovementUpdateNativeLayout.TaggedFieldReaderFileOffset))
+            && Matches(0x60E6A0, "66C741600101")
+            && Matches(0x60E6A8, "C6417400")
+            && Matches(0x60E6AC, "66C781280100000101")
+            && Matches(0x60E6B5, "C6813C01000000")
+            && Matches(0x60E6BC, "66C781F00100000101")
+            && Matches(0x60E6C5, "C6810402000000")
+            && Matches(0x60E6CC, "66C781B80200000101")
+            && Matches(0x60E6D5, "C681CC02000000")
+            && Matches(0x60E6DC, "66C781800300000101")
+            && Matches(0x60E6E5, "C6819403000000")
+            && Matches(0x60E6EC, "66C781480400000101")
+            && Matches(0x60E6F5, "C6815C04000000")
+            && Matches(0x60E6FC, "66C781100500000101")
+            && Matches(0x60E705, "C6812405000000")
+            && VtableRttiName(CharacterPublicDebugMovementUpdateNativeLayout.VtableVirtualAddress, 80)
+                == CharacterPublicDebugMovementUpdateNativeLayout.RttiName);
+        check("Binary inner selector 0x71 routes ForcedMovement through its initialized tagged state",
+            ReadUInt32(VirtualAddressToFileOffset(
+                CharacterForcedMovementNativeLayout.InnerSelectorTableVirtualAddress)
+                + CharacterForcedMovementNativeLayout.InnerSelectorTableEntryOffset)
+                == CharacterForcedMovementNativeLayout.CaseVirtualAddress
+            && Matches(CharacterForcedMovementNativeLayout.CaseFileOffset, "68E8010000")
+            && RelativeBranchTargets(CharacterForcedMovementNativeLayout.CaseFileOffset + 5, 0xE8,
+                CharacterForcedMovementNativeLayout.AllocationFunctionFileOffset)
+            && Matches(CharacterForcedMovementNativeLayout.CaseFileOffset + 0x11, "C744242079000000")
+            && Matches(CharacterForcedMovementNativeLayout.CaseFileOffset + 0x1B, "7410")
+            && Matches(CharacterForcedMovementNativeLayout.AllocationFailureContinuationFileOffset, "33F6")
+            && RelativeBranchTargets(CharacterForcedMovementNativeLayout.ConstructorCallSiteFileOffset,
+                0xE8, CharacterForcedMovementNativeLayout.ConstructorFileOffset)
+            && RelativeBranchTargets(CharacterForcedMovementNativeLayout.BodyReaderCallSiteFileOffset,
+                0xE8, CharacterForcedMovementNativeLayout.BodyReaderFileOffset)
+            && Matches(CharacterForcedMovementNativeLayout.ConstructorFileOffset + 0x12, "C70071000000")
+            && RelativeBranchTargets(CharacterForcedMovementNativeLayout.ConstructorFileOffset + 0x18,
+                0xE8, CharacterForcedMovementNativeLayout.BaseConstructorHelperFileOffset)
+            && Matches(CharacterForcedMovementNativeLayout.ConstructorFileOffset + 0x22, "C7069870C601")
+            && RelativeBranchTargets(CharacterForcedMovementNativeLayout.ConstructorFileOffset + 0x28, 0xE8,
+                CharacterForcedMovementNativeLayout.NestedStateInitializerFileOffset)
+            && RelativeBranchTargets(CharacterForcedMovementNativeLayout.BodyReaderFileOffset + 0x0F, 0xE8,
+                CharacterForcedMovementNativeLayout.DiscriminatedStateReaderFileOffset)
+            && RelativeBranchTargets(CharacterForcedMovementNativeLayout.BodyReaderFileOffset + 0x1D, 0xE8,
+                CharacterForcedMovementNativeLayout.WordReaderFileOffset)
+            && RelativeBranchTargets(CharacterForcedMovementNativeLayout.DiscriminatedStateReaderFileOffset + 0x96,
+                0xE8, CharacterForcedMovementNativeLayout.DwordReaderFileOffset)
+            && RelativeBranchTargets(CharacterForcedMovementNativeLayout.DiscriminatedStateReaderFileOffset + 0xAE,
+                0xE8, CharacterForcedMovementNativeLayout.ConditionalPairReaderFileOffset)
+            && Matches(CharacterForcedMovementNativeLayout.NestedStateInitializerFileOffset,
+                "558BEC8B45088941048BC1C70100000000C7410800000000")
+            && VtableRttiName(CharacterForcedMovementNativeLayout.VtableVirtualAddress, 80)
+                == CharacterForcedMovementNativeLayout.RttiName);
+        check("Binary inner selector 0x72 routes ForcedMovementCancelled through DWORD then WORD readers",
+            ReadUInt32(VirtualAddressToFileOffset(
+                CharacterForcedMovementCancelledNativeLayout.InnerSelectorTableVirtualAddress)
+                + CharacterForcedMovementCancelledNativeLayout.InnerSelectorTableEntryOffset)
+                == CharacterForcedMovementCancelledNativeLayout.CaseVirtualAddress
+            && Matches(CharacterForcedMovementCancelledNativeLayout.CaseFileOffset, "6A30")
+            && RelativeBranchTargets(CharacterForcedMovementCancelledNativeLayout.CaseFileOffset + 2, 0xE8,
+                CharacterForcedMovementCancelledNativeLayout.AllocationFunctionFileOffset)
+            && Matches(CharacterForcedMovementCancelledNativeLayout.CaseFileOffset + 0x0E,
+                "C74424207A000000")
+            && Matches(CharacterForcedMovementCancelledNativeLayout.CaseFileOffset + 0x18, "7410")
+            && Matches(CharacterForcedMovementCancelledNativeLayout.AllocationFailureContinuationFileOffset,
+                "33F6")
+            && RelativeBranchTargets(CharacterForcedMovementCancelledNativeLayout.ConstructorCallSiteFileOffset,
+                0xE8, CharacterForcedMovementCancelledNativeLayout.ConstructorFileOffset)
+            && RelativeBranchTargets(CharacterForcedMovementCancelledNativeLayout.BodyReaderCallSiteFileOffset,
+                0xE8, CharacterForcedMovementCancelledNativeLayout.BodyReaderFileOffset)
+            && Matches(CharacterForcedMovementCancelledNativeLayout.ConstructorFileOffset + 0x12,
+                "C70072000000")
+            && RelativeBranchTargets(CharacterForcedMovementCancelledNativeLayout.ConstructorFileOffset + 0x18,
+                0xE8, CharacterForcedMovementCancelledNativeLayout.BaseConstructorHelperFileOffset)
+            && Matches(CharacterForcedMovementCancelledNativeLayout.ConstructorFileOffset + 0x1D,
+                "C7067870C601")
+            && RelativeBranchTargets(CharacterForcedMovementCancelledNativeLayout.BodyReaderFileOffset + 0x0E,
+                0xE8, CharacterForcedMovementCancelledNativeLayout.DwordReaderFileOffset)
+            && RelativeBranchTargets(CharacterForcedMovementCancelledNativeLayout.BodyReaderFileOffset + 0x19,
+                0xE8, CharacterForcedMovementCancelledNativeLayout.WordReaderFileOffset)
+            && VtableRttiName(CharacterForcedMovementCancelledNativeLayout.VtableVirtualAddress, 80)
+                == CharacterForcedMovementCancelledNativeLayout.RttiName);
+        check("Binary inner selector 0x73 routes GrappleClimbPermission through the shared tagged-state reader",
+            ReadUInt32(VirtualAddressToFileOffset(
+                CharacterGrappleClimbPermissionNativeLayout.InnerSelectorTableVirtualAddress)
+                + CharacterGrappleClimbPermissionNativeLayout.InnerSelectorTableEntryOffset)
+                == CharacterGrappleClimbPermissionNativeLayout.CaseVirtualAddress
+            && Matches(CharacterGrappleClimbPermissionNativeLayout.CaseFileOffset, "68E0010000")
+            && RelativeBranchTargets(CharacterGrappleClimbPermissionNativeLayout.CaseFileOffset + 5, 0xE8,
+                CharacterGrappleClimbPermissionNativeLayout.AllocationFunctionFileOffset)
+            && Matches(CharacterGrappleClimbPermissionNativeLayout.CaseFileOffset + 0x11,
+                "C74424207B000000")
+            && Matches(CharacterGrappleClimbPermissionNativeLayout.CaseFileOffset + 0x1B, "7410")
+            && Matches(CharacterGrappleClimbPermissionNativeLayout.AllocationFailureContinuationFileOffset,
+                "33F6")
+            && RelativeBranchTargets(CharacterGrappleClimbPermissionNativeLayout.ConstructorCallSiteFileOffset,
+                0xE8, CharacterGrappleClimbPermissionNativeLayout.ConstructorFileOffset)
+            && RelativeBranchTargets(CharacterGrappleClimbPermissionNativeLayout.BodyReaderCallSiteFileOffset,
+                0xE8, CharacterGrappleClimbPermissionNativeLayout.BodyReaderFileOffset)
+            && Matches(CharacterGrappleClimbPermissionNativeLayout.ConstructorFileOffset + 0x12,
+                "C70073000000")
+            && RelativeBranchTargets(CharacterGrappleClimbPermissionNativeLayout.ConstructorFileOffset + 0x18,
+                0xE8, CharacterGrappleClimbPermissionNativeLayout.BaseConstructorHelperFileOffset)
+            && Matches(CharacterGrappleClimbPermissionNativeLayout.ConstructorFileOffset + 0x22,
+                "C7068870C601")
+            && RelativeBranchTargets(CharacterGrappleClimbPermissionNativeLayout.ConstructorFileOffset + 0x28,
+                0xE8, CharacterGrappleClimbPermissionNativeLayout.NestedStateInitializerFileOffset)
+            && Matches(CharacterGrappleClimbPermissionNativeLayout.NestedStateInitializerFileOffset,
+                "558BEC8B45088941048BC1C70100000000C7410800000000")
+            && RelativeBranchTargets(CharacterGrappleClimbPermissionNativeLayout.BodyReaderFileOffset + 0x96,
+                0xE8, CharacterGrappleClimbPermissionNativeLayout.DwordReaderFileOffset)
+            && RelativeBranchTargets(CharacterGrappleClimbPermissionNativeLayout.BodyReaderFileOffset + 0xAE,
+                0xE8, CharacterGrappleClimbPermissionNativeLayout.ConditionalPairReaderFileOffset)
+            && VtableRttiName(CharacterGrappleClimbPermissionNativeLayout.VtableVirtualAddress, 80)
+                == CharacterGrappleClimbPermissionNativeLayout.RttiName);
         check("Binary matrix socket factory requests overlapped UDP",
             Matches(0xBE354A, "6A016A006A006A11B8170000006A020F44C150FF15684DAC01"));
         check("Binary matrix local binding uses seven or two attempts and final-two fallback",

@@ -1584,6 +1584,77 @@ processes the field at `+0xB0` through byte-gated nested reader `0x5FFB00`.
 Allocation failure zeroes ESI before the same reader setup. Nested contents, field
 meanings, and message semantics remain unresolved.
 
+### Selector 0x70: `PublicDebugMovementUpdate`
+
+Entry29 maps selector `0x70` to VA `0xC1E0FA` / raw case `0x81D4FA`. The case
+allocates `0x5A0` bytes, stores local DWORD `0x78` (role unknown), and calls
+constructor `0x526180`. The constructor passes `0x70` to helper `0x5A1100`,
+installs vtable VA `0x1C670A8` (RTTI
+`firefall::Character::PublicDebugMovementUpdate`), then runs initializer
+`0x60E6A0`.
+
+The allocation is exactly a `0x28`-byte object prefix followed by seven
+`0xC8`-byte records. In each record, the reader consumes a WORD at `+0x00`;
+uses the record at `+0x04` for three DWORDs at record `+0x04/+0x08/+0x0C`,
+a 16-byte block at `+0x50`, a WORD set to 1 at `+0x60`, and three DWORDs at
+`+0x64/+0x68/+0x6C`; consumes another WORD at `+0x70`; and reads a gate byte
+at `+0x74` before a conditional helper-managed nested value. The constructor
+initializes each record's WORD `+0x60` to `0x0101` and gate byte `+0x74` to 0;
+the reader overwrites the WORD with 1. Record starts are object offsets
+`+0x28 + i*0xC8`, for `i=0..6`. The gate's variable payload and field meanings
+remain unresolved. Allocation failure zeroes ESI before entering the shared
+reader setup; the consequences of that path are not inferred.
+
+### Selector 0x71: `ForcedMovement`
+
+Entry30 maps selector `0x71` to VA `0xC1E14F` / raw case `0x81D54F`. It
+allocates `0x1E8` bytes, stores local DWORD `0x79` (role unknown), and calls
+constructor `0x526230`. The constructor passes `0x71` to helper `0x5A1170`,
+installs vtable VA `0x1C67098` (RTTI
+`firefall::Character::ForcedMovement`), and initializes the nested state at
+object `+0x28` through `0x92B8A0`.
+
+The initialized nested state spans `+0x28..+0x1DF`. Constructor writes are:
+zero DWORDs at `+0x28/+0x2C/+0x30`, `+0x114/+0x118`, `+0x138/+0x13C`,
+and `+0x1B8/+0x1BC/+0x1C0/+0x1C4`; WORDs `+0x34=0`, `+0x94=0x0101`,
+`+0x100=0x0101`, `+0x110=0`, `+0x19C=0x0101`, and `+0x1CC=0`.
+Reader `0x5EF690` invokes `0x92F800` on the nested state, then reads a
+separate WORD at object `+0x1E0`. The nested reader reads a DWORD at `+0x2C`,
+a discriminator byte at `+0x30`, a conditional pair at `+0x138/+0x13C`,
+and dispatches 14 discriminator cases. The case-specific tail layouts and
+field meanings remain unresolved. Allocation failure zeroes ESI before the
+reader setup.
+
+### Selector 0x72: `ForcedMovementCancelled`
+
+Entry31 maps selector `0x72` to VA `0xC1E1A3` / raw case `0x81D5A3`. It
+allocates `0x30` bytes, stores local DWORD `0x7A` (role unknown), and calls
+constructor `0x5262C0`. The constructor passes `0x72` to helper `0x5A11E0`
+and installs vtable VA `0x1C67078` (RTTI
+`firefall::Character::ForcedMovementCancelled`). Reader `0x5EF490` reads a
+DWORD at object `+0x28` with `0x3370A0`, then a WORD at `+0x2C` with
+`0x336AC0`. The derived constructor does not initialize those two fields.
+Allocation failure zeroes ESI before the reader setup. Field meanings remain
+unknown.
+
+### Selector 0x73: `GrappleClimbPermission`
+
+Entry32 maps selector `0x73` to VA `0xC1E1F4` / raw case `0x81D5F4`. It
+allocates `0x1E0` bytes, stores local DWORD `0x7B` (role unknown), and calls
+constructor `0x526340`. The constructor passes `0x73` to helper `0x5A1250`,
+installs vtable VA `0x1C67088` (RTTI
+`firefall::Character::GrappleClimbPermission`), and initializes a `0x1B8`-byte
+nested state at object `+0x28` through `0x92B8A0`. Its explicit initialized
+DWORD and WORD offsets/values match selector `0x71`; the state reaches the end
+of this allocation, with no trailing WORD.
+
+The body reader is `0x92F800`, shared with selector `0x71`: it reads the
+DWORD at nested `+0x04`, discriminator byte at `+0x08`, and conditional pair
+at `+0x110/+0x114`, then dispatches 14 discriminator cases. Those nested
+offsets correspond to object `+0x2C`, `+0x30`, and `+0x138/+0x13C`.
+Case-specific tail layouts and field meanings remain unresolved. Allocation
+failure zeroes ESI before the reader setup.
+
 The nested table at raw `0x821844` has 40 four-byte entries for selectors
 `0x53` through `0x7A` inclusive; entry `0x7A` is the last one and points to
 VA `0xC1E3EF` / raw `0x81D7EF`. The decoder's secondary dispatch subtracts

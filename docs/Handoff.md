@@ -1099,6 +1099,10 @@ These updates supersede older next-step suggestions below where they overlap.
   Selector0x6D constructs `WarnLockTargeted`; the case has no body-reader call and allocation failure takes the zero-return switch epilogue.
   Selector0x6E constructs `CurrentPoseUpdate` and reads variable scalar groups controlled by masks in byte +0x28; field meanings remain unresolved.
   Selector0x6F constructs `ConfirmedPoseUpdate` and reads a conditional nested record at +0x28 plus WORD +0xB8; nested semantics remain unresolved.
+  Selector0x70 constructs `PublicDebugMovementUpdate` with seven 0xC8-stride records in a 0x5A0 allocation; constructor defaults and reader-written fields are documented, while meanings and gated payloads remain unresolved.
+  Selector0x71 constructs `ForcedMovement` with an initialized 0x1B8 nested state, a 14-case discriminator reader, and trailing WORD +0x1E0; case-specific meanings remain unresolved.
+  Selector0x72 constructs `ForcedMovementCancelled` and reads DWORD +0x28 then WORD +0x2C; field meanings remain unresolved.
+  Selector0x73 constructs `GrappleClimbPermission` with the same initialized 0x1B8 nested state as selector0x71 and its 14-case reader; case-specific meanings remain unresolved.
   Remaining case handlers, field meanings, and message semantics are open.
   RTTI names the results `nl::RoutedMessage` and
   `nl::RoutedMultipleMessage`; QWORD and message semantics remain unknown.
