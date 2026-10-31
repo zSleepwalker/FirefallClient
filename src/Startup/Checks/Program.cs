@@ -1040,6 +1040,22 @@ Check("DebugWeaponStats selector 0x57 records eight raw WORD fields",
     && CharacterDebugWeaponStatsNativeLayout.WordFieldCount == 8
     && CharacterDebugWeaponStatsNativeLayout.WordFieldOffsets.SequenceEqual(
         new[] { 0x28, 0x2A, 0x2C, 0x2E, 0x30, 0x32, 0x34, 0x36 }));
+Check("RewardInfo selector 0x58 records its byte, QWORD, and DWORD fields",
+    CharacterRewardInfoNativeLayout.InnerSelector == 0x58
+    && CharacterRewardInfoNativeLayout.CaseFileOffset == 0x81CE38
+    && CharacterRewardInfoNativeLayout.CaseLocalDwordValue == 0x60
+    && CharacterRewardInfoNativeLayout.AllocationSize == 0x48
+    && CharacterRewardInfoNativeLayout.ConstructorFileOffset == 0x525120
+    && CharacterRewardInfoNativeLayout.BodyReaderFileOffset == 0x5F47C0
+    && CharacterRewardInfoNativeLayout.VtableVirtualAddress == 0x1C67218
+    && CharacterRewardInfoNativeLayout.FirstByteFieldOffset == 0x28
+    && CharacterRewardInfoNativeLayout.SecondByteFieldOffset == 0x29
+    && CharacterRewardInfoNativeLayout.RawQwordFieldOffset == 0x30
+    && CharacterRewardInfoNativeLayout.RawDwordFieldOffsets.SequenceEqual(new[] { 0x38, 0x3C, 0x40 })
+    && CharacterRewardInfoNativeLayout.NominalInputByteCount == 0x16
+    && CharacterRewardInfoNativeLayout.ReaderLastWrittenFieldEndOffset == 0x44
+    && CharacterRewardInfoNativeLayout.ConstructorZeroedDwordField1Offset == 0x30
+    && CharacterRewardInfoNativeLayout.ConstructorZeroedDwordField2Offset == 0x34);
 Check("Shared channel-2/3 compact-code routing groups the observed native cases",
     Enumerable.Range(1, 6).All(code =>
         MatrixOtherChannelDecoderNativeLayout.SelectRoute(code)

@@ -1020,7 +1020,7 @@ factory/callback ABI remain unresolved.
 `MatrixOtherChannelDecoderNativeLayout.cs` records dispatch only, not a
 replacement decoder.
 
-## Secondary command dispatcher and four verified class cases
+## Secondary command dispatcher and six verified class cases
 
 The secondary-dispatch target `0x81CC50` is a large raw function
 (`0x4B9E` bytes) with two separate selector tables. It reads a leading byte
@@ -1047,14 +1047,14 @@ selector range return zero. Leading bytes `0x36..0xEF` also reach the
 zero-return path. These are dispatch boundaries only; the inputs’ semantic
 names and the 91 secondary targets are unresolved.
 
-Four nested selectors are mapped: route0 block `0x81CCAD` dispatches selector
+Six nested selectors are mapped: route0 block `0x81CCAD` dispatches selector
 `0x53` through the table at VA `0xC22444` (raw `0x821844`) to raw case
 `0x81CCC3`. That case allocates `0x48` bytes, calls constructor `0x524C30`,
 then body reader `0x5F6B10`. Constructor RTTI identifies the object as
 `firefall::Character::MarketRequestComplete`. The reader stores, in order,
 a byte at object+`0x28`, raw QWORD at+`0x30`, byte at+`0x38`, and three
 NUL-terminated shared-text values at+`0x3C/+0x40/+0x44`. Field meanings
-remain unknown; these four selectors do not name the remaining table cases.
+remain unknown; these six selectors do not name the remaining table cases.
 `MatrixSecondaryCommandDispatcherNativeLayout.cs` and
 `CharacterMarketRequestCompleteNativeLayout` preserve the route bounds and
 this bounded object layout without implementing a parser.
@@ -1162,6 +1162,21 @@ constructor `0x5250A0` and body reader `0x5F4A10`. The constructor passes
 in order into object offsets `+0x28,+0x2A,+0x2C,+0x2E,+0x30,+0x32,+0x34,+0x36`.
 These occupy the final 16 bytes of the allocation. Their meanings remain
 unknown; the RTTI name does not establish their semantics.
+
+### Selector 0x58: `RewardInfo`
+
+Entry5 maps selector `0x58` to VA `0xC1DA38` / raw case `0x81CE38`. It
+allocates `0x48` bytes, stores local DWORD `0x60` (role unknown), then calls
+constructor `0x525120` and reader `0x5F47C0`. The constructor passes `0x58`
+to `0x5A0630`, installs vtable VA `0x1C67218` (RTTI
+`firefall::Character::RewardInfo`), and zeros DWORDs at object `+0x30/+0x34`.
+The reader then fills a byte at `+0x28`, a byte at `+0x29`, a raw QWORD at
+`+0x30`, and three raw DWORDs at `+0x38/+0x3C/+0x40`. These reads nominally
+consume `0x16` input bytes and write through object `+0x43`; the constructor's
+zeroes at `+0x30/+0x34` are overwritten by the QWORD read. Gaps at
+`+0x2A..+0x2F` and the final allocation bytes `+0x44..+0x47` are not written
+by this reader. Field meanings remain unknown; the RTTI name does not prove
+reward-related semantics.
 
 ## Message35 application body
 

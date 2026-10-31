@@ -1049,6 +1049,8 @@ These updates supersede older next-step suggestions below where they overlap.
   equivalence.
   Selector0x57 constructs `DebugWeaponStats` and reads eight raw WORDs at
   object offsets+0x28 through+0x36; their meanings are unknown.
+  Selector0x58 constructs `RewardInfo` and reads two bytes, one QWORD, and
+  three DWORDs at object offsets+0x28..+0x40; meanings remain unknown.
   Remaining case handlers, field meanings, and message semantics are open.
   RTTI names the results `nl::RoutedMessage` and
   `nl::RoutedMultipleMessage`; QWORD and message semantics remain unknown.

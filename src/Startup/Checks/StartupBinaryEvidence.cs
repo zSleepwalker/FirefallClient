@@ -1298,6 +1298,36 @@ internal static class StartupBinaryEvidence
             && Matches(0x336AC9, "83F902")
             && Matches(0x336AE0, "668B088B450866890883460402")
             && Matches(0x336B10, "834608FE"));
+        check("Binary inner selector 0x58 constructs RewardInfo and reads its observed field sequence",
+            ReadUInt32(VirtualAddressToFileOffset(
+                CharacterRewardInfoNativeLayout.InnerSelectorTableVirtualAddress) + 20) == 0xC1DA38
+            && Matches(CharacterRewardInfoNativeLayout.CaseFileOffset, "6A48")
+            && RelativeBranchTargets(0x81CE3A, 0xE8, 0x12B7FB0)
+            && Matches(0x81CE46, "C744242060000000")
+            && RelativeBranchTargets(0x81CE59, 0xE8,
+                CharacterRewardInfoNativeLayout.ConstructorFileOffset)
+            && RelativeBranchTargets(0x81CE6F, 0xE8,
+                CharacterRewardInfoNativeLayout.BodyReaderFileOffset)
+            && Matches(0x525132, "C70058000000")
+            && RelativeBranchTargets(0x525138, 0xE8,
+                CharacterRewardInfoNativeLayout.ConstructorHelperFileOffset)
+            && Matches(0x52513D, "C7061872C601")
+            && Matches(0x525145, "C7463000000000")
+            && Matches(0x52514C, "C7463400000000")
+            && VtableRttiName(CharacterRewardInfoNativeLayout.VtableVirtualAddress, 80)
+                == CharacterRewardInfoNativeLayout.RttiName
+            && Matches(0x5F47CA, "8D5628")
+            && RelativeBranchTargets(0x5F47CD, 0xE8, 0x337180)
+            && Matches(0x5F47D2, "8D5629")
+            && RelativeBranchTargets(0x5F47D7, 0xE8, 0x337180)
+            && Matches(0x5F47DC, "8D4630")
+            && RelativeBranchTargets(0x5F47E2, 0xE8, 0x356F80)
+            && Matches(0x5F47E7, "8D4638")
+            && RelativeBranchTargets(0x5F47ED, 0xE8, 0x3370A0)
+            && Matches(0x5F47F2, "8D463C")
+            && RelativeBranchTargets(0x5F47F8, 0xE8, 0x3370A0)
+            && Matches(0x5F47FD, "8D4640")
+            && RelativeBranchTargets(0x5F4803, 0xE8, 0x3370A0));
         check("Binary matrix socket factory requests overlapped UDP",
             Matches(0xBE354A, "6A016A006A006A11B8170000006A020F44C150FF15684DAC01"));
         check("Binary matrix local binding uses seven or two attempts and final-two fallback",
