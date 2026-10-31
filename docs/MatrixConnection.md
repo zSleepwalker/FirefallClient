@@ -1661,6 +1661,67 @@ VA `0xC1E3EF` / raw `0x81D7EF`. The decoder's secondary dispatch subtracts
 `0x20` and accepts values through `0x5A`, giving an inclusive upper bound of
 `0x7A`; values above it take the default path.
 
+### Selector 0x74: `AbilityActivated`
+
+Entry33 maps selector `0x74` to VA `0xC1E249` / raw case `0x81D649`. The case
+allocates `0x40` bytes, stores local DWORD `0x7C` (role unknown), and calls
+constructor `0x5263D0`. The constructor passes selector `0x74` to helper
+`0x5A12C0` and installs vtable VA `0x1C67068` (RTTI
+`firefall::Character::AbilityActivated`). It initializes a 16-byte state at
+object `+0x30`: DWORD `0x1C80CC4` followed by three zero DWORDs.
+
+Reader `0x5EF1F0` reads DWORDs at `+0x28` and `+0x2C` through `0x3370A0`.
+It then invokes virtual slot `+0x10` on the state at `+0x30`, passing the
+remaining stream length and input pointer. The exact interpretation of this
+state and its trailing bytes remains unknown. On allocation failure, ESI is
+zeroed before the reader setup; runtime consequences are not inferred.
+
+### Selector 0x75: `AbilityFailed`
+
+Entry34 maps selector `0x75` to VA `0xC1E29A` / raw case `0x81D69A`. It
+allocates `0x40` bytes, stores local DWORD `0x7D` (role unknown), and calls
+constructor `0x5264C0`. The constructor passes selector `0x75` to helper
+`0x5A1330` and installs vtable VA `0x1C67058` (RTTI
+`firefall::Character::AbilityFailed`). Its initialized 16-byte state at
+`+0x30` matches selector `0x74`: DWORD `0x1C80CC4` followed by three zero
+DWORDs.
+
+Reader `0x5EF090` has the same observed field-access pattern as `0x5EF1F0`:
+DWORDs at `+0x28` and `+0x2C` through `0x3370A0`, then a virtual slot `+0x10`
+call on `+0x30` using the remaining stream length. Shared layout and reader
+shape do not establish matching event semantics. The state meaning, trailing
+bytes, and allocation-failure consequences remain unresolved.
+
+### Selector 0x76: `AbilityCooldowns`
+
+Entry35 maps selector `0x76` to VA `0xC1E2EB` / raw case `0x81D6EB`. It
+allocates `0x38` bytes, stores local DWORD `0x7E` (role unknown), and calls
+constructor `0x5265B0`. The constructor passes selector `0x76` to helper
+`0x5A13C0`, installs vtable VA `0x1C67038` (RTTI
+`firefall::Character::AbilityCooldowns`), and initializes a 16-byte state at
+object `+0x28` with DWORD `0x1C80CC4` followed by three zero DWORDs.
+
+Reader `0x5EEE60` passes the state at `+0x28` to its virtual slot `+0x10`
+with the remaining stream length and input pointer. Thus the observed reader
+consumes the remaining bytes into that state; its exact meaning and allocation
+failure consequences remain unresolved.
+
+### Selector 0x77: `NPCInteraction`
+
+Entry36 maps selector `0x77` to VA `0xC1E33C` / raw case `0x81D73C`. It
+allocates `0x30` bytes, stores local DWORD `0x7F` (role unknown), and calls
+constructor `0x5266A0`. The constructor passes selector `0x77` to helper
+`0x5A1430`, installs vtable VA `0x1C67048` (RTTI
+`firefall::Character::NPCInteraction`), and zero-initializes DWORDs at
+`+0x28` and `+0x2C`.
+
+The success path jumps to shared reader setup at raw `0x81F72E`, which reads
+one raw QWORD into `+0x28` via `0x356F80`; the reader copies eight bytes and
+advances the input stream by eight. The allocation-failure branch reaches
+`0x81F72C`, zeroes ESI, and joins that setup. The resulting failure-path
+address calculation is recorded as observed; its runtime consequence and the
+QWORD's field meanings remain unknown.
+
 ## Message35 application body
 
 Factory case35 at `0x33D557` allocates a fresh0x50-byte descriptor through

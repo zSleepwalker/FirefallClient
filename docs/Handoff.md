@@ -1103,6 +1103,10 @@ These updates supersede older next-step suggestions below where they overlap.
   Selector0x71 constructs `ForcedMovement` with an initialized 0x1B8 nested state, a 14-case discriminator reader, and trailing WORD +0x1E0; case-specific meanings remain unresolved.
   Selector0x72 constructs `ForcedMovementCancelled` and reads DWORD +0x28 then WORD +0x2C; field meanings remain unresolved.
   Selector0x73 constructs `GrappleClimbPermission` with the same initialized 0x1B8 nested state as selector0x71 and its 14-case reader; case-specific meanings remain unresolved.
+  Selector0x74 constructs `AbilityActivated`, reads DWORDs +0x28/+0x2C, then passes remaining input to the opaque embedded state at +0x30 (virtual +0x10 reader).
+  Selector0x75 constructs `AbilityFailed` with the same observed DWORD/opaque-state reader shape as selector0x74; event semantics remain unproven.
+  Selector0x76 constructs `AbilityCooldowns` and passes remaining input to the opaque embedded state at +0x28 (virtual +0x10 reader); field meaning remains unknown.
+  Selector0x77 constructs `NPCInteraction` and reads one raw QWORD at +0x28; field meaning and allocation-failure consequence remain unknown.
   Remaining case handlers, field meanings, and message semantics are open.
   RTTI names the results `nl::RoutedMessage` and
   `nl::RoutedMultipleMessage`; QWORD and message semantics remain unknown.

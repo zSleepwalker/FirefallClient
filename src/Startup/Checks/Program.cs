@@ -1638,6 +1638,67 @@ Check("GrappleClimbPermission selector 0x73 records its initialized nested state
         .SequenceEqual(CharacterForcedMovementNativeLayout.ConstructorInitializedDwords)
     && CharacterGrappleClimbPermissionNativeLayout.ConstructorInitializedWords
         .SequenceEqual(CharacterForcedMovementNativeLayout.ConstructorInitializedWords));
+Check("AbilityActivated selector 0x74 records its two DWORDs and trailing opaque embedded state",
+    CharacterAbilityActivatedNativeLayout.InnerSelector == 0x74
+    && CharacterAbilityActivatedNativeLayout.InnerSelectorTableEntryOffset == 0x84
+    && CharacterAbilityActivatedNativeLayout.CaseVirtualAddress == 0xC1E249
+    && CharacterAbilityActivatedNativeLayout.CaseFileOffset == 0x81D649
+    && CharacterAbilityActivatedNativeLayout.CaseLocalDwordValue == 0x7C
+    && CharacterAbilityActivatedNativeLayout.AllocationSize == 0x40
+    && CharacterAbilityActivatedNativeLayout.ConstructorFileOffset == 0x5263D0
+    && CharacterAbilityActivatedNativeLayout.BaseConstructorHelperFileOffset == 0x5A12C0
+    && CharacterAbilityActivatedNativeLayout.BaseConstructorArgument == 0x74
+    && CharacterAbilityActivatedNativeLayout.BodyReaderFileOffset == 0x5EF1F0
+    && CharacterAbilityActivatedNativeLayout.DwordReaderFileOffset == 0x3370A0
+    && CharacterAbilityActivatedNativeLayout.FirstReaderFieldOffset == 0x28
+    && CharacterAbilityActivatedNativeLayout.SecondReaderFieldOffset == 0x2C
+    && CharacterAbilityActivatedNativeLayout.PayloadOffset == 0x30
+    && CharacterAbilityActivatedNativeLayout.PayloadStateSize == 0x10
+    && CharacterAbilityActivatedNativeLayout.PayloadStateInitializer == 0x1C80CC4);
+Check("AbilityFailed selector 0x75 records its two DWORDs and trailing opaque embedded state",
+    CharacterAbilityFailedNativeLayout.InnerSelector == 0x75
+    && CharacterAbilityFailedNativeLayout.InnerSelectorTableEntryOffset == 0x88
+    && CharacterAbilityFailedNativeLayout.CaseVirtualAddress == 0xC1E29A
+    && CharacterAbilityFailedNativeLayout.CaseFileOffset == 0x81D69A
+    && CharacterAbilityFailedNativeLayout.CaseLocalDwordValue == 0x7D
+    && CharacterAbilityFailedNativeLayout.AllocationSize == 0x40
+    && CharacterAbilityFailedNativeLayout.ConstructorFileOffset == 0x5264C0
+    && CharacterAbilityFailedNativeLayout.BaseConstructorHelperFileOffset == 0x5A1330
+    && CharacterAbilityFailedNativeLayout.BaseConstructorArgument == 0x75
+    && CharacterAbilityFailedNativeLayout.BodyReaderFileOffset == 0x5EF090
+    && CharacterAbilityFailedNativeLayout.DwordReaderFileOffset == 0x3370A0
+    && CharacterAbilityFailedNativeLayout.FirstReaderFieldOffset == 0x28
+    && CharacterAbilityFailedNativeLayout.SecondReaderFieldOffset == 0x2C
+    && CharacterAbilityFailedNativeLayout.PayloadOffset == 0x30
+    && CharacterAbilityFailedNativeLayout.PayloadStateSize == 0x10
+    && CharacterAbilityFailedNativeLayout.PayloadStateInitializer == 0x1C80CC4);
+Check("AbilityCooldowns selector 0x76 records an opaque embedded state",
+    CharacterAbilityCooldownsNativeLayout.InnerSelector == 0x76
+    && CharacterAbilityCooldownsNativeLayout.InnerSelectorTableEntryOffset == 0x8C
+    && CharacterAbilityCooldownsNativeLayout.CaseVirtualAddress == 0xC1E2EB
+    && CharacterAbilityCooldownsNativeLayout.CaseFileOffset == 0x81D6EB
+    && CharacterAbilityCooldownsNativeLayout.CaseLocalDwordValue == 0x7E
+    && CharacterAbilityCooldownsNativeLayout.AllocationSize == 0x38
+    && CharacterAbilityCooldownsNativeLayout.ConstructorFileOffset == 0x5265B0
+    && CharacterAbilityCooldownsNativeLayout.BaseConstructorHelperFileOffset == 0x5A13C0
+    && CharacterAbilityCooldownsNativeLayout.BaseConstructorArgument == 0x76
+    && CharacterAbilityCooldownsNativeLayout.BodyReaderFileOffset == 0x5EEE60
+    && CharacterAbilityCooldownsNativeLayout.PayloadOffset == 0x28
+    && CharacterAbilityCooldownsNativeLayout.PayloadStateSize == 0x10
+    && CharacterAbilityCooldownsNativeLayout.PayloadStateInitializer == 0x1C80CC4);
+Check("NPCInteraction selector 0x77 records its raw QWORD body field",
+    CharacterNPCInteractionNativeLayout.InnerSelector == 0x77
+    && CharacterNPCInteractionNativeLayout.InnerSelectorTableEntryOffset == 0x90
+    && CharacterNPCInteractionNativeLayout.CaseVirtualAddress == 0xC1E33C
+    && CharacterNPCInteractionNativeLayout.CaseFileOffset == 0x81D73C
+    && CharacterNPCInteractionNativeLayout.CaseLocalDwordValue == 0x7F
+    && CharacterNPCInteractionNativeLayout.AllocationSize == 0x30
+    && CharacterNPCInteractionNativeLayout.ConstructorFileOffset == 0x5266A0
+    && CharacterNPCInteractionNativeLayout.BaseConstructorHelperFileOffset == 0x5A1430
+    && CharacterNPCInteractionNativeLayout.BaseConstructorArgument == 0x77
+    && CharacterNPCInteractionNativeLayout.BodyReaderFileOffset == 0x81F72E
+    && CharacterNPCInteractionNativeLayout.QwordReaderFileOffset == 0x356F80
+    && CharacterNPCInteractionNativeLayout.FirstQwordFieldOffset == 0x28);
 Check("Shared channel-2/3 compact-code routing groups the observed native cases",
     Enumerable.Range(1, 6).All(code =>
         MatrixOtherChannelDecoderNativeLayout.SelectRoute(code)
