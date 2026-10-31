@@ -169,6 +169,14 @@ public static class SceneFactoryNativeLayout
     public const int FactoryListWalkerFileOffset = 0x12C3A80;
     public const int FactoryListWalkerCallSiteFileOffset = 0x2EAF3B;
     public const int EngineSystemVtableSlotCount = 26;
+    public const int FactoryClassListHeadVirtualAddress = 0x1E4B0A4;
+    public const int FactoryInstanceListHeadVirtualAddress = 0x1E4B0A8;
+    public const int FactoryListTeardownWalkerFileOffset = 0x12C3AF0;
+    public const int FactoryListTeardownDispatchCheckOffset = 0x34;
+    public const int FactoryCreateVtableSlotOffset = 4;
+    public const int FactoryDestroyVtableSlotOffset = 8;
+    public const int FactoryInstanceNextOffset = 0xC;
+    public const int FactoryInstanceSlotOffset = 0x10;
 
     public static IReadOnlyList<int> PhysicsDrawInterfaceVtableSlots => PhysicsDrawInterfaceVtableSlotFileOffsets;
 

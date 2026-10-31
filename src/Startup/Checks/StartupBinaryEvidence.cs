@@ -119,7 +119,10 @@ internal static class StartupBinaryEvidence
                 == SceneFactoryNativeLayout.EngineSystemInitializeSlotFileOffset + 0x400C00
             && Matches(SceneFactoryNativeLayout.FactoryListWalkerFileOffset + 0x43, "7414807E040075078B068BCEFF5004")
             && Matches(SceneFactoryNativeLayout.FactoryListWalkerCallSiteFileOffset, "E8408BFD00"));
-        check("Binary render init args come from oEngineSystem window state (+0x130/0x138/0x13C/0x140) and reach oD3DRenderAPI slot +8; oShaderBuilderSystem is a static global",
+        check("Binary factory instance list (head 0x1E4B0A8) create slots link into it and the teardown walker calls factory slot +8",
+            Matches(SceneFactoryNativeLayout.FactoryListTeardownWalkerFileOffset + SceneFactoryNativeLayout.FactoryListTeardownDispatchCheckOffset, "85C9740F8B01FF50088B0DA8B0E40185C975F1")
+            && Matches(SceneFactoryNativeLayout.EngineSystemFactoryCreateFileOffset + 0x8C, "894610A1A8B0E40189460C8935A8B0E401C64604018B".Substring(0, 28))
+            && Matches(SceneFactoryNativeLayout.EngineSystemFactoryCreateFileOffset + 0x8C, "894610A1A8B0E40189460C8935A8B0E401"));        check("Binary render init args come from oEngineSystem window state (+0x130/0x138/0x13C/0x140) and reach oD3DRenderAPI slot +8; oShaderBuilderSystem is a static global",
             Matches(SceneFactoryNativeLayout.RenderSystemInitCallSiteFileOffset - 0x30,
                 "FF75E083BF3001000001A170E9DF0151FFB7400100000F94C3B970E9DF01FFB73C010000885DDCFFB738010000FF75DCFF5034")
             && ReadUInt32(VirtualAddressToFileOffset(SceneFactoryNativeLayout.RenderApiVtableVirtualAddress) + 8)

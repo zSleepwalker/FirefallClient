@@ -1706,3 +1706,6 @@ Single direct init caller: raw `0xE53C72` (in `0xE53AC0`, called from `0xE550D5`
 ## oEngineSystem construction (latest pass)
 
 Ctor is raw `0xE4DFA0` (sole caller `0xE4E660` = slot 1 of factory vtable `0x1C77C1C`; factory static at VA `0x1E00460`, list head `0x1E4B0A4` walked by `0x12C3A80` from `ClientApplicationBootstrap` `0x2EAE70` <- `0x2E9630` <- `CrtInitializeAndInvokeClient` `0x136ADBA`). Vtable has 26 slots (see MatrixConnection.md). Slot 0 caller remains unresolved.
+
+## Factory list consumers (engine systems)
+- Static pass: the factory lists (0x1E4B0A4 classes, 0x1E4B0A8 instances) have only a create walker (0x12C3A80, slot +4) and a teardown walker (0x12C3AF0, slot +8); no init loop calls oEngineSystem slot 0 (0xE54BF0). The list is a generic singleton registry (Network, SoundThread, fsAssetDB, uiManager, oParticleInterface, ...). Next: find the real caller of 0xE54BF0 (see docs\MatrixConnection.md 'Factory list consumers').

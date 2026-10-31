@@ -3365,3 +3365,32 @@ for name-keyed registries (only direct string refs were searched).
 - **Unresolved.** The caller that invokes slot 0 (`E54BF0`) and the others (no direct call or
   vtable-literal reference found; likely through `factory+0x10` / `0x1E4B0A8` list consumers
   such as `0x110D060`, `0x2F1540`, `0x311090`; not traced); role names of slots 1-25.
+
+### Factory list consumers and engine-system init (static pass 2)
+
+- **Observed.** `0x12C3A80` (create walk) iterates `dword_1E4B0A4` via `+8` and calls factory vtable
+  `+4` (create) on entries whose `+4` byte is 0; `byte_1E4B095` = "walking", `byte_1E4B096` =
+  "walked". `0x12C3AF0` (teardown walk, raw bytes `85C9740F8B01FF5008...` at `+0x34`) loops on
+  `dword_1E4B0A8` and calls factory vtable `+8` (destroy) until the head is empty. Create slots
+  (e.g. `0xE4E660`, `0x2EC510`) link the factory into the instance list (`+0xC` = old `A8` head,
+  `A8` = factory, `+4 = 1`, object at `+0x10`); destroy slots (e.g. `0x2F1540`) pop the `A8` head.
+  `dword_1E4B0A4` has exactly one code reference (the create walker); `dword_1E4B0A8` is referenced
+  by 80 functions, each with exactly two references (create/destroy slots) plus the teardown walker.
+  No code reads factory `+0x10` by a static address: raw scans find the immediates `0x1E00460`/
+  `0x1E00470` only in the static init (`0xE4F630`) and accessor `0xE4E630` (no callers, no jump).
+- **Observed (class list).** 43 create slots with a resolvable constructor store these vtables
+  (RTTI): `slUsesSingleton<nl::Network>`, `slUsesSingleton<slSafeQueue::NodePool>`, `nl::SocketPumpI`,
+  `smSoundThread`, `ilHiddenInputWindowThread`, `fsAssetDB`, `tsLodManager`, `tfGUIInterface`,
+  a `tfAudioManager` bound functor, `tfDebugEvent`, `tfDebugLag`, `oParticleInterface`,
+  `EnglishRules`, `tfGlobalizationManager`, `smSoundActionManager`, `vcs::StaticDBDataStore`,
+  `tfToggleFireModeCommand`, `uiManager`, `oEngineSystem` (rest have no ctor-stored RTTI vtable).
+- **Interpreted.** The list is a generic static singleton/service registry (network, sound, asset DB,
+  GUI, UI, debug, rules, engine), not an engine-system-only list. Instance order is creation order in
+  `A4` order (A4 head = last registered static init); teardown is the reverse (LIFO via `A8`). The
+  registration order across translation units (CRT initialiser table) was not recovered.
+- **Observed (negative).** No loop over either list calls a slot on `factory+0x10`; the only list
+  consumers are the create and teardown walkers. Hence `oEngineSystem` slot 0 (`0xE54BF0`) is NOT
+  invoked by a factory-list init loop.
+- **Unresolved.** The real caller of `0xE54BF0` (likely a virtual call through an interface pointer
+  obtained elsewhere, e.g. a ctor-time global store or `oEngineInterface`); `Init` naming remains
+  inferred from its log strings; init order of the other classes; classes without RTTI-resolved ctors.
