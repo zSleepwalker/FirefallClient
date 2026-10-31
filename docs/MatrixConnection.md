@@ -22,7 +22,7 @@ vtable VA is `0x1C73EBC`.
 The Login response handler loads the resulting pointer at raw `0x63C1E2`,
 pushes message ID `0x145`, and invokes `uiManager` slot `+0xAC` at raw
 `0x63C1F5`. That route enters `0xBF9D80`, looks up an event-ID bucket in the
-registry at `uiManager+0x1BC`, and walks listeners through `0xBF9C40`;
+registry at `uiManager+0x6F0`, and walks listeners through `0xBF9C40`;
 listener matching/callback work continues through `0xC38400`. Dispatch is
 gated by `uiManager+0x672`, which the constructor initializes to zero.
 Who enables that flag is not established. This identifies the endpoint and

@@ -32,7 +32,7 @@ public static class UiManagerNativeLayout
     public const int SingletonInstancePointerOffset = 0x10;
     public const int UiManagerAllocationSize = 0xA10;
     public const int UiManagerEventDispatchVtableOffset = 0xAC;
-    public const int UiManagerEventRegistryOffset = 0x1BC;
+    public const int UiManagerEventRegistryOffset = 0x6F0;
     public const int UiManagerEventReadyFlagOffset = 0x672;
     public const int UiManagerListenerNameOffset = 0x70;
     public const int LoginResponseNotificationId = 0x145;

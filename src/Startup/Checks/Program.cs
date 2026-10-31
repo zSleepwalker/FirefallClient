@@ -387,6 +387,7 @@ Check("UI manager singleton and global event routing boundaries are recorded",
     && UiManagerNativeLayout.UiManagerEventListenerLookupFileOffset == 0xC0AA20
     && UiManagerNativeLayout.UiManagerEventCallbackRouteFileOffset == 0xC38400
     && UiManagerNativeLayout.UiManagerEventDispatchVtableOffset == 0xAC
+    && UiManagerNativeLayout.UiManagerEventRegistryOffset == 0x6F0
     && UiManagerNativeLayout.UiManagerEventReadyFlagOffset == 0x672
     && UiManagerNativeLayout.LoginMessage145GlobalLoadFileOffset == 0x63C1E2
     && UiManagerNativeLayout.LoginMessage145CallFileOffset == 0x63C1F5);

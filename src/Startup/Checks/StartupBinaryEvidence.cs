@@ -1866,6 +1866,9 @@ internal static class StartupBinaryEvidence
                 "80B872060000000F849C010000")
             && Matches(UiManagerNativeLayout.UiManagerEventReadyFlagInitializeFileOffset, "C6837206000000")
             && Matches(UiManagerNativeLayout.UiManagerEventDispatchMethodFileOffset, "558BEC83E4F86AFF")
+            && Matches(0xBF9B5C, "8DBEF0060000508BCF")
+            && Matches(0xBF9BDA, "8DB1F00600008D45FC")
+            && Matches(0xBF9EE5, "8D8FF0060000")
             && Matches(UiManagerNativeLayout.LoginMessage145GlobalLoadFileOffset,
                 "8B0DB802E0018D55846A005268450100008B01FF90AC000000")
             && VtableRttiName(UiManagerNativeLayout.SingletonVtableVirtualAddress)
