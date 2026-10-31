@@ -1416,6 +1416,29 @@ internal static class StartupBinaryEvidence
             && Matches(0x5F33A9, "8D5304")
             && RelativeBranchTargets(0x5F33AE, 0xE8,
                 CharacterPublicCombatLogNativeLayout.WordLengthPrefixedBlobReaderFileOffset));
+        check("Binary inner selector 0x5C constructs PrivateCombatLog and rejoins the shared reader",
+            ReadUInt32(VirtualAddressToFileOffset(
+                CharacterPrivateCombatLogNativeLayout.InnerSelectorTableVirtualAddress) + 36) == 0xC1DB81
+            && Matches(CharacterPrivateCombatLogNativeLayout.CaseFileOffset, "6A40")
+            && RelativeBranchTargets(0x81CF83, 0xE8, 0x12B7FB0)
+            && Matches(0x81CF8F, "C744242064000000")
+            && RelativeBranchTargets(0x81CFA2, 0xE8,
+                CharacterPrivateCombatLogNativeLayout.ConstructorFileOffset)
+            && Matches(0x81CFA9, "EBB0")
+            && Matches(0x525492, "C7005C000000")
+            && RelativeBranchTargets(0x525498, 0xE8,
+                CharacterPrivateCombatLogNativeLayout.ConstructorHelperFileOffset)
+            && Matches(0x52549D, "C706E871C601")
+            && Matches(0x5254A5, "C6462800")
+            && Matches(0x5254A9, "C7462CC40CC801")
+            && Matches(0x5254B0, "C7463000000000")
+            && Matches(0x5254B7, "C7463400000000")
+            && Matches(0x5254BE, "C7463800000000")
+            && VtableRttiName(CharacterPrivateCombatLogNativeLayout.VtableVirtualAddress, 80)
+                == CharacterPrivateCombatLogNativeLayout.RttiName
+            && Matches(CharacterPrivateCombatLogNativeLayout.SharedBodyReaderSetupFileOffset, "578D4E28")
+            && RelativeBranchTargets(0x81CF67, 0xE8,
+                CharacterPrivateCombatLogNativeLayout.BodyReaderFileOffset));
         check("Binary matrix socket factory requests overlapped UDP",
             Matches(0xBE354A, "6A016A006A006A11B8170000006A020F44C150FF15684DAC01"));
         check("Binary matrix local binding uses seven or two attempts and final-two fallback",

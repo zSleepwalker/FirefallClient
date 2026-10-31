@@ -1061,6 +1061,9 @@ These updates supersede older next-step suggestions below where they overlap.
   Selector0x5B constructs `PublicCombatLog` and accepts raw DWORD gate1
   followed by a WORD-length-prefixed blob; the non-1 diagnostic path remains
   unresolved.
+  Selector0x5C constructs distinct RTTI `PrivateCombatLog` and branches to
+  the same reader with `this = object+0x28`; parser reuse does not prove
+  semantic equivalence with selector0x5B.
   Remaining case handlers, field meanings, and message semantics are open.
   RTTI names the results `nl::RoutedMessage` and
   `nl::RoutedMultipleMessage`; QWORD and message semantics remain unknown.

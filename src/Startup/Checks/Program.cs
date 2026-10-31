@@ -1113,6 +1113,22 @@ Check("PublicCombatLog selector 0x5B records its gated blob body without naming 
     && CharacterPublicCombatLogNativeLayout.RawDwordWidth == 4
     && CharacterPublicCombatLogNativeLayout.BlobLengthPrefixByteCount == 2
     && CharacterPublicCombatLogNativeLayout.MinimumSuccessBodyPrefixByteCount == 6);
+Check("PrivateCombatLog selector 0x5C has distinct RTTI and shares the public-log body reader",
+    CharacterPrivateCombatLogNativeLayout.InnerSelector == 0x5C
+    && CharacterPrivateCombatLogNativeLayout.CaseFileOffset == 0x81CF81
+    && CharacterPrivateCombatLogNativeLayout.CaseLocalDwordValue == 0x64
+    && CharacterPrivateCombatLogNativeLayout.AllocationSize == 0x40
+    && CharacterPrivateCombatLogNativeLayout.ConstructorFileOffset == 0x525480
+    && CharacterPrivateCombatLogNativeLayout.ConstructorHelperFileOffset == 0x5A0810
+    && CharacterPrivateCombatLogNativeLayout.BodyReaderFileOffset
+        == CharacterPublicCombatLogNativeLayout.BodyReaderFileOffset
+    && CharacterPrivateCombatLogNativeLayout.SharedBodyReaderSetupFileOffset == 0x81CF5B
+    && CharacterPrivateCombatLogNativeLayout.VtableVirtualAddress == 0x1C671E8
+    && CharacterPrivateCombatLogNativeLayout.ConstructorZeroedByteFieldOffset == 0x28
+    && CharacterPrivateCombatLogNativeLayout.EmbeddedBlobFieldOffset == 0x2C
+    && CharacterPrivateCombatLogNativeLayout.EmbeddedBlobVtableVirtualAddress == 0x1C80CC4
+    && CharacterPrivateCombatLogNativeLayout.BodyReaderThisObjectOffset == 0x28
+    && CharacterPrivateCombatLogNativeLayout.BlobDestinationOffsetFromReaderThis == 4);
 Check("Shared channel-2/3 compact-code routing groups the observed native cases",
     Enumerable.Range(1, 6).All(code =>
         MatrixOtherChannelDecoderNativeLayout.SelectRoute(code)

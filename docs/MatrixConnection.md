@@ -1020,7 +1020,7 @@ factory/callback ABI remain unresolved.
 `MatrixOtherChannelDecoderNativeLayout.cs` records dispatch only, not a
 replacement decoder.
 
-## Secondary command dispatcher and nine verified class cases
+## Secondary command dispatcher and ten verified class cases
 
 The secondary-dispatch target `0x81CC50` is a large raw function
 (`0x4B9E` bytes) with two separate selector tables. It reads a leading byte
@@ -1047,14 +1047,14 @@ selector range return zero. Leading bytes `0x37..0xEF` also reach the
 zero-return path. These are dispatch boundaries only; the inputs’ semantic
 names and the 91 secondary targets are unresolved.
 
-Nine nested selectors are mapped: route0 block `0x81CCAD` dispatches selector
+Ten nested selectors are mapped: route0 block `0x81CCAD` dispatches selector
 `0x53` through the table at VA `0xC22444` (raw `0x821844`) to raw case
 `0x81CCC3`. That case allocates `0x48` bytes, calls constructor `0x524C30`,
 then body reader `0x5F6B10`. Constructor RTTI identifies the object as
 `firefall::Character::MarketRequestComplete`. The reader stores, in order,
 a byte at object+`0x28`, raw QWORD at+`0x30`, byte at+`0x38`, and three
 NUL-terminated shared-text values at+`0x3C/+0x40/+0x44`. Field meanings
-remain unknown; these nine selectors do not name the remaining table cases.
+remain unknown; these ten selectors do not name the remaining table cases.
 `MatrixSecondaryCommandDispatcherNativeLayout.cs` and
 `CharacterMarketRequestCompleteNativeLayout` preserve the route bounds and
 this bounded object layout without implementing a parser.
@@ -1240,6 +1240,22 @@ with minimum six bytes for a zero-length blob. Other DWORD values reach a
 diagnostic path whose exact failure/return behavior is not established.
 The reader does not store the raw DWORD into object `+0x28`; it is only the
 observed gate. Blob contents and field semantics remain unknown.
+
+### Selector 0x5C: `PrivateCombatLog`
+
+Entry9 maps selector `0x5C` to VA `0xC1DB81` / raw case `0x81CF81`. It
+allocates `0x40` bytes, stores local DWORD `0x64` (role unknown), then calls
+constructor `0x525480`. The constructor passes `0x5C` to `0x5A0810`, installs
+vtable VA `0x1C671E8` (RTTI `firefall::Character::PrivateCombatLog`), zeros
+byte `+0x28`, and initializes the blob subobject at `+0x2C`.
+
+After construction, the case branches to the shared reader setup at raw
+`0x81CF5B`; it passes `this = object+0x28` and the input stream to the same
+reader `0x5F3350` used by selector `0x5B`. The reader's `this+4` destination
+therefore maps to object `+0x2C`, and its successful body format is the same
+observed DWORD-1 gate followed by a WORD-length-prefixed blob. Shared parsing
+does not prove that `PublicCombatLog` and `PrivateCombatLog` have identical
+semantics; the non-1 diagnostic path remains unresolved.
 
 ## Message35 application body
 
