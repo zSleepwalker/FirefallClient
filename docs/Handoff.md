@@ -1115,9 +1115,10 @@ These updates supersede older next-step suggestions below where they overlap.
   message `0x89`. Separately, raw `0x6385C0` is present in the `tfLogin`
   vtable at raw `0x18662C0 + 0x0C`; its conditional branch at `0x638B89`
   passes request pair `{2,0}` to `AppMode_EnqueuePendingModeRequest`
-  (`0x30DEB0`). The login response handler also calls the shared runtime
-  message endpoint at raw `0x63C1E2` with ID `0x145`. These establish a World
-  queue path and a response-side event dispatch, but not that this event causes
+  (`0x30DEB0`). A separate Login-mode routine at raw `0x63C1E2` posts ID
+  `0x145` through the shared `uiManager` endpoint; it is not the
+  `Login_HandleLoginResponse` callback at `0x63B7C0`. These establish a World
+  queue path and a Login-mode event dispatch, but not that this event causes
   that update path or that successful login reaches its queue condition. The
   selected pair is not labeled a GUID and the complete successful transition
   remains unresolved. Details and layout constants are in `docs\LoginMode.md`

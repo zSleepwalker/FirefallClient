@@ -19,9 +19,10 @@ wrapper `+0x10` (VA `0x1E002B8`), links the wrapper into `0x1E4B0A8`, and
 sets its initialized flag. `uiManager` RTTI is `.?AVuiManager@@`, and its
 vtable VA is `0x1C73EBC`.
 
-The Login response handler loads the resulting pointer at raw `0x63C1E2`,
-pushes message ID `0x145`, and invokes `uiManager` slot `+0xAC` at raw
-`0x63C1F5`. That route enters `0xBF9D80`, looks up an event-ID bucket in the
+The separate Login-mode routine at raw `0x63C1E2` (after the `ret` at
+`0x63C0A7` in `Login_HandleLoginResponse`) loads the resulting pointer, pushes
+message ID `0x145`, and invokes `uiManager` slot `+0xAC` at raw `0x63C1F5`.
+That route enters `0xBF9D80`, looks up an event-ID bucket in the
 registry at `uiManager+0x6F0`, and walks listeners through `0xBF9C40`;
 listener matching/callback work continues through `0xC38400`. Dispatch is
 gated by `uiManager+0x672`, which the constructor initializes to zero.
@@ -40,10 +41,11 @@ The local installed UI sources provide a candidate name for the Login
 notification. `UISets\LoginUI.xml` loads the `LoginUI` folder, and
 `components\LoginUI\AccountLogin\AccountLogin.xml:17` binds
 `ON_LOGIN_RESPONSE` to `OnLoginResponse`; the Lua handler is defined at
-`AccountLogin.lua:876`. This makes `0x145 -> ON_LOGIN_RESPONSE` plausible,
-but not proven because the runtime name-registration order for the 326th
-event ID was not reconstructed. The actual subscriber and any World-mode
-side effect remain unresolved.
+`AccountLogin.lua:876`. This makes `0x145 -> ON_LOGIN_RESPONSE` plausible, but not proven: the native
+callsite is in a separate Login-mode routine, not in the response callback
+`0x63B7C0`, and the runtime name-registration order for the 326th event ID was
+not reconstructed. The actual subscriber and any World-mode side effect
+remain unresolved.
 
 These read-only text samples were hashed before inspection. They are under
 `D:\SteamLibrary\steamapps\common\Firefall\system\gui\` and are not repository

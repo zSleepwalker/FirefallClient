@@ -23,8 +23,8 @@ public static class UiManagerNativeLayout
     public const uint UiManagerNamedSubscriptionFileOffset = 0xC35BB0;
     public const uint UiManagerMessageObjectSubscriptionFileOffset = 0xC35740;
     public const uint UiManagerMessageObjectListenerRegisterCallSiteFileOffset = 0xC35AD8;
-    public const uint LoginMessage145GlobalLoadFileOffset = 0x63C1E2;
-    public const uint LoginMessage145CallFileOffset = 0x63C1F5;
+    public const uint LoginModeMessage145GlobalLoadFileOffset = 0x63C1E2;
+    public const uint LoginModeMessage145CallFileOffset = 0x63C1F5;
     public const uint SingletonObjectVirtualAddress = 0x1E002A8;
     public const uint SingletonVtableVirtualAddress = 0x1C62FF0;
     public const uint SingletonTypeDescriptorVirtualAddress = 0x1E06728;
@@ -44,7 +44,7 @@ public static class UiManagerNativeLayout
     public const int UiManagerEventNameArrayEndOffset = 0x720;
     public const int UiManagerEventReadyFlagOffset = 0x672;
     public const int UiManagerListenerNameOffset = 0x70;
-    public const int LoginResponseNotificationId = 0x145;
+    public const int LoginModeMessageId = 0x145;
     public const int EnterZonePausedNotificationId = 110;
     public const string SingletonRttiName = ".?AV?$slSingleton@VuiManager@@@@";
     public const string UiManagerRttiName = ".?AVuiManager@@";

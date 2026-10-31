@@ -398,8 +398,9 @@ Check("UI manager singleton and global event routing boundaries are recorded",
     && UiManagerNativeLayout.UiManagerEventNameArrayBeginOffset == 0x71C
     && UiManagerNativeLayout.UiManagerEventNameArrayEndOffset == 0x720
     && UiManagerNativeLayout.UiManagerEventReadyFlagOffset == 0x672
-    && UiManagerNativeLayout.LoginMessage145GlobalLoadFileOffset == 0x63C1E2
-    && UiManagerNativeLayout.LoginMessage145CallFileOffset == 0x63C1F5);
+    && UiManagerNativeLayout.LoginModeMessage145GlobalLoadFileOffset == 0x63C1E2
+    && UiManagerNativeLayout.LoginModeMessage145CallFileOffset == 0x63C1F5
+    && UiManagerNativeLayout.LoginModeMessageId == 0x145);
 int retryDelay = 0;
 var retryDelays = new List<int>();
 for (int i = 0; i < 12; i++)

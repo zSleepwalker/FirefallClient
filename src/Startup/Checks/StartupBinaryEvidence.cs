@@ -1877,7 +1877,7 @@ internal static class StartupBinaryEvidence
             && Matches(UiManagerNativeLayout.UiManagerMessageObjectListenerRegisterCallSiteFileOffset,
                 "E86340FCFF")
             && Matches(0xC358AF, "E8FC41FCFF")
-            && Matches(UiManagerNativeLayout.LoginMessage145GlobalLoadFileOffset,
+            && Matches(UiManagerNativeLayout.LoginModeMessage145GlobalLoadFileOffset,
                 "8B0DB802E0018D55846A005268450100008B01FF90AC000000")
             && VtableRttiName(UiManagerNativeLayout.SingletonVtableVirtualAddress)
                 == UiManagerNativeLayout.SingletonRttiName
