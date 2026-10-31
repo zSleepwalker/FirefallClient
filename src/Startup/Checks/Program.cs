@@ -429,8 +429,19 @@ Check("UI manager singleton and global event routing boundaries are recorded",
     && UiManagerNativeLayout.UiManagerEventListenerLookupFileOffset == 0xC0AA20
     && UiManagerNativeLayout.UiManagerEventCallbackRouteFileOffset == 0xC38400
     && UiManagerNativeLayout.UiManagerNamedSubscriptionFileOffset == 0xC35BB0
-    && UiManagerNativeLayout.UiManagerMessageObjectSubscriptionFileOffset == 0xC35740
-    && UiManagerNativeLayout.UiManagerMessageObjectListenerRegisterCallSiteFileOffset == 0xC35AD8
+    && UiManagerNativeLayout.UiComponentRootXmlParserFileOffset == 0xC34F50
+    && UiManagerNativeLayout.UiComponentEventsSectionParserFileOffset == 0xC35740
+    && UiManagerNativeLayout.UiComponentEventsSectionParserCallSiteFileOffset == 0xC353B0
+    && UiManagerNativeLayout.UiComponentEventNameToIdCallSiteFileOffset == 0xC358AF
+    && UiManagerNativeLayout.UiComponentEventBindLookupCallSiteFileOffset == 0xC358FE
+    && UiManagerNativeLayout.UiComponentEventListenerRegisterCallSiteFileOffset == 0xC35AD8
+    && UiManagerNativeLayout.ComponentBindEventApiFileOffset == 0xC32460
+    && UiManagerNativeLayout.ComponentBindEventNamedSubscriptionCallSiteFileOffset == 0xC32643
+    && UiManagerNativeLayout.ComponentEventsSectionNameVirtualAddress == 0x1BBCC6C
+    && UiManagerNativeLayout.ComponentEventElementNameVirtualAddress == 0x1BBCCDC
+    && UiManagerNativeLayout.ComponentEventNameAttributeVirtualAddress == 0x1BBCD1C
+    && UiManagerNativeLayout.ComponentEventBindAttributeVirtualAddress == 0x1BBCCD4
+    && UiManagerNativeLayout.ComponentBindEventUsageVirtualAddress == 0x1BBC760
     && UiManagerNativeLayout.UiManagerEventDispatchVtableOffset == 0xAC
     && UiManagerNativeLayout.UiManagerEventRegistryOffset == 0x6F0
     && UiManagerNativeLayout.UiManagerEventNameMapOffset == 0x6E8

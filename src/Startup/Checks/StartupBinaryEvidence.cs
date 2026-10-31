@@ -1891,7 +1891,7 @@ internal static class StartupBinaryEvidence
             && Matches(0xBF9EE5, "8D8FF0060000")
             && Matches(0xC35BE4, "E8C73EFCFF")
             && Matches(0xC35CF0, "E84B3EFCFF")
-            && Matches(UiManagerNativeLayout.UiManagerMessageObjectListenerRegisterCallSiteFileOffset,
+            && Matches(UiManagerNativeLayout.UiComponentEventListenerRegisterCallSiteFileOffset,
                 "E86340FCFF")
             && Matches(0xC358AF, "E8FC41FCFF")
             && Matches(UiManagerNativeLayout.LoginModeMessage145GlobalLoadFileOffset,
@@ -1910,6 +1910,30 @@ internal static class StartupBinaryEvidence
             && ReadUInt32(VirtualAddressToFileOffset(UiManagerNativeLayout.UiManagerVtableVirtualAddress)
                 + UiManagerNativeLayout.UiManagerEventDispatchVtableOffset)
                 == UiManagerNativeLayout.UiManagerEventDispatchMethodFileOffset + 0x400C00);
+        check("Component XML Events map names immediately, while Component.BindEvent uses the shared named map",
+            Matches(UiManagerNativeLayout.UiComponentRootXmlParserFileOffset, "558BEC6AFF6838A4A40164A1")
+            && Matches(UiManagerNativeLayout.UiComponentEventsSectionParserCallSiteFileOffset, "E88B030000")
+            && RelativeBranchTargets(UiManagerNativeLayout.UiComponentEventsSectionParserCallSiteFileOffset,
+                0xE8, UiManagerNativeLayout.UiComponentEventsSectionParserFileOffset)
+            && ReadCStringAscii(UiManagerNativeLayout.ComponentEventsSectionNameVirtualAddress, 16) == "Events"
+            && ReadCStringAscii(UiManagerNativeLayout.ComponentEventElementNameVirtualAddress, 16) == "Event"
+            && ReadCStringAscii(UiManagerNativeLayout.ComponentEventNameAttributeVirtualAddress, 16) == "name"
+            && ReadCStringAscii(UiManagerNativeLayout.ComponentEventBindAttributeVirtualAddress, 16) == "bind"
+            && Matches(UiManagerNativeLayout.UiComponentEventNameToIdCallSiteFileOffset, "E8FC41FCFF")
+            && RelativeBranchTargets(UiManagerNativeLayout.UiComponentEventNameToIdCallSiteFileOffset,
+                0xE8, UiManagerNativeLayout.UiManagerEventNameToIdMethodFileOffset)
+            && Matches(UiManagerNativeLayout.UiComponentEventBindLookupCallSiteFileOffset, "E80D646B00")
+            && UiManagerNativeLayout.UiComponentEventNameToIdCallSiteFileOffset
+                < UiManagerNativeLayout.UiComponentEventBindLookupCallSiteFileOffset
+            && Matches(UiManagerNativeLayout.UiComponentEventListenerRegisterCallSiteFileOffset, "E86340FCFF")
+            && RelativeBranchTargets(UiManagerNativeLayout.UiComponentEventListenerRegisterCallSiteFileOffset,
+                0xE8, UiManagerNativeLayout.UiManagerEventListenerRegisterMethodFileOffset)
+            && ReadCStringAscii(UiManagerNativeLayout.ComponentBindEventUsageVirtualAddress, 64)
+                == "Usage: Component.BindEvent( event, function )"
+            && Matches(UiManagerNativeLayout.ComponentBindEventNamedSubscriptionCallSiteFileOffset,
+                "E868350000")
+            && RelativeBranchTargets(UiManagerNativeLayout.ComponentBindEventNamedSubscriptionCallSiteFileOffset,
+                0xE8, UiManagerNativeLayout.UiManagerNamedSubscriptionFileOffset));
         check("Lua preload System APIs register and dispatch through Login into Matrix connection",
             Matches(LoginModeNativeLayout.KnownLuaSystemApiBindings[0].RegistrationSiteFileOffset,
                 "BA8431B6018B4308C700606AA400C74008160000")

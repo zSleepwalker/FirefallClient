@@ -40,20 +40,32 @@ does not prove a completed handshake or a `tfWorld` request. See
 
 Subscription names map to numeric IDs through `uiManager+0x6E8`.
 `0xBF9AB0` returns an existing ID or assigns the current DWORD count of the
-name array at `+0x71C..+0x720`, then appends the new string. Message-object
-subscription `0xC35740` and named subscription `0xC35BB0` use that ID and
-register a listener through `0xBF9B40`; that method first removes a matching
-old listener through `0xBF9BD0`, then updates the ID bucket at `+0x6F0`.
+name array at `+0x71C..+0x720`, then appends the new string. Component XML
+event parser `0xC35740` handles the `<Events>` section of a root
+`<Component>` document. For each `<Event>` child, it reads the `name`
+attribute and immediately calls `0xBF9AB0`; it then reads `bind`, builds the
+listener record, and registers it through `0xBF9B40` (raw callsite
+`0xC35AD8`). The name-map call is at `0xC358AF`, before the `bind` lookup at
+`0xC358FE`. The `Component.BindEvent(event, function)` API is a separate path:
+its wrapper `0xC32460` calls named-subscription helper `0xC35BB0` at
+`0xC32643`; that helper also calls `0xBF9AB0` and `0xBF9B40`. Both paths add
+first-seen names to the same dynamic map.
 
 The local installed UI sources provide a candidate name for the Login
-notification. `UISets\LoginUI.xml` loads the `LoginUI` folder, and
+notification. `UISets\LoginUI.xml` sets `glue_mode=true` and lists folder
+roots `LoginUI`, `MainUI/Panels/Options`, `MainUI/Backend/IME`, and
+`MainUI/Panels/Generic` in that order. The component
 `components\LoginUI\AccountLogin\AccountLogin.xml:17` binds
 `ON_LOGIN_RESPONSE` to `OnLoginResponse`; the Lua handler is defined at
 `AccountLogin.lua:876`. This makes `0x145 -> ON_LOGIN_RESPONSE` plausible, but not proven: the native
 callsite is in a separate Login-mode routine, not in the response callback
-`0x63B7C0`, and the runtime name-registration order for the 326th event ID was
-not reconstructed. The actual subscriber remains unresolved. The independent
-UI-to-Matrix route does not establish that message `0x145` triggers it.
+`0x63B7C0`. `0x145` is array index 325, so it would be the 326th insertion if
+the initial count is zero; repeated event names reuse their existing ID.
+Because both XML `<Events>` parsing and `Component.BindEvent` calls insert
+names, the complete first-insertion order across folders, components, and
+script activity is not reconstructed. The actual subscriber remains
+unresolved; the independent UI-to-Matrix route does not establish that
+message `0x145` triggers it.
 
 These read-only text samples were hashed before inspection. They are under
 `D:\SteamLibrary\steamapps\common\Firefall\system\gui\` and are not repository
@@ -61,21 +73,31 @@ files:
 
 | Relative sample path | Size | SHA-256 | Observation |
 |---|---:|---|---|
-| `UISets\LoginUI.xml` | 521 | `F7FE3C61489C51E0262E288EE5DBF7996CE90029A2D6CBC179AEEBC898A71D66` | Loads `LoginUI`; `glue_mode=true`. |
+| `UISets\LoginUI.xml` | 521 | `F7FE3C61489C51E0262E288EE5DBF7996CE90029A2D6CBC179AEEBC898A71D66` | `glue_mode=true`; lists `LoginUI` then three `MainUI` folder roots. |
 | `UISets\MainUI.xml` | 409 | `1441F9FE7633F857FFA1B49B2E1297A1C19BFE22C0FBC60DAAE3601F97E75EDD` | Root UI-set comparison; no event IDs. |
 | `UISets\LookingGlass.xml` | 386 | `9A0BE16C2A2175FDD842420DAC9DEE982C31965E9781C6C303D774435FE34B25` | Root UI-set comparison; `glue_mode=false`. |
 | `UISets\Broadcast.xml` | 991 | `7F60A9E8370E1871239CF7AB82C4485A8F7E19A3BECA2AD05B63B2B02FB88E63` | Root UI-set comparison; `glue_mode=false`. |
 | `components\LoginUI\AccountLogin\AccountLogin.xml` | 24,728 | `67CBD909E54E1354E291728F66EBAB9E7F1410DB2600CA75E50EFF77CB5FA05A` | Declares `ON_LOGIN_RESPONSE` at line17. |
 | `components\LoginUI\AccountLogin\AccountLogin.lua` | 69,488 | `9EA014EA94C803B82DC696CF0790E12DD414154993B11F5997DD3901B244D462` | Defines `OnLoginResponse` at line876. |
+| `components\LoginUI\AccountLogin\Legal.xml` | 3,122 | `14199356EEDE06A28594CA4ED573A7BAECFF2AF9E1B5698C0BC1099838881865` | Declares `ON_COMPONENT_LOAD`. |
+| `components\LoginUI\CharacterCreation\CharacterCreation.xml` | 36,506 | `7814E0E16ADF21B6EF196A009C8BE0518DE8045636B48D5639E6750B505EA64D` | Declares component-load, stream-progress, mouseover, and `MY_CONNECT` events. |
+| `components\LoginUI\Credits\Credits.xml` | 7,065 | `551F35946F670DE3E52F85CA3AE44FE2269180DA17C993149E3903D3E8C75891` | Declares `ON_COMPONENT_LOAD` and `MY_SHOW_CREDITS`. |
+| `components\LoginUI\LoginBackground\LoginBackground.xml` | 9,788 | `B479DF7498D9540C62A0283C444928BF05F9D995FC44F01110DB08450D1A285C` | Declares `ON_COMPONENT_LOAD` and `ON_LIST_CHARACTERS_RESPONSE`. |
+| `components\LoginUI\LoginPreloadScreen\LoginFullscreenPanel.xml` | 2,334 | `BAA660AEEEC18A28AD4AE1F7FA97C1270B3722DEC5EC9A544C89F40D2E956EA9` | Declares `ON_COMPONENT_LOAD` and `MY_FULLPANEL_EVENT`. |
 | `components\LoginUI\ZoneSelection\ZoneSelection.xml` | 33,076 | `F49545D3F3B9757D7E360CB607341386AD794BFCD15618ED8758844CBD380AD4` | Binds `MY_CONNECT` to `OnConnect` at line25. |
 | `components\LoginUI\ZoneSelection\ZoneSelection.lua` | 75,192 | `F136FC2FF26EFC892D9AB24E5464F98D49CB3890830E391971C26C5C2148BD97` | `JoinWorld` emits `MY_PRELOAD_EVENT` with `zone.matrix_url` and character fields at lines2147-2225; the URL is nil in the PvE matchmaking branch. |
+| `components\LoginUI\LoginPreloadScreen\LoadingCinematic\LoadingCinematic.xml` | 2,771 | `84C8FE76044C58157FAAB9C061EB43F46831CA29AFAFF6D62382926CEBFB5FC2` | Declares `ON_COMPONENT_LOAD`, `ON_FIRSTLOGIN`, and `MY_PLAYINTRO`. |
 | `components\LoginUI\LoginPreloadScreen\LoginPreloadScreen.xml` | 3,147 | `A59E0A3F7D93FD8866AFF2FB3BF1E1AAF8A2D24BFC7439076F2B53F9FDEB3E31` | Binds `MY_PRELOAD_EVENT` to `OnPreload` at line19. |
 | `components\LoginUI\LoginPreloadScreen\LoginPreloadScreen.lua` | 4,614 | `2D1A1801F331101D035F9A0BAE3A12EB1EF75ACDD4DE91B7B433AD77EF0D45F4` | After the duration/delay timer, the credentials gate calls `System.SetupCharacter` then `System.StartInstanceConnection` at lines89-98. |
+| `components\LoginUI\LoginPreloadScreen\WaitingScreen\WaitingScreen.xml` | 1,005 | `E236C85F37631D4BB36BBB753103DA92FEBFD0E635D6298607D1DE664C63CB0D` | Declares `MY_WAITNG_SCREEN`. |
+| `components\LoginUI\Migration\Migration.xml` | 7,198 | `564DD33CB6E680F5C85B7155540FA2A62A27ECDA5CB9F4F878004D1DD35D71E0` | Declares `ON_COMPONENT_LOAD` and `ON_LIST_CHARACTERS_RESPONSE`. |
+| `components\LoginUI\Web\Webframe\Webframe.xml` | 1,301 | `620525806B925ECE6E896F4DFDDE4228CB12666767C10C13B8BB813732A72F25` | Declares operator, web-UI, and match-list events. |
 
-A safe static discriminator is to reconstruct the UI loader's ordered event
-registrations and evaluate the name-array index produced by `0xBF9AB0` for
-`ON_LOGIN_RESPONSE`; matching index `0x145` would confirm the hypothesis.
-Until that order is recovered, the numeric-name correlation is unresolved.
+A static discriminator must reconstruct the first-time event-name insertions
+across loaded component XML `<Events>` sections and calls to
+`Component.BindEvent`, then evaluate the ID assigned to `ON_LOGIN_RESPONSE`.
+Matching array index `0x145` would confirm the hypothesis; the order across
+folders, components, and script API calls is not established.
 
 ## Oracle-ticket request
 
