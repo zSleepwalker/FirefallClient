@@ -1066,6 +1066,9 @@ These updates supersede older next-step suggestions below where they overlap.
   semantic equivalence with selector0x5B.
   Selector0x5D constructs `AnimationUpdated` and reads a WORD plus a byte at
   object+0x28/+0x2A; meanings remain unknown.
+  Selector0x5E constructs `RaiaNPCDebugging` and reads a NUL-terminated
+  shared-text field at object+0x28 in 256-byte chunks; encoding and text
+  meaning remain unknown.
   Remaining case handlers, field meanings, and message semantics are open.
   RTTI names the results `nl::RoutedMessage` and
   `nl::RoutedMultipleMessage`; QWORD and message semantics remain unknown.

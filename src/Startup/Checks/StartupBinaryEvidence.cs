@@ -1459,6 +1459,31 @@ internal static class StartupBinaryEvidence
             && RelativeBranchTargets(0x5F30FE, 0xE8, 0x336AC0)
             && Matches(0x5F3103, "8D562A")
             && RelativeBranchTargets(0x5F3108, 0xE8, 0x337180));
+        check("Binary inner selector 0x5E routes a shared-text NUL-terminated byte reader to object+0x28",
+            ReadUInt32(VirtualAddressToFileOffset(
+                CharacterRaiaNpcDebuggingNativeLayout.InnerSelectorTableVirtualAddress) + 44) == 0xC1DBFC
+            && Matches(CharacterRaiaNpcDebuggingNativeLayout.CaseFileOffset, "6A30")
+            && RelativeBranchTargets(0x81CFFE, 0xE8, 0x12B7FB0)
+            && Matches(0x81D00A, "C744242066000000")
+            && RelativeBranchTargets(0x81D021, 0xE8,
+                CharacterRaiaNpcDebuggingNativeLayout.ConstructorFileOffset)
+            && Matches(0x81D028, "E9FA2A0000")
+            && Matches(0x525602, "C7005E000000")
+            && RelativeBranchTargets(0x525608, 0xE8,
+                CharacterRaiaNpcDebuggingNativeLayout.ConstructorHelperFileOffset)
+            && Matches(0x52560D, "C706B871C601")
+            && Matches(0x525615, "C7462800000000")
+            && VtableRttiName(CharacterRaiaNpcDebuggingNativeLayout.VtableVirtualAddress, 80)
+                == CharacterRaiaNpcDebuggingNativeLayout.RttiName
+            && Matches(0x81FB27, "8D5628C7442420FFFFFFFF8BCF")
+            && RelativeBranchTargets(0x81FB34, 0xE8,
+                CharacterRaiaNpcDebuggingNativeLayout.SharedTextReaderFileOffset)
+            && Matches(0x12EE060, "8A01888435F8FEFFFF8D4101894704")
+            && Matches(0x12EE08E, "FF4F0880BC35F8FEFFFF00")
+            && Matches(0x12EE09B, "4681FE000100007C9E")
+            && RelativeBranchTargets(0x12EE0BF, 0xE8, 0x12B8220)
+            && RelativeBranchTargets(0x12EE0CE, 0xE8, 0x159D8F4)
+            && RelativeBranchTargets(0x12EE12B, 0xE8, 0x159D8F4));
         check("Binary matrix socket factory requests overlapped UDP",
             Matches(0xBE354A, "6A016A006A006A11B8170000006A020F44C150FF15684DAC01"));
         check("Binary matrix local binding uses seven or two attempts and final-two fallback",

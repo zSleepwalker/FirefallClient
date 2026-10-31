@@ -1020,7 +1020,7 @@ factory/callback ABI remain unresolved.
 `MatrixOtherChannelDecoderNativeLayout.cs` records dispatch only, not a
 replacement decoder.
 
-## Secondary command dispatcher and eleven verified class cases
+## Secondary command dispatcher and twelve verified class cases
 
 The secondary-dispatch target `0x81CC50` is a large raw function
 (`0x4B9E` bytes) with two separate selector tables. It reads a leading byte
@@ -1047,14 +1047,14 @@ selector range return zero. Leading bytes `0x37..0xEF` also reach the
 zero-return path. These are dispatch boundaries only; the inputs’ semantic
 names and the 91 secondary targets are unresolved.
 
-Eleven nested selectors are mapped: route0 block `0x81CCAD` dispatches selector
+Twelve nested selectors are mapped: route0 block `0x81CCAD` dispatches selector
 `0x53` through the table at VA `0xC22444` (raw `0x821844`) to raw case
 `0x81CCC3`. That case allocates `0x48` bytes, calls constructor `0x524C30`,
 then body reader `0x5F6B10`. Constructor RTTI identifies the object as
 `firefall::Character::MarketRequestComplete`. The reader stores, in order,
 a byte at object+`0x28`, raw QWORD at+`0x30`, byte at+`0x38`, and three
 NUL-terminated shared-text values at+`0x3C/+0x40/+0x44`. Field meanings
-remain unknown; these eleven selectors do not name the remaining table cases.
+remain unknown; these twelve selectors do not name the remaining table cases.
 `MatrixSecondaryCommandDispatcherNativeLayout.cs` and
 `CharacterMarketRequestCompleteNativeLayout` preserve the route bounds and
 this bounded object layout without implementing a parser.
@@ -1267,6 +1267,24 @@ constructor `0x525570` and body reader `0x5F30F0`. The constructor passes
 `+0x28` followed by a byte at `+0x2A`, nominally consuming three input bytes.
 The field meanings remain unknown; the RTTI name does not establish
 animation-related semantics.
+
+### Selector 0x5E: `RaiaNPCDebugging`
+
+Entry11 maps selector `0x5E` to VA `0xC1DBFC` / raw case `0x81CFFC`. It
+allocates `0x30` bytes, stores local DWORD `0x66` (role unknown), then calls
+constructor `0x5255F0`. The constructor passes `0x5E` to `0x5A08F0`, installs
+vtable VA `0x1C671B8` (RTTI `firefall::Character::RaiaNPCDebugging`), and
+zeros object field `+0x28`.
+
+The case branches to shared reader setup `0x81FB27`. The caller passes the
+input stream and the address of object `+0x28` to helper `0x12EE010`, also
+documented as the SDB block-name reader in `src/Serialization/README.md`.
+That helper consumes raw bytes through and including the first NUL, copies
+the preceding bytes into the shared-text field, and reads in chunks of at
+most `0x100` bytes using a `0x104`-byte temporary buffer. The chunk size is
+not an established total-string limit; no overall maximum or encoding is
+proven. The field’s text meaning remains unknown, and the RTTI name does not
+establish NPC-debugging semantics.
 
 ## Message35 application body
 

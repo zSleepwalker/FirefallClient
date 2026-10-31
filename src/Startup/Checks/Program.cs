@@ -1141,6 +1141,20 @@ Check("AnimationUpdated selector 0x5D records its WORD and byte fields",
     && CharacterAnimationUpdatedNativeLayout.RawWordFieldOffset == 0x28
     && CharacterAnimationUpdatedNativeLayout.RawByteFieldOffset == 0x2A
     && CharacterAnimationUpdatedNativeLayout.NominalInputByteCount == 3);
+Check("RaiaNPCDebugging selector 0x5E records its NUL-terminated shared-text field",
+    CharacterRaiaNpcDebuggingNativeLayout.InnerSelector == 0x5E
+    && CharacterRaiaNpcDebuggingNativeLayout.CaseFileOffset == 0x81CFFC
+    && CharacterRaiaNpcDebuggingNativeLayout.CaseLocalDwordValue == 0x66
+    && CharacterRaiaNpcDebuggingNativeLayout.AllocationSize == 0x30
+    && CharacterRaiaNpcDebuggingNativeLayout.ConstructorFileOffset == 0x5255F0
+    && CharacterRaiaNpcDebuggingNativeLayout.ConstructorHelperFileOffset == 0x5A08F0
+    && CharacterRaiaNpcDebuggingNativeLayout.SharedTextReaderSetupFileOffset == 0x81FB27
+    && CharacterRaiaNpcDebuggingNativeLayout.SharedTextReaderFileOffset == 0x12EE010
+    && CharacterRaiaNpcDebuggingNativeLayout.VtableVirtualAddress == 0x1C671B8
+    && CharacterRaiaNpcDebuggingNativeLayout.SharedTextFieldOffset == 0x28
+    && CharacterRaiaNpcDebuggingNativeLayout.SharedTextChunkByteLimit == 0x100
+    && CharacterRaiaNpcDebuggingNativeLayout.SharedTextTemporaryBufferByteCount == 0x104
+    && CharacterRaiaNpcDebuggingNativeLayout.SharedTextTerminatorByte == 0);
 Check("Shared channel-2/3 compact-code routing groups the observed native cases",
     Enumerable.Range(1, 6).All(code =>
         MatrixOtherChannelDecoderNativeLayout.SelectRoute(code)
