@@ -223,4 +223,10 @@ public static class ClientMainLoopNativeLayout
     public const long WireWriteCompactUInt16Raw = 0x320900;
     // Round 20: SubmitApplicationBuffer channel jump table (VA 0xFD4A3C = raw 0xBD3E3C).
     public const long SubmitChannelJumpTableRaw = 0xBD3E3C;
+    // Round 21: GameSocket receive completion chain.
+    public const long GameSocketVtableSlot18FileOffset = 0x1C73A5C - 0x401400 + 0x18;
+    public const long GameSocketHandleReceiveCompletionRaw = 0xBD2E30;
+    public const long GameSocketAdmitReceivedDatagramRaw = 0xBD3030;
+    public const long GameSocketParseNonzeroContextChunksRaw = 0xBD3140;
+    public const long GameSocketParseZeroContextHandshakeReplyRaw = 0xBD39D0;
 }

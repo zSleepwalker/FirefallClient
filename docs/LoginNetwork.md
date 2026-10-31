@@ -117,3 +117,14 @@
 
 ## Unresolved
 - IOCP recv completion handler for the this+632 buffer and the type-id -> handler list were not traced this round (existing doc: IOCP receive dispatch and table raw 0x33D424). Scope: only 0x320900 and 0xBD3B20 targets inspected.
+
+# Round 21: GameSocket receive completion chain (verification)
+
+## Observed
+- GameSocket vtable VA 0x1C73A5C slots: +0x18 = raw `0xBD2E30 GameSocket_HandleReceiveCompletion`, +0x1C = `0xBD2D10` close, +0x20 = `0xBD2D70` completion error (matches the PumpThread slot use in docs\MatrixConnection.md).
+- `0xBD2E30`: locks socket+0xD98; skips if suppression byte +0xD95; `WSAGetOverlappedResult` (`dword_1AC4D64`) on the operation record at this+3572 gives the byte count; decodes the sender sockaddr at record+24 (`0xBE3A00`); calls `0xBD3030 GameSocket_AdmitReceivedDatagram(count, sender)`; then reposts the 1400-byte `WSARecvFrom` into this+632 (address length 128). Error != 996/997 goes to slot +0x20.
+- `0xBD3030`: accepts 5..1400 bytes; first 4 bytes (network order, via `dword_1AC4D94`) must equal DWORD this+276 (context); sender must be specific/non-zero port (`0xBCCA60`); failure logs and increments this+236. Body = count-4 bytes at this+636: context 0 -> `0xBD39D0 GameSocket_ParseZeroContextHandshakeReply`; non-zero -> `0xBD3140 GameSocket_ParseNonzeroContextChunks`; tracks max size at this+3464.
+- Downstream (already documented, not re-derived): queue consumed by `0xBD3E50` in tick `0xBD4BC0`; channel1 descriptors reach the receiver dispatcher `0x33CE40` (ids 34..68, table raw `0x33D424`).
+
+## Unresolved
+- I did not decompile `0xBD3140`/`0xBD3E50` this round, and did not produce a new id->handler name list; names beyond `docs\MatrixServerMessageBodies.md` / `MatrixServerMessageCatalog.cs` are unproven. Fragment reassembly/ack internals not re-traced (see MatrixConnection.md).
