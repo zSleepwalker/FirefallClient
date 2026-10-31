@@ -1095,6 +1095,24 @@ Check("ReceivedDeferredXP selector 0x5A records its count-blocked 16-byte vector
     && CharacterReceivedDeferredXPNativeLayout.RecordByteCount == 0x10
     && CharacterReceivedDeferredXPNativeLayout.CountFieldByteCount == 1
     && CharacterReceivedDeferredXPNativeLayout.CountBlockRepeatMarker == 0xFF);
+Check("PublicCombatLog selector 0x5B records its gated blob body without naming its fields",
+    CharacterPublicCombatLogNativeLayout.InnerSelector == 0x5B
+    && CharacterPublicCombatLogNativeLayout.CaseFileOffset == 0x81CF2F
+    && CharacterPublicCombatLogNativeLayout.CaseLocalDwordValue == 0x63
+    && CharacterPublicCombatLogNativeLayout.AllocationSize == 0x40
+    && CharacterPublicCombatLogNativeLayout.ConstructorFileOffset == 0x525390
+    && CharacterPublicCombatLogNativeLayout.BodyReaderFileOffset == 0x5F3350
+    && CharacterPublicCombatLogNativeLayout.WordLengthPrefixedBlobReaderFileOffset == 0x12EE170
+    && CharacterPublicCombatLogNativeLayout.VtableVirtualAddress == 0x1C671F8
+    && CharacterPublicCombatLogNativeLayout.ConstructorZeroedByteFieldOffset == 0x28
+    && CharacterPublicCombatLogNativeLayout.EmbeddedBlobFieldOffset == 0x2C
+    && CharacterPublicCombatLogNativeLayout.EmbeddedBlobVtableVirtualAddress == 0x1C80CC4
+    && CharacterPublicCombatLogNativeLayout.BodyReaderThisObjectOffset == 0x28
+    && CharacterPublicCombatLogNativeLayout.BlobDestinationOffsetFromReaderThis == 4
+    && CharacterPublicCombatLogNativeLayout.RequiredRawDwordValue == 1
+    && CharacterPublicCombatLogNativeLayout.RawDwordWidth == 4
+    && CharacterPublicCombatLogNativeLayout.BlobLengthPrefixByteCount == 2
+    && CharacterPublicCombatLogNativeLayout.MinimumSuccessBodyPrefixByteCount == 6);
 Check("Shared channel-2/3 compact-code routing groups the observed native cases",
     Enumerable.Range(1, 6).All(code =>
         MatrixOtherChannelDecoderNativeLayout.SelectRoute(code)

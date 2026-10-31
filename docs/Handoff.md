@@ -1058,6 +1058,9 @@ These updates supersede older next-step suggestions below where they overlap.
   Selector0x5A constructs `ReceivedDeferredXP` and reads count-blocked
   records of four raw DWORDs (16 bytes) into its vector; meanings remain
   unknown.
+  Selector0x5B constructs `PublicCombatLog` and accepts raw DWORD gate1
+  followed by a WORD-length-prefixed blob; the non-1 diagnostic path remains
+  unresolved.
   Remaining case handlers, field meanings, and message semantics are open.
   RTTI names the results `nl::RoutedMessage` and
   `nl::RoutedMultipleMessage`; QWORD and message semantics remain unknown.

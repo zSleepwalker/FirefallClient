@@ -1385,6 +1385,37 @@ internal static class StartupBinaryEvidence
             && Matches(0x5F3D15, "F30F7F00")
             && Matches(0x5F3D23, "83470410")
             && Matches(0x5F3D33, "80FAFF0F8458FDFFFF"));
+        check("Binary inner selector 0x5B constructs PublicCombatLog and gates its length-prefixed blob reader",
+            ReadUInt32(VirtualAddressToFileOffset(
+                CharacterPublicCombatLogNativeLayout.InnerSelectorTableVirtualAddress) + 32) == 0xC1DB2F
+            && Matches(CharacterPublicCombatLogNativeLayout.CaseFileOffset, "6A40")
+            && RelativeBranchTargets(0x81CF31, 0xE8, 0x12B7FB0)
+            && Matches(0x81CF3D, "C744242063000000")
+            && RelativeBranchTargets(0x81CF50, 0xE8,
+                CharacterPublicCombatLogNativeLayout.ConstructorFileOffset)
+            && Matches(0x81CF55, "8BF0EB02")
+            && Matches(0x81CF5B, "578D4E28C7442424FFFFFFFF")
+            && RelativeBranchTargets(0x81CF67, 0xE8,
+                CharacterPublicCombatLogNativeLayout.BodyReaderFileOffset)
+            && Matches(0x5253A2, "C7005B000000")
+            && RelativeBranchTargets(0x5253A8, 0xE8,
+                CharacterPublicCombatLogNativeLayout.ConstructorHelperFileOffset)
+            && Matches(0x5253AD, "C706F871C601")
+            && Matches(0x5253B5, "C6462800")
+            && Matches(0x5253B9, "C7462CC40CC801")
+            && Matches(0x5253C0, "C7463000000000")
+            && Matches(0x5253C7, "C7463400000000")
+            && Matches(0x5253CE, "C7463800000000")
+            && VtableRttiName(CharacterPublicCombatLogNativeLayout.VtableVirtualAddress, 80)
+                == CharacterPublicCombatLogNativeLayout.RttiName
+            && Matches(0x5F3358, "8BD9")
+            && Matches(0x5F3375, "8B38")
+            && Matches(0x5F3377, "83C004")
+            && Matches(0x5F33A0, "834608FC")
+            && Matches(0x5F33A4, "83FF01")
+            && Matches(0x5F33A9, "8D5304")
+            && RelativeBranchTargets(0x5F33AE, 0xE8,
+                CharacterPublicCombatLogNativeLayout.WordLengthPrefixedBlobReaderFileOffset));
         check("Binary matrix socket factory requests overlapped UDP",
             Matches(0xBE354A, "6A016A006A006A11B8170000006A020F44C150FF15684DAC01"));
         check("Binary matrix local binding uses seven or two attempts and final-two fallback",
