@@ -1857,11 +1857,30 @@ internal static class StartupBinaryEvidence
             && Matches(GameSocketReliableQueueNativeLayout.AcknowledgmentPendingFlagClearSiteFileOffset, "C6463200")
             && Matches(0xBE56AC, "66FF432A")
             && Matches(GameSocketReliableQueueNativeLayout.AcknowledgmentPendingFlagSetSiteFileOffset, "C6433201"));
-        check("Login message-145 call uses a zero-initialized global endpoint",
-            Matches(MatrixConnectionNativeLayout.LoginMessage145EndpointGlobalLoadFileOffset,
+        check("UI manager singleton list initializes the message-145 endpoint and event dispatcher",
+            Matches(UiManagerNativeLayout.SingletonRegistrationStubFileOffset,
+                "C705A4B0E401A802E001C705A802E001F02FC601C705B802E00100000000C3")
+            && Matches(0x3E4573, "E808358100EB0233C0894610A1A8B0E40189460C8935A8B0E401C6460401")
+            && Matches(0xBF7ABB, "C703BC3EC701")
+            && Matches(UiManagerNativeLayout.UiManagerEventReadyFlagTestFileOffset,
+                "80B872060000000F849C010000")
+            && Matches(UiManagerNativeLayout.UiManagerEventReadyFlagInitializeFileOffset, "C6837206000000")
+            && Matches(UiManagerNativeLayout.UiManagerEventDispatchMethodFileOffset, "558BEC83E4F86AFF")
+            && Matches(UiManagerNativeLayout.LoginMessage145GlobalLoadFileOffset,
                 "8B0DB802E0018D55846A005268450100008B01FF90AC000000")
-            && Matches(MatrixConnectionNativeLayout.GlobalMessageEndpointNullStoreFileOffset,
-                "C705B802E00100000000C3")
-            && ReadUInt32(VirtualAddressToFileOffset(MatrixConnectionNativeLayout.GlobalMessageEndpointVirtualAddress)) == 0);
+            && VtableRttiName(UiManagerNativeLayout.SingletonVtableVirtualAddress)
+                == UiManagerNativeLayout.SingletonRttiName
+            && VtableRttiName(UiManagerNativeLayout.UiManagerVtableVirtualAddress)
+                == UiManagerNativeLayout.UiManagerRttiName
+            && ReadUInt32(VirtualAddressToFileOffset(UiManagerNativeLayout.SingletonObjectVirtualAddress))
+                == UiManagerNativeLayout.SingletonVtableVirtualAddress
+            && ReadUInt32(VirtualAddressToFileOffset(UiManagerNativeLayout.SingletonObjectVirtualAddress)
+                + UiManagerNativeLayout.SingletonInstancePointerOffset) == 0
+            && ReadUInt32(VirtualAddressToFileOffset(UiManagerNativeLayout.UiManagerGlobalPointerVirtualAddress)) == 0
+            && ReadUInt32(VirtualAddressToFileOffset(UiManagerNativeLayout.SingletonVtableVirtualAddress) + 4)
+                == UiManagerNativeLayout.SingletonInitializeMethodFileOffset + 0x400C00
+            && ReadUInt32(VirtualAddressToFileOffset(UiManagerNativeLayout.UiManagerVtableVirtualAddress)
+                + UiManagerNativeLayout.UiManagerEventDispatchVtableOffset)
+                == UiManagerNativeLayout.UiManagerEventDispatchMethodFileOffset + 0x400C00);
     }
 }

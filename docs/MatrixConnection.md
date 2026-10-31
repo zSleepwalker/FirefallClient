@@ -4,14 +4,30 @@ This trace continues auto-login state 5 after selected-character preparation.
 Addresses are raw file offsets unless marked VA. The `0xBB0`-byte
 Login-owned object at Login `+0x1C` is called a matrix connection object by
 observed logs and operations; its original class name is not established.
-It is distinct from the global polymorphic message endpoint at VA `0x1E002B8`
-(raw `.data` offset `0x19FE6B8`). The Login response handler loads that
-endpoint at raw `0x63C1E2`, pushes message ID `0x145`, and invokes virtual
-slot `+0xAC` at raw `0x63C1F5`. The endpoint cell is zero in the original
-file. Raw code at `0x3EE8D4` stores zero to it and returns; a direct absolute
-store scan found no nonzero assignment, but indirect or external population
-is not ruled out. The endpoint's recipient and any causal connection to
-World-mode entry remain unproven.
+It is distinct from the global `uiManager` event endpoint at VA `0x1E002B8`
+(raw `.data` offset `0x19FE6B8`). The singleton wrapper at VA `0x1E002A8`
+has RTTI `.?AV?$slSingleton@VuiManager@@@@`; its instance pointer is `+0x10`,
+and its on-disk value is zero. The raw singleton seed at `0x3EE8C0` links the
+wrapper into list head `0x1E4B0A4`, installs wrapper vtable VA `0x1C62FF0`,
+and zeroes that pointer.
+
+`ClientApplicationBootstrap` (`0x2EAE70`) calls singleton walker `0x12C3A80`,
+which walks the `+8` links and invokes vtable slot `+4` on uninitialized
+entries. The `slSingleton<uiManager>` slot `+4` method `0x3E44F0` allocates
+`0xA10` bytes, constructs `uiManager` with `0xBF7A80`, stores the instance at
+wrapper `+0x10` (VA `0x1E002B8`), links the wrapper into `0x1E4B0A8`, and
+sets its initialized flag. `uiManager` RTTI is `.?AVuiManager@@`, and its
+vtable VA is `0x1C73EBC`.
+
+The Login response handler loads the resulting pointer at raw `0x63C1E2`,
+pushes message ID `0x145`, and invokes `uiManager` slot `+0xAC` at raw
+`0x63C1F5`. That route enters `0xBF9D80`, looks up an event-ID bucket in the
+registry at `uiManager+0x1BC`, and walks listeners through `0xBF9C40`;
+listener matching/callback work continues through `0xC38400`. Dispatch is
+gated by `uiManager+0x672`, which the constructor initializes to zero.
+Who enables that flag is not established. This identifies the endpoint and
+routing layer, but the subscriber for message `0x145` and any resulting
+World-mode request remain unresolved.
 
 ## Oracle-ticket request
 

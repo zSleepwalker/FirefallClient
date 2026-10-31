@@ -8,10 +8,11 @@ in its 256-slot scan. Outbound ACKs are assembled at `0xBE4F20` with the
 matching receive frontiers at `+0x2A/+0x30` and a 256-entry selective bitmap.
 Queue flag `+0x32` is initialized, set after contiguous receive consumption,
 and cleared by the ACK builder; it can request a frontier-only ACK.
-The Login message-145 notification reads global endpoint VA `0x1E002B8`
-(on-disk zero). A bounded direct-absolute-store scan found a raw zero-store
-stub but no nonzero assignment; indirect or external population, its runtime
-recipient, and any link to World mode remain unresolved.
+The Login message-145 notification routes through the `uiManager` singleton:
+bootstrap walks `slSingleton<uiManager>` and its slot+4 initializer stores the
+constructed `uiManager` at VA `0x1E002B8`. Its slot+0xAC dispatches through the
+event-ID registry, but the message-145 subscriber and any resulting World-mode
+request remain unresolved.
 The offline body decoder is in `GameSocketAcknowledgmentBody.cs`, with checks
 in `GameSocketAcknowledgmentBodyChecks.cs`; full queue mutation and resend
 behavior remain outside the reconstruction.
@@ -1078,8 +1079,9 @@ These updates supersede older next-step suggestions below where they overlap.
   loads global VA `0x1E002B8` (raw `.data` `0x19FE6B8`). The indirect call
   at `0x63CF05` uses vtable `+0xAC` with message `0x89`, local buffer, and
   zero. The translated file value is zero; reading raw EA `0x1E002B8`
-  instead reads unrelated resource bytes. Its runtime class and connection
-  to a successful Login-to-World transition remain unresolved.
+  instead reads unrelated resource bytes. The runtime class is now identified
+  as `uiManager`; the message-89 subscriber and connection to a successful
+  Login-to-World transition remain unresolved.
 - **Login request callback attachment is now directly traced.** Raw
   `Login_QueueLoginRequest` (`0x63B550`) allocates a `0x78`-byte request
   object, writes type 2 at object `+8`, and copies the Login callback pair at

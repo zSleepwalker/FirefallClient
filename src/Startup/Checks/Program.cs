@@ -374,11 +374,22 @@ Check("Matrix connection requests oracle tickets through a distinct callback wra
     && ClientApiRequestNativeLayout.ResolveHttpMethod(MatrixConnectionNativeLayout.OracleRequestType) == "POST"
     && MatrixConnectionNativeLayout.KnownResponseKeys.SequenceEqual(
         ["matrix_url", "ticket", "datacenter", "operator_override", "session_id", "hostname"]));
-Check("Matrix login notification uses the separately tracked global endpoint",
-    MatrixConnectionNativeLayout.LoginMessage145EndpointGlobalLoadFileOffset == 0x63C1E2
-    && MatrixConnectionNativeLayout.LoginMessage145EndpointCallFileOffset == 0x63C1F5
-    && MatrixConnectionNativeLayout.GlobalMessageEndpointNullStoreFileOffset == 0x3EE8D4
-    && MatrixConnectionNativeLayout.GlobalMessageEndpointVirtualAddress == 0x1E002B8);
+Check("UI manager singleton and global event routing boundaries are recorded",
+    UiManagerNativeLayout.SingletonRegistrationStubFileOffset == 0x3EE8C0
+    && UiManagerNativeLayout.SingletonInitializeMethodFileOffset == 0x3E44F0
+    && UiManagerNativeLayout.SingletonListWalkerFileOffset == 0x12C3A80
+    && UiManagerNativeLayout.ClientApplicationBootstrapFileOffset == 0x2EAE70
+    && UiManagerNativeLayout.SingletonObjectVirtualAddress == 0x1E002A8
+    && UiManagerNativeLayout.UiManagerGlobalPointerVirtualAddress == 0x1E002B8
+    && UiManagerNativeLayout.UiManagerAllocationSize == 0xA10
+    && UiManagerNativeLayout.UiManagerEventDispatchMethodFileOffset == 0xBF9D80
+    && UiManagerNativeLayout.UiManagerEventListenerDispatchFileOffset == 0xBF9C40
+    && UiManagerNativeLayout.UiManagerEventListenerLookupFileOffset == 0xC0AA20
+    && UiManagerNativeLayout.UiManagerEventCallbackRouteFileOffset == 0xC38400
+    && UiManagerNativeLayout.UiManagerEventDispatchVtableOffset == 0xAC
+    && UiManagerNativeLayout.UiManagerEventReadyFlagOffset == 0x672
+    && UiManagerNativeLayout.LoginMessage145GlobalLoadFileOffset == 0x63C1E2
+    && UiManagerNativeLayout.LoginMessage145CallFileOffset == 0x63C1F5);
 int retryDelay = 0;
 var retryDelays = new List<int>();
 for (int i = 0; i < 12; i++)
