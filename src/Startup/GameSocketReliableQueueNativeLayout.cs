@@ -21,6 +21,7 @@ public static class GameSocketReliableQueueNativeLayout
     public const int FailureCodeOffset = 0x20;
     public const int NextSequenceOffset = 0x28;
     public const int PeerWindowSequenceOffset = 0x2C;
+    public const int CumulativeAcknowledgmentSequenceOffset = 0x2E;
     public const int PendingQueueOffset = 0x38;
     public const int OutstandingTreeHeadOffset = 0x50;
     public const int OutstandingTreeCountOffset = 0x54;

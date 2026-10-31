@@ -1827,5 +1827,19 @@ internal static class StartupBinaryEvidence
         check("round18 udp open fingerprints", Matches(ClientMainLoopNativeLayout.MatrixGameSocketOpenUdpRaw, "558BEC6AFF68474F") && Matches(ClientMainLoopNativeLayout.MatrixInitialPacketEmitRaw, "558BEC6AFF68D8A7") && Matches(ClientMainLoopNativeLayout.MatrixSubmitApplicationBufferRaw, "558BEC83EC0C5356") && Matches(ClientMainLoopNativeLayout.GameSocketLogFormatFileOffset, "47616D65536F636B"));
         check("round19 serializer fingerprints", Matches(ClientMainLoopNativeLayout.MatrixInitialPacketSerializeRaw, "558BEC6AFF6840A8") && Matches(ClientMainLoopNativeLayout.WireWriteCompactUInt16Raw, "558BEC83EC08578B"));
         check("round20 channel jump table", Matches(ClientMainLoopNativeLayout.SubmitChannelJumpTableRaw, "1948FD003C48FD003C48FD00C649FD00"));
-        check("round21 recv completion chain", Matches(ClientMainLoopNativeLayout.GameSocketVtableSlot18FileOffset, "303AFD001039FD007039FD00") && Matches(ClientMainLoopNativeLayout.GameSocketHandleReceiveCompletionRaw, "558BEC83E4F86AFF") && Matches(ClientMainLoopNativeLayout.GameSocketAdmitReceivedDatagramRaw, "558BEC515356578B") && Matches(ClientMainLoopNativeLayout.GameSocketParseNonzeroContextChunksRaw, "558BEC83E4F86AFF") && Matches(ClientMainLoopNativeLayout.GameSocketParseZeroContextHandshakeReplyRaw, "558BEC538B5D0856"));    }
+        check("round21 recv completion chain", Matches(ClientMainLoopNativeLayout.GameSocketVtableSlot18FileOffset, "303AFD001039FD007039FD00")
+            && Matches(ClientMainLoopNativeLayout.GameSocketHandleReceiveCompletionRaw, "558BEC83E4F86AFF")
+            && Matches(ClientMainLoopNativeLayout.GameSocketAdmitReceivedDatagramRaw, "558BEC515356578B")
+            && Matches(ClientMainLoopNativeLayout.GameSocketParseNonzeroContextChunksRaw, "558BEC83E4F86AFF")
+            && Matches(ClientMainLoopNativeLayout.GameSocketParseZeroContextHandshakeReplyRaw, "558BEC538B5D0856"));
+        check("deferred ACK opcode targets and word parser",
+            Matches(GameSocketStateAndControlCatalog.DeferredControlMethodFileOffset, "558BEC5356578B7D088BF185")
+            && Matches(GameSocketStateAndControlCatalog.DeferredControlJumpTableFileOffset,
+                "1944FD00DE44FD003D45FD001944FD003A44FD00")
+            && Matches(0xBD38DE, "668B07B9FF0700006623C16683E8030FB7C883F904")
+            && Matches(0xBD393D, "668B07B9FF0700006623C16683E8030FB7C883F904")
+            && Matches(GameSocketAcknowledgmentBody.NativeHandlerFileOffset, "558BEC83EC20538BD9565789")
+            && GameSocketReliableQueueNativeLayout.PeerWindowSequenceOffset == 0x2C
+            && GameSocketReliableQueueNativeLayout.CumulativeAcknowledgmentSequenceOffset == 0x2E);
+    }
 }

@@ -1730,6 +1730,7 @@ MatrixChatFileChecks.Run(Check);
 MatrixChatIdentityChecks.Run(Check);
 MatrixRequestSigscan32Checks.Run(Check);
 MatrixSynchronization57Checks.Run(Check);
+GameSocketAcknowledgmentBodyChecks.Run(Check);
 MatrixServerMessageNativeTypeChecks.Run(Check);
 MatrixSynchronizationDispatchChecks.Run(Check);
 NativeMt19937Checks.Run(Check);

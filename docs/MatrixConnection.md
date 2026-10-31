@@ -263,8 +263,9 @@ retry delays, which are measured in seconds and capped at 300.
 Acknowledgment handler `0xBE43B0` reads network-byte-order WORDs, advances
 modular sequence frontiers, and removes acknowledged outstanding entries.
 It also feeds elapsed time back into the capped retry interval. Its
-complete selective-ack packet interpretation and receive-window behavior
-are not yet reconstructed. `GameSocketReliableQueueNativeLayout.cs`
+two-frontier and optional exact-sequence interpretation is described below;
+the full peer-window semantics and receive-window behavior remain unresolved.
+`GameSocketReliableQueueNativeLayout.cs`
 preserves bounded retry growth and the exact modular send-window test,
 without implementing a timer or reliability engine.
 
@@ -497,10 +498,27 @@ return unhandled so the body can enter the deferred queue. No wider control
 code is inferred.
 
 Deferred handler `0xBD3760` uses a separate translated table at raw
-`0xBD39B4`. Opcodes2/3 require at least two network-order WORDs after the
-opcode, with an even byte count. They call acknowledgment handler
-`0xBE43B0` on the channel1/channel2 queue respectively. Opcode5 requires
-a17-byte body (19-byte chunk including header), calls clock-sample
+`0xBD39B4`. Opcode2 selects the channel1 queue at socket `+0xD6C`; opcode3
+selects channel2 at `+0xD70`. After the control opcode, both require at least
+two network-order WORDs and an even byte count. The first word advances queue
+field `+0x2C` (`PeerWindowSequence`); the second advances `+0x2E` and
+cumulatively retires outstanding sequence entries at or before that frontier.
+Any remaining WORDs are selective acknowledgments: each is looked up by
+sequence in the outstanding tree and an exact match is retired. Comparisons
+use 16-bit modular ordering. `GameSocketAcknowledgmentBody.cs` decodes this
+bounded body without mutating queue state.
+
+For acknowledged fragments with a valid elapsed-time sample, `0xBE43B0`
+updates the retry interval to
+`clamp((old + ceil(sample/2) + 2*sample) / 2, 250, 2500)` milliseconds.
+The associated smoothed-RTT statistic is averaged only when the fragment's
+attempt byte is1. After processing the reported frontiers and selective
+sequences, the handler scans outstanding entries in the observed 256-slot
+range; entries at least250 milliseconds old are passed to `0xBE4DE0` for
+retry preparation. This records the observed gate, not a complete resend
+or selective-ACK protocol implementation.
+
+Opcode5 requires a17-byte body (19-byte chunk including header), calls clock-sample
 processor `0xBE82E0`, and then, **if socket state is3/Connecting and
 clock sample count at clock object+0x10 is at least2**, invokes state
 setter `0xBD1B70` with5/Connected. Otherwise, while Connecting, it resets

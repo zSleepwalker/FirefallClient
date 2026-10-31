@@ -1,5 +1,13 @@
 # Reverse-engineering handoff
 
+Latest Matrix transport follow-up: deferred-control opcodes2/3 carry two
+network-order frontier WORDs and optional selective sequence WORDs.
+`0xBE43B0` advances queue offsets `+0x2C/+0x2E`, retires cumulative and
+selective matches, updates retry timing, and prepares retries for old entries
+in its 256-slot scan. The offline decoder and Startup checks are in
+`GameSocketAcknowledgmentBody.cs`; full queue mutation and resend behavior
+remain outside the reconstruction.
+
 
 The latest render-init pass identifies the six `0xED1650` args (fullscreen flag, display w/h, third display value, window client w/h, forwarded to oD3DRenderAPI slot +8 `0xF08680`), the host class `oEngineSystem` (`0xE54BF0` = vtable `0x1C77C2C` slot 0) and `0x1DFE9C8` as `oShaderBuilderSystem`; see MatrixConnection.md. Cvar-field mapping and the path to the main loop remain unresolved.
 
