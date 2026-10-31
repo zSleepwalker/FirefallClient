@@ -6,6 +6,8 @@ network-order frontier WORDs and optional selective sequence WORDs.
 selective matches, updates retry timing, and prepares retries for old entries
 in its 256-slot scan. Outbound ACKs are assembled at `0xBE4F20` with the
 matching receive frontiers at `+0x2A/+0x30` and a 256-entry selective bitmap.
+Queue flag `+0x32` is initialized, set after contiguous receive consumption,
+and cleared by the ACK builder; it can request a frontier-only ACK.
 The offline body decoder is in `GameSocketAcknowledgmentBody.cs`, with checks
 in `GameSocketAcknowledgmentBodyChecks.cs`; full queue mutation and resend
 behavior remain outside the reconstruction.

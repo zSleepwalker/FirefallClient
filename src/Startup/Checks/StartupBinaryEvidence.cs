@@ -1852,5 +1852,10 @@ internal static class StartupBinaryEvidence
             && GameSocketReliableQueueNativeLayout.NextReceiveSequenceOffset == 0x2A
             && GameSocketReliableQueueNativeLayout.LocalCumulativeAcknowledgmentSequenceOffset == 0x30
             && GameSocketReliableQueueNativeLayout.MaximumEmittedAcknowledgmentChunkLength == 0xFF);
+        check("ACK pending flag is initialized, set after receive sequence advance, and cleared by the emitter",
+            Matches(0xBE3FDE, "C6473200")
+            && Matches(GameSocketReliableQueueNativeLayout.AcknowledgmentPendingFlagClearSiteFileOffset, "C6463200")
+            && Matches(0xBE56AC, "66FF432A")
+            && Matches(GameSocketReliableQueueNativeLayout.AcknowledgmentPendingFlagSetSiteFileOffset, "C6433201"));
     }
 }

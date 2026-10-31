@@ -11,6 +11,8 @@ public static class GameSocketReliableQueueNativeLayout
     public const uint ActivateMethodFileOffset = 0xBE3F60;
     public const uint DatagramAssemblerMethodFileOffset = 0xBD4340;
     public const uint OutgoingAcknowledgmentBuilderFileOffset = 0xBE4F20;
+    public const uint AcknowledgmentPendingFlagClearSiteFileOffset = 0xBE4FA9;
+    public const uint AcknowledgmentPendingFlagSetSiteFileOffset = 0xBE56BF;
     public const uint PromotePendingAndPrepareRetriesFileOffset = 0xBE49E0;
     public const uint PrepareRetryFileOffset = 0xBE4DE0;
     public const uint AcknowledgmentHandlerFileOffset = 0xBE43B0;

@@ -529,6 +529,14 @@ places these control chunks before queued data fragments. This documents the
 outbound ACK builder's observed projection only; it does not construct or send
 datagrams in C#.
 
+The pending flag at queue `+0x32` is initialized to zero by activation
+`0xBE3F60`, set by `0xBE5440` after it advances the next-receive sequence and
+releases a contiguous fragment, then cleared by the ACK builder. `0xBE4F20`
+returns without a chunk only when both the tracker count `+0x48C` and this
+flag are zero. Thus the flag can request a frontier-only ACK when there are
+no selective sequence entries; origins beyond these observed stores remain
+unresolved.
+
 For acknowledged fragments with a valid elapsed-time sample, `0xBE43B0`
 updates the retry interval to
 `clamp((old + ceil(sample/2) + 2*sample) / 2, 250, 2500)` milliseconds.

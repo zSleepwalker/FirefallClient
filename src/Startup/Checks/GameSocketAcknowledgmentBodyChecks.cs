@@ -91,6 +91,8 @@ internal static class GameSocketAcknowledgmentBodyChecks
             && GameSocketReliableQueueNativeLayout.SelectiveAcknowledgmentBitmapHeadOffset == 0x590
             && GameSocketReliableQueueNativeLayout.EmittedAcknowledgmentBaseChunkLength == 7
             && GameSocketReliableQueueNativeLayout.MaximumEmittedAcknowledgmentChunkLength == 0xFF
-            && GameSocketReliableQueueNativeLayout.MaximumEmittedSelectiveAcknowledgmentCount == 124);
+            && GameSocketReliableQueueNativeLayout.MaximumEmittedSelectiveAcknowledgmentCount == 124
+            && GameSocketReliableQueueNativeLayout.AcknowledgmentPendingFlagClearSiteFileOffset == 0xBE4FA9
+            && GameSocketReliableQueueNativeLayout.AcknowledgmentPendingFlagSetSiteFileOffset == 0xBE56BF);
     }
 }
