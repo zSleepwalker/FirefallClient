@@ -15,6 +15,9 @@
   <Folder Name="/src/Containers/">
     <Project Path="src/Containers/Firefall.Containers.csproj" />
   </Folder>
+  <Folder Name="/src/FirefallProcess/">
+    <Project Path="src/FirefallProcess/Firefall.FirefallProcess.csproj" />
+  </Folder>
   <Folder Name="/src/Graphics/" />
   <Folder Name="/src/Graphics/Nvapi/">
     <Project Path="src/Graphics/Nvapi/Nvapi.Reconstruction.csproj" />
@@ -25,6 +28,9 @@
   </Folder>
   <Folder Name="/src/Scripting/LuaCache/Checks/">
     <Project Path="src/Scripting/LuaCache/Checks/LuaCache.Checks.csproj" />
+  </Folder>
+  <Folder Name="/src/DeploymentCommon/">
+    <Project Path="src/DeploymentCommon/Firefall.DeploymentCommon.csproj" />
   </Folder>
   <Folder Name="/src/Startup/">
     <Project Path="src/Startup/Firefall.Startup.csproj" />
