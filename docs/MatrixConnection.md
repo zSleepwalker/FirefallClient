@@ -2951,6 +2951,23 @@ this does not prove those fields remain unchanged by replay callbacks.
 No downstream LookingGlass identity producer was followed in this bounded
 initialization trace.
 
+### tfLogin update `0x638B89` guard and `{2,0}` queue consumer
+
+Observation (raw offsets, bytes checked against `.original`): at `0x638AB5`
+`C7461C00000000 A1A4CAE501 8A4040 84C0 0F84BD000000` clears `[esi+1Ch]`, reads
+global `0x1E5CAA4`, tests byte `+0x40`, and jumps to `0x638B89` when zero. When
+nonzero it tests `[0x1E50C8C+0x40]` and `[0x1E6075C+0x40]` (conditionally
+sending message strings via `0x1E69348` vtable `+0x88`), then queues mode 3
+through `0x30D590`. `0x638B89` builds `{2,0}` and calls `0x30DEB0` on
+`[0x1DFFD98]`. `0x30DEB0` checks `[this+0xC]` and request mode 1 (dedupe vs
+current-mode object `[this+0xA28]`), else pushes the pair into the queue at
+`this+0xB84` (`0x315060`). `0x30D850` drains it; mode 2 -> `AppMode_World_Ctor`.
+
+Not found: any writer of `0x1E5CAA4` (single code reference), the jump-table
+selector `[msg+0xC]` source, or a link from message `0x145`. Interpretation:
+`{2,0}` is a request to switch to World; the condition looks like a
+cvar/config flag, not login-response state, and remains unproven.
+
 ### World scene-factory root and owned renderer interface
 
 The static sample is

@@ -1095,6 +1095,18 @@ These updates supersede older next-step suggestions below where they overlap.
   selected pair is not labeled a GUID and the complete successful transition
   remains unresolved. Details and layout constants are in `docs\LoginMode.md`
   and `src\Startup\`.
+- **tfLogin `0x638B89` guard (static).** Observed: the default switch case
+  (`0x638AB5`, `mov [esi+1Ch],0`) reads global `0x1E5CAA4` and tests byte
+  `[obj+0x40]` (`0x638ABC..0x638AC6`); zero jumps to `0x638B89` (`{2,0}` to
+  `0x30DEB0` on global `0x1DFFD98`), nonzero checks cvar-like objects
+  `0x1E50C8C`/`0x1E6075C` (+0x40) and queues mode 3 via `0x30D590`. The only
+  code reference to `0x1E5CAA4` is that read; its writer is not found
+  statically, and the 0x145 login-response link is unproven. `0x30DEB0`: if
+  `[app+0xC]!=0` and mode==1 it dedupes against current-mode `[+0xA28]`,
+  otherwise pushes `{mode,payload}` into the `+0xB84` queue (`0x315060`);
+  `0x30D850` drains it, mode 2 constructs `AppMode_World_Ctor`.
+  Interpretation: this is a world-load request; trigger unresolved. Bytes are
+  checked in `StartupBinaryEvidence`.
 - **World scene-factory return boundary.** Raw `0x9B73F0`, called from
   `TfWorld_Initialize` (`0x64B460`), returns `EDI` through `EAX` at raw
   `0x9B82B4` (`8B C7`); that epilogue returns at `0x9B82C6` (`C3`). The

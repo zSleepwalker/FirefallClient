@@ -125,6 +125,15 @@ public static class LoginModeNativeLayout
     public const int LoginUpdateMethodVtableOffset = 0x0C;
     public const uint LoginUpdateMethodFileOffset = 0x6385C0;
     public const uint LoginUpdateWorldModeQueueCallSiteFileOffset = 0x638B89;
+    public const uint LoginUpdateDefaultCaseFileOffset = 0x638AB5;
+    public const uint LoginUpdateGuardGlobalVa = 0x1E5CAA4;
+    public const uint LoginUpdateGuardByteOffset = 0x40;
+    public const uint LoginUpdateGuardReadFileOffset = 0x638ABC;
+    public const uint LoginUpdateLookingGlassPathFileOffset = 0x638B1A;
+    public const uint PendingRequestEnqueueActiveFlagOffset = 0xC;
+    public const uint PendingRequestQueueOffset = 0xB84;
+    public const uint PendingRequestEnqueueFlagCheckFileOffset = 0x30DED8;
+    public const uint PendingRequestEnqueuePushFileOffset = 0x30E00A;
     public const uint LoginResponseNotificationCallSiteFileOffset = 0x63C1E2;
     public const int LoginResponseNotificationMessageId = 0x145;
     public const int ResponseCallbackObjectSize = 0x20;

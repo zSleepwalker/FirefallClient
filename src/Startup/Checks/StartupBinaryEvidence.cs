@@ -874,6 +874,13 @@ internal static class StartupBinaryEvidence
                 "C091A300")
             && Matches(LoginModeNativeLayout.LoginUpdateWorldModeQueueCallSiteFileOffset,
                 "C744241C02000000C7442420000000008D44241CC7842430010000060000008B0D98FDDF0150E8FC52CDFF"));
+        check("Binary tfLogin update {2,0} queue is guarded by byte [dword_1E5CAA4+0x40]==0 and queue push uses +0xB84",
+            Matches(LoginModeNativeLayout.LoginUpdateDefaultCaseFileOffset,
+                "C7461C00000000A1A4CAE5018A404084C00F84BD000000A18C0CE501")
+            && Matches(LoginModeNativeLayout.PendingRequestEnqueueFlagCheckFileOffset,
+                "8BD9807B0C008B4D080F84230100008339010F851A")
+            && Matches(LoginModeNativeLayout.PendingRequestEnqueuePushFileOffset,
+                "8B71048B018945DCC745E00000000085F674178D4DE0E80BA5FA008975E08D4EFCB801000000F00FC1018D45DCC745FC00000000508D8B840B0000E8167000"));
         check("Binary worker registers the concrete WinHTTP status callback",
             Matches(0xBC31DE, "6A006AFF68E032FC00FF37FF150C4DAC01")
             && Matches(0xBC278E, "C21400"));
