@@ -1053,6 +1053,16 @@ internal static class StartupBinaryEvidence
             && Matches(0x4954A0, "C6461C00"));
         check("Binary matrix transport-open success moves connection to state 3",
             Matches(0x4962C3, "C7430C03000000"));
+        check("Binary GameSocket open copies connection codec pairs into channel queue fields",
+            Matches(MatrixChannelCodecNativeLayout.GameSocketOpenCallSiteFileOffset - 7,
+                "8D832408000050")
+            && RelativeBranchTargets(MatrixChannelCodecNativeLayout.GameSocketOpenCallSiteFileOffset,
+                0xE8, MatrixChannelCodecNativeLayout.GameSocketOpenMethodFileOffset)
+            && Matches(0xBE3D1B, "33C0897E08C6460C0066894610894614")
+            && Matches(0xBE3F84, "66837F1000751D837F14007517")
+            && Matches(0xBD0B6E, "8B068943108B4604894314")
+            && Matches(0xBD0BBC, "8B46088943108B460C894314")
+            && Matches(0xBD0C0E, "8B46088943108B460C8DB718010000894314"));
         check("Binary matrix socket factory requests overlapped UDP",
             Matches(0xBE354A, "6A016A006A006A11B8170000006A020F44C150FF15684DAC01"));
         check("Binary matrix local binding uses seven or two attempts and final-two fallback",

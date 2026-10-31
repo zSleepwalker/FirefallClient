@@ -931,12 +931,16 @@ The MatrixConnection constructor explicitly installs:
 | 1 | `0xB968` | `+0x824` / `+0x828` | `0x73EEE0` → `0x33E2E0` |
 | 2,3 | `0x4C5F` | `+0x82C` / `+0x830` | `0xC227A0` → `0x821BA0` |
 
-GameSocket open copies this configuration into each queue: tags at queue+10
-and decoder pointers at+14; channel3 shares channel2's configuration.
-The low tag WORDs also become socket+30/+32, explaining the default values
-of POKE/KISS's previously opaque WORDs. The second tag numerically matches
-Login's zone-list protocol filter; its derivation/checksum meaning is **not**
-established.
+`MatrixConnection_OpenTransport` passes `this+0x824` at raw callsite
+`0x4961AD` to GameSocket open `0xBD0960`. Open copies the first pair from
+configuration offsets `+0/+4` into queue `+0xD6C` fields `+0x10/+0x14`;
+it copies the second pair from `+8/+0xC` into queues `+0xD70` and `+0xD74`.
+Thus channel3 shares channel2's configuration. Reliable-queue constructor
+`0xBE3CE0` zeros its tag/decoder slots, and activation `0xBE3F60` logs when
+both the tag WORD and decoder pointer remain zero. The low tag WORDs also
+become socket `+0x30/+0x32`, explaining the default values of POKE/KISS's
+previously opaque WORDs. The second tag numerically matches Login's zone-list
+protocol filter; its derivation/checksum meaning is **not** established.
 
 Channel1 decoder `0x33E2E0` builds a bounded read view from the supplied
 buffer, or an optional alternate buffer, reads a compact message code through
@@ -944,8 +948,9 @@ buffer, or an optional alternate buffer, reads a compact message code through
 function, so its inflated virtual-call argument lists are not reliable
 prototypes. The callback address and its call edge are established, but
 per-message wire fields and complete error handling still require instruction
-verification. `MatrixChannelCodecNativeLayout.cs` records routing only,
-without pretending this is a usable replacement decoder.
+verification. `MatrixChannelCodecNativeLayout.cs` records the connection
+fields and queue-copy offsets, without pretending this is a usable replacement
+decoder.
 
 ## Compact message-code header
 

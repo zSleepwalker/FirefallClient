@@ -1022,8 +1022,10 @@ These updates supersede older next-step suggestions below where they overlap.
   and sets ACK-pending+32. The `socket+120` limit is checked on continuation
   only; the final append has no visible same check. Codes3/4 propagate
   through BD5080 to pump-close. The ring/window model remains non-mutating.
-  Next: constructor BE3CE0 / GameSocket open queue creation to identify
-  decoder+14. Accumulator callback ABI and selective ACK logic remain partial.
+  Constructor BE3CE0 zeros the queue tag/decoder fields; MatrixConnection
+  passes its codec pair at+824 to BD0960, which installs pairs in queue+10/+14
+  for channel1 and channels2/3 (3 shares2). Decoder ABI and selective ACK
+  details remain partial.
 - **Decoder addresses are now proven from constructor stores.** Native48F12C
   installs owner+828 VA73EEE0(raw33E2E0), tag+824=B968;48F14E installs
   owner+830 VAC227A0(raw821BA0), tag+82C=4C5F. Socket open copies pair1 to

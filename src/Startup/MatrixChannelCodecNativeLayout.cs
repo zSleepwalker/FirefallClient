@@ -2,13 +2,24 @@ namespace Firefall.Reconstruction.Startup;
 
 public readonly record struct MatrixChannelCodec(ushort OpaqueTag, uint DecoderFileOffset, uint DecoderVirtualAddress);
 
-/// <summary>Constructor-installed decoder routes. Tag derivation and complete wire decoding remain unresolved.</summary>
+/// <summary>
+/// Connection-installed decoder pairs and their copy into GameSocket queues.
+/// Tag derivation and complete wire decoding remain unresolved.
+/// </summary>
 public static class MatrixChannelCodecNativeLayout
 {
     public const int ConnectionChannel1TagOffset = 0x824;
     public const int ConnectionChannel1DecoderOffset = 0x828;
     public const int ConnectionOtherChannelsTagOffset = 0x82C;
     public const int ConnectionOtherChannelsDecoderOffset = 0x830;
+    public const uint GameSocketOpenMethodFileOffset = 0xBD0960;
+    public const uint GameSocketOpenCallSiteFileOffset = 0x4961AD;
+    public const uint ReliableQueueConstructorFileOffset = 0xBE3CE0;
+    public const int GameSocketChannel1QueueOffset = 0xD6C;
+    public const int GameSocketChannel2QueueOffset = 0xD70;
+    public const int GameSocketChannel3QueueOffset = 0xD74;
+    public const int GameSocketQueueTagOffset = 0x10;
+    public const int GameSocketQueueDecoderOffset = 0x14;
     public const ushort Channel1OpaqueTag = 0xB968;
     public const ushort OtherChannelsOpaqueTag = 0x4C5F;
     public const uint Channel1DecoderFileOffset = 0x33E2E0;

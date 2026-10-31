@@ -912,10 +912,22 @@ try { GameSocketReliableReceiveWindow.GetRingSlot(256, 0, 0); }
 catch (ArgumentOutOfRangeException) { outOfWindowRingSlotRejected = true; }
 Check("Receive-ring slot lookup rejects invalid head indices and out-of-window packets",
     invalidReceiveRingHeadRejected && outOfWindowRingSlotRejected);
-Check("Matrix data channels use constructor-installed codec tags and translated decoder addresses",
+Check("Matrix codec pairs map to the native GameSocket queue tag and decoder slots",
     MatrixChannelCodecNativeLayout.GetForChannel(1) == new MatrixChannelCodec(0xB968, 0x33E2E0, 0x73EEE0)
     && MatrixChannelCodecNativeLayout.GetForChannel(2) == new MatrixChannelCodec(0x4C5F, 0x821BA0, 0xC227A0)
-    && MatrixChannelCodecNativeLayout.GetForChannel(2) == MatrixChannelCodecNativeLayout.GetForChannel(3));
+    && MatrixChannelCodecNativeLayout.GetForChannel(2) == MatrixChannelCodecNativeLayout.GetForChannel(3)
+    && MatrixChannelCodecNativeLayout.GameSocketOpenMethodFileOffset == 0xBD0960
+    && MatrixChannelCodecNativeLayout.GameSocketOpenCallSiteFileOffset == 0x4961AD
+    && MatrixChannelCodecNativeLayout.ReliableQueueConstructorFileOffset == 0xBE3CE0
+    && MatrixChannelCodecNativeLayout.ConnectionChannel1TagOffset == 0x824
+    && MatrixChannelCodecNativeLayout.ConnectionChannel1DecoderOffset == 0x828
+    && MatrixChannelCodecNativeLayout.ConnectionOtherChannelsTagOffset == 0x82C
+    && MatrixChannelCodecNativeLayout.ConnectionOtherChannelsDecoderOffset == 0x830
+    && MatrixChannelCodecNativeLayout.GameSocketQueueTagOffset == 0x10
+    && MatrixChannelCodecNativeLayout.GameSocketQueueDecoderOffset == 0x14
+    && MatrixChannelCodecNativeLayout.GameSocketChannel1QueueOffset == 0xD6C
+    && MatrixChannelCodecNativeLayout.GameSocketChannel2QueueOffset == 0xD70
+    && MatrixChannelCodecNativeLayout.GameSocketChannel3QueueOffset == 0xD74);
 bool controlCodecRejected = false;
 try { MatrixChannelCodecNativeLayout.GetForChannel(0); }
 catch (ArgumentOutOfRangeException) { controlCodecRejected = true; }
