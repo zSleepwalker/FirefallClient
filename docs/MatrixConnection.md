@@ -1481,6 +1481,42 @@ helpers remains unresolved. The body reader then reads bytes at `+0x50` and
 With the outer gate clear the body consumes six bytes; when set, its length
 depends on the nested gate. Field meanings remain unknown.
 
+### Selector 0x6A: `AlmostHit`
+
+Entry23 maps selector `0x6A` to VA `0xC1DF44` / raw case `0x81D344`. It
+allocates `0x30` bytes, stores local DWORD `0x72` (role unknown), then calls
+constructor `0x525DD0`. The constructor passes `0x6A` to helper `0x5A0E50`,
+installs vtable VA `0x1C67108` (RTTI
+`firefall::Character::AlmostHit`), and clears the QWORD at `+0x28`.
+
+The successful path joins the shared continuation at `0x81F72E`, which forms
+the destination `object+0x28` and calls `0x356F80` to read one QWORD (nominal
+body length eight bytes). Allocation failure branches at `0x81D35C` to
+`0x81F72C`, zeroes ESI, then joins the same reader setup, which forms address
+`0x28`; the consequence of that abnormal path is unresolved. The field
+meaning remains unknown; the RTTI name does not prove message semantics.
+
+### Selector 0x6B: `DealtHit`
+
+Entry24 maps selector `0x6B` to VA `0xC1DF75` / raw case `0x81D375`. It
+allocates `0x58` bytes, stores local DWORD `0x73` (role unknown), then calls
+constructor `0x525E60`. The constructor passes `0x6B` to helper `0x5A0EC0`,
+installs vtable VA `0x1C670F8` (RTTI
+`firefall::Character::DealtHit`), clears byte `+0x28`, and clears WORD
+`+0x50`.
+
+The successful path joins the reader setup at `0x81D3A1` and calls
+`0x5F0800`. Its first sub-reader `0x5F0CF0` consumes a gate byte for the
+record at `+0x28`; when set it reads a QWORD, a nested gate byte and optional
+QWORD, then a DWORD and byte. The temporary values are routed through
+`0x5F0B20` or `0x5F0C30` into offsets `+0x30`, `+0x38`, `+0x40`, `+0x48`,
+and `+0x4C`. The reader then consumes bytes at `+0x50` and `+0x51`. With the
+outer gate clear, the nominal minimum body length is three bytes; a set gate
+adds the record fields. Allocation failure branches at `0x81D38D` to
+`0x81D39F`, zeroes ESI, and continues into the same reader; its abnormal
+runtime consequence is unresolved. Field meanings and message semantics
+remain unknown.
+
 ## Message35 application body
 
 Factory case35 at `0x33D557` allocates a fresh0x50-byte descriptor through
