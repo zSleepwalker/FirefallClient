@@ -1279,6 +1279,20 @@ Check("ProximityTextChat selector 0x64 records shared text and optional blob fra
     && CharacterProximityTextChatNativeLayout.MaximumOptionalBlobPayloadByteCount == 0xFFFF
     && CharacterProximityTextChatNativeLayout.EmptyTextInputByteCountWithoutOptionalBlob == 5
     && CharacterProximityTextChatNativeLayout.EmptyTextInputByteCountWithEmptyOptionalBlob == 7);
+Check("JumpActioned selector 0x65 records its shared WORD reader continuation",
+    CharacterJumpActionedNativeLayout.InnerSelector == 0x65
+    && CharacterJumpActionedNativeLayout.CaseFileOffset == 0x81D1F3
+    && CharacterJumpActionedNativeLayout.CaseLocalDwordValue == 0x6D
+    && CharacterJumpActionedNativeLayout.AllocationSize == 0x30
+    && CharacterJumpActionedNativeLayout.ConstructorFileOffset == 0x525AF0
+    && CharacterJumpActionedNativeLayout.BaseConstructorHelperFileOffset == 0x5A0C20
+    && CharacterJumpActionedNativeLayout.BaseConstructorArgument == 0x65
+    && CharacterJumpActionedNativeLayout.AllocationFailureContinuationFileOffset == 0x81D21D
+    && CharacterJumpActionedNativeLayout.BodyReaderContinuationFileOffset == 0x81D21F
+    && CharacterJumpActionedNativeLayout.WordReaderFileOffset == 0x336AC0
+    && CharacterJumpActionedNativeLayout.VtableVirtualAddress == 0x1C67168
+    && CharacterJumpActionedNativeLayout.WordFieldOffset == 0x28
+    && CharacterJumpActionedNativeLayout.NominalInputByteCount == 2);
 Check("Shared channel-2/3 compact-code routing groups the observed native cases",
     Enumerable.Range(1, 6).All(code =>
         MatrixOtherChannelDecoderNativeLayout.SelectRoute(code)

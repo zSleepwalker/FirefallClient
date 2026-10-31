@@ -1394,6 +1394,23 @@ temporary buffer; no overall text limit or encoding is established. The WORD
 blob length permits at most `0xFFFF` payload bytes. Field meanings remain
 unknown; RTTI alone does not establish proximity-chat semantics.
 
+### Selector 0x65: `JumpActioned`
+
+Entry18 maps selector `0x65` to VA `0xC1DDF3` / raw case `0x81D1F3`. It
+allocates `0x30` bytes, stores local DWORD `0x6D` (role unknown), then calls
+constructor `0x525AF0`. The constructor passes `0x65` to helper `0x5A0C20`
+and installs vtable VA `0x1C67168` (RTTI
+`firefall::Character::JumpActioned`).
+
+On the successful allocation path, the case jumps to shared reader
+continuation `0x81D21F`, which reads a WORD into object field `+0x28`
+through helper `0x336AC0`; nominal body length is two bytes. The allocation
+failure branch at `0x81D20B` instead enters `0x81D21D`, zeroes ESI, and
+continues into the same field reader, which forms destination address
+`0x28`. The runtime consequence of that abnormal path is unresolved.
+Field meaning remains unknown; RTTI alone does not establish jump-action
+semantics.
+
 ## Message35 application body
 
 Factory case35 at `0x33D557` allocates a fresh0x50-byte descriptor through
