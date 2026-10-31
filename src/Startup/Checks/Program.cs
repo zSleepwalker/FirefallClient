@@ -928,6 +928,54 @@ Check("Matrix codec pairs map to the native GameSocket queue tag and decoder slo
     && MatrixChannelCodecNativeLayout.GameSocketChannel1QueueOffset == 0xD6C
     && MatrixChannelCodecNativeLayout.GameSocketChannel2QueueOffset == 0xD70
     && MatrixChannelCodecNativeLayout.GameSocketChannel3QueueOffset == 0xD74);
+Check("Secondary command dispatcher separates primary-byte, secondary-selector, and zero-return paths",
+    MatrixSecondaryCommandDispatcherNativeLayout.ClassifyLeadingByte(0)
+        == MatrixSecondaryCommandInputPath.SecondarySelectorTable
+    && MatrixSecondaryCommandDispatcherNativeLayout.ClassifyLeadingByte(0xF0)
+        == MatrixSecondaryCommandInputPath.SecondarySelectorTable
+    && MatrixSecondaryCommandDispatcherNativeLayout.ClassifyLeadingByte(1)
+        == MatrixSecondaryCommandInputPath.PrimaryByteRouteMap
+    && MatrixSecondaryCommandDispatcherNativeLayout.ClassifyLeadingByte(0x35)
+        == MatrixSecondaryCommandInputPath.PrimaryByteRouteMap
+    && MatrixSecondaryCommandDispatcherNativeLayout.ClassifyLeadingByte(0x36)
+        == MatrixSecondaryCommandInputPath.ReturnZero
+    && MatrixSecondaryCommandDispatcherNativeLayout.ClassifyLeadingByte(0x37)
+        == MatrixSecondaryCommandInputPath.ReturnZero
+    && MatrixSecondaryCommandDispatcherNativeLayout.ClassifyLeadingByte(0xEF)
+        == MatrixSecondaryCommandInputPath.ReturnZero
+    && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryRouteIndex(0) is null
+    && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryRouteIndex(1) == 0
+    && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryRouteIndex(0x0D) == 0
+    && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryRouteIndex(0x0E) == 1
+    && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryRouteIndex(0x11) == 1
+    && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryRouteIndex(0x12) == 2
+    && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryRouteIndex(0x19) == 3
+    && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryRouteIndex(0x1F) == 1
+    && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryRouteIndex(0x21) == 4
+    && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryRouteIndex(0x25) == 5
+    && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryRouteIndex(0x33) == 6
+    && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryRouteIndex(0x35) == 1
+    && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryRouteIndex(0x36) is null
+    && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryRouteIndex(0x37) is null
+    && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryTargetFileOffset(0) == 0x81CCAD
+    && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryTargetFileOffset(1) == 0x8217D9
+    && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryTargetFileOffset(6) == 0x81F34A
+    && MatrixSecondaryCommandDispatcherNativeLayout.GetSecondarySelectorIndex(0x20) == 0
+    && MatrixSecondaryCommandDispatcherNativeLayout.GetSecondarySelectorIndex(0x7A) == 0x5A
+    && MatrixSecondaryCommandDispatcherNativeLayout.GetSecondarySelectorIndex(0x7B) is null);
+Check("MarketRequestComplete selector 0x53 preserves its RTTI and native body field offsets",
+    CharacterMarketRequestCompleteNativeLayout.InnerSelector == 0x53
+    && CharacterMarketRequestCompleteNativeLayout.CaseFileOffset == 0x81CCC3
+    && CharacterMarketRequestCompleteNativeLayout.AllocationSize == 0x48
+    && CharacterMarketRequestCompleteNativeLayout.ConstructorFileOffset == 0x524C30
+    && CharacterMarketRequestCompleteNativeLayout.BodyReaderFileOffset == 0x5F6B10
+    && CharacterMarketRequestCompleteNativeLayout.VtableVirtualAddress == 0x1C67278
+    && CharacterMarketRequestCompleteNativeLayout.FirstByteFieldOffset == 0x28
+    && CharacterMarketRequestCompleteNativeLayout.RawQwordFieldOffset == 0x30
+    && CharacterMarketRequestCompleteNativeLayout.SecondByteFieldOffset == 0x38
+    && CharacterMarketRequestCompleteNativeLayout.FirstSharedTextFieldOffset == 0x3C
+    && CharacterMarketRequestCompleteNativeLayout.SecondSharedTextFieldOffset == 0x40
+    && CharacterMarketRequestCompleteNativeLayout.ThirdSharedTextFieldOffset == 0x44);
 Check("Shared channel-2/3 compact-code routing groups the observed native cases",
     Enumerable.Range(1, 6).All(code =>
         MatrixOtherChannelDecoderNativeLayout.SelectRoute(code)

@@ -1036,8 +1036,10 @@ These updates supersede older next-step suggestions below where they overlap.
   and compact positive16 code; codes1..6/9 reach factory `0xBC9B80`, code8
   reaches `0xBC9DB0`, and code7/out-of-range reaches shared secondary-dispatch
   block `0x821D7C` then `0x81CC50`. The three route targets and byte-map/table
-  addresses are in MatrixConnection.md; the larger secondary dispatch remains
-  to be mapped.
+  addresses are in MatrixConnection.md. The inner `0x81CC50` tables are
+  structurally mapped with direct byte indexing (nonzero indices1..0x35);
+  selector0x53 builds `MarketRequestComplete`. Remaining case handlers and
+  message semantics are open.
   RTTI names the results `nl::RoutedMessage` and
   `nl::RoutedMultipleMessage`; QWORD and message semantics remain unknown.
 - **Header/factory roles corrected by instructions.** 34A020 reads compact

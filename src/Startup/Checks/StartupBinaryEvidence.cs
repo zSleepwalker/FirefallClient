@@ -1106,6 +1106,38 @@ internal static class StartupBinaryEvidence
             && RelativeBranchTargets(0xBCB12E, 0xE8, 0x327210)
             && Matches(0xBCB13C, "0FB74738")
             && RelativeBranchTargets(0xBCB148, 0xE8, 0x336CA0));
+        check("Binary 0x81CC50 direct byte indexing and secondary-selector paths match their bounds",
+            Matches(0x81CC80, "8A0684C0")
+            && Matches(0x81CC8A, "3CF00F8313270000")
+            && Matches(0x81CC92, "0FB6C04883F8350F873A4B00000FB6800C24C200FF2485F023C200")
+            && ReadAt(MatrixSecondaryCommandDispatcherNativeLayout.PrimaryByteMapFileOffset,
+                MatrixSecondaryCommandDispatcherNativeLayout.PrimaryByteMapLength)
+                .SequenceEqual(MatrixSecondaryCommandDispatcherNativeLayout.ExpectedPrimaryByteRouteMap)
+            && new uint[] { 0xC1D8AD, 0xC223D9, 0xC1FA63, 0xC1FB6D, 0xC1FE06, 0xC1FEEF, 0xC1FF4A }
+                .Select((target, index) => ReadUInt32(
+                    MatrixSecondaryCommandDispatcherNativeLayout.PrimaryJumpTableFileOffset + (uint)(index * 4))
+                    == target).All(matches => matches)
+            && Matches(MatrixSecondaryCommandDispatcherNativeLayout.PrimaryZeroReturnFileOffset, "33C0")
+            && Matches(0x81F3A5, "8B450883C0E083F85A0F8725240000FF24853026C200")
+            && ReadUInt32(MatrixSecondaryCommandDispatcherNativeLayout.SecondaryJumpTableFileOffset) == 0xC1FFBB
+            && ReadUInt32(MatrixSecondaryCommandDispatcherNativeLayout.SecondaryJumpTableFileOffset
+                + (MatrixSecondaryCommandDispatcherNativeLayout.SecondaryJumpTableEntryCount - 1) * 4) == 0xC2236E);
+        check("Binary inner selector 0x53 constructs the RTTI MarketRequestComplete body layout",
+            ReadUInt32(VirtualAddressToFileOffset(
+                CharacterMarketRequestCompleteNativeLayout.InnerSelectorTableVirtualAddress)) == 0xC1D8C3
+            && RelativeBranchTargets(0x81CCC5, 0xE8, 0x12B7FB0)
+            && RelativeBranchTargets(0x81CCE4, 0xE8,
+                CharacterMarketRequestCompleteNativeLayout.ConstructorFileOffset)
+            && RelativeBranchTargets(0x81CCFA, 0xE8,
+                CharacterMarketRequestCompleteNativeLayout.BodyReaderFileOffset)
+            && VtableRttiName(CharacterMarketRequestCompleteNativeLayout.VtableVirtualAddress, 80)
+                == CharacterMarketRequestCompleteNativeLayout.RttiName
+            && Matches(0x5F6B1B, "8D5628")
+            && Matches(0x5F6B23, "8D46308BCF50")
+            && Matches(0x5F6B2E, "8D56388BCF")
+            && Matches(0x5F6B38, "8D563C8BCF")
+            && Matches(0x5F6B42, "8D56408BCF")
+            && Matches(0x5F6B4C, "8D56448BCF"));
         check("Binary matrix socket factory requests overlapped UDP",
             Matches(0xBE354A, "6A016A006A006A11B8170000006A020F44C150FF15684DAC01"));
         check("Binary matrix local binding uses seven or two attempts and final-two fallback",

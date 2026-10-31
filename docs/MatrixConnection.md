@@ -1020,6 +1020,45 @@ factory/callback ABI remain unresolved.
 `MatrixOtherChannelDecoderNativeLayout.cs` records dispatch only, not a
 replacement decoder.
 
+## Secondary command dispatcher and one verified class case
+
+The secondary-dispatch target `0x81CC50` is a large raw function
+(`0x4B9E` bytes) with two separate selector tables. It reads a leading byte
+from its input structure. After handling byte0 and values `0xF0..0xFF` through
+the secondary selector path, it compares the byte directly with `0x35` and
+uses the byte itself as the index into the 54-byte map at VA `0xC2240C`
+(raw `0x82180C`); no decrement occurs. The map result selects a seven-entry
+table at VA `0xC223F0` (raw `0x8217F0`). The table-index ranges and their
+corresponding leading-byte ranges for nonzero inputs are:
+
+| Leading byte / table index | Route index | Raw target | Observation |
+| ---: | ---: | ---: | --- |
+| `0x00..0x0D` | 0 | `0x81CCAD` | Nested selector table; byte0 uses secondary path instead |
+| `0x0E..0x11`, `0x1F..0x20`, `0x28..0x32`, `0x35` | 1 | `0x8217D9` | Returns zero |
+| `0x12..0x18` | 2 | `0x81EE63` | Case block not mapped |
+| `0x19..0x1E` | 3 | `0x81EF6D` | Case block not mapped |
+| `0x21..0x24` | 4 | `0x81F206` | Case block not mapped |
+| `0x25..0x27` | 5 | `0x81F2EF` | Case block not mapped |
+| `0x33..0x34` | 6 | `0x81F34A` | Case block not mapped |
+
+Leading byte0 or `0xF0..0xFF` uses a second table at VA `0xC22630`
+(raw `0x821A30`) when its selector is `0x20..0x7A`; values outside that
+selector range return zero. Leading bytes `0x36..0xEF` also reach the
+zero-return path. These are dispatch boundaries only; the inputs’ semantic
+names and the 91 secondary targets are unresolved.
+
+One nested selector is mapped: route0 block `0x81CCAD` dispatches selector
+`0x53` through the table at VA `0xC22444` (raw `0x821844`) to raw case
+`0x81CCC3`. That case allocates `0x48` bytes, calls constructor `0x524C30`,
+then body reader `0x5F6B10`. Constructor RTTI identifies the object as
+`firefall::Character::MarketRequestComplete`. The reader stores, in order,
+a byte at object+`0x28`, raw QWORD at+`0x30`, byte at+`0x38`, and three
+NUL-terminated shared-text values at+`0x3C/+0x40/+0x44`. Field meanings
+remain unknown; this one selector does not name the remaining table cases.
+`MatrixSecondaryCommandDispatcherNativeLayout.cs` and
+`CharacterMarketRequestCompleteNativeLayout` preserve the route bounds and
+this bounded object layout without implementing a parser.
+
 ## Message35 application body
 
 Factory case35 at `0x33D557` allocates a fresh0x50-byte descriptor through
