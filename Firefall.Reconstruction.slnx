@@ -48,4 +48,16 @@
   <Folder Name="/tests/Serialization/">
     <Project Path="tests/Serialization/SerializationChecks.csproj" />
   </Folder>
+  <Folder Name="/src/RedHanded/">
+    <Project Path="src/RedHanded/Firefall.RedHanded.csproj" />
+  </Folder>
+  <Folder Name="/src/DumpTruck/">
+    <Project Path="src/DumpTruck/Firefall.DumpTruck.csproj" />
+  </Folder>
+  <Folder Name="/src/R5Dumper/">
+    <Project Path="src/R5Dumper/Firefall.R5Dumper.csproj" />
+  </Folder>
+  <Folder Name="/src/HWStats/">
+    <Project Path="src/HWStats/Firefall.HWStats.csproj" />
+  </Folder>
 </Solution>
