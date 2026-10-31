@@ -1,5 +1,24 @@
 # Reverse-engineering handoff
 
+## Resume here (end of October 31 session)
+
+- Matrix nested selector table raw `0x821844` (selectors `0x53..0x7A`) is
+  fully traced; see the summary table in `docs/MatrixConnection.md`.
+- Primary-dispatcher routes 2-6 hold 17 subcases; 5 are reconstructed
+  (`0x81EF1C`, `0x81EF83`, `0x81F29E`, `0x81F2F9`, `0x81F354`). Remaining:
+  route targets raw `0x81EE63` (values `0x54-0x55`), `0x81EF6D` (entries
+  1-8) and `0x81F206` (values `0x54-0x55`).
+- The 91 secondary-table entries (VA `0xC22630` / raw `0x821A30`) are mapped
+  as dispatch data, but their message identities are still unresolved.
+- Next suggested work: the remaining 12 primary subcases, then the
+  message-object consumers (vtable handler methods, e.g. vtables VA
+  `0x1C67028`, `0x1C67018`, `0x1C66FF8`).
+- Open items: field semantics, allocation-failure consequences, selector
+  `0x55` 12-byte temp prefix, selector `0x6D` body consumption.
+- Workflow per batch: Luna agent reconstructs (layout + Program.cs +
+  StartupBinaryEvidence.cs + MatrixConnection.md + Handoff note), Luna
+  `code-review` QA, then build, binary checks, commit and push.
+
 Latest Matrix transport follow-up: deferred-control opcodes2/3 carry two
 network-order frontier WORDs and optional selective sequence WORDs.
 `0xBE43B0` advances queue offsets `+0x2C/+0x2E`, retires cumulative and
@@ -1110,7 +1129,7 @@ These updates supersede older next-step suggestions below where they overlap.
   Selector0x78 constructs `OpenMovieDialog` and passes input through the shared NUL-terminated text reader at +0x28; field meaning and allocation-failure consequence remain unknown.
   Selector0x79 constructs `PrivateDialog` and reads DWORD +0x28, QWORD +0x30, and DWORD +0x38; field meanings and allocation-failure consequence remain unknown.
   Selector0x7A constructs `PublicDialog` and reads DWORDs +0x28/+0x2C; field meanings and allocation-failure consequence remain unknown.
-  The nested selector table 0x53..0x7A is fully traced. Next trace consumers of parsed message objects (including vtable handler methods) and the remaining primary dispatcher cases at 0x81EE63, 0x81EF6D, 0x81F206, 0x81F2EF, and 0x81F34A; field semantics and message meanings remain open.
+  The nested selector table 0x53..0x7A is fully traced. Five of 17 case-bearing primary-route subcases are now mapped; 12 remain at route targets 0x81EE63, 0x81EF6D, 0x81F206, 0x81F2EF, and 0x81F34A. Next trace parsed-object consumers; field semantics remain open.
   RTTI names the results `nl::RoutedMessage` and
   `nl::RoutedMultipleMessage`; QWORD and message semantics remain unknown.
 - **Header/factory roles corrected by instructions.** 34A020 reads compact

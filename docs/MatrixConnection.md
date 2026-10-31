@@ -1035,26 +1035,97 @@ table at VA `0xC223F0` (raw `0x8217F0`). The observed leading-byte ranges are:
 | ---: | ---: | ---: | --- |
 | `0x01..0x0E` | 0 | `0x81CCAD` | Nested selector table |
 | `0x0F..0x12`, `0x20..0x21`, `0x29..0x33`, `0x36` | 1 | `0x8217D9` | Returns zero |
-| `0x13..0x19` | 2 | `0x81EE63` | Case block not mapped |
-| `0x1A..0x1F` | 3 | `0x81EF6D` | Case block not mapped |
-| `0x22..0x25` | 4 | `0x81F206` | Case block not mapped |
-| `0x26..0x28` | 5 | `0x81F2EF` | Case block not mapped |
-| `0x34..0x35` | 6 | `0x81F34A` | Case block not mapped |
+| `0x13..0x19` | 2 | `0x81EE63` | Three dispatcher values (`0x53..0x55`); value `0x53` documented below |
+| `0x1A..0x1F` | 3 | `0x81EF6D` | Nine switch entries; entry 0 documented below |
+| `0x22..0x25` | 4 | `0x81F206` | Three dispatcher values (`0x53..0x55`); value `0x53` documented below |
+| `0x26..0x28` | 5 | `0x81F2EF` | Value `0x53` documented below |
+| `0x34..0x35` | 6 | `0x81F34A` | Value `0x53` documented below |
 
 Leading byte0 or `0xF0..0xFF` uses a second table at VA `0xC22630`
 (raw `0x821A30`) when its selector is `0x20..0x7A`; values outside that
 selector range return zero. Leading bytes `0x37..0xEF` also reach the
 zero-return path. These are dispatch boundaries only; the inputs’ semantic
-names and the 91 secondary targets are unresolved.
+names for the 91 secondary-table entries are unresolved.
 
-Twelve nested selectors are mapped: route0 block `0x81CCAD` dispatches selector
-`0x53` through the table at VA `0xC22444` (raw `0x821844`) to raw case
+The five case-bearing primary routes (indices 2..6) have 17 directly selected
+subcases: three at route2, nine at route3, three at route4, and one each at
+routes5 and6. Five subcases now have native layouts; 12 remain unmapped.
+Route0's nested table has a separate, complete set of 40 documented selectors
+(`0x53..0x7A`); route1 is the zero-return route. The secondary selector table
+records all 91 targets as dispatch data, but their message identities remain
+unresolved.
+
+### Route index 2, dispatcher value `0x53`: `AreaVisualData::LootObjectCollected`
+
+The route2 block `0x81EE63` subtracts `0x53` from its dispatcher value; equality
+branches to case `0x81EF1C`. That case requests `0x40` bytes from allocator
+`0x12B7FB0`, stores local DWORD `0xCD` (role unknown), calls constructor
+`0xADBAA0`, then body reader `0x83AD90`. The constructor passes `0x53` to helper
+`0xB07660` and installs vtable VA `0x1C723C0`, whose RTTI is
+`firefall::AreaVisualData::LootObjectCollected`.
+
+The body reader writes a DWORD at object+`0x28`, followed by raw QWORDs at
+`+0x30` and `+0x38`, using readers `0x3370A0` and `0x356F80`. Field meanings
+remain unknown. Dispatcher values `0x54` and `0x55` in this route are not yet
+mapped.
+
+### Route index 3, switch entry 0: `Vehicle::AbilityActivated`
+
+The route3 block `0x81EF6D` computes `arg_0 + 0xAD` and bounds the result to
+indices `0..8` before indexing the nine-entry table at VA `0xC2260C` (raw
+`0x821A0C`). Entry0 reaches case `0x81EF83`, which allocates `0x30` bytes,
+stores local DWORD `0xD0` (role unknown), calls constructor `0xB093C0`, then
+reader `0x83A840`. The constructor passes `0x53` to helper `0xB474B0` and
+installs vtable VA `0x1C72998` (RTTI `firefall::Vehicle::AbilityActivated`).
+
+The reader writes DWORDs at object+`0x28` and `+0x2C` through `0x3370A0`.
+Their meanings remain unknown; switch entries1..8 remain unmapped.
+
+### Route index 4, dispatcher value `0x53`: `Deployable::TookHit`
+
+The route4 block `0x81F206` subtracts `0x53` and branches to case `0x81F29E`
+on equality. The case allocates `0x60` bytes, stores local DWORD `0xD9` (role
+unknown), calls constructor `0xB27E80`, then reader `0x83A120`. The constructor
+passes `0x53` to helper `0xB47C40`, installs vtable VA `0x1C727A8` (RTTI
+`firefall::Deployable::TookHit`), and zeroes byte `+0x28` and WORD `+0x50`.
+
+The body reader calls conditional-record reader `0x5F0CF0` for object+`0x28`,
+reads bytes at `+0x50` and `+0x51`, a WORD at `+0x58`, then a byte at `+0x5A`.
+The conditional record's internal field meanings and all outer field meanings
+remain unknown. Dispatcher values `0x54` and `0x55` remain unmapped.
+
+### Route index 5, dispatcher value `0x53`: `Turret::WeaponProjectileFired`
+
+The route5 block `0x81F2EF` accepts dispatcher value `0x53` and enters case
+`0x81F2F9`. It allocates `0x48` bytes, stores local DWORD `0xDC` (role
+unknown), calls constructor `0xB36520`, then body reader `0x839EB0`. The
+constructor passes `0x53` to helper `0xB47D90`, installs vtable VA `0x1C726E8`
+(RTTI `firefall::Turret::WeaponProjectileFired`), and zeroes byte `+0x38`.
+
+The body reader uses `0x3370A0` at `+0x28`, `0x3568E0` at `+0x2C`, `+0x30`,
+and `+0x34`, then helper `0x5C0270` at `+0x38`. Field meanings and the role of
+the final helper remain unresolved.
+
+### Route index 6, dispatcher value `0x53`: `LootStoreExtension::LootObjectCollected`
+
+The route6 block `0x81F34A` accepts dispatcher value `0x53` and enters case
+`0x81F354`. It allocates `0x40` bytes, stores local DWORD `0xDD` (role
+unknown), calls constructor `0xB43A70`, then body reader `0x839DB0`. The
+constructor passes `0x53` to helper `0xB48040`, installs vtable VA `0x1C72608`
+(RTTI `firefall::LootStoreExtension::LootObjectCollected`), and initializes
+DWORDs at `+0x30`, `+0x34`, `+0x38`, and `+0x3C` to zero.
+
+The body reader writes a DWORD at object+`0x28`, then raw QWORDs at `+0x30` and
+`+0x38`, through `0x3370A0` and `0x356F80`. Field meanings remain unknown.
+
+Nested-table entry0 maps selector `0x53`: route0 block `0x81CCAD` dispatches it
+through the table at VA `0xC22444` (raw `0x821844`) to raw case
 `0x81CCC3`. That case allocates `0x48` bytes, calls constructor `0x524C30`,
 then body reader `0x5F6B10`. Constructor RTTI identifies the object as
 `firefall::Character::MarketRequestComplete`. The reader stores, in order,
 a byte at object+`0x28`, raw QWORD at+`0x30`, byte at+`0x38`, and three
 NUL-terminated shared-text values at+`0x3C/+0x40/+0x44`. Field meanings
-remain unknown; these twelve selectors do not name the remaining table cases.
+remain unknown; this case's RTTI name does not identify the remaining table cases.
 `MatrixSecondaryCommandDispatcherNativeLayout.cs` and
 `CharacterMarketRequestCompleteNativeLayout` preserve the route bounds and
 this bounded object layout without implementing a parser.
@@ -1790,9 +1861,10 @@ The nested table at VA `0xC22444` (raw `0x821844`) is now traced from selector
 
 This closes the nested case mapping, not the overall Matrix analysis. Field
 semantics, allocation-failure consequences, the selector `0x55` 12-byte
-temporary prefix, and selector `0x6D` body consumption remain unresolved.
-Next, trace what consumes parsed message objects (including candidate vtable
-handler methods) and map the remaining primary dispatcher cases at raw
+temporary prefix, selector `0x6D` body consumption, and 12 primary-route
+subcases remain unresolved. Next, trace consumers of parsed message objects
+(including candidate vtable handler methods); five of 17 primary-route
+subcases now have native layouts. The remaining cases are at route targets
 `0x81EE63`, `0x81EF6D`, `0x81F206`, `0x81F2EF`, and `0x81F34A`.
 
 ## Message35 application body

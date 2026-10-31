@@ -970,6 +970,89 @@ Check("Secondary command dispatcher separates primary-byte, secondary-selector, 
     && MatrixSecondaryCommandDispatcherNativeLayout.GetSecondarySelectorIndex(0x20) == 0
     && MatrixSecondaryCommandDispatcherNativeLayout.GetSecondarySelectorIndex(0x7A) == 0x5A
     && MatrixSecondaryCommandDispatcherNativeLayout.GetSecondarySelectorIndex(0x7B) is null);
+Check("AreaVisualData LootObjectCollected route-index-2 subcase layout is recorded",
+    AreaVisualDataLootObjectCollectedNativeLayout.DispatcherFileOffset == 0x81EE63
+    && AreaVisualDataLootObjectCollectedNativeLayout.DispatcherValue == 0x53
+    && AreaVisualDataLootObjectCollectedNativeLayout.CaseFileOffset == 0x81EF1C
+    && AreaVisualDataLootObjectCollectedNativeLayout.CaseLocalDwordValue == 0xCD
+    && AreaVisualDataLootObjectCollectedNativeLayout.AllocationSize == 0x40
+    && AreaVisualDataLootObjectCollectedNativeLayout.ConstructorFileOffset == 0xADBAA0
+    && AreaVisualDataLootObjectCollectedNativeLayout.BaseConstructorHelperFileOffset == 0xB07660
+    && AreaVisualDataLootObjectCollectedNativeLayout.BaseConstructorArgument == 0x53
+    && AreaVisualDataLootObjectCollectedNativeLayout.BodyReaderFileOffset == 0x83AD90
+    && AreaVisualDataLootObjectCollectedNativeLayout.VtableVirtualAddress == 0x1C723C0
+    && AreaVisualDataLootObjectCollectedNativeLayout.RttiName == ".?AVLootObjectCollected@AreaVisualData@firefall@@"
+    && AreaVisualDataLootObjectCollectedNativeLayout.DwordFieldOffset == 0x28
+    && AreaVisualDataLootObjectCollectedNativeLayout.FirstQwordFieldOffset == 0x30
+    && AreaVisualDataLootObjectCollectedNativeLayout.SecondQwordFieldOffset == 0x38);
+Check("Vehicle AbilityActivated route-index-3 switch-entry layout is recorded",
+    VehicleAbilityActivatedNativeLayout.DispatcherFileOffset == 0x81EF6D
+    && VehicleAbilityActivatedNativeLayout.SwitchTableVirtualAddress == 0xC2260C
+    && VehicleAbilityActivatedNativeLayout.SwitchTableFileOffset == 0x821A0C
+    && VehicleAbilityActivatedNativeLayout.SwitchEntryIndex == 0
+    && VehicleAbilityActivatedNativeLayout.SwitchArgumentAdjustment == 0xAD
+    && VehicleAbilityActivatedNativeLayout.CaseFileOffset == 0x81EF83
+    && VehicleAbilityActivatedNativeLayout.CaseLocalDwordValue == 0xD0
+    && VehicleAbilityActivatedNativeLayout.AllocationSize == 0x30
+    && VehicleAbilityActivatedNativeLayout.ConstructorFileOffset == 0xB093C0
+    && VehicleAbilityActivatedNativeLayout.BaseConstructorHelperFileOffset == 0xB474B0
+    && VehicleAbilityActivatedNativeLayout.BaseConstructorArgument == 0x53
+    && VehicleAbilityActivatedNativeLayout.BodyReaderFileOffset == 0x83A840
+    && VehicleAbilityActivatedNativeLayout.VtableVirtualAddress == 0x1C72998
+    && VehicleAbilityActivatedNativeLayout.RttiName == ".?AVAbilityActivated@Vehicle@firefall@@"
+    && VehicleAbilityActivatedNativeLayout.FirstDwordFieldOffset == 0x28
+    && VehicleAbilityActivatedNativeLayout.SecondDwordFieldOffset == 0x2C);
+Check("Deployable TookHit route-index-4 subcase layout is recorded",
+    DeployableTookHitNativeLayout.DispatcherFileOffset == 0x81F206
+    && DeployableTookHitNativeLayout.DispatcherValue == 0x53
+    && DeployableTookHitNativeLayout.CaseFileOffset == 0x81F29E
+    && DeployableTookHitNativeLayout.CaseLocalDwordValue == 0xD9
+    && DeployableTookHitNativeLayout.AllocationSize == 0x60
+    && DeployableTookHitNativeLayout.ConstructorFileOffset == 0xB27E80
+    && DeployableTookHitNativeLayout.BaseConstructorHelperFileOffset == 0xB47C40
+    && DeployableTookHitNativeLayout.BaseConstructorArgument == 0x53
+    && DeployableTookHitNativeLayout.BodyReaderFileOffset == 0x83A120
+    && DeployableTookHitNativeLayout.ConditionalRecordReaderFileOffset == 0x5F0CF0
+    && DeployableTookHitNativeLayout.VtableVirtualAddress == 0x1C727A8
+    && DeployableTookHitNativeLayout.RttiName == ".?AVTookHit@Deployable@firefall@@"
+    && DeployableTookHitNativeLayout.ConditionalRecordOffset == 0x28
+    && DeployableTookHitNativeLayout.FirstByteFieldOffset == 0x50
+    && DeployableTookHitNativeLayout.SecondByteFieldOffset == 0x51
+    && DeployableTookHitNativeLayout.WordFieldOffset == 0x58
+    && DeployableTookHitNativeLayout.FinalByteFieldOffset == 0x5A);
+Check("Turret WeaponProjectileFired route-index-5 subcase layout is recorded",
+    TurretWeaponProjectileFiredNativeLayout.DispatcherFileOffset == 0x81F2EF
+    && TurretWeaponProjectileFiredNativeLayout.DispatcherValue == 0x53
+    && TurretWeaponProjectileFiredNativeLayout.CaseFileOffset == 0x81F2F9
+    && TurretWeaponProjectileFiredNativeLayout.CaseLocalDwordValue == 0xDC
+    && TurretWeaponProjectileFiredNativeLayout.AllocationSize == 0x48
+    && TurretWeaponProjectileFiredNativeLayout.ConstructorFileOffset == 0xB36520
+    && TurretWeaponProjectileFiredNativeLayout.BaseConstructorHelperFileOffset == 0xB47D90
+    && TurretWeaponProjectileFiredNativeLayout.BaseConstructorArgument == 0x53
+    && TurretWeaponProjectileFiredNativeLayout.BodyReaderFileOffset == 0x839EB0
+    && TurretWeaponProjectileFiredNativeLayout.OpaqueFieldReaderFileOffset == 0x5C0270
+    && TurretWeaponProjectileFiredNativeLayout.VtableVirtualAddress == 0x1C726E8
+    && TurretWeaponProjectileFiredNativeLayout.RttiName == ".?AVWeaponProjectileFired@Turret@firefall@@"
+    && TurretWeaponProjectileFiredNativeLayout.DwordFieldOffset == 0x28
+    && TurretWeaponProjectileFiredNativeLayout.FirstRepeatedReaderFieldOffset == 0x2C
+    && TurretWeaponProjectileFiredNativeLayout.SecondRepeatedReaderFieldOffset == 0x30
+    && TurretWeaponProjectileFiredNativeLayout.ThirdRepeatedReaderFieldOffset == 0x34
+    && TurretWeaponProjectileFiredNativeLayout.OpaqueFieldOffset == 0x38);
+Check("LootStoreExtension LootObjectCollected route-index-6 subcase layout is recorded",
+    LootStoreExtensionLootObjectCollectedNativeLayout.DispatcherFileOffset == 0x81F34A
+    && LootStoreExtensionLootObjectCollectedNativeLayout.DispatcherValue == 0x53
+    && LootStoreExtensionLootObjectCollectedNativeLayout.CaseFileOffset == 0x81F354
+    && LootStoreExtensionLootObjectCollectedNativeLayout.CaseLocalDwordValue == 0xDD
+    && LootStoreExtensionLootObjectCollectedNativeLayout.AllocationSize == 0x40
+    && LootStoreExtensionLootObjectCollectedNativeLayout.ConstructorFileOffset == 0xB43A70
+    && LootStoreExtensionLootObjectCollectedNativeLayout.BaseConstructorHelperFileOffset == 0xB48040
+    && LootStoreExtensionLootObjectCollectedNativeLayout.BaseConstructorArgument == 0x53
+    && LootStoreExtensionLootObjectCollectedNativeLayout.BodyReaderFileOffset == 0x839DB0
+    && LootStoreExtensionLootObjectCollectedNativeLayout.VtableVirtualAddress == 0x1C72608
+    && LootStoreExtensionLootObjectCollectedNativeLayout.RttiName == ".?AVLootObjectCollected@LootStoreExtension@firefall@@"
+    && LootStoreExtensionLootObjectCollectedNativeLayout.DwordFieldOffset == 0x28
+    && LootStoreExtensionLootObjectCollectedNativeLayout.FirstQwordFieldOffset == 0x30
+    && LootStoreExtensionLootObjectCollectedNativeLayout.SecondQwordFieldOffset == 0x38);
 Check("MarketRequestComplete selector 0x53 preserves its RTTI and native body field offsets",
     CharacterMarketRequestCompleteNativeLayout.InnerSelector == 0x53
     && CharacterMarketRequestCompleteNativeLayout.CaseFileOffset == 0x81CCC3
