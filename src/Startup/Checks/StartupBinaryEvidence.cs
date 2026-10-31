@@ -1711,5 +1711,21 @@ internal static class StartupBinaryEvidence
             && Matches(SceneFactoryNativeLayout.EngineSystemSlotSizeTripleGetFileOffset, "558BEC8B550885D274088B814C01000089028B550C85D274088B815001000089028B551085D274088B815401000089025DC20C00")
             && Matches(SceneFactoryNativeLayout.EngineSystemSlotDisplayModeApplyFileOffset + 0x14, "803DDE95E40100")
             && Matches(SceneFactoryNativeLayout.EngineSystemHandleSetInitCallSiteFileOffset, "A12CC8DF01FF352801E0018B088B01FF5064")
-            && Matches(SceneFactoryNativeLayout.EngineSystemHandleSetShutdownCallSiteFileOffset, "A12CC8DF01C786800B0000000000006A008B088B01FF5064"));    }
+            && Matches(SceneFactoryNativeLayout.EngineSystemHandleSetShutdownCallSiteFileOffset, "A12CC8DF01C786800B0000000000006A008B088B01FF5064"));        check("Binary client main loop: bootstrap calls Initialize/RunLoop/Shutdown and RunLoop quit flag, timer, engine-step slot +0x20, mode apply, service slot +8 and App+0xB98 slot +0x24 sequences match",
+            Matches(ClientMainLoopNativeLayout.BootstrapInitializeCallSiteFileOffset, "E83CB2010084C0740D8B0D98FDDF01E81DE70100")
+            && Matches(ClientMainLoopNativeLayout.BootstrapShutdownCallSiteFileOffset, "E8D2E30100E87D030100")
+            && Matches(ClientMainLoopNativeLayout.InitializeFileOffset, "558BEC6AFF68E04E9D01")
+            && Matches(ClientMainLoopNativeLayout.ShutdownFileOffset, "558BEC6AFF6878519D01")
+            && Matches(ClientMainLoopNativeLayout.RunLoopFileOffset, "558BEC83E4F86AFF68C8519D01")
+            && Matches(ClientMainLoopNativeLayout.RunLoopQuitCheckSiteFileOffset, "803DB0B0E401000F858E060000")
+            && Matches(ClientMainLoopNativeLayout.RunLoopQuitCheckTailSiteFileOffset, "803DB0B0E40100")
+            && Matches(ClientMainLoopNativeLayout.RunLoopFrameTimerCallSiteFileOffset, "8D8E880A0000E8F7A401008B0D70FFDF01")
+            && Matches(ClientMainLoopNativeLayout.RunLoopEngineStepSlotCallSiteFileOffset, "A1A40EE6018B08F30F2CC08B11508B4220")
+            && Matches(ClientMainLoopNativeLayout.RunLoopApplyPendingModesCallSiteFileOffset, "8BCEE83D3E0000")
+            && Matches(0x309B08, "E8C3EE0100")
+            && Matches(ClientMainLoopNativeLayout.RunLoopServiceSlot2CallSiteFileOffset, "8B0D7467E4018B01FF50")
+            && Matches(0x309B18, "8BCEE8B1460000")
+            && Matches(0x309B1F, "83BE640C000000")
+            && Matches(ClientMainLoopNativeLayout.RunLoopCurrentModeSlot24CallSiteFileOffset, "85C90F84430200008B018B4024FFD0")
+            && Matches(ClientMainLoopNativeLayout.ShutdownCurrentModeDeleteSiteFileOffset, "8B016A01FF108BCFC786980B00000000"));    }
 }
