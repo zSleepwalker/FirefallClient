@@ -961,18 +961,22 @@ These updates supersede older next-step suggestions below where they overlap.
   encodes POKE/KISS and decodes ABRT/HEHE/HUGG with exact stage/port
   behavior and abort map. Native replies write candidate+224, word+228,
   remoteport+248, and expectedcontext+114, but do not themselves advance
-  socket state. Continue at nonzero-context control handler `0xBD3510`
-  (decompiler fails due raw switch) and its state-transition driver.
+  socket state. `0xBD3140` now records the chunk header, sequence, shared
+  body slice and time sample; lengths2/3 pass the header gate despite an
+  incomplete sequence prefix. This is a declared-chunk overread observation,
+  not proof of an allocation-boundary fault.
 - **Control routing and the transport Connected gate are established.**
   Logged native state IDs0..9 are cataloged in
   `GameSocketStateAndControlCatalog.cs`. Translated `0xBD3510`/`0xBD3760`
   switches separate immediate keepalive/clock/close controls from deferred
   ACKs for queues1/2. A deferred clock reply while socket state3 and
   clock-object sample count>=2 calls `0xBD1B70` to set5/Connected.
-  `GameSocketChunkHeader.cs` inspects only exact2..1392-byte header gates,
-  not unsafe/complete payload decoding. Follow virtual+10 (`0xBD4BC0`)
-  through queued dispatcher `0xBD3E50`, and state setter `0xBD1B70`'s
-  translated cases, to establish owner notification/tick progression.
+  `0xBD3E50` now has channel0..3 dispatch and token1..3 provenance recorded
+  in `MatrixConnection.md`: close completion queues1, completion errors and
+  failed binding queue2, and successful binding queues3. The exact chunk
+  record offsets and short sequence-prefix boundary case are also recorded.
+  `GameSocketChunkHeader.cs` remains a header-only model; full reassembly,
+  reliable-window policy, and callback lifetime are not reconstructed.
 - **Handshake tick progression is now linked.** `0xBD4BC0` consumes
   receive queue+260 then translated state table+rawBD505C. Nonzero HEHE
   candidate causes Initializing1→Transferring2 and immediate KISS; HUGG

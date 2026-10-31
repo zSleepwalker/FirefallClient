@@ -750,6 +750,12 @@ Check("Chunk header errors preserve exact length and continuation gates",
         == GameSocketChunkHeaderOutcome.InvalidContinuation
     && GameSocketChunkHeaderDecoder.Inspect(Convert.FromHexString("1002")).Outcome
         == GameSocketChunkHeaderOutcome.UnsupportedControlMarker);
+Check("Header-only gate accepts 2/3-byte nonzero chunks despite the full sequence prefix being 4 bytes",
+    GameSocketChunkHeaderDecoder.Inspect(Convert.FromHexString("4002")).Outcome
+        == GameSocketChunkHeaderOutcome.Accepted
+    && GameSocketChunkHeaderDecoder.Inspect(Convert.FromHexString("4003AA")).Outcome
+        == GameSocketChunkHeaderOutcome.Accepted
+    && GameSocketQueuedReceiveNativeLayout.DataChannelSequencePrefixSize == 4);
 Check("Context-ready tick transitions follow Initializing/Transferring without inventing timers",
     GameSocketTickNativeLayout.SelectReadyHandshakeState(NativeGameSocketState.Initializing, 1, 0, true)
         == NativeGameSocketState.Transferring
@@ -792,6 +798,23 @@ Check("Owner delivery separates channel 1 from channels 2/3 and preserves their 
     GameSocketQueuedReceiveNativeLayout.GetOwnerDelivery(1) == new GameSocketOwnerDelivery(4, null)
     && GameSocketQueuedReceiveNativeLayout.GetOwnerDelivery(2) == new GameSocketOwnerDelivery(8, 1)
     && GameSocketQueuedReceiveNativeLayout.GetOwnerDelivery(3) == new GameSocketOwnerDelivery(8, 0));
+Check("Received-queue records and internal event tokens retain their observed native offsets",
+    (int)GameSocketReceivedQueueEvent.CloseCompletion == 1
+    && (int)GameSocketReceivedQueueEvent.PumpCloseRequest == 2
+    && (int)GameSocketReceivedQueueEvent.SenderBindingSucceeded == 3
+    && GameSocketQueuedReceiveNativeLayout.ParseNonzeroContextChunksMethodFileOffset == 0xBD3140
+    && GameSocketQueuedReceiveNativeLayout.ReceivedQueueOffset == 0x260
+    && GameSocketQueuedReceiveNativeLayout.QueueEventPointerThreshold == 0x10
+    && GameSocketQueuedReceiveNativeLayout.FragmentHeaderWordOffset == 0
+    && GameSocketQueuedReceiveNativeLayout.FragmentSequenceWordOffset == 2
+    && GameSocketQueuedReceiveNativeLayout.FragmentBodySliceOffsetFieldOffset == 4
+    && GameSocketQueuedReceiveNativeLayout.FragmentBodyObjectOffset == 8
+    && GameSocketQueuedReceiveNativeLayout.FragmentArrivalTickOffset == 0x18
+    && GameSocketQueuedReceiveNativeLayout.Channel0BodySliceOffset == 2
+    && GameSocketQueuedReceiveNativeLayout.DataChannelBodySliceOffset == 4
+    && GameSocketQueuedReceiveNativeLayout.Channel1QueueOffset == 0xD6C
+    && GameSocketQueuedReceiveNativeLayout.Channel2QueueOffset == 0xD70
+    && GameSocketQueuedReceiveNativeLayout.Channel3QueueOffset == 0xD74);
 bool invalidHandshakeStateRejected = false;
 bool invalidQueuedStateRejected = false;
 bool invalidQueuedChannelRejected = false;

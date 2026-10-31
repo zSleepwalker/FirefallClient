@@ -1094,6 +1094,48 @@ internal static class StartupBinaryEvidence
             Matches(0xBD2F0B,
                 "8B8EF40D00008D4424345083C118E8E20A010050FF7424148BCEE806010000")
             && Matches(0xBD2FDC, "FFB618010000FF15544DAC01"));
+        check("Binary zero-context handshake parser compares the exact ABRT, HEHE and HUGG tags",
+            ImportSlotNames(0x1AC4894, "strncmp")
+            && ReadCStringAscii(0x1BB70C4, 5) == "ABRT"
+            && ReadCStringAscii(0x1BB6FCC, 5) == "HEHE"
+            && ReadCStringAscii(0x1BB6FD4, 5) == "HUGG"
+            && Matches(0xBD39E4, "83FE05")
+            && Matches(0xBD3A64, "83FE08")
+            && Matches(0xBD3AC4, "83FE08")
+            && ReadUInt32(VirtualAddressToFileOffset(0x1AC4D94)) == 0x8000000E
+            && ReadUInt32(VirtualAddressToFileOffset(0x1AC4DE0)) == 0x8000000F);
+        check("Binary chunk parser extracts header fields, bounds chunks, then reads a sequence word",
+            Matches(0xBD3205, "C1EB06884C24128AC8C0E903240780E101")
+            && Matches(0xBD322F, "8D48FE663BCF0F874D020000")
+            && Matches(0xBD323B, "0FB7F88B450C3BF80F873F020000")
+            && Matches(0xBD32EB, "0FB60A0FB64201")
+            && Matches(0xBD33C3, "66894702")
+            && Matches(0xBD3463, "894704")
+            && Matches(0xBD346B, "894718")
+            && ImportSlotNames(0x1AC4D24, "timeGetTime")
+            && RelativeBranchTargets(0xBD346E, 0xE8, 0x12CE310));
+        check("Binary received-queue table routes four channels through the observed handlers",
+            ReadUInt32(GameSocketQueuedReceiveNativeLayout.ChannelJumpTableFileOffset) == 0x00FD4D41
+            && ReadUInt32(GameSocketQueuedReceiveNativeLayout.ChannelJumpTableFileOffset + 4) == 0x00FD4D5A
+            && ReadUInt32(GameSocketQueuedReceiveNativeLayout.ChannelJumpTableFileOffset + 8) == 0x00FD4D8D
+            && ReadUInt32(GameSocketQueuedReceiveNativeLayout.ChannelJumpTableFileOffset + 12) == 0x00FD4DC0
+            && RelativeBranchTargets(0xBD4144, 0xE8, 0xBD3760)
+            && RelativeBranchTargets(0xBD4161, 0xE8, 0xBD5BA0)
+            && RelativeBranchTargets(0xBD4168, 0xE8, 0xBE51F0)
+            && RelativeBranchTargets(0xBD4194, 0xE8, 0xBD5BA0)
+            && RelativeBranchTargets(0xBD419B, 0xE8, 0xBE51F0)
+            && RelativeBranchTargets(0xBD41C7, 0xE8, 0xBD5C00)
+            && RelativeBranchTargets(0xBD41CE, 0xE8, 0xBE5A40));
+        check("Binary internal receive-queue event tokens are produced by close, error, and sender-binding paths",
+            Matches(0xBD2D59, "6A018D8E60020000")
+            && RelativeBranchTargets(0xBD2D68, 0xE8, 0x12CE310)
+            && Matches(0xBD2E0C, "6A028D8E60020000")
+            && RelativeBranchTargets(0xBD2E14, 0xE8, 0x12CE310)
+            && Matches(0xBD3092, "E889190000")
+            && Matches(0xBD309B, "6A03EB0B")
+            && Matches(0xBD309F, "6A0A8BCEE848190000")
+            && Matches(0xBD30A8, "6A028D8E60020000")
+            && RelativeBranchTargets(0xBD30B0, 0xE8, 0x12CE310));
         check("Binary IOCP import calls and cached completion-dequeue call match exact instruction starts",
             Matches(NetworkIoCompletionNativeLayout.CreatePortCallFileOffset, "FF153443AC01")
             && Matches(NetworkIoCompletionNativeLayout.AssociateSocketCallFileOffset, "FF153443AC01")

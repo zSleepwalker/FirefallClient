@@ -599,21 +599,38 @@ Parser `0xBD3140` reads two-byte network-order chunk headers: channel in
 bits14..15, payload marker in bits12..13, continuation in bit11, and
 declared total length in bits0..10. Length must be2..1392 and fit the
 remaining body. Continuation is allowed only for channels1/2; channel0
-requires marker0. Nonzero channels additionally read a sequence WORD and
-retain slices in a shared body buffer before queuing. A header-length
-check alone does not establish safe/complete sequence or payload decoding.
-`GameSocketChunkHeader.cs` consequently inspects only header constraints,
-not the complete native parser. Native iteration stops once fewer than
-two bytes remain; a lone trailing byte after processed chunks is not
-parsed as another header.
+requires marker0. The parser advances by the declared total length. It
+unconditionally reads a network-order sequence WORD at chunk offset2 for
+channels1..3 and uses body-slice offset4; channel0 writes sequence0 and uses
+body-slice offset2. Channel0 with marker0 first calls immediate control
+`0xBD3510` with the bytes after the two-byte header, and queues only an
+unhandled result. A channel0 nonzero marker is logged and increments socket
+`+0x4C`; malformed length/continuation paths increment `+0xEC`.
+
+The queued fragment record stores its normalized header at `+0`, sequence
+WORD at `+2`, body-slice offset DWORD at `+4`, an embedded shared-body
+`slBlob` at `+8`, and a `timeGetTime` sample at `+0x18`; it is appended to
+the socket queue at `+0x260`. The `+4` value is an offset, not a payload
+length. No `length >= 4` check precedes the nonzero-channel sequence read:
+declared lengths2 and3 pass the header gate but leave only zero or one
+sequence bytes inside that chunk. The read can cross into the following
+chunk; this establishes a declared-chunk-boundary overread, not by itself
+an access beyond the backing allocation. The later data-channel handlers
+derive payload length as `declared length - 4` and reverse the marker XOR.
+`GameSocketChunkHeader.cs` consequently models only the header gate, not the
+complete native parser. Iteration stops once fewer than two body bytes
+remain; a lone trailing byte after processed chunks is not parsed as another
+header. `GameSocketQueuedReceiveNativeLayout.cs` records the queue and
+fragment-field offsets without implementing a full parser.
 
 Immediate channel0 handler `0xBD3510` rejects an empty body or a first
 opcode byte with mask `0x08` set. Its translated table (raw `0xBD3738`)
 maps opcode0 to close/error handling, 1 and6 to handled no-ops
 (keepalive/probe padding), 4 to clock-query response, and5 to preliminary
 clock-reply processing. Opcodes2/3 and otherwise-unrecognized values
-return unhandled so the body can enter the deferred queue. No wider control
-code is inferred.
+return unhandled so the body can enter the deferred queue. Empty bodies and
+the masked-opcode case log, increment socket `+0x4C`, and return handled, so
+they do not enter that queue. No wider control code is inferred.
 
 Deferred handler `0xBD3760` uses a separate translated table at raw
 `0xBD39B4`. Opcode2 selects the channel1 queue at socket `+0xD6C`; opcode3
@@ -718,7 +735,20 @@ behind a full state-machine API.
 
 ## Queued receives and owner callbacks
 
-`0xBD3E50` consumes a mixed queue of small event tokens and fragment pointers.
+`0xBD3E50` consumes a mixed queue: a zero result is skipped, nonzero values
+below `0x10` are internal event tokens, and values at or above `0x10` take
+the fragment-pointer path. Token1 is produced by close completion
+`0xBD2D10`; it enters disconnect-notification state6 unless already
+Disconnected/state7 or Closed/state9, and enters Closed/state9 from
+Destroyed/state8. Token2 is produced by completion error `0xBD2D70` and
+failed sender binding in `0xBD3030`; the consumer calls
+`GameSocket_RequestPumpClose` (`0xBD2430`). Token3 is produced by `0xBD3030`
+after sender binding succeeds. It acts only in WaitingContact/state4, checks
+the retained address/port at `+0x230/+0x248`, then calls the state setter for
+Connected/state5; diagnostics do not suppress that setter call. Other
+nonzero values below `0x10` log and take the same disconnect/close fallback;
+their producers and exact meaning are unresolved.
+
 Fragment processing asserts state3,5 or8. With suppression byte `+0xD95`
 set it releases a fragment without delivery. While Connecting/state3,
 only channel0 deferred control is processed; early data-channel fragments

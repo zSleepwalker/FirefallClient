@@ -9,17 +9,41 @@ public enum GameSocketReceivedFragmentRoute
     ReleaseWithoutDelivery
 }
 
+public enum GameSocketReceivedQueueEvent
+{
+    CloseCompletion = 1,
+    PumpCloseRequest = 2,
+    SenderBindingSucceeded = 3
+}
+
 public readonly record struct GameSocketOwnerDelivery(int HandlerVirtualOffset, int? DeliveryFlag);
 
-/// <summary>Queued receive routing only; packet assembly and callback lifetimes remain native observations.</summary>
+/// <summary>
+/// Queued receive event/fragment routing and the fragment-record field offsets.
+/// Packet assembly and callback lifetimes remain native observations.
+/// </summary>
 public static class GameSocketQueuedReceiveNativeLayout
 {
+    public const uint ParseNonzeroContextChunksMethodFileOffset = 0xBD3140;
     public const uint ConsumeMethodFileOffset = 0xBD3E50;
     public const uint ChannelJumpTableFileOffset = 0xBD422C;
     public const uint ReliableReceiveMethodFileOffset = 0xBE51F0;
     public const uint UnreliableReceiveMethodFileOffset = 0xBE5A40;
     public const uint DeliverOwnerCallbacksMethodFileOffset = 0xBD5170;
     public const int DeliverOwnerCallbacksVirtualOffset = 0x14;
+    public const int ReceivedQueueOffset = 0x260;
+    public const int QueueEventPointerThreshold = 0x10;
+    public const int FragmentHeaderWordOffset = 0;
+    public const int FragmentSequenceWordOffset = 2;
+    public const int FragmentBodySliceOffsetFieldOffset = 4;
+    public const int FragmentBodyObjectOffset = 8;
+    public const int FragmentArrivalTickOffset = 0x18;
+    public const int Channel0BodySliceOffset = 2;
+    public const int DataChannelBodySliceOffset = 4;
+    public const int DataChannelSequencePrefixSize = 4;
+    public const int Channel1QueueOffset = 0xD6C;
+    public const int Channel2QueueOffset = 0xD70;
+    public const int Channel3QueueOffset = 0xD74;
     public const int SuppressionFlagOffset = 0xD95;
     public const int DisconnectHandlerVirtualOffset = 0x0C;
     public const uint TryEnableConnectedSendMethodFileOffset = 0xBD4A20;
