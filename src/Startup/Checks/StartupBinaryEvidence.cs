@@ -1934,6 +1934,46 @@ internal static class StartupBinaryEvidence
                 "E868350000")
             && RelativeBranchTargets(UiManagerNativeLayout.ComponentBindEventNamedSubscriptionCallSiteFileOffset,
                 0xE8, UiManagerNativeLayout.UiManagerNamedSubscriptionFileOffset));
+        check("UI-set folders are scanned through CRT FindFirst/Next and routed through the folder loader",
+            Matches(UiComponentLoadingNativeLayout.DirectoryEnumerationMethodFileOffset,
+                "558BEC83E4F86AFF681147A90164A10000000050")
+            && Matches(UiComponentLoadingNativeLayout.FolderPathLoaderFileOffset,
+                "558BEC6AFF68A0529D0164A1000000005083EC2C")
+            && Matches(UiComponentLoadingNativeLayout.DirectoryEnumerationCallSiteFileOffset,
+                "E8F4BDFA00")
+            && RelativeBranchTargets(UiComponentLoadingNativeLayout.DirectoryEnumerationCallSiteFileOffset,
+                0xE8, UiComponentLoadingNativeLayout.DirectoryEnumerationMethodFileOffset)
+            && Matches(UiComponentLoadingNativeLayout.UiSetFolderTraversalCallSites[0], "E800F6FFFF")
+            && Matches(UiComponentLoadingNativeLayout.UiSetFolderTraversalCallSites[1], "E80EF5FFFF")
+            && UiComponentLoadingNativeLayout.UiSetFolderTraversalCallSites.All(callSite =>
+                RelativeBranchTargets(callSite, 0xE8, UiComponentLoadingNativeLayout.FolderPathLoaderFileOffset))
+            && ReadCStringAscii(UiComponentLoadingNativeLayout.FolderSearchPatternVirtualAddress, 16) == "%s\\*"
+            && ImportSlotNames(UiComponentLoadingNativeLayout.FindFirstFileIatVirtualAddress, "_wfindfirst64i32")
+            && ImportSlotNames(UiComponentLoadingNativeLayout.FindNextFileIatVirtualAddress, "_wfindnext64i32")
+            && ImportSlotNames(UiComponentLoadingNativeLayout.FindCloseIatVirtualAddress, "_findclose"));
+        check("UI folder enumeration splits directory/file entries and traverses the directory path first",
+            Matches(UiComponentLoadingNativeLayout.FindFirstFileCallSiteFileOffset, "FF153C47AC01")
+            && Matches(UiComponentLoadingNativeLayout.FindNextFileFunctionPointerLoadFileOffset,
+                "8B1D3847AC01")
+            && Matches(UiComponentLoadingNativeLayout.FindNextFileCallSiteFileOffset, "FFD3")
+            && Matches(UiComponentLoadingNativeLayout.FindCloseCallSiteFileOffset, "FF153447AC01")
+            && Matches(UiComponentLoadingNativeLayout.DirectoryAttributeTestFileOffset, "F644242410")
+            && Matches(UiComponentLoadingNativeLayout.DirectoryToFileBranchFileOffset, "7425")
+            && Matches(UiComponentLoadingNativeLayout.DirectoryListAppendCallSiteFileOffset, "E8B69605FF")
+            && RelativeBranchTargets(UiComponentLoadingNativeLayout.DirectoryListAppendCallSiteFileOffset,
+                0xE8, 0x310280)
+            && Matches(UiComponentLoadingNativeLayout.FileListAppendCallSiteFileOffset, "E8919605FF")
+            && RelativeBranchTargets(UiComponentLoadingNativeLayout.FileListAppendCallSiteFileOffset,
+                0xE8, 0x310280)
+            && Matches(UiComponentLoadingNativeLayout.ChildDirectoryProcessCallSiteFileOffset,
+                "E8E6B30000")
+            && RelativeBranchTargets(UiComponentLoadingNativeLayout.ChildDirectoryProcessCallSiteFileOffset,
+                0xE8, 0x316020)
+            && UiComponentLoadingNativeLayout.ChildDirectoryProcessCallSiteFileOffset
+                < UiComponentLoadingNativeLayout.FileListLoopStartFileOffset
+            && Matches(UiComponentLoadingNativeLayout.FileListLoopStartFileOffset,
+                "8B5DCC8BFB8B45D03BD80F84")
+            && Matches(UiComponentLoadingNativeLayout.FileLoadCallSiteFileOffset, "FF502C"));
         check("Lua preload System APIs register and dispatch through Login into Matrix connection",
             Matches(LoginModeNativeLayout.KnownLuaSystemApiBindings[0].RegistrationSiteFileOffset,
                 "BA8431B6018B4308C700606AA400C74008160000")

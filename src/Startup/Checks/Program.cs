@@ -451,6 +451,31 @@ Check("UI manager singleton and global event routing boundaries are recorded",
     && UiManagerNativeLayout.LoginModeMessage145GlobalLoadFileOffset == 0x63C1E2
     && UiManagerNativeLayout.LoginModeMessage145CallFileOffset == 0x63C1F5
     && UiManagerNativeLayout.LoginModeMessageId == 0x145);
+Check("UI-set folder traversal and native file-enumeration imports are recorded",
+    UiComponentLoadingNativeLayout.UiSetXmlLoaderFileOffset == 0x30AF50
+    && UiComponentLoadingNativeLayout.FolderPathLoaderFileOffset == 0x30AB90
+    && UiComponentLoadingNativeLayout.DirectoryEnumerationMethodFileOffset == 0x12B6A00
+    && UiComponentLoadingNativeLayout.FolderSearchPatternVirtualAddress == 0x1C1548C
+    && UiComponentLoadingNativeLayout.DirectoryEnumerationCallSiteFileOffset == 0x30AC07
+    && UiComponentLoadingNativeLayout.FindFirstFileCallSiteFileOffset == 0x12B6AD0
+    && UiComponentLoadingNativeLayout.FindNextFileFunctionPointerLoadFileOffset == 0x12B6AEA
+    && UiComponentLoadingNativeLayout.FindNextFileCallSiteFileOffset == 0x12B6C06
+    && UiComponentLoadingNativeLayout.FindCloseCallSiteFileOffset == 0x12B6C15
+    && UiComponentLoadingNativeLayout.DirectoryAttributeTestFileOffset == 0x12B6B94
+    && UiComponentLoadingNativeLayout.DirectoryToFileBranchFileOffset == 0x12B6BA9
+    && UiComponentLoadingNativeLayout.DirectoryListAppendCallSiteFileOffset == 0x12B6BC5
+    && UiComponentLoadingNativeLayout.FileListAppendCallSiteFileOffset == 0x12B6BEA
+    && UiComponentLoadingNativeLayout.ChildDirectoryProcessCallSiteFileOffset == 0x30AC35
+    && UiComponentLoadingNativeLayout.FileListLoopStartFileOffset == 0x30AC9C
+    && UiComponentLoadingNativeLayout.FileLoadCallSiteFileOffset == 0x30AE85
+    && UiComponentLoadingNativeLayout.FindFirstFileIatVirtualAddress == 0x1AC473C
+    && UiComponentLoadingNativeLayout.FindNextFileIatVirtualAddress == 0x1AC4738
+    && UiComponentLoadingNativeLayout.FindCloseIatVirtualAddress == 0x1AC4734
+    && UiComponentLoadingNativeLayout.DirectoryAttributeMask == 0x10
+    && UiComponentLoadingNativeLayout.ChildDirectoryProcessCallSiteFileOffset
+        < UiComponentLoadingNativeLayout.FileListLoopStartFileOffset
+    && UiComponentLoadingNativeLayout.UiSetFolderTraversalCallSites.SequenceEqual(
+        [0x30B58Bu, 0x30B67Du]));
 int retryDelay = 0;
 var retryDelays = new List<int>();
 for (int i = 0; i < 12; i++)
