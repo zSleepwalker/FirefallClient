@@ -1812,5 +1812,10 @@ internal static class StartupBinaryEvidence
             Matches(ClientMainLoopNativeLayout.IniLocaleGateFn12B78F0FileOffset, "558BEC81EC38080000A10050") &&
             Matches(ClientMainLoopNativeLayout.EngineInitBannerStringFileOffset, "2D2D2D20496E697469616C69") &&
             Matches(ClientMainLoopNativeLayout.EngineInitMainWindowStringFileOffset, "496E697469616C697A696E67") &&
-            Matches(ClientMainLoopNativeLayout.EngineAutodetectDirStringFileOffset, "656E67696E652F6175746F64"));    }
+            Matches(ClientMainLoopNativeLayout.EngineAutodetectDirStringFileOffset, "656E67696E652F6175746F64"));
+        check("Binary startup round 11 (oEngineSystem vtable, ini loader)",
+            Matches(ClientMainLoopNativeLayout.FileListGlobExpandFn1361890FileOffset, "558BEC83E4F86AFF6863CAA9") &&
+            Matches(ClientMainLoopNativeLayout.IniFileLoadFn12DCE00FileOffset, "558BEC83E4F86AFF68B461A9") &&
+            Matches(ClientMainLoopNativeLayout.OEngineSystemCtorE4DFA0FileOffset, "558BEC6AFF6826F4A50164A1") &&
+            Matches(ClientMainLoopNativeLayout.OEngineSystemVtableFileOffset, "F0572501F05F250180612501"));    }
 }

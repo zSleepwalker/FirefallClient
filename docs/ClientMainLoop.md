@@ -111,3 +111,14 @@ Static, read-only IDA analysis of `FirefallClient.exe`. Constants: `src\Startup\
 **Interpreted**: the `.include?` gate looks like a "skip if file bit set/absent" test; exact meaning of the 0x4000 flag is unproven.
 
 **Unresolved**: AssetDB on-disk format; vtables of fs/ts/tfAssetDB; the `.pak` handling at `0x1361890` (only one caller inside undefined code at 0xF07FFB; not decompiled). Negative claims are limited to IDA xrefs.
+## Round 11: pak/list expander, ini loader, oEngineSystem vtable
+
+**Observed**
+- `0x1361890` (`__fastcall`-like: ecx = input string vector, edx = output; stack arg = scratch) iterates a vector of strings, expands each through `0x12B6C60` (the same directory/wildcard enumerator used by `.include-all`) and appends non-duplicate results via `0x12BBEC0`. It is a file-list/glob expander; IDA would not decompile it, so this comes from disassembly. Its only caller is the undefined region at `0xF07FFB` (outputs to object+0xC0/+0xCC; the same function that calls `0x1319520` with `engine/autodetect`). No `.pak` string or file open occurs in it.
+- `0x12DCE00` (ini file loader used by `.include`/`.include?`): fails with a logged message if the name is empty, cannot be opened by `0x12BB660`, or the parsed content cannot be read (`0x12DB5D0`); otherwise it walks a section map (red-black tree) and merges each key/value into the target ini object (`this`), logging a message per key that cannot be inserted. Returns bool. A missing file therefore fails here; `.include?` tolerance comes only from the gate `0x12B78F0`.
+- oEngineSystem constructor is `0xE4DFA0` (sole code xref `0xE4E6E3` in `0xE4E660`, which has no xrefs). The vtable is at file offset `0x187682C` / VA `0x1C77C2C` (slot 0 = `0xE54BF0`, slot +0x20 = `0xE55990`, slot -1 = `0x1CD439C`, likely RTTI locator); only code reference to the vtable VA is `0xE4DFDE`. Byte search for the slot-0 pointer (`F0 57 25 01`) found exactly one match.
+- `dword_1E60EA4` has 424 data xrefs. Among them I scanned for `call [reg]` (slot 0) within 8 instructions: only `0xF54DAF/0xF54DFB`, which act on another object, so no slot-0 call on `[dword_1E60EA4]` was found. RunLoop uses slot +0x20 (0x3099DB); `0x3073F3` uses +0x54.
+
+**Interpreted**: slot 0 is probably invoked through a different register path or a helper (e.g. via `0xE4E660` chain); unproven.
+
+**Unresolved**: AssetDB on-disk format and fs/ts/tfAssetDB vtables (no constructor located; scoped to RTTI string/IDA xref search). The `.pak` open path is not identified.

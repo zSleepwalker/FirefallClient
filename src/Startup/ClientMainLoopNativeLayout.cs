@@ -161,4 +161,11 @@ public static class ClientMainLoopNativeLayout
     public const int IniLocaleGateFn12B78F0FileOffset = 0x12B78F0;
     public const int EngineInitBannerStringFileOffset = 0x1BDF708 - 0x401400;
     public const int EngineInitMainWindowStringFileOffset = 0x1BDF6E4 - 0x401400;
-    public const int EngineAutodetectDirStringFileOffset = 0x1BED3C0 - 0x401400;}
+    public const int EngineAutodetectDirStringFileOffset = 0x1BED3C0 - 0x401400;
+
+    // Round 11: file-list expander, ini file loader, oEngineSystem vtable/constructor.
+    public const int FileListGlobExpandFn1361890FileOffset = 0x1361890;
+    public const int IniFileLoadFn12DCE00FileOffset = 0x12DCE00;
+    public const int OEngineSystemCtorE4DFA0FileOffset = 0xE4DFA0;
+    public const int OEngineSystemVtableFileOffset = 0x187682C;
+    public const int OEngineSystemVtableVa = 0x1C77C2C;}
