@@ -66,4 +66,17 @@ public static class ClientMainLoopNativeLayout
     public const int LoadStateCurrentObjectOffset = 0x14;
     public const int LoadStateDeleteObjectOffset = 0x18;
     public const int LoadStateStateOffset = 0x1C;
+
+    public const int InitCommandLineLikeStateFn304170FileOffset = 0x304170;
+    public const int InitPathNormalizeFn3047E0FileOffset = 0x3047E0;
+    public const int InitRegistryInstallFn304BB0FileOffset = 0x304BB0;
+    public const int InitStringMapFindOrInsertFn325350FileOffset = 0x325350;
+    public const int EngineStepFrameLimiterFileOffset = 0xE55C80;
+    public const int EngineStepFpsCounterFileOffset = 0xE55750;
+    public const int EngineStepLimiterCallSiteFileOffset = 0xE55C3E;
+    public const int EngineStepFpsCallSiteFileOffset = 0xE55C4D;
+    public const int EngineStepSleepCallSiteFileOffset = 0xE55DB3;
+    public const int EngineStepTargetFpsFieldOffset = 0x164;
+    public const int EngineStepFpsCapFieldOffset = 0x168;
+    public const int InitializeTailEngineSlot54CallSiteFileOffset = 0x307403;
 }

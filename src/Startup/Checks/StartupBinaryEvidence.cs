@@ -1735,5 +1735,15 @@ internal static class StartupBinaryEvidence
             && Matches(ClientMainLoopNativeLayout.LoadStateStepFileOffset, "558BEC5153568BF157837E14")
             && Matches(ClientMainLoopNativeLayout.EngineStepTargetFileOffset, "558BEC6AFF6870F9A50164A100000000")
             && Matches(ClientMainLoopNativeLayout.EngineStepPeekMessageLoopFileOffset, "6A006A006A006A008D45C850FFD685C0")
-            && ReadUInt32(ClientMainLoopNativeLayout.EngineSystemVtableSlot8FileOffset) == 0x1256590);    }
+            && ReadUInt32(ClientMainLoopNativeLayout.EngineSystemVtableSlot8FileOffset) == 0x1256590);
+        check("Binary client main loop round 3: Initialize helpers and engine-step frame limiter (QPC + Sleep)", Matches(ClientMainLoopNativeLayout.InitCommandLineLikeStateFn304170FileOffset, "558BEC83E4F86AFF68784B9D")
+            && Matches(ClientMainLoopNativeLayout.InitPathNormalizeFn3047E0FileOffset, "558BEC6AFF68D04B9D0164A1")
+            && Matches(ClientMainLoopNativeLayout.InitRegistryInstallFn304BB0FileOffset, "558BEC6AFF68184C9D0164A1")
+            && Matches(ClientMainLoopNativeLayout.InitStringMapFindOrInsertFn325350FileOffset, "558BEC6AFF6820689D0164A1")
+            && Matches(ClientMainLoopNativeLayout.EngineStepFrameLimiterFileOffset, "558BEC83E4F8A100FEED0183")
+            && Matches(ClientMainLoopNativeLayout.EngineStepFpsCounterFileOffset, "558BEC83E4F883EC2CA1F0FD")
+            && Matches(ClientMainLoopNativeLayout.EngineStepLimiterCallSiteFileOffset, "E83D000000")
+            && Matches(ClientMainLoopNativeLayout.EngineStepFpsCallSiteFileOffset, "E8FEFAFFFF")
+            && Matches(ClientMainLoopNativeLayout.EngineStepSleepCallSiteFileOffset, "8BF03B5C241872798B44241077043BF0766F8BCE2BC8B8D34D6210F7E1C1EA0652FF1574")
+            && Matches(ClientMainLoopNativeLayout.InitializeTailEngineSlot54CallSiteFileOffset, "FF5054"));    }
 }
