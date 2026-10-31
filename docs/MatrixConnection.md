@@ -35,8 +35,28 @@ name array at `+0x71C..+0x720`, then appends the new string. Message-object
 subscription `0xC35740` and named subscription `0xC35BB0` use that ID and
 register a listener through `0xBF9B40`; that method first removes a matching
 old listener through `0xBF9BD0`, then updates the ID bucket at `+0x6F0`.
-No event-name entry or listener corresponding to ID `0x145` was recovered, so
-the dynamic name-to-ID ordering and any World-mode side effect remain open.
+
+The local installed UI sources provide a candidate name for the Login
+notification. `UISets\LoginUI.xml` loads the `LoginUI` folder, and
+`components\LoginUI\AccountLogin\AccountLogin.xml:17` binds
+`ON_LOGIN_RESPONSE` to `OnLoginResponse`; the Lua handler is defined at
+`AccountLogin.lua:876`. This makes `0x145 -> ON_LOGIN_RESPONSE` plausible,
+but not proven because the runtime name-registration order for the 326th
+event ID was not reconstructed. The actual subscriber and any World-mode
+side effect remain unresolved.
+
+These read-only text samples were hashed before inspection. They are under
+`D:\SteamLibrary\steamapps\common\Firefall\system\gui\` and are not repository
+files:
+
+| Relative sample path | Size | SHA-256 | Observation |
+|---|---:|---|---|
+| `UISets\LoginUI.xml` | 521 | `F7FE3C61489C51E0262E288EE5DBF7996CE90029A2D6CBC179AEEBC898A71D66` | Loads `LoginUI`; `glue_mode=true`. |
+| `UISets\MainUI.xml` | 409 | `1441F9FE7633F857FFA1B49B2E1297A1C19BFE22C0FBC60DAAE3601F97E75EDD` | Root UI-set comparison; no event IDs. |
+| `UISets\LookingGlass.xml` | 386 | `9A0BE16C2A2175FDD842420DAC9DEE982C31965E9781C6C303D774435FE34B25` | Root UI-set comparison; `glue_mode=false`. |
+| `UISets\Broadcast.xml` | 991 | `7F60A9E8370E1871239CF7AB82C4485A8F7E19A3BECA2AD05B63B2B02FB88E63` | Root UI-set comparison; `glue_mode=false`. |
+| `components\LoginUI\AccountLogin\AccountLogin.xml` | 24,728 | `67CBD909E54E1354E291728F66EBAB9E7F1410DB2600CA75E50EFF77CB5FA05A` | Declares `ON_LOGIN_RESPONSE` at line17. |
+| `components\LoginUI\AccountLogin\AccountLogin.lua` | 69,488 | `9EA014EA94C803B82DC696CF0790E12DD414154993B11F5997DD3901B244D462` | Defines `OnLoginResponse` at line876. |
 
 ## Oracle-ticket request
 
