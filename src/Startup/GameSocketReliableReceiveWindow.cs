@@ -21,6 +21,11 @@ public static class GameSocketReliableReceiveWindow
     public const int FragmentRingHeadIndexOffset = 0x478;
     public const int SequenceTrackerOffset = 0x47C;
     public const int ReassemblyBufferOffset = 0x594;
+    public const int FragmentSequenceWordOffset = 2;
+    public const int FragmentBodySliceOffsetFieldOffset = 4;
+    public const int FragmentPayloadHeaderSize = 4;
+    public const int ContinuationFlagMask = 0x0800;
+    public const int ReassemblyLimitSocketOffset = 0x120;
     public const int DecodeFunctionPointerOffset = 0x14;
     public const int DecodedObjectChannelOffset = 0x20;
     public const int DecodedObjectPayloadSizeOffset = 0x24;

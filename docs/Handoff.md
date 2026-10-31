@@ -1018,8 +1018,10 @@ These updates supersede older next-step suggestions below where they overlap.
   drop. Ring+78 indexed by(head+478+delta)%256; new fragments reverse XOR
   once before storage. BE56D0→BE5440 consumes contiguous slots, appends
   continuation into+594, final-decodes via plain pointer+14, stamps decoded
-  object+20 channel/+24 size, queues+60, then advances/recycles fragment.
-  Pure ring/window model saved and exhaustively checked in synthetic suite.
+  object+20 channel/+24 size, queues+60, then advances/recycles fragment
+  and sets ACK-pending+32. The `socket+120` limit is checked on continuation
+  only; the final append has no visible same check. Codes3/4 propagate
+  through BD5080 to pump-close. The ring/window model remains non-mutating.
   Next: constructor BE3CE0 / GameSocket open queue creation to identify
   decoder+14. Accumulator callback ABI and selective ACK logic remain partial.
 - **Decoder addresses are now proven from constructor stores.** Native48F12C

@@ -886,24 +886,34 @@ fragments also drop but skip the sequence-tracker call at queue+47C.
 New in-window fragments occupy pointer ring `+0x78`, slot
 `(headIndex(+0x478) + distance) % 256`. Duplicate occupancy must match
 the same sequence. Only a new fragment applies the attempt-marker XOR
-in place before storage. Receive-side XOR reverses the previously saved
-send transform; it is not a second protocol or cryptographic layer.
+in place before storage, over payload length `declaredLength - 4`, using the
+body-slice offset at fragment `+4` and the embedded body object at `+8`.
+Receive-side XOR reverses the previously saved send transform; it is not a
+second protocol or cryptographic layer.
 
 `0xBE56D0` consumes only contiguous available head slots through
 `0xBE5440`. Continuation fragments append to queue's reassembly buffer
-`+0x594` without producing a descriptor. Final fragments call the queue's
-**plain function pointer at+0x14**, not an owner virtual method: directly
-on a single fragment or on the accumulated payload. Successful decode
-sets output object DWORD+20 to channel and DWORD+24 to payload size,
-then queues that object at+60 for the previously traced owner delivery.
-The consumed ring slot is cleared, head advances modulo256, expected
-sequence advances modulo65536, and the native fragment is released.
+`+0x594` without producing a decoded object. A final fragment calls the
+queue's **plain function pointer at+0x14**, not an owner virtual method:
+directly on a single fragment slice, or on the accumulated payload at offset0.
+The receive queue's `+0x04` channel DWORD is written to decoded-object `+0x20`,
+and payload size to `+0x24`; the object is enqueued at queue `+0x60` for the
+previously traced owner delivery. The consumed ring slot is cleared, head
+advances modulo256, expected sequence advances modulo65536, the native
+fragment is released, and ACK-pending byte `+0x32` is set.
 
-A configured limit at socket+120 is checked on the continuation path
-using `accumulated + current >= limit`; zero disables that check.
-This is not evidence that every final-message size is checked there.
-Decoder failure sets queue failure code4 (if unset); continuation limit
-failure sets3. Those paths do not pretend to produce a decoded object.
+A nonzero DWORD limit at socket `+0x120` is checked only on the continuation
+path, using `accumulatedSize + currentPayloadLength >= limit`; zero skips
+that check. No equivalent comparison is visible when the final fragment is
+appended, so this is not evidence of a complete final-message size cap.
+Continuation-limit failure sets queue failure flag `+0x1C` and code `3` if
+no code was already set. A null decoder result likewise sets the failure
+flag and code `4` if unset. Neither path produces a decoded object.
+
+`0xBD5080` drains reliable queues `+0xD6C` and `+0xD70` in order. If either
+drain fails, it atomically stores that queue's failure code at socket `+0x124`
+if no earlier error is present, snapshots socket state `+0x108` to `+0x128`,
+and requests pump close with the failure code.
 Decoder addresses and the header reader are established below; the complete
 accumulator ABI and per-message field decoding remain partial.
 

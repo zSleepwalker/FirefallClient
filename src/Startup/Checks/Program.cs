@@ -890,6 +890,20 @@ Check("Receive-ring indices wrap independently of the 16-bit packet sequence",
     && GameSocketReliableReceiveWindow.GetRingSlot(255, 0, 0) == 255
     && GameSocketReliableReceiveWindow.Classify(65535, 0) == GameSocketReceiveSequenceClass.BeforeWindow
     && GameSocketReliableReceiveWindow.Classify(256, 0) == GameSocketReceiveSequenceClass.BeyondWindow);
+Check("Reliable receive layout preserves fragment slices, continuation assembly, and decoded channel metadata",
+    GameSocketReliableReceiveWindow.FragmentSequenceWordOffset == 2
+    && GameSocketReliableReceiveWindow.FragmentBodySliceOffsetFieldOffset == 4
+    && GameSocketReliableReceiveWindow.FragmentPayloadHeaderSize == 4
+    && GameSocketReliableReceiveWindow.ContinuationFlagMask == 0x0800
+    && GameSocketReliableReceiveWindow.ReassemblyBufferOffset == 0x594
+    && GameSocketReliableReceiveWindow.ReassemblyLimitSocketOffset == 0x120
+    && GameSocketReliableReceiveWindow.DecodedDeliveryQueueOffset == 0x60
+    && GameSocketReliableQueueNativeLayout.ChannelOffset == 0x04
+    && GameSocketReliableReceiveWindow.DecodedObjectChannelOffset == 0x20
+    && GameSocketReliableReceiveWindow.DecodedObjectPayloadSizeOffset == 0x24
+    && GameSocketReliableQueueNativeLayout.FailureFlagOffset == 0x1C
+    && GameSocketReliableQueueNativeLayout.FailureCodeOffset == 0x20
+    && GameSocketReliableQueueNativeLayout.AcknowledgmentPendingFlagOffset == 0x32);
 bool invalidReceiveRingHeadRejected = false;
 bool outOfWindowRingSlotRejected = false;
 try { GameSocketReliableReceiveWindow.GetRingSlot(0, 0, 256); }

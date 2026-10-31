@@ -1916,6 +1916,33 @@ internal static class StartupBinaryEvidence
             && Matches(GameSocketReliableQueueNativeLayout.AcknowledgmentPendingFlagClearSiteFileOffset, "C6463200")
             && Matches(0xBE56AC, "66FF432A")
             && Matches(GameSocketReliableQueueNativeLayout.AcknowledgmentPendingFlagSetSiteFileOffset, "C6433201"));
+        check("Binary reliable receive classifies the 16-bit sequence distance and extracts in-window fragments",
+            Matches(0xBE522A, "0FB757028D4F020FB75E2A8BC22BC3")
+            && Matches(0xBE5240, "0FB7D88D8300FFFFFF663B45087740")
+            && Matches(0xBE547C, "0FB70E8BC1C1E90B25FF07000083E8040FB7F8897DFC")
+            && Matches(0xBE53D0, "83E804508B4708FF7704FF50048BD08ACBE8FA04FFFF")
+            && RelativeBranchTargets(0xBE53E1, 0xE8, 0xBD58E0));
+        check("Binary reliable assembly caps continuation appends, annotates decoded output, and advances ACK state",
+            Matches(0xBE5492,
+                "F6C1010F84920000008B038BB02001000085F6745A8B83940500008D8B94050000FF500C8BC80FB7C703C83BCE7240")
+            && Matches(0xBE54E7, "C6431C01837B20007507C7432003000000")
+            && Matches(0xBE55C3, "C6431C01837B20007507C7432004000000")
+            && Matches(0xBE5653, "8B4304894620897E24")
+            && Matches(0xBE565C, "8B8378040000C744837800000000")
+            && Matches(0xBE567F, "8B7DF8898378040000668B4702663B432A")
+            && Matches(0xBE56AC, "66FF432A")
+            && Matches(0xBE56BF, "C6433201"));
+        check("Binary contiguous reliable drain queues decoded results and propagates queue failures to pump close",
+            RelativeBranchTargets(0xBE5702, 0xE8, 0xBE5440)
+            && Matches(0xBE5718, "508D4E60")
+            && RelativeBranchTargets(0xBE571C, 0xE8, 0x12CE310)
+            && RelativeBranchTargets(GameSocketQueuedReceiveNativeLayout.CheckReliableQueueFailuresMethodFileOffset + 0x29,
+                0xE8, 0xBE56D0)
+            && RelativeBranchTargets(GameSocketQueuedReceiveNativeLayout.CheckReliableQueueFailuresMethodFileOffset + 0xA5,
+                0xE8, 0xBE56D0)
+            && Matches(0xBD50D8, "8B50208D8E2401000033C0F00FB111")
+            && Matches(0xBD50EB, "8B8608010000898628010000")
+            && RelativeBranchTargets(0xBD50FA, 0xE9, 0xBD2430));
         check("UI manager singleton list initializes the message-145 endpoint and event dispatcher",
             Matches(UiManagerNativeLayout.SingletonRegistrationStubFileOffset,
                 "C705A4B0E401A802E001C705A802E001F02FC601C705B802E00100000000C3")
