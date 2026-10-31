@@ -1174,6 +1174,39 @@ Check("WeaponProjectileFired selector 0x5F records its prefix and optional tail"
     && CharacterWeaponProjectileFiredNativeLayout.OptionalTailPayloadWordCount == 3
     && CharacterWeaponProjectileFiredNativeLayout.InputByteCountWithoutOptionalTail == 9
     && CharacterWeaponProjectileFiredNativeLayout.InputByteCountWithOptionalTail == 15);
+Check("AbilityProjectileFired selector 0x60 records its fixed fields and optional QWORD",
+    CharacterAbilityProjectileFiredNativeLayout.InnerSelector == 0x60
+    && CharacterAbilityProjectileFiredNativeLayout.CaseFileOffset == 0x81D07E
+    && CharacterAbilityProjectileFiredNativeLayout.CaseLocalDwordValue == 0x68
+    && CharacterAbilityProjectileFiredNativeLayout.AllocationSize == 0x68
+    && CharacterAbilityProjectileFiredNativeLayout.ConstructorFileOffset == 0x5257A0
+    && CharacterAbilityProjectileFiredNativeLayout.BaseConstructorHelperFileOffset == 0x5A09F0
+    && CharacterAbilityProjectileFiredNativeLayout.BaseConstructorArgument == 0x60
+    && CharacterAbilityProjectileFiredNativeLayout.BodyReaderFileOffset == 0x5F22A0
+    && CharacterAbilityProjectileFiredNativeLayout.OptionalQwordReaderFileOffset == 0x5FDA00
+    && CharacterAbilityProjectileFiredNativeLayout.QwordReaderFileOffset == 0x356F80
+    && CharacterAbilityProjectileFiredNativeLayout.VtableVirtualAddress == 0x1C671A8
+    && CharacterAbilityProjectileFiredNativeLayout.WordField0Offset == 0x28
+    && CharacterAbilityProjectileFiredNativeLayout.WordField1Offset == 0x2A
+    && CharacterAbilityProjectileFiredNativeLayout.WordField2Offset == 0x2C
+    && CharacterAbilityProjectileFiredNativeLayout.WordField3Offset == 0x2E
+    && CharacterAbilityProjectileFiredNativeLayout.WordField4Offset == 0x30
+    && CharacterAbilityProjectileFiredNativeLayout.WordField5Offset == 0x32
+    && CharacterAbilityProjectileFiredNativeLayout.WordField6Offset == 0x34
+    && CharacterAbilityProjectileFiredNativeLayout.WordField7Offset == 0x36
+    && CharacterAbilityProjectileFiredNativeLayout.DwordField0Offset == 0x38
+    && CharacterAbilityProjectileFiredNativeLayout.DwordField1Offset == 0x3C
+    && CharacterAbilityProjectileFiredNativeLayout.ByteField0Offset == 0x40
+    && CharacterAbilityProjectileFiredNativeLayout.DwordField2Offset == 0x44
+    && CharacterAbilityProjectileFiredNativeLayout.ByteField1Offset == 0x48
+    && CharacterAbilityProjectileFiredNativeLayout.DwordField3Offset == 0x4C
+    && CharacterAbilityProjectileFiredNativeLayout.DwordField4Offset == 0x50
+    && CharacterAbilityProjectileFiredNativeLayout.OptionalQwordPresenceFieldOffset == 0x58
+    && CharacterAbilityProjectileFiredNativeLayout.OptionalQwordFieldOffset == 0x60
+    && CharacterAbilityProjectileFiredNativeLayout.OptionalQwordInputGateOffset == 0x26
+    && CharacterAbilityProjectileFiredNativeLayout.OptionalQwordByteCount == 8
+    && CharacterAbilityProjectileFiredNativeLayout.InputByteCountWithoutOptionalQword == 0x27
+    && CharacterAbilityProjectileFiredNativeLayout.InputByteCountWithOptionalQword == 0x2F);
 Check("Shared channel-2/3 compact-code routing groups the observed native cases",
     Enumerable.Range(1, 6).All(code =>
         MatrixOtherChannelDecoderNativeLayout.SelectRoute(code)

@@ -1529,6 +1529,85 @@ internal static class StartupBinaryEvidence
             && Matches(0x5F2878, "66894706")
             && Matches(0x5F2896, "C60701")
             && Matches(0x5F28A4, "C60700"));
+        check("Binary inner selector 0x60 allocates AbilityProjectileFired and installs its RTTI",
+            ReadUInt32(VirtualAddressToFileOffset(
+                CharacterAbilityProjectileFiredNativeLayout.InnerSelectorTableVirtualAddress) + 52) == 0xC1DC7E
+            && Matches(CharacterAbilityProjectileFiredNativeLayout.CaseFileOffset, "6A68")
+            && Matches(0x81D08C, "C744242068000000")
+            && RelativeBranchTargets(0x81D09F, 0xE8,
+                CharacterAbilityProjectileFiredNativeLayout.ConstructorFileOffset)
+            && RelativeBranchTargets(0x81D0B5, 0xE8,
+                CharacterAbilityProjectileFiredNativeLayout.BodyReaderFileOffset)
+            && Matches(0x5257B2, "C70060000000")
+            && RelativeBranchTargets(0x5257B8, 0xE8,
+                CharacterAbilityProjectileFiredNativeLayout.BaseConstructorHelperFileOffset)
+            && Matches(0x5257BD, "C706A871C601")
+            && Matches(0x5257C5, "C6465800")
+            && VtableRttiName(CharacterAbilityProjectileFiredNativeLayout.VtableVirtualAddress, 80)
+                == CharacterAbilityProjectileFiredNativeLayout.RttiName);
+        check("Binary AbilityProjectileFired reader maps each fixed field to its primitive reader",
+            Matches(0x5F22AD, "8D4328")
+            && RelativeBranchTargets(0x5F22B1, 0xE8, 0x336AC0)
+            && Matches(0x5F22B6, "8D732A")
+            && RelativeBranchTargets(0x5F22BC, 0xE8, 0x34B740)
+            && Matches(0x5F22C1, "8D4602")
+            && RelativeBranchTargets(0x5F22C7, 0xE8, 0x34B740)
+            && Matches(0x5F22CC, "8D4604")
+            && RelativeBranchTargets(0x5F22D2, 0xE8, 0x34B740)
+            && Matches(0x5F22D7, "8D7330")
+            && RelativeBranchTargets(0x5F22DD, 0xE8, 0x6097B0)
+            && Matches(0x5F22E2, "8D4602")
+            && RelativeBranchTargets(0x5F22E8, 0xE8, 0x6097B0)
+            && Matches(0x5F22ED, "8D4604")
+            && RelativeBranchTargets(0x5F22F3, 0xE8, 0x6097B0)
+            && Matches(0x5F22F8, "8D4336")
+            && RelativeBranchTargets(0x5F22FE, 0xE8, 0x336AC0)
+            && Matches(0x5F2303, "8D4338")
+            && RelativeBranchTargets(0x5F2309, 0xE8, 0x3568E0)
+            && Matches(0x5F230E, "8D433C")
+            && RelativeBranchTargets(0x5F2314, 0xE8, 0x353310)
+            && Matches(0x5F2319, "8D5340")
+            && RelativeBranchTargets(0x5F231E, 0xE8, 0x337180)
+            && Matches(0x5F2323, "8D4344")
+            && RelativeBranchTargets(0x5F2329, 0xE8, 0x3568E0)
+            && Matches(0x5F232E, "8D5348")
+            && RelativeBranchTargets(0x5F2333, 0xE8, 0x337180)
+            && Matches(0x5F2338, "8D434C")
+            && RelativeBranchTargets(0x5F233E, 0xE8, 0x3370A0)
+            && Matches(0x5F2343, "8D4350")
+            && RelativeBranchTargets(0x5F2349, 0xE8, 0x3370A0)
+            && Matches(0x5F234E, "8D5358")
+            && RelativeBranchTargets(0x5F2353, 0xE8,
+                CharacterAbilityProjectileFiredNativeLayout.OptionalQwordReaderFileOffset));
+        check("Binary AbilityProjectileFired scalar helpers consume their observed widths",
+            Matches(0x336AC9, "83F902730F")
+            && Matches(0x336AE0, "668B08")
+            && Matches(0x336AE6, "668908")
+            && Matches(0x336AE9, "83460402")
+            && Matches(0x3568E9, "83F904730F")
+            && Matches(0x356900, "8B08")
+            && Matches(0x356907, "83460404")
+            && Matches(0x337189, "83F9017311")
+            && Matches(0x3371A2, "8A008803FF4704")
+            && Matches(0x3370A9, "83F904730F")
+            && Matches(0x3370C7, "83460404")
+            && Matches(0x353319, "83F904730F")
+            && Matches(0x353337, "83460404"));
+        check("Binary AbilityProjectileFired optional QWORD gate updates the +0x58 presence byte",
+            Matches(0x5FDA27, "8B43048A0840")
+            && Matches(0x5FDA5B, "FF4B08")
+            && Matches(0x5FDA5E, "84C9744D")
+            && RelativeBranchTargets(0x5FDA72, 0xE8,
+                CharacterAbilityProjectileFiredNativeLayout.QwordReaderFileOffset)
+            && Matches(0x5FDA77, "803F0074")
+            && Matches(0x5FDA80, "894708")
+            && Matches(0x5FDA87, "89470C")
+            && Matches(0x5FDAA5, "C60701")
+            && Matches(0x5FDAB4, "C60700")
+            && Matches(0x356F89, "83F908730F")
+            && Matches(0x356FA3, "8B028901")
+            && Matches(0x356FA7, "8B4204894104")
+            && Matches(0x356FAD, "83460408"));
         check("Binary matrix socket factory requests overlapped UDP",
             Matches(0xBE354A, "6A016A006A006A11B8170000006A020F44C150FF15684DAC01"));
         check("Binary matrix local binding uses seven or two attempts and final-two fallback",

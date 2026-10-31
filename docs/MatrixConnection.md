@@ -1305,6 +1305,27 @@ stream by two. Thus the observed nominal body size is 9 bytes without the
 optional tail or 15 bytes with it. Field meanings remain unknown; the RTTI
 name alone does not establish projectile semantics.
 
+### Selector 0x60: `AbilityProjectileFired`
+
+Entry13 maps selector `0x60` to VA `0xC1DC7E` / raw case `0x81D07E`. It
+allocates `0x68` bytes, stores local DWORD `0x68` (role unknown), then calls
+constructor `0x5257A0`. That constructor passes `0x60` to base helper
+`0x5A09F0`, installs vtable VA `0x1C671A8` (RTTI
+`firefall::Character::AbilityProjectileFired`), and zeros the presence byte
+at object `+0x58`. The role of the base-helper argument remains unknown.
+
+Body reader `0x5F22A0` reads eight WORD fields at `+0x28`, `+0x2A`,
+`+0x2C`, `+0x2E`, `+0x30`, `+0x32`, `+0x34`, and `+0x36`; five DWORD
+fields at `+0x38`, `+0x3C`, `+0x44`, `+0x4C`, and `+0x50`; and byte fields
+at `+0x40` and `+0x48`. It then calls `0x5FDA00` with `this = object+0x58`.
+That helper consumes a gate byte at input offset `0x26`; when nonzero, it
+reads an eight-byte QWORD through `0x356F80`, stores it at `+0x60/+0x64`,
+and sets the presence byte at `+0x58` to one. A zero gate clears a set
+presence byte. The nominal body length is `0x27` bytes without the QWORD
+and `0x2F` bytes with it. The reader does not write object `+0x54..+0x57`;
+that gap and all field meanings remain unresolved. RTTI alone does not
+establish ability-projectile semantics.
+
 ## Message35 application body
 
 Factory case35 at `0x33D557` allocates a fresh0x50-byte descriptor through
