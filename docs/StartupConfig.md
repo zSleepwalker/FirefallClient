@@ -88,3 +88,15 @@ Addresses: file offsets (= IDA addresses); VA code = raw+0x400C00, .rdata = raw+
 **Interpreted**: AssetDB list holds directories/DB roots from config key `AssetPath`; ordinary list from `FilePaths`.
 
 **Unresolved**: on-disk AssetDB format; the `.include` parser inside ini object (0x12DAD70); caller(s) of `0x38B310`; the "AssetDB"/"fsAssetDB" strings were not located this round. Negative claims limited to xrefs IDA reported.
+## Round 9: ini directives, hotfix reload, AssetDB RTTI
+
+**Observed**
+- `0x12DD300` (this = ini object) handles lines starting with `.`; after the dot it string-compares (`dword_1AC4894`, inferred strncmp) against `include ` (8), `include? ` (9) and `include-all ` (12). Other text logs "Did not understand INI processor instruction '%s'". `.include-all` logs ".include-all '%s': directory does not exist" if the directory is missing and otherwise loads each listed file via `0x12DCE00`; a failing file aborts it. `.include?` is treated as optional (observed: a UTF-8 locale check gates the result). The only caller of ini constructor `0x12DAD70` seen is hotfix `0x386D90`; other ini users use other paths (scope: IDA xrefs).
+- `0x38B310` (the asset-path reconfigure, this = `dword_1DFFFD4`) callers: `ClientApplicationInitialize` (0x306D77), `0x3865C0` (post-hotfix) and `0x9B2F10` (called from Login_PickBackgroundZone, AppMode_LookingGlass_Initialize, ReplayReader_Initialize).
+- `0x3865C0` is called from `0x386430`. It enumerates `bin\`, `\clientdb.sd2`, `components\` file sets, calls `0x38B310`, stores `LastHotfixLevel` (format `%s-%u/%u`), and logs "Hotfix: applied level %u." or "Hotfix: skipping reload systems (cvar setting) ...".
+- RTTI strings exist for `tsAssetDB`, `fsAssetDB`, `tfAssetDB` (slSingleton); no xrefs to their type descriptors were found in IDA, so vtables were not located. "AssetDB search paths" is logged by `0x1318400`.
+- `0x3289D0` (Twitch worker) is called from `ClientApplicationBootstrap` (0x2EB216) and `ClientApplicationRunLoop` (0x309B08), i.e. it is polled per frame by RunLoop. Config cvars `twitchtv_username/password/authkey/width/height`, console command `twitch_auth`. A hardcoded client-ID-like string exists at 0x1B41BD8 (not reproduced). API endpoints were not recovered (the TTV SDK is imported).
+
+**Interpreted**: `clientdb.sd2` is a client DB reloaded after a hotfix.
+
+**Unresolved**: the AssetDB on-disk format and file-open routines; vtables of fs/ts/tfAssetDB; `.include?` exact semantics.

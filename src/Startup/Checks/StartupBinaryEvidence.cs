@@ -1797,5 +1797,14 @@ internal static class StartupBinaryEvidence
             Matches(ClientMainLoopNativeLayout.HotfixIncludeFormatStringFileOffset, "2E696E636C75646520") &&
             Matches(ClientMainLoopNativeLayout.HotfixDownloadPathKeyStringFileOffset, "446F776E6C6F61642D50") &&
             Matches(ClientMainLoopNativeLayout.AssetPathConfigDefaultStringFileOffset, "73797374656D2F617373") &&
-            Matches(ClientMainLoopNativeLayout.AssetPathConfigInstallDirStringFileOffset, "496E7374616C6C446972"));    }
+            Matches(ClientMainLoopNativeLayout.AssetPathConfigInstallDirStringFileOffset, "496E7374616C6C446972"));
+        check("Binary startup round 9 (ini directives, hotfix reload)",
+            Matches(ClientMainLoopNativeLayout.IniDirectiveDispatchFn12DD300FileOffset, "558BEC6AFF681862A90164A1") &&
+            Matches(ClientMainLoopNativeLayout.HotfixApplyReloadFn3865C0FileOffset, "558BEC6AFF68B8B29D0164A1") &&
+            Matches(ClientMainLoopNativeLayout.HotfixApplyCallerFn386430FileOffset, "558BEC5153568BF157837E14") &&
+            Matches(ClientMainLoopNativeLayout.IniIncludeDirectiveStringFileOffset, "696E636C75646520") &&
+            Matches(ClientMainLoopNativeLayout.IniIncludeAllDirectiveStringFileOffset, "696E636C7564652D616C6C20") &&
+            Matches(ClientMainLoopNativeLayout.IniIncludeOptionalDirectiveStringFileOffset, "696E636C7564653F20") &&
+            Matches(ClientMainLoopNativeLayout.HotfixLastLevelKeyStringFileOffset, "4C617374486F746669784C65") &&
+            Matches(ClientMainLoopNativeLayout.HotfixAppliedLevelStringFileOffset, "486F746669783A206170706C"));    }
 }

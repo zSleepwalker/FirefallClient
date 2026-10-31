@@ -144,4 +144,14 @@ public static class ClientMainLoopNativeLayout
     public const int AssetPathConfigDefaultStringFileOffset = 0x1B45AE0 - 0x401400;
     public const int AssetPathConfigAssetPathKeyStringFileOffset = 0x1B45AF0 - 0x401400;
     public const int AssetPathConfigFilePathsKeyStringFileOffset = 0x1B45B24 - 0x401400;
-    public const int AssetPathConfigInstallDirStringFileOffset = 0x1B45B30 - 0x401400;}
+    public const int AssetPathConfigInstallDirStringFileOffset = 0x1B45B30 - 0x401400;
+
+    // Round 9: ini directive dispatcher, hotfix reload.
+    public const int IniDirectiveDispatchFn12DD300FileOffset = 0x12DD300;
+    public const int HotfixApplyReloadFn3865C0FileOffset = 0x3865C0;
+    public const int HotfixApplyCallerFn386430FileOffset = 0x386430;
+    public const int IniIncludeDirectiveStringFileOffset = 0x1C80D04 - 0x401400;
+    public const int IniIncludeAllDirectiveStringFileOffset = 0x1C80D10 - 0x401400;
+    public const int IniIncludeOptionalDirectiveStringFileOffset = 0x1C80D20 - 0x401400;
+    public const int HotfixLastLevelKeyStringFileOffset = 0x1B455A0 - 0x401400;
+    public const int HotfixAppliedLevelStringFileOffset = 0x1B45608 - 0x401400;}
