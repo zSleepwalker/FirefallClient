@@ -1088,6 +1088,8 @@ These updates supersede older next-step suggestions below where they overlap.
   Selector0x65 constructs `JumpActioned` and reads a WORD at object+0x28
   through shared continuation 0x81D21F; allocation-failure behavior remains
   unresolved.
+  Selector0x66 constructs `JumpRolled` and shares that WORD continuation;
+  its allocation-failure path also zeroes ESI before reading.
   Remaining case handlers, field meanings, and message semantics are open.
   RTTI names the results `nl::RoutedMessage` and
   `nl::RoutedMultipleMessage`; QWORD and message semantics remain unknown.

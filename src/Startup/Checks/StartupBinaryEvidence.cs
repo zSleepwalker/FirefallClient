@@ -1733,6 +1733,25 @@ internal static class StartupBinaryEvidence
             && Matches(0x525B0D, "C7066871C601")
             && VtableRttiName(CharacterJumpActionedNativeLayout.VtableVirtualAddress, 80)
                 == CharacterJumpActionedNativeLayout.RttiName);
+        check("Binary inner selector 0x66 routes JumpRolled through the shared WORD reader",
+            ReadUInt32(VirtualAddressToFileOffset(
+                CharacterJumpRolledNativeLayout.InnerSelectorTableVirtualAddress) + 76) == 0xC1DE47
+            && Matches(CharacterJumpRolledNativeLayout.CaseFileOffset, "6A30")
+            && Matches(0x81D255, "C74424206E000000")
+            && Matches(0x81D25F, "74BC")
+            && RelativeBranchTargets(0x81D268, 0xE8,
+                CharacterJumpRolledNativeLayout.ConstructorFileOffset)
+            && Matches(0x81D26F, "EBAE")
+            && Matches(CharacterJumpRolledNativeLayout.AllocationFailureContinuationFileOffset, "33F68D4628")
+            && Matches(CharacterJumpRolledNativeLayout.BodyReaderContinuationFileOffset, "8D4628")
+            && RelativeBranchTargets(0x81D22D, 0xE8,
+                CharacterJumpRolledNativeLayout.WordReaderFileOffset)
+            && Matches(0x525B82, "C70066000000")
+            && RelativeBranchTargets(0x525B88, 0xE8,
+                CharacterJumpRolledNativeLayout.BaseConstructorHelperFileOffset)
+            && Matches(0x525B8D, "C7064871C601")
+            && VtableRttiName(CharacterJumpRolledNativeLayout.VtableVirtualAddress, 80)
+                == CharacterJumpRolledNativeLayout.RttiName);
         check("Binary matrix socket factory requests overlapped UDP",
             Matches(0xBE354A, "6A016A006A006A11B8170000006A020F44C150FF15684DAC01"));
         check("Binary matrix local binding uses seven or two attempts and final-two fallback",

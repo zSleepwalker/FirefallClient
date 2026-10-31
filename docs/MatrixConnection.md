@@ -1411,6 +1411,23 @@ continues into the same field reader, which forms destination address
 Field meaning remains unknown; RTTI alone does not establish jump-action
 semantics.
 
+### Selector 0x66: `JumpRolled`
+
+Entry19 maps selector `0x66` to VA `0xC1DE47` / raw case `0x81D247`. It
+allocates `0x30` bytes, stores local DWORD `0x6E` (role unknown), then calls
+constructor `0x525B70`. The constructor passes `0x66` to helper `0x5A0C90`
+and installs vtable VA `0x1C67148` (RTTI
+`firefall::Character::JumpRolled`).
+
+On the successful allocation path, the case jumps to the same reader
+continuation `0x81D21F` used by selector `0x65`; it reads a WORD into object
+field `+0x28` through helper `0x336AC0`, for a nominal two-byte body.
+Selector `0x66` has its own RTTI and constructor, so the shared parser does
+not establish semantic equivalence with `JumpActioned`. The allocation
+failure branch at `0x81D25F` enters `0x81D21D`, zeroes ESI, and continues
+into the same reader, which forms destination address `0x28`; the runtime
+consequence remains unresolved. Field meaning is unknown.
+
 ## Message35 application body
 
 Factory case35 at `0x33D557` allocates a fresh0x50-byte descriptor through
