@@ -1064,6 +1064,8 @@ These updates supersede older next-step suggestions below where they overlap.
   Selector0x5C constructs distinct RTTI `PrivateCombatLog` and branches to
   the same reader with `this = object+0x28`; parser reuse does not prove
   semantic equivalence with selector0x5B.
+  Selector0x5D constructs `AnimationUpdated` and reads a WORD plus a byte at
+  object+0x28/+0x2A; meanings remain unknown.
   Remaining case handlers, field meanings, and message semantics are open.
   RTTI names the results `nl::RoutedMessage` and
   `nl::RoutedMultipleMessage`; QWORD and message semantics remain unknown.

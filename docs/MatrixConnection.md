@@ -1020,7 +1020,7 @@ factory/callback ABI remain unresolved.
 `MatrixOtherChannelDecoderNativeLayout.cs` records dispatch only, not a
 replacement decoder.
 
-## Secondary command dispatcher and ten verified class cases
+## Secondary command dispatcher and eleven verified class cases
 
 The secondary-dispatch target `0x81CC50` is a large raw function
 (`0x4B9E` bytes) with two separate selector tables. It reads a leading byte
@@ -1047,14 +1047,14 @@ selector range return zero. Leading bytes `0x37..0xEF` also reach the
 zero-return path. These are dispatch boundaries only; the inputs’ semantic
 names and the 91 secondary targets are unresolved.
 
-Ten nested selectors are mapped: route0 block `0x81CCAD` dispatches selector
+Eleven nested selectors are mapped: route0 block `0x81CCAD` dispatches selector
 `0x53` through the table at VA `0xC22444` (raw `0x821844`) to raw case
 `0x81CCC3`. That case allocates `0x48` bytes, calls constructor `0x524C30`,
 then body reader `0x5F6B10`. Constructor RTTI identifies the object as
 `firefall::Character::MarketRequestComplete`. The reader stores, in order,
 a byte at object+`0x28`, raw QWORD at+`0x30`, byte at+`0x38`, and three
 NUL-terminated shared-text values at+`0x3C/+0x40/+0x44`. Field meanings
-remain unknown; these ten selectors do not name the remaining table cases.
+remain unknown; these eleven selectors do not name the remaining table cases.
 `MatrixSecondaryCommandDispatcherNativeLayout.cs` and
 `CharacterMarketRequestCompleteNativeLayout` preserve the route bounds and
 this bounded object layout without implementing a parser.
@@ -1256,6 +1256,17 @@ therefore maps to object `+0x2C`, and its successful body format is the same
 observed DWORD-1 gate followed by a WORD-length-prefixed blob. Shared parsing
 does not prove that `PublicCombatLog` and `PrivateCombatLog` have identical
 semantics; the non-1 diagnostic path remains unresolved.
+
+### Selector 0x5D: `AnimationUpdated`
+
+Entry10 maps selector `0x5D` to VA `0xC1DBAB` / raw case `0x81CFAB`. It
+allocates `0x30` bytes, stores local DWORD `0x65` (role unknown), then calls
+constructor `0x525570` and body reader `0x5F30F0`. The constructor passes
+`0x5D` to `0x5A0880` and installs vtable VA `0x1C671D8` (RTTI
+`firefall::Character::AnimationUpdated`). The reader stores a WORD at object
+`+0x28` followed by a byte at `+0x2A`, nominally consuming three input bytes.
+The field meanings remain unknown; the RTTI name does not establish
+animation-related semantics.
 
 ## Message35 application body
 

@@ -1129,6 +1129,18 @@ Check("PrivateCombatLog selector 0x5C has distinct RTTI and shares the public-lo
     && CharacterPrivateCombatLogNativeLayout.EmbeddedBlobVtableVirtualAddress == 0x1C80CC4
     && CharacterPrivateCombatLogNativeLayout.BodyReaderThisObjectOffset == 0x28
     && CharacterPrivateCombatLogNativeLayout.BlobDestinationOffsetFromReaderThis == 4);
+Check("AnimationUpdated selector 0x5D records its WORD and byte fields",
+    CharacterAnimationUpdatedNativeLayout.InnerSelector == 0x5D
+    && CharacterAnimationUpdatedNativeLayout.CaseFileOffset == 0x81CFAB
+    && CharacterAnimationUpdatedNativeLayout.CaseLocalDwordValue == 0x65
+    && CharacterAnimationUpdatedNativeLayout.AllocationSize == 0x30
+    && CharacterAnimationUpdatedNativeLayout.ConstructorFileOffset == 0x525570
+    && CharacterAnimationUpdatedNativeLayout.ConstructorHelperFileOffset == 0x5A0880
+    && CharacterAnimationUpdatedNativeLayout.BodyReaderFileOffset == 0x5F30F0
+    && CharacterAnimationUpdatedNativeLayout.VtableVirtualAddress == 0x1C671D8
+    && CharacterAnimationUpdatedNativeLayout.RawWordFieldOffset == 0x28
+    && CharacterAnimationUpdatedNativeLayout.RawByteFieldOffset == 0x2A
+    && CharacterAnimationUpdatedNativeLayout.NominalInputByteCount == 3);
 Check("Shared channel-2/3 compact-code routing groups the observed native cases",
     Enumerable.Range(1, 6).All(code =>
         MatrixOtherChannelDecoderNativeLayout.SelectRoute(code)

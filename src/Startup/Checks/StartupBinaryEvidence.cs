@@ -1439,6 +1439,26 @@ internal static class StartupBinaryEvidence
             && Matches(CharacterPrivateCombatLogNativeLayout.SharedBodyReaderSetupFileOffset, "578D4E28")
             && RelativeBranchTargets(0x81CF67, 0xE8,
                 CharacterPrivateCombatLogNativeLayout.BodyReaderFileOffset));
+        check("Binary inner selector 0x5D constructs AnimationUpdated and reads its WORD/byte fields",
+            ReadUInt32(VirtualAddressToFileOffset(
+                CharacterAnimationUpdatedNativeLayout.InnerSelectorTableVirtualAddress) + 40) == 0xC1DBAB
+            && Matches(CharacterAnimationUpdatedNativeLayout.CaseFileOffset, "6A30")
+            && RelativeBranchTargets(0x81CFAD, 0xE8, 0x12B7FB0)
+            && Matches(0x81CFB9, "C744242065000000")
+            && RelativeBranchTargets(0x81CFCC, 0xE8,
+                CharacterAnimationUpdatedNativeLayout.ConstructorFileOffset)
+            && RelativeBranchTargets(0x81CFE2, 0xE8,
+                CharacterAnimationUpdatedNativeLayout.BodyReaderFileOffset)
+            && Matches(0x525582, "C7005D000000")
+            && RelativeBranchTargets(0x525588, 0xE8,
+                CharacterAnimationUpdatedNativeLayout.ConstructorHelperFileOffset)
+            && Matches(0x52558D, "C706D871C601")
+            && VtableRttiName(CharacterAnimationUpdatedNativeLayout.VtableVirtualAddress, 80)
+                == CharacterAnimationUpdatedNativeLayout.RttiName
+            && Matches(0x5F30FA, "8D4628")
+            && RelativeBranchTargets(0x5F30FE, 0xE8, 0x336AC0)
+            && Matches(0x5F3103, "8D562A")
+            && RelativeBranchTargets(0x5F3108, 0xE8, 0x337180));
         check("Binary matrix socket factory requests overlapped UDP",
             Matches(0xBE354A, "6A016A006A006A11B8170000006A020F44C150FF15684DAC01"));
         check("Binary matrix local binding uses seven or two attempts and final-two fallback",
