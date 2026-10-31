@@ -1865,10 +1865,18 @@ internal static class StartupBinaryEvidence
             && Matches(UiManagerNativeLayout.UiManagerEventReadyFlagTestFileOffset,
                 "80B872060000000F849C010000")
             && Matches(UiManagerNativeLayout.UiManagerEventReadyFlagInitializeFileOffset, "C6837206000000")
+            && Matches(UiManagerNativeLayout.UiManagerEventNameToIdMethodFileOffset, "558BEC83EC0853568BF18D45")
+            && Matches(UiManagerNativeLayout.UiManagerEventListenerRegisterMethodFileOffset, "558BEC83EC105657FF750C")
+            && Matches(UiManagerNativeLayout.UiManagerEventListenerUnregisterMethodFileOffset, "558BEC5156578D450C")
             && Matches(UiManagerNativeLayout.UiManagerEventDispatchMethodFileOffset, "558BEC83E4F86AFF")
             && Matches(0xBF9B5C, "8DBEF0060000508BCF")
             && Matches(0xBF9BDA, "8DB1F00600008D45FC")
             && Matches(0xBF9EE5, "8D8FF0060000")
+            && Matches(0xC35BE4, "E8C73EFCFF")
+            && Matches(0xC35CF0, "E84B3EFCFF")
+            && Matches(UiManagerNativeLayout.UiManagerMessageObjectListenerRegisterCallSiteFileOffset,
+                "E86340FCFF")
+            && Matches(0xC358AF, "E8FC41FCFF")
             && Matches(UiManagerNativeLayout.LoginMessage145GlobalLoadFileOffset,
                 "8B0DB802E0018D55846A005268450100008B01FF90AC000000")
             && VtableRttiName(UiManagerNativeLayout.SingletonVtableVirtualAddress)

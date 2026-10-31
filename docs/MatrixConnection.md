@@ -29,6 +29,15 @@ Who enables that flag is not established. This identifies the endpoint and
 routing layer, but the subscriber for message `0x145` and any resulting
 World-mode request remain unresolved.
 
+Subscription names map to numeric IDs through `uiManager+0x6E8`.
+`0xBF9AB0` returns an existing ID or assigns the current DWORD count of the
+name array at `+0x71C..+0x720`, then appends the new string. Message-object
+subscription `0xC35740` and named subscription `0xC35BB0` use that ID and
+register a listener through `0xBF9B40`; that method first removes a matching
+old listener through `0xBF9BD0`, then updates the ID bucket at `+0x6F0`.
+No event-name entry or listener corresponding to ID `0x145` was recovered, so
+the dynamic name-to-ID ordering and any World-mode side effect remain open.
+
 ## Oracle-ticket request
 
 Connection entry `0x494CA0` sets connection state `+0x0C` to 2 on the

@@ -383,11 +383,20 @@ Check("UI manager singleton and global event routing boundaries are recorded",
     && UiManagerNativeLayout.UiManagerGlobalPointerVirtualAddress == 0x1E002B8
     && UiManagerNativeLayout.UiManagerAllocationSize == 0xA10
     && UiManagerNativeLayout.UiManagerEventDispatchMethodFileOffset == 0xBF9D80
+    && UiManagerNativeLayout.UiManagerEventNameToIdMethodFileOffset == 0xBF9AB0
+    && UiManagerNativeLayout.UiManagerEventListenerRegisterMethodFileOffset == 0xBF9B40
+    && UiManagerNativeLayout.UiManagerEventListenerUnregisterMethodFileOffset == 0xBF9BD0
     && UiManagerNativeLayout.UiManagerEventListenerDispatchFileOffset == 0xBF9C40
     && UiManagerNativeLayout.UiManagerEventListenerLookupFileOffset == 0xC0AA20
     && UiManagerNativeLayout.UiManagerEventCallbackRouteFileOffset == 0xC38400
+    && UiManagerNativeLayout.UiManagerNamedSubscriptionFileOffset == 0xC35BB0
+    && UiManagerNativeLayout.UiManagerMessageObjectSubscriptionFileOffset == 0xC35740
+    && UiManagerNativeLayout.UiManagerMessageObjectListenerRegisterCallSiteFileOffset == 0xC35AD8
     && UiManagerNativeLayout.UiManagerEventDispatchVtableOffset == 0xAC
     && UiManagerNativeLayout.UiManagerEventRegistryOffset == 0x6F0
+    && UiManagerNativeLayout.UiManagerEventNameMapOffset == 0x6E8
+    && UiManagerNativeLayout.UiManagerEventNameArrayBeginOffset == 0x71C
+    && UiManagerNativeLayout.UiManagerEventNameArrayEndOffset == 0x720
     && UiManagerNativeLayout.UiManagerEventReadyFlagOffset == 0x672
     && UiManagerNativeLayout.LoginMessage145GlobalLoadFileOffset == 0x63C1E2
     && UiManagerNativeLayout.LoginMessage145CallFileOffset == 0x63C1F5);

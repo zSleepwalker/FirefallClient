@@ -11,8 +11,10 @@ and cleared by the ACK builder; it can request a frontier-only ACK.
 The Login message-145 notification routes through the `uiManager` singleton:
 bootstrap walks `slSingleton<uiManager>` and its slot+4 initializer stores the
 constructed `uiManager` at VA `0x1E002B8`. Its slot+0xAC dispatches through the
-event-ID registry, but the message-145 subscriber and any resulting World-mode
-request remain unresolved.
+event-ID registry. Named subscriptions map strings to numeric IDs through
+`uiManager+0x6E8` before registering listener nodes at `+0x6F0`; the
+message-145 name/subscriber and any resulting World-mode request remain
+unresolved.
 The offline body decoder is in `GameSocketAcknowledgmentBody.cs`, with checks
 in `GameSocketAcknowledgmentBodyChecks.cs`; full queue mutation and resend
 behavior remain outside the reconstruction.
