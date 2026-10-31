@@ -218,4 +218,7 @@ public static class ClientMainLoopNativeLayout
     public const long MatrixInitialPacketEmitRaw = 0x4980A0;
     public const long MatrixSubmitApplicationBufferRaw = 0xBD3B20;
     public const long GameSocketLogFormatFileOffset = 0x1BB6400 - 0x401400; // 'GameSock...'
+    // Round 19: initial-packet serializer orchestrator.
+    public const long MatrixInitialPacketSerializeRaw = 0x498A00;
+    public const long WireWriteCompactUInt16Raw = 0x320900;
 }

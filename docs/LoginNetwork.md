@@ -91,3 +91,17 @@
 
 ## Unresolved
 - I did not re-derive the per-type incoming handler name table this round (not decompiled; relied on the existing doc). Encryption/signature: no cipher found at this layer; `0xBD4780` is documented as not a general encryption pass (existing doc). Meaning of OpenUdp a3/a4 beyond the port pointer is partial.
+
+# Round 19: serializer orchestrator and submit path
+
+## Observed
+- `0x498A00(packet, writerStream)` (stdcall): local header DWORD = 17 (message id); asserts stream flag a2+4 clear (line 82); ensures stream capacity >= 29 bytes (vtable+16 grow); calls `Wire_WriteCompactPositiveUInt16` (`0x320900`) on the stream, then `MatrixInitialPacket_Encode` (`0x349E60`); calls stream vtable+0 (finalize); returns 1.
+- `0xBD3B20 SubmitApplicationBuffer(channel, stream)` (disasm; decompile fails): asserts this+0x108 and this+0x10C non-zero (lines 0x47E/0x47F); returns early if byte this+0xD95 set; stream vtable+0x0C yields the byte length (0 = return); if length > WORD this+0x104 and channel==3 and length > 0x56C it asserts (line 0x499), logs and promotes channel to 2; channel switch (jump table 0xFD4A3C, channels 0-3, default asserts line 0x4D3).
+- No checksum, signature or cipher instruction appears in these two functions.
+
+## Interpreted
+- The 'compact positive UInt16' written before the packet body is probably a length/size prefix (not proven which); existing `MatrixInitialPacket.cs` documents `FixedEncodedSize = 30` and no prefix, so the prefix may belong to the stream layer, not the encoder. Possible mismatch; unverified.
+- Framing/ack/reliability: already in docs\MatrixConnection.md (lines ~180-320); nothing contradicting it was seen.
+
+## Unresolved
+- The channel jump-table targets, the IOCP recv completion handler for the 1400-byte buffer, and the type-id to handler-name list were not re-derived (existing doc covers table raw 0x33D424). Scope: only these two functions were inspected this round.
