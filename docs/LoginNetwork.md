@@ -41,3 +41,17 @@
 
 ## Unresolved
 - Actual `clientapi_host` value (config source), the exact field order/body of the JSON, and the slot `0x1AC4D0C` import identity.
+
+# Round 15: oracle reply, ClientApi headers, sock:// consumer
+
+## Observed
+- `0x495460 MatrixConnection_HandleOracleResponse(this, resp)`: clears in-flight this+0x1C; if `0x4956C0` (ParseOracleResponse) succeeds it frees the text at this+2976 and zeroes this+0x18 (retry delay). On failure while state==2 it grows the retry delay `d+2+(d+1)/2` capped at 300, logs, sends UI message 383 via `dword_1E002B8` vtable+0xAC and calls `0x494E30` again (retry); otherwise logs an unhandled-message id.
+- `0x4956C0` (size 0x804) references these JSON keys: `matrix_url`, `ticket`, `datacenter`, `operator_override`, `session_id`, `hostname`, and error keys `status`, `message`, `invalid_response`. Strings: `Invalid decrypted oracle login ticket`, `Decode: invalid oracle login ticket` (ticket is decoded/decrypted client-side), `Matrix connection initiated to %s (%s)` / `Could not initiate Matrix connection to %s (%s)`, `invalid oracle response (STATUS=%s,HTTP=%d): '%s'`. Decompile of 0x4956C0 failed; keys are from data xrefs only, field order/semantics not read.
+- `0x635E90` (ClientApi header builder, this = header map, uses `0x4969A0` find-or-insert + `0x2FCC90` assign): `X-Red5-Session-ID` (App+2616, when non-empty), `X-Red5-Hotfix-Level` (%u from [[App+3172]+8]+56), `X-Steam-Client-UserId` (%llu) and `X-Steam-Session-Ticket` when the Steam object `dword_1E46774` reports ready (vtable +12/+28/+36), else `X-Youxi-Session-Ticket` if `dword_1E4B2DC` text non-empty, else if `byte_1E4B2E1` `X-369-Session-Ticket` + `X-369-Session-Site` (`369 auth was not ready, http request will not support it.` when `byte_1E4B2E0` clear); `X-Red5-Signature2` from `0x30F660(App)`; `Accept-Language` from table `dword_1DE0868[min(dword_1E00100[1],5)]`; `X-Red5-Is-Censored` `1`/`0` from `dword_1E00100+19`; `X-Red5-SiloPoolId` (%u, App+2620). No secrets recorded.
+- `sock://` consumer: `0x3820E0` is a URL-source classifier (this+8 type, this+12 stripped path). Prefixes `http://`(/`https://`) -> type 4 (whole URL kept), `live_file://` -> 2, `sock://` -> 5 (7 chars stripped), `file://` -> stripped; no prefix -> type 1, upgraded to 3 when a `.chunk_index` path passes the locale check. It is used by the chunk/file source layer, not by the Matrix UDP path; the `sock://%s` string built by `0x3054F9` (VA 0x1B4036C) is a different, separate string.
+
+## Interpreted
+- Oracle reply gives `matrix_url` (host:port) + encrypted `ticket`; the Matrix connect log line is emitted from inside `0x4956C0`. Header builder is the shared ClientApi/hotfix auth header set (Red5/Steam/Youxi/369 ticket variants). Prefix matching assumes `0x325730` is a prefix test.
+
+## Unresolved
+- Callers of `0x635E90` and the request queue struct layout; the JSON-to-field mapping in `0x4956C0`; who consumes type 5 from `0x3820E0`; actual host values.

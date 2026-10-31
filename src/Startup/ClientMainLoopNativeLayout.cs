@@ -189,4 +189,12 @@ public static class ClientMainLoopNativeLayout
     public const long UriDefaultBranchRaw = 0x3054F9;
     public const long ClientApiHostKeyFileOffset = 0x1B520A8 - 0x401400; // "clientapi_host"
     public const long OracleTicketFormatFileOffset = 0x1B520E8 - 0x401400;
+    // Round 15: oracle reply, request headers, URL scheme classifier.
+    public const long OracleResponseHandlerRaw = 0x495460;
+    public const long OracleResponseParseRaw = 0x4956C0;
+    public const long ClientApiHeaderBuilderRaw = 0x635E90;
+    public const long UrlSchemeClassifierRaw = 0x3820E0;
+    public const long MatrixUrlKeyFileOffset = 0x1B52244 - 0x401400;
+    public const long SessionIdHeaderFileOffset = 0x1B6168C - 0x401400;
+    public const long SockSchemeFileOffset = 0x1B452C0 - 0x401400;
 }
