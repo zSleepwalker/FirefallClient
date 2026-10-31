@@ -1090,6 +1090,8 @@ These updates supersede older next-step suggestions below where they overlap.
   unresolved.
   Selector0x66 constructs `JumpRolled` and shares that WORD continuation;
   its allocation-failure path also zeroes ESI before reading.
+  Selector0x68 constructs `CalledForHelp` and shares the same WORD
+  continuation; allocation-failure behavior remains unresolved.
   Remaining case handlers, field meanings, and message semantics are open.
   RTTI names the results `nl::RoutedMessage` and
   `nl::RoutedMultipleMessage`; QWORD and message semantics remain unknown.

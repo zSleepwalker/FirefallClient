@@ -1428,6 +1428,23 @@ failure branch at `0x81D25F` enters `0x81D21D`, zeroes ESI, and continues
 into the same reader, which forms destination address `0x28`; the runtime
 consequence remains unresolved. Field meaning is unknown.
 
+### Selector 0x68: `CalledForHelp`
+
+Entry21 maps selector `0x68` to VA `0xC1DEC2` / raw case `0x81D2C2`. It
+allocates `0x30` bytes, stores local DWORD `0x70` (role unknown), then calls
+constructor `0x525C70`. The constructor passes `0x68` to helper `0x5A0D70`
+and installs vtable VA `0x1C67118` (RTTI
+`firefall::Character::CalledForHelp`).
+
+On the successful allocation path, the case jumps to reader continuation
+`0x81D21F`, shared by selectors `0x65` and `0x66`; it reads a WORD into
+object field `+0x28` through helper `0x336AC0`, for a nominal two-byte body.
+The allocation-failure branch at `0x81D2DA` enters `0x81D21D`, zeroes ESI,
+and continues into the same reader, which forms destination address `0x28`.
+The runtime consequence of that abnormal path is unresolved. Field meaning
+remains unknown; shared parsing does not establish semantic equivalence with
+the other selectors.
+
 ## Message35 application body
 
 Factory case35 at `0x33D557` allocates a fresh0x50-byte descriptor through

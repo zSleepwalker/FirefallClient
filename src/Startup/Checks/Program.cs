@@ -1307,6 +1307,20 @@ Check("JumpRolled selector 0x66 records its shared WORD reader continuation",
     && CharacterJumpRolledNativeLayout.VtableVirtualAddress == 0x1C67148
     && CharacterJumpRolledNativeLayout.WordFieldOffset == 0x28
     && CharacterJumpRolledNativeLayout.NominalInputByteCount == 2);
+Check("CalledForHelp selector 0x68 records its shared WORD reader continuation",
+    CharacterCalledForHelpNativeLayout.InnerSelector == 0x68
+    && CharacterCalledForHelpNativeLayout.CaseFileOffset == 0x81D2C2
+    && CharacterCalledForHelpNativeLayout.CaseLocalDwordValue == 0x70
+    && CharacterCalledForHelpNativeLayout.AllocationSize == 0x30
+    && CharacterCalledForHelpNativeLayout.ConstructorFileOffset == 0x525C70
+    && CharacterCalledForHelpNativeLayout.BaseConstructorHelperFileOffset == 0x5A0D70
+    && CharacterCalledForHelpNativeLayout.BaseConstructorArgument == 0x68
+    && CharacterCalledForHelpNativeLayout.AllocationFailureContinuationFileOffset == 0x81D21D
+    && CharacterCalledForHelpNativeLayout.BodyReaderContinuationFileOffset == 0x81D21F
+    && CharacterCalledForHelpNativeLayout.WordReaderFileOffset == 0x336AC0
+    && CharacterCalledForHelpNativeLayout.VtableVirtualAddress == 0x1C67118
+    && CharacterCalledForHelpNativeLayout.WordFieldOffset == 0x28
+    && CharacterCalledForHelpNativeLayout.NominalInputByteCount == 2);
 Check("Shared channel-2/3 compact-code routing groups the observed native cases",
     Enumerable.Range(1, 6).All(code =>
         MatrixOtherChannelDecoderNativeLayout.SelectRoute(code)
