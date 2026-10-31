@@ -1106,7 +1106,7 @@ internal static class StartupBinaryEvidence
             && RelativeBranchTargets(0xBCB12E, 0xE8, 0x327210)
             && Matches(0xBCB13C, "0FB74738")
             && RelativeBranchTargets(0xBCB148, 0xE8, 0x336CA0));
-        check("Binary 0x81CC50 direct byte indexing and secondary-selector paths match their bounds",
+        check("Binary 0x81CC50 decremented primary-byte indexing and secondary-selector paths match their bounds",
             Matches(0x81CC80, "8A0684C0")
             && Matches(0x81CC8A, "3CF00F8313270000")
             && Matches(0x81CC92, "0FB6C04883F8350F873A4B00000FB6800C24C200FF2485F023C200")
@@ -1357,6 +1357,34 @@ internal static class StartupBinaryEvidence
             && Matches(0x5F4363, "80FBFF0F8417FEFFFF")
             && Matches(0x520145, "83460414")
             && Matches(0x520170, "83460414"));
+        check("Binary inner selector 0x5A parses count blocks of 16-byte vector records",
+            ReadUInt32(VirtualAddressToFileOffset(
+                CharacterReceivedDeferredXPNativeLayout.InnerSelectorTableVirtualAddress) + 28) == 0xC1DADC
+            && Matches(CharacterReceivedDeferredXPNativeLayout.CaseFileOffset, "6A38")
+            && RelativeBranchTargets(0x81CEDE, 0xE8, 0x12B7FB0)
+            && Matches(0x81CEEA, "C744242062000000")
+            && RelativeBranchTargets(0x81CEFD, 0xE8,
+                CharacterReceivedDeferredXPNativeLayout.ConstructorFileOffset)
+            && RelativeBranchTargets(0x81CF15, 0xE8,
+                CharacterReceivedDeferredXPNativeLayout.BodyReaderFileOffset)
+            && Matches(0x5252B2, "C7005A000000")
+            && RelativeBranchTargets(0x5252B8, 0xE8,
+                CharacterReceivedDeferredXPNativeLayout.ConstructorHelperFileOffset)
+            && Matches(0x5252BD, "C7060872C601")
+            && Matches(0x5252C5, "C7462800000000")
+            && Matches(0x5252CC, "C7462C00000000")
+            && Matches(0x5252D3, "C7463000000000")
+            && VtableRttiName(CharacterReceivedDeferredXPNativeLayout.VtableVirtualAddress, 80)
+                == CharacterReceivedDeferredXPNativeLayout.RttiName
+            && Matches(0x5F3B10, "89442420")
+            && Matches(0x5F3B5D, "89442424")
+            && Matches(0x5F3BAA, "89442428")
+            && Matches(0x5F3BF7, "8944242C")
+            && RelativeBranchTargets(0x5F3C95, 0xE8,
+                CharacterReceivedDeferredXPNativeLayout.VectorGrowthHelperFileOffset)
+            && Matches(0x5F3D15, "F30F7F00")
+            && Matches(0x5F3D23, "83470410")
+            && Matches(0x5F3D33, "80FAFF0F8458FDFFFF"));
         check("Binary matrix socket factory requests overlapped UDP",
             Matches(0xBE354A, "6A016A006A006A11B8170000006A020F44C150FF15684DAC01"));
         check("Binary matrix local binding uses seven or two attempts and final-two fallback",

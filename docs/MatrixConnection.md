@@ -1020,41 +1020,41 @@ factory/callback ABI remain unresolved.
 `MatrixOtherChannelDecoderNativeLayout.cs` records dispatch only, not a
 replacement decoder.
 
-## Secondary command dispatcher and seven verified class cases
+## Secondary command dispatcher and eight verified class cases
 
 The secondary-dispatch target `0x81CC50` is a large raw function
 (`0x4B9E` bytes) with two separate selector tables. It reads a leading byte
-from its input structure. After handling byte0 and values `0xF0..0xFF` through
-the secondary selector path, it compares the byte directly with `0x35` and
-uses the byte itself as the index into the 54-byte map at VA `0xC2240C`
-(raw `0x82180C`); no decrement occurs. The map result selects a seven-entry
-table at VA `0xC223F0` (raw `0x8217F0`). The table-index ranges and their
-corresponding leading-byte ranges for nonzero inputs are:
+from its input structure. Byte0 and values `0xF0..0xFF` use the secondary
+selector path. For other values, it decrements the leading byte, compares the
+result with `0x35`, then uses that decremented value as the index into the
+54-byte map at VA `0xC2240C` (raw `0x82180C`). Thus nonzero leading bytes
+`0x01..0x36` map to indices `0x00..0x35`; the map result selects a seven-entry
+table at VA `0xC223F0` (raw `0x8217F0`). The observed leading-byte ranges are:
 
-| Leading byte / table index | Route index | Raw target | Observation |
+| Leading byte | Route index | Raw target | Observation |
 | ---: | ---: | ---: | --- |
-| `0x00..0x0D` | 0 | `0x81CCAD` | Nested selector table; byte0 uses secondary path instead |
-| `0x0E..0x11`, `0x1F..0x20`, `0x28..0x32`, `0x35` | 1 | `0x8217D9` | Returns zero |
-| `0x12..0x18` | 2 | `0x81EE63` | Case block not mapped |
-| `0x19..0x1E` | 3 | `0x81EF6D` | Case block not mapped |
-| `0x21..0x24` | 4 | `0x81F206` | Case block not mapped |
-| `0x25..0x27` | 5 | `0x81F2EF` | Case block not mapped |
-| `0x33..0x34` | 6 | `0x81F34A` | Case block not mapped |
+| `0x01..0x0E` | 0 | `0x81CCAD` | Nested selector table |
+| `0x0F..0x12`, `0x20..0x21`, `0x29..0x33`, `0x36` | 1 | `0x8217D9` | Returns zero |
+| `0x13..0x19` | 2 | `0x81EE63` | Case block not mapped |
+| `0x1A..0x1F` | 3 | `0x81EF6D` | Case block not mapped |
+| `0x22..0x25` | 4 | `0x81F206` | Case block not mapped |
+| `0x26..0x28` | 5 | `0x81F2EF` | Case block not mapped |
+| `0x34..0x35` | 6 | `0x81F34A` | Case block not mapped |
 
 Leading byte0 or `0xF0..0xFF` uses a second table at VA `0xC22630`
 (raw `0x821A30`) when its selector is `0x20..0x7A`; values outside that
-selector range return zero. Leading bytes `0x36..0xEF` also reach the
+selector range return zero. Leading bytes `0x37..0xEF` also reach the
 zero-return path. These are dispatch boundaries only; the inputs’ semantic
 names and the 91 secondary targets are unresolved.
 
-Seven nested selectors are mapped: route0 block `0x81CCAD` dispatches selector
+Eight nested selectors are mapped: route0 block `0x81CCAD` dispatches selector
 `0x53` through the table at VA `0xC22444` (raw `0x821844`) to raw case
 `0x81CCC3`. That case allocates `0x48` bytes, calls constructor `0x524C30`,
 then body reader `0x5F6B10`. Constructor RTTI identifies the object as
 `firefall::Character::MarketRequestComplete`. The reader stores, in order,
 a byte at object+`0x28`, raw QWORD at+`0x30`, byte at+`0x38`, and three
 NUL-terminated shared-text values at+`0x3C/+0x40/+0x44`. Field meanings
-remain unknown; these seven selectors do not name the remaining table cases.
+remain unknown; these eight selectors do not name the remaining table cases.
 `MatrixSecondaryCommandDispatcherNativeLayout.cs` and
 `CharacterMarketRequestCompleteNativeLayout` preserve the route bounds and
 this bounded object layout without implementing a parser.
@@ -1199,6 +1199,27 @@ established. The five DWORD meanings and the RTTI's semantic relation to
 progression remain unknown. `CharacterProgressionXpRefreshNativeLayout`
 records the vector header, record width, and count continuation marker
 without assigning field names or implementing a parser.
+
+### Selector 0x5A: `ReceivedDeferredXP`
+
+Entry7 maps selector `0x5A` to VA `0xC1DADC` / raw case `0x81CEDC`. It
+allocates `0x38` bytes, stores local DWORD `0x62` (role unknown), then calls
+constructor `0x5252A0` and reader `0x5F3A80`. The constructor passes `0x5A`
+to `0x5A0710`, installs vtable VA `0x1C67208` (RTTI
+`firefall::Character::ReceivedDeferredXP`), and zeros the vector header at
+object `+0x28/+0x2C/+0x30`.
+
+The reader resets vector end to begin, reads one count byte, then parses that
+many records of four raw DWORDs (`0x10` bytes each) into the vector. A count
+of `0xFF` parses 255 records and causes another count byte; any count below
+`0xFF` terminates the sequence, with zero meaning no records in that block.
+The reader stores each 16-byte record and advances vector end by `0x10`;
+`0x5F3880` is the vector-growth helper. Nominal input consumption is one
+count byte plus `count * 0x10` bytes per block. No per-reader cap on repeated
+`0xFF` blocks is established. The four DWORD meanings and the RTTI's
+semantic relation to XP remain unknown. `CharacterReceivedDeferredXPNativeLayout`
+records the vector header, record width, and count continuation marker without
+assigning field names or implementing a parser.
 
 ## Message35 application body
 

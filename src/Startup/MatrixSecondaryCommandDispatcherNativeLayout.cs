@@ -8,7 +8,7 @@ public enum MatrixSecondaryCommandInputPath
 }
 
 public readonly record struct MatrixSecondaryCommandRouteRange(
-    byte FirstTableIndex, byte LastTableIndex, int RouteIndex);
+    byte FirstLeadingByte, byte LastLeadingByte, int RouteIndex);
 
 /// <summary>
 /// Static route boundaries for raw 0x81CC50. This records dispatch only; it
@@ -22,7 +22,7 @@ public static class MatrixSecondaryCommandDispatcherNativeLayout
     public const uint PrimaryByteMapVirtualAddress = 0xC2240C;
     public const uint PrimaryByteMapFileOffset = 0x82180C;
     public const int PrimaryByteMapLength = 0x36;
-    public const int PrimaryByteMapMaximumInput = PrimaryByteMapLength - 1;
+    public const int PrimaryByteMapMaximumLeadingByte = PrimaryByteMapLength;
     public const uint PrimaryZeroReturnFileOffset = 0x8217D9;
     public const uint SecondaryJumpTableVirtualAddress = 0xC22630;
     public const uint SecondaryJumpTableFileOffset = 0x821A30;
@@ -33,16 +33,16 @@ public static class MatrixSecondaryCommandDispatcherNativeLayout
     public static IReadOnlyList<MatrixSecondaryCommandRouteRange> PrimaryRouteRanges { get; } =
         Array.AsReadOnly(new[]
         {
-            new MatrixSecondaryCommandRouteRange(0x00, 0x0D, 0),
-            new MatrixSecondaryCommandRouteRange(0x0E, 0x11, 1),
-            new MatrixSecondaryCommandRouteRange(0x12, 0x18, 2),
-            new MatrixSecondaryCommandRouteRange(0x19, 0x1E, 3),
-            new MatrixSecondaryCommandRouteRange(0x1F, 0x20, 1),
-            new MatrixSecondaryCommandRouteRange(0x21, 0x24, 4),
-            new MatrixSecondaryCommandRouteRange(0x25, 0x27, 5),
-            new MatrixSecondaryCommandRouteRange(0x28, 0x32, 1),
-            new MatrixSecondaryCommandRouteRange(0x33, 0x34, 6),
-            new MatrixSecondaryCommandRouteRange(0x35, 0x35, 1)
+            new MatrixSecondaryCommandRouteRange(0x01, 0x0E, 0),
+            new MatrixSecondaryCommandRouteRange(0x0F, 0x12, 1),
+            new MatrixSecondaryCommandRouteRange(0x13, 0x19, 2),
+            new MatrixSecondaryCommandRouteRange(0x1A, 0x1F, 3),
+            new MatrixSecondaryCommandRouteRange(0x20, 0x21, 1),
+            new MatrixSecondaryCommandRouteRange(0x22, 0x25, 4),
+            new MatrixSecondaryCommandRouteRange(0x26, 0x28, 5),
+            new MatrixSecondaryCommandRouteRange(0x29, 0x33, 1),
+            new MatrixSecondaryCommandRouteRange(0x34, 0x35, 6),
+            new MatrixSecondaryCommandRouteRange(0x36, 0x36, 1)
         });
 
     public static IReadOnlyList<byte> ExpectedPrimaryByteRouteMap { get; } =
@@ -57,7 +57,7 @@ public static class MatrixSecondaryCommandDispatcherNativeLayout
     public static MatrixSecondaryCommandInputPath ClassifyLeadingByte(byte leadingByte) =>
         leadingByte == 0 || leadingByte >= 0xF0
             ? MatrixSecondaryCommandInputPath.SecondarySelectorTable
-            : leadingByte <= PrimaryByteMapMaximumInput
+            : leadingByte <= PrimaryByteMapMaximumLeadingByte
                 ? MatrixSecondaryCommandInputPath.PrimaryByteRouteMap
                 : MatrixSecondaryCommandInputPath.ReturnZero;
 
@@ -67,7 +67,7 @@ public static class MatrixSecondaryCommandDispatcherNativeLayout
             return null;
 
         foreach (var route in PrimaryRouteRanges)
-            if (leadingByte >= route.FirstTableIndex && leadingByte <= route.LastTableIndex)
+            if (leadingByte >= route.FirstLeadingByte && leadingByte <= route.LastLeadingByte)
                 return route.RouteIndex;
         return null;
     }
@@ -88,8 +88,8 @@ public static class MatrixSecondaryCommandDispatcherNativeLayout
     {
         var map = new byte[PrimaryByteMapLength];
         foreach (var route in PrimaryRouteRanges)
-            Array.Fill(map, (byte)route.RouteIndex, route.FirstTableIndex,
-                route.LastTableIndex - route.FirstTableIndex + 1);
+            Array.Fill(map, (byte)route.RouteIndex, route.FirstLeadingByte - 1,
+                route.LastLeadingByte - route.FirstLeadingByte + 1);
         return map;
     }
 }

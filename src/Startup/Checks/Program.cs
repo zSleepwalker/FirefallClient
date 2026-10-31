@@ -937,25 +937,32 @@ Check("Secondary command dispatcher separates primary-byte, secondary-selector, 
         == MatrixSecondaryCommandInputPath.PrimaryByteRouteMap
     && MatrixSecondaryCommandDispatcherNativeLayout.ClassifyLeadingByte(0x35)
         == MatrixSecondaryCommandInputPath.PrimaryByteRouteMap
+    && MatrixSecondaryCommandDispatcherNativeLayout.PrimaryByteMapMaximumLeadingByte == 0x36
     && MatrixSecondaryCommandDispatcherNativeLayout.ClassifyLeadingByte(0x36)
-        == MatrixSecondaryCommandInputPath.ReturnZero
+        == MatrixSecondaryCommandInputPath.PrimaryByteRouteMap
     && MatrixSecondaryCommandDispatcherNativeLayout.ClassifyLeadingByte(0x37)
         == MatrixSecondaryCommandInputPath.ReturnZero
     && MatrixSecondaryCommandDispatcherNativeLayout.ClassifyLeadingByte(0xEF)
         == MatrixSecondaryCommandInputPath.ReturnZero
     && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryRouteIndex(0) is null
     && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryRouteIndex(1) == 0
-    && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryRouteIndex(0x0D) == 0
-    && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryRouteIndex(0x0E) == 1
-    && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryRouteIndex(0x11) == 1
-    && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryRouteIndex(0x12) == 2
-    && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryRouteIndex(0x19) == 3
-    && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryRouteIndex(0x1F) == 1
-    && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryRouteIndex(0x21) == 4
-    && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryRouteIndex(0x25) == 5
-    && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryRouteIndex(0x33) == 6
-    && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryRouteIndex(0x35) == 1
-    && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryRouteIndex(0x36) is null
+    && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryRouteIndex(0x0E) == 0
+    && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryRouteIndex(0x0F) == 1
+    && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryRouteIndex(0x12) == 1
+    && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryRouteIndex(0x13) == 2
+    && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryRouteIndex(0x1A) == 3
+    && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryRouteIndex(0x1F) == 3
+    && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryRouteIndex(0x20) == 1
+    && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryRouteIndex(0x21) == 1
+    && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryRouteIndex(0x22) == 4
+    && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryRouteIndex(0x25) == 4
+    && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryRouteIndex(0x26) == 5
+    && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryRouteIndex(0x28) == 5
+    && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryRouteIndex(0x29) == 1
+    && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryRouteIndex(0x33) == 1
+    && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryRouteIndex(0x34) == 6
+    && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryRouteIndex(0x35) == 6
+    && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryRouteIndex(0x36) == 1
     && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryRouteIndex(0x37) is null
     && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryTargetFileOffset(0) == 0x81CCAD
     && MatrixSecondaryCommandDispatcherNativeLayout.GetPrimaryTargetFileOffset(1) == 0x8217D9
@@ -1072,6 +1079,22 @@ Check("ProgressionXpRefresh selector 0x59 records its count-blocked 20-byte vect
     && CharacterProgressionXpRefreshNativeLayout.RecordByteCount == 0x14
     && CharacterProgressionXpRefreshNativeLayout.CountFieldByteCount == 1
     && CharacterProgressionXpRefreshNativeLayout.CountBlockRepeatMarker == 0xFF);
+Check("ReceivedDeferredXP selector 0x5A records its count-blocked 16-byte vector",
+    CharacterReceivedDeferredXPNativeLayout.InnerSelector == 0x5A
+    && CharacterReceivedDeferredXPNativeLayout.CaseFileOffset == 0x81CEDC
+    && CharacterReceivedDeferredXPNativeLayout.CaseLocalDwordValue == 0x62
+    && CharacterReceivedDeferredXPNativeLayout.AllocationSize == 0x38
+    && CharacterReceivedDeferredXPNativeLayout.ConstructorFileOffset == 0x5252A0
+    && CharacterReceivedDeferredXPNativeLayout.BodyReaderFileOffset == 0x5F3A80
+    && CharacterReceivedDeferredXPNativeLayout.VectorGrowthHelperFileOffset == 0x5F3880
+    && CharacterReceivedDeferredXPNativeLayout.VtableVirtualAddress == 0x1C67208
+    && CharacterReceivedDeferredXPNativeLayout.VectorBeginOffset == 0x28
+    && CharacterReceivedDeferredXPNativeLayout.VectorEndOffset == 0x2C
+    && CharacterReceivedDeferredXPNativeLayout.VectorCapacityOffset == 0x30
+    && CharacterReceivedDeferredXPNativeLayout.RecordDwordCount == 4
+    && CharacterReceivedDeferredXPNativeLayout.RecordByteCount == 0x10
+    && CharacterReceivedDeferredXPNativeLayout.CountFieldByteCount == 1
+    && CharacterReceivedDeferredXPNativeLayout.CountBlockRepeatMarker == 0xFF);
 Check("Shared channel-2/3 compact-code routing groups the observed native cases",
     Enumerable.Range(1, 6).All(code =>
         MatrixOtherChannelDecoderNativeLayout.SelectRoute(code)

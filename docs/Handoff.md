@@ -1037,7 +1037,8 @@ These updates supersede older next-step suggestions below where they overlap.
   reaches `0xBC9DB0`, and code7/out-of-range reaches shared secondary-dispatch
   block `0x821D7C` then `0x81CC50`. The three route targets and byte-map/table
   addresses are in MatrixConnection.md. The inner `0x81CC50` tables are
-  structurally mapped with direct byte indexing (nonzero indices1..0x35);
+  structurally mapped with a leading-byte decrement (accepted inputs1..0x36
+  map to indices0..0x35);
   selector0x53 builds `MarketRequestComplete`, and selector0x54 builds
   `ReceiveWeaponTweaks` with two raw bytes followed by a remaining-stream
   blob. Selector0x55's `TookDebugWeaponHitPublic` reader has a verified
@@ -1054,6 +1055,9 @@ These updates supersede older next-step suggestions below where they overlap.
   Selector0x59 constructs `ProgressionXpRefresh` and reads count-blocked
   records of five raw DWORDs (20 bytes) into the vector at object+0x28; field
   meanings remain unknown.
+  Selector0x5A constructs `ReceivedDeferredXP` and reads count-blocked
+  records of four raw DWORDs (16 bytes) into its vector; meanings remain
+  unknown.
   Remaining case handlers, field meanings, and message semantics are open.
   RTTI names the results `nl::RoutedMessage` and
   `nl::RoutedMultipleMessage`; QWORD and message semantics remain unknown.
