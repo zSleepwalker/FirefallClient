@@ -51,6 +51,11 @@ its wrapper `0xC32460` calls named-subscription helper `0xC35BB0` at
 `0xC32643`; that helper also calls `0xBF9AB0` and `0xBF9B40`. Both paths add
 first-seen names to the same dynamic map.
 
+The `uiManager` constructor initializes the name-array begin/end pointers at
+`+0x71C/+0x720` to zero (raw stores `0xBF7FF6` and `0xBF8000`), so the first
+new name receives ID 0. ID `0x145` is therefore the 326th distinct
+first-time insertion; repeated names reuse their existing ID.
+
 The UI-set loader's folder path uses `0x30AB90`, which calls directory
 enumerator `0x12B6A00` with search pattern `%s\*`. The enumerator uses CRT
 `_wfindfirst64i32`, `_wfindnext64i32`, and `_findclose`; it splits entries by
@@ -58,14 +63,6 @@ the directory attribute, appends each class in returned order, and the caller
 processes the directory list before its file list. No sort is observed in
 this path. Therefore the folder roots listed in the UI-set XML do not alone
 establish the component-file event-registration order.
-
-The UI-set loader's folder path uses `0x30AB90`, which calls directory
-enumerator `0x12B6A00` with search pattern `%s\*`. The enumerator uses
-MSVCR120 `_wfindfirst64i32`, `_wfindnext64i32`, and `_findclose`; it appends
-directory and file entries in the returned order, and the caller processes
-the directory list before its file list. No sort is observed in this path.
-Thus, the folder roots listed in the UI-set XML do not alone establish the
-component-file event-registration order.
 
 The local installed UI sources provide a candidate name for the Login
 notification. `UISets\LoginUI.xml` sets `glue_mode=true` and lists folder
@@ -75,8 +72,8 @@ roots `LoginUI`, `MainUI/Panels/Options`, `MainUI/Backend/IME`, and
 `ON_LOGIN_RESPONSE` to `OnLoginResponse`; the Lua handler is defined at
 `AccountLogin.lua:876`. This makes `0x145 -> ON_LOGIN_RESPONSE` plausible, but not proven: the native
 callsite is in a separate Login-mode routine, not in the response callback
-`0x63B7C0`. `0x145` is array index 325, so it would be the 326th insertion if
-the initial count is zero; repeated event names reuse their existing ID.
+`0x63B7C0`. `0x145` is array index 325, the 326th distinct first-time
+insertion; repeated event names reuse their existing ID.
 Because both XML `<Events>` parsing and `Component.BindEvent` calls insert
 names, the complete first-insertion order across folders, components, and
 script activity is not reconstructed. The actual subscriber remains

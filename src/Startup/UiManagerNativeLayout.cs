@@ -53,6 +53,10 @@ public static class UiManagerNativeLayout
     public const int UiManagerEventNameMapOffset = 0x6E8;
     public const int UiManagerEventNameArrayBeginOffset = 0x71C;
     public const int UiManagerEventNameArrayEndOffset = 0x720;
+    public const int UiManagerEventNameArrayBeginInitialValue = 0;
+    public const int UiManagerEventNameArrayEndInitialValue = 0;
+    public const uint UiManagerEventNameArrayBeginInitializationFileOffset = 0xBF7FF6;
+    public const uint UiManagerEventNameArrayEndInitializationFileOffset = 0xBF8000;
     public const int UiManagerEventReadyFlagOffset = 0x672;
     public const int UiManagerListenerNameOffset = 0x70;
     public const int LoginModeMessageId = 0x145;

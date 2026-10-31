@@ -450,6 +450,10 @@ Check("UI manager singleton and global event routing boundaries are recorded",
     && UiManagerNativeLayout.UiManagerEventNameMapOffset == 0x6E8
     && UiManagerNativeLayout.UiManagerEventNameArrayBeginOffset == 0x71C
     && UiManagerNativeLayout.UiManagerEventNameArrayEndOffset == 0x720
+    && UiManagerNativeLayout.UiManagerEventNameArrayBeginInitialValue == 0
+    && UiManagerNativeLayout.UiManagerEventNameArrayEndInitialValue == 0
+    && UiManagerNativeLayout.UiManagerEventNameArrayBeginInitializationFileOffset == 0xBF7FF6
+    && UiManagerNativeLayout.UiManagerEventNameArrayEndInitializationFileOffset == 0xBF8000
     && UiManagerNativeLayout.UiManagerEventReadyFlagOffset == 0x672
     && UiManagerNativeLayout.LoginModeMessage145GlobalLoadFileOffset == 0x63C1E2
     && UiManagerNativeLayout.LoginModeMessage145CallFileOffset == 0x63C1F5

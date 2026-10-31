@@ -40,14 +40,13 @@ request for mode `{2,0}` when the object pointed to by the DWORD stored at VA
 to message `0x145` remain unknown.
 The component XML `<Events>` parser now maps each `name` through `0xBF9AB0`
 before registering its `bind`; `Component.BindEvent` uses the same dynamic map.
-The first-insertion order needed to resolve `ON_LOGIN_RESPONSE` to ID `0x145`
-is still open.
-The folder walker uses the host CRT's find-first/find-next enumeration and
-processes directory entries before files, with no explicit sort observed.
-Thus component XML order is not recoverable from lexical filenames alone.
-The Login UI folder walker uses `_wfindfirst64i32` / `_wfindnext64i32` without
-an observed sort, so component XML registration order cannot be inferred from
-lexical file names alone.
+The `uiManager` constructor starts its name array empty, so ID `0x145` is the
+326th distinct first-time name insertion. The order needed to identify which
+name occupies that slot is still open.
+The Login UI folder walker uses CRT `_wfindfirst64i32` /
+`_wfindnext64i32` / `_findclose`, processes directory entries before files,
+and shows no explicit sort in the analyzed path. Component XML order is not
+recoverable from lexical filenames alone.
 
 The latest render-init pass identifies the six `0xED1650` args (fullscreen flag, display w/h, third display value, window client w/h, forwarded to oD3DRenderAPI slot +8 `0xF08680`), the host class `oEngineSystem` (`0xE54BF0` = vtable `0x1C77C2C` slot 0) and `0x1DFE9C8` as `oShaderBuilderSystem`; see MatrixConnection.md. Cvar-field mapping and the path to the main loop remain unresolved.
 

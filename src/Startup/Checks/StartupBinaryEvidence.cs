@@ -1879,6 +1879,10 @@ internal static class StartupBinaryEvidence
                 "C705A4B0E401A802E001C705A802E001F02FC601C705B802E00100000000C3")
             && Matches(0x3E4573, "E808358100EB0233C0894610A1A8B0E40189460C8935A8B0E401C6460401")
             && Matches(0xBF7ABB, "C703BC3EC701")
+            && Matches(UiManagerNativeLayout.UiManagerEventNameArrayBeginInitializationFileOffset,
+                "C7831C07000000000000")
+            && Matches(UiManagerNativeLayout.UiManagerEventNameArrayEndInitializationFileOffset,
+                "C7832007000000000000")
             && Matches(UiManagerNativeLayout.UiManagerEventReadyFlagTestFileOffset,
                 "80B872060000000F849C010000")
             && Matches(UiManagerNativeLayout.UiManagerEventReadyFlagInitializeFileOffset, "C6837206000000")
