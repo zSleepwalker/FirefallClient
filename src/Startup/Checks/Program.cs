@@ -1699,6 +1699,50 @@ Check("NPCInteraction selector 0x77 records its raw QWORD body field",
     && CharacterNPCInteractionNativeLayout.BodyReaderFileOffset == 0x81F72E
     && CharacterNPCInteractionNativeLayout.QwordReaderFileOffset == 0x356F80
     && CharacterNPCInteractionNativeLayout.FirstQwordFieldOffset == 0x28);
+Check("OpenMovieDialog selector 0x78 records its shared text field",
+    CharacterOpenMovieDialogNativeLayout.InnerSelector == 0x78
+    && CharacterOpenMovieDialogNativeLayout.InnerSelectorTableEntryOffset == 0x94
+    && CharacterOpenMovieDialogNativeLayout.CaseVirtualAddress == 0xC1E36D
+    && CharacterOpenMovieDialogNativeLayout.CaseFileOffset == 0x81D76D
+    && CharacterOpenMovieDialogNativeLayout.CaseLocalDwordValue == 0x80
+    && CharacterOpenMovieDialogNativeLayout.AllocationSize == 0x30
+    && CharacterOpenMovieDialogNativeLayout.ConstructorFileOffset == 0x526730
+    && CharacterOpenMovieDialogNativeLayout.BaseConstructorHelperFileOffset == 0x5A14A0
+    && CharacterOpenMovieDialogNativeLayout.BaseConstructorArgument == 0x78
+    && CharacterOpenMovieDialogNativeLayout.AllocationFailureContinuationFileOffset == 0x81FB25
+    && CharacterOpenMovieDialogNativeLayout.BodyReaderSetupFileOffset == 0x81FB27
+    && CharacterOpenMovieDialogNativeLayout.BodyReaderFileOffset == 0x12EE010
+    && CharacterOpenMovieDialogNativeLayout.FirstTextFieldOffset == 0x28);
+Check("PrivateDialog selector 0x79 records its DWORD/QWORD/DWORD reader fields",
+    CharacterPrivateDialogNativeLayout.InnerSelector == 0x79
+    && CharacterPrivateDialogNativeLayout.InnerSelectorTableEntryOffset == 0x98
+    && CharacterPrivateDialogNativeLayout.CaseVirtualAddress == 0xC1E39E
+    && CharacterPrivateDialogNativeLayout.CaseFileOffset == 0x81D79E
+    && CharacterPrivateDialogNativeLayout.CaseLocalDwordValue == 0x81
+    && CharacterPrivateDialogNativeLayout.AllocationSize == 0x40
+    && CharacterPrivateDialogNativeLayout.ConstructorFileOffset == 0x526840
+    && CharacterPrivateDialogNativeLayout.BaseConstructorHelperFileOffset == 0x5A1510
+    && CharacterPrivateDialogNativeLayout.BaseConstructorArgument == 0x79
+    && CharacterPrivateDialogNativeLayout.BodyReaderFileOffset == 0x5EE900
+    && CharacterPrivateDialogNativeLayout.DwordReaderFileOffset == 0x3370A0
+    && CharacterPrivateDialogNativeLayout.QwordReaderFileOffset == 0x356F80
+    && CharacterPrivateDialogNativeLayout.FirstDwordFieldOffset == 0x28
+    && CharacterPrivateDialogNativeLayout.QwordFieldOffset == 0x30
+    && CharacterPrivateDialogNativeLayout.SecondDwordFieldOffset == 0x38);
+Check("PublicDialog selector 0x7A records two DWORD reader fields",
+    CharacterPublicDialogNativeLayout.InnerSelector == 0x7A
+    && CharacterPublicDialogNativeLayout.InnerSelectorTableEntryOffset == 0x9C
+    && CharacterPublicDialogNativeLayout.CaseVirtualAddress == 0xC1E3EF
+    && CharacterPublicDialogNativeLayout.CaseFileOffset == 0x81D7EF
+    && CharacterPublicDialogNativeLayout.CaseLocalDwordValue == 0x82
+    && CharacterPublicDialogNativeLayout.AllocationSize == 0x30
+    && CharacterPublicDialogNativeLayout.ConstructorFileOffset == 0x5268D0
+    && CharacterPublicDialogNativeLayout.BaseConstructorHelperFileOffset == 0x5A1580
+    && CharacterPublicDialogNativeLayout.BaseConstructorArgument == 0x7A
+    && CharacterPublicDialogNativeLayout.BodyReaderFileOffset == 0x5EE730
+    && CharacterPublicDialogNativeLayout.DwordReaderFileOffset == 0x3370A0
+    && CharacterPublicDialogNativeLayout.FirstDwordFieldOffset == 0x28
+    && CharacterPublicDialogNativeLayout.SecondDwordFieldOffset == 0x2C);
 Check("Shared channel-2/3 compact-code routing groups the observed native cases",
     Enumerable.Range(1, 6).All(code =>
         MatrixOtherChannelDecoderNativeLayout.SelectRoute(code)

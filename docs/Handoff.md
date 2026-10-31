@@ -1107,7 +1107,10 @@ These updates supersede older next-step suggestions below where they overlap.
   Selector0x75 constructs `AbilityFailed` with the same observed DWORD/opaque-state reader shape as selector0x74; event semantics remain unproven.
   Selector0x76 constructs `AbilityCooldowns` and passes remaining input to the opaque embedded state at +0x28 (virtual +0x10 reader); field meaning remains unknown.
   Selector0x77 constructs `NPCInteraction` and reads one raw QWORD at +0x28; field meaning and allocation-failure consequence remain unknown.
-  Remaining case handlers, field meanings, and message semantics are open.
+  Selector0x78 constructs `OpenMovieDialog` and passes input through the shared NUL-terminated text reader at +0x28; field meaning and allocation-failure consequence remain unknown.
+  Selector0x79 constructs `PrivateDialog` and reads DWORD +0x28, QWORD +0x30, and DWORD +0x38; field meanings and allocation-failure consequence remain unknown.
+  Selector0x7A constructs `PublicDialog` and reads DWORDs +0x28/+0x2C; field meanings and allocation-failure consequence remain unknown.
+  The nested selector table 0x53..0x7A is fully traced. Next trace consumers of parsed message objects (including vtable handler methods) and the remaining primary dispatcher cases at 0x81EE63, 0x81EF6D, 0x81F206, 0x81F2EF, and 0x81F34A; field semantics and message meanings remain open.
   RTTI names the results `nl::RoutedMessage` and
   `nl::RoutedMultipleMessage`; QWORD and message semantics remain unknown.
 - **Header/factory roles corrected by instructions.** 34A020 reads compact

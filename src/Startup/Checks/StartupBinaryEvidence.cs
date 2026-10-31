@@ -2309,6 +2309,103 @@ internal static class StartupBinaryEvidence
                 0xE8, CharacterNPCInteractionNativeLayout.QwordReaderFileOffset)
             && VtableRttiName(CharacterNPCInteractionNativeLayout.VtableVirtualAddress, 80)
                 == CharacterNPCInteractionNativeLayout.RttiName);
+        check("Binary inner selector 0x78 routes OpenMovieDialog through the shared text reader",
+            ReadUInt32(VirtualAddressToFileOffset(
+                CharacterOpenMovieDialogNativeLayout.InnerSelectorTableVirtualAddress)
+                + CharacterOpenMovieDialogNativeLayout.InnerSelectorTableEntryOffset)
+                == CharacterOpenMovieDialogNativeLayout.CaseVirtualAddress
+            && Matches(CharacterOpenMovieDialogNativeLayout.CaseFileOffset, "6A30")
+            && RelativeBranchTargets(CharacterOpenMovieDialogNativeLayout.CaseFileOffset + 2, 0xE8,
+                CharacterOpenMovieDialogNativeLayout.AllocationFunctionFileOffset)
+            && Matches(CharacterOpenMovieDialogNativeLayout.CaseFileOffset + 0x0E,
+                "C744242080000000")
+            && Matches(CharacterOpenMovieDialogNativeLayout.CaseFileOffset + 0x18, "0F849A230000")
+            && Matches(CharacterOpenMovieDialogNativeLayout.CaseFileOffset + 0x2C, "E989230000")
+            && Matches(CharacterOpenMovieDialogNativeLayout.AllocationFailureContinuationFileOffset, "33F6")
+            && Matches(CharacterOpenMovieDialogNativeLayout.BodyReaderSetupFileOffset,
+                "8D5628C7442420FFFFFFFF")
+            && RelativeBranchTargets(CharacterOpenMovieDialogNativeLayout.BodyReaderCallSiteFileOffset,
+                0xE8, CharacterOpenMovieDialogNativeLayout.BodyReaderFileOffset)
+            && RelativeBranchTargets(CharacterOpenMovieDialogNativeLayout.ConstructorCallSiteFileOffset,
+                0xE8, CharacterOpenMovieDialogNativeLayout.ConstructorFileOffset)
+            && Matches(CharacterOpenMovieDialogNativeLayout.ConstructorFileOffset + 0x12,
+                "C70078000000")
+            && RelativeBranchTargets(CharacterOpenMovieDialogNativeLayout.ConstructorFileOffset + 0x18,
+                0xE8, CharacterOpenMovieDialogNativeLayout.BaseConstructorHelperFileOffset)
+            && Matches(CharacterOpenMovieDialogNativeLayout.ConstructorFileOffset + 0x1D,
+                "C7062870C601")
+            && Matches(CharacterOpenMovieDialogNativeLayout.ConstructorFileOffset + 0x25,
+                "C7462800000000")
+            && Matches(CharacterOpenMovieDialogNativeLayout.BodyReaderFileOffset,
+                "558BEC81EC14010000")
+            && VtableRttiName(CharacterOpenMovieDialogNativeLayout.VtableVirtualAddress, 80)
+                == CharacterOpenMovieDialogNativeLayout.RttiName);
+        check("Binary inner selector 0x79 routes PrivateDialog through its DWORD/QWORD/DWORD reader",
+            ReadUInt32(VirtualAddressToFileOffset(
+                CharacterPrivateDialogNativeLayout.InnerSelectorTableVirtualAddress)
+                + CharacterPrivateDialogNativeLayout.InnerSelectorTableEntryOffset)
+                == CharacterPrivateDialogNativeLayout.CaseVirtualAddress
+            && Matches(CharacterPrivateDialogNativeLayout.CaseFileOffset, "6A40")
+            && RelativeBranchTargets(CharacterPrivateDialogNativeLayout.CaseFileOffset + 2, 0xE8,
+                CharacterPrivateDialogNativeLayout.AllocationFunctionFileOffset)
+            && Matches(CharacterPrivateDialogNativeLayout.CaseFileOffset + 0x0E,
+                "C744242081000000")
+            && Matches(CharacterPrivateDialogNativeLayout.CaseFileOffset + 0x18, "7410")
+            && Matches(CharacterPrivateDialogNativeLayout.AllocationFailureContinuationFileOffset, "33F6")
+            && RelativeBranchTargets(CharacterPrivateDialogNativeLayout.ConstructorCallSiteFileOffset,
+                0xE8, CharacterPrivateDialogNativeLayout.ConstructorFileOffset)
+            && RelativeBranchTargets(CharacterPrivateDialogNativeLayout.BodyReaderCallSiteFileOffset,
+                0xE8, CharacterPrivateDialogNativeLayout.BodyReaderFileOffset)
+            && Matches(CharacterPrivateDialogNativeLayout.ConstructorFileOffset + 0x12,
+                "C70079000000")
+            && RelativeBranchTargets(CharacterPrivateDialogNativeLayout.ConstructorFileOffset + 0x18,
+                0xE8, CharacterPrivateDialogNativeLayout.BaseConstructorHelperFileOffset)
+            && Matches(CharacterPrivateDialogNativeLayout.ConstructorFileOffset + 0x1D,
+                "C7061870C601")
+            && Matches(CharacterPrivateDialogNativeLayout.ConstructorFileOffset + 0x25,
+                "C7463000000000")
+            && Matches(CharacterPrivateDialogNativeLayout.ConstructorFileOffset + 0x2C,
+                "C7463400000000")
+            && Matches(CharacterPrivateDialogNativeLayout.BodyReaderFileOffset,
+                "558BEC568B7508578BF98D462850")
+            && RelativeBranchTargets(CharacterPrivateDialogNativeLayout.BodyReaderFileOffset + 0x0E,
+                0xE8, CharacterPrivateDialogNativeLayout.DwordReaderFileOffset)
+            && RelativeBranchTargets(CharacterPrivateDialogNativeLayout.BodyReaderFileOffset + 0x19,
+                0xE8, CharacterPrivateDialogNativeLayout.QwordReaderFileOffset)
+            && RelativeBranchTargets(CharacterPrivateDialogNativeLayout.BodyReaderFileOffset + 0x24,
+                0xE8, CharacterPrivateDialogNativeLayout.DwordReaderFileOffset)
+            && VtableRttiName(CharacterPrivateDialogNativeLayout.VtableVirtualAddress, 80)
+                == CharacterPrivateDialogNativeLayout.RttiName);
+        check("Binary inner selector 0x7A routes PublicDialog through two DWORD readers",
+            ReadUInt32(VirtualAddressToFileOffset(
+                CharacterPublicDialogNativeLayout.InnerSelectorTableVirtualAddress)
+                + CharacterPublicDialogNativeLayout.InnerSelectorTableEntryOffset)
+                == CharacterPublicDialogNativeLayout.CaseVirtualAddress
+            && Matches(CharacterPublicDialogNativeLayout.CaseFileOffset, "6A30")
+            && RelativeBranchTargets(CharacterPublicDialogNativeLayout.CaseFileOffset + 2, 0xE8,
+                CharacterPublicDialogNativeLayout.AllocationFunctionFileOffset)
+            && Matches(CharacterPublicDialogNativeLayout.CaseFileOffset + 0x0E,
+                "C744242082000000")
+            && Matches(CharacterPublicDialogNativeLayout.CaseFileOffset + 0x18, "7410")
+            && Matches(CharacterPublicDialogNativeLayout.AllocationFailureContinuationFileOffset, "33F6")
+            && RelativeBranchTargets(CharacterPublicDialogNativeLayout.ConstructorCallSiteFileOffset,
+                0xE8, CharacterPublicDialogNativeLayout.ConstructorFileOffset)
+            && RelativeBranchTargets(CharacterPublicDialogNativeLayout.BodyReaderCallSiteFileOffset,
+                0xE8, CharacterPublicDialogNativeLayout.BodyReaderFileOffset)
+            && Matches(CharacterPublicDialogNativeLayout.ConstructorFileOffset + 0x12,
+                "C7007A000000")
+            && RelativeBranchTargets(CharacterPublicDialogNativeLayout.ConstructorFileOffset + 0x18,
+                0xE8, CharacterPublicDialogNativeLayout.BaseConstructorHelperFileOffset)
+            && Matches(CharacterPublicDialogNativeLayout.ConstructorFileOffset + 0x1D,
+                "C706F86FC601")
+            && Matches(CharacterPublicDialogNativeLayout.BodyReaderFileOffset,
+                "558BEC568B7508578BF98D462850")
+            && RelativeBranchTargets(CharacterPublicDialogNativeLayout.BodyReaderFileOffset + 0x0E,
+                0xE8, CharacterPublicDialogNativeLayout.DwordReaderFileOffset)
+            && RelativeBranchTargets(CharacterPublicDialogNativeLayout.BodyReaderFileOffset + 0x19,
+                0xE8, CharacterPublicDialogNativeLayout.DwordReaderFileOffset)
+            && VtableRttiName(CharacterPublicDialogNativeLayout.VtableVirtualAddress, 80)
+                == CharacterPublicDialogNativeLayout.RttiName);
         check("Binary matrix socket factory requests overlapped UDP",
             Matches(0xBE354A, "6A016A006A006A11B8170000006A020F44C150FF15684DAC01"));
         check("Binary matrix local binding uses seven or two attempts and final-two fallback",

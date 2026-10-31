@@ -1722,6 +1722,79 @@ advances the input stream by eight. The allocation-failure branch reaches
 address calculation is recorded as observed; its runtime consequence and the
 QWORD's field meanings remain unknown.
 
+### Selector 0x78: `OpenMovieDialog`
+
+Entry37 maps selector `0x78` to VA `0xC1E36D` / raw case `0x81D76D`. It
+allocates `0x30` bytes, stores local DWORD `0x80` (role unknown), and calls
+constructor `0x526730`. The constructor passes selector `0x78` to helper
+`0x5A14A0`, installs vtable VA `0x1C67028` (RTTI
+`firefall::Character::OpenMovieDialog`), and zero-initializes DWORD `+0x28`.
+
+The success path joins shared reader setup at raw `0x81FB27`; allocation
+failure first zeroes ESI at `0x81FB25` before joining it. The setup passes
+`+0x28` to reader `0x12EE010`, which consumes a NUL-terminated byte sequence
+into the shared text state. The meaning of the field and the allocation-failure
+consequence remain unresolved.
+
+### Selector 0x79: `PrivateDialog`
+
+Entry38 maps selector `0x79` to VA `0xC1E39E` / raw case `0x81D79E`. It
+allocates `0x40` bytes, stores local DWORD `0x81` (role unknown), and calls
+constructor `0x526840`. The constructor passes selector `0x79` to helper
+`0x5A1510`, installs vtable VA `0x1C67018` (RTTI
+`firefall::Character::PrivateDialog`), and zero-initializes DWORDs at `+0x30`
+and `+0x34`.
+
+Reader `0x5EE900` reads a DWORD at `+0x28`, a raw QWORD at `+0x30`, and a
+DWORD at `+0x38`, using readers `0x3370A0`, `0x356F80`, and `0x3370A0`
+respectively. The allocation-failure branch zeroes ESI before reaching this
+reader; its runtime consequence and the fields' meanings remain unresolved.
+
+### Selector 0x7A: `PublicDialog`
+
+Entry39 maps selector `0x7A` to VA `0xC1E3EF` / raw case `0x81D7EF`. It
+allocates `0x30` bytes, stores local DWORD `0x82` (role unknown), and calls
+constructor `0x5268D0`. The constructor passes selector `0x7A` to helper
+`0x5A1580` and installs vtable VA `0x1C66FF8` (RTTI
+`firefall::Character::PublicDialog`).
+
+Reader `0x5EE730` reads DWORDs at `+0x28` and `+0x2C` through `0x3370A0`.
+The allocation-failure branch zeroes ESI before reaching this reader; its
+runtime consequence and the fields' meanings remain unresolved.
+
+The nested table at VA `0xC22444` (raw `0x821844`) is now traced from selector
+`0x53` through `0x7A`, inclusive:
+
+| Selector | RTTI | Selector | RTTI |
+| --- | --- | --- | --- |
+| `0x53` | `MarketRequestComplete` | `0x54` | `ReceiveWeaponTweaks` |
+| `0x55` | `TookDebugWeaponHitPublic` | `0x56` | `TookDebugWeaponHit` |
+| `0x57` | `DebugWeaponStats` | `0x58` | `RewardInfo` |
+| `0x59` | `ProgressionXpRefresh` | `0x5A` | `ReceivedDeferredXP` |
+| `0x5B` | `PublicCombatLog` | `0x5C` | `PrivateCombatLog` |
+| `0x5D` | `AnimationUpdated` | `0x5E` | `RaiaNPCDebugging` |
+| `0x5F` | `WeaponProjectileFired` | `0x60` | `AbilityProjectileFired` |
+| `0x61` | `ProjectileHitReported` | `0x62` | `Stumble` |
+| `0x63` | `QuickChat` | `0x64` | `ProximityTextChat` |
+| `0x65` | `JumpActioned` | `0x66` | `JumpRolled` |
+| `0x67` | `Respawned` | `0x68` | `CalledForHelp` |
+| `0x69` | `TookHit` | `0x6A` | `AlmostHit` |
+| `0x6B` | `DealtHit` | `0x6C` | `Killed` |
+| `0x6D` | `WarnLockTargeted` | `0x6E` | `CurrentPoseUpdate` |
+| `0x6F` | `ConfirmedPoseUpdate` | `0x70` | `PublicDebugMovementUpdate` |
+| `0x71` | `ForcedMovement` | `0x72` | `ForcedMovementCancelled` |
+| `0x73` | `GrappleClimbPermission` | `0x74` | `AbilityActivated` |
+| `0x75` | `AbilityFailed` | `0x76` | `AbilityCooldowns` |
+| `0x77` | `NPCInteraction` | `0x78` | `OpenMovieDialog` |
+| `0x79` | `PrivateDialog` | `0x7A` | `PublicDialog` |
+
+This closes the nested case mapping, not the overall Matrix analysis. Field
+semantics, allocation-failure consequences, the selector `0x55` 12-byte
+temporary prefix, and selector `0x6D` body consumption remain unresolved.
+Next, trace what consumes parsed message objects (including candidate vtable
+handler methods) and map the remaining primary dispatcher cases at raw
+`0x81EE63`, `0x81EF6D`, `0x81F206`, `0x81F2EF`, and `0x81F34A`.
+
 ## Message35 application body
 
 Factory case35 at `0x33D557` allocates a fresh0x50-byte descriptor through
