@@ -1771,6 +1771,74 @@ internal static class StartupBinaryEvidence
             && Matches(0x525C8D, "C7061871C601")
             && VtableRttiName(CharacterCalledForHelpNativeLayout.VtableVirtualAddress, 80)
                 == CharacterCalledForHelpNativeLayout.RttiName);
+        check("Binary inner selector 0x67 routes Respawned through its WORD and byte readers",
+            ReadUInt32(VirtualAddressToFileOffset(
+                CharacterRespawnedNativeLayout.InnerSelectorTableVirtualAddress) + 80) == 0xC1DE71
+            && Matches(CharacterRespawnedNativeLayout.CaseFileOffset, "6A30")
+            && RelativeBranchTargets(CharacterRespawnedNativeLayout.CaseFileOffset + 2, 0xE8,
+                CharacterRespawnedNativeLayout.AllocationFunctionFileOffset)
+            && Matches(0x81D27F, "C74424206F000000")
+            && Matches(0x81D289, "7410")
+            && RelativeBranchTargets(0x81D292, 0xE8,
+                CharacterRespawnedNativeLayout.ConstructorFileOffset)
+            && Matches(0x81D299, "EB02")
+            && Matches(CharacterRespawnedNativeLayout.AllocationFailureContinuationFileOffset, "33F6")
+            && Matches(CharacterRespawnedNativeLayout.BodyReaderContinuationFileOffset, "568BCF")
+            && RelativeBranchTargets(0x81D2A8, 0xE8,
+                CharacterRespawnedNativeLayout.BodyReaderFileOffset)
+            && RelativeBranchTargets(0x5F155E, 0xE8,
+                CharacterRespawnedNativeLayout.WordReaderFileOffset)
+            && RelativeBranchTargets(0x5F1568, 0xE8,
+                CharacterRespawnedNativeLayout.FirstByteReaderFileOffset)
+            && RelativeBranchTargets(0x5F1572, 0xE8,
+                CharacterRespawnedNativeLayout.SecondByteReaderFileOffset)
+            && Matches(0x525C02, "C70067000000")
+            && RelativeBranchTargets(0x525C08, 0xE8,
+                CharacterRespawnedNativeLayout.BaseConstructorHelperFileOffset)
+            && Matches(0x525C0D, "C7063871C601")
+            && VtableRttiName(CharacterRespawnedNativeLayout.VtableVirtualAddress, 80)
+                == CharacterRespawnedNativeLayout.RttiName);
+        check("Binary inner selector 0x69 routes TookHit through its conditional record reader",
+            ReadUInt32(VirtualAddressToFileOffset(
+                CharacterTookHitNativeLayout.InnerSelectorTableVirtualAddress) + 88) == 0xC1DEF3
+            && Matches(CharacterTookHitNativeLayout.CaseFileOffset, "6A60")
+            && RelativeBranchTargets(CharacterTookHitNativeLayout.CaseFileOffset + 2, 0xE8,
+                CharacterTookHitNativeLayout.AllocationFunctionFileOffset)
+            && Matches(0x81D301, "C744242071000000")
+            && Matches(0x81D30B, "7410")
+            && RelativeBranchTargets(0x81D314, 0xE8,
+                CharacterTookHitNativeLayout.ConstructorFileOffset)
+            && Matches(0x81D31B, "EB02")
+            && Matches(CharacterTookHitNativeLayout.AllocationFailureContinuationFileOffset, "33F6")
+            && Matches(CharacterTookHitNativeLayout.BodyReaderContinuationFileOffset, "568BCF")
+            && RelativeBranchTargets(0x81D32A, 0xE8,
+                CharacterTookHitNativeLayout.BodyReaderFileOffset)
+            && RelativeBranchTargets(0x5F0FCE, 0xE8,
+                CharacterTookHitNativeLayout.ConditionalRecordReaderFileOffset)
+            && RelativeBranchTargets(0x5F0D9F, 0xE8,
+                CharacterTookHitNativeLayout.QwordReaderFileOffset)
+            && RelativeBranchTargets(0x5F0DAA, 0xE8,
+                CharacterTookHitNativeLayout.ConditionalQwordReaderFileOffset)
+            && RelativeBranchTargets(0x5F0DB6, 0xE8,
+                CharacterTookHitNativeLayout.DwordReaderFileOffset)
+            && RelativeBranchTargets(0x5F0DC1, 0xE8,
+                CharacterTookHitNativeLayout.ByteReaderFileOffset)
+            && RelativeBranchTargets(0x5F0FD8, 0xE8,
+                CharacterTookHitNativeLayout.ByteReaderFileOffset)
+            && RelativeBranchTargets(0x5F0FE2, 0xE8,
+                CharacterTookHitNativeLayout.ByteReaderFileOffset)
+            && RelativeBranchTargets(0x5F0FED, 0xE8,
+                CharacterTookHitNativeLayout.WordReaderFileOffset)
+            && RelativeBranchTargets(0x5F0FF7, 0xE8,
+                CharacterTookHitNativeLayout.ByteReaderFileOffset)
+            && Matches(0x525D02, "C70069000000")
+            && RelativeBranchTargets(0x525D08, 0xE8,
+                CharacterTookHitNativeLayout.BaseConstructorHelperFileOffset)
+            && Matches(0x525D0D, "C7062871C601")
+            && Matches(0x525D15, "C6462800")
+            && Matches(0x525D19, "66C746500000")
+            && VtableRttiName(CharacterTookHitNativeLayout.VtableVirtualAddress, 80)
+                == CharacterTookHitNativeLayout.RttiName);
         check("Binary matrix socket factory requests overlapped UDP",
             Matches(0xBE354A, "6A016A006A006A11B8170000006A020F44C150FF15684DAC01"));
         check("Binary matrix local binding uses seven or two attempts and final-two fallback",

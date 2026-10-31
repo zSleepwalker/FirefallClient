@@ -1321,6 +1321,62 @@ Check("CalledForHelp selector 0x68 records its shared WORD reader continuation",
     && CharacterCalledForHelpNativeLayout.VtableVirtualAddress == 0x1C67118
     && CharacterCalledForHelpNativeLayout.WordFieldOffset == 0x28
     && CharacterCalledForHelpNativeLayout.NominalInputByteCount == 2);
+Check("Respawned selector 0x67 records its WORD and byte reader layout",
+    CharacterRespawnedNativeLayout.InnerSelector == 0x67
+    && CharacterRespawnedNativeLayout.InnerSelectorTableVirtualAddress == 0xC22444
+    && CharacterRespawnedNativeLayout.InnerSelectorTableFileOffset == 0x821844
+    && CharacterRespawnedNativeLayout.CaseFileOffset == 0x81D271
+    && CharacterRespawnedNativeLayout.CaseLocalDwordValue == 0x6F
+    && CharacterRespawnedNativeLayout.AllocationSize == 0x30
+    && CharacterRespawnedNativeLayout.AllocationFunctionFileOffset == 0x12B7FB0
+    && CharacterRespawnedNativeLayout.ConstructorFileOffset == 0x525BF0
+    && CharacterRespawnedNativeLayout.BaseConstructorHelperFileOffset == 0x5A0D00
+    && CharacterRespawnedNativeLayout.BaseConstructorArgument == 0x67
+    && CharacterRespawnedNativeLayout.AllocationFailureContinuationFileOffset == 0x81D29B
+    && CharacterRespawnedNativeLayout.BodyReaderContinuationFileOffset == 0x81D29D
+    && CharacterRespawnedNativeLayout.BodyReaderFileOffset == 0x5F1550
+    && CharacterRespawnedNativeLayout.WordReaderFileOffset == 0x336AC0
+    && CharacterRespawnedNativeLayout.FirstByteReaderFileOffset == 0x356CF0
+    && CharacterRespawnedNativeLayout.SecondByteReaderFileOffset == 0x337180
+    && CharacterRespawnedNativeLayout.VtableVirtualAddress == 0x1C67138
+    && CharacterRespawnedNativeLayout.RttiName == ".?AVRespawned@Character@firefall@@"
+    && CharacterRespawnedNativeLayout.WordFieldOffset == 0x28
+    && CharacterRespawnedNativeLayout.FirstByteFieldOffset == 0x2A
+    && CharacterRespawnedNativeLayout.SecondByteFieldOffset == 0x2B
+    && CharacterRespawnedNativeLayout.NominalInputByteCount == 4);
+Check("TookHit selector 0x69 records its conditional and trailing field layout",
+    CharacterTookHitNativeLayout.InnerSelector == 0x69
+    && CharacterTookHitNativeLayout.InnerSelectorTableVirtualAddress == 0xC22444
+    && CharacterTookHitNativeLayout.InnerSelectorTableFileOffset == 0x821844
+    && CharacterTookHitNativeLayout.CaseFileOffset == 0x81D2F3
+    && CharacterTookHitNativeLayout.CaseLocalDwordValue == 0x71
+    && CharacterTookHitNativeLayout.AllocationSize == 0x60
+    && CharacterTookHitNativeLayout.AllocationFunctionFileOffset == 0x12B7FB0
+    && CharacterTookHitNativeLayout.ConstructorFileOffset == 0x525CF0
+    && CharacterTookHitNativeLayout.BaseConstructorHelperFileOffset == 0x5A0DE0
+    && CharacterTookHitNativeLayout.BaseConstructorArgument == 0x69
+    && CharacterTookHitNativeLayout.AllocationFailureContinuationFileOffset == 0x81D31D
+    && CharacterTookHitNativeLayout.BodyReaderContinuationFileOffset == 0x81D31F
+    && CharacterTookHitNativeLayout.BodyReaderFileOffset == 0x5F0FC0
+    && CharacterTookHitNativeLayout.ConditionalRecordReaderFileOffset == 0x5F0CF0
+    && CharacterTookHitNativeLayout.ConditionalQwordReaderFileOffset == 0x5FDA00
+    && CharacterTookHitNativeLayout.QwordReaderFileOffset == 0x356F80
+    && CharacterTookHitNativeLayout.DwordReaderFileOffset == 0x353310
+    && CharacterTookHitNativeLayout.ByteReaderFileOffset == 0x337180
+    && CharacterTookHitNativeLayout.WordReaderFileOffset == 0x336AC0
+    && CharacterTookHitNativeLayout.VtableVirtualAddress == 0x1C67128
+    && CharacterTookHitNativeLayout.RttiName == ".?AVTookHit@Character@firefall@@"
+    && CharacterTookHitNativeLayout.ConditionalRecordGateByteOffset == 0x28
+    && CharacterTookHitNativeLayout.ConditionalRecordFirstQwordOffset == 0x30
+    && CharacterTookHitNativeLayout.ConditionalRecordNestedGateByteOffset == 0x38
+    && CharacterTookHitNativeLayout.ConditionalRecordSecondQwordOffset == 0x40
+    && CharacterTookHitNativeLayout.ConditionalRecordDwordOffset == 0x48
+    && CharacterTookHitNativeLayout.ConditionalRecordByteOffset == 0x4C
+    && CharacterTookHitNativeLayout.FirstTrailingByteFieldOffset == 0x50
+    && CharacterTookHitNativeLayout.SecondTrailingByteFieldOffset == 0x51
+    && CharacterTookHitNativeLayout.TrailingWordFieldOffset == 0x58
+    && CharacterTookHitNativeLayout.FinalByteFieldOffset == 0x5A
+    && CharacterTookHitNativeLayout.MinimumInputByteCount == 6);
 Check("Shared channel-2/3 compact-code routing groups the observed native cases",
     Enumerable.Range(1, 6).All(code =>
         MatrixOtherChannelDecoderNativeLayout.SelectRoute(code)

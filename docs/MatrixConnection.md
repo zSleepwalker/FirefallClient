@@ -1428,6 +1428,22 @@ failure branch at `0x81D25F` enters `0x81D21D`, zeroes ESI, and continues
 into the same reader, which forms destination address `0x28`; the runtime
 consequence remains unresolved. Field meaning is unknown.
 
+### Selector 0x67: `Respawned`
+
+Entry20 maps selector `0x67` to VA `0xC1DE71` / raw case `0x81D271`. It
+allocates `0x30` bytes, stores local DWORD `0x6F` (role unknown), then calls
+constructor `0x525BF0`. The constructor passes `0x67` to helper `0x5A0D00`
+and installs vtable VA `0x1C67138` (RTTI
+`firefall::Character::Respawned`).
+
+On the successful allocation path, the case calls body reader `0x5F1550`.
+That reader reads a WORD into object `+0x28` through `0x336AC0`, then bytes
+at `+0x2A` and `+0x2B` through `0x356CF0` and `0x337180`; the nominal body
+length is four bytes. Allocation failure branches at `0x81D289` to
+`0x81D29B`, zeroes ESI, then joins the body-reader setup at `0x81D29D`;
+the consequence of that abnormal path remains unresolved. The field meanings
+are unknown, and the RTTI name does not establish respawn semantics.
+
 ### Selector 0x68: `CalledForHelp`
 
 Entry21 maps selector `0x68` to VA `0xC1DEC2` / raw case `0x81D2C2`. It
@@ -1444,6 +1460,26 @@ and continues into the same reader, which forms destination address `0x28`.
 The runtime consequence of that abnormal path is unresolved. Field meaning
 remains unknown; shared parsing does not establish semantic equivalence with
 the other selectors.
+
+### Selector 0x69: `TookHit`
+
+Entry22 maps selector `0x69` to VA `0xC1DEF3` / raw case `0x81D2F3`. It
+allocates `0x60` bytes, stores local DWORD `0x71` (role unknown), then calls
+constructor `0x525CF0`. The constructor passes `0x69` to helper `0x5A0DE0`,
+installs vtable VA `0x1C67128` (RTTI
+`firefall::Character::TookHit`), clears byte `+0x28`, and clears WORD
+`+0x50`.
+
+The case calls body reader `0x5F0FC0`. Its first sub-reader `0x5F0CF0`
+consumes a gate byte for the record at `+0x28`; when set, it reads a QWORD,
+then `0x5FDA00` consumes another gate byte and an optional QWORD, followed by
+a DWORD and byte. The temporary values are routed through `0x5F0B20` or
+`0x5F0C30`, which copy QWORDs at `+0x30` and optionally `+0x40`, a DWORD at
+`+0x48`, and a byte at `+0x4C`; the higher-level meaning of these state
+helpers remains unresolved. The body reader then reads bytes at `+0x50` and
+`+0x51`, a WORD at `+0x58` via `0x336AC0`, and a byte at `+0x5A`.
+With the outer gate clear the body consumes six bytes; when set, its length
+depends on the nested gate. Field meanings remain unknown.
 
 ## Message35 application body
 
