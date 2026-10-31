@@ -126,6 +126,22 @@ public static class LoginModeNativeLayout
     public const uint LoginUpdateMethodFileOffset = 0x6385C0;
     public const uint LoginUpdateWorldModeQueueCallSiteFileOffset = 0x638B89;
     public const uint LoginUpdateDefaultCaseFileOffset = 0x638AB5;
+
+    // Observed: ctor stores stack arg1 at +0x20 and arg2 at +0x24; update reads
+    // [[this+0x20]] and caches it in +0x1C. This is a pointer cell, not a list.
+    public const int LoginMessageCellPointerOffset = 0x20;
+    public const int LoginMessageCellOwnerOffset = 0x24;
+    public const int LoginCurrentMessageOffset = 0x1C;
+    public const int LoginMessageSelectorOffset = 0x0C;
+    public const int LoginMessageTextOffset = 0x10;
+    public const uint LoginConstructorCellStoreFileOffset = 0x63664E;
+    public const uint LoginUpdateMessageFetchFileOffset = 0x638897;
+    public const uint LoginUpdateMessageDispatchFileOffset = 0x6388C5;
+    public const uint LoginUpdateMessageCase1FileOffset = 0x638A0E;
+    public const uint LoginUpdateMessageCase1ReleaseFileOffset = 0x638A48;
+    public const uint LoginMessageNotificationId = 0x146;
+    public const uint AppModeLoginCtorCallArgumentsFileOffset = 0x30DC12;
+    public const int AppModeLoginCtorCellOffsetInApp = 0x9E8;
     public const uint LoginUpdateGuardGlobalVa = 0x1E5CAA4;
     public const uint LoginUpdateGuardByteOffset = 0x40;
     public const uint LoginUpdateGuardReadFileOffset = 0x638ABC;

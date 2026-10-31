@@ -31,6 +31,8 @@ Two additional raw sites, `0x12ABD6C` and `0x12ABDBC`, contain identical
 no function boundary or xrefs for them, and the caller/ECX provenance is
 unknown; they are not evidence of generated-output region release.
 
+Latest tfLogin pass: update `0x6385C0` reads a single pointer cell (`this+0x20` = ctor arg1 = `App+0x9E8`), not a node list; selector case 1 sends message `0x146` with `node+0xC/+0x10` and virtual-deletes the node. Producers of the cell and cases 0/2/3/4 are unproven; see `docs\MatrixConnection.md`.
+
 ## What is saved
 
 - **Generated provider initialization prefix saved:** `NativeGeneratedTransformProviderPrefix`

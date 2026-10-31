@@ -881,6 +881,19 @@ internal static class StartupBinaryEvidence
                 "8BD9807B0C008B4D080F84230100008339010F851A")
             && Matches(LoginModeNativeLayout.PendingRequestEnqueuePushFileOffset,
                 "8B71048B018945DCC745E00000000085F674178D4DE0E80BA5FA008975E08D4EFCB801000000F00FC1018D45DCC745FC00000000508D8B840B0000E8167000"));
+        check("Binary tfLogin +0x20 is a ctor-supplied pointer cell (App+0x9E8), fetched/dispatched by update; case1 sends 0x146 with node+0x10",
+            Matches(LoginModeNativeLayout.LoginConstructorCellStoreFileOffset,
+                "8B45088946208B450C89462433C0C7461C00000000C6")
+            && Matches(LoginModeNativeLayout.LoginUpdateMessageFetchFileOffset,
+                "8B4E208B0185C0742D8B561C3BC2742685D2741A6A006805020000689561B401689661B401FF15A05EC10183C4108B4E208B0189461C8B461C85")
+            && Matches(LoginModeNativeLayout.LoginUpdateMessageDispatchFileOffset,
+                "8B4E208B0189461C8B461C85C00F84F50200008B500C83FA040F87")
+            && Matches(LoginModeNativeLayout.LoginUpdateMessageCase1FileOffset,
+                "8B461C8B401085C00F45C85168781AB6018D8C24C4000000E8C5B35E008B0DB802E0018D9424BC0000006A005268460100008B01FF90AC00")
+            && Matches(LoginModeNativeLayout.LoginUpdateMessageCase1ReleaseFileOffset,
+                "8B4E1C85C974068B016A01FF1083BE480A000006C7461C0000000075")
+            && Matches(LoginModeNativeLayout.AppModeLoginCtorCallArgumentsFileOffset,
+                "FFB6280A00008D86E809000050E88C893200EB"));
         check("Binary tfLogin update switch selects on [node+0xC] with a five-entry table (case1 -> message 0x146)",
             Matches(LoginModeNativeLayout.LoginUpdateSwitchSelectorLoadFileOffset,
                 "8B500C83FA040F87CF010000FF24951C99A300")

@@ -3178,3 +3178,34 @@ write was performed.
   stored by the base constructor (field not traced). No name-keyed registry was
   found within this budget. `oRenderSystem` slot `+0x3C` looks like a
   "get active render API" accessor.
+
+## tfLogin pending-message cell (static, read-only; raw offsets)
+
+**Observation** (bytes checked against `.original`):
+
+- Ctor `0x6365B0` stores stack arg1 at `this+0x20` and arg2 at `this+0x24`
+  (`0x63664E`), and zeroes `this+0x1C`. Vtable `0x1C676C0` (base `0x1C67710`).
+- The only static ctor caller is the App mode-apply function (`0x30DC1F`),
+  which passes `&App+0x9E8` as arg1 (`lea eax,[esi+9E8h]` at `0x30DC18`).
+  The App ctor zeroes `App+0x9E8/+0x9EC` (`0x303104`); the mode-apply code
+  clears `App+0x9E8` after other mode ctors (`0x30DB8A`).
+- Update `0x6385C0` loads `ecx=[this+0x20]`, `eax=[ecx]` and, if it differs
+  from `[this+0x1C]`, stores it in `+0x1C` (`0x638897`/`0x6388C5`). It then
+  switches on `[node+0xC]` (`<=4`, table VA `0xA3991C`, raw `0x638D1C`):
+  entries 0,2,3,4 -> raw `0x638C3A`, entry 1 -> raw `0x6389F2`.
+- Case 1 builds a message with format `0x1B61A78` and text `node+0x10`
+  (default `0x1C5EA68` when null), calls vtable `+0xAC` on the receiver
+  `[0x1E002B8]` with id `0x146`, then virtual-deletes the node
+  (`push 1; call [vtable+0]`) and zeroes `this+0x1C`; if `+0xA48==6` it sets
+  `+0xA48=5` and `+0xA50=tick+0xBB8`.
+- IDA has no function/xrefs for the case-1 block (`0x6389F2`).
+
+**Interpretation / unresolved**
+
+- `+0x20` is a pointer to a single-slot cell holding one polymorphic node
+  pointer, not a node list; the "list" reading is not supported. Selector
+  case 1 is the only provable name: "send text via notification 0x146".
+- No producer of nodes was found: no writer of `App+0x9E8` besides the
+  zeroing sites above, and `Login_HandleLoginResponse` was not traced to a
+  node store. Selectors 0/2/3/4 and per-producer values remain unproven.
+  The `0x9E8` scans were displacement-byte matches and are not exhaustive.
