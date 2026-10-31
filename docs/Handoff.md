@@ -1651,3 +1651,5 @@ requests. Continue with bounded, evidence-backed static reconstruction as
 directed; preserve saved source and IDB state, and do not execute or patch the
 sample. No recurring session automation is configured. Overall reconstruction
 remains incomplete.
+
+Scene-factory follow-up: tfPhysicsDrawInterface has 14 verified in-text vtable slots (slot 9 forwards to slot 8; slot 13 logs the model-release string), its constructor field layout is saved in SceneFactoryNativeLayout, and the 0x64B528 publish stores root[0] into [[0x1E00060]+0xF8] (pointer deref, correcting earlier wording). Scene class identities remain unresolved (indirect via global 0x1DFE970).

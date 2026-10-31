@@ -79,6 +79,28 @@ public static class SceneFactoryNativeLayout
     public const int GlobalActiveSceneVirtualAddress = 0x1E00060;
     public const int GlobalActiveScenePointerOffset = 0xF8;
 
+    public const int PhysicsDrawInterfaceBaseVtableVirtualAddress = 0x1C709B8;
+    public const int PhysicsDrawInterfaceVtableSlotCount = 14;
+    public const int PhysicsDrawInterfaceDestructorFileOffset = 0x9B6930;
+    public const int PhysicsDrawInterfaceForwardThunkFileOffset = 0x9B6730;
+    public const int PhysicsDrawInterfaceReleaseModelFileOffset = 0x9B68F0;
+    public const int PhysicsDrawInterfaceReleaseModelMessageVirtualAddress = 0x1C70834;
+    public const string PhysicsDrawInterfaceReleaseModelMessage = "DebugCollision:ReleaseModelObject(model %i)";
+    public const int PhysicsDrawInterfaceSceneFieldOffset = 0x44;
+    public const int PhysicsDrawInterfaceColorFieldOffset = 0x50;
+    public const int PhysicsDrawInterfaceColorSourceVirtualAddress = 0x1DFF438;
+    public const int PhysicsDrawInterfaceBoundsFieldOffset = 0x16C;
+    public const int GlobalActiveSceneStoreFileOffset = 0x64B528;
+    public const int GlobalActiveSceneFailureMessageVirtualAddress = 0x1B635CC;
+
+    private static readonly int[] PhysicsDrawInterfaceVtableSlotFileOffsets =
+    [
+        0x9B6930, 0x9B5840, 0x9B5930, 0x9B59C0, 0x9B5AA0, 0x9B5D60, 0x9B5E60,
+        0x9B62C0, 0x9B6560, 0x9B6730, 0x9B56F0, 0x9B6740, 0x9B6860, 0x9B68F0
+    ];
+
+    public static IReadOnlyList<int> PhysicsDrawInterfaceVtableSlots => PhysicsDrawInterfaceVtableSlotFileOffsets;
+
     public static IReadOnlyList<SceneFactoryResourceSnapshot> KnownSceneResources => SceneResources;
     public static IReadOnlyList<SceneFactoryChildAllocationSnapshot> KnownChildAllocations => ChildAllocations;
 }

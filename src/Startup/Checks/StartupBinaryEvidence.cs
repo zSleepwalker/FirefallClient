@@ -106,7 +106,27 @@ internal static class StartupBinaryEvidence
                 .SequenceEqual(Encoding.ASCII.GetBytes(SceneFactoryNativeLayout.PhysicsDrawInterfaceRttiName + "\0"))
             && Matches(0x9B7FE2, "518B0DA001E0018D45EC5068FCC4DF01E879BE3E00894710")
             && Matches(0x9B8502, "C7461400000000"));
-        foreach (var type in MatrixServerMessageNativeTypes.Entries)
+        check("Binary tfPhysicsDrawInterface vtable has 14 in-text slots, a forwarding thunk, a model-release log and a global scene publish",
+            Enumerable.Range(0, SceneFactoryNativeLayout.PhysicsDrawInterfaceVtableSlotCount).All(i =>
+                ReadUInt32(SceneFactoryNativeLayout.PhysicsDrawInterfaceVtableFileOffset + i * 4)
+                    == SceneFactoryNativeLayout.PhysicsDrawInterfaceVtableSlots[i] + 0x400C00)
+            && Matches(SceneFactoryNativeLayout.PhysicsDrawInterfaceConstructorFileOffset + 0x2C, "C706B809C701")
+            && Matches(SceneFactoryNativeLayout.PhysicsDrawInterfaceConstructorFileOffset + 0x67, "894644C7066809C701")
+            && Matches(SceneFactoryNativeLayout.PhysicsDrawInterfaceConstructorFileOffset + 0xB6,
+                "C7866C010000FFFF7F7F")
+            && Matches(SceneFactoryNativeLayout.PhysicsDrawInterfaceConstructorFileOffset + 0xE8,
+                "C78680010000FFFF7FFF")
+            && Matches(SceneFactoryNativeLayout.PhysicsDrawInterfaceForwardThunkFileOffset, "558BEC8B015DFF6020")
+            && Matches(SceneFactoryNativeLayout.PhysicsDrawInterfaceDestructorFileOffset + 0x29, "C7066809C701")
+            && Matches(SceneFactoryNativeLayout.PhysicsDrawInterfaceReleaseModelFileOffset + 0x0D,
+                "683408C701")
+            && ReadAt(VirtualAddressToFileOffset(
+                SceneFactoryNativeLayout.PhysicsDrawInterfaceReleaseModelMessageVirtualAddress),
+                SceneFactoryNativeLayout.PhysicsDrawInterfaceReleaseModelMessage.Length + 1)
+                .SequenceEqual(Encoding.ASCII.GetBytes(
+                    SceneFactoryNativeLayout.PhysicsDrawInterfaceReleaseModelMessage + "\0"))
+            && Matches(SceneFactoryNativeLayout.GlobalActiveSceneStoreFileOffset,
+                "8B08A16000E0018988F8000000"));        foreach (var type in MatrixServerMessageNativeTypes.Entries)
         {
             var name = Encoding.ASCII.GetBytes(type.RttiText + "\0");
             check($"Binary incoming{type.MessageId} factory/constructor RTTI is {type.QualifiedName}",

@@ -3012,3 +3012,47 @@ complete-object-locator VA is `0x1CC7700`, type-descriptor VA `0x1E28A34`,
 and RTTI name file offset `0x1A26E3C`. These are checked using PE section
 mapping, not by subtracting a universal VA delta. No runtime execution or IDB
 write was performed.
+
+### tfPhysicsDrawInterface vtable, constructor and global scene publish
+
+**Observations** (original PE, raw offsets re-read; VA = raw + `0x400C00` in
+`.text`)
+
+- Vtable VA `0x1C70968` has 14 slots, all pointing into `.text` (VAs
+  `0xDB7530, 0xDB6440, 0xDB6530, 0xDB65C0, 0xDB66A0, 0xDB6960, 0xDB6A60,
+  0xDB6EC0, 0xDB7160, 0xDB7330, 0xDB62F0, 0xDB7340, 0xDB7460, 0xDB74F0`; raw
+  `0x9B6930, 0x9B5840, 0x9B5930, 0x9B59C0, 0x9B5AA0, 0x9B5D60, 0x9B5E60,
+  0x9B62C0, 0x9B6560, 0x9B6730, 0x9B56F0, 0x9B6740, 0x9B6860, 0x9B68F0`).
+  The next dword (`0x1CC76EC`) is not a `.text` address.
+- Constructor `0x9B5440` first stores base vtable VA `0x1C709B8`, calls
+  `0xDBC170` on `this+8`, zeroes `+0x28/+0x2C/+0x30/+0x34/+0x38`, stores the
+  scene argument at `+0x44`, then overwrites `[this]` with `0x1C70968`. It
+  clears `+0x48/+0x4C`, copies four floats from `0x1DFF438..444` to
+  `+0x50..+0x5C`, clears byte `+0x60`, and writes `0x7F7FFFFF` to
+  `+0x16C/+0x170/+0x174` and `0xFF7FFFFF` to `+0x178/+0x17C/+0x180`. If
+  `+0x44` is null it calls an indirect assertion-like function pointer
+  (`[0x1C15EA0]`) with a `0x7F` argument; the callee is unresolved.
+- Slot 0 stores the vtable back, pushes 1, calls a helper, and conditionally
+  tests the delete flag (`[esp+8] & 1`) before a second call.
+- Slot 9 (`0x9B6730`) is a thunk: `jmp [vtable+0x20]`, i.e. slot 8.
+- Slot 10 returns false immediately when argument 2 has bit `0x2000` set.
+- Slot 13 (`0x9B68F0`) sign-extends a 24-bit argument, logs the string
+  `DebugCollision:ReleaseModelObject(model %i)` (VA `0x1C70834`), then calls
+  `[global 0x1DFE970 vtable+0x48]` and tail-jumps to returned object's
+  slot `+0x34`. Slot 11 uses the same `+0x48` getter with flag `0x200`;
+  slot 12 uses another global (`0x1E732C0`, slot `+0x64`).
+- Slots 1-8 use the scene pointer/float math (SSE, `+0x30/+0x34` float
+  reads from an argument) with float stack arguments.
+- Publish at `0x64B528`: `mov ecx,[eax]` (root `[0]`), `mov eax,[0x1E00060]`,
+  `mov [eax+0xF8],ecx`. `0x1E00060` holds a pointer; the store is to the
+  pointed-to object's `+0xF8`, not to the global's own address plus `0xF8`.
+  A null factory result logs string `Unable to create global scene`
+  (VA `0x1B635CC`).
+- The three scene lookup targets remain indirect through runtime global
+  `0x1DFE970`; static bytes do not name their classes.
+
+**Interpretation** (not proven)
+
+- Slots 1-8 are likely debug-draw primitives and 13 a model-release
+  callback, from float-heavy bodies and the log string; names unverified.
+  Root `[0]` (RenderScene result) is plausibly the "global scene".
