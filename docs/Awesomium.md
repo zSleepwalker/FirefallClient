@@ -11,11 +11,21 @@ Static triage via IDA; image VAs, base 0x10000000. Concise: only Firefall-releva
 - Child launcher (VA 0x10189DD0) reads `--type` (renderer, plugin, worker, nacl-loader, gpu-process, ppapi, utility), appends switches (`no-sandbox`, `disable-gpu-sandbox`, `in-process-plugins`, `disable-3d-apis`, `disable-webgl`, ...), ` --type=renderer `, `/prefetch:%d`, and spawns via `StartProcessWithAccess::LAUNCHPROCESS`.
 - Awesomium-specific switches/strings: `awesomium-asset-protocol`, `awesomium-user-script`, `awesomium-log-path`, `./awesomium.log`.
 - IPC: UTF-16 string `\\.\pipe\chrome.` (string data VA 0x11267238).
-- FirefallClient.exe does not statically import awesomium.dll in the IDB import table; it holds ~85 mangled export names as strings (string-data VAs 0x19BD41C–0x19BE2CE, followed by `awesomium.dll` at 0x19BE2F8), i.e. it appears to bind exports by name at runtime. Used API: WebString, WebURL, JSValue/JSArray/JSObject (Invoke/InvokeAsync/SetProperty/GetProperty), WebConfig, WebPreferences, WebCore::Initialize/Shutdown, BitmapSurface (buffer/width/height/row_span/is_dirty), ResourceInterceptor::OnWillDownload, WebViewListener::{View,Load,Process}, WebKeyboardEvent. Client strings: `awesomium.log_callbacks`, `awesomium.async_jsinvoke`, `uiWebFrame: Awesomium process was terminated on url ...`.
 
 ## Interpreted
 - The helper child is FirefallProcess.exe (stock `awesomium_process`, see FirefallProcess.md), launched via `browser-subprocess-path`; IPC is Chromium named pipes `\\.\pipe\chrome.*`.
-- Contradicts earlier "86 imports" note in other docs: not reproducible from the IDB import table; the 85 mangled strings are the evidence found.
 
 ## Unresolved
-- Where FirefallClient assigns `child_process_path` (not located); exact pipe name suffix format.
+- Exact pipe name suffix format. See client-side section for the remaining client-side unknowns.
+
+## FirefallClient.exe client side (static, IDA addresses = raw file offsets; VA = raw+0x400C00 in .text, raw+0x401400 in .rdata)
+### Observed
+- awesomium.dll is a plain static import (no LoadLibrary/GetProcAddress loop, no runtime table). Import descriptor RVA table: OFT RVA 0x19BDE4C, IAT FirstThunk RVA 0x16C4E00 (VA 0x1AC4E00..0x1AC4F54, stride 4), exactly 86 by-name entries; slot 0 `?ToBoolean@JSValue`, slot 85 `?ToString@JSValue`. The ~85 mangled strings at 0x19BD41C.. are that table's hint/name entries. IDA's own import list omits this descriptor, which caused the earlier "no static import" claim.
+- Key slots: 0x1AC4E8C `WebConfig::WebConfig`, 0x1AC4E94 `WebCore::Initialize`, 0x1AC4E88 `WebCore::Shutdown`, 0x1AC4E90 `WebString::operator=`, 0x1AC4EA8 `WebConfig::~WebConfig`, 0x1AC4E10 `WebPreferences::WebPreferences`, 0x1AC4EE0 `SetCustomMethod` (imported, absent from the older used-API list).
+- Sole init function `sub_CBCA50` (thiscall; only caller `helper_multicall_CBC410` at 0xCBC4B6): calls WebConfig ctor at 0xCBCA96, `WebCore::Initialize(&config)` at 0xCBCF0E, stores WebCore* at this+8, then vtable+0x10 on it, logs `Initialized awesomium: %s`.
+- Wide literals (.rdata raw): `awesomium` 0x17C4BDC, `system\bin` 0x17C4C28, `system\bin\Plugins` 0x17C4C40, `awesomium.log` 0x17C4C68, ASCII `firefall/%s (%s)` 0x17C4C84, `FirefallProcess.exe` 0x17C4CB0, `Plugins` 0x17C4CD8.
+- Logic: `<base>\FirefallProcess.exe` existence is tested with GetFileAttributesW; if present the plugin dir is `<base>\Plugins` else `<base>\system\bin[\Plugins]`. WebConfig (stack base var_E0): +0x00 int = 2 (log_level), +0x04/+0x08/+0x0C/+0x10/+0x14 WebStrings assigned via `WebString::operator=`, +0x20 byte = 1. +0x0C = path joined with `awesomium.log`; +0x14 = user agent `firefall/%s (%s)` formatted with two build strings (`VIBE_FormatSharedText`).
+### Interpreted
+- The WebString at +0x08 is built from the FirefallProcess.exe path and is the `child_process_path` (so the client does set it, stock `awesomium_process` is not used); +0x04 is plugin_path, +0x0C log_path, +0x14 user_agent. Field names follow Awesomium 1.7 SDK order and are inferred, not proven by symbol.
+### Unresolved
+- Which two strings fill `%s (%s)` and the meaning of +0x10 and +0x20 (+0x20=1 possibly a boolean flag); exact path branch semantics; the `WebPreferences` and `SetCustomMethod` call sites.

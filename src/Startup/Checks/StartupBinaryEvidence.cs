@@ -391,6 +391,15 @@ internal static class StartupBinaryEvidence
             && ImportSlotNames(0x1AC4028, "RegOpenKeyA")
             && ImportSlotNames(0x1AC4070, "RegQueryValueExA")
             && ImportSlotNames(0x1AC4064, "RegCloseKey"));
+        check("Binary awesomium.dll is a static 86-entry import; WebCore init sub_CBCA50 calls WebConfig ctor and Initialize through IAT",
+            ImportSlotNames(0x1AC4E00, "?ToBoolean@JSValue@Awesomium@@QBE_NXZ")
+            && ImportSlotNames(0x1AC4F54, "?ToString@JSValue@Awesomium@@QBE?AVWebString@2@XZ")
+            && ImportSlotNames(0x1AC4E8C, "??0WebConfig@Awesomium@@QAE@XZ")
+            && ImportSlotNames(0x1AC4E94, "?Initialize@WebCore@Awesomium@@SAPAV12@ABUWebConfig@2@@Z")
+            && Matches(0xCBCA50, "558BEC6AFF68C5FCA401")
+            && Matches(0xCBCA96, "FF158C4EAC01")
+            && Matches(0xCBCF0E, "FF15944EAC01")
+            && Matches(0xCBCAD0, "68B060BC01") && Matches(0xCBCD3C, "686860BC01") && Matches(0xCBCDF1, "688460BC01"));
         check("Binary adapter registry root, Connection suffix, PnpInstanceID and PCI/USB/BTH literals decode exactly",
             DecodedAdapterLiteral(0x1C7E908, 79, 79, -1, 0xB1, NativeAdapterAddressFingerprint.RegistryRoot)
             && DecodedAdapterLiteral(0x1C7E668, 11, 83, 1, 0xAD, NativeAdapterAddressFingerprint.ConnectionSuffix)

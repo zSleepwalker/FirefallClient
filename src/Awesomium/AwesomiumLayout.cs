@@ -34,4 +34,20 @@ public static class AwesomiumLayout
     public const string RendererTypeArg = " --type=renderer ";
     public const string PrefetchFormat = "/prefetch:%d";
     public const string IpcPipePrefix = @"\\.\pipe\chrome."; // UTF-16 in image
-}
+
+    // FirefallClient.exe client side (raw file offsets == IDA addresses; VAs have image base 0x400000)
+    public const int ClientImportCount = 86;
+    public const uint ClientImportThunkRva = 0x19BDE4C;
+    public const uint ClientImportIatVa = 0x1AC4E00;
+    public const uint ClientImportIatEndVa = 0x1AC4F54;
+    public const uint ClientWebConfigCtorSlotVa = 0x1AC4E8C;
+    public const uint ClientWebCoreInitializeSlotVa = 0x1AC4E94;
+    public const uint ClientWebCoreShutdownSlotVa = 0x1AC4E88;
+    public const uint ClientWebStringAssignSlotVa = 0x1AC4E90;
+    public const uint ClientInitFunctionRaw = 0xCBCA50;
+    public const uint ClientWebConfigCtorCallRaw = 0xCBCA96;
+    public const uint ClientWebCoreInitializeCallRaw = 0xCBCF0E;
+    public const string ClientLogFileName = "awesomium.log";
+    public const string ClientUserAgentFormat = "firefall/%s (%s)";
+    public const string ClientChildProcessName = "FirefallProcess.exe";
+    public const string ClientPluginsRelativePath = @"system\bin\Plugins";}
