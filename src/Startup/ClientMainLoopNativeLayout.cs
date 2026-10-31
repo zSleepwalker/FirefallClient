@@ -213,4 +213,9 @@ public static class ClientMainLoopNativeLayout
     public const long ReplaySourceDefaultAssertRaw = 0x38271A;
     public const long HostPortBracketFormatFileOffset = 0x1BB60A0 - 0x401400;
     public const long HostPortPlainFormatFileOffset = 0x1BB608C - 0x401400;
+    // Round 18: UDP open and initial-packet emission.
+    public const long MatrixGameSocketOpenUdpRaw = 0xBD0960;
+    public const long MatrixInitialPacketEmitRaw = 0x4980A0;
+    public const long MatrixSubmitApplicationBufferRaw = 0xBD3B20;
+    public const long GameSocketLogFormatFileOffset = 0x1BB6400 - 0x401400; // 'GameSock...'
 }

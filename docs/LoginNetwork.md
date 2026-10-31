@@ -81,3 +81,13 @@
 
 ## Unresolved
 - Wire layout of the encoded packet (`0x4980A0`), meanings of this+2120/2408 blobs, 1962 constant, request-struct field map and queue storage inside `0xBC2B30`, and where type 5 is consumed outside this switch.
+
+# Round 18: UDP open, initial-packet emission, existing-code mapping
+
+## Observed
+- `0xBD0960 MatrixGameSocket_OpenUdp(this=GameSocket, a2=two 8-byte addr blocks (remote/second), a3, a4=&port, a5=flags+addr...)`: asserts this+268 (handler) set and this+264 (state) == 0; stores security flags/addr at this+560..584; creates an overlapped UDP socket (`0xBE3510`, WSASocket) and sets a socket option (import thunk `dword_1AC4DDC`). Local port: tries bind candidates starting at the configured port (`*a4`) incrementing for up to 6 attempts (2 ephemeral attempts if port is 0), using the local address from `dword_1DFFF70`+48..; each failure is logged, after all fail the socket is closed and 0 returned. Then `getsockname` (`dword_1AC4D80`) records the bound endpoint at this+16..40; creates an 0x68-byte object (`0xBE8170`) at this+3448; sets state this+264=1, timestamp this+592; calls handler (this+8) vtable+4 with the socket (registers with IOCP); posts the first overlapped recv (WSARecvFrom-style import `dword_1AC4D54`): one buffer, 1400 bytes at this+632, address buffer at `*(this+3572)+24`. Pending (WSA 997) returns 1. Error path sets state 7.
+- `0x4980A0` (stdcall, arg = packet): builds a stack stream (vtable VA 0x1C81144 over a `0x1C80CC4` buffer), calls `0x498A00` to serialize, asserts the stream is non-empty, passes it to `0xBD3B20` (channel arg 1) and returns the byte count (v8-v10).
+- Existing `src\Startup\MatrixInitialPacket.cs` already records MessageId 0x11, 1962 constant, encoder `0x349E60`, emission `0x4980A0`, submit `0xBD3B20`; my round-17 field offsets agree (this+40 mode, +44 =1962, +56/60 pair, +64..72, +76/77 bytes, +80 text, +88 optional, +112 trailing blob). No mismatch found in the fields compared. Framing, sequence, reliability and datagram assembly are already documented in docs\MatrixConnection.md (lines ~180-320); incoming dispatch (translated table raw `0x33D424`) is in its server-message section.
+
+## Unresolved
+- I did not re-derive the per-type incoming handler name table this round (not decompiled; relied on the existing doc). Encryption/signature: no cipher found at this layer; `0xBD4780` is documented as not a general encryption pass (existing doc). Meaning of OpenUdp a3/a4 beyond the port pointer is partial.
