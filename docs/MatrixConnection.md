@@ -1020,7 +1020,7 @@ factory/callback ABI remain unresolved.
 `MatrixOtherChannelDecoderNativeLayout.cs` records dispatch only, not a
 replacement decoder.
 
-## Secondary command dispatcher and two verified class cases
+## Secondary command dispatcher and three verified class cases
 
 The secondary-dispatch target `0x81CC50` is a large raw function
 (`0x4B9E` bytes) with two separate selector tables. It reads a leading byte
@@ -1047,14 +1047,14 @@ selector range return zero. Leading bytes `0x36..0xEF` also reach the
 zero-return path. These are dispatch boundaries only; the inputs’ semantic
 names and the 91 secondary targets are unresolved.
 
-Two nested selectors are mapped: route0 block `0x81CCAD` dispatches selector
+Three nested selectors are mapped: route0 block `0x81CCAD` dispatches selector
 `0x53` through the table at VA `0xC22444` (raw `0x821844`) to raw case
 `0x81CCC3`. That case allocates `0x48` bytes, calls constructor `0x524C30`,
 then body reader `0x5F6B10`. Constructor RTTI identifies the object as
 `firefall::Character::MarketRequestComplete`. The reader stores, in order,
 a byte at object+`0x28`, raw QWORD at+`0x30`, byte at+`0x38`, and three
 NUL-terminated shared-text values at+`0x3C/+0x40/+0x44`. Field meanings
-remain unknown; these two selectors do not name the remaining table cases.
+remain unknown; these three selectors do not name the remaining table cases.
 `MatrixSecondaryCommandDispatcherNativeLayout.cs` and
 `CharacterMarketRequestCompleteNativeLayout` preserve the route bounds and
 this bounded object layout without implementing a parser.
@@ -1077,6 +1077,65 @@ stream refill when a byte read sees zero remaining, but the exact malformed
 short-input behavior is not established.
 `CharacterReceiveWeaponTweaksNativeLayout` records the offsets and call
 targets without implementing a parser.
+
+### Selector 0x55: `TookDebugWeaponHitPublic`
+
+Entry2 of the same table maps selector `0x55` to VA `0xC1D965` / raw case
+`0x81CD65`. It allocates `0xA8` bytes, stores local DWORD `0x5D` (role
+unknown), then calls constructor `0x524EE0` and reader `0x5F60F0`. The
+constructor passes `0x55` to `0x5A04E0`, installs vtable VA `0x1C67258`
+(RTTI `firefall::Character::TookDebugWeaponHitPublic`), and zeros object
+bytes `+0x58` and `+0x88`. The RTTI label does not establish field semantics.
+
+The reader's fixed scalar prefix is listed in **input order** below. Input
+positions are nominal offsets from the reader's initial cursor, assuming the
+individual helpers obtain the requested bytes:
+
+| Input offset | Width | Object offset | Observation |
+| ---: | ---: | ---: | --- |
+| `0x00` | 1 byte | `+0x00` | Raw byte |
+| `0x01` | DWORD | `+0x04` | Raw DWORD |
+| `0x05` | DWORD | `+0x08` | Raw DWORD |
+| `0x09` | WORD | `+0x0C` | Raw WORD |
+| `0x0B`, `0x0F`, `0x13`, `0x17`, `0x1B`, `0x1F` | DWORD each | `+0x10..+0x24` | Six raw DWORDs |
+| `0x23` | DWORD | `+0x28` | Raw DWORD |
+
+This is nominally `0x27` input bytes before the first conditional tail.
+Tail `+0x30` first consumes a gate byte. If nonzero, `0x5F4D60` reads
+`0x26` payload bytes into a temporary record: QWORD at temporary `+0`,
+three DWORDs at `+8/+0xC/+0x10`, four DWORD bit patterns at `+0x14..+0x20`
+that `0x384B40` subsequently uses as floats, then two bytes at `+0x24/+0x25`.
+The record is copied into object `+0x38..+0x5D`; the object marker at `+0x30`
+is set to one when its prior value is zero. If the gate is zero, a nonzero
+object marker is cleared without an observed clear of the rest of the record.
+Thus, on this branch the tail consumes nominally `1 + 0x26` bytes. The
+constructor's zero at object `+0x58` lies inside the four-float byte range
+`+0x4C..+0x5B`, which this reader can overwrite.
+
+Tail `+0x60` then consumes another gate byte. On its nonzero branch, it reads
+a QWORD and enters `0x5F5420`. That routine reads a count byte and parses
+that many records, each exactly `0x40` bytes (`0x6087E0` reads sixteen
+DWORDs per record). A count of `0xFF` causes another count byte and record
+block to be read; any other count ends the sequence, with zero representing
+no records. The temporary vector is copied into the object beginning at
+`+0x74` (begin/end/capacity at `+0x74/+0x78/+0x7C`); the associated marker is
+at `+0x60`. A zero gate releases the current vector when the marker is
+nonzero, clears those three DWORDs, and clears the marker.
+
+One data-flow discrepancy remains in the nonzero `+0x60` path. The QWORD
+reader writes eight bytes to a 12-byte local prefix at `0x5F6059`, while
+`0x5F5EB0` copies three DWORDs from that local prefix to object
+`+0x68/+0x6C/+0x70` at `0x5F5EE9/0x5F5EEF/0x5F5EF5`. The disassembled caller
+sequence `0x5F6032..0x5F6070` initializes the separate vector temporary and
+passes the QWORD temporary first to `0x356F80`, then to `0x5F5EB0`; it shows
+no write to the QWORD temporary's third DWORD. The `0x356F80` fingerprint
+confirms two DWORD stores and an eight-byte cursor advance, and the
+`0x5F5EB0` fingerprint confirms the three destination offsets. Accordingly,
+object `+0x70` is recorded as unresolved rather than assigned a wire-field
+meaning. Refill and short-input behavior of the scalar helpers is also not
+established. `CharacterTookDebugWeaponHitPublicNativeLayout` preserves the
+observed offsets, widths, branch boundaries, and record size without
+implementing a parser or naming semantic fields.
 
 ## Message35 application body
 

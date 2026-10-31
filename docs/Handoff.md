@@ -1040,8 +1040,11 @@ These updates supersede older next-step suggestions below where they overlap.
   structurally mapped with direct byte indexing (nonzero indices1..0x35);
   selector0x53 builds `MarketRequestComplete`, and selector0x54 builds
   `ReceiveWeaponTweaks` with two raw bytes followed by a remaining-stream
-  blob. Remaining case handlers, field meanings, and message semantics are
-  open.
+  blob. Selector0x55's `TookDebugWeaponHitPublic` reader has a verified
+  39-byte scalar prefix and two conditional tails, including a count-blocked
+  vector of 64-byte records. The copied third DWORD at object+0x70 has no
+  observed input write in the reader path; its origin remains unresolved.
+  Remaining case handlers, field meanings, and message semantics are open.
   RTTI names the results `nl::RoutedMessage` and
   `nl::RoutedMultipleMessage`; QWORD and message semantics remain unknown.
 - **Header/factory roles corrected by instructions.** 34A020 reads compact

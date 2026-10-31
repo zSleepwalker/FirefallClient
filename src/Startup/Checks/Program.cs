@@ -989,6 +989,32 @@ Check("ReceiveWeaponTweaks selector 0x54 preserves its RTTI and raw body field o
     && CharacterReceiveWeaponTweaksNativeLayout.TrailingBlobVtableVirtualAddress == 0x1C80CC4
     && CharacterReceiveWeaponTweaksNativeLayout.TrailingBlobCopyMethodFileOffset == 0x12CB9D0
     && CharacterReceiveWeaponTweaksNativeLayout.TrailingBlobResizeMethodFileOffset == 0x12CBCB0);
+Check("TookDebugWeaponHitPublic selector 0x55 records its scalar prefix and conditional-tail boundaries",
+    CharacterTookDebugWeaponHitPublicNativeLayout.InnerSelector == 0x55
+    && CharacterTookDebugWeaponHitPublicNativeLayout.CaseFileOffset == 0x81CD65
+    && CharacterTookDebugWeaponHitPublicNativeLayout.CaseLocalDwordValue == 0x5D
+    && CharacterTookDebugWeaponHitPublicNativeLayout.AllocationSize == 0xA8
+    && CharacterTookDebugWeaponHitPublicNativeLayout.ConstructorFileOffset == 0x524EE0
+    && CharacterTookDebugWeaponHitPublicNativeLayout.BodyReaderFileOffset == 0x5F60F0
+    && CharacterTookDebugWeaponHitPublicNativeLayout.VtableVirtualAddress == 0x1C67258
+    && CharacterTookDebugWeaponHitPublicNativeLayout.FirstByteFieldOffset == 0
+    && CharacterTookDebugWeaponHitPublicNativeLayout.RawWordFieldOffset == 0x0C
+    && CharacterTookDebugWeaponHitPublicNativeLayout.RawDwordFieldOffsets.SequenceEqual(
+        new[] { 0x04, 0x08, 0x10, 0x14, 0x18, 0x1C, 0x20, 0x24, 0x28 })
+    && CharacterTookDebugWeaponHitPublicNativeLayout.FixedPrefixByteCount == 0x27
+    && CharacterTookDebugWeaponHitPublicNativeLayout.FirstConditionalTailMarkerOffset == 0x30
+    && CharacterTookDebugWeaponHitPublicNativeLayout.FirstConditionalTailPayloadByteCount == 0x26
+    && CharacterTookDebugWeaponHitPublicNativeLayout.FirstConditionalTailFourFloatGroupOffset == 0x4C
+    && CharacterTookDebugWeaponHitPublicNativeLayout.SecondConditionalTailMarkerOffset == 0x60
+    && CharacterTookDebugWeaponHitPublicNativeLayout.SecondConditionalTailCopiedPrefixOffset == 0x68
+    && CharacterTookDebugWeaponHitPublicNativeLayout.SecondConditionalTailCopiedPrefixDwordCount == 3
+    && CharacterTookDebugWeaponHitPublicNativeLayout.SecondConditionalTailVectorBeginOffset == 0x74
+    && CharacterTookDebugWeaponHitPublicNativeLayout.SecondConditionalTailVectorEndOffset == 0x78
+    && CharacterTookDebugWeaponHitPublicNativeLayout.SecondConditionalTailVectorCapacityOffset == 0x7C
+    && CharacterTookDebugWeaponHitPublicNativeLayout.SecondConditionalTailRecordByteCount == 0x40
+    && CharacterTookDebugWeaponHitPublicNativeLayout.SecondConditionalTailRecordDwordCount == 16
+    && CharacterTookDebugWeaponHitPublicNativeLayout.SecondConditionalTailCountRepeatMarker == 0xFF
+    && CharacterTookDebugWeaponHitPublicNativeLayout.SecondConditionalTailReaderByteCount == 0x121);
 Check("Shared channel-2/3 compact-code routing groups the observed native cases",
     Enumerable.Range(1, 6).All(code =>
         MatrixOtherChannelDecoderNativeLayout.SelectRoute(code)

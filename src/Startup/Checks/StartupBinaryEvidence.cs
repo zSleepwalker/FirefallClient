@@ -1174,6 +1174,76 @@ internal static class StartupBinaryEvidence
             && RelativeBranchTargets(
                 CharacterReceiveWeaponTweaksNativeLayout.TrailingBlobCopyMethodFileOffset + 0x20,
                 0xE8, 0x159D8F4));
+        check("Binary inner selector 0x55 constructs the RTTI TookDebugWeaponHitPublic object and invokes its reader",
+            ReadUInt32(VirtualAddressToFileOffset(
+                CharacterTookDebugWeaponHitPublicNativeLayout.InnerSelectorTableVirtualAddress) + 8) == 0xC1D965
+            && Matches(CharacterTookDebugWeaponHitPublicNativeLayout.CaseFileOffset, "68A8000000")
+            && RelativeBranchTargets(0x81CD6A, 0xE8, 0x12B7FB0)
+            && RelativeBranchTargets(0x81CD89, 0xE8,
+                CharacterTookDebugWeaponHitPublicNativeLayout.ConstructorFileOffset)
+            && RelativeBranchTargets(0x81CDA0, 0xE8,
+                CharacterTookDebugWeaponHitPublicNativeLayout.BodyReaderFileOffset)
+            && VtableRttiName(CharacterTookDebugWeaponHitPublicNativeLayout.VtableVirtualAddress, 80)
+                == CharacterTookDebugWeaponHitPublicNativeLayout.RttiName
+            && Matches(0x524EE0, "558BEC5156FF750C8BF1FF750883EC08")
+            && RelativeBranchTargets(0x524EF8, 0xE8,
+                CharacterTookDebugWeaponHitPublicNativeLayout.ConstructorHelperFileOffset)
+            && Matches(0x524EFD, "C7065872C601")
+            && Matches(0x524F05, "C6465800")
+            && Matches(0x524F09, "C6868800000000"));
+        check("Binary selector 0x55 reader preserves scalar widths and both optional-tail routes",
+            Matches(0x5F60F0, "558BEC53568BD9")
+            && RelativeBranchTargets(0x5F60FF, 0xE8, 0x337180)
+            && Matches(0x5F6104, "8D4304")
+            && RelativeBranchTargets(0x5F610A, 0xE8, 0x3370A0)
+            && Matches(0x5F610F, "8D4308")
+            && RelativeBranchTargets(0x5F6115, 0xE8, 0x3370A0)
+            && Matches(0x5F611A, "8D430C")
+            && RelativeBranchTargets(0x5F6120, 0xE8, 0x336AC0)
+            && Matches(0x5F6125, "8D7310")
+            && RelativeBranchTargets(0x5F612B, 0xE8, 0x3568E0)
+            && Matches(0x5F6146, "8D731C")
+            && RelativeBranchTargets(0x5F614C, 0xE8, 0x3568E0)
+            && Matches(0x5F6167, "8D4328")
+            && RelativeBranchTargets(0x5F616D, 0xE8, 0x3370A0)
+            && Matches(0x5F6172, "8D5330")
+            && RelativeBranchTargets(0x5F6177, 0xE8,
+                CharacterTookDebugWeaponHitPublicNativeLayout.FirstConditionalTailReaderFileOffset)
+            && Matches(0x5F617C, "8D5360")
+            && RelativeBranchTargets(0x5F6181, 0xE8,
+                CharacterTookDebugWeaponHitPublicNativeLayout.SecondConditionalTailReaderFileOffset)
+            && RelativeBranchTargets(0x5F5039, 0xE8,
+                CharacterTookDebugWeaponHitPublicNativeLayout.FirstConditionalTailPayloadReaderFileOffset)
+            && RelativeBranchTargets(0x5F5045, 0xE8, 0x5F4F60)
+            && RelativeBranchTargets(0x5F4FAD, 0xE8, 0x5F4EB0)
+            && RelativeBranchTargets(0x5F4D6C, 0xE8, 0x356F80)
+            && RelativeBranchTargets(0x5F4D77, 0xE8, 0x3568E0)
+            && RelativeBranchTargets(0x5F4D82, 0xE8, 0x3568E0)
+            && RelativeBranchTargets(0x5F4D8D, 0xE8, 0x3568E0)
+            && RelativeBranchTargets(0x5F4D97, 0xE8, 0x384B40)
+            && RelativeBranchTargets(0x5F4DA1, 0xE8, 0x356CF0)
+            && RelativeBranchTargets(0x5F4DAB, 0xE8, 0x337180)
+            && RelativeBranchTargets(0x5F6059, 0xE8, 0x356F80)
+            && RelativeBranchTargets(0x5F6064, 0xE8, 0x5F5420)
+            && RelativeBranchTargets(0x5F6070, 0xE8, 0x5F5EB0)
+            && RelativeBranchTargets(0x5F607D, 0xE8, 0x12C8D60)
+            && RelativeBranchTargets(0x5F60A1, 0xE8, 0x12C8D60)
+            && RelativeBranchTargets(0x5F54A6, 0xE8,
+                CharacterTookDebugWeaponHitPublicNativeLayout.SecondConditionalTailRecordReaderFileOffset)
+            && Matches(0x5F6032,
+                "C744242000000000C744242400000000C7442428000000008D442414C744243800000000508BCBE8220FD6FF8D5424208BCBE8B7F3FFFF8D4424148BCF50E83BFEFFFF")
+            && Matches(0x356FA5, "89018B420489410483460408")
+            && Matches(0x5F5EE1, "8B55088D4E148B028946088B420489460C8B42088946108D420C50")
+            && Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(ReadAt(
+                CharacterTookDebugWeaponHitPublicNativeLayout.SecondConditionalTailReaderFileOffset,
+                CharacterTookDebugWeaponHitPublicNativeLayout.SecondConditionalTailReaderByteCount)))
+                == "C81A426689241B7BC446F111240FDC138549B9248032CDF32749F7EEF53913B6"
+            && Matches(0x5F5592, "83460440")
+            && Matches(0x5F55A6, "80F9FF0F8495FEFFFF")
+            && Matches(0x6087E9, "C745FC04000000")
+            && Matches(0x6087F2, "BB04000000")
+            && RelativeBranchTargets(0x5F5EFC, 0xE8, 0x5F5880)
+            && RelativeBranchTargets(0x5F5F3E, 0xE8, 0x5F5D70));
         check("Binary matrix socket factory requests overlapped UDP",
             Matches(0xBE354A, "6A016A006A006A11B8170000006A020F44C150FF15684DAC01"));
         check("Binary matrix local binding uses seven or two attempts and final-two fallback",
