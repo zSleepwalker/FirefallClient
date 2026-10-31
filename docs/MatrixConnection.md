@@ -27,8 +27,12 @@ registry at `uiManager+0x6F0`, and walks listeners through `0xBF9C40`;
 listener matching/callback work continues through `0xC38400`. Dispatch is
 gated by `uiManager+0x672`, which the constructor initializes to zero.
 Who enables that flag is not established. This identifies the endpoint and
-routing layer, but the subscriber for message `0x145` and any resulting
-World-mode request remain unresolved.
+routing layer, but the subscriber for message `0x145` remains unresolved. A
+separate installed-UI join path now traces through the native Matrix
+connection entry to its oracle-ticket callsite. `JoinWorld` can pass a nil
+`dev_matrix_url` in the PvE matchmaking branch, whose native handling remains
+unresolved; this does not prove a completed handshake or a `tfWorld` request.
+See [`LoginMode.md`](LoginMode.md#ui-preload-route-into-the-matrix-connection).
 
 Subscription names map to numeric IDs through `uiManager+0x6E8`.
 `0xBF9AB0` returns an existing ID or assigns the current DWORD count of the
@@ -44,8 +48,8 @@ notification. `UISets\LoginUI.xml` loads the `LoginUI` folder, and
 `AccountLogin.lua:876`. This makes `0x145 -> ON_LOGIN_RESPONSE` plausible, but not proven: the native
 callsite is in a separate Login-mode routine, not in the response callback
 `0x63B7C0`, and the runtime name-registration order for the 326th event ID was
-not reconstructed. The actual subscriber and any World-mode side effect
-remain unresolved.
+not reconstructed. The actual subscriber remains unresolved. The independent
+UI-to-Matrix route does not establish that message `0x145` triggers it.
 
 These read-only text samples were hashed before inspection. They are under
 `D:\SteamLibrary\steamapps\common\Firefall\system\gui\` and are not repository
@@ -59,6 +63,10 @@ files:
 | `UISets\Broadcast.xml` | 991 | `7F60A9E8370E1871239CF7AB82C4485A8F7E19A3BECA2AD05B63B2B02FB88E63` | Root UI-set comparison; `glue_mode=false`. |
 | `components\LoginUI\AccountLogin\AccountLogin.xml` | 24,728 | `67CBD909E54E1354E291728F66EBAB9E7F1410DB2600CA75E50EFF77CB5FA05A` | Declares `ON_LOGIN_RESPONSE` at line17. |
 | `components\LoginUI\AccountLogin\AccountLogin.lua` | 69,488 | `9EA014EA94C803B82DC696CF0790E12DD414154993B11F5997DD3901B244D462` | Defines `OnLoginResponse` at line876. |
+| `components\LoginUI\ZoneSelection\ZoneSelection.xml` | 33,076 | `F49545D3F3B9757D7E360CB607341386AD794BFCD15618ED8758844CBD380AD4` | Binds `MY_CONNECT` to `OnConnect` at line25. |
+| `components\LoginUI\ZoneSelection\ZoneSelection.lua` | 75,192 | `F136FC2FF26EFC892D9AB24E5464F98D49CB3890830E391971C26C5C2148BD97` | `JoinWorld` emits `MY_PRELOAD_EVENT` with `zone.matrix_url` and character fields at lines2147-2225; the URL is nil in the PvE matchmaking branch. |
+| `components\LoginUI\LoginPreloadScreen\LoginPreloadScreen.xml` | 3,147 | `A59E0A3F7D93FD8866AFF2FB3BF1E1AAF8A2D24BFC7439076F2B53F9FDEB3E31` | Binds `MY_PRELOAD_EVENT` to `OnPreload` at line19. |
+| `components\LoginUI\LoginPreloadScreen\LoginPreloadScreen.lua` | 4,614 | `2D1A1801F331101D035F9A0BAE3A12EB1EF75ACDD4DE91B7B433AD77EF0D45F4` | After the duration/delay timer, the credentials gate calls `System.SetupCharacter` then `System.StartInstanceConnection` at lines89-98. |
 
 A safe static discriminator is to reconstruct the UI loader's ordered event
 registrations and evaluate the name-array index produced by `0xBF9AB0` for
@@ -68,8 +76,9 @@ Until that order is recovered, the numeric-name correlation is unresolved.
 ## Oracle-ticket request
 
 Connection entry `0x494CA0` sets connection state `+0x0C` to 2 on the
-Login-reachable path and calls `0x494E30`. The latter requires state 2 and
-returns without another request when byte `+0x1C` is already set.
+Login-reachable path and calls `0x494E30` at raw callsite `0x494D0B`. The
+ticket-queue routine `0x494E30` requires state 2 and returns without another
+request when byte `+0x1C` is already set.
 It checks a locked account/service context before constructing a request;
 the complete meaning of that service's flags is untraced.
 

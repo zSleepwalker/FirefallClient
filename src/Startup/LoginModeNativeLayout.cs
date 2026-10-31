@@ -24,9 +24,18 @@ public readonly record struct LoginRequestAttachmentSnapshot(
     public string HttpMethod => ClientApiRequestNativeLayout.ResolveHttpMethod(NativeRequestType);
 }
 
+public readonly record struct LoginSystemApiBindingSnapshot(
+    string Name,
+    uint NameVirtualAddress,
+    uint RegistrationSiteFileOffset,
+    uint RegisteredThunkVirtualAddress,
+    uint ThunkFileOffset,
+    uint TargetFileOffset);
+
 /// <summary>
 /// Verified addresses, object offsets, and literal catalogs from the 32-bit
-/// tfLogin object. These observations do not implement the native login protocol.
+/// tfLogin object and its request/connection handoff. These observations do not
+/// implement the native login protocol.
 /// </summary>
 public static class LoginModeNativeLayout
 {
@@ -100,6 +109,12 @@ public static class LoginModeNativeLayout
             CharacterListEndpointFormat, 0x9F0),
         new("Zone-list response", 0x63E390, 0x63E56C, 0xA00, 2,
             ZoneListEndpointFormat, null)
+    ];
+
+    private static readonly LoginSystemApiBindingSnapshot[] SystemApiBindings =
+    [
+        new("SetupCharacter", 0x1B63184, 0x642DF7, 0xA46A60, 0x645E60, 0x641950),
+        new("StartInstanceConnection", 0x1B63194, 0x642E47, 0xA46A70, 0x645E70, 0x641C50)
     ];
 
     public const int AllocationSize = 0xA58;
@@ -199,6 +214,14 @@ public static class LoginModeNativeLayout
     public const uint ConnectSelectedCharacterStateBranchFileOffset = 0x63E890;
     public const uint PrepareSelectedCharacterMethodFileOffset = 0x63EE30;
     public const uint RequestMatrixConnectionMethodFileOffset = 0x63F230;
+    public const uint SystemApiRegistrationRoutineFileOffset = 0x6429E0;
+    public const uint SetupCharacterPreparationCallSiteFileOffset = 0x641BF3;
+    public const uint StartInstanceConnectionValidationCallSiteFileOffset = 0x641DD4;
+    public const uint MatrixConnectionBeginCallSiteFileOffset = 0x63F57F;
+    public const uint SetupCharacterNameKeyVirtualAddress = 0x1B6266C;
+    public const uint SetupCharacterIsDevKeyVirtualAddress = 0x1B62630;
+    public const uint SetupCharacterRaceKeyVirtualAddress = 0x1B62778;
+    public const uint SetupCharacterGenderKeyVirtualAddress = 0x1B62770;
     public const int SelectedCharacterPropertiesOffsetInRecord = 0xC8;
     public const int CharacterConnectionObjectMemberOffset = 0x1C;
     public const int CharacterConnectionObjectAllocationSize = 0xBB0;
@@ -226,4 +249,5 @@ public static class LoginModeNativeLayout
     public static IReadOnlyList<LoginResponseHandlerSnapshot> KnownResponseHandlers => ResponseHandlers;
     public static IReadOnlyList<LoginResponseCallbackSnapshot> KnownResponseCallbacks => ResponseCallbacks;
     public static IReadOnlyList<LoginRequestAttachmentSnapshot> KnownRequestAttachments => RequestAttachments;
+    public static IReadOnlyList<LoginSystemApiBindingSnapshot> KnownLuaSystemApiBindings => SystemApiBindings;
 }

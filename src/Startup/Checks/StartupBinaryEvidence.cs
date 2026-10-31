@@ -25,6 +25,13 @@ internal static class StartupBinaryEvidence
             return ReadAt(offset, expected.Length).SequenceEqual(expected);
         }
 
+        bool RelativeBranchTargets(long offset, byte opcode, uint target)
+        {
+            byte[] instruction = ReadAt(offset, 5);
+            return instruction[0] == opcode
+                && offset + 5 + BinaryPrimitives.ReadInt32LittleEndian(instruction.AsSpan(1)) == target;
+        }
+
         uint peOffset = ReadUInt32(0x3C);
         ushort sectionCount = BinaryPrimitives.ReadUInt16LittleEndian(ReadAt(peOffset + 6, 2));
         ushort optionalHeaderSize = BinaryPrimitives.ReadUInt16LittleEndian(ReadAt(peOffset + 20, 2));
@@ -1105,6 +1112,10 @@ internal static class StartupBinaryEvidence
             && ReadUInt32(0x183CE7D) == 0x00BBE620);
         check("Binary oracle submission calls the shared matrix request wrapper",
             Matches(MatrixConnectionNativeLayout.OracleRequestSubmissionFileOffset, "E80C5B0000"));
+        check("Matrix connection entry queues the oracle ticket on its initial connection path",
+            Matches(MatrixConnectionNativeLayout.QueueOracleTicketCallSiteFileOffset, "E820010000")
+            && RelativeBranchTargets(MatrixConnectionNativeLayout.QueueOracleTicketCallSiteFileOffset,
+                0xE8, MatrixConnectionNativeLayout.QueueOracleTicketMethodFileOffset));
         check("Binary packet admission uses unsigned count-minus-five and a network-order context word",
             Matches(0xBD303C, "8D47FB3D730500000F87C1000000")
             && Matches(0xBD3050, "FF15944DAC013B8614010000")
@@ -1893,5 +1904,44 @@ internal static class StartupBinaryEvidence
             && ReadUInt32(VirtualAddressToFileOffset(UiManagerNativeLayout.UiManagerVtableVirtualAddress)
                 + UiManagerNativeLayout.UiManagerEventDispatchVtableOffset)
                 == UiManagerNativeLayout.UiManagerEventDispatchMethodFileOffset + 0x400C00);
+        check("Lua preload System APIs register and dispatch through Login into Matrix connection",
+            Matches(LoginModeNativeLayout.KnownLuaSystemApiBindings[0].RegistrationSiteFileOffset,
+                "BA8431B6018B4308C700606AA400C74008160000")
+            && Matches(LoginModeNativeLayout.KnownLuaSystemApiBindings[1].RegistrationSiteFileOffset,
+                "BA9431B6018B43088BCBC700706AA400C74008160000")
+            && ReadCStringAscii(LoginModeNativeLayout.KnownLuaSystemApiBindings[0].NameVirtualAddress, 32)
+                == LoginModeNativeLayout.KnownLuaSystemApiBindings[0].Name
+            && ReadCStringAscii(LoginModeNativeLayout.KnownLuaSystemApiBindings[1].NameVirtualAddress, 32)
+                == LoginModeNativeLayout.KnownLuaSystemApiBindings[1].Name
+            && Matches(LoginModeNativeLayout.KnownLuaSystemApiBindings[0].ThunkFileOffset,
+                "558BEC5DE9E7BAFFFF")
+            && Matches(LoginModeNativeLayout.KnownLuaSystemApiBindings[1].ThunkFileOffset,
+                "558BEC5DE9D7BDFFFF")
+            && VirtualAddressToFileOffset(
+                LoginModeNativeLayout.KnownLuaSystemApiBindings[0].RegisteredThunkVirtualAddress)
+                == LoginModeNativeLayout.KnownLuaSystemApiBindings[0].ThunkFileOffset
+            && VirtualAddressToFileOffset(
+                LoginModeNativeLayout.KnownLuaSystemApiBindings[1].RegisteredThunkVirtualAddress)
+                == LoginModeNativeLayout.KnownLuaSystemApiBindings[1].ThunkFileOffset
+            && RelativeBranchTargets(LoginModeNativeLayout.KnownLuaSystemApiBindings[0].ThunkFileOffset + 4,
+                0xE9, LoginModeNativeLayout.KnownLuaSystemApiBindings[0].TargetFileOffset)
+            && RelativeBranchTargets(LoginModeNativeLayout.KnownLuaSystemApiBindings[1].ThunkFileOffset + 4,
+                0xE9, LoginModeNativeLayout.KnownLuaSystemApiBindings[1].TargetFileOffset)
+            && Matches(LoginModeNativeLayout.SetupCharacterPreparationCallSiteFileOffset,
+                "E838D2FFFF")
+            && Matches(LoginModeNativeLayout.StartInstanceConnectionValidationCallSiteFileOffset,
+                "E857D4FFFF")
+            && Matches(LoginModeNativeLayout.MatrixConnectionBeginCallSiteFileOffset,
+                "E81C57E5FF")
+            && RelativeBranchTargets(LoginModeNativeLayout.SetupCharacterPreparationCallSiteFileOffset,
+                0xE8, LoginModeNativeLayout.PrepareSelectedCharacterMethodFileOffset)
+            && RelativeBranchTargets(LoginModeNativeLayout.StartInstanceConnectionValidationCallSiteFileOffset,
+                0xE8, LoginModeNativeLayout.RequestMatrixConnectionMethodFileOffset)
+            && RelativeBranchTargets(LoginModeNativeLayout.MatrixConnectionBeginCallSiteFileOffset,
+                0xE8, LoginModeNativeLayout.MatrixConnectionRequestBoundaryFileOffset)
+            && ReadCStringAscii(LoginModeNativeLayout.SetupCharacterNameKeyVirtualAddress, 24) == "name"
+            && ReadCStringAscii(LoginModeNativeLayout.SetupCharacterIsDevKeyVirtualAddress, 24) == "is_dev"
+            && ReadCStringAscii(LoginModeNativeLayout.SetupCharacterRaceKeyVirtualAddress, 24) == "race"
+            && ReadCStringAscii(LoginModeNativeLayout.SetupCharacterGenderKeyVirtualAddress, 24) == "gender");
     }
 }

@@ -354,6 +354,20 @@ Check("Auto-login state 5 prepares selected character and requests matrix connec
         .SequenceEqual(["name", "is_dev", "race", "gender"])
     && LoginModeNativeLayout.MatrixOverrideConfigSection == "Development"
     && LoginModeNativeLayout.MatrixOverrideConfigKey == "MatrixOverride");
+Check("Lua System API bindings connect preload character setup to Matrix connection entry",
+    LoginModeNativeLayout.SystemApiRegistrationRoutineFileOffset == 0x6429E0
+    && LoginModeNativeLayout.KnownLuaSystemApiBindings.SequenceEqual(
+    [
+        new LoginSystemApiBindingSnapshot("SetupCharacter", 0x1B63184, 0x642DF7,
+            0xA46A60, 0x645E60, 0x641950),
+        new LoginSystemApiBindingSnapshot("StartInstanceConnection", 0x1B63194, 0x642E47,
+            0xA46A70, 0x645E70, 0x641C50)
+    ])
+    && LoginModeNativeLayout.SetupCharacterPreparationCallSiteFileOffset == 0x641BF3
+    && LoginModeNativeLayout.StartInstanceConnectionValidationCallSiteFileOffset == 0x641DD4
+    && LoginModeNativeLayout.MatrixConnectionBeginCallSiteFileOffset == 0x63F57F
+    && LoginModeNativeLayout.KnownCharacterConnectionPropertyKeys
+        .SequenceEqual(["name", "is_dev", "race", "gender"]));
 Check("Matrix connection requests oracle tickets through a distinct callback wrapper",
     MatrixConnectionNativeLayout.AllocationSize == 0xBB0
     && MatrixConnectionNativeLayout.OracleCallbackPairOffset == 0xB98
@@ -364,6 +378,7 @@ Check("Matrix connection requests oracle tickets through a distinct callback wra
     && MatrixConnectionNativeLayout.OracleCallbackOwnerAdjustmentOffset == 12
     && MatrixConnectionNativeLayout.OracleCallbackTargetVirtualAddress == 0x896060
     && MatrixConnectionNativeLayout.OracleCallbackTrampolineFileOffset == 0x496DF0
+    && MatrixConnectionNativeLayout.QueueOracleTicketCallSiteFileOffset == 0x494D0B
     && MatrixConnectionNativeLayout.QueueOracleTicketMethodFileOffset == 0x494E30
     && MatrixConnectionNativeLayout.OracleCallbackAttachmentFileOffset == 0x49510C
     && MatrixConnectionNativeLayout.OracleRequestSubmissionFileOffset == 0x4953DF

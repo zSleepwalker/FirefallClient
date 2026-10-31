@@ -379,6 +379,40 @@ and calls `0x494E30`. Its message-24 descriptor branch is instead for states
 documented in [`MatrixConnection.md`](MatrixConnection.md). The app-mode
 transition remains unresolved.
 
+## UI preload route into the Matrix connection
+
+The installed UI has a second, script-driven route into the same native
+connection path. `ZoneSelection.lua::JoinWorld` emits `MY_PRELOAD_EVENT` with
+`dev_matrix_url=zone.matrix_url` and the selected character's `guid`, `name`,
+`is_dev`, `race`, and `gender`. The matrix URL can be `nil` in the PvE
+matchmaking branch, which constructs `zone` with `matrix_url=nil`.
+`LoginPreloadScreen.xml` binds the event to `OnPreload`. After its configured
+timer, `LoginPreloadScreen.lua::OnPreload` checks
+`System.GetCredentialsInfo()` and, when credentials remain available, calls
+`System.SetupCharacter(arg)` followed by
+`System.StartInstanceConnection(arg.dev_matrix_url)`. Native handling of the
+nil argument is not established. Source paths, hashes, and sizes are recorded
+in [`MatrixConnection.md`](MatrixConnection.md).
+
+The native System API registration routine at `0x6429E0` registers
+`SetupCharacter` at raw `0x642DF7` and `StartInstanceConnection` at raw
+`0x642E47`. Their name VAs are `0x1B63184` and `0x1B63194`; the registered
+thunks at VAs `0xA46A60` and `0xA46A70` map to raw `0x645E60` and `0x645E70`.
+Those thunks tail-jump to `0x641950` and `0x641C50`, respectively.
+`0x641950` parses the character table and calls
+`Login_PrepareSelectedCharacterConnection` (`0x63EE30`); the observed keys
+are `name`, `is_dev`, `race`, and `gender`. `0x641C50` passes the Lua-provided
+argument to `Login_ValidateMatrixDestinationAndBegin` (`0x63F230`), which
+calls `MatrixConnection_BeginConnection` (`0x494CA0`) on the Login-owned
+object at `Login+0x1C`. This reaches the state-2 oracle-ticket path described
+in [`MatrixConnection.md`](MatrixConnection.md#oracle-ticket-request) on the
+validator's permitted destination branch. The PvE matchmaking branch can
+pass nil, and that native nil-argument case remains unresolved.
+
+This confirms the UI-to-Matrix connection initiation path, not a completed
+server handshake or a transition to `tfWorld`. It also does not resolve which
+dynamic UI event name, if any, corresponds to native message ID `0x145`.
+
 ## Pending app-mode queue
 
 The application queue helper at raw `0x30DEB0` (`AppMode_EnqueuePendingModeRequest`)

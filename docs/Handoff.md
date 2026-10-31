@@ -13,12 +13,21 @@ bootstrap walks `slSingleton<uiManager>` and its slot+4 initializer stores the
 constructed `uiManager` at VA `0x1E002B8`. Its slot+0xAC dispatches through the
 event-ID registry. Named subscriptions map strings to numeric IDs through
 `uiManager+0x6E8` before registering listener nodes at `+0x6F0`; the
-message-145 name/subscriber and any resulting World-mode request remain
-unresolved.
+message-145 name/subscriber and any direct message-145-to-World-mode request
+remain unresolved.
 The offline body decoder is in `GameSocketAcknowledgmentBody.cs`, with checks
 in `GameSocketAcknowledgmentBodyChecks.cs`; full queue mutation and resend
 behavior remain outside the reconstruction.
 
+The installed UI's separate join path is now traced from
+`ZoneSelection.JoinWorld` through `MY_PRELOAD_EVENT` and the preloader's
+`System.SetupCharacter`/`System.StartInstanceConnection` calls to
+`MatrixConnection_BeginConnection` and its oracle-ticket callsite on the
+permitted destination branch. The PvE matchmaking branch can pass a nil
+`dev_matrix_url`; native nil handling, the final `tfWorld` transition, and
+the dynamic name for message `0x145` remain unresolved. Native API bindings
+and binary fingerprints are saved in `LoginModeNativeLayout.cs`; source
+hashes are in `MatrixConnection.md`, and the flow details are in `LoginMode.md`.
 
 The latest render-init pass identifies the six `0xED1650` args (fullscreen flag, display w/h, third display value, window client w/h, forwarded to oD3DRenderAPI slot +8 `0xF08680`), the host class `oEngineSystem` (`0xE54BF0` = vtable `0x1C77C2C` slot 0) and `0x1DFE9C8` as `oShaderBuilderSystem`; see MatrixConnection.md. Cvar-field mapping and the path to the main loop remain unresolved.
 
