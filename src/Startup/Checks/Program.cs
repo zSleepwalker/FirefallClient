@@ -368,6 +368,17 @@ Check("Lua System API bindings connect preload character setup to Matrix connect
     && LoginModeNativeLayout.MatrixConnectionBeginCallSiteFileOffset == 0x63F57F
     && LoginModeNativeLayout.KnownCharacterConnectionPropertyKeys
         .SequenceEqual(["name", "is_dev", "race", "gender"]));
+Check("Matrix destination source precedence and empty input are explicit",
+    LoginMatrixDestinationSelection.Select("lua-url", "development-url", "login-url")
+        == new LoginMatrixDestinationSelectionResult(
+            "login-url", LoginMatrixDestinationSource.LoginSelectedMatrixUrl)
+    && LoginMatrixDestinationSelection.Select("lua-url", "development-url", null)
+        == new LoginMatrixDestinationSelectionResult(
+            "development-url", LoginMatrixDestinationSource.DevelopmentMatrixOverride)
+    && LoginMatrixDestinationSelection.Select("lua-url", null, "")
+        == new LoginMatrixDestinationSelectionResult("lua-url", LoginMatrixDestinationSource.LuaArgument)
+    && LoginMatrixDestinationSelection.Select(null, "", null)
+        == new LoginMatrixDestinationSelectionResult("", LoginMatrixDestinationSource.None));
 Check("Matrix connection requests oracle tickets through a distinct callback wrapper",
     MatrixConnectionNativeLayout.AllocationSize == 0xBB0
     && MatrixConnectionNativeLayout.OracleCallbackPairOffset == 0xB98
@@ -380,6 +391,11 @@ Check("Matrix connection requests oracle tickets through a distinct callback wra
     && MatrixConnectionNativeLayout.OracleCallbackTrampolineFileOffset == 0x496DF0
     && MatrixConnectionNativeLayout.QueueOracleTicketCallSiteFileOffset == 0x494D0B
     && MatrixConnectionNativeLayout.QueueOracleTicketMethodFileOffset == 0x494E30
+    && MatrixConnectionNativeLayout.EmptyTextPredicateMethodFileOffset == 0x2FCD00
+    && MatrixConnectionNativeLayout.ExistingConnectionResetMethodFileOffset == 0x490090
+    && MatrixConnectionNativeLayout.CharacterMetadataApplyMethodFileOffset == 0x490390
+    && MatrixConnectionNativeLayout.PreferredDestinationEmptyCheckCallSiteFileOffset == 0x494CF4
+    && MatrixConnectionNativeLayout.OracleMatrixFieldEmptyCheckCallSiteFileOffset == 0x495257
     && MatrixConnectionNativeLayout.OracleCallbackAttachmentFileOffset == 0x49510C
     && MatrixConnectionNativeLayout.OracleRequestSubmissionFileOffset == 0x4953DF
     && MatrixConnectionNativeLayout.OracleResponseHandlerFileOffset == 0x495460

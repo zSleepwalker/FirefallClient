@@ -390,9 +390,8 @@ matchmaking branch, which constructs `zone` with `matrix_url=nil`.
 timer, `LoginPreloadScreen.lua::OnPreload` checks
 `System.GetCredentialsInfo()` and, when credentials remain available, calls
 `System.SetupCharacter(arg)` followed by
-`System.StartInstanceConnection(arg.dev_matrix_url)`. Native handling of the
-nil argument is not established. Source paths, hashes, and sizes are recorded
-in [`MatrixConnection.md`](MatrixConnection.md).
+`System.StartInstanceConnection(arg.dev_matrix_url)`. Source paths, hashes,
+and sizes are recorded in [`MatrixConnection.md`](MatrixConnection.md).
 
 The native System API registration routine at `0x6429E0` registers
 `SetupCharacter` at raw `0x642DF7` and `StartInstanceConnection` at raw
@@ -401,13 +400,28 @@ thunks at VAs `0xA46A60` and `0xA46A70` map to raw `0x645E60` and `0x645E70`.
 Those thunks tail-jump to `0x641950` and `0x641C50`, respectively.
 `0x641950` parses the character table and calls
 `Login_PrepareSelectedCharacterConnection` (`0x63EE30`); the observed keys
-are `name`, `is_dev`, `race`, and `gender`. `0x641C50` passes the Lua-provided
-argument to `Login_ValidateMatrixDestinationAndBegin` (`0x63F230`), which
-calls `MatrixConnection_BeginConnection` (`0x494CA0`) on the Login-owned
-object at `Login+0x1C`. This reaches the state-2 oracle-ticket path described
-in [`MatrixConnection.md`](MatrixConnection.md#oracle-ticket-request) on the
-validator's permitted destination branch. The PvE matchmaking branch can
-pass nil, and that native nil-argument case remains unresolved.
+are `name`, `is_dev`, `race`, and `gender`. `0x641C50` converts a nil or empty
+Lua argument to empty shared text through `0x2FCC90`, then passes it to
+`Login_ValidateMatrixDestinationAndBegin` (`0x63F230`). Destination selection
+prefers a nonempty Login `+0xA20` URL over `Development/MatrixOverride`; either
+nonempty value replaces the Lua argument. `LoginMatrixDestinationSelection.cs`
+models that source precedence. If all three are empty, the validator allows
+the empty-destination branch when the connection state is below 2 and calls
+`MatrixConnection_BeginConnection` (`0x494CA0`) on the Login-owned object at
+`Login+0x1C`, without host/port validation for an absent URL. This reaches the
+state-2 oracle-ticket path described in
+[`MatrixConnection.md`](MatrixConnection.md#oracle-ticket-request).
+
+An empty argument does not necessarily clear an older preference: the begin
+routine updates connection `+0xBA0` only for nonempty input, and the oracle
+request includes `matrix` only when `+0xBA0` is nonempty. When `SetupCharacter`
+reuses the existing connection, reset routine `0x490090` resets connection
+state and destroys its socket but has no observed direct store to `+0xBA0`;
+the following character-metadata setter `0x490390` writes fields around
+`+0x848..+0x85C`.
+Therefore an earlier preferred matrix URL can survive this reset and still be
+sent on the nil-input path. The initial `+0xBA0` value for a freshly allocated
+connection remains unverified.
 
 This confirms the UI-to-Matrix connection initiation path, not a completed
 server handshake or a transition to `tfWorld`. It also does not resolve which

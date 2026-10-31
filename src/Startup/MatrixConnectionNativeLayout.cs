@@ -17,6 +17,11 @@ public static class MatrixConnectionNativeLayout
     public const uint BeginConnectionMethodFileOffset = 0x494CA0;
     public const uint QueueOracleTicketCallSiteFileOffset = 0x494D0B;
     public const uint QueueOracleTicketMethodFileOffset = 0x494E30;
+    public const uint EmptyTextPredicateMethodFileOffset = 0x2FCD00;
+    public const uint ExistingConnectionResetMethodFileOffset = 0x490090;
+    public const uint CharacterMetadataApplyMethodFileOffset = 0x490390;
+    public const uint PreferredDestinationEmptyCheckCallSiteFileOffset = 0x494CF4;
+    public const uint OracleMatrixFieldEmptyCheckCallSiteFileOffset = 0x495257;
     public const uint OracleCallbackAttachmentFileOffset = 0x49510C;
     public const uint OracleRequestSubmissionFileOffset = 0x4953DF;
     public const uint OracleResponseHandlerFileOffset = 0x495460;

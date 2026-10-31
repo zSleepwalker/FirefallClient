@@ -1943,5 +1943,37 @@ internal static class StartupBinaryEvidence
             && ReadCStringAscii(LoginModeNativeLayout.SetupCharacterIsDevKeyVirtualAddress, 24) == "is_dev"
             && ReadCStringAscii(LoginModeNativeLayout.SetupCharacterRaceKeyVirtualAddress, 24) == "race"
             && ReadCStringAscii(LoginModeNativeLayout.SetupCharacterGenderKeyVirtualAddress, 24) == "gender");
+        check("Nil StartInstanceConnection input becomes empty shared text",
+            Matches(LoginModeNativeLayout.StartInstanceConnectionTextConversionCallSiteFileOffset,
+                "E8C7AECBFF")
+            && RelativeBranchTargets(
+                LoginModeNativeLayout.StartInstanceConnectionTextConversionCallSiteFileOffset,
+                0xE8, LoginModeNativeLayout.StartInstanceConnectionTextConversionMethodFileOffset)
+            && Matches(LoginModeNativeLayout.StartInstanceConnectionTextConversionMethodFileOffset,
+                "558BEC538B5D0856578BF985DB7441803B00743C"));
+        check("Empty MatrixConnection preference is not overwritten or serialized as a matrix URL",
+            Matches(MatrixConnectionNativeLayout.EmptyTextPredicateMethodFileOffset,
+                "8B0185C0741E668378F800740C0FB748FA33C085C90F94C0")
+            && Matches(MatrixConnectionNativeLayout.PreferredDestinationEmptyCheckCallSiteFileOffset,
+                "E80780E6FF84C0750C")
+            && RelativeBranchTargets(MatrixConnectionNativeLayout.PreferredDestinationEmptyCheckCallSiteFileOffset,
+                0xE8, MatrixConnectionNativeLayout.EmptyTextPredicateMethodFileOffset)
+            && Matches(MatrixConnectionNativeLayout.OracleMatrixFieldEmptyCheckCallSiteFileOffset,
+                "E8A47AE6FF84C07511")
+            && RelativeBranchTargets(MatrixConnectionNativeLayout.OracleMatrixFieldEmptyCheckCallSiteFileOffset,
+                0xE8, MatrixConnectionNativeLayout.EmptyTextPredicateMethodFileOffset));
+        check("SetupCharacter resets an existing connection before applying character metadata",
+            Matches(LoginModeNativeLayout.ExistingCharacterConnectionResetCallSiteFileOffset,
+                "E8C30FE5FF")
+            && RelativeBranchTargets(LoginModeNativeLayout.ExistingCharacterConnectionResetCallSiteFileOffset,
+                0xE8, MatrixConnectionNativeLayout.ExistingConnectionResetMethodFileOffset)
+            && Matches(MatrixConnectionNativeLayout.ExistingConnectionResetMethodFileOffset,
+                "558BEC83E4F8515356578BF9")
+            && Matches(LoginModeNativeLayout.CharacterConnectionMetadataApplyCallSiteFileOffset,
+                "E8F311E5FF")
+            && RelativeBranchTargets(LoginModeNativeLayout.CharacterConnectionMetadataApplyCallSiteFileOffset,
+                0xE8, MatrixConnectionNativeLayout.CharacterMetadataApplyMethodFileOffset)
+            && Matches(MatrixConnectionNativeLayout.CharacterMetadataApplyMethodFileOffset,
+                "558BEC83E4F85153568B75088BD9578B0E8BC18B56040BC2"));
     }
 }

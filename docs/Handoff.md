@@ -23,11 +23,15 @@ The installed UI's separate join path is now traced from
 `ZoneSelection.JoinWorld` through `MY_PRELOAD_EVENT` and the preloader's
 `System.SetupCharacter`/`System.StartInstanceConnection` calls to
 `MatrixConnection_BeginConnection` and its oracle-ticket callsite on the
-permitted destination branch. The PvE matchmaking branch can pass a nil
-`dev_matrix_url`; native nil handling, the final `tfWorld` transition, and
-the dynamic name for message `0x145` remain unresolved. Native API bindings
-and binary fingerprints are saved in `LoginModeNativeLayout.cs`; source
-hashes are in `MatrixConnection.md`, and the flow details are in `LoginMode.md`.
+permitted destination branch. A nil `dev_matrix_url` becomes empty shared text;
+Login's selected URL or `Development/MatrixOverride` may take precedence.
+`SetupCharacter`'s existing-connection reset has no observed direct store to
+preferred Matrix text `+0xBA0`, so an earlier URL can survive and reach the
+oracle request.
+The fresh-object initial value of `+0xBA0`, final `tfWorld` transition, and
+dynamic name for message `0x145` remain open. Native API bindings and binary
+fingerprints are saved in `LoginModeNativeLayout.cs`; source hashes are in
+`MatrixConnection.md`, and flow details are in `LoginMode.md`.
 
 The latest render-init pass identifies the six `0xED1650` args (fullscreen flag, display w/h, third display value, window client w/h, forwarded to oD3DRenderAPI slot +8 `0xF08680`), the host class `oEngineSystem` (`0xE54BF0` = vtable `0x1C77C2C` slot 0) and `0x1DFE9C8` as `oShaderBuilderSystem`; see MatrixConnection.md. Cvar-field mapping and the path to the main loop remain unresolved.
 

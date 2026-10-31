@@ -216,8 +216,12 @@ public static class LoginModeNativeLayout
     public const uint RequestMatrixConnectionMethodFileOffset = 0x63F230;
     public const uint SystemApiRegistrationRoutineFileOffset = 0x6429E0;
     public const uint SetupCharacterPreparationCallSiteFileOffset = 0x641BF3;
+    public const uint StartInstanceConnectionTextConversionCallSiteFileOffset = 0x641DC4;
     public const uint StartInstanceConnectionValidationCallSiteFileOffset = 0x641DD4;
+    public const uint ExistingCharacterConnectionResetCallSiteFileOffset = 0x63F0C8;
+    public const uint CharacterConnectionMetadataApplyCallSiteFileOffset = 0x63F198;
     public const uint MatrixConnectionBeginCallSiteFileOffset = 0x63F57F;
+    public const uint StartInstanceConnectionTextConversionMethodFileOffset = 0x2FCC90;
     public const uint SetupCharacterNameKeyVirtualAddress = 0x1B6266C;
     public const uint SetupCharacterIsDevKeyVirtualAddress = 0x1B62630;
     public const uint SetupCharacterRaceKeyVirtualAddress = 0x1B62778;
