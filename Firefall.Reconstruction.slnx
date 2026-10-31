@@ -60,4 +60,8 @@
   <Folder Name="/src/HWStats/">
     <Project Path="src/HWStats/Firefall.HWStats.csproj" />
   </Folder>
+  <Folder Name="/src/Awesomium/">
+    <Project Path="src/Awesomium/Firefall.Awesomium.csproj" />
+  </Folder>
 </Solution>
+

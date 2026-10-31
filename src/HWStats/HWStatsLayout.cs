@@ -15,8 +15,15 @@ public static class HWStatsLayout
     public static readonly (string Name, uint Va)[] Sections =
     {
         ("macaddr", 0x404340), ("soundplayback/soundrecording (DirectSound)", 0x404340),
-        ("sub_4035A0", 0x4035A0), ("display registry (sub_4034C0)", 0x4034C0),
-        ("memory (sub_4037F0)", 0x4037F0), ("sub_404020", 0x404020),
-        ("D3D9/CPU features (sub_402250)", 0x402250), ("sub_406880", 0x406880),
+        ("ram/nprocessors + CPUID (sub_4035A0 -> sub_403350)", 0x4035A0), ("display registry (sub_4034C0)", 0x4034C0),
+        ("memory (sub_4037F0)", 0x4037F0), ("System: OS/DirectX version + BIOS registry values (sub_404020)", 0x404020),
+        ("D3D9/CPU features (sub_402250)", 0x402250), ("report object cleanup, not a section (sub_406880)", 0x406880),
     };
+
+    public const uint CpuidSectionVa = 0x403350;
+    public const uint ReportCleanupVa = 0x406880;
+    public const int ReportObjectFileOffset = 0;
+    public const int ReportObjectIndentOffset = 0x54;
+    public const int ReportObjectHeapSlots = 20;
 }
+
