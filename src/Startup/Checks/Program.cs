@@ -379,6 +379,14 @@ Check("Matrix destination source precedence and empty input are explicit",
         == new LoginMatrixDestinationSelectionResult("lua-url", LoginMatrixDestinationSource.LuaArgument)
     && LoginMatrixDestinationSelection.Select(null, "", null)
         == new LoginMatrixDestinationSelectionResult("", LoginMatrixDestinationSource.None));
+Check("tfLogin default update branch queues World mode {2,0} behind the zero guard",
+    LoginModeNativeLayout.LoginUpdateMethodFileOffset == 0x6385C0
+    && LoginModeNativeLayout.LoginUpdateSwitchDefaultTargetFileOffset == 0x638AB3
+    && LoginModeNativeLayout.LoginUpdateGuardGlobalVa == 0x1E5CAA4
+    && LoginModeNativeLayout.LoginUpdateGuardByteOffset == 0x40
+    && LoginModeNativeLayout.LoginUpdateWorldModeGuardBranchFileOffset == 0x638AC6
+    && LoginModeNativeLayout.LoginUpdateWorldModeQueueRequestBuildFileOffset == 0x638B89
+    && LoginModeNativeLayout.LoginUpdateWorldModeQueueCallSiteFileOffset == 0x638BAF);
 Check("Matrix connection requests oracle tickets through a distinct callback wrapper",
     MatrixConnectionNativeLayout.AllocationSize == 0xBB0
     && MatrixConnectionNativeLayout.OracleCallbackPairOffset == 0xB98

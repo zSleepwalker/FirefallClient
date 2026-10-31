@@ -28,10 +28,15 @@ Login's selected URL or `Development/MatrixOverride` may take precedence.
 `SetupCharacter`'s existing-connection reset has no observed direct store to
 preferred Matrix text `+0xBA0`, so an earlier URL can survive and reach the
 oracle request.
-The fresh-object initial value of `+0xBA0`, final `tfWorld` transition, and
-dynamic name for message `0x145` remain open. Native API bindings and binary
+The fresh-object initial value of `+0xBA0`, the runtime cause/completion of
+the `tfWorld` request, and the dynamic name for message `0x145` remain open.
+Native API bindings and binary
 fingerprints are saved in `LoginModeNativeLayout.cs`; source hashes are in
 `MatrixConnection.md`, and flow details are in `LoginMode.md`.
+Separately, `tfLogin::Update` (`0x6385C0`) has a traced default-branch
+request for mode `{2,0}` when the object pointed to by the DWORD stored at VA
+`0x1E5CAA4` has byte `+0x40` equal to zero; its guard writer and relationship
+to message `0x145` remain unknown.
 
 The latest render-init pass identifies the six `0xED1650` args (fullscreen flag, display w/h, third display value, window client w/h, forwarded to oD3DRenderAPI slot +8 `0xF08680`), the host class `oEngineSystem` (`0xE54BF0` = vtable `0x1C77C2C` slot 0) and `0x1DFE9C8` as `oShaderBuilderSystem`; see MatrixConnection.md. Cvar-field mapping and the path to the main loop remain unresolved.
 
@@ -1137,8 +1142,9 @@ These updates supersede older next-step suggestions below where they overlap.
   remains unresolved. Details and layout constants are in `docs\LoginMode.md`
   and `src\Startup\`.
 - **tfLogin `0x638B89` guard (static).** Observed: the default switch case
-  (`0x638AB5`, `mov [esi+1Ch],0`) reads global `0x1E5CAA4` and tests byte
-  `[obj+0x40]` (`0x638ABC..0x638AC6`); zero jumps to `0x638B89` (`{2,0}` to
+  (`0x638AB5`, `mov [esi+1Ch],0`) loads the pointer cell at VA `0x1E5CAA4`
+  and tests byte `[pointee+0x40]` (`0x638ABC..0x638AC6`); zero jumps to
+  `0x638B89` (`{2,0}` to
   `0x30DEB0` on global `0x1DFFD98`), nonzero checks cvar-like objects
   `0x1E50C8C`/`0x1E6075C` (+0x40) and queues mode 3 via `0x30D590`. The only
   code reference to `0x1E5CAA4` is that read; its writer is not found

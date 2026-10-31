@@ -947,11 +947,17 @@ internal static class StartupBinaryEvidence
                 "558BEC83E4F8")
             && Matches(LoginModeNativeLayout.VtableFileOffset + LoginModeNativeLayout.LoginUpdateMethodVtableOffset,
                 "C091A300")
+            && Matches(LoginModeNativeLayout.LoginUpdateWorldModeQueueRequestBuildFileOffset,
+                "C744241C02000000C7442420000000008D44241CC7842430010000060000008B0D98FDDF0150E8FC52CDFF")
             && Matches(LoginModeNativeLayout.LoginUpdateWorldModeQueueCallSiteFileOffset,
-                "C744241C02000000C7442420000000008D44241CC7842430010000060000008B0D98FDDF0150E8FC52CDFF"));
-        check("Binary tfLogin update {2,0} queue is guarded by byte [dword_1E5CAA4+0x40]==0 and queue push uses +0xB84",
+                "E8FC52CDFF")
+            && RelativeBranchTargets(LoginModeNativeLayout.LoginUpdateWorldModeQueueCallSiteFileOffset,
+                0xE8, AppModeCatalog.PendingModeQueueInsertMethodFileOffset));
+        check("Binary tfLogin update {2,0} queue is guarded by the pointed-to object's byte +0x40 and uses queue +0xB84",
             Matches(LoginModeNativeLayout.LoginUpdateDefaultCaseFileOffset,
                 "C7461C00000000A1A4CAE5018A404084C00F84BD000000A18C0CE501")
+            && Matches(LoginModeNativeLayout.LoginUpdateWorldModeGuardBranchFileOffset,
+                "0F84BD000000")
             && Matches(LoginModeNativeLayout.PendingRequestEnqueueFlagCheckFileOffset,
                 "8BD9807B0C008B4D080F84230100008339010F851A")
             && Matches(LoginModeNativeLayout.PendingRequestEnqueuePushFileOffset,

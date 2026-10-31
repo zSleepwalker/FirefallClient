@@ -446,10 +446,17 @@ The helper at raw `0x30D590` (`AppMode_QueueLookingGlassMode`) enqueues `{3,0}`
 and copies the caller's `0x34`-byte request-context region to application
 `+0x9F0`. The `tfLookingGlass` constructor copies that region to mode `+0x18`,
 preserving shared-text references at context `+0x14` and `+0x1C`; the other
-context fields are opaque. Function `0x6385C0` has a conditional path that queues mode 3
-through that helper or queues `{2,0}` directly; a separate branch calls
-`Login_StartAutoLogin`. No static callers of `0x6385C0` were found in the
-analyzed IDB.
+context fields are opaque. `tfLogin` Update (`0x6385C0`, vtable slot `+0x0C`)
+also has a direct World-mode request path in its switch default branch
+(`0x638AB3`), reached when the unsigned selector is greater than 4. When
+the DWORD stored at VA `0x1E5CAA4` points to an object whose byte `+0x40` is
+zero, branch `0x638AC6` reaches `0x638B89`, which builds `{2,0}` and calls the
+pending-mode queue at `0x638BAF`; mode ID 2 constructs `tfWorld`. If that guard
+byte is nonzero, this default-branch path can instead request LookingGlass
+mode 3 through `0x30D590`. `Login_StartAutoLogin` is on a separate Update
+control-flow path at `0x638BCD`/`0x638C12`, not an outcome of the guard-set
+default branch. The guard's writer and the producer of selector values greater
+than 4 remain unresolved.
 
 The mode-3 helper itself has six static callers, including replay-reader
 request paths at `0x65D400`, `0x6AE3E0`, and `0x6AF120`, plus the text-and-pair
@@ -460,10 +467,10 @@ that can request LookingGlass; it does not identify all external entry
 conditions or establish a Login-response-to-queue transition.
 
 Neither `Login_HandleLoginResponse` nor `Login_HandleCharacterRefreshResponse`
-has a direct call edge to the queue helper or dispatcher. Their response
-callback registration/dispatch is known, but the branch that actually completes
-character selection remains unresolved, so the observed mode-2/mode-3 queue paths must
-not be presented as proven consequences of successful login.
+has a direct call edge to this queue path. The default-update mode-2 request is
+therefore a verified `tfWorld` request mechanism, not proof that successful
+login or message `0x145` caused it. Response callback registration/dispatch is
+known, but the branch that completes character selection remains unresolved.
 
 Auto-login settings are read from `autologin-*` command-line entries, with
 `AutoLogin/*` configuration fallbacks. Observed setting names are `MaxTimes`,

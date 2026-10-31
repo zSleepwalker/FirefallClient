@@ -139,7 +139,9 @@ public static class LoginModeNativeLayout
     public const int CharacterRefreshRequestMessageId = 0x89;
     public const int LoginUpdateMethodVtableOffset = 0x0C;
     public const uint LoginUpdateMethodFileOffset = 0x6385C0;
-    public const uint LoginUpdateWorldModeQueueCallSiteFileOffset = 0x638B89;
+    public const uint LoginUpdateWorldModeQueueRequestBuildFileOffset = 0x638B89;
+    public const uint LoginUpdateWorldModeQueueCallSiteFileOffset = 0x638BAF;
+    public const uint LoginUpdateWorldModeGuardBranchFileOffset = 0x638AC6;
     public const uint LoginUpdateDefaultCaseFileOffset = 0x638AB5;
 
     // Observed: ctor stores stack arg1 at +0x20 and arg2 at +0x24; update reads
@@ -164,6 +166,7 @@ public static class LoginModeNativeLayout
     public const uint AppDtorCellReleaseFileOffset = 0x16000E9;
     public const uint RefCountedCellReleaseHelperFileOffset = 0x636B30;
     public const uint AppModeLoginCellPassedToOtherModeCtorsFileOffset = 0x30DAF7;
+    // Update loads this pointer cell, then tests byte +0x40 of the pointed-to object.
     public const uint LoginUpdateGuardGlobalVa = 0x1E5CAA4;
     public const uint LoginUpdateGuardByteOffset = 0x40;
     public const uint LoginUpdateGuardReadFileOffset = 0x638ABC;
