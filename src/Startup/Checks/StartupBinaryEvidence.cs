@@ -1484,6 +1484,51 @@ internal static class StartupBinaryEvidence
             && RelativeBranchTargets(0x12EE0BF, 0xE8, 0x12B8220)
             && RelativeBranchTargets(0x12EE0CE, 0xE8, 0x159D8F4)
             && RelativeBranchTargets(0x12EE12B, 0xE8, 0x159D8F4));
+        check("Binary inner selector 0x5F routes four WORDs and a gated optional tail",
+            ReadUInt32(VirtualAddressToFileOffset(
+                CharacterWeaponProjectileFiredNativeLayout.InnerSelectorTableVirtualAddress) + 48) == 0xC1DC2D
+            && Matches(CharacterWeaponProjectileFiredNativeLayout.CaseFileOffset, "6A38")
+            && Matches(0x81D03B, "C744242067000000")
+            && RelativeBranchTargets(0x81D04E, 0xE8,
+                CharacterWeaponProjectileFiredNativeLayout.ConstructorFileOffset)
+            && RelativeBranchTargets(0x81D064, 0xE8,
+                CharacterWeaponProjectileFiredNativeLayout.BodyReaderFileOffset)
+            && Matches(0x525712, "C7005F000000")
+            && RelativeBranchTargets(0x525718, 0xE8,
+                CharacterWeaponProjectileFiredNativeLayout.ConstructorHelperFileOffset)
+            && Matches(0x52571D, "C706C871C601")
+            && Matches(0x525725, "C6463000")
+            && VtableRttiName(CharacterWeaponProjectileFiredNativeLayout.VtableVirtualAddress, 80)
+                == CharacterWeaponProjectileFiredNativeLayout.RttiName
+            && Matches(0x5F299B, "8D4728")
+            && RelativeBranchTargets(0x5F299F, 0xE8, 0x336AC0)
+            && Matches(0x5F29A4, "8D772A")
+            && RelativeBranchTargets(0x5F29AA, 0xE8, 0x6097B0)
+            && Matches(0x5F29AF, "8D4602")
+            && RelativeBranchTargets(0x5F29B5, 0xE8, 0x6097B0)
+            && Matches(0x5F29BA, "8D4604")
+            && RelativeBranchTargets(0x5F29C0, 0xE8, 0x6097B0)
+            && RelativeBranchTargets(0x5F29CA, 0xE8,
+                CharacterWeaponProjectileFiredNativeLayout.OptionalTailReaderFileOffset)
+            && RelativeBranchTargets(0x5F2844, 0xE8,
+                CharacterWeaponProjectileFiredNativeLayout.WordReaderFileOffset)
+            && RelativeBranchTargets(0x5F284F, 0xE8,
+                CharacterWeaponProjectileFiredNativeLayout.WordReaderFileOffset)
+            && RelativeBranchTargets(0x5F285A, 0xE8,
+                CharacterWeaponProjectileFiredNativeLayout.WordReaderFileOffset)
+            && Matches(0x34B760, "668B08")
+            && Matches(0x34B766, "668908")
+            && Matches(0x34B769, "83460402")
+            && Matches(0x5F283A, "84C9")
+            && Matches(0x5F285F, "803F00")
+            && Matches(0x5F2864, "0FB745F4")
+            && Matches(0x5F2868, "66894702")
+            && Matches(0x5F286C, "0FB745F6")
+            && Matches(0x5F2870, "66894704")
+            && Matches(0x5F2874, "0FB745F8")
+            && Matches(0x5F2878, "66894706")
+            && Matches(0x5F2896, "C60701")
+            && Matches(0x5F28A4, "C60700"));
         check("Binary matrix socket factory requests overlapped UDP",
             Matches(0xBE354A, "6A016A006A006A11B8170000006A020F44C150FF15684DAC01"));
         check("Binary matrix local binding uses seven or two attempts and final-two fallback",

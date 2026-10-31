@@ -1155,6 +1155,25 @@ Check("RaiaNPCDebugging selector 0x5E records its NUL-terminated shared-text fie
     && CharacterRaiaNpcDebuggingNativeLayout.SharedTextChunkByteLimit == 0x100
     && CharacterRaiaNpcDebuggingNativeLayout.SharedTextTemporaryBufferByteCount == 0x104
     && CharacterRaiaNpcDebuggingNativeLayout.SharedTextTerminatorByte == 0);
+Check("WeaponProjectileFired selector 0x5F records its prefix and optional tail",
+    CharacterWeaponProjectileFiredNativeLayout.InnerSelector == 0x5F
+    && CharacterWeaponProjectileFiredNativeLayout.CaseFileOffset == 0x81D02D
+    && CharacterWeaponProjectileFiredNativeLayout.CaseLocalDwordValue == 0x67
+    && CharacterWeaponProjectileFiredNativeLayout.AllocationSize == 0x38
+    && CharacterWeaponProjectileFiredNativeLayout.ConstructorFileOffset == 0x525700
+    && CharacterWeaponProjectileFiredNativeLayout.ConstructorHelperFileOffset == 0x5A0960
+    && CharacterWeaponProjectileFiredNativeLayout.BodyReaderFileOffset == 0x5F2990
+    && CharacterWeaponProjectileFiredNativeLayout.OptionalTailReaderFileOffset == 0x5F27E0
+    && CharacterWeaponProjectileFiredNativeLayout.WordReaderFileOffset == 0x34B740
+    && CharacterWeaponProjectileFiredNativeLayout.VtableVirtualAddress == 0x1C671C8
+    && CharacterWeaponProjectileFiredNativeLayout.PrefixWordFieldOffset == 0x28
+    && CharacterWeaponProjectileFiredNativeLayout.PrefixWordCount == 4
+    && CharacterWeaponProjectileFiredNativeLayout.OptionalTailInputGateOffset == 8
+    && CharacterWeaponProjectileFiredNativeLayout.OptionalTailMarkerFieldOffset == 0x30
+    && CharacterWeaponProjectileFiredNativeLayout.OptionalTailPayloadFieldOffset == 0x32
+    && CharacterWeaponProjectileFiredNativeLayout.OptionalTailPayloadWordCount == 3
+    && CharacterWeaponProjectileFiredNativeLayout.InputByteCountWithoutOptionalTail == 9
+    && CharacterWeaponProjectileFiredNativeLayout.InputByteCountWithOptionalTail == 15);
 Check("Shared channel-2/3 compact-code routing groups the observed native cases",
     Enumerable.Range(1, 6).All(code =>
         MatrixOtherChannelDecoderNativeLayout.SelectRoute(code)

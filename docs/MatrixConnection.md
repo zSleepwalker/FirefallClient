@@ -1286,6 +1286,25 @@ not an established total-string limit; no overall maximum or encoding is
 proven. The field’s text meaning remains unknown, and the RTTI name does not
 establish NPC-debugging semantics.
 
+### Selector 0x5F: `WeaponProjectileFired`
+
+Entry12 maps selector `0x5F` to VA `0xC1DC2D` / raw case `0x81D02D`. It
+allocates `0x38` bytes, stores local DWORD `0x67` (role unknown), then calls
+constructor `0x525700`. The constructor passes `0x5F` to helper `0x5A0960`,
+installs vtable VA `0x1C671C8` (RTTI
+`firefall::Character::WeaponProjectileFired`), and zeros object field
+`+0x30`.
+
+Body reader `0x5F2990` reads four WORDs into object fields `+0x28`, `+0x2A`,
+`+0x2C`, and `+0x2E`. It then calls `0x5F27E0` with `this = object+0x30`.
+That helper consumes one gate byte; a nonzero byte causes three more WORDs
+to be read and stored at `+0x32`, `+0x34`, and `+0x36`, with marker byte
+`+0x30` set to one. A zero gate clears the marker when it is set. The WORD
+reader checks for two available input bytes before reading and advances the
+stream by two. Thus the observed nominal body size is 9 bytes without the
+optional tail or 15 bytes with it. Field meanings remain unknown; the RTTI
+name alone does not establish projectile semantics.
+
 ## Message35 application body
 
 Factory case35 at `0x33D557` allocates a fresh0x50-byte descriptor through

@@ -1069,6 +1069,9 @@ These updates supersede older next-step suggestions below where they overlap.
   Selector0x5E constructs `RaiaNPCDebugging` and reads a NUL-terminated
   shared-text field at object+0x28 in 256-byte chunks; encoding and text
   meaning remain unknown.
+  Selector0x5F constructs `WeaponProjectileFired`, reads four WORDs at
+  object+0x28..+0x2E, then consumes a gate byte and an optional three-WORD
+  tail at object+0x30..+0x36; field meanings remain unknown.
   Remaining case handlers, field meanings, and message semantics are open.
   RTTI names the results `nl::RoutedMessage` and
   `nl::RoutedMultipleMessage`; QWORD and message semantics remain unknown.
