@@ -1785,5 +1785,17 @@ internal static class StartupBinaryEvidence
             Matches(ClientMainLoopNativeLayout.Utf8FileOpenFn12BA030FileOffset, "558BEC81EC040A0000A10050") &&
             Matches(ClientMainLoopNativeLayout.HotfixHttpFetchFn388BD0FileOffset, "558BEC6AFF68A3B59D0164A1") &&
             Matches(ClientMainLoopNativeLayout.HotfixLocalCopyFn388800FileOffset, "558BEC6AFF6851B59D0164A1") &&
-            Matches(ClientMainLoopNativeLayout.HotfixBadMd5StringFileOffset, "426164206D64357375"));    }
+            Matches(ClientMainLoopNativeLayout.HotfixBadMd5StringFileOffset, "426164206D64357375"));
+        check("Binary startup round 8 (AssetDB path lists, Twitch worker, config strings)",
+            Matches(ClientMainLoopNativeLayout.TwitchWorkerFn3289D0FileOffset, "538BDC83EC0883E4F083C404") &&
+            Matches(ClientMainLoopNativeLayout.SearchPathAddOrdinaryFn1317D00FileOffset, "558BEC6AFF684984A90164A1") &&
+            Matches(ClientMainLoopNativeLayout.SearchPathAddAssetDbFn1318080FileOffset, "558BEC6AFF68D984A90164A1") &&
+            Matches(ClientMainLoopNativeLayout.SearchPathRemoveOrdinaryFn1317F80FileOffset, "558BEC83EC088BC18945FC53") &&
+            Matches(ClientMainLoopNativeLayout.SearchPathRemoveAssetDbFn1318300FileOffset, "558BEC83EC088BC18945FC53") &&
+            Matches(ClientMainLoopNativeLayout.SearchPathNormalizeFn1317AD0FileOffset, "558BEC6AFF680984A90164A1") &&
+            Matches(ClientMainLoopNativeLayout.AssetPathConfigLoaderFn38B310FileOffset, "558BEC6AFF68EFB89D0164A1") &&
+            Matches(ClientMainLoopNativeLayout.HotfixIncludeFormatStringFileOffset, "2E696E636C75646520") &&
+            Matches(ClientMainLoopNativeLayout.HotfixDownloadPathKeyStringFileOffset, "446F776E6C6F61642D50") &&
+            Matches(ClientMainLoopNativeLayout.AssetPathConfigDefaultStringFileOffset, "73797374656D2F617373") &&
+            Matches(ClientMainLoopNativeLayout.AssetPathConfigInstallDirStringFileOffset, "496E7374616C6C446972"));    }
 }

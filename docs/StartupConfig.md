@@ -75,3 +75,16 @@ Addresses: file offsets (= IDA addresses); VA code = raw+0x400C00, .rdata = raw+
 
 ### Unresolved
 - Mode strings at 0x1B45A44/0x1B45A48, the hotfix.ini key schema, the base URL value.
+## Round 8: search-path writers and asset-path config loader
+
+**Observed**
+- `0x1318080` (add AssetDB path, list head this+16, count this+20) has one caller: wrapper `0x38D2B0`, called 4x from `0x38B310`. `0x1318300` (remove from this+16 list) is called from `0x38B310` (loop at 0x38B3DC). `0x1317F80` (remove from this+8 list) is also called from `0x38B310` (0x38B38C).
+- `0x1317D00` (add ordinary, this+8) has one caller, wrapper `0xE56BD0`, called from `0xE52370` and `0x10D8A40`. Strings there: "localassets", "Engine", "system".
+- `0x38B310` is a reconfigure routine on singleton `dword_1DFFF5C`: it clears both lists (stored in `this` vectors), reads config via `0x12DC080` (ini get) keys `Preview`, `searchlocalfirst`, `AssetPath` (default `system/assetdb`), `FilePaths`, `InstallDir` / `Development`, then re-adds paths via `0x1318080`.
+- `0x1317AD0` normalises a path (length <= 0x200, appends separator, validates), logging on failure.
+- `0x3289D0` is the TwitchTV worker (state `dword_1E6819C`, cases 1..4; strings "TTV_Start failed.", "TTV_Chat_Init failed.", etc.), not an app mode switch.
+- Hotfix master ini lines are `.include "%u\%s"` with `hotfix.ini`; section `Hotfix`, key `Download-Path` read after fetch (0x386D90 state 1->2->3->4).
+
+**Interpreted**: AssetDB list holds directories/DB roots from config key `AssetPath`; ordinary list from `FilePaths`.
+
+**Unresolved**: on-disk AssetDB format; the `.include` parser inside ini object (0x12DAD70); caller(s) of `0x38B310`; the "AssetDB"/"fsAssetDB" strings were not located this round. Negative claims limited to xrefs IDA reported.

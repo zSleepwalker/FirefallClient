@@ -129,4 +129,19 @@ public static class ClientMainLoopNativeLayout
     public const int HotfixLocalCopyFn388800FileOffset = 0x388800;
     public const int SearchRootLogStringFileOffset = 0x1C5A61C - 0x401400;
     public const int HotfixBadMd5StringFileOffset = 0x1B45AA4 - 0x401400;
-    public const int HotfixHttpInitFailStringFileOffset = 0x1B45A78 - 0x401400;}
+    public const int HotfixHttpInitFailStringFileOffset = 0x1B45A78 - 0x401400;
+
+    // Round 8: AssetDB path lists, TwitchTV worker, hotfix.ini strings, asset-path config loader.
+    public const int TwitchWorkerFn3289D0FileOffset = 0x3289D0;
+    public const int SearchPathAddOrdinaryFn1317D00FileOffset = 0x1317D00;
+    public const int SearchPathAddAssetDbFn1318080FileOffset = 0x1318080;
+    public const int SearchPathRemoveOrdinaryFn1317F80FileOffset = 0x1317F80;
+    public const int SearchPathRemoveAssetDbFn1318300FileOffset = 0x1318300;
+    public const int SearchPathNormalizeFn1317AD0FileOffset = 0x1317AD0;
+    public const int AssetPathConfigLoaderFn38B310FileOffset = 0x38B310;
+    public const int HotfixIncludeFormatStringFileOffset = 0x1B4576C - 0x401400;
+    public const int AssetPathConfigSearchLocalFirstStringFileOffset = 0x1B45ACC - 0x401400;
+    public const int AssetPathConfigDefaultStringFileOffset = 0x1B45AE0 - 0x401400;
+    public const int AssetPathConfigAssetPathKeyStringFileOffset = 0x1B45AF0 - 0x401400;
+    public const int AssetPathConfigFilePathsKeyStringFileOffset = 0x1B45B24 - 0x401400;
+    public const int AssetPathConfigInstallDirStringFileOffset = 0x1B45B30 - 0x401400;}

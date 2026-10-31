@@ -75,3 +75,17 @@ Static, read-only IDA analysis of `FirefallClient.exe`. Constants: `src\Startup\
 - Command-line parsing and cvar/config file loading: no helper in the above was identified as a file or command-line reader; option text appears pre-populated in the `App+0xA6C` container before these helpers run (not traced to its filler). Filesystem/asset mounts: not found in these helpers (scope: only 0x304170, 0x3047E0, 0x304BB0, 0x325350 and the tail 0x307224 decompiles).
 - Correction (round 5): strings examined are plain ASCII at rest at raw = VA - 0x401400; see docs\StartupConfig.md for decoded config/switch names. Registry key/value names of 0x304BB0 remain not individually decoded.
 - Virtual (indirect) callees of the engine step (73 not followed) may contain further waits.
+
+## Round 8: search-path writers and asset-path config loader
+
+**Observed**
+- `0x1318080` (add AssetDB path, list head this+16, count this+20) has one caller: wrapper `0x38D2B0`, called 4x from `0x38B310`. `0x1318300` (remove from this+16 list) is called from `0x38B310` (loop at 0x38B3DC). `0x1317F80` (remove from this+8 list) is also called from `0x38B310` (0x38B38C).
+- `0x1317D00` (add ordinary, this+8) has one caller, wrapper `0xE56BD0`, called from `0xE52370` and `0x10D8A40`. Strings there: "localassets", "Engine", "system".
+- `0x38B310` is a reconfigure routine on singleton `dword_1DFFF5C`: it clears both lists (stored in `this` vectors), reads config via `0x12DC080` (ini get) keys `Preview`, `searchlocalfirst`, `AssetPath` (default `system/assetdb`), `FilePaths`, `InstallDir` / `Development`, then re-adds paths via `0x1318080`.
+- `0x1317AD0` normalises a path (length <= 0x200, appends separator, validates), logging on failure.
+- `0x3289D0` is the TwitchTV worker (state `dword_1E6819C`, cases 1..4; strings "TTV_Start failed.", "TTV_Chat_Init failed.", etc.), not an app mode switch.
+- Hotfix master ini lines are `.include "%u\%s"` with `hotfix.ini`; section `Hotfix`, key `Download-Path` read after fetch (0x386D90 state 1->2->3->4).
+
+**Interpreted**: AssetDB list holds directories/DB roots from config key `AssetPath`; ordinary list from `FilePaths`.
+
+**Unresolved**: on-disk AssetDB format; the `.include` parser inside ini object (0x12DAD70); caller(s) of `0x38B310`; the "AssetDB"/"fsAssetDB" strings were not located this round. Negative claims limited to xrefs IDA reported.
