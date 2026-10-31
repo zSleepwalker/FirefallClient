@@ -1028,6 +1028,18 @@ Check("TookDebugWeaponHit selector 0x56 has a distinct RTTI type and shares sele
     && CharacterTookDebugWeaponHitNativeLayout.SharedBodyReaderSetupFileOffset == 0x81CD94
     && CharacterTookDebugWeaponHitNativeLayout.ConstructorZeroedByteField1Offset == 0x58
     && CharacterTookDebugWeaponHitNativeLayout.ConstructorZeroedByteField2Offset == 0x88);
+Check("DebugWeaponStats selector 0x57 records eight raw WORD fields",
+    CharacterDebugWeaponStatsNativeLayout.InnerSelector == 0x57
+    && CharacterDebugWeaponStatsNativeLayout.CaseFileOffset == 0x81CDE7
+    && CharacterDebugWeaponStatsNativeLayout.CaseLocalDwordValue == 0x5F
+    && CharacterDebugWeaponStatsNativeLayout.AllocationSize == 0x38
+    && CharacterDebugWeaponStatsNativeLayout.ConstructorFileOffset == 0x5250A0
+    && CharacterDebugWeaponStatsNativeLayout.BodyReaderFileOffset == 0x5F4A10
+    && CharacterDebugWeaponStatsNativeLayout.VtableVirtualAddress == 0x1C67238
+    && CharacterDebugWeaponStatsNativeLayout.FirstWordFieldOffset == 0x28
+    && CharacterDebugWeaponStatsNativeLayout.WordFieldCount == 8
+    && CharacterDebugWeaponStatsNativeLayout.WordFieldOffsets.SequenceEqual(
+        new[] { 0x28, 0x2A, 0x2C, 0x2E, 0x30, 0x32, 0x34, 0x36 }));
 Check("Shared channel-2/3 compact-code routing groups the observed native cases",
     Enumerable.Range(1, 6).All(code =>
         MatrixOtherChannelDecoderNativeLayout.SelectRoute(code)

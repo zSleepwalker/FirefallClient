@@ -1047,6 +1047,8 @@ These updates supersede older next-step suggestions below where they overlap.
   Selector0x56 constructs the distinct RTTI class `TookDebugWeaponHit` and
   shares the same `0x5F60F0` body reader; this does not prove semantic
   equivalence.
+  Selector0x57 constructs `DebugWeaponStats` and reads eight raw WORDs at
+  object offsets+0x28 through+0x36; their meanings are unknown.
   Remaining case handlers, field meanings, and message semantics are open.
   RTTI names the results `nl::RoutedMessage` and
   `nl::RoutedMultipleMessage`; QWORD and message semantics remain unknown.

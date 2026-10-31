@@ -1152,6 +1152,17 @@ not that their distinct RTTI classes have identical semantics. The reader's
 offset/width ledger and conditional tails are recorded under selector
 `0x55`; no semantic field names are inferred for either class.
 
+### Selector 0x57: `DebugWeaponStats`
+
+Entry4 maps selector `0x57` to VA `0xC1D9E7` / raw case `0x81CDE7`. It
+allocates `0x38` bytes, stores local DWORD `0x5F` (role unknown), then calls
+constructor `0x5250A0` and body reader `0x5F4A10`. The constructor passes
+`0x57` to `0x5A05C0` and installs vtable VA `0x1C67238` (RTTI
+`firefall::Character::DebugWeaponStats`). The reader consumes eight WORDs
+in order into object offsets `+0x28,+0x2A,+0x2C,+0x2E,+0x30,+0x32,+0x34,+0x36`.
+These occupy the final 16 bytes of the allocation. Their meanings remain
+unknown; the RTTI name does not establish their semantics.
+
 ## Message35 application body
 
 Factory case35 at `0x33D557` allocates a fresh0x50-byte descriptor through
