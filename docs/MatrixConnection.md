@@ -1020,7 +1020,7 @@ factory/callback ABI remain unresolved.
 `MatrixOtherChannelDecoderNativeLayout.cs` records dispatch only, not a
 replacement decoder.
 
-## Secondary command dispatcher and one verified class case
+## Secondary command dispatcher and two verified class cases
 
 The secondary-dispatch target `0x81CC50` is a large raw function
 (`0x4B9E` bytes) with two separate selector tables. It reads a leading byte
@@ -1047,17 +1047,36 @@ selector range return zero. Leading bytes `0x36..0xEF` also reach the
 zero-return path. These are dispatch boundaries only; the inputs’ semantic
 names and the 91 secondary targets are unresolved.
 
-One nested selector is mapped: route0 block `0x81CCAD` dispatches selector
+Two nested selectors are mapped: route0 block `0x81CCAD` dispatches selector
 `0x53` through the table at VA `0xC22444` (raw `0x821844`) to raw case
 `0x81CCC3`. That case allocates `0x48` bytes, calls constructor `0x524C30`,
 then body reader `0x5F6B10`. Constructor RTTI identifies the object as
 `firefall::Character::MarketRequestComplete`. The reader stores, in order,
 a byte at object+`0x28`, raw QWORD at+`0x30`, byte at+`0x38`, and three
 NUL-terminated shared-text values at+`0x3C/+0x40/+0x44`. Field meanings
-remain unknown; this one selector does not name the remaining table cases.
+remain unknown; these two selectors do not name the remaining table cases.
 `MatrixSecondaryCommandDispatcherNativeLayout.cs` and
 `CharacterMarketRequestCompleteNativeLayout` preserve the route bounds and
 this bounded object layout without implementing a parser.
+
+The same table's entry1 maps selector `0x54` to VA `0xC1D914` / raw case
+`0x81CD14`. It allocates `0x40` bytes, calls constructor `0x524DF0`, then
+body reader `0x5F68D0`. The constructor installs vtable VA `0x1C67268`
+(RTTI `firefall::Character::ReceiveWeaponTweaks`) and initializes an embedded
+blob object at `+0x2C` with vtable VA `0x1C80CC4`. The reader processes two
+raw bytes into object `+0x28` and `+0x29`, then passes the current stream
+cursor and all remaining bytes to the blob object's vtable slot `+0x10`.
+That slot resolves to raw `0x12CB9D0`, which resizes the blob to the supplied
+length with preservation disabled and copies those bytes; the reader advances
+the cursor and subtracts that length from the remaining count. The body
+therefore has two observed byte fields followed by a tail blob, without a
+separate blob-length prefix. The case also stores local DWORD `0x5C`, whose
+role is unknown. The two byte meanings and blob contents remain unresolved;
+RTTI alone does not establish weapon semantics. Its body reader attempts a
+stream refill when a byte read sees zero remaining, but the exact malformed
+short-input behavior is not established.
+`CharacterReceiveWeaponTweaksNativeLayout` records the offsets and call
+targets without implementing a parser.
 
 ## Message35 application body
 

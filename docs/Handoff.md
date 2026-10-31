@@ -1038,8 +1038,10 @@ These updates supersede older next-step suggestions below where they overlap.
   block `0x821D7C` then `0x81CC50`. The three route targets and byte-map/table
   addresses are in MatrixConnection.md. The inner `0x81CC50` tables are
   structurally mapped with direct byte indexing (nonzero indices1..0x35);
-  selector0x53 builds `MarketRequestComplete`. Remaining case handlers and
-  message semantics are open.
+  selector0x53 builds `MarketRequestComplete`, and selector0x54 builds
+  `ReceiveWeaponTweaks` with two raw bytes followed by a remaining-stream
+  blob. Remaining case handlers, field meanings, and message semantics are
+  open.
   RTTI names the results `nl::RoutedMessage` and
   `nl::RoutedMultipleMessage`; QWORD and message semantics remain unknown.
 - **Header/factory roles corrected by instructions.** 34A020 reads compact

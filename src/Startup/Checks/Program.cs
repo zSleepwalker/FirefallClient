@@ -976,6 +976,19 @@ Check("MarketRequestComplete selector 0x53 preserves its RTTI and native body fi
     && CharacterMarketRequestCompleteNativeLayout.FirstSharedTextFieldOffset == 0x3C
     && CharacterMarketRequestCompleteNativeLayout.SecondSharedTextFieldOffset == 0x40
     && CharacterMarketRequestCompleteNativeLayout.ThirdSharedTextFieldOffset == 0x44);
+Check("ReceiveWeaponTweaks selector 0x54 preserves its RTTI and raw body field offsets",
+    CharacterReceiveWeaponTweaksNativeLayout.InnerSelector == 0x54
+    && CharacterReceiveWeaponTweaksNativeLayout.CaseFileOffset == 0x81CD14
+    && CharacterReceiveWeaponTweaksNativeLayout.AllocationSize == 0x40
+    && CharacterReceiveWeaponTweaksNativeLayout.ConstructorFileOffset == 0x524DF0
+    && CharacterReceiveWeaponTweaksNativeLayout.BodyReaderFileOffset == 0x5F68D0
+    && CharacterReceiveWeaponTweaksNativeLayout.VtableVirtualAddress == 0x1C67268
+    && CharacterReceiveWeaponTweaksNativeLayout.FirstByteFieldOffset == 0x28
+    && CharacterReceiveWeaponTweaksNativeLayout.SecondByteFieldOffset == 0x29
+    && CharacterReceiveWeaponTweaksNativeLayout.TrailingBlobFieldOffset == 0x2C
+    && CharacterReceiveWeaponTweaksNativeLayout.TrailingBlobVtableVirtualAddress == 0x1C80CC4
+    && CharacterReceiveWeaponTweaksNativeLayout.TrailingBlobCopyMethodFileOffset == 0x12CB9D0
+    && CharacterReceiveWeaponTweaksNativeLayout.TrailingBlobResizeMethodFileOffset == 0x12CBCB0);
 Check("Shared channel-2/3 compact-code routing groups the observed native cases",
     Enumerable.Range(1, 6).All(code =>
         MatrixOtherChannelDecoderNativeLayout.SelectRoute(code)

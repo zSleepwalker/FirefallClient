@@ -1138,6 +1138,42 @@ internal static class StartupBinaryEvidence
             && Matches(0x5F6B38, "8D563C8BCF")
             && Matches(0x5F6B42, "8D56408BCF")
             && Matches(0x5F6B4C, "8D56448BCF"));
+        check("Binary inner selector 0x54 constructs ReceiveWeaponTweaks and consumes its remaining body as blob data",
+            ReadUInt32(VirtualAddressToFileOffset(
+                CharacterReceiveWeaponTweaksNativeLayout.InnerSelectorTableVirtualAddress) + 4) == 0xC1D914
+            && RelativeBranchTargets(0x81CD16, 0xE8, 0x12B7FB0)
+            && RelativeBranchTargets(0x81CD35, 0xE8,
+                CharacterReceiveWeaponTweaksNativeLayout.ConstructorFileOffset)
+            && RelativeBranchTargets(0x81CD4B, 0xE8,
+                CharacterReceiveWeaponTweaksNativeLayout.BodyReaderFileOffset)
+            && VtableRttiName(CharacterReceiveWeaponTweaksNativeLayout.VtableVirtualAddress, 80)
+                == CharacterReceiveWeaponTweaksNativeLayout.RttiName
+            && Matches(0x524E00, "8BC4C70054000000")
+            && RelativeBranchTargets(0x524E08, 0xE8, 0x5A0470)
+            && Matches(0x524E0D, "C7066872C601")
+            && Matches(0x524E15, "C7462CC40CC801")
+            && Matches(0x524E1C, "C7463000000000")
+            && Matches(0x524E23, "C7463400000000")
+            && Matches(0x524E2A, "C7463800000000")
+            && Matches(0x5F68DC, "8D5628")
+            && RelativeBranchTargets(0x5F68DF, 0xE8, 0x337180)
+            && Matches(0x5F68E4, "8D56298BCF")
+            && RelativeBranchTargets(0x5F68E9, 0xE8, 0x356CF0)
+            && Matches(0x5F68EE, "8D4E2C8B770885F6")
+            && Matches(0x5F68F8, "8B0156FF7704FF5010")
+            && Matches(0x5F6901, "017704397708731D")
+            && Matches(0x5F6926, "297708")
+            && ReadUInt32(VirtualAddressToFileOffset(
+                CharacterReceiveWeaponTweaksNativeLayout.TrailingBlobVtableVirtualAddress) + 0x10)
+                == 0x016CC5D0
+            && VirtualAddressToFileOffset(0x016CC5D0)
+                == CharacterReceiveWeaponTweaksNativeLayout.TrailingBlobCopyMethodFileOffset
+            && RelativeBranchTargets(
+                CharacterReceiveWeaponTweaksNativeLayout.TrailingBlobCopyMethodFileOffset + 0x0B,
+                0xE8, CharacterReceiveWeaponTweaksNativeLayout.TrailingBlobResizeMethodFileOffset)
+            && RelativeBranchTargets(
+                CharacterReceiveWeaponTweaksNativeLayout.TrailingBlobCopyMethodFileOffset + 0x20,
+                0xE8, 0x159D8F4));
         check("Binary matrix socket factory requests overlapped UDP",
             Matches(0xBE354A, "6A016A006A006A11B8170000006A020F44C150FF15684DAC01"));
         check("Binary matrix local binding uses seven or two attempts and final-two fallback",

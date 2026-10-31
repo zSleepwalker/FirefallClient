@@ -116,3 +116,22 @@ public static class CharacterMarketRequestCompleteNativeLayout
     public const int SecondSharedTextFieldOffset = 0x40;
     public const int ThirdSharedTextFieldOffset = 0x44;
 }
+
+public static class CharacterReceiveWeaponTweaksNativeLayout
+{
+    public const int InnerSelector = 0x54;
+    public const uint InnerSelectorTableVirtualAddress = 0xC22444;
+    public const uint InnerSelectorTableFileOffset = 0x821844;
+    public const uint CaseFileOffset = 0x81CD14;
+    public const int AllocationSize = 0x40;
+    public const uint ConstructorFileOffset = 0x524DF0;
+    public const uint BodyReaderFileOffset = 0x5F68D0;
+    public const uint VtableVirtualAddress = 0x1C67268;
+    public const string RttiName = ".?AVReceiveWeaponTweaks@Character@firefall@@";
+    public const int FirstByteFieldOffset = 0x28;
+    public const int SecondByteFieldOffset = 0x29;
+    public const int TrailingBlobFieldOffset = 0x2C;
+    public const uint TrailingBlobVtableVirtualAddress = 0x1C80CC4;
+    public const uint TrailingBlobCopyMethodFileOffset = 0x12CB9D0;
+    public const uint TrailingBlobResizeMethodFileOffset = 0x12CBCB0;
+}
