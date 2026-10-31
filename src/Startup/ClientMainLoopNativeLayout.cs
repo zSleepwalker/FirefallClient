@@ -205,4 +205,12 @@ public static class ClientMainLoopNativeLayout
     public const long ReplaySourceSwitchRaw = 0x3823F0;
     public const long ReplaySourceSwitchCmpRaw = 0x382423; // cmp eax,4; ja default
     public const long OracleTicketR5CheckRaw = 0x4959CE; // cmp byte [eax],0x52
+    // Round 17: Matrix transport open, ClientApi request wrapper.
+    public const long MatrixHostPortParseRaw = 0xBCBF90;
+    public const long ClientApiEnqueueRaw = 0xBC1990;
+    public const long MatrixInitialPacketCtorRaw = 0x338250;
+    public const long MatrixInitialPacketEncodeRaw = 0x4980A0;
+    public const long ReplaySourceDefaultAssertRaw = 0x38271A;
+    public const long HostPortBracketFormatFileOffset = 0x1BB60A0 - 0x401400;
+    public const long HostPortPlainFormatFileOffset = 0x1BB608C - 0x401400;
 }

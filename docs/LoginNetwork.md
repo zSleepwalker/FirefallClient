@@ -68,3 +68,16 @@
 
 ## Unresolved
 - Cipher/key for the ticket (if any), exact meaning of the two stored strings, the `0x495F20` argument roles and UDP host:port parse, the default-case handler of `0x3823F0` and whether type 5 is consumed elsewhere; the request struct/queue layout (`0x3233B0` 0x78 bytes) was not decoded.
+
+# Round 17: MatrixConnection_OpenTransport, ClientApi request wrapper, 0x3823F0 default
+
+## Observed
+- `0x495F20` `__thiscall(this, a2=&matrix_url text, a3=&alt host text, a4=&shared text/ticket holder, a5)`. Steps: if this+2140 set, computes security flags (this+2108; log `Matrix is using security flags %u`, 1 or 17 by `0x3265A0`); parses a2 with `0xBCBF90` (sscanf formats `[%256[^]]]:%d` for bracketed IPv6 and `%256[^:]:%d` for host:port; else `0xBCD4C0` plain host); needs `0xBCCA60` success and nonzero port, otherwise logs `Invalid matrix (invalid address) for '%s'` and returns 0. Stores text into this+2100 and this+2104 (a3, else a2). Creates a GameSocket (0xDF8 bytes, ctor `0xBD00B0`, registered by `0xBBD730` on `dword_1DFFF70`), stores at this+2080, owner back-pointer at socket+0x10C. Calls `MatrixGameSocket_OpenUdp` (0xBD0960) with the parsed address, optional 2nd (IPv6-sized 16-byte) address, and port. Failure: destroys socket, formats a message into this+16, sets this+12=1, returns 0. Success: this+12=3, clears this+32..0x820 buffers, this+2424=timestamp (`dword_1AC4D24(0)`, import call), then builds `MatrixInitialPacket_Ctor` (0x338250; base ctor `0x33E990` type 17; fields: +40 security flags byte, +44 constant 1962 (a3 arg; likely protocol/build version - interpretation), +48 text (ticket), +56/60 8 bytes from this+2120, +64..72 12 bytes from this+2408, +77 byte, +80 text, +88 optional string, +112 stream holding data copied from stream arg) and `MatrixInitialPacket_EncodeAndSubmit` (0x4980A0), returns 1.
+- `0x636550` (this=request): calls header builder `0x635E90(this+8)` then `0xBC1990(this, App+2600)` (App+2600 asserted non-null; it is the ClientApi worker/queue object). `0xBC1990` checks the request (WinHTTP-style handle via import thunks), builds a hashed key/signature (`0xBC1460`, `0x12E4100`) from fields this+16 (url), this+24, this+44 vtable slot+12 and stores the result in the map at this+32 keyed by a short string (`byte_1BB5328`); returns 1.
+- `0x3823F0` default (type > 4, incl. type 5 `sock://`): VA 0x78331A jumps to an assertion call `dword_1C15EA0` with line 0x15C (348) then returns - no handler.
+
+## Interpreted
+- `sock://` is not consumed by the replay-source switch; it is rejected by assert there. Handshake first packet is type 17 `MatrixInitialPacket` carrying ticket text, flags, and client identity blobs, sent over UDP (consistent with docs\MatrixConnection.md).
+
+## Unresolved
+- Wire layout of the encoded packet (`0x4980A0`), meanings of this+2120/2408 blobs, 1962 constant, request-struct field map and queue storage inside `0xBC2B30`, and where type 5 is consumed outside this switch.
