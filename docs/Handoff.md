@@ -1653,3 +1653,14 @@ sample. No recurring session automation is configured. Overall reconstruction
 remains incomplete.
 
 Scene-factory follow-up: tfPhysicsDrawInterface has 14 verified in-text vtable slots (slot 9 forwards to slot 8; slot 13 logs the model-release string), its constructor field layout is saved in SceneFactoryNativeLayout, and the 0x64B528 publish stores root[0] into [[0x1E00060]+0xF8] (pointer deref, correcting earlier wording). Scene class identities remain unresolved (indirect via global 0x1DFE970).
+
+## Scene factory named lookup (static)
+
+Global `0x1DFE970` is a statically initialized `oRenderSystem` (vtable
+`0x1C7870C`); slot `+0x3C` returns global `0x1DE05FC`, an `oD3DRenderAPI`
+(ctor raw `0xF05FE0`, published at `0xED17DC`). Its slot `+0x30` (raw
+`0xF255A0`) allocates a `0x18F48` scene and runs `0xF0FCD0(name)`, which
+registers it by index in the 32-slot table at VA `0x1EDACD8`. No name-keyed
+registry found; create-by-name reading is interpretation. Details in
+`docs\MatrixConnection.md`; constants in `SceneFactoryNativeLayout`, pinned by
+`StartupBinaryEvidence`.

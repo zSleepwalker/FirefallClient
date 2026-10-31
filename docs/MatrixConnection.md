@@ -3056,3 +3056,41 @@ write was performed.
 - Slots 1-8 are likely debug-draw primitives and 13 a model-release
   callback, from float-heavy bodies and the log string; names unverified.
   Root `[0]` (RenderScene result) is plausibly the "global scene".
+
+### Scene factory named lookup: oRenderSystem getter -> oD3DRenderAPI create-scene slot
+
+**Observations** (original PE, raw offsets; IDA static read-only, bytes re-read):
+
+- Global VA `0x1DFE970` (raw `0x19FCD70`) is **statically initialized** in
+  `.data` with vtable VA `0x1C7870C` (raw `0x187730C`); no code store of a
+  constructed pointer to it was found (all ~2,880 xrefs are `mov eax,[g]` /
+  `mov ecx,offset g` virtual-call pairs). RTTI via COL `0x1CD59A4` ->
+  type descriptor `0x1E3103C`: `.?AVoRenderSystem@@`. Its only code writer is
+  an exit-time reset stub at raw `0xE93F70`
+  (`C70570E9DF0184 87C701 B870E9DF01 C3`) that stores the following
+  vtable `0x1C78784` (all slots `0x199DFC8`).
+- Factory raw `0x9B7D11`..: `mov eax,[g]; mov ecx,g; call [eax+0x3C]` then
+  `push <name>; mov edx,[eax]; call [edx+0x30]`. Slot `+0x3C` of the
+  `oRenderSystem` vtable is raw `0xE96380`: `A1 FC05DE01 C3`, i.e. it only
+  returns the pointer stored at global VA `0x1DE05FC`.
+- `0x1DE05FC` is written at raw `0xED17DC` (`A3FC05DE01`, in the function at
+  `0xED1650`, which is itself `oRenderSystem` vtable slot `+0x34`) after
+  `new 0x49B8` (`68B8490000E8FC673E00`, raw `0xED17AA`) and the constructor at
+  raw `0xF05FE0`, which stores vtable VA `0x1C79ED4` (`C707D49EC701` at
+  `+0x3C`). RTTI: type descriptor `0x1E311F0`, `.?AVoD3DRenderAPI@@`. A second
+  store at `0xED196B` assigns static `0x1E72DF8` (alternate path, not traced).
+- `oD3DRenderAPI` vtable slot `+0x30` is raw `0xF255A0`: allocates `0x18F48`
+  bytes and calls `0xF0FCD0(obj, this, name)`. That routine passes the name
+  to base ctor `0xE11E40`, stores vtable `0x1C7A334` (`+0x46`), and inserts
+  the object into a 32-entry static table at VA `0x1EDACD8` at the first free
+  index (`893C85D8ACED01 89877C020000` at raw `0xF104C2`: table entry and
+  `this+0x27C`).
+
+**Interpretation** (not proven)
+
+- The "lookup" is plausibly a create-by-name scene factory (allocation +
+  construct on each call), not a name->existing-object map. The scenes are
+  registered by index, not by name, in the `0x1EDACD8` table; the name is only
+  stored by the base constructor (field not traced). No name-keyed registry was
+  found within this budget. `oRenderSystem` slot `+0x3C` looks like a
+  "get active render API" accessor.
