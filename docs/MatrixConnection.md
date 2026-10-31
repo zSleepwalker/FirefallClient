@@ -58,6 +58,11 @@ files:
 | `components\LoginUI\AccountLogin\AccountLogin.xml` | 24,728 | `67CBD909E54E1354E291728F66EBAB9E7F1410DB2600CA75E50EFF77CB5FA05A` | Declares `ON_LOGIN_RESPONSE` at line17. |
 | `components\LoginUI\AccountLogin\AccountLogin.lua` | 69,488 | `9EA014EA94C803B82DC696CF0790E12DD414154993B11F5997DD3901B244D462` | Defines `OnLoginResponse` at line876. |
 
+A safe static discriminator is to reconstruct the UI loader's ordered event
+registrations and evaluate the name-array index produced by `0xBF9AB0` for
+`ON_LOGIN_RESPONSE`; matching index `0x145` would confirm the hypothesis.
+Until that order is recovered, the numeric-name correlation is unresolved.
+
 ## Oracle-ticket request
 
 Connection entry `0x494CA0` sets connection state `+0x0C` to 2 on the
