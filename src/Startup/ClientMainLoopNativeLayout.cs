@@ -176,4 +176,11 @@ public static class ClientMainLoopNativeLayout
     public const long UserAgentFormatFileOffset = 0x17C4C84; // "firefall/%s (%s)"
     public const long UriSchemeFileOffset = 0x1B40188 - 0x401400; // "firefall://"
     public const long UriOperatorPrefixFileOffset = 0x1B402C4 - 0x401400; // "operator/"
+    // Round 13: network subsystem init and WinHTTP status dispatch.
+    public const long NetworkSubsystemInitRaw = 0xBBD110;
+    public const long WinHttpStatusDispatchRaw = 0xBC1DA0;
+    public const long WinHttpStatusCallbackRaw = 0xBC26E0;
+    public const long MatrixBeginConnectionRaw = 0x494CA0;
+    public const long WsaStartupFailedStringFileOffset = 0x17B3870;
+    public const long WinHttpWriteDataStringFileOffset = 0x17B3F50;
 }
