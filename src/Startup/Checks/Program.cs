@@ -3534,6 +3534,10 @@ Check("Matrix keyed receiver factory bounds and thirty-six RTTI-backed receiver 
     MatrixKeyedReceiverFactoryNativeLayout.FactoryFileOffset == 0x81B1B0
     && MatrixKeyedReceiverFactoryNativeLayout.FactoryVirtualAddress == 0xC1BDB0
     && MatrixKeyedReceiverFactoryNativeLayout.FactoryByteDispatchFileOffset == 0x81B1DC
+    && MatrixKeyedReceiverFactoryNativeLayout.ReceiverRegistryFactoryArgumentSequenceFileOffset == 0x800148
+    && MatrixKeyedReceiverFactoryNativeLayout.ReceiverRegistryFactoryInvocationFileOffset == 0x800151
+    && MatrixKeyedReceiverFactoryNativeLayout.BaseControllerFactoryConstructorArgumentSetupFileOffset == 0x81B213
+    && MatrixKeyedReceiverFactoryNativeLayout.BaseControllerFactoryConstructorCallFileOffset == 0x81B21B
     && MatrixKeyedReceiverFactoryNativeLayout.JumpTableFileOffset == 0x81BAA8
     && MatrixKeyedReceiverFactoryNativeLayout.JumpTableVirtualAddress == 0xC1C6A8
     && MatrixKeyedReceiverFactoryNativeLayout.JumpTableEntryCount == 0x34
@@ -3922,7 +3926,19 @@ Check("Keyed Character receiver dialog IDs map through their actual BaseControll
     && CharacterKeyedDialogDispatchNativeLayout.MessageIdFieldOffset == 0x10
     && CharacterKeyedDialogDispatchNativeLayout.MessageForwardedToNestedReceiverFieldOffset == 0x24
     && CharacterKeyedDialogDispatchNativeLayout.ReceiverOptionalNestedObjectFieldOffset == 0x10
-    && CharacterKeyedDialogDispatchNativeLayout.ReceiverDispatchGateFieldOffset == 0x2C
+    && CharacterKeyedDialogDispatchNativeLayout.ReceiverOptionalCallbackObjectPointerFieldOffset == 0x2C
+    && CharacterKeyedDialogDispatchNativeLayout.CallbackObjectPointerLoadRelativeOffset == 0x1A
+    && CharacterKeyedDialogDispatchNativeLayout.CallbackMessagePointerPushRelativeOffset == 0x1D
+    && CharacterKeyedDialogDispatchNativeLayout.CallbackObjectVtableLoadRelativeOffset == 0x1E
+    && CharacterKeyedDialogDispatchNativeLayout.CallbackVirtualCallRelativeOffset == 0x20
+    && CharacterKeyedDialogDispatchNativeLayout.BaseControllerCallbackObjectNullStoreFileOffset == 0x53F9D2
+    && CharacterKeyedDialogDispatchNativeLayout.NpcControllerCallbackObjectNullStoreFileOffset == 0x54E802
+    && CharacterKeyedDialogDispatchNativeLayout.BaseControllerMessagePointerLoadFileOffset == 0x540390
+    && CharacterKeyedDialogDispatchNativeLayout.NpcControllerMessagePointerLoadFileOffset == 0x54F4B0
+    && CharacterKeyedDialogDispatchNativeLayout.BaseControllerNestedReceiverLoadFileOffset == 0x54038D
+    && CharacterKeyedDialogDispatchNativeLayout.NpcControllerNestedReceiverLoadFileOffset == 0x54F4AD
+    && CharacterKeyedDialogDispatchNativeLayout.BaseControllerPayloadObjectPointerReadFileOffset == 0x544288
+    && CharacterKeyedDialogDispatchNativeLayout.NpcControllerPayloadObjectPointerReadFileOffset == 0x553798
     && CharacterKeyedDialogDispatchNativeLayout.ReceiverLoggerContextFieldOffset == 0x30
     && CharacterKeyedDialogDispatchNativeLayout.DispatchMessageIdMinimum == 0x53
     && CharacterKeyedDialogDispatchNativeLayout.DispatchMessageIdMaximum == 0xC4
@@ -3961,10 +3977,11 @@ Check("Keyed Character receiver dialog IDs map through their actual BaseControll
     && CharacterKeyedDialogDispatchNativeLayout.OuterEnvelopeDispatcherFileOffset == 0x800420
     && CharacterKeyedDialogDispatchNativeLayout.OuterSelectorDefaultBranchFileOffset == 0x800697
     && CharacterKeyedDialogDispatchNativeLayout.OuterSelectorDefaultReceiverCallFileOffset == 0x8008D3);
-var keyedCharacterCallbackSlots = CharacterKeyedDialogCallbackNativeLayout.VtableSlots;
-var keyedCharacterCallbackMethods = CharacterKeyedDialogCallbackNativeLayout.CallbackMethods;
-var keyedCharacterCallbackContractCandidates = CharacterKeyedDialogCallbackNativeLayout.ContractCandidates;
-Check("Keyed Character callback methods match the RTTI-backed tfGenericCharacter vtable and state-factory path",
+var keyedCharacterBaseAdapterSlots =
+    CharacterKeyedDialogCallbackNativeLayout.SelectorTwoAdapterVtableSlots;
+var keyedCharacterSelectorThreeAdapterSlots =
+    CharacterKeyedDialogCallbackNativeLayout.SelectorThreeConditionalAdapterVtableSlots;
+Check("Keyed Character selector-2 state factory metadata identifies a separate tfGenericCharacter state",
     CharacterKeyedDialogCallbackNativeLayout.RawTextOffsetToVirtualAddressDelta
         == CharacterKeyedDialogDispatchNativeLayout.RawTextOffsetToVirtualAddressDelta
     && CharacterKeyedDialogCallbackNativeLayout.GenericCharacterRttiName == ".?AVtfGenericCharacter@@"
@@ -3976,36 +3993,86 @@ Check("Keyed Character callback methods match the RTTI-backed tfGenericCharacter
     && CharacterKeyedDialogCallbackNativeLayout.GenericCharacterSetupDispatcherFileOffset == 0x4263C0
     && CharacterKeyedDialogCallbackNativeLayout.GenericCharacterSetupMethodFileOffset == 0x426840
     && CharacterKeyedDialogCallbackNativeLayout.GenericCharacterSetupSelectorTwoCaseFileOffset == 0x426436
+    && CharacterKeyedDialogCallbackNativeLayout.SetupPrivateContextAllocationCallFileOffset == 0x426881
+    && CharacterKeyedDialogCallbackNativeLayout.SetupPrivateContextAllocationSize == 0x43D8
+    && CharacterKeyedDialogCallbackNativeLayout.SetupPrivateContextConstructorCallFileOffset == 0x4268A1
+    && CharacterKeyedDialogCallbackNativeLayout.SetupPrivateContextConstructorFileOffset == 0x49EB30
+    && CharacterKeyedDialogCallbackNativeLayout.SetupPrivateContextStateFieldOffset == 0x4D20
+    && CharacterKeyedDialogCallbackNativeLayout.SetupPrivateContextNullPointerInitializationFileOffset == 0x49EBE9
+    && CharacterKeyedDialogCallbackNativeLayout.SetupIndirectSourceObjectPointerFieldOffset == 0x20
+    && CharacterKeyedDialogCallbackNativeLayout.SetupIndirectChildObjectPointerFieldOffset == 0x9C
+    && CharacterKeyedDialogCallbackNativeLayout.SetupIndirectBackPointerFieldOffset == 0x2C
+    && CharacterKeyedDialogCallbackNativeLayout.SetupIndirectBackPointerDataflowSequenceFileOffset == 0x4A2EFE
+    && CharacterKeyedDialogCallbackNativeLayout.SetupIndirectBackPointerStoreFileOffset == 0x4A2F07
     && CharacterKeyedDialogCallbackNativeLayout.StateFactoryMethodFileOffset == 0xAC9350
     && CharacterKeyedDialogCallbackNativeLayout.StateFactorySelectorMapFileOffset == 0xAC9704
     && CharacterKeyedDialogCallbackNativeLayout.StateFactoryJumpTableFileOffset == 0xAC96DC
     && CharacterKeyedDialogCallbackNativeLayout.GenericCharacterStateFactoryBranchFileOffset == 0xAC9483
     && CharacterKeyedDialogCallbackNativeLayout.UnsupportedNpcStateFactoryBranchFileOffset == 0xAC96A8
-    && keyedCharacterCallbackSlots.Select(slot => slot.SlotOffset)
-        .SequenceEqual([0x10, 0x14, 0x18, 0x1C, 0x20])
-    && keyedCharacterCallbackSlots.Select(slot => slot.MethodFileOffset)
-        .SequenceEqual([0x4206B0u, 0x4206A0u, 0x420720u, 0x420780u, 0x4263C0u])
-    && keyedCharacterCallbackSlots.All(slot =>
+    && CharacterKeyedDialogCallbackNativeLayout.GenericCharacterSetupDispatcherFileOffset == 0x4263C0
+    && CharacterKeyedDialogCallbackNativeLayout.GenericCharacterSetupMethodFileOffset == 0x426840
+    && CharacterKeyedDialogCallbackNativeLayout.StateFactorySetupVirtualCallFileOffset == 0x800A7C);
+Check("Selector-2 BaseController +0x2C binding resolves to its constructed BaseNetController adapter",
+    CharacterKeyedDialogCallbackNativeLayout.SelectorTwoAdapterAllocationFileOffset == 0x4A182C
+    && CharacterKeyedDialogCallbackNativeLayout.SelectorTwoAdapterAllocationSize == 0x228
+    && CharacterKeyedDialogCallbackNativeLayout.SelectorTwoAdapterConstructorCallFileOffset == 0x4A1853
+    && CharacterKeyedDialogCallbackNativeLayout.SelectorTwoAdapterConstructorFileOffset == 0x4C66D0
+    && CharacterKeyedDialogCallbackNativeLayout.SelectorTwoAdapterPrivateContextFieldStoreFileOffset == 0x4C6714
+    && CharacterKeyedDialogCallbackNativeLayout.SelectorTwoAdapterPrivateContextFieldOffset == 0x170
+    && CharacterKeyedDialogCallbackNativeLayout.SelectorTwoAdapterVtableStoreFileOffset == 0x4C671D
+    && CharacterKeyedDialogCallbackNativeLayout.SelectorTwoAdapterControllerFieldOffset == 0x174
+    && CharacterKeyedDialogCallbackNativeLayout.SelectorTwoAdapterControllerFieldStoreFileOffset == 0x4C672D
+    && CharacterKeyedDialogCallbackNativeLayout.SelectorTwoAdapterVtableVirtualAddress == 0x1C64648
+    && CharacterKeyedDialogCallbackNativeLayout.SelectorTwoAdapterVtableFileOffset == 0x1863248
+    && CharacterKeyedDialogCallbackNativeLayout.SelectorTwoAdapterRttiName
+        == ".?AVBaseNetController@tfLocalCharacter@@"
+    && CharacterKeyedDialogCallbackNativeLayout.SelectorTwoAdapterBindingMethodFileOffset == 0x4C7360
+    && CharacterKeyedDialogCallbackNativeLayout.SelectorTwoAdapterControllerCallbackPointerStoreFileOffset
+        == 0x4C7393
+    && CharacterKeyedDialogCallbackNativeLayout.SelectorTwoAdapterControllerContextPointerStoreFileOffset
+        == 0x4C73A5
+    && keyedCharacterBaseAdapterSlots.Select(slot => slot.SlotOffset)
+        .SequenceEqual([0x10, 0x14, 0x18])
+    && keyedCharacterBaseAdapterSlots.Select(slot => slot.MethodFileOffset)
+        .SequenceEqual([0x4C82E0u, 0x4C8300u, 0x4C9B80u])
+    && keyedCharacterBaseAdapterSlots.All(slot =>
         slot.MethodVirtualAddress
             == slot.MethodFileOffset
-                + CharacterKeyedDialogCallbackNativeLayout.RawTextOffsetToVirtualAddressDelta)
-    && keyedCharacterCallbackMethods.Select(method => method.SlotOffset)
-        .SequenceEqual([0x10, 0x14, 0x18])
-    && keyedCharacterCallbackMethods.All(method => method.ReceivesOriginalMessagePointer
-        && !method.ReadsMessagePayload
-        && !method.WritesCallbackObjectDirectly)
-    && keyedCharacterCallbackContractCandidates.Select(candidate => candidate.SlotOffset)
-        .SequenceEqual([0x18, 0x1C])
-    && keyedCharacterCallbackContractCandidates.Select(candidate => candidate.CandidateMethodFileOffset)
-        .SequenceEqual([0x420720u, 0x420780u])
-    && keyedCharacterCallbackContractCandidates.All(candidate =>
-        candidate.ExpectedStackArgumentCount == 2
-        && candidate.CalleeStackCleanupBytes == 8
-        && candidate.ObservedCallerStackArgumentPushCount == 1)
-    && keyedCharacterCallbackContractCandidates.Select(candidate => candidate.CallerMethodFileOffset)
-        .SequenceEqual([0x540380u, 0x4206B0u])
-    && keyedCharacterCallbackContractCandidates.Select(candidate => candidate.CallerCallInstructionFileOffset)
-        .SequenceEqual([0x5404B8u, 0x42070Au]));
+                + CharacterKeyedDialogCallbackNativeLayout.RawTextOffsetToVirtualAddressDelta));
+Check("Selector-3 MandM adapter construction is conditional and does not prove an NPC binding",
+    CharacterKeyedDialogCallbackNativeLayout.SelectorThreeConditionalAdapterAllocationFileOffset == 0x4A190F
+    && CharacterKeyedDialogCallbackNativeLayout.SelectorThreeConditionalAdapterAllocationSize == 0xB0
+    && CharacterKeyedDialogCallbackNativeLayout.SelectorThreeConditionalAdapterConstructorCallFileOffset == 0x4A192E
+    && CharacterKeyedDialogCallbackNativeLayout.SelectorThreeConditionalAdapterConstructorFileOffset == 0x4C6360
+    && CharacterKeyedDialogCallbackNativeLayout.SelectorThreeConditionalAdapterPrivateContextFieldStoreFileOffset
+        == 0x4C63AF
+    && CharacterKeyedDialogCallbackNativeLayout.SelectorThreeConditionalAdapterPrivateContextFieldOffset == 0x10
+    && CharacterKeyedDialogCallbackNativeLayout.SelectorThreeConditionalAdapterVtableStoreFileOffset
+        == 0x4C63B5
+    && CharacterKeyedDialogCallbackNativeLayout.SelectorThreeConditionalAdapterControllerFieldOffset == 0x14
+    && CharacterKeyedDialogCallbackNativeLayout.SelectorThreeConditionalAdapterControllerFieldStoreFileOffset
+        == 0x4C63BB
+    && CharacterKeyedDialogCallbackNativeLayout.SelectorThreeConditionalAdapterVtableVirtualAddress == 0x1C64640
+    && CharacterKeyedDialogCallbackNativeLayout.SelectorThreeConditionalAdapterVtableFileOffset == 0x1863240
+    && CharacterKeyedDialogCallbackNativeLayout.SelectorThreeConditionalAdapterRttiName
+        == ".?AVMandMController@tfLocalCharacter@@"
+    && CharacterKeyedDialogCallbackNativeLayout.SelectorThreeConditionalAdapterBindingMethodFileOffset
+        == 0x4C6490
+    && CharacterKeyedDialogCallbackNativeLayout.SelectorThreeConditionalAdapterControllerCallbackPointerStoreFileOffset
+        == 0x4C64A1
+    && CharacterKeyedDialogCallbackNativeLayout.UnsupportedNpcStateFactoryBranchFileOffset == 0xAC96A8
+    && keyedCharacterSelectorThreeAdapterSlots.Select(slot => slot.SlotOffset)
+        .SequenceEqual([0x14, 0x18])
+    && keyedCharacterSelectorThreeAdapterSlots.Select(slot => slot.MethodFileOffset)
+        .SequenceEqual([0x4C7C50u, 0x4C82E0u]));
+Check("Optional nested Character receiver is a separate +0x10 field with forwarding payload at +0x24",
+    CharacterKeyedDialogCallbackNativeLayout.SharedKeyedReceiverConstructorHelperFileOffset == 0xBCAD70
+    && CharacterKeyedDialogCallbackNativeLayout.SharedOptionalNestedReceiverNullStoreFileOffset == 0xBCAD91
+    && CharacterKeyedDialogCallbackNativeLayout.SharedOptionalNestedReceiverFieldOffset == 0x10
+    && CharacterKeyedDialogCallbackNativeLayout.BaseControllerOptionalNestedForwardCallFileOffset == 0x54039A
+    && CharacterKeyedDialogCallbackNativeLayout.NpcControllerOptionalNestedForwardCallFileOffset == 0x54F4BA
+    && CharacterKeyedDialogDispatchNativeLayout.MessageForwardedToNestedReceiverFieldOffset == 0x24
+    && CharacterKeyedDialogDispatchNativeLayout.ReceiverOptionalCallbackObjectPointerFieldOffset == 0x2C);
 Check("Conditional message fan-out records its constructed keyed state and recipient-vector call",
     MatrixMessageParserFlowNativeLayout.ConditionalFanoutStateLazyConstructionMethodFileOffset == 0x7FE1C0
     && MatrixMessageParserFlowNativeLayout.ConditionalFanoutStateConstructorFileOffset == 0xBD6E10

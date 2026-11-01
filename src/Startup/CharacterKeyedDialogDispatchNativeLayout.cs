@@ -25,8 +25,12 @@ public static class CharacterKeyedDialogDispatchNativeLayout
     public const int MessageIdFieldOffset = 0x10;
     public const int MessageForwardedToNestedReceiverFieldOffset = 0x24;
     public const int ReceiverOptionalNestedObjectFieldOffset = 0x10;
-    public const int ReceiverDispatchGateFieldOffset = 0x2C;
+    public const int ReceiverOptionalCallbackObjectPointerFieldOffset = 0x2C;
     public const int ReceiverLoggerContextFieldOffset = 0x30;
+    public const int CallbackObjectPointerLoadRelativeOffset = 0x1A;
+    public const int CallbackMessagePointerPushRelativeOffset = 0x1D;
+    public const int CallbackObjectVtableLoadRelativeOffset = 0x1E;
+    public const int CallbackVirtualCallRelativeOffset = 0x20;
     public const int DispatchMessageIdMinimum = 0x53;
     public const int DispatchMessageIdMaximum = 0xC4;
 
@@ -35,22 +39,30 @@ public static class CharacterKeyedDialogDispatchNativeLayout
     public const uint OuterSelectorDefaultReceiverCallFileOffset = 0x8008D3;
 
     public const uint BaseControllerConstructorFileOffset = 0x53F980;
+    public const uint BaseControllerCallbackObjectNullStoreFileOffset = 0x53F9D2;
     public const uint BaseControllerPrimaryVtableVirtualAddress = 0x1C66080;
     public const uint BaseControllerMessageDispatcherFileOffset = 0x540380;
+    public const uint BaseControllerMessagePointerLoadFileOffset = 0x540390;
+    public const uint BaseControllerNestedReceiverLoadFileOffset = 0x54038D;
     public const uint BaseControllerSelectorMapFileOffset = 0x54119C;
     public const uint BaseControllerSelectorMapVirtualAddress = 0x941D9C;
     public const uint BaseControllerJumpTableFileOffset = 0x54106C;
     public const uint BaseControllerJumpTableVirtualAddress = 0x941C6C;
     public const uint BaseControllerUnsupportedTargetFileOffset = 0x541052;
+    public const uint BaseControllerPayloadObjectPointerReadFileOffset = 0x544288;
 
     public const uint NpcControllerConstructorFileOffset = 0x54E7B0;
+    public const uint NpcControllerCallbackObjectNullStoreFileOffset = 0x54E802;
     public const uint NpcControllerPrimaryVtableVirtualAddress = 0x1C65F1C;
     public const uint NpcControllerMessageDispatcherFileOffset = 0x54F4A0;
+    public const uint NpcControllerMessagePointerLoadFileOffset = 0x54F4B0;
+    public const uint NpcControllerNestedReceiverLoadFileOffset = 0x54F4AD;
     public const uint NpcControllerSelectorMapFileOffset = 0x55034D;
     public const uint NpcControllerSelectorMapVirtualAddress = 0x950F4D;
     public const uint NpcControllerJumpTableFileOffset = 0x550210;
     public const uint NpcControllerJumpTableVirtualAddress = 0x950E10;
     public const uint NpcControllerUnsupportedTargetFileOffset = 0x5501F6;
+    public const uint NpcControllerPayloadObjectPointerReadFileOffset = 0x553798;
 
     public const uint VibeLogIfSeverityLe2FileOffset = 0x322820;
     public const uint VibeLogUnhandledMessageIdFileOffset = 0x2FC4F0;
@@ -111,7 +123,7 @@ public static class CharacterKeyedDialogDispatchNativeLayout
             hasSpecificHandler ? ReceiverLoggerContextFieldOffset : null,
             loggerFormatStringImmediate,
             loggerMessageLabelImmediate,
-            hasSpecificHandler ? ReceiverDispatchGateFieldOffset : null,
+            hasSpecificHandler ? ReceiverOptionalCallbackObjectPointerFieldOffset : null,
             callbackVtableSlotOffset,
             hasSpecificHandler,
             ReadsMessagePayload: false);

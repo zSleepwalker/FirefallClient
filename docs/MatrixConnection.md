@@ -2540,9 +2540,12 @@ the direct helper at `0x800300` and do not call one of these primary slots.
 The `+0x04` methods for `BaseController`, `NPCController`, `CombatController`,
 and `ObserverView` dispatch message IDs from `message+0x10` over respective
 observed ranges `0x53..0xC4`, `0x53..0xC4`, `0x56..0xA8`, and `0x5B..0xAB`,
-subject to the receiver state flag. They first forward to an optional nested
-object at receiver `+0x10`; the dispatcher tables themselves are not decoded
-here. The `+0x04` methods for `MissionAndMarkerController`,
+subject to a class-specific condition. For BaseController and NPCController,
+the condition is the non-null virtual-receiver pointer at `+0x2C`, not a
+Boolean state flag; the corresponding fields in the other two classes are not
+classified here. They first forward to an optional nested object at receiver
+`+0x10`; the dispatcher tables themselves are not decoded here. The `+0x04`
+methods for `MissionAndMarkerController`,
 `LocalEffectsController`, `SpectatorController`, and `EquipmentView` forward
 to that optional nested object and conditionally emit the fixed
 "this view doesn't have any valid events" message, without a message-ID
@@ -2745,6 +2748,15 @@ selector-`0x02` BaseController method. These are factory selector identities;
 this mapping does not establish which selector is used by a particular runtime
 key.
 
+For selector `0x02`, the factory case at raw `0x81B1F2` allocates `0xB80`
+bytes and calls the constructor at `0x53F980` (`0x81B21B`). Immediately before
+that call, it loads the new object into `ECX` and passes the two factory
+arguments from `[ebp+0x08]` and `[ebp+0x0C]`; the registry-side indirect
+factory call at `0x800151` forwards its two words from `[ebp+0x18]` and
+`[ebp+0x1C]`. The selector-`0x03` factory case similarly allocates and
+constructs the NPCController at `0x54E7B0`. These arguments establish
+factory/key provenance, not a callback pointer.
+
 The keyed envelope dispatcher at raw `0x800420` first obtains the registry
 receiver from the QWORD at envelope `+0x18/+0x1C`. It uses envelope `+0x10`
 for its compact selector; after decrementing the value, the `> 8` branch at
@@ -2767,13 +2779,19 @@ Both `+0x04` methods first call the indirect helper at `dword_1AC4D24` with
 the receiver and store its result at receiver `+0x28`. If receiver `+0x10` is
 non-null, they call that nested object's vtable `+0x04` with the receiver,
 the original message pointer, and the DWORD at `message+0x24`. Only when
-receiver `+0x2C` is non-null do they dispatch `message+0x10`; the accepted
+the pointer at receiver `+0x2C` is non-null do they dispatch `message+0x10`; the accepted
 range is `0x53..0xC4`. An ID outside that range or a table sentinel (`0x4B`
 for BaseController, `0x4E` for NPCController) reaches
 `VIBE_LogUnhandledMessageId` with the supplied ID. The constructors at
 `0x53F980` and `0x54E7B0` initialize receiver `+0x28/+0x2C/+0x30` to zero;
-the `+0x10` nested-object type and any later writer of these optional fields
-remain unresolved.
+at the instruction level, both explicitly write zero to `+0x2C` (`0x53F9D2`
+and `0x54E802`). Dispatch treats that field as a nullable object pointer, not
+as a Boolean state flag: each specific case pushes the original message
+pointer, loads `ECX` from `[receiver+0x2C]`, reads that object's vptr, then
+calls the listed slot. The selector-`0x02` BaseController binding is resolved
+below; the selector-`0x03` NPC runtime binding is not. The separate nested
+object at `+0x10` remains optional, with its type and later non-null writer
+unresolved.
 
 The five concrete routes do not parse `message+0x28` or other dialog payload
 fields, update message-driven application state, or directly dispatch a
@@ -2785,62 +2803,90 @@ logger arguments, not event names. The cases then pass the unchanged message
 pointer to the object at receiver `+0x2C` through the class/ID-specific
 virtual slot shown above.
 
-The callback implementation targets now have a concrete vtable owner. In
-the original PE, vtable VA `0x1C63998` maps to raw `.rdata` offset `0x1862598`;
-its COL/TypeDescriptor resolves to RTTI `.?AVtfGenericCharacter@@`. The
-constructor at raw `0x422E80` installs this vtable, and its slots match the
-callback destinations exactly: `+0x10 -> 0x4206B0`, `+0x14 -> 0x4206A0`,
-`+0x18 -> 0x420720`, `+0x1C -> 0x420780`, and setup `+0x20 -> 0x4263C0`.
-This identity is based on constructor/vtable/target equality; the RTTI name
-alone is not evidence of message semantics.
+### Verified selector-`0x02` BaseController binding
 
-The keyed state factory at raw `0xAC9350` maps selector `0x02` to a
-`0x5AE0`-byte allocation followed by constructor `0x422E80`; selector `0x03`
-maps to its unhandled-ID path and returns no state from this factory. For
-selector `0x02`, the state setup vtable slot `+0x20` reaches `0x4263C0`, whose
-selector-2 case calls `0x426840`. The creation path calls the state's `+0x20`
-method with the keyed receiver and outer manager, then registers the state
-with the manager. This associates a `tfGenericCharacter` state object with
-the BaseController key, and its vtable targets match the BaseController
-callback slots. It does **not** prove that this state pointer is written to
-the controller's optional `+0x2C` gate: the observed constructors zero that
-field, and the examined state setup/registration path contains no such
-receiver-field store. The actual runtime value behind the gate therefore
-remains conditional. The same setup factory does not create an NPCController
-selector-`0x03` state, so it cannot establish the NPC callback receiver
-either.
+The actual object stored in BaseController `+0x2C` on the selector-`0x02`
+state-setup path is a separate `tfLocalCharacter::BaseNetController` adapter,
+not the `tfGenericCharacter` state object. The receiver pointer returned by
+the keyed registry lookup is carried in `EBX` and passed to state creation at
+raw `0x800927`; the state factory then passes that same receiver to the
+state's `+0x20` setup method at `0x800A7C`. The `tfGenericCharacter` setup at
+`0x426840` passes the keyed receiver and its private context to `0x4A17C0`
+(`0x4268C2`).
 
-Two representative callback bodies show pointer-processing behavior rather
-than payload parsing. If the optional callback object is a
-`tfGenericCharacter`, BaseController ID `0x77` reaches its slot `+0x10` /
-raw `0x4206B0` with the original message pointer. It first
-calls the object's slot `+0x04` predicate; a true result returns that pointer
-unchanged. Otherwise a guarded global-state branch can return the object
-member at `+0x1BE4`; the remaining path calls slots `+0x08` and `+0x1C` in
-sequence and returns the latter result. BaseController ID `0x78` (and
-NPCController ID `0x77`) would reach slot `+0x14` / raw `0x4206A0`, which passes
-the same original pointer to `0x444AA0` with `this+0x1BC0`; that helper selects
-an endpoint or interpolates across the stored ranges through `0x447220`.
-The vtable target at slot `+0x18` / raw `0x420720` has a narrower status:
-it tests the second stack argument at `[ebp+0x0C]` and uses `ret 8` on every
-return path, so its body expects two stack arguments and callee-cleans eight
-bytes. The BaseController case at raw `0x540498` reaches the slot call at
-`0x5404B8` after pushing only the original message pointer once. Likewise,
-the sibling slot `+0x1C` target `0x420780` tests `[ebp+0x0C]` and returns
-with `ret 8`; `0x4206B0` reaches that virtual slot at `0x42070A` after one
-`push eax` of its intermediate pointer. These are statically observed
-call-contract differences if those calls dispatch to the candidate targets.
-The optional controller field `+0x2C` is initialized to null in the observed
-constructors, and no store binding it to a `tfGenericCharacter` instance has
-been found. The actual runtime callback-object binding is therefore
-unresolved: this evidence does not establish a runtime mismatch or its
-consequences. The pointer-mapping bodies treat their arguments as addresses,
-not message contents; `0x4206B0` passes its input through the `+0x08`/`+0x1C`
-virtual-helper chain. No downstream application-state effect is proven. The
-controller reads the message ID from `message+0x10` and forwards
-`message+0x24` only to the separate optional nested object at receiver
-`+0x10`; neither field is substituted for the callback's original-pointer
-argument. The callback result is not used by the outer `0x800420` call site.
+For selector `0x02`, `0x4A17C0` allocates `0x228` bytes at raw `0x4A182C`,
+retains the allocation in `EBX`, and calls constructor `0x4C66D0` at
+`0x4A1853` with that object in `ECX`, the private context, and the keyed
+BaseController receiver as its first two stack arguments; the call also
+pushes the pre-call `ECX` value as a third stack argument whose role is not
+needed for the traced field stores. The constructor installs vtable VA `0x1C64648`
+(raw `.rdata` offset `0x1863248`, RTTI
+`.?AVBaseNetController@tfLocalCharacter@@`) at object offset `0`; it stores
+the private context at adapter `+0x170` and the keyed receiver at `+0x174`.
+The context retains this adapter at `+0x18`.
+
+The setup update at `0x4A18D6` and subsequent context update at `0x4A2EE5`
+call `0x4C7360`. That method loads the keyed receiver from adapter `+0x174`
+and writes the adapter's unadjusted `this` pointer to
+`[BaseController+0x2C]` at `0x4C7393`. It also refreshes BaseController
+`+0x24` from the pointer at private-context `+0x170/+0x04`; this is a
+separate field from the `+0x2C` callback object.
+
+The installed BaseNetController vtable entries resolve directly to
+`+0x10 -> 0x4C82E0`, `+0x14 -> 0x4C8300`, and `+0x18 -> 0x4C9B80`
+(runtime VAs `0x8C8EE0`, `0x8C8F00`, and `0x8CA780`). These are the exact
+targets used for BaseController IDs `0x77/0x78/0x79`. The case stubs pass the
+original message pointer as one stack argument and use the loaded object as
+`ECX`; all three target methods return with `ret 4`. The vtable entries point
+directly at these methods and the constructor installs the vptr at object
+offset zero, so no secondary-subobject adjustment is observed in this
+binding. This matches the dispatch call contract.
+
+The `tfGenericCharacter` object remains the state created for selector `0x02`,
+not the callback receiver. Its primary vtable at VA `0x1C63998` / raw
+`.rdata` `0x1862598` has RTTI `.?AVtfGenericCharacter@@` and a distinct setup
+slot at `+0x20 -> 0x4263C0`. The former callback-candidate assignment to
+`tfGenericCharacter` and the associated `0x420720/0x420780` `ret 8`
+call-contract concern are withdrawn: they are not the methods in the
+BaseNetController vtable. The actual BaseController `+0x18` target is
+`0x4C9B80`, which returns with `ret 4`.
+
+### Conditional selector-`0x03` adapter code, not an NPC runtime binding
+
+`0x4A17C0` also contains selector-`0x03` code that allocates `0xB0` bytes at
+`0x4A190F` and constructs a `tfLocalCharacter::MandMController` at
+`0x4C6360`. Its vtable VA is `0x1C64640` (raw `.rdata` `0x1863240`, RTTI
+`.?AVMandMController@tfLocalCharacter@@`); its constructor stores context at
+adapter `+0x10` and the keyed receiver at `+0x14`. When the private context
+later updates `+0x1C`, it calls `0x4C6490`, which writes that adapter's
+unadjusted `this` pointer to the receiver's `+0x2C` at `0x4C64A1`. If
+installed, the adapter's vtable slots `+0x14/+0x18` point to
+`0x4C7C50/0x4C82E0`.
+
+This is conditional code, not evidence that an NPCController receives this
+adapter through the traced registration path. `0x4A17C0` has only the direct
+caller `0x426840`; the keyed state factory at `0xAC9350` creates
+`tfGenericCharacter` for selector `0x02` and takes selector `0x03` to its
+unsupported-ID path. Thus the available path establishes the BaseController
+binding but does not establish an NPCController `+0x2C` writer or runtime
+adapter identity.
+
+The separate indirect store at raw `0x4A2F07` is still not a controller
+binding: it loads a pointer from private-context `+0x20`, follows its `+0x9C`
+pointer, and writes the original pointer to that child object's `+0x2C`.
+Private-context constructor `0x49EB30` initializes `+0x20` to null at
+`0x49EBE9`; no alias from that child destination to either keyed controller
+is established.
+
+The optional nested receiver at controller `+0x10` is independent of the
+callback adapter at `+0x2C`. Shared constructor helper `0xBCAD70` initializes
+nested `+0x10` to null at `0xBCAD91`. Both dispatchers load that field and,
+when non-null, call its vtable `+0x04` with `ECX` set to the nested object and
+stack arguments `(controller, original message, DWORD at message+0x24)`.
+The nested receiver's type and any later non-null writer remain unresolved.
+The keyed Character cases themselves do not parse `message+0x28` or other
+dialog payload fields, update message-driven application state, or directly
+dispatch a numeric UI event.
 
 This keyed path is separate from the conditional zero-low-byte branch in
 `0x7FDC60`, which can call the `tfGameProtocolHandler` via callback-context

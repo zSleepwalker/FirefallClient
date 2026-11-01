@@ -170,36 +170,45 @@
   NPCController handles `0x77/0x78` through `+0x14/+0x18`; `0x79/0x7A` are
   unsupported. Both methods refresh receiver `+0x28`, optionally forward
   `(receiver, message, message+0x24)` through a nested object at `+0x10`, then
-  require receiver `+0x2C` before ID dispatch. Specific cases optionally log
-  through receiver `+0x30` and pass the original message pointer unchanged;
-  they do not directly read dialog payloads or emit numeric UI events. The
-  callback targets match slots `+0x10/+0x14/+0x18` of the constructor-installed,
-  RTTI-backed `tfGenericCharacter` vtable at VA `0x1C63998` / raw `.rdata`
-  `0x1862598`. Selector `0x02` state creation allocates `0x5AE0` bytes and
-  calls `0x422E80`; its setup `+0x20` path reaches `0x426840`. The
-  selector-`0x03` state-factory branch is unhandled. The state factory
-  associates the selector-`0x02` state with its keyed receiver, but no
-  observed store binds it to receiver `+0x2C`; the gate's runtime target
-  remains conditional, and this does not establish the NPC callback object's
-  identity. The `+0x18` candidate `0x420720` and sibling `+0x1C` candidate
-  `0x420780` each test `[ebp+0x0C]` and return with `ret 8` (two stack
-  arguments expected). Their observed callers at `0x5404B8` and `0x42070A`
-  push one stack argument each. This is only a conditional call-contract
-  incompatibility if the unresolved `+0x2C` receiver binding dispatches to
-  `tfGenericCharacter`; do not conclude an actual runtime mismatch or effect.
-  The other representative bodies `0x4206B0` and `0x4206A0` process their
-  pointer arguments rather than parse message fields; `0x4206B0` delegates
-  through two virtual helpers whose payload use and side effects are not
-  established. None directly writes the callback object. This does not alter
-  the conditional
+  test the pointer at receiver `+0x2C` before ID dispatch. Constructors
+  `0x53F980` and `0x54E7B0` explicitly initialize `+0x2C` to null; each
+  specific dispatch case then loads that field into `ECX`, reads its vptr, and
+  calls the recorded slot with the original message pointer as its sole stack
+  argument. Thus `+0x2C` is a nullable virtual-receiver pointer, not a state
+  flag. The selector-`0x02` factory allocates `0xB80` bytes and passes its two
+  key words to `0x53F980`; selector `0x03` constructs the NPCController at
+  `0x54E7B0`. The separate keyed state factory's selector-`0x02` state
+  creation allocates `0x5AE0` bytes and calls `0x422E80`; its setup `+0x20`
+  path reaches `0x426840`, while selector `0x03` is unhandled. The state
+  `tfGenericCharacter` object is a state object, not the callback receiver.
+  The selector-`0x02` setup allocates a separate `0x228`-byte adapter at
+  `0x4A182C` and constructs `tfLocalCharacter::BaseNetController` at
+  `0x4C66D0`. Its vtable is VA `0x1C64648` / raw `.rdata` `0x1863248`;
+  constructor fields are private context `+0x170` and keyed receiver
+  `+0x174`. Update method `0x4C7360` loads the receiver from `+0x174` and
+  writes its own unadjusted `this` pointer to BaseController `+0x2C` at
+  `0x4C7393`. The actual callback slots are `+0x10/+0x14/+0x18` ->
+  `0x4C82E0/0x4C8300/0x4C9B80`; each target's `ret 4` matches the one
+  message-pointer argument pushed by the dispatcher. The earlier
+  `tfGenericCharacter` callback-vtable claim and associated `0x420720/0x420780`
+  `ret 8` mismatch are withdrawn.
+  The selector-`0x03` code in `0x4A17C0` can construct a `0xB0`-byte
+  `MandMController` (`0x4C6360`, vtable VA `0x1C64640`) and its updater
+  `0x4C6490` writes the adapter to receiver `+0x2C` at `0x4C64A1`. But
+  `0x4A17C0` has only the traced caller `0x426840`, while the keyed state
+  factory rejects selector `0x03`; this does not prove an NPCController
+  binding. The separate `0x4A2F07` child `+0x2C` store likewise has no
+  proven alias to either controller.
+  The optional nested receiver at controller `+0x10` is distinct: shared
+  helper `0xBCAD70` initializes it null at `0xBCAD91`; dispatch forwards
+  `(controller, original message, message+0x24)` through its vtable `+0x04`
+  when non-null. Its type and later non-null writer remain unresolved. This
+  does not alter the conditional
   `0x7FDC60` global route: nonzero message
   `+0x18` low byte goes to `0x800420`, while the zero-low-byte, non-nested,
   non-null callback-context `+0x08` branch can reach the separate
-  `tfGameProtocolHandler`. Next concrete target: identify any writer of
-  receiver `+0x2C` outside the state-factory path (or confirm the gate stays
-  null for these constructors), then resolve the distinct nested `+0x10`
-  receiver type; do not infer callback semantics from the `tfGenericCharacter`
-  RTTI name.
+  `tfGameProtocolHandler`. See `docs/MatrixConnection.md` for precise
+  factory/constructor bytes, vtable targets, and unresolved NPC/nested edges.
 - The gated `0xBD7060` path serializes the message QWORD and message data into
   its output stream, then passes the selector separately to `0xBD7460`,
   which stores it in the recipient callback's local record, not the stream.

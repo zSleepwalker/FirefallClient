@@ -51,6 +51,10 @@ public static class MatrixKeyedReceiverFactoryNativeLayout
     public const uint FactoryFileOffset = 0x81B1B0;
     public const uint FactoryVirtualAddress = 0xC1BDB0;
     public const uint FactoryByteDispatchFileOffset = 0x81B1DC;
+    public const uint ReceiverRegistryFactoryArgumentSequenceFileOffset = 0x800148;
+    public const uint ReceiverRegistryFactoryInvocationFileOffset = 0x800151;
+    public const uint BaseControllerFactoryConstructorArgumentSetupFileOffset = 0x81B213;
+    public const uint BaseControllerFactoryConstructorCallFileOffset = 0x81B21B;
     public const uint OutOfRangeReturnFileOffset = 0x81BA93;
     public const uint JumpTableFileOffset = 0x81BAA8;
     public const uint JumpTableVirtualAddress = 0xC1C6A8;
@@ -319,11 +323,11 @@ public static class MatrixKeyedReceiverFactoryNativeLayout
     public static IReadOnlyList<MatrixKeyedReceiverVtableSlotSnapshot> PrimaryVtableSlots { get; } =
         Array.AsReadOnly(new[]
         {
-            Slot(0x02, 0x04, 0x540380, "Message-ID dispatcher for 0x53..0xC4, gated by the receiver state flag."),
+            Slot(0x02, 0x04, 0x540380, "Message-ID dispatcher for 0x53..0xC4, enabled by the optional callback-object pointer at +0x2C."),
             Slot(0x02, 0x08, 0x541220, "Called with parsed byte data and length; body not exhaustively mapped."),
             Slot(0x02, 0x0C, 0x5441B0, "Called with parsed byte data and length; body not exhaustively mapped."),
             Slot(0x02, 0x18, 0x54DE00, "State-refresh wrapper; ignores payload arguments but is not a no-op."),
-            Slot(0x03, 0x04, 0x54F4A0, "Message-ID dispatcher for 0x53..0xC4, gated by the receiver state flag."),
+            Slot(0x03, 0x04, 0x54F4A0, "Message-ID dispatcher for 0x53..0xC4, enabled by the optional callback-object pointer at +0x2C."),
             Slot(0x03, 0x08, 0x5503D0, "Called with parsed byte data and length; body not exhaustively mapped."),
             Slot(0x03, 0x0C, 0x5536C0, "Code prologue is present; IDA did not recover this method boundary or body."),
             Slot(0x03, 0x18, 0x55E160, "State-refresh wrapper; ignores payload arguments but is not a no-op."),

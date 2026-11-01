@@ -5,23 +5,6 @@ public readonly record struct CharacterKeyedDialogCallbackVtableSlotSnapshot(
     uint MethodFileOffset,
     uint MethodVirtualAddress);
 
-public readonly record struct CharacterKeyedDialogCallbackMethodSnapshot(
-    int SlotOffset,
-    uint MethodFileOffset,
-    bool ReceivesOriginalMessagePointer,
-    bool ReadsMessagePayload,
-    bool WritesCallbackObjectDirectly,
-    string ObservedBehavior);
-
-public readonly record struct CharacterKeyedDialogCallbackContractCandidateSnapshot(
-    int SlotOffset,
-    uint CandidateMethodFileOffset,
-    int ExpectedStackArgumentCount,
-    int CalleeStackCleanupBytes,
-    uint CallerMethodFileOffset,
-    uint CallerCallInstructionFileOffset,
-    int ObservedCallerStackArgumentPushCount);
-
 public static class CharacterKeyedDialogCallbackNativeLayout
 {
     public const uint RawTextOffsetToVirtualAddressDelta = 0x400C00;
@@ -47,74 +30,79 @@ public static class CharacterKeyedDialogCallbackNativeLayout
     public const uint GenericCharacterSetupMethodFileOffset = 0x426840;
     public const uint StateFactorySetupVirtualCallFileOffset = 0x800A7C;
 
-    public const uint BaseControllerPointerSelectionCallbackFileOffset = 0x4206B0;
-    public const uint BaseControllerPointerMapCallbackFileOffset = 0x4206A0;
-    public const uint BaseControllerPointerRangeCallbackFileOffset = 0x420720;
-    public const uint BaseControllerPointerRangeCallSequenceFileOffset = 0x5404B2;
-    public const uint BaseControllerPointerRangeCallInstructionFileOffset = 0x5404B8;
-    public const uint PointerMapHelperFileOffset = 0x444AA0;
-    public const uint PointerMapInterpolationHelperFileOffset = 0x447220;
-    public const uint PointerRangeSearchHelperFileOffset = 0x444BF0;
-    public const uint ReversePointerRangeCallbackFileOffset = 0x420780;
-    public const uint ReversePointerRangeCallSequenceFileOffset = 0x420707;
-    public const uint ReversePointerRangeCallInstructionFileOffset = 0x42070A;
+    public const uint SetupPrivateContextAllocationCallFileOffset = 0x426881;
+    public const int SetupPrivateContextAllocationSize = 0x43D8;
+    public const uint SetupPrivateContextConstructorCallFileOffset = 0x4268A1;
+    public const uint SetupPrivateContextConstructorFileOffset = 0x49EB30;
+    public const int SetupPrivateContextStateFieldOffset = 0x4D20;
+    public const uint SetupPrivateContextNullPointerInitializationFileOffset = 0x49EBE9;
+    public const int SetupIndirectSourceObjectPointerFieldOffset = 0x20;
+    public const int SetupIndirectChildObjectPointerFieldOffset = 0x9C;
+    public const int SetupIndirectBackPointerFieldOffset = 0x2C;
+    public const uint SetupIndirectBackPointerDataflowSequenceFileOffset = 0x4A2EFE;
+    public const uint SetupIndirectBackPointerStoreFileOffset = 0x4A2F07;
 
-    public static IReadOnlyList<CharacterKeyedDialogCallbackVtableSlotSnapshot> VtableSlots { get; } =
+    public const uint SelectorTwoAdapterAllocationFileOffset = 0x4A182C;
+    public const int SelectorTwoAdapterAllocationSize = 0x228;
+    public const uint SelectorTwoAdapterConstructorCallFileOffset = 0x4A1853;
+    public const uint SelectorTwoAdapterConstructorFileOffset = 0x4C66D0;
+    public const uint SelectorTwoAdapterPrivateContextFieldStoreFileOffset = 0x4C6714;
+    public const int SelectorTwoAdapterPrivateContextFieldOffset = 0x170;
+    public const uint SelectorTwoAdapterVtableStoreFileOffset = 0x4C671D;
+    public const uint SelectorTwoAdapterVtableVirtualAddress = 0x1C64648;
+    public const uint SelectorTwoAdapterVtableFileOffset = 0x1863248;
+    public const string SelectorTwoAdapterRttiName = ".?AVBaseNetController@tfLocalCharacter@@";
+    public const uint SelectorTwoAdapterControllerFieldStoreFileOffset = 0x4C672D;
+    public const int SelectorTwoAdapterControllerFieldOffset = 0x174;
+    public const uint SelectorTwoAdapterBindingMethodFileOffset = 0x4C7360;
+    public const uint SelectorTwoAdapterControllerPointerLoadFileOffset = 0x4C738D;
+    public const uint SelectorTwoAdapterControllerCallbackPointerStoreFileOffset = 0x4C7393;
+    public const uint SelectorTwoAdapterControllerContextPointerRefreshFileOffset = 0x4C7396;
+    public const uint SelectorTwoAdapterControllerContextPointerStoreFileOffset = 0x4C73A5;
+    public const uint SelectorTwoAdapterStateSetupCallFileOffset = 0x4A184E;
+    public const uint SelectorTwoAdapterContextInstallCallFileOffset = 0x4A1867;
+    public const uint SelectorTwoAdapterInitialUpdateCallFileOffset = 0x4A18D6;
+    public const uint SelectorTwoAdapterContextUpdateCallFileOffset = 0x4A2EE5;
+
+    public static IReadOnlyList<CharacterKeyedDialogCallbackVtableSlotSnapshot>
+        SelectorTwoAdapterVtableSlots { get; } =
         Array.AsReadOnly(new[]
         {
-            Slot(0x10, BaseControllerPointerSelectionCallbackFileOffset),
-            Slot(0x14, BaseControllerPointerMapCallbackFileOffset),
-            Slot(0x18, BaseControllerPointerRangeCallbackFileOffset),
-            Slot(0x1C, ReversePointerRangeCallbackFileOffset),
-            Slot(0x20, GenericCharacterSetupDispatcherFileOffset)
+            Slot(0x10, 0x4C82E0),
+            Slot(0x14, 0x4C8300),
+            Slot(0x18, 0x4C9B80)
         });
 
-    public static IReadOnlyList<CharacterKeyedDialogCallbackMethodSnapshot> CallbackMethods { get; } =
+    public const uint SelectorThreeConditionalAdapterAllocationFileOffset = 0x4A190F;
+    public const int SelectorThreeConditionalAdapterAllocationSize = 0xB0;
+    public const uint SelectorThreeConditionalAdapterConstructorCallFileOffset = 0x4A192E;
+    public const uint SelectorThreeConditionalAdapterConstructorFileOffset = 0x4C6360;
+    public const uint SelectorThreeConditionalAdapterPrivateContextFieldStoreFileOffset = 0x4C63AF;
+    public const int SelectorThreeConditionalAdapterPrivateContextFieldOffset = 0x10;
+    public const uint SelectorThreeConditionalAdapterVtableStoreFileOffset = 0x4C63B5;
+    public const uint SelectorThreeConditionalAdapterVtableVirtualAddress = 0x1C64640;
+    public const uint SelectorThreeConditionalAdapterVtableFileOffset = 0x1863240;
+    public const string SelectorThreeConditionalAdapterRttiName = ".?AVMandMController@tfLocalCharacter@@";
+    public const uint SelectorThreeConditionalAdapterControllerFieldStoreFileOffset = 0x4C63BB;
+    public const int SelectorThreeConditionalAdapterControllerFieldOffset = 0x14;
+    public const uint SelectorThreeConditionalAdapterBindingMethodFileOffset = 0x4C6490;
+    public const uint SelectorThreeConditionalAdapterControllerPointerLoadFileOffset = 0x4C649B;
+    public const uint SelectorThreeConditionalAdapterControllerCallbackPointerStoreFileOffset = 0x4C64A1;
+    public const uint SelectorThreeConditionalAdapterContextUpdateCallFileOffset = 0x4A2EF3;
+
+    public static IReadOnlyList<CharacterKeyedDialogCallbackVtableSlotSnapshot>
+        SelectorThreeConditionalAdapterVtableSlots { get; } =
         Array.AsReadOnly(new[]
         {
-            new CharacterKeyedDialogCallbackMethodSnapshot(
-                0x10,
-                BaseControllerPointerSelectionCallbackFileOffset,
-                ReceivesOriginalMessagePointer: true,
-                ReadsMessagePayload: false,
-                WritesCallbackObjectDirectly: false,
-                "Returns the input, member +0x1BE4, or the result of the +0x08 then +0x1C callback chain."),
-            new CharacterKeyedDialogCallbackMethodSnapshot(
-                0x14,
-                BaseControllerPointerMapCallbackFileOffset,
-                ReceivesOriginalMessagePointer: true,
-                ReadsMessagePayload: false,
-                WritesCallbackObjectDirectly: false,
-                "Returns a range-mapped pointer using the mapping state at +0x1BC0."),
-            new CharacterKeyedDialogCallbackMethodSnapshot(
-                0x18,
-                BaseControllerPointerRangeCallbackFileOffset,
-                ReceivesOriginalMessagePointer: true,
-                ReadsMessagePayload: false,
-                WritesCallbackObjectDirectly: false,
-                "When the range table at +0x1BE8 is enabled, adds its selected range delta to the input pointer.")
+            Slot(0x14, 0x4C7C50),
+            Slot(0x18, 0x4C82E0)
         });
 
-    public static IReadOnlyList<CharacterKeyedDialogCallbackContractCandidateSnapshot> ContractCandidates { get; } =
-        Array.AsReadOnly(new[]
-        {
-            new CharacterKeyedDialogCallbackContractCandidateSnapshot(
-                0x18,
-                BaseControllerPointerRangeCallbackFileOffset,
-                ExpectedStackArgumentCount: 2,
-                CalleeStackCleanupBytes: 8,
-                CallerMethodFileOffset: 0x540380,
-                CallerCallInstructionFileOffset: BaseControllerPointerRangeCallInstructionFileOffset,
-                ObservedCallerStackArgumentPushCount: 1),
-            new CharacterKeyedDialogCallbackContractCandidateSnapshot(
-                0x1C,
-                ReversePointerRangeCallbackFileOffset,
-                ExpectedStackArgumentCount: 2,
-                CalleeStackCleanupBytes: 8,
-                CallerMethodFileOffset: BaseControllerPointerSelectionCallbackFileOffset,
-                CallerCallInstructionFileOffset: ReversePointerRangeCallInstructionFileOffset,
-                ObservedCallerStackArgumentPushCount: 1)
-        });
+    public const uint SharedKeyedReceiverConstructorHelperFileOffset = 0xBCAD70;
+    public const uint SharedOptionalNestedReceiverNullStoreFileOffset = 0xBCAD91;
+    public const int SharedOptionalNestedReceiverFieldOffset = 0x10;
+    public const uint BaseControllerOptionalNestedForwardCallFileOffset = 0x54039A;
+    public const uint NpcControllerOptionalNestedForwardCallFileOffset = 0x54F4BA;
 
     private static CharacterKeyedDialogCallbackVtableSlotSnapshot Slot(
         int slotOffset,

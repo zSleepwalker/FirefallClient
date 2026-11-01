@@ -4875,25 +4875,41 @@ internal static class StartupBinaryEvidence
                 "4F83FF080F8732020000")
             && Matches(CharacterKeyedDialogDispatchNativeLayout.OuterSelectorDefaultReceiverCallFileOffset,
                 "8B038BCB56FF5004"));
+        check("Binary keyed Character registration forwards both key words and selector 0x02 constructs BaseController",
+            Matches(MatrixKeyedReceiverFactoryNativeLayout.ReceiverRegistryFactoryArgumentSequenceFileOffset,
+                "FF751C8B4314FF7518FFD0")
+            && Matches(MatrixKeyedReceiverFactoryNativeLayout.BaseControllerFactoryConstructorArgumentSetupFileOffset,
+                "FF750C8BC8FF7508E8")
+            && RelativeBranchTargets(
+                MatrixKeyedReceiverFactoryNativeLayout.BaseControllerFactoryConstructorCallFileOffset,
+                0xE8, MatrixKeyedReceiverFactoryNativeLayout.FirstEightCases
+                    .Single(snapshot => snapshot.Selector == 0x02).ConstructorFileOffset)
+            && Matches(CharacterKeyedDialogDispatchNativeLayout.BaseControllerMessagePointerLoadFileOffset,
+                "8B7D08")
+            && Matches(CharacterKeyedDialogDispatchNativeLayout.NpcControllerMessagePointerLoadFileOffset,
+                "8B7D08")
+            && Matches(CharacterKeyedDialogDispatchNativeLayout.BaseControllerNestedReceiverLoadFileOffset,
+                "8B4E10")
+            && Matches(CharacterKeyedDialogDispatchNativeLayout.NpcControllerNestedReceiverLoadFileOffset,
+                "8B4E10")
+            && Matches(CharacterKeyedDialogDispatchNativeLayout.BaseControllerCallbackObjectNullStoreFileOffset,
+                "C7462C00000000")
+            && Matches(CharacterKeyedDialogDispatchNativeLayout.NpcControllerCallbackObjectNullStoreFileOffset,
+                "C7462C00000000"));
+        check("Binary private-context +0x20 path stores a child +0x2C back-pointer, separate from keyed controllers",
+            Matches(CharacterKeyedDialogCallbackNativeLayout.SetupPrivateContextNullPointerInitializationFileOffset,
+                "C7472000000000")
+            && Matches(CharacterKeyedDialogCallbackNativeLayout.SetupIndirectBackPointerDataflowSequenceFileOffset,
+                "8B4E208B819C00000089482C")
+            && Matches(CharacterKeyedDialogCallbackNativeLayout.SetupIndirectBackPointerStoreFileOffset,
+                "89482C"));
         var genericCharacterVtableFileOffset = VirtualAddressToFileOffset(
             CharacterKeyedDialogCallbackNativeLayout.GenericCharacterPrimaryVtableVirtualAddress);
-        check("Binary keyed Character callback targets match the tfGenericCharacter RTTI vtable and selector-2 state construction",
+        check("Binary selector-2 state factory constructs tfGenericCharacter while selector 3 is unsupported",
             genericCharacterVtableFileOffset
                 == CharacterKeyedDialogCallbackNativeLayout.GenericCharacterPrimaryVtableFileOffset
             && VtableRttiName(CharacterKeyedDialogCallbackNativeLayout.GenericCharacterPrimaryVtableVirtualAddress)
                 == CharacterKeyedDialogCallbackNativeLayout.GenericCharacterRttiName
-            && ReadUInt32(genericCharacterVtableFileOffset + 0x10)
-                == CharacterKeyedDialogCallbackNativeLayout.BaseControllerPointerSelectionCallbackFileOffset
-                    + CharacterKeyedDialogCallbackNativeLayout.RawTextOffsetToVirtualAddressDelta
-            && ReadUInt32(genericCharacterVtableFileOffset + 0x14)
-                == CharacterKeyedDialogCallbackNativeLayout.BaseControllerPointerMapCallbackFileOffset
-                    + CharacterKeyedDialogCallbackNativeLayout.RawTextOffsetToVirtualAddressDelta
-            && ReadUInt32(genericCharacterVtableFileOffset + 0x18)
-                == CharacterKeyedDialogCallbackNativeLayout.BaseControllerPointerRangeCallbackFileOffset
-                    + CharacterKeyedDialogCallbackNativeLayout.RawTextOffsetToVirtualAddressDelta
-            && ReadUInt32(genericCharacterVtableFileOffset + 0x1C)
-                == CharacterKeyedDialogCallbackNativeLayout.ReversePointerRangeCallbackFileOffset
-                    + CharacterKeyedDialogCallbackNativeLayout.RawTextOffsetToVirtualAddressDelta
             && ReadUInt32(genericCharacterVtableFileOffset + 0x20)
                 == CharacterKeyedDialogCallbackNativeLayout.GenericCharacterSetupDispatcherFileOffset
                     + CharacterKeyedDialogCallbackNativeLayout.RawTextOffsetToVirtualAddressDelta
@@ -4915,50 +4931,117 @@ internal static class StartupBinaryEvidence
                 0xE8, CharacterKeyedDialogCallbackNativeLayout.GenericCharacterSetupMethodFileOffset)
             && Matches(CharacterKeyedDialogCallbackNativeLayout.StateFactorySetupVirtualCallFileOffset - 9,
                 "8B0383C4188BCB5657FF5020")
+            && Matches(0x800927, "53E8")
+            && RelativeBranchTargets(0x800928, 0xE8, 0x8009A0)
+            && Matches(0x8009A9, "8B7D08")
+            && Matches(0x800A73, "8B0383C4188BCB5657FF5020")
+            && Matches(0x4268B8, "51FF75088B8E204D0000")
+            && RelativeBranchTargets(0x4268C2, 0xE8, 0x4A17C0)
             && RelativeBranchTargets(CharacterKeyedDialogCallbackNativeLayout.UnsupportedNpcStateFactoryBranchFileOffset + 0x13,
                 0xE8, CharacterKeyedDialogDispatchNativeLayout.VibeLogUnhandledMessageIdFileOffset));
-        check("Binary tfGenericCharacter callback-body candidates preserve their distinct call contracts",
-            Matches(CharacterKeyedDialogCallbackNativeLayout.BaseControllerPointerMapCallbackFileOffset,
-                "558BEC81C1C01B00005DE9")
+        var baseAdapterVtableFileOffset = VirtualAddressToFileOffset(
+            CharacterKeyedDialogCallbackNativeLayout.SelectorTwoAdapterVtableVirtualAddress);
+        var baseAdapterSlots =
+            CharacterKeyedDialogCallbackNativeLayout.SelectorTwoAdapterVtableSlots;
+        check("Binary selector-2 setup stores the constructed BaseNetController adapter at BaseController +0x2C",
+            baseAdapterVtableFileOffset
+                == CharacterKeyedDialogCallbackNativeLayout.SelectorTwoAdapterVtableFileOffset
+            && VtableRttiName(CharacterKeyedDialogCallbackNativeLayout.SelectorTwoAdapterVtableVirtualAddress)
+                == CharacterKeyedDialogCallbackNativeLayout.SelectorTwoAdapterRttiName
+            && baseAdapterSlots.All(slot =>
+                ReadUInt32(baseAdapterVtableFileOffset + (uint)slot.SlotOffset)
+                    == slot.MethodVirtualAddress
+                && VirtualAddressToFileOffset(slot.MethodVirtualAddress) == slot.MethodFileOffset)
+            && Matches(CharacterKeyedDialogCallbackNativeLayout.SelectorTwoAdapterAllocationFileOffset,
+                "6828020000E87A67E1008BD883C404895D08")
             && RelativeBranchTargets(
-                CharacterKeyedDialogCallbackNativeLayout.BaseControllerPointerMapCallbackFileOffset + 0x0A,
-                0xE9, CharacterKeyedDialogCallbackNativeLayout.PointerMapHelperFileOffset)
+                CharacterKeyedDialogCallbackNativeLayout.SelectorTwoAdapterAllocationFileOffset + 5,
+                0xE8, 0x12B7FB0)
+            && Matches(CharacterKeyedDialogCallbackNativeLayout.SelectorTwoAdapterStateSetupCallFileOffset,
+                "5157568BCB")
             && RelativeBranchTargets(
-                CharacterKeyedDialogCallbackNativeLayout.PointerMapHelperFileOffset + 0x62,
-                0xE8, CharacterKeyedDialogCallbackNativeLayout.PointerMapInterpolationHelperFileOffset)
-            && Matches(CharacterKeyedDialogCallbackNativeLayout.BaseControllerPointerSelectionCallbackFileOffset,
-                "558BEC578BF98B078B4004FFD084C07408")
-            && Matches(CharacterKeyedDialogCallbackNativeLayout.BaseControllerPointerSelectionCallbackFileOffset + 0x54,
-                "FF5608")
-            && Matches(CharacterKeyedDialogCallbackNativeLayout.BaseControllerPointerSelectionCallbackFileOffset + 0x5A,
-                "FF561C")
-            && Matches(CharacterKeyedDialogCallbackNativeLayout.BaseControllerPointerRangeCallbackFileOffset,
-                "558BEC807D0C00568BF174138B068B4004FFD084C07408")
-            && Matches(CharacterKeyedDialogCallbackNativeLayout.BaseControllerPointerRangeCallbackFileOffset + 0x1F,
-                "83BE4C1C000000578DBEE81B00007509")
+                CharacterKeyedDialogCallbackNativeLayout.SelectorTwoAdapterConstructorCallFileOffset,
+                0xE8, CharacterKeyedDialogCallbackNativeLayout.SelectorTwoAdapterConstructorFileOffset)
+            && Matches(0x4C670F, "8B45088BCF8986700100008B450CC7064846C601")
+            && Matches(CharacterKeyedDialogCallbackNativeLayout.SelectorTwoAdapterPrivateContextFieldStoreFileOffset,
+                "898670010000")
+            && Matches(CharacterKeyedDialogCallbackNativeLayout.SelectorTwoAdapterVtableStoreFileOffset,
+                "C7064846C601")
+            && Matches(CharacterKeyedDialogCallbackNativeLayout.SelectorTwoAdapterControllerFieldStoreFileOffset,
+                "898674010000")
+            && Matches(CharacterKeyedDialogCallbackNativeLayout.SelectorTwoAdapterContextInstallCallFileOffset - 0x0B,
+                "508D4E18")
             && RelativeBranchTargets(
-                CharacterKeyedDialogCallbackNativeLayout.BaseControllerPointerRangeCallbackFileOffset + 0x40,
-                0xE8, CharacterKeyedDialogCallbackNativeLayout.PointerRangeSearchHelperFileOffset)
-            && Matches(CharacterKeyedDialogCallbackNativeLayout.BaseControllerPointerRangeCallbackFileOffset,
-                "558BEC807D0C00")
-            && Matches(CharacterKeyedDialogCallbackNativeLayout.BaseControllerPointerRangeCallbackFileOffset + 0x1C,
-                "C20800")
-            && Matches(CharacterKeyedDialogCallbackNativeLayout.BaseControllerPointerRangeCallbackFileOffset + 0x35,
-                "C20800")
-            && Matches(CharacterKeyedDialogCallbackNativeLayout.BaseControllerPointerRangeCallbackFileOffset + 0x52,
-                "C20800")
-            && Matches(CharacterKeyedDialogCallbackNativeLayout.ReversePointerRangeCallbackFileOffset,
-                "558BEC807D0C00")
-            && Matches(CharacterKeyedDialogCallbackNativeLayout.ReversePointerRangeCallbackFileOffset + 0x1C,
-                "C20800")
-            && Matches(CharacterKeyedDialogCallbackNativeLayout.ReversePointerRangeCallbackFileOffset + 0x35,
-                "C20800")
-            && Matches(CharacterKeyedDialogCallbackNativeLayout.ReversePointerRangeCallbackFileOffset + 0x52,
-                "C20800")
-            && Matches(CharacterKeyedDialogCallbackNativeLayout.BaseControllerPointerRangeCallSequenceFileOffset,
-                "8B4E2C578B01FF5018")
-            && Matches(CharacterKeyedDialogCallbackNativeLayout.ReversePointerRangeCallSequenceFileOffset,
-                "508BCFFF561C"));
+                CharacterKeyedDialogCallbackNativeLayout.SelectorTwoAdapterContextInstallCallFileOffset,
+                0xE8, 0x4DB1E0)
+            && RelativeBranchTargets(
+                CharacterKeyedDialogCallbackNativeLayout.SelectorTwoAdapterInitialUpdateCallFileOffset,
+                0xE8, CharacterKeyedDialogCallbackNativeLayout.SelectorTwoAdapterBindingMethodFileOffset)
+            && RelativeBranchTargets(
+                CharacterKeyedDialogCallbackNativeLayout.SelectorTwoAdapterContextUpdateCallFileOffset,
+                0xE8, CharacterKeyedDialogCallbackNativeLayout.SelectorTwoAdapterBindingMethodFileOffset)
+            && Matches(CharacterKeyedDialogCallbackNativeLayout.SelectorTwoAdapterControllerPointerLoadFileOffset,
+                "8B837401000089582C")
+            && Matches(CharacterKeyedDialogCallbackNativeLayout.SelectorTwoAdapterControllerContextPointerRefreshFileOffset,
+                "8B83700100008B50048B8374010000895024")
+            && Matches(CharacterKeyedDialogCallbackNativeLayout.SelectorTwoAdapterControllerContextPointerStoreFileOffset,
+                "895024")
+            && Matches(baseAdapterSlots[0].MethodFileOffset,
+                "680098B5016800B2E401E80142E3FF83C408C20400")
+            && Matches(baseAdapterSlots[0].MethodFileOffset + 0x12, "C20400")
+            && Matches(baseAdapterSlots[1].MethodFileOffset,
+                "558BEC6AFF6888DC9E0164A1000000005083EC64")
+            && Matches(baseAdapterSlots[1].MethodFileOffset + 0xF7, "C20400")
+            && Matches(baseAdapterSlots[2].MethodFileOffset,
+                "558BEC83E4F883EC0C")
+            && Matches(baseAdapterSlots[2].MethodFileOffset + 0x83, "C20400"));
+        var selectorThreeAdapterVtableFileOffset = VirtualAddressToFileOffset(
+            CharacterKeyedDialogCallbackNativeLayout.SelectorThreeConditionalAdapterVtableVirtualAddress);
+        var selectorThreeAdapterSlots =
+            CharacterKeyedDialogCallbackNativeLayout.SelectorThreeConditionalAdapterVtableSlots;
+        check("Binary selector-3 code constructs a conditional MandMController adapter but does not establish an NPC binding",
+            selectorThreeAdapterVtableFileOffset
+                == CharacterKeyedDialogCallbackNativeLayout.SelectorThreeConditionalAdapterVtableFileOffset
+            && VtableRttiName(
+                CharacterKeyedDialogCallbackNativeLayout.SelectorThreeConditionalAdapterVtableVirtualAddress)
+                == CharacterKeyedDialogCallbackNativeLayout.SelectorThreeConditionalAdapterRttiName
+            && selectorThreeAdapterSlots.All(slot =>
+                ReadUInt32(selectorThreeAdapterVtableFileOffset + (uint)slot.SlotOffset)
+                    == slot.MethodVirtualAddress
+                && VirtualAddressToFileOffset(slot.MethodVirtualAddress) == slot.MethodFileOffset)
+            && Matches(CharacterKeyedDialogCallbackNativeLayout.SelectorThreeConditionalAdapterAllocationFileOffset,
+                "68B0000000E89766E100")
+            && RelativeBranchTargets(
+                CharacterKeyedDialogCallbackNativeLayout.SelectorThreeConditionalAdapterAllocationFileOffset + 5,
+                0xE8, 0x12B7FB0)
+            && Matches(0x4A1926, "85C0740B57568BC8")
+            && RelativeBranchTargets(
+                CharacterKeyedDialogCallbackNativeLayout.SelectorThreeConditionalAdapterConstructorCallFileOffset,
+                0xE8, CharacterKeyedDialogCallbackNativeLayout.SelectorThreeConditionalAdapterConstructorFileOffset)
+            && Matches(CharacterKeyedDialogCallbackNativeLayout.SelectorThreeConditionalAdapterPrivateContextFieldStoreFileOffset,
+                "894710")
+            && Matches(CharacterKeyedDialogCallbackNativeLayout.SelectorThreeConditionalAdapterVtableStoreFileOffset,
+                "C7074046C601")
+            && Matches(CharacterKeyedDialogCallbackNativeLayout.SelectorThreeConditionalAdapterControllerFieldStoreFileOffset,
+                "894714")
+            && Matches(CharacterKeyedDialogCallbackNativeLayout.SelectorThreeConditionalAdapterControllerPointerLoadFileOffset,
+                "8B46148D7B3489702C")
+            && Matches(CharacterKeyedDialogCallbackNativeLayout.SelectorThreeConditionalAdapterControllerCallbackPointerStoreFileOffset,
+                "89702C")
+            && RelativeBranchTargets(
+                CharacterKeyedDialogCallbackNativeLayout.SelectorThreeConditionalAdapterContextUpdateCallFileOffset,
+                0xE8, CharacterKeyedDialogCallbackNativeLayout.SelectorThreeConditionalAdapterBindingMethodFileOffset));
+        check("Binary optional nested Character receiver is initialized null and receives the recorded forwarded arguments",
+            Matches(CharacterKeyedDialogCallbackNativeLayout.SharedOptionalNestedReceiverNullStoreFileOffset,
+                "C7461000000000")
+            && Matches(CharacterKeyedDialogDispatchNativeLayout.BaseControllerNestedReceiverLoadFileOffset,
+                "8B4E10")
+            && Matches(CharacterKeyedDialogCallbackNativeLayout.BaseControllerOptionalNestedForwardCallFileOffset,
+                "FF77248B015756FF5004")
+            && Matches(CharacterKeyedDialogDispatchNativeLayout.NpcControllerNestedReceiverLoadFileOffset,
+                "8B4E10")
+            && Matches(CharacterKeyedDialogCallbackNativeLayout.NpcControllerOptionalNestedForwardCallFileOffset,
+                "FF77248B015756FF5004"));
         check("Binary conditional fan-out gate, state construction, recipient insertion, and slot call match the original image",
             Matches(0x7FDD64, "83BEB0000000007419")
             && RelativeBranchTargets(0x7FDD81, 0xE8,
