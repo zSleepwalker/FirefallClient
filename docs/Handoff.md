@@ -18,8 +18,27 @@
   (40,197,848 bytes);
   it differs from the analyzed image in 13 bytes across four ranges, none of
   which overlap this batch's code/vtable evidence.
-- The 91 secondary-table entries (VA `0xC22630` / raw `0x821A30`) are mapped
-  as dispatch data, but their message identities are still unresolved.
+- Secondary selectors in `0x81CC50` use the separate 91-entry table at VA
+  `0xC22630` / raw `0x821A30`: `[ebp+8] - 0x20`, bounded through index
+  `0x5A`, then indexed by DWORD. The original binary has 91 nonzero, distinct
+  destinations; only selectors `0x20..0x27` now have verified message
+  identities/layouts, so the remaining 83 identities are unresolved. See the
+  new C# snapshots and `docs/MatrixConnection.md`.
+- The first eight secondary cases are RTTI-backed `EncounterToUIMessage`,
+  `VotekickInitiated`, `VotekickResponded`, and `ScoreBoardEnable/Init/
+  SetWinner/Clear/AddPlayer`. Their common base initializer writes marker
+  `+0x08`, descriptor anchor `+0x0C`, selector ID `+0x10`, parser-context
+  copies `+0x18/+0x1C`, and zeros `+0x20/+0x24`; body begins `+0x28`.
+  `ScoreBoardInit` owns the nontrivial `0xA8`-stride nested record sequence.
+  Table targets are all unique in this batch (no shared/zero table slots);
+  out-of-range selectors share zero-return raw `0x8217D9`. Selector `0x26`
+  also branches there on allocation failure, while the other seven cases
+  fall through to readers with a zero object register; no runtime consequence
+  is asserted.
+- Keep this table distinct from the unrelated keyed-receiver factory
+  `0x81B1B0`, route0's nested Character selectors `0x53..0x7A`, and primary
+  routes 2-6. `.text` and `.rdata` section-aware vtable RTTI names were
+  verified against the requested `FirefallClient.exe.original`.
 - Selector-`0x02`'s actual `tfLocalCharacter::BaseNetController` adapter is
   now traced through callbacks for BaseController IDs `0x77..0x79`: exact
   dispatch slots, adapter/context initialization, event ID `285`, and the

@@ -1149,7 +1149,7 @@ internal static class StartupBinaryEvidence
             && RelativeBranchTargets(0xBCB12E, 0xE8, 0x327210)
             && Matches(0xBCB13C, "0FB74738")
             && RelativeBranchTargets(0xBCB148, 0xE8, 0x336CA0));
-        check("Binary 0x81CC50 decremented primary-byte indexing and secondary-selector paths match their bounds",
+        check("Binary 0x81CC50 primary and secondary dispatch bounds and all 91 target addresses match",
             Matches(0x81CC80, "8A0684C0")
             && Matches(0x81CC8A, "3CF00F8313270000")
             && Matches(0x81CC92, "0FB6C04883F8350F873A4B00000FB6800C24C200FF2485F023C200")
@@ -1164,7 +1164,104 @@ internal static class StartupBinaryEvidence
             && Matches(0x81F3A5, "8B450883C0E083F85A0F8725240000FF24853026C200")
             && ReadUInt32(MatrixSecondaryCommandDispatcherNativeLayout.SecondaryJumpTableFileOffset) == 0xC1FFBB
             && ReadUInt32(MatrixSecondaryCommandDispatcherNativeLayout.SecondaryJumpTableFileOffset
-                + (MatrixSecondaryCommandDispatcherNativeLayout.SecondaryJumpTableEntryCount - 1) * 4) == 0xC2236E);
+                + (MatrixSecondaryCommandDispatcherNativeLayout.SecondaryJumpTableEntryCount - 1) * 4) == 0xC2236E
+            && Enumerable.Range(0, MatrixSecondaryDecoderTableNativeLayout.EntryCount)
+                .Select(index => ReadUInt32(MatrixSecondaryDecoderTableNativeLayout.TableFileOffset
+                    + (uint)(index * 4)))
+                .All(target => target != 0)
+            && Enumerable.Range(0, MatrixSecondaryDecoderTableNativeLayout.EntryCount)
+                .Select(index => ReadUInt32(MatrixSecondaryDecoderTableNativeLayout.TableFileOffset
+                    + (uint)(index * 4)))
+                .Distinct().Count() == MatrixSecondaryDecoderTableNativeLayout.EntryCount);
+        check("Binary secondary selectors 0x20-0x27 map to eight section-aware RTTI-backed message cases",
+            MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
+                .Select((entry, index) => ReadUInt32(MatrixSecondaryDecoderTableNativeLayout.TableFileOffset
+                    + (uint)(index * 4)) == entry.TargetVirtualAddress).All(matches => matches)
+            && VtableRttiName(EncounterToUIMessageNativeLayout.VtableVirtualAddress, 80)
+                == EncounterToUIMessageNativeLayout.RttiName
+            && VtableRttiName(VotekickInitiatedNativeLayout.VtableVirtualAddress, 80)
+                == VotekickInitiatedNativeLayout.RttiName
+            && VtableRttiName(VotekickRespondedNativeLayout.VtableVirtualAddress, 80)
+                == VotekickRespondedNativeLayout.RttiName
+            && VtableRttiName(ScoreBoardEnableNativeLayout.VtableVirtualAddress, 80)
+                == ScoreBoardEnableNativeLayout.RttiName
+            && VtableRttiName(ScoreBoardInitNativeLayout.VtableVirtualAddress, 80)
+                == ScoreBoardInitNativeLayout.RttiName
+            && VtableRttiName(ScoreBoardSetWinnerNativeLayout.VtableVirtualAddress, 80)
+                == ScoreBoardSetWinnerNativeLayout.RttiName
+            && VtableRttiName(ScoreBoardClearNativeLayout.VtableVirtualAddress, 80)
+                == ScoreBoardClearNativeLayout.RttiName
+            && VtableRttiName(ScoreBoardAddPlayerNativeLayout.VtableVirtualAddress, 80)
+                == ScoreBoardAddPlayerNativeLayout.RttiName);
+        check("Binary secondary cases allocate, initialize common metadata, and call their observed constructors",
+            new (uint CallSite, uint Target)[]
+            {
+                (0x81F3D4, 0x12B7FB0), (0x81F43C, 0x12B7FB0),
+                (0x81F4A4, 0x12B7FB0), (0x81F50C, 0x12B7FB0),
+                (0x81F576, 0x12B7FB0), (0x81F5DE, 0x12B7FB0),
+                (0x81F648, 0x12B7FB0), (0x81F69C, 0x12B7FB0),
+                (0x81F3F3, 0x813400), (0x81F45B, 0x813630),
+                (0x81F4C3, 0x8138A0), (0x81F52B, 0x813AF0),
+                (0x81F595, 0x813BA0), (0x81F5FD, 0x813EA0),
+                (0x81F66B, 0x813F50), (0x81F6BB, 0x813FC0),
+                (0x813418, 0x823020), (0x813648, 0x823090),
+                (0x8138B8, 0x823100), (0x813B08, 0x823170),
+                (0x813BB8, 0x8231E0), (0x813EB8, 0x823250),
+                (0x813F68, 0x8232C0), (0x813FDB, 0x823330)
+            }.All(call => RelativeBranchTargets(call.CallSite, 0xE8, call.Target))
+            && new (long Offset, string Bytes)[]
+            {
+                (0x81F3D2, "6A38"), (0x81F43A, "6A50"),
+                (0x81F4A2, "6A40"), (0x81F50A, "6A30"),
+                (0x81F574, "6A40"), (0x81F5DC, "6A30"),
+                (0x81F646, "6A28"), (0x81F69A, "6A58"),
+                (0x823033, "C7460CDC9CB801C7460801000000"),
+                (0x823041, "894610"),
+                (0x82304B, "8946188B451489461CC7462000000000C7462400000000")
+            }.All(fingerprint => Matches(fingerprint.Offset, fingerprint.Bytes))
+            && new (long Offset, uint Value)[]
+            {
+                (0x813414, 0x20), (0x813644, 0x21),
+                (0x8138B4, 0x22), (0x813B04, 0x23),
+                (0x813BB4, 0x24), (0x813EB4, 0x25),
+                (0x813F64, 0x26), (0x813FD7, 0x27),
+                (0x823036, 0x1B89CDC), (0x8230A6, 0x1B89CE4),
+                (0x823116, 0x1B89CCC), (0x823186, 0x1B89CD4),
+                (0x8231F6, 0x1B89CBC), (0x823266, 0x1B89CC4),
+                (0x8232D6, 0x1B89CAC), (0x823346, 0x1B89CB4),
+                (0x81341F, 0x1C6E258), (0x81364F, 0x1C6E288),
+                (0x8138BF, 0x1C6E278), (0x813B0F, 0x1C6E228),
+                (0x813BBF, 0x1C6E248), (0x813EBF, 0x1C6E238),
+                (0x813F6F, 0x1C6E1F8), (0x813FE2, 0x1C6E218)
+            }.All(value => ReadUInt32(value.Offset) == value.Value));
+        check("Binary secondary body readers preserve observed field order, widths, and the explicit zero-return branch",
+            new (uint CallSite, uint Target)[]
+            {
+                (0x81F409, 0x853B10), (0x81F471, 0x853A20),
+                (0x81F4D9, 0x8538D0), (0x81F543, 0x356CF0),
+                (0x81F5AB, 0x853720), (0x81F615, 0x337180),
+                (0x81F6D1, 0x851490),
+                (0x853B1F, 0x356F80), (0x853B29, 0x12EE010),
+                (0x853B33, 0x12EE010),
+                (0x853A2F, 0x356F80), (0x853A39, 0x12EE010),
+                (0x853A43, 0x12EE010), (0x853A4E, 0x3370A0),
+                (0x853A59, 0x356F80), (0x853A63, 0x356CF0),
+                (0x8538DF, 0x356F80), (0x8538E9, 0x12EE010),
+                (0x8538F3, 0x12EE010), (0x8538FD, 0x356CF0),
+                (0x853908, 0x336AC0), (0x853913, 0x336AC0),
+                (0x85372E, 0x8532D0), (0x853738, 0x356CF0),
+                (0x853742, 0x356CF0), (0x85374C, 0x337180),
+                (0x853756, 0x356CF0), (0x853760, 0x12EE010),
+                (0x8533A9, 0x852B70), (0x8533B7, 0x853210),
+                (0x852BE4, 0x852290), (0x852BF1, 0x851920),
+                (0x852C19, 0x852A10),
+                (0x8514A1, 0x356F80), (0x8514AC, 0x356F80),
+                (0x8514B6, 0x12EE010), (0x8514C1, 0x3568E0),
+                (0x8514CB, 0x337180), (0x8514D6, 0x3370A0),
+                (0x8514E0, 0x337180), (0x8514EA, 0x851780),
+                (0x8514F4, 0x356CF0), (0x8514FE, 0x337180)
+            }.All(call => RelativeBranchTargets(call.CallSite, 0xE8, call.Target))
+            && Matches(0x81F65E, "0F8475210000"));
         check("Binary inner selector 0x53 constructs the RTTI MarketRequestComplete body layout",
             ReadUInt32(VirtualAddressToFileOffset(
                 CharacterMarketRequestCompleteNativeLayout.InnerSelectorTableVirtualAddress)) == 0xC1D8C3

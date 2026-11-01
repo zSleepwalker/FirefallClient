@@ -970,6 +970,72 @@ Check("Secondary command dispatcher separates primary-byte, secondary-selector, 
     && MatrixSecondaryCommandDispatcherNativeLayout.GetSecondarySelectorIndex(0x20) == 0
     && MatrixSecondaryCommandDispatcherNativeLayout.GetSecondarySelectorIndex(0x7A) == 0x5A
     && MatrixSecondaryCommandDispatcherNativeLayout.GetSecondarySelectorIndex(0x7B) is null);
+Check("Secondary decoder table snapshot records selectors 0x20-0x27 without completing the remaining identities",
+    MatrixSecondaryDecoderTableNativeLayout.ParserFileOffset == 0x81CC50
+    && MatrixSecondaryDecoderTableNativeLayout.SelectorComparisonFileOffset == 0x81F3A8
+    && MatrixSecondaryDecoderTableNativeLayout.SelectorJumpFileOffset == 0x81F3B4
+    && MatrixSecondaryDecoderTableNativeLayout.TableVirtualAddress == 0xC22630
+    && MatrixSecondaryDecoderTableNativeLayout.TableFileOffset == 0x821A30
+    && MatrixSecondaryDecoderTableNativeLayout.EntryCount == 0x5B
+    && MatrixSecondaryDecoderTableNativeLayout.DefaultZeroReturnFileOffset == 0x8217D9
+    && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x20) == 0
+    && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x27) == 7
+    && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x7A) == 0x5A
+    && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x7B) is null
+    && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries.Count == 8
+    && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
+        .Select(entry => entry.Selector)
+        .SequenceEqual(Enumerable.Range(0x20, 8).Select(selector => (byte)selector))
+    && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
+        .Select(entry => entry.TableIndex)
+        .SequenceEqual(Enumerable.Range(0, 8))
+    && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
+        .Select(entry => entry.TargetVirtualAddress)
+        .SequenceEqual(new uint[]
+        {
+            0xC1FFBB, 0xC20023, 0xC2008B, 0xC200F3,
+            0xC2015D, 0xC201C5, 0xC2022F, 0xC20283
+        })
+    && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
+        .All(entry => entry.TargetKind == MatrixSecondaryDecoderTargetKind.MessageCase)
+    && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x27)?.TargetFileOffset == 0x81F683
+    && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x28) is null);
+Check("Secondary decoder RTTI and native body layouts retain observed offsets and widths",
+    MatrixSecondaryMessageHeaderNativeLayout.BaseMetadataFlagOffset == 0x08
+    && MatrixSecondaryMessageHeaderNativeLayout.DescriptorAnchorPointerOffset == 0x0C
+    && MatrixSecondaryMessageHeaderNativeLayout.NativeTypeIdOffset == 0x10
+    && MatrixSecondaryMessageHeaderNativeLayout.ParserInputFirstDwordCopyOffset == 0x18
+    && MatrixSecondaryMessageHeaderNativeLayout.ParserInputSecondDwordCopyOffset == 0x1C
+    && MatrixSecondaryMessageHeaderNativeLayout.BodyOffset == 0x28
+    && EncounterToUIMessageNativeLayout.AllocationSize == 0x38
+    && EncounterToUIMessageNativeLayout.RawQwordFieldOffset == 0x28
+    && EncounterToUIMessageNativeLayout.FirstSharedTextFieldOffset == 0x30
+    && EncounterToUIMessageNativeLayout.SecondSharedTextFieldOffset == 0x34
+    && VotekickInitiatedNativeLayout.AllocationSize == 0x50
+    && VotekickInitiatedNativeLayout.DwordFieldOffset == 0x38
+    && VotekickInitiatedNativeLayout.SecondRawQwordFieldOffset == 0x40
+    && VotekickInitiatedNativeLayout.ByteFieldOffset == 0x48
+    && VotekickRespondedNativeLayout.FirstByteFieldOffset == 0x38
+    && VotekickRespondedNativeLayout.FirstWordFieldOffset == 0x3A
+    && VotekickRespondedNativeLayout.SecondWordFieldOffset == 0x3C
+    && ScoreBoardEnableNativeLayout.ByteFieldOffset == 0x28
+    && ScoreBoardInitNativeLayout.RecordVectorBeginPointerOffset == 0x28
+    && ScoreBoardInitNativeLayout.RecordVectorEndPointerOffset == 0x2C
+    && ScoreBoardInitNativeLayout.RecordVectorCapacityPointerOffset == 0x30
+    && ScoreBoardInitNativeLayout.RecordStride == ScoreBoardInitRecordNativeLayout.Size
+    && ScoreBoardInitNativeLayout.NestedRecordStride == 0x5C
+    && ScoreBoardInitRecordNativeLayout.NestedDwordSequenceCount == 18
+    && ScoreBoardInitRecordNativeLayout.CountedFourDwordItemsOffset == 0x74
+    && ScoreBoardInitRecordNativeLayout.CountedRecordVectorOffset == 0x88
+    && ScoreBoardInitRecordNativeLayout.CountedKeyedEntriesOffset == 0x94
+    && ScoreBoardSetWinnerNativeLayout.ByteFieldOffset == 0x28
+    && !ScoreBoardClearNativeLayout.HasBodyReader
+    && ScoreBoardClearNativeLayout.AllocationFailureZeroReturnFileOffset == 0x8217D9
+    && ScoreBoardAddPlayerNativeLayout.FirstRawQwordFieldOffset == 0x28
+    && ScoreBoardAddPlayerNativeLayout.SharedTextFieldOffset == 0x38
+    && ScoreBoardAddPlayerNativeLayout.FirstDwordFieldOffset == 0x3C
+    && ScoreBoardAddPlayerNativeLayout.FourthByteFieldOffset == 0x51
+    && ScoreBoardAddPlayerNativeLayout.FifthByteFieldOffset == 0x50);
 Check("AreaVisualData LootObjectCollected route-index-2 subcase layout is recorded",
     AreaVisualDataLootObjectCollectedNativeLayout.DispatcherFileOffset == 0x81EE63
     && AreaVisualDataLootObjectCollectedNativeLayout.DispatcherValue == 0x53

@@ -1057,7 +1057,7 @@ factory/callback ABI remain unresolved.
 `MatrixOtherChannelDecoderNativeLayout.cs` records dispatch only, not a
 replacement decoder.
 
-## Secondary command dispatcher and twelve verified class cases
+## Secondary command dispatcher and verified selector cases
 
 The secondary-dispatch target `0x81CC50` is a large raw function
 (`0x4B9E` bytes) with two separate selector tables. It reads a leading byte
@@ -1081,16 +1081,95 @@ table at VA `0xC223F0` (raw `0x8217F0`). The observed leading-byte ranges are:
 Leading byte0 or `0xF0..0xFF` uses a second table at VA `0xC22630`
 (raw `0x821A30`) when its selector is `0x20..0x7A`; values outside that
 selector range return zero. Leading bytes `0x37..0xEF` also reach the
-zero-return path. These are dispatch boundaries only; the inputs’ semantic
-names for the 91 secondary-table entries are unresolved.
+zero-return path. These comparisons establish dispatch boundaries only;
+RTTI-backed secondary-selector identities are documented below.
 
 The five case-bearing primary routes (indices 2..6) have 17 directly selected
 subcases: three at route2, nine at route3, three at route4, and one each at
 routes5 and6. All 17 subcases now have native layouts.
 Route0's nested table has a separate, complete set of 40 documented selectors
 (`0x53..0x7A`); route1 is the zero-return route. The secondary selector table
-records all 91 targets as dispatch data, but their message identities remain
-unresolved.
+records 91 dispatch targets. Selectors `0x20..0x27` now have RTTI-backed class
+and body-reader layouts; the remaining 83 identities are unresolved. All 91
+table entries are nonzero and have distinct targets in the original binary,
+which establishes address uniqueness, not 91 completed identities.
+
+### Secondary-selector entries `0x20..0x27`
+
+This is the separate second table used by the leading-byte-zero and
+`0xF0..0xFF` path in `0x81CC50`, not the primary byte map, route0's nested
+Character table, or the keyed-receiver factory at `0x81B1B0`. In that path the
+parser reads its selector argument from `[ebp+8]`, subtracts `0x20`, accepts
+indices `0..0x5A`, then dispatches through the DWORD table at VA `0xC22630`
+(raw file offset `0x821A30`). The original PE confirms `.text` raw offsets map
+to VA with `+0x400C00` and `.rdata` offsets with `+0x401400`; vtable RTTI below
+was resolved through each section's file-backed range and MSVC complete-object
+locator, not by treating a VA as a raw offset. Selector values outside
+`0x20..0x7A` reach the shared zero-return block at raw `0x8217D9`.
+
+| Selector | Table index | Target VA / raw | Alloc size | Constructor (raw) | Vtable VA / RTTI | Body reader (raw) |
+| ---: | ---: | ---: | ---: | ---: | --- | ---: |
+| `0x20` | 0 | `0xC1FFBB` / `0x81F3BB` | `0x38` | `0x813400` | `0x1C6E258` / `EncounterToUIMessage` | `0x853B10` |
+| `0x21` | 1 | `0xC20023` / `0x81F423` | `0x50` | `0x813630` | `0x1C6E288` / `VotekickInitiated` | `0x853A20` |
+| `0x22` | 2 | `0xC2008B` / `0x81F48B` | `0x40` | `0x8138A0` | `0x1C6E278` / `VotekickResponded` | `0x8538D0` |
+| `0x23` | 3 | `0xC200F3` / `0x81F4F3` | `0x30` | `0x813AF0` | `0x1C6E228` / `ScoreBoardEnable` | `0x356CF0` |
+| `0x24` | 4 | `0xC2015D` / `0x81F55D` | `0x40` | `0x813BA0` | `0x1C6E248` / `ScoreBoardInit` | `0x853720` |
+| `0x25` | 5 | `0xC201C5` / `0x81F5C5` | `0x30` | `0x813EA0` | `0x1C6E238` / `ScoreBoardSetWinner` | `0x337180` |
+| `0x26` | 6 | `0xC2022F` / `0x81F62F` | `0x28` | `0x813F50` | `0x1C6E1F8` / `ScoreBoardClear` | none |
+| `0x27` | 7 | `0xC20283` / `0x81F683` | `0x58` | `0x813FC0` | `0x1C6E218` / `ScoreBoardAddPlayer` | `0x851490` |
+
+These eight entries have eight distinct, nonzero table destinations. No shared
+case or zero-valued table slot occurs in this verified prefix. Selector `0x26`
+does have a distinct allocation-failure branch to the common zero-return block;
+that is a case-path result, not a zero table entry.
+
+All eight constructors call a selector-specific base-metadata initializer
+(`0x823020`, `0x823090`, `0x823100`, `0x823170`, `0x8231E0`, `0x823250`,
+`0x8232C0`, `0x823330`) before storing the derived vtable. The initializer
+sets a base flag DWORD at `+0x08` to 1, stores its descriptor-anchor pointer at
+`+0x0C`, stores the selector/type DWORD at `+0x10`, copies the parser input's
+first two DWORDs to `+0x18/+0x1C`, and zeros DWORDs at `+0x20/+0x24`. Thus the
+message body begins at `+0x28`. The descriptor anchors are opaque metadata
+pointers; class identities in the table come from the section-aware vtable
+RTTI names. No field semantics are inferred from the class names or from a
+reader being shared.
+
+Body reads, with field labels deliberately limited to offsets and widths:
+
+- `0x20` `EncounterToUIMessage`: raw QWORD at `+0x28`, then
+  NUL-terminated shared-text reads at `+0x30` and `+0x34`.
+- `0x21` `VotekickInitiated`: raw QWORD at `+0x28`; shared text at `+0x30`
+  and `+0x34`; DWORD at `+0x38`; raw QWORD at `+0x40`; byte at `+0x48`.
+- `0x22` `VotekickResponded`: raw QWORD at `+0x28`; shared text at `+0x30`
+  and `+0x34`; byte at `+0x38`; WORDs at `+0x3A` and `+0x3C`.
+- `0x23` `ScoreBoardEnable` and `0x25` `ScoreBoardSetWinner`: one byte at
+  `+0x28` via their respective readers. Neither has a body gate.
+- `0x24` `ScoreBoardInit`: a three-pointer record vector at
+  `+0x28/+0x2C/+0x30`, followed by bytes at `+0x34`, `+0x35`, `+0x38`,
+  `+0x39`, then shared text at `+0x3C`. The collection reader first clears
+  existing `0xA8`-stride records. It then reads a byte run count, parses that
+  many records when nonzero, and reads another run count only when the prior
+  count was `0xFF`; zero ends the sequence. Each record reader at `0x852B70`
+  reads QWORDs at `+0x00/+0x08`, shared text at `+0x10`, DWORD at `+0x14`,
+  byte at `+0x18`, DWORD at `+0x1C`, bytes at `+0x20/+0x24/+0x29/+0x28`,
+  then nested readers at `+0x2C`, `+0x94`, `+0x88` in that order. The
+  `+0x2C` reader consumes 18 DWORDs, a byte-run collection of four-DWORD
+  items, a DWORD at `+0x80`, and a byte at `+0x84`. The `+0x94` reader
+  inserts byte-run entries of three DWORDs (first DWORD used as the tree key);
+  it is followed by a DWORD at `+0x9C` and byte at `+0xA0`. The final `+0x88`
+  collection contains `0x5C`-stride records. Names and semantics for these
+  nested values remain unknown.
+- `0x26` `ScoreBoardClear`: no body-reader call; its allocation is exactly the
+  `0x28`-byte base object.
+- `0x27` `ScoreBoardAddPlayer`: raw QWORDs at `+0x28/+0x30`, shared text at
+  `+0x38`, DWORD at `+0x3C`, byte at `+0x40`, DWORD at `+0x44`, byte at
+  `+0x48`, then byte at `+0x4C`, byte at `+0x51`, and byte at `+0x50`.
+
+On allocation failure, selectors `0x20..0x25` and `0x27` set the object
+register to zero but still fall through to their body-reader call; selector
+`0x26` instead branches directly to the shared zero-return block. These are
+static control-flow observations only; their runtime consequence is not
+asserted.
 
 ### Route index 2, dispatcher value `0x53`: `AreaVisualData::LootObjectCollected`
 
