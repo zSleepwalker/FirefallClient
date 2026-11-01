@@ -4304,7 +4304,96 @@ internal static class StartupBinaryEvidence
             && Matches(0x81BBE7, "8B068BCE57FF50045F5E5DC20400")
             && Matches(0x81BC0F, "8B068BCE57FF50085F5E5DC20400")
             && Matches(0x81C0EA, "8B068BCE57FF90840000005F5E5DC20400")
+            && Matches(0x81CA52, "8B068BCE57FF90640100005F5E5DC20400")
+            && Matches(0x81CA7D, "8B068BCE57FF90680100005F5E5DC20400")
             && Matches(0x81CAA8, "8B068BCE57FF906C0100005F5E5DC20400"));
+        var messageReceiverVtable = MatrixMessageParserFlowNativeLayout.ReplayReaderMessageReceiver;
+        check("Binary ReplayReader getter owner and tfGameProtocolHandler construction resolve through RTTI and PE mappings",
+            imageBase == 0x400000
+            && VirtualAddressToFileOffset(
+                MatrixMessageParserFlowNativeLayout.ReplayReaderMessageRecipientGetterOwnerVtableVirtualAddress)
+                == 0x186641C
+            && VirtualAddressToFileOffset(
+                MatrixMessageParserFlowNativeLayout.ReplayReaderMessageRecipientGetterOwnerCompleteObjectLocatorVirtualAddress)
+                == 0x18A5BB4
+            && VirtualAddressToFileOffset(
+                MatrixMessageParserFlowNativeLayout.ReplayReaderMessageRecipientGetterOwnerTypeDescriptorVirtualAddress)
+                == 0x1A11048
+            && VtableRttiName(
+                MatrixMessageParserFlowNativeLayout.ReplayReaderMessageRecipientGetterOwnerVtableVirtualAddress, 80)
+                == MatrixMessageParserFlowNativeLayout.ReplayReaderMessageRecipientGetterOwnerRttiName
+            && ReadUInt32(VirtualAddressToFileOffset(
+                MatrixMessageParserFlowNativeLayout.ReplayReaderMessageRecipientGetterOwnerVtableVirtualAddress) + 0x24)
+                == MatrixMessageParserFlowNativeLayout.ReplayReaderMessageRecipientGetterVirtualAddress
+            && VirtualAddressToFileOffset(
+                MatrixMessageParserFlowNativeLayout.ReplayReaderMessageRecipientGetterVirtualAddress)
+                == MatrixMessageParserFlowNativeLayout.ReplayReaderMessageRecipientGetterFileOffset
+            && Matches(MatrixMessageParserFlowNativeLayout.ReplayReaderMessageRecipientGetterFileOffset,
+                "568BF1837E50007517")
+            && Matches(MatrixMessageParserFlowNativeLayout.ReplayReaderMessageRecipientGetterFileOffset + 0x20,
+                "8B46508B3085F67516")
+            && RelativeBranchTargets(
+                MatrixMessageParserFlowNativeLayout.LookingGlassOwnerContextSetupCallFileOffset,
+                0xE8,
+                MatrixMessageParserFlowNativeLayout.LookingGlassOwnerContextSetupHelperFileOffset)
+            && RelativeBranchTargets(
+                MatrixMessageParserFlowNativeLayout.ReplayMessageOwnerFactoryCallFileOffset,
+                0xE8,
+                MatrixMessageParserFlowNativeLayout.ReplayMessageOwnerFactoryFileOffset)
+            && Matches(MatrixMessageParserFlowNativeLayout.LookingGlassOwnerPointerStoreFileOffset, "8906")
+            && RelativeBranchTargets(
+                MatrixMessageParserFlowNativeLayout.ReplayMessageOwnerConstructorCallFileOffset,
+                0xE8,
+                MatrixMessageParserFlowNativeLayout.ReplayMessageOwnerConstructorFileOffset)
+            && Matches(MatrixMessageParserFlowNativeLayout.ReplayMessageOwnerReceiverInitialNullStoreFileOffset,
+                "C7467800000000")
+            && RelativeBranchTargets(
+                MatrixMessageParserFlowNativeLayout.ReplayMessageOwnerReceiverConstructorCallFileOffset,
+                0xE8,
+                MatrixMessageParserFlowNativeLayout.ReplayMessageReceiverConstructorFileOffset)
+            && Matches(
+                MatrixMessageParserFlowNativeLayout.ReplayMessageOwnerReceiverFieldStoreFileOffset - 3,
+                "8B4F78897778")
+            && Matches(MatrixMessageParserFlowNativeLayout.ReplayMessageReceiverConstructorVtableStoreFileOffset,
+                "C706C01EC701894608")
+            && VirtualAddressToFileOffset(messageReceiverVtable.VtableVirtualAddress) == 0x1870AC0
+            && VirtualAddressToFileOffset(messageReceiverVtable.CompleteObjectLocatorVirtualAddress) == 0x18C9004
+            && VirtualAddressToFileOffset(messageReceiverVtable.TypeDescriptorVirtualAddress) == 0x1A281F8
+            && ReadUInt32(VirtualAddressToFileOffset(messageReceiverVtable.VtableVirtualAddress) - 4)
+                == messageReceiverVtable.CompleteObjectLocatorVirtualAddress
+            && ReadUInt32(VirtualAddressToFileOffset(
+                messageReceiverVtable.CompleteObjectLocatorVirtualAddress) + 4)
+                == messageReceiverVtable.ObjectVtableFieldOffset
+            && ReadUInt32(VirtualAddressToFileOffset(
+                messageReceiverVtable.CompleteObjectLocatorVirtualAddress) + 12)
+                == messageReceiverVtable.TypeDescriptorVirtualAddress
+            && VtableRttiName(messageReceiverVtable.VtableVirtualAddress, 80) == messageReceiverVtable.RttiName
+            && messageReceiverVtable.DialogSlots.All(slot =>
+                ReadUInt32(VirtualAddressToFileOffset(messageReceiverVtable.VtableVirtualAddress)
+                    + slot.VtableSlotOffset) == slot.MethodVirtualAddress
+                && VirtualAddressToFileOffset(slot.MethodVirtualAddress) == slot.MethodFileOffset
+                && (slot.TargetKind == MatrixMessageReceiverVtableTargetKind.DirectFunction
+                    || slot.TailJumpTargetFileOffset is uint target
+                        && RelativeBranchTargets(slot.MethodFileOffset, 0xE9, target)))
+            && Matches(0xACE2F3, "E82830ECFF")
+            && RelativeBranchTargets(
+                MatrixMessageParserFlowNativeLayout.OpenMovieDialogHandlerOrchestratorCallFileOffset,
+                0xE8,
+                MatrixMessageParserFlowNativeLayout.OpenMovieDialogApplicationDispatcherFileOffset)
+            && Matches(MatrixMessageParserFlowNativeLayout.OpenMovieDialogEventCodeFileOffset,
+                "68E40000008B01FF90AC000000")
+            && Matches(MatrixMessageParserFlowNativeLayout.PrivateDialogEventCodeFileOffset,
+                "68E50000008B01FF90AC000000")
+            && RelativeBranchTargets(
+                MatrixMessageParserFlowNativeLayout.PublicDialogDispatchContextFactoryCallFileOffset,
+                0xE8,
+                0x49DCC0)
+            && RelativeBranchTargets(
+                MatrixMessageParserFlowNativeLayout.PublicDialogApplicationHelperCallFileOffset,
+                0xE8,
+                0x4D6C10)
+            && Matches(MatrixMessageParserFlowNativeLayout.PublicDialogEventCodeFileOffset,
+                "68650100008B01FF90AC000000"));
         check("Binary dialog-message primary vftables point to stream writers, stream readers, and deleting destructors",
             MatrixMessageParserFlowNativeLayout.DialogMessageVtables.All(vtable =>
                 vtable.PrimarySlots.All(slot =>

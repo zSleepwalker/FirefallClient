@@ -2121,8 +2121,8 @@ the object in EDI invokes its vtable slot `+0x24` at raw `0x65DB10`; the
 returned pointer's field `+0x78` is loaded at `0x65DB38` and passed as the
 constructor's second stack argument to `0x7FD670`. The constructor stores that
 argument at callback-context `+8` (`0x7FD6B2`). Thus the `0x81BB90` receiver
-is the value read from `[getter-result+0x78]`; the receiver's concrete type
-and RTTI are not established here.
+is the value read from `[getter-result+0x78]`. Its construction path and RTTI
+are now resolved below.
 
 At `0x81BB90`, ECX is that receiver and the parsed-message pointer is the
 stack argument. The function loads the message discriminator from `+0x10`,
@@ -2131,8 +2131,10 @@ VA `0xC1D6DC` (raw `0x81CADC`). Each case calls a receiver vtable slot with the
 message pointer: discriminator `0x20` reaches raw `0x81BBCD` and slot `+4`,
 `0x21` reaches `0x81BBF5` and slot `+8`, and `0x40` reaches `0x81C0D0` and
 slot `+0x84`. Static decoding of all 91 cases gives slot offsets
-`4 + 4 * (discriminator - 0x20)` through `+0x16C`; no message names or
-receiver RTTI are inferred from this numeric switch.
+`4 + 4 * (discriminator - 0x20)` through `+0x16C`. The known dialog IDs
+`0x78..0x7A` select slots `+0x164..+0x16C`; the concrete type and those three
+handlers are documented below. This does not assign names to the remaining
+numeric cases.
 
 The other direct call, `0xBD7060`, is separately gated by a zero return from
 `0x80A030(message[+0x18])` and non-null context field `+0xB0`. Its selector
@@ -2174,17 +2176,73 @@ not message-specific application handling. Thus these vtable entries are
 stream read/write and destruction methods; they should not be treated as
 application event handlers.
 
+### Concrete ReplayReader message receiver
+
+The virtual getter called at raw `0x65DB10` is `tfLookingGlass` slot `+0x24`:
+the owner vtable is VA `0x1C6781C` / raw `0x186641C`, its RTTI name is
+`.?AVtfLookingGlass@@`, and the target method is VA `0xA5A370` / raw
+`0x659770`. That getter reads the context pointer at `this+0x50`, then returns
+the first DWORD of that context. `ReplayReader_Initialize` loads the returned
+context's `+0x78` field and passes it to the callback-context constructor,
+which stores it at callback-context `+8`.
+
+The `tfLookingGlass` owner context is initialized through raw `0x9B2D00`
+(called from `AppMode_LookingGlass_Initialize` at `0x65A903`). That helper
+calls factory `0x9B73F0` and stores its result at context `+0`. The factory
+constructs an opaque `0xA0`-byte state block through `0x9B82F0`; its
+constructor initializes state field `+0x78` to null at `0x9B8411`. The
+factory then constructs a `0xD8`-byte receiver through constructor
+`0xAC8CA0` and stores the result into state `+0x78` at `0x9B7B56`, replacing
+and releasing a prior non-null value through that value's vtable slot `+0`.
+The state block's own type is not inferred.
+
+Constructor `0xAC8CA0` installs the receiver's vptr at object offset zero.
+Its vtable is VA `0x1C71EC0` / raw `0x1870AC0`; the Complete Object Locator
+is VA `0x1CCA404` / raw `0x18C9004`, and its type descriptor is VA `0x1E29DF8`
+/ raw `0x1A281F8`, containing RTTI name
+`.?AVtfGameProtocolHandler@@`. These addresses and the RTTI chain are mapped
+from the requested PE's section table; the binary checks verify the VA/raw
+relationships as well as constructor bytes.
+
+The receiver slots below are separate from the dialog-message serialization
+vftables above. Case targets are the switch-table destinations, and the slot
+call sites follow the dispatcher's `4 + 4 * (ID - 0x20)` formula:
+
+| Dialog message | ID | Case target / slot-call raw offset | Receiver slot | Vtable method VA / raw | Target form |
+| --- | --- | --- | --- | --- | --- |
+| `OpenMovieDialog` | `0x78` | `0x81CA38` / `0x81CA57` | `+0x164` | `0xECEEE0` / `0xACE2E0` | Direct |
+| `PrivateDialog` | `0x79` | `0x81CA63` / `0x81CA82` | `+0x168` | `0xECEF00` / `0xACE300` | Tail-jump thunk to `0xD92110` / `0x991510` |
+| `PublicDialog` | `0x7A` | `0x81CA8E` / `0x81CAAD` | `+0x16C` | `0xECEF90` / `0xACE390` | Direct |
+
+One selected path is traced farther: `OpenMovieDialog` handler `0xACE2E0`
+calls `0x991320`, which prepares an application-dispatch record and calls
+`dword_1E002B8` through vtable slot `+0xAC` with numeric event code `228`
+(`0xE4`; immediate at raw `0x99147C`). The `PrivateDialog` thunk reaches
+`0x991510`, which similarly dispatches numeric code `229` (`0xE5`; raw
+`0x99165B`). `PublicDialog` handler `0xACE390` calls `0x49DCC0`, then
+`0x4D6C10` with the returned value, the message's `+0x28` address, and a
+boolean derived from byte `+0x84`; that helper dispatches numeric code `357`
+(`0x165`; raw `0x4D6D43`). These are observed dispatch codes and arguments,
+not inferred UI or dialog semantics.
+
+None of these three selected entries is a null or empty stub: two target
+direct functions and the `PrivateDialog` entry is a five-byte no-adjustment
+tail-jump thunk. The 91 receiver-table entries have distinct function-pointer
+values in the analyzed database, but the other slots have not been semantically
+classified as inherited, default, or message-specific methods.
+
 `MatrixMessageParserFlowNativeLayout.cs` records the direct parser callsites,
 allocator/registration split, callback load/call, input arguments, result
 queue, ReplayReader context RTTI/vtable slots, conditional message-recipient
-selector cases, dispatch routes, and observed reference decrement. Startup
-checks fingerprint those binary edges together with the registration field
-copies, constructor-return/context-field identity, context vtable targets and
-dispatch calls, selector-table targets and representative receiver slots,
-parser-return epilogs, and each dialog vtable entry and RTTI name from the
-requested binary. This model does not emulate parsing, assign semantic
-meaning to the context message tags/fields, or claim a complete ownership
-policy.
+selector cases, concrete recipient constructor/RTTI, representative dialog
+receiver slots and observed application-dispatch codes, and reference
+decrement. Startup checks fingerprint those binary edges together with the
+registration field copies, constructor-return/context-field identity, context
+vtable targets and dispatch calls, selector-table targets, parser-return
+epilogs, and each dialog vtable entry and RTTI name from the requested binary.
+This model does not emulate parsing, assign semantic meaning to context
+message tags/fields or numeric application-dispatch codes, or claim a complete
+ownership policy.
 
 The nested table at VA `0xC22444` (raw `0x821844`) is now traced from selector
 `0x53` through `0x7A`, inclusive:

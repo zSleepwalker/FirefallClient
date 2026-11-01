@@ -3160,6 +3160,34 @@ var expectedCallbackContextSlots = new[]
         0x7FDC00,
         MatrixCallbackContextVtableSlotRole.ModeDependentMessageDispatch)
 };
+var messageReceiverVtable = MatrixMessageParserFlowNativeLayout.ReplayReaderMessageReceiver;
+var expectedMessageReceiverDialogSlots = new[]
+{
+    new MatrixMessageReceiverDialogSlotSnapshot(
+        0x78,
+        0x164,
+        0xECEEE0,
+        0xACE2E0,
+        MatrixMessageReceiverVtableTargetKind.DirectFunction,
+        null,
+        null),
+    new MatrixMessageReceiverDialogSlotSnapshot(
+        0x79,
+        0x168,
+        0xECEF00,
+        0xACE300,
+        MatrixMessageReceiverVtableTargetKind.TailJumpThunk,
+        0xD92110,
+        0x991510),
+    new MatrixMessageReceiverDialogSlotSnapshot(
+        0x7A,
+        0x16C,
+        0xECEF90,
+        0xACE390,
+        MatrixMessageReceiverVtableTargetKind.DirectFunction,
+        null,
+        null)
+};
 Check("Matrix parser callsites, callback invocation, and result consumption remain explicit",
     MatrixMessageParserFlowNativeLayout.NestedCommandParserFileOffset == 0x81CC50
     && MatrixMessageParserFlowNativeLayout.DirectParserCallSites.SequenceEqual(
@@ -3233,8 +3261,56 @@ Check("ReplayReader message dispatch receiver and discriminator vtable cases rem
         new MatrixMessageDispatchVtableCaseSnapshot(0x20, 0xC1C7CD, 0x81BBCD, 0x81BBEC, 4),
         new MatrixMessageDispatchVtableCaseSnapshot(0x21, 0xC1C7F5, 0x81BBF5, 0x81BC14, 8),
         new MatrixMessageDispatchVtableCaseSnapshot(0x40, 0xC1CCD0, 0x81C0D0, 0x81C0EF, 0x84),
+        new MatrixMessageDispatchVtableCaseSnapshot(0x78, 0xC1D638, 0x81CA38, 0x81CA57, 0x164),
+        new MatrixMessageDispatchVtableCaseSnapshot(0x79, 0xC1D663, 0x81CA63, 0x81CA82, 0x168),
         new MatrixMessageDispatchVtableCaseSnapshot(0x7A, 0xC1D68E, 0x81CA8E, 0x81CAAD, 0x16C)
     ]));
+Check("ReplayReader getter and owner construction resolve the concrete message receiver field",
+    MatrixMessageParserFlowNativeLayout.ReplayReaderMessageRecipientGetterOwnerRttiName
+        == ".?AVtfLookingGlass@@"
+    && MatrixMessageParserFlowNativeLayout.ReplayReaderMessageRecipientGetterOwnerVtableVirtualAddress
+        == 0x1C6781C
+    && MatrixMessageParserFlowNativeLayout.ReplayReaderMessageRecipientGetterOwnerCompleteObjectLocatorVirtualAddress
+        == 0x1CA6FB4
+    && MatrixMessageParserFlowNativeLayout.ReplayReaderMessageRecipientGetterOwnerTypeDescriptorVirtualAddress
+        == 0x1E12C48
+    && MatrixMessageParserFlowNativeLayout.ReplayReaderMessageRecipientGetterOwnerVtableSlotOffset == 0x24
+    && MatrixMessageParserFlowNativeLayout.ReplayReaderMessageRecipientGetterVirtualAddress == 0xA5A370
+    && MatrixMessageParserFlowNativeLayout.ReplayReaderMessageRecipientGetterFileOffset == 0x659770
+    && MatrixMessageParserFlowNativeLayout.ReplayReaderMessageRecipientGetterContextFieldOffset == 0x50
+    && MatrixMessageParserFlowNativeLayout.LookingGlassOwnerContextSetupCallFileOffset == 0x65A903
+    && MatrixMessageParserFlowNativeLayout.LookingGlassOwnerContextSetupHelperFileOffset == 0x9B2D00
+    && MatrixMessageParserFlowNativeLayout.LookingGlassOwnerPointerStoreFileOffset == 0x9B2D22
+    && MatrixMessageParserFlowNativeLayout.ReplayMessageOwnerFactoryFileOffset == 0x9B73F0
+    && MatrixMessageParserFlowNativeLayout.ReplayMessageOwnerFactoryCallFileOffset == 0x9B2D1A
+    && MatrixMessageParserFlowNativeLayout.ReplayMessageOwnerConstructorCallFileOffset == 0x9B743D
+    && MatrixMessageParserFlowNativeLayout.ReplayMessageOwnerConstructorFileOffset == 0x9B82F0
+    && MatrixMessageParserFlowNativeLayout.ReplayMessageOwnerReceiverFieldOffset == 0x78
+    && MatrixMessageParserFlowNativeLayout.ReplayReaderMessageRecipientSourceFieldOffset
+        == MatrixMessageParserFlowNativeLayout.ReplayMessageOwnerReceiverFieldOffset
+    && MatrixMessageParserFlowNativeLayout.ReplayMessageOwnerReceiverInitialNullStoreFileOffset == 0x9B8411
+    && MatrixMessageParserFlowNativeLayout.ReplayMessageOwnerReceiverConstructorCallFileOffset == 0x9B7B21
+    && MatrixMessageParserFlowNativeLayout.ReplayMessageOwnerReceiverFieldStoreFileOffset == 0x9B7B56
+    && MatrixMessageParserFlowNativeLayout.ReplayMessageReceiverConstructorFileOffset == 0xAC8CA0
+    && MatrixMessageParserFlowNativeLayout.ReplayMessageReceiverConstructorVtableStoreFileOffset == 0xAC8CE2
+    && MatrixMessageParserFlowNativeLayout.OpenMovieDialogHandlerOrchestratorCallFileOffset == 0xACE2F3
+    && MatrixMessageParserFlowNativeLayout.OpenMovieDialogApplicationDispatcherFileOffset == 0x991320
+    && MatrixMessageParserFlowNativeLayout.OpenMovieDialogEventCodeFileOffset == 0x99147C
+    && MatrixMessageParserFlowNativeLayout.OpenMovieDialogEventCode == 228
+    && MatrixMessageParserFlowNativeLayout.PrivateDialogEventCodeFileOffset == 0x99165B
+    && MatrixMessageParserFlowNativeLayout.PrivateDialogEventCode == 229
+    && MatrixMessageParserFlowNativeLayout.PublicDialogDispatchContextFactoryCallFileOffset == 0xACE3A8
+    && MatrixMessageParserFlowNativeLayout.PublicDialogApplicationHelperCallFileOffset == 0xACE3AF
+    && MatrixMessageParserFlowNativeLayout.PublicDialogEventCodeFileOffset == 0x4D6D43
+    && MatrixMessageParserFlowNativeLayout.PublicDialogEventCode == 357);
+Check("tfGameProtocolHandler RTTI and concrete dialog receiver slots remain explicit",
+    messageReceiverVtable.RttiName == ".?AVtfGameProtocolHandler@@"
+    && messageReceiverVtable.VtableVirtualAddress == 0x1C71EC0
+    && messageReceiverVtable.CompleteObjectLocatorVirtualAddress == 0x1CCA404
+    && messageReceiverVtable.TypeDescriptorVirtualAddress == 0x1E29DF8
+    && messageReceiverVtable.ObjectVtableFieldOffset == 0
+    && messageReceiverVtable.ConstructorFileOffset == 0xAC8CA0
+    && messageReceiverVtable.DialogSlots.SequenceEqual(expectedMessageReceiverDialogSlots));
 Check("Dialog message primary vftables map stream readers and writers separately from destruction",
     dialogMessageVtables.Count == 3
     && dialogMessageVtables.Select(vtable => vtable.VtableVirtualAddress)

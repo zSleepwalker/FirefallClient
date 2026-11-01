@@ -61,24 +61,33 @@
   meaning. The readiness probe at `0xBD68F4` remains separate. Details and
   byte fingerprints are in `docs/MatrixConnection.md` and
   `src/Startup/MatrixMessageParserFlowNativeLayout.cs`.
-- The next recipient-dispatch pass traced `0x7FDC60` into `0x81BB90`.
-  `ReplayReader_Initialize` calls a virtual getter at raw `0x65DB10`, loads
-  field `+0x78` from its result at `0x65DB38`, and passes that value to the
-  `0x7FD670` constructor, which stores its second stack argument at context
-  `+8`. When that field is non-null and message byte `+0x18` is zero, a
-  non-`dword_1DFC030` message reaches `0x81BB90`; its 91-entry discriminator
-  table covers `0x20..0x7A` and maps each ID to receiver vtable slot
-  `4 + 4*(ID-0x20)`. Verified examples: `0x20 -> +4`, `0x21 -> +8`,
-  `0x40 -> +0x84`. No concrete RTTI was found for this dynamic receiver.
-  The `.text` section maps raw+`0x400C00` to VA (the requested original's
-  section header confirms ImageBase `0x400000`, RVA `0x1000`, raw pointer
-  `0x400`; raw `0x7FDC60` is VA `0xBFE860`).
-- Next static target: resolve the concrete receiver behind context `+8` or
-  trace the callback-list fan-out behind `0xBD7060` (including its per-entry
-  slot `+0x0C`) without assigning meanings to numeric tags absent evidence.
-  The separate parser wrapper `0x821DE0` still has no proven application
-  caller. Continue read-only; do not modify the sample/IDB or commit/push
-  unless explicitly requested.
+- The recipient-dispatch pass traced `0x7FDC60` into `0x81BB90`. The receiver
+  at callback-context `+8` is now identified as `tfGameProtocolHandler`:
+  `ReplayReader_Initialize` calls the `tfLookingGlass` getter at raw
+  `0x65DB10`, loads its result's `+0x78` field at `0x65DB38`, and passes that
+  value to constructor `0x7FD670`. The getter is `tfLookingGlass` vtable slot
+  `+0x24`; it returns the first DWORD of the context at `this+0x50`.
+  `AppMode_LookingGlass_Initialize` calls the setup helper at `0x9B2D00`,
+  whose factory `0x9B73F0` creates an opaque state block, initializes its
+  `+0x78` receiver field, and constructs the `0xD8` receiver at `0xAC8CA0`.
+  The receiver's vtable VA `0x1C71EC0` / raw `0x1870AC0` resolves by RTTI to
+  `.?AVtfGameProtocolHandler@@`; the requested original's PE section table
+  verifies these VA/raw mappings (including `.text` raw+`0x400C00`).
+- Dispatcher `0x81BB90`'s 91-entry table covers `0x20..0x7A` and maps ID to
+  receiver slot `4 + 4*(ID-0x20)`. The concrete dialog mappings are
+  `0x78 OpenMovieDialog -> +0x164 -> 0xACE2E0`, `0x79 PrivateDialog ->
+  +0x168 -> 0xACE300 -> tail-jump 0x991510`, and `0x7A PublicDialog ->
+  +0x16C -> 0xACE390`. The OpenMovie path dispatches numeric application code
+  `228`; the other two dispatch `229` and `357`. These IDs are structural
+  evidence only; application/dialog semantics remain unresolved. The other
+  receiver slots are not semantically classified.
+- Next static target: trace the concrete application-dispatch vtable
+  implementation behind `dword_1E002B8` slot `+0xAC` for codes `228`, `229`,
+  and `357`, without inferring their meanings. The separate recipient
+  iteration behind `0xBD7060` (including its per-entry slot `+0x0C`) and the
+  wrapper `0x821DE0`'s application caller also remain unknown. Continue
+  read-only; do not modify the sample/IDB or commit/push unless explicitly
+  requested.
 - Open items: field semantics, allocation-failure consequences, selector
   `0x55` 12-byte temp prefix, selector `0x6D` body consumption.
 - Workflow per batch: preserve native evidence in the existing layout,

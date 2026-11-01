@@ -43,12 +43,36 @@ public readonly record struct MatrixMessageDispatchVtableCaseSnapshot(
     uint VtableCallFileOffset,
     int VtableSlotOffset);
 
+public enum MatrixMessageReceiverVtableTargetKind
+{
+    DirectFunction,
+    TailJumpThunk
+}
+
+public readonly record struct MatrixMessageReceiverDialogSlotSnapshot(
+    int MessageDiscriminator,
+    int VtableSlotOffset,
+    uint MethodVirtualAddress,
+    uint MethodFileOffset,
+    MatrixMessageReceiverVtableTargetKind TargetKind,
+    uint? TailJumpTargetVirtualAddress,
+    uint? TailJumpTargetFileOffset);
+
+public readonly record struct MatrixMessageReceiverVtableSnapshot(
+    string RttiName,
+    uint VtableVirtualAddress,
+    uint CompleteObjectLocatorVirtualAddress,
+    uint TypeDescriptorVirtualAddress,
+    int ObjectVtableFieldOffset,
+    uint ConstructorFileOffset,
+    IReadOnlyList<MatrixMessageReceiverDialogSlotSnapshot> DialogSlots);
+
 /// <summary>
 /// Records parser return pass-through, the ReplayReader callback registration,
 /// invocation, result-queue path, and primary dialog-message vftable slots.
-/// The ReplayReader context's primary dispatch methods and final-release path
-/// and its conditional message-recipient selector path are recorded without
-/// assigning semantic meanings to the message tags.
+/// The ReplayReader context's primary dispatch methods and final-release path,
+/// concrete message-recipient construction path, and representative dialog
+/// receiver slots are recorded without assigning unverified meanings to fields.
 /// </summary>
 public static class MatrixMessageParserFlowNativeLayout
 {
@@ -127,6 +151,37 @@ public static class MatrixMessageParserFlowNativeLayout
     public const uint ReplayReaderMessageRecipientGetterCallFileOffset = 0x65DB10;
     public const uint ReplayReaderMessageRecipientFieldLoadFileOffset = 0x65DB38;
     public const int ReplayReaderMessageRecipientSourceFieldOffset = 0x78;
+    public const string ReplayReaderMessageRecipientGetterOwnerRttiName = ".?AVtfLookingGlass@@";
+    public const uint ReplayReaderMessageRecipientGetterOwnerVtableVirtualAddress = 0x1C6781C;
+    public const uint ReplayReaderMessageRecipientGetterOwnerCompleteObjectLocatorVirtualAddress = 0x1CA6FB4;
+    public const uint ReplayReaderMessageRecipientGetterOwnerTypeDescriptorVirtualAddress = 0x1E12C48;
+    public const int ReplayReaderMessageRecipientGetterOwnerVtableSlotOffset = 0x24;
+    public const uint ReplayReaderMessageRecipientGetterVirtualAddress = 0xA5A370;
+    public const uint ReplayReaderMessageRecipientGetterFileOffset = 0x659770;
+    public const int ReplayReaderMessageRecipientGetterContextFieldOffset = 0x50;
+    public const uint LookingGlassOwnerContextSetupCallFileOffset = 0x65A903;
+    public const uint LookingGlassOwnerContextSetupHelperFileOffset = 0x9B2D00;
+    public const uint LookingGlassOwnerPointerStoreFileOffset = 0x9B2D22;
+    public const uint ReplayMessageOwnerFactoryFileOffset = 0x9B73F0;
+    public const uint ReplayMessageOwnerFactoryCallFileOffset = 0x9B2D1A;
+    public const uint ReplayMessageOwnerConstructorCallFileOffset = 0x9B743D;
+    public const uint ReplayMessageOwnerConstructorFileOffset = 0x9B82F0;
+    public const int ReplayMessageOwnerReceiverFieldOffset = 0x78;
+    public const uint ReplayMessageOwnerReceiverInitialNullStoreFileOffset = 0x9B8411;
+    public const uint ReplayMessageOwnerReceiverConstructorCallFileOffset = 0x9B7B21;
+    public const uint ReplayMessageOwnerReceiverFieldStoreFileOffset = 0x9B7B56;
+    public const uint ReplayMessageReceiverConstructorFileOffset = 0xAC8CA0;
+    public const uint ReplayMessageReceiverConstructorVtableStoreFileOffset = 0xAC8CE2;
+    public const uint OpenMovieDialogHandlerOrchestratorCallFileOffset = 0xACE2F3;
+    public const uint OpenMovieDialogApplicationDispatcherFileOffset = 0x991320;
+    public const uint OpenMovieDialogEventCodeFileOffset = 0x99147C;
+    public const int OpenMovieDialogEventCode = 228;
+    public const uint PrivateDialogEventCodeFileOffset = 0x99165B;
+    public const int PrivateDialogEventCode = 229;
+    public const uint PublicDialogDispatchContextFactoryCallFileOffset = 0xACE3A8;
+    public const uint PublicDialogApplicationHelperCallFileOffset = 0xACE3AF;
+    public const uint PublicDialogEventCodeFileOffset = 0x4D6D43;
+    public const int PublicDialogEventCode = 357;
 
     public static IReadOnlyList<MatrixParserCallSiteSnapshot> DirectParserCallSites { get; } =
         Array.AsReadOnly(new[]
@@ -164,8 +219,48 @@ public static class MatrixMessageParserFlowNativeLayout
             new MatrixMessageDispatchVtableCaseSnapshot(
                 0x40, 0xC1CCD0, 0x81C0D0, 0x81C0EF, 0x84),
             new MatrixMessageDispatchVtableCaseSnapshot(
+                0x78, 0xC1D638, 0x81CA38, 0x81CA57, 0x164),
+            new MatrixMessageDispatchVtableCaseSnapshot(
+                0x79, 0xC1D663, 0x81CA63, 0x81CA82, 0x168),
+            new MatrixMessageDispatchVtableCaseSnapshot(
                 0x7A, 0xC1D68E, 0x81CA8E, 0x81CAAD, 0x16C)
         });
+
+    public static MatrixMessageReceiverVtableSnapshot ReplayReaderMessageReceiver { get; } =
+        new(
+            ".?AVtfGameProtocolHandler@@",
+            0x1C71EC0,
+            0x1CCA404,
+            0x1E29DF8,
+            0,
+            ReplayMessageReceiverConstructorFileOffset,
+            Array.AsReadOnly(new[]
+            {
+                new MatrixMessageReceiverDialogSlotSnapshot(
+                    0x78,
+                    0x164,
+                    0xECEEE0,
+                    0xACE2E0,
+                    MatrixMessageReceiverVtableTargetKind.DirectFunction,
+                    null,
+                    null),
+                new MatrixMessageReceiverDialogSlotSnapshot(
+                    0x79,
+                    0x168,
+                    0xECEF00,
+                    0xACE300,
+                    MatrixMessageReceiverVtableTargetKind.TailJumpThunk,
+                    0xD92110,
+                    0x991510),
+                new MatrixMessageReceiverDialogSlotSnapshot(
+                    0x7A,
+                    0x16C,
+                    0xECEF90,
+                    0xACE390,
+                    MatrixMessageReceiverVtableTargetKind.DirectFunction,
+                    null,
+                    null)
+            }));
 
     public static IReadOnlyList<MatrixDialogMessageVtableSnapshot> DialogMessageVtables { get; } =
         Array.AsReadOnly(new[]
