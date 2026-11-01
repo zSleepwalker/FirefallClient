@@ -3146,7 +3146,7 @@ var expectedDialogSlots = new IReadOnlyList<MatrixMessageVtableSlotSnapshot>[]
         new MatrixMessageVtableSlotSnapshot(8, 0x526900, MatrixMessageVtableSlotRole.DeletingDestructor)
     }
 };
-Check("Matrix parser callsites and callback-like registration remain explicit",
+Check("Matrix parser callsites and ReplayReader callback registration remain explicit",
     MatrixMessageParserFlowNativeLayout.NestedCommandParserFileOffset == 0x81CC50
     && MatrixMessageParserFlowNativeLayout.DirectParserCallSites.SequenceEqual(
     [
@@ -3157,7 +3157,18 @@ Check("Matrix parser callsites and callback-like registration remain explicit",
         == MatrixMessageParserFlowNativeLayout.StreamParserCallerFileOffset + 0x400C00
     && MatrixMessageParserFlowNativeLayout.ParserWrapperVirtualAddress
         == MatrixMessageParserFlowNativeLayout.ParserWrapperFileOffset + 0x400C00
-    && MatrixMessageParserFlowNativeLayout.ReplayReaderRegistrationHelperFileOffset == 0x12B7FB0
+    && MatrixMessageParserFlowNativeLayout.ReplayReaderAllocationCallFileOffset == 0x65DAF2
+    && MatrixMessageParserFlowNativeLayout.ReplayReaderAllocationHelperFileOffset == 0x12B7FB0
+    && MatrixMessageParserFlowNativeLayout.ReplayReaderAllocatorBackendCallFileOffset == 0x12B7FC7
+    && MatrixMessageParserFlowNativeLayout.ReplayReaderAllocatorBackendFileOffset == 0x12C8A20
+    && MatrixMessageParserFlowNativeLayout.ReplayReaderCallbackObjectCallFileOffset == 0x65DB3F
+    && MatrixMessageParserFlowNativeLayout.ReplayReaderCallbackRegistrationCallFileOffset == 0x65DBD3
+    && MatrixMessageParserFlowNativeLayout.ReplayReaderCallbackRegistrationHelperFileOffset == 0xBD6260
+    && MatrixMessageParserFlowNativeLayout.ReplayReaderReadinessProbeFileOffset == 0xBD68D0
+    && MatrixMessageParserFlowNativeLayout.ReplayReaderReadinessProbeCallFileOffset == 0xBD68F4
+    && MatrixMessageParserFlowNativeLayout.ReplayReaderCallbackRecordParserFieldOffset == 4
+    && MatrixMessageParserFlowNativeLayout.ReplayReaderRegisteredParserFieldOffset == 0x1C
+    && MatrixMessageParserFlowNativeLayout.ReplayReaderRegisteredContextFieldOffset == 0x20
     && MatrixMessageParserFlowNativeLayout.CallbackObjectParserPointerFieldOffset == 0x10);
 Check("Dialog message primary vftables map stream readers and writers separately from destruction",
     dialogMessageVtables.Count == 3

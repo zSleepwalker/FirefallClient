@@ -4151,7 +4151,7 @@ internal static class StartupBinaryEvidence
                 DeployablePublicCombatLogNativeLayout.WordLengthPrefixedBlobReaderFileOffset)
             && VtableRttiName(DeployablePublicCombatLogNativeLayout.VtableVirtualAddress, 80)
                 == DeployablePublicCombatLogNativeLayout.RttiName);
-        check("Binary nested-message parser results return through both direct callers and parser callback registration",
+        check("Binary nested-message parser results pass through both callers and ReplayReader registration stores the callback separately from allocation",
             RelativeBranchTargets(MatrixMessageParserFlowNativeLayout.StreamParserCallSiteFileOffset,
                 0xE8, MatrixMessageParserFlowNativeLayout.NestedCommandParserFileOffset)
             && RelativeBranchTargets(MatrixMessageParserFlowNativeLayout.ParserWrapperCallSiteFileOffset,
@@ -4160,14 +4160,30 @@ internal static class StartupBinaryEvidence
                 "83C4048B4DF464890D00000000595F5E5B8BE55DC3")
             && Matches(MatrixMessageParserFlowNativeLayout.ParserWrapperCallSiteFileOffset + 5,
                 "83C4048B4DF464890D00000000595F5E5B8BE55DC3")
-            && Matches(MatrixMessageParserFlowNativeLayout.ReplayReaderFunctionArgumentFileOffset,
-                "C744241CA027C200")
-            && RelativeBranchTargets(MatrixMessageParserFlowNativeLayout.ReplayReaderRegistrationCallFileOffset,
-                0xE8, MatrixMessageParserFlowNativeLayout.ReplayReaderRegistrationHelperFileOffset)
+            && Matches(MatrixMessageParserFlowNativeLayout.ReplayReaderAllocationCallFileOffset - 13,
+                "68CC000000C744241CA027C200")
+            && RelativeBranchTargets(MatrixMessageParserFlowNativeLayout.ReplayReaderAllocationCallFileOffset,
+                0xE8, MatrixMessageParserFlowNativeLayout.ReplayReaderAllocationHelperFileOffset)
+            && RelativeBranchTargets(MatrixMessageParserFlowNativeLayout.ReplayReaderAllocatorBackendCallFileOffset,
+                0xE8, MatrixMessageParserFlowNativeLayout.ReplayReaderAllocatorBackendFileOffset)
+            && Matches(MatrixMessageParserFlowNativeLayout.ReplayReaderCallbackObjectCallFileOffset - 7,
+                "FF70788BCE6A00")
             && RelativeBranchTargets(MatrixMessageParserFlowNativeLayout.ReplayReaderCallbackObjectCallFileOffset,
                 0xE8, MatrixMessageParserFlowNativeLayout.CallbackObjectConstructorFileOffset)
+            && Matches(MatrixMessageParserFlowNativeLayout.ReplayReaderCallbackRegistrationCallFileOffset - 10,
+                "8D442414FF77548BCB50")
+            && RelativeBranchTargets(MatrixMessageParserFlowNativeLayout.ReplayReaderCallbackRegistrationCallFileOffset,
+                0xE8, MatrixMessageParserFlowNativeLayout.ReplayReaderCallbackRegistrationHelperFileOffset)
+            && Matches(MatrixMessageParserFlowNativeLayout.ReplayReaderCallbackRegistrationFieldStoresFileOffset,
+                "8B4D088B018946188B41048B4E0489461C0FB74618897E20")
+            && Matches(MatrixMessageParserFlowNativeLayout.ReplayReaderReadinessProbeCallFileOffset - 15,
+                "8B4E24C686B1000000018B018B4010FFD084C075068886B1000000")
             && Matches(MatrixMessageParserFlowNativeLayout.CallbackObjectParserPointerStoreFileOffset,
-                "C74710A027C200"));
+                "C74710A027C200")
+            && Matches(MatrixMessageParserFlowNativeLayout.CallbackObjectParserPointerStoreFileOffset + 7,
+                "C74714B0BDC100")
+            && Matches(MatrixMessageParserFlowNativeLayout.ReplayReaderCallbackRecordFunctionPointerStoreFileOffset,
+                "C744241CA027C200"));
         check("Binary dialog-message primary vftables point to stream writers, stream readers, and deleting destructors",
             MatrixMessageParserFlowNativeLayout.DialogMessageVtables.All(vtable =>
                 vtable.PrimarySlots.All(slot =>

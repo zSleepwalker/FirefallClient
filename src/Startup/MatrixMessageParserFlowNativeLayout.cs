@@ -19,8 +19,9 @@ public readonly record struct MatrixDialogMessageVtableSnapshot(
     IReadOnlyList<MatrixMessageVtableSlotSnapshot> PrimarySlots);
 
 /// <summary>
-/// Records parser return pass-through and the observed primary dialog-message
-/// vftable slots without claiming an application-level consumer.
+/// Records parser return pass-through, the ReplayReader callback registration
+/// path, and primary dialog-message vftable slots without claiming a resolved
+/// indirect callback invoker or application-level consumer.
 /// </summary>
 public static class MatrixMessageParserFlowNativeLayout
 {
@@ -31,10 +32,20 @@ public static class MatrixMessageParserFlowNativeLayout
     public const uint ParserWrapperFileOffset = 0x821DE0;
     public const uint ParserWrapperCallSiteFileOffset = 0x821E1E;
     public const uint ParserWrapperVirtualAddress = 0xC229E0;
-    public const uint ReplayReaderFunctionArgumentFileOffset = 0x65DAEA;
-    public const uint ReplayReaderRegistrationCallFileOffset = 0x65DAF2;
-    public const uint ReplayReaderRegistrationHelperFileOffset = 0x12B7FB0;
+    public const uint ReplayReaderCallbackRecordFunctionPointerStoreFileOffset = 0x65DAEA;
+    public const uint ReplayReaderAllocationCallFileOffset = 0x65DAF2;
+    public const uint ReplayReaderAllocationHelperFileOffset = 0x12B7FB0;
+    public const uint ReplayReaderAllocatorBackendCallFileOffset = 0x12B7FC7;
+    public const uint ReplayReaderAllocatorBackendFileOffset = 0x12C8A20;
     public const uint ReplayReaderCallbackObjectCallFileOffset = 0x65DB3F;
+    public const uint ReplayReaderCallbackRegistrationCallFileOffset = 0x65DBD3;
+    public const uint ReplayReaderCallbackRegistrationHelperFileOffset = 0xBD6260;
+    public const uint ReplayReaderCallbackRegistrationFieldStoresFileOffset = 0xBD62AE;
+    public const uint ReplayReaderReadinessProbeFileOffset = 0xBD68D0;
+    public const uint ReplayReaderReadinessProbeCallFileOffset = 0xBD68F4;
+    public const int ReplayReaderCallbackRecordParserFieldOffset = 4;
+    public const int ReplayReaderRegisteredParserFieldOffset = 0x1C;
+    public const int ReplayReaderRegisteredContextFieldOffset = 0x20;
     public const uint CallbackObjectConstructorFileOffset = 0x7FD670;
     public const uint CallbackObjectParserPointerStoreFileOffset = 0x7FD820;
     public const int CallbackObjectParserPointerFieldOffset = 0x10;

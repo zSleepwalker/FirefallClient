@@ -2037,21 +2037,41 @@ post-call transformation. These are parser-result pass-throughs, not observed
 application handlers.
 
 The raw function `0x821BA0` has runtime VA `0xC227A0` under the documented
-`.text` mapping (`raw + 0x400C00`). That pointer is used as follows:
+`.text` mapping (`raw + 0x400C00`). The ReplayReader setup now distinguishes
+allocation from callback registration:
 
-- `ReplayReader_Initialize` (`0x65D880`) stores it in the high DWORD of
-  `qword_1EDD1EC` at `0x65DAB6` and passes it in an argument record at
-  `0x65DAEA` to helper `0x12B7FB0` (call at `0x65DAF2`).
-- The same initializer calls `0x7FD670` at `0x65DB3F`. That routine stores
-  `0xC227A0` at object `+0x10` (`0x7FD820`) and `0xC1BDB0` at `+0x14`.
-- `0x7FE9F0` also copies `0xC227A0` into `qword_1EDD1EC` and calls
-  `0x7FEB50`; this establishes another registration/state path, not a call to
-  the parser.
+- `ReplayReader_Initialize` (`0x65D880`) writes the callback VA into a local
+  record at `0x65DAEA` (record `+4`; the selector is `0x4C5F`). The preceding
+  `push 0xCC` and call at `0x65DAF2` pass only the allocation size to
+  `0x12B7FB0`. That helper delegates to allocator backend `0x12C8A20` and
+  returns the allocation or logs failure; it is not the callback registrar.
+- The initializer constructs the allocation with `0x7FD670` at `0x65DB3F`.
+  The constructor stores `0xC227A0` at object `+0x10` (`0x7FD820`) and
+  `0xC1BDB0` at `+0x14`.
+- The actual static registration call is `0x65DBD3` to `0xBD6260`, with the
+  local record and the object at `[edi+0x54]`. `0xBD6260` copies the record's
+  first DWORD to registration-state `+0x18`, its parser pointer from record
+  `+4` to state `+0x1C`, and the object pointer to state `+0x20`.
+- `0x7FE9F0` separately copies `0xC227A0` into `qword_1EDD1EC` and calls
+  `0x7FEB50`; this is another observed state update, not proof of a parser
+  invocation.
 
-The parser result's next consumer, ownership/lifetime handling, and any
-application-level dispatch are still unproven. The stored function-pointer
-values and their registration sites do not identify their eventual invoker.
-The wrapper at `0x821DE0` has no proven application caller in this pass.
+The callback's invocation remains unresolved. The static references to VA
+`0xC227A0` in the active IDA database are stores (`0x65DAB6`, `0x65DAEA`,
+`0x7FD820`, `0x7FEA1C`); the callback target itself is reached through the
+registered function pointer, so those references do not identify a callsite.
+The nearby ReplayReader readiness probe at `0xBD68F4` is a distinct vtable
+call through an object at `this+0x24`; its AL result sets or clears
+`this+0xB1`, with no proven relation to the registered parser pointer at
+state `+0x1C`.
+
+The parser's returned pointer is passed through EAX by both `0x821BA0` and
+the wrapper `0x821DE0`. No retaining/releasing operation or application-level
+consumer is proven after those returns. The first known direct consumer of
+the callback *registration data* is `0xBD6260`, which stores the callback and
+context; it is not a consumer of a parsed message. Ownership/lifetime of the
+message object after the indirect callback, and the callback's first caller,
+remain open. `0x821DE0` also has no proven application caller in this pass.
 
 The three dialog-message RTTI vtables have a primary three-slot prefix. VAs
 are runtime addresses; the mapped `.rdata` file offsets below follow the PE
@@ -2075,11 +2095,12 @@ not message-specific application handling. Thus these vtable entries are
 stream read/write and destruction methods; they should not be treated as
 application event handlers.
 
-`MatrixMessageParserFlowNativeLayout.cs` records these roles, field offsets,
-direct parser callsites, and the callback-like pointer stores. Startup checks
-fingerprint the `.text` callsites/method prefixes and verify each vtable
+`MatrixMessageParserFlowNativeLayout.cs` records the direct parser callsites,
+allocator/registration split, record and context offsets, and callback-like
+pointer stores. Startup checks fingerprint the allocation and registration
+calls, the registration field copies, parser-return epilogs, and each vtable
 entry and RTTI name from the requested binary. This model does not emulate
-parsing or claim the unresolved consumer edge.
+parsing or claim the unresolved indirect invocation or message ownership.
 
 The nested table at VA `0xC22444` (raw `0x821844`) is now traced from selector
 `0x53` through `0x7A`, inclusive:
@@ -2111,12 +2132,12 @@ This closes the nested selector mapping, not the overall Matrix analysis.
 All 17 primary-route subcases have native layouts, but field semantics,
 allocation-failure consequences, selector `0x55`'s 12-byte temporary prefix,
 and selector `0x6D` body consumption remain open. The immediate
-`0x81CC50` result pass-throughs and dialog primary-vftable method roles are
-now recorded above; the application consumer/dispatch edge is still open.
-Next, trace invocation of the callback-like field at `0x7FD670+0x10` and the
-registration path through `0x65DAEA`/`0x12B7FB0` to determine who receives the
-returned object. No application handler name is inferred from the RTTI or
-vtable slots.
+`0x81CC50` result pass-throughs, dialog primary-vftable method roles, and
+ReplayReader allocation/registration path are now recorded above. Next, find
+the code that consumes registered callback-state `+0x1C/+0x20`, then establish
+the indirect parser invocation, parsed-object ownership, and first recipient.
+The vtable call at `0xBD68F4` is not identified as that invocation. No
+application handler name is inferred from RTTI or vtable slots.
 
 ## Message35 application body
 
