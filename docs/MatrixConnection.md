@@ -2027,6 +2027,60 @@ Reader `0x5EE730` reads DWORDs at `+0x28` and `+0x2C` through `0x3370A0`.
 The allocation-failure branch zeroes ESI before reaching this reader; its
 runtime consequence and the fields' meanings remain unresolved.
 
+## Parser result path and dialog-message primary vftables
+
+The large dispatcher/parser at raw file offset `0x81CC50` has two direct
+callers in the current IDA database. `0x821BA0` calls it at `0x821D87` on its
+secondary-dispatch path and returns EAX through its own epilog. The separate
+wrapper at `0x821DE0` calls it at `0x821E1E` and likewise returns EAX without
+post-call transformation. These are parser-result pass-throughs, not observed
+application handlers.
+
+The raw function `0x821BA0` has runtime VA `0xC227A0` under the documented
+`.text` mapping (`raw + 0x400C00`). That pointer is used as follows:
+
+- `ReplayReader_Initialize` (`0x65D880`) stores it in the high DWORD of
+  `qword_1EDD1EC` at `0x65DAB6` and passes it in an argument record at
+  `0x65DAEA` to helper `0x12B7FB0` (call at `0x65DAF2`).
+- The same initializer calls `0x7FD670` at `0x65DB3F`. That routine stores
+  `0xC227A0` at object `+0x10` (`0x7FD820`) and `0xC1BDB0` at `+0x14`.
+- `0x7FE9F0` also copies `0xC227A0` into `qword_1EDD1EC` and calls
+  `0x7FEB50`; this establishes another registration/state path, not a call to
+  the parser.
+
+The parser result's next consumer, ownership/lifetime handling, and any
+application-level dispatch are still unproven. The stored function-pointer
+values and their registration sites do not identify their eventual invoker.
+The wrapper at `0x821DE0` has no proven application caller in this pass.
+
+The three dialog-message RTTI vtables have a primary three-slot prefix. VAs
+are runtime addresses; the mapped `.rdata` file offsets below follow the PE
+section table. The function targets are raw file offsets:
+
+| Message RTTI | Vtable VA / `.rdata` raw offset | `+0` | `+4` | `+8` | Stream fields |
+| --- | --- | --- | --- | --- | --- |
+| `OpenMovieDialog` | `0x1C67028` / `0x1865C28` | `0x5EEC40` write | `0x5EEAE0` read | `0x526770` deleting destructor | `+0x28` |
+| `PrivateDialog` | `0x1C67018` / `0x1865C18` | `0x5EEA40` write | `0x5EE930` read | `0x526880` deleting destructor | `+0x28`, `+0x30`, `+0x38` |
+| `PublicDialog` | `0x1C66FF8` / `0x1865BF8` | `0x5EE830` write | `0x5EE760` read | `0x526900` deleting destructor | `+0x28`, `+0x2C` |
+
+For `OpenMovieDialog`, slot `+0` obtains the NUL-terminated shared-text
+length from `this+0x28`, reserves output space, and copies the field including
+its terminator; slot `+4` calls
+`Stream_ReadNullTerminatedSharedTextBytes(stream, this+0x28)`. The
+`PrivateDialog` writer and reader visit `+0x28`, `+0x30`, and `+0x38` in that
+order; the middle field is passed to the raw-QWORD writer/reader. The
+`PublicDialog` pair visits DWORD fields `+0x28` and `+0x2C`. Each `+8` method
+has destructor/deallocation behavior (including a conditional delete flag),
+not message-specific application handling. Thus these vtable entries are
+stream read/write and destruction methods; they should not be treated as
+application event handlers.
+
+`MatrixMessageParserFlowNativeLayout.cs` records these roles, field offsets,
+direct parser callsites, and the callback-like pointer stores. Startup checks
+fingerprint the `.text` callsites/method prefixes and verify each vtable
+entry and RTTI name from the requested binary. This model does not emulate
+parsing or claim the unresolved consumer edge.
+
 The nested table at VA `0xC22444` (raw `0x821844`) is now traced from selector
 `0x53` through `0x7A`, inclusive:
 
@@ -2053,13 +2107,16 @@ The nested table at VA `0xC22444` (raw `0x821844`) is now traced from selector
 | `0x77` | `NPCInteraction` | `0x78` | `OpenMovieDialog` |
 | `0x79` | `PrivateDialog` | `0x7A` | `PublicDialog` |
 
-This closes the nested case mapping, not the overall Matrix analysis. Field
-semantics, allocation-failure consequences, the selector `0x55` 12-byte
-temporary prefix, selector `0x6D` body consumption, and 12 primary-route
-subcases remain unresolved. Next, trace consumers of parsed message objects
-(including candidate vtable handler methods); five of 17 primary-route
-subcases now have native layouts. The remaining cases are at route targets
-`0x81EE63`, `0x81EF6D`, `0x81F206`, `0x81F2EF`, and `0x81F34A`.
+This closes the nested selector mapping, not the overall Matrix analysis.
+All 17 primary-route subcases have native layouts, but field semantics,
+allocation-failure consequences, selector `0x55`'s 12-byte temporary prefix,
+and selector `0x6D` body consumption remain open. The immediate
+`0x81CC50` result pass-throughs and dialog primary-vftable method roles are
+now recorded above; the application consumer/dispatch edge is still open.
+Next, trace invocation of the callback-like field at `0x7FD670+0x10` and the
+registration path through `0x65DAEA`/`0x12B7FB0` to determine who receives the
+returned object. No application handler name is inferred from the RTTI or
+vtable slots.
 
 ## Message35 application body
 

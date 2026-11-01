@@ -3124,6 +3124,57 @@ NativeProfilerDisplayNameChecks.Run(Check);
 NativeProfilerNodeSnapshotChecks.Run(Check);
 NativeProfilerNameRequestChecks.Run(Check);
 
+var dialogMessageVtables = MatrixMessageParserFlowNativeLayout.DialogMessageVtables;
+var expectedDialogSlots = new IReadOnlyList<MatrixMessageVtableSlotSnapshot>[]
+{
+    new[]
+    {
+        new MatrixMessageVtableSlotSnapshot(0, 0x5EEC40, MatrixMessageVtableSlotRole.WriteToStream),
+        new MatrixMessageVtableSlotSnapshot(4, 0x5EEAE0, MatrixMessageVtableSlotRole.ReadFromStream),
+        new MatrixMessageVtableSlotSnapshot(8, 0x526770, MatrixMessageVtableSlotRole.DeletingDestructor)
+    },
+    new[]
+    {
+        new MatrixMessageVtableSlotSnapshot(0, 0x5EEA40, MatrixMessageVtableSlotRole.WriteToStream),
+        new MatrixMessageVtableSlotSnapshot(4, 0x5EE930, MatrixMessageVtableSlotRole.ReadFromStream),
+        new MatrixMessageVtableSlotSnapshot(8, 0x526880, MatrixMessageVtableSlotRole.DeletingDestructor)
+    },
+    new[]
+    {
+        new MatrixMessageVtableSlotSnapshot(0, 0x5EE830, MatrixMessageVtableSlotRole.WriteToStream),
+        new MatrixMessageVtableSlotSnapshot(4, 0x5EE760, MatrixMessageVtableSlotRole.ReadFromStream),
+        new MatrixMessageVtableSlotSnapshot(8, 0x526900, MatrixMessageVtableSlotRole.DeletingDestructor)
+    }
+};
+Check("Matrix parser callsites and callback-like registration remain explicit",
+    MatrixMessageParserFlowNativeLayout.NestedCommandParserFileOffset == 0x81CC50
+    && MatrixMessageParserFlowNativeLayout.DirectParserCallSites.SequenceEqual(
+    [
+        new MatrixParserCallSiteSnapshot(0x821BA0, 0x821D87),
+        new MatrixParserCallSiteSnapshot(0x821DE0, 0x821E1E)
+    ])
+    && MatrixMessageParserFlowNativeLayout.StreamParserCallerVirtualAddress
+        == MatrixMessageParserFlowNativeLayout.StreamParserCallerFileOffset + 0x400C00
+    && MatrixMessageParserFlowNativeLayout.ParserWrapperVirtualAddress
+        == MatrixMessageParserFlowNativeLayout.ParserWrapperFileOffset + 0x400C00
+    && MatrixMessageParserFlowNativeLayout.ReplayReaderRegistrationHelperFileOffset == 0x12B7FB0
+    && MatrixMessageParserFlowNativeLayout.CallbackObjectParserPointerFieldOffset == 0x10);
+Check("Dialog message primary vftables map stream readers and writers separately from destruction",
+    dialogMessageVtables.Count == 3
+    && dialogMessageVtables.Select(vtable => vtable.VtableVirtualAddress)
+        .SequenceEqual([0x1C67028u, 0x1C67018u, 0x1C66FF8u])
+    && dialogMessageVtables.Select(vtable => vtable.RttiName).SequenceEqual(
+    [
+        ".?AVOpenMovieDialog@Character@firefall@@",
+        ".?AVPrivateDialog@Character@firefall@@",
+        ".?AVPublicDialog@Character@firefall@@"
+    ])
+    && dialogMessageVtables.Select((vtable, index) =>
+        vtable.PrimarySlots.SequenceEqual(expectedDialogSlots[index])).All(matches => matches)
+    && dialogMessageVtables[0].SerializedFieldOffsets.SequenceEqual([0x28])
+    && dialogMessageVtables[1].SerializedFieldOffsets.SequenceEqual([0x28, 0x30, 0x38])
+    && dialogMessageVtables[2].SerializedFieldOffsets.SequenceEqual([0x28, 0x2C]));
+
 if (args.Length != 0)
 {
     if (args.Length != 2 || args[0] != "--binary")

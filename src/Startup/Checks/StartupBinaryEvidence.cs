@@ -4151,5 +4151,45 @@ internal static class StartupBinaryEvidence
                 DeployablePublicCombatLogNativeLayout.WordLengthPrefixedBlobReaderFileOffset)
             && VtableRttiName(DeployablePublicCombatLogNativeLayout.VtableVirtualAddress, 80)
                 == DeployablePublicCombatLogNativeLayout.RttiName);
+        check("Binary nested-message parser results return through both direct callers and parser callback registration",
+            RelativeBranchTargets(MatrixMessageParserFlowNativeLayout.StreamParserCallSiteFileOffset,
+                0xE8, MatrixMessageParserFlowNativeLayout.NestedCommandParserFileOffset)
+            && RelativeBranchTargets(MatrixMessageParserFlowNativeLayout.ParserWrapperCallSiteFileOffset,
+                0xE8, MatrixMessageParserFlowNativeLayout.NestedCommandParserFileOffset)
+            && Matches(MatrixMessageParserFlowNativeLayout.StreamParserCallSiteFileOffset + 5,
+                "83C4048B4DF464890D00000000595F5E5B8BE55DC3")
+            && Matches(MatrixMessageParserFlowNativeLayout.ParserWrapperCallSiteFileOffset + 5,
+                "83C4048B4DF464890D00000000595F5E5B8BE55DC3")
+            && Matches(MatrixMessageParserFlowNativeLayout.ReplayReaderFunctionArgumentFileOffset,
+                "C744241CA027C200")
+            && RelativeBranchTargets(MatrixMessageParserFlowNativeLayout.ReplayReaderRegistrationCallFileOffset,
+                0xE8, MatrixMessageParserFlowNativeLayout.ReplayReaderRegistrationHelperFileOffset)
+            && RelativeBranchTargets(MatrixMessageParserFlowNativeLayout.ReplayReaderCallbackObjectCallFileOffset,
+                0xE8, MatrixMessageParserFlowNativeLayout.CallbackObjectConstructorFileOffset)
+            && Matches(MatrixMessageParserFlowNativeLayout.CallbackObjectParserPointerStoreFileOffset,
+                "C74710A027C200"));
+        check("Binary dialog-message primary vftables point to stream writers, stream readers, and deleting destructors",
+            MatrixMessageParserFlowNativeLayout.DialogMessageVtables.All(vtable =>
+                vtable.PrimarySlots.All(slot =>
+                    ReadUInt32(VirtualAddressToFileOffset(vtable.VtableVirtualAddress) + slot.SlotOffset)
+                        == slot.MethodFileOffset + 0x400C00)
+                && VtableRttiName(vtable.VtableVirtualAddress, 80) == vtable.RttiName)
+            && Matches(0x5EEC40 + 7, "8B472885C07412")
+            && Matches(0x5EEAE0, "558BEC8D51288B4D08E822F5CF00")
+            && Matches(0x526770, "558BEC568BF1E825000000F6450801")
+            && Matches(0x5EEA40 + 0x0C, "8D472850E8")
+            && Matches(0x5EEA40 + 0x15, "8D47308BCE50E8")
+            && Matches(0x5EEA40 + 0x20, "8D47388BCE50E8")
+            && Matches(0x5EE930 + 0x0C, "8D472850E8")
+            && Matches(0x5EE930 + 0x15, "8D47308BCE50E8")
+            && Matches(0x5EE930 + 0x20, "8D47388BCE50E8")
+            && Matches(0x526880, "558BECF6450801568BF1C706841BC6017405")
+            && Matches(0x526880 + 0x12, "E8C924DA00")
+            && Matches(0x5EE830 + 9, "8D472850E8")
+            && Matches(0x5EE830 + 0x12, "8B4D088D472C50E8")
+            && Matches(0x5EE760 + 9, "8D472850E8")
+            && Matches(0x5EE760 + 0x12, "8B4D088D472C50E8")
+            && Matches(0x526900, "558BECF6450801568BF1C706841BC6017405")
+            && Matches(0x526900 + 0x12, "E84924DA00"));
     }
 }

@@ -16,8 +16,16 @@
   separately.
 - The 91 secondary-table entries (VA `0xC22630` / raw `0x821A30`) are mapped
   as dispatch data, but their message identities are still unresolved.
-- Next suggested work: trace message-object consumers (vtable handler methods,
-  e.g. vtables VA `0x1C67028`, `0x1C67018`, `0x1C66FF8`).
+- Latest consumer pass: raw `0x81CC50`'s two direct callers (`0x821BA0` and
+  `0x821DE0`) pass its result through EAX; `0x821BA0`'s runtime address is
+  stored as a callback-like pointer in ReplayReader state and object `+0x10`.
+  The three dialog-message primary vftables expose stream write/read methods
+  and deleting destructors, not application handlers. The downstream object
+  consumer/dispatch edge remains unproven; details and binary checks are in
+  `docs/MatrixConnection.md` and `MatrixMessageParserFlowNativeLayout.cs`.
+- Next static target: follow the invocation of the callback-like field at
+  `0x7FD670+0x10` and the registration path through `0x65DAEA` /
+  `0x12B7FB0` to identify who receives the returned object.
 - Open items: field semantics, allocation-failure consequences, selector
   `0x55` 12-byte temp prefix, selector `0x6D` body consumption.
 - Workflow per batch: Luna agent reconstructs (layout + Program.cs +
