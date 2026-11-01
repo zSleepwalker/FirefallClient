@@ -120,6 +120,11 @@ internal static class StartupBinaryEvidence
             int end = Array.IndexOf(raw, (byte)0);
             return Encoding.ASCII.GetString(raw, 0, end < 0 ? raw.Length : end);
         }
+        uint VtableCompleteObjectOffset(uint vtableVa)
+        {
+            uint col = ReadUInt32(VirtualAddressToFileOffset(vtableVa) - 4);
+            return ReadUInt32(VirtualAddressToFileOffset(col) + 4);
+        }
         string ReplayCallbackContextRttiName(uint vtableVa, int maximumNameLength)
         {
             uint completeObjectLocator = ReadUInt32(VirtualAddressToFileOffset(vtableVa) - 4);
@@ -5065,6 +5070,91 @@ internal static class StartupBinaryEvidence
             && Matches(0x439580,
                 "8986004D00008B018986044D00008B41048986084D00008B410889860C4D0000")
             && Matches(0x439539, "888E104D0000"));
+        var keyedRecipientVtableFileOffset = VirtualAddressToFileOffset(
+            CharacterKeyedRecipientNativeLayout.GenericCharacterVtableVirtualAddress);
+        check("Binary message-0x79 recipient is constructed as tfGenericCharacter and inserted unchanged into the exact getter registry",
+            CharacterKeyedRecipientNativeLayout.CallbackFileOffset
+                + CharacterKeyedRecipientNativeLayout.RawTextOffsetToVirtualAddressDelta
+                == CharacterKeyedRecipientNativeLayout.CallbackVirtualAddress
+            && CharacterKeyedRecipientNativeLayout.RegistryAccessorFileOffset
+                + CharacterKeyedRecipientNativeLayout.RawTextOffsetToVirtualAddressDelta
+                == CharacterKeyedRecipientNativeLayout.RegistryAccessorVirtualAddress
+            && CharacterKeyedRecipientNativeLayout.RegistryInsertionFileOffset
+                + CharacterKeyedRecipientNativeLayout.RawTextOffsetToVirtualAddressDelta
+                == CharacterKeyedRecipientNativeLayout.RegistryInsertionVirtualAddress
+            && CharacterKeyedRecipientNativeLayout.GenericCharacterInsertionProducerFileOffset
+                + CharacterKeyedRecipientNativeLayout.RawTextOffsetToVirtualAddressDelta
+                == CharacterKeyedRecipientNativeLayout.GenericCharacterInsertionProducerVirtualAddress
+            && CharacterKeyedRecipientNativeLayout.GenericCharacterFactoryFileOffset
+                + CharacterKeyedRecipientNativeLayout.RawTextOffsetToVirtualAddressDelta
+                == CharacterKeyedRecipientNativeLayout.GenericCharacterFactoryVirtualAddress
+            && CharacterKeyedRecipientNativeLayout.GenericCharacterConstructorFileOffset
+                + CharacterKeyedRecipientNativeLayout.RawTextOffsetToVirtualAddressDelta
+                == CharacterKeyedRecipientNativeLayout.GenericCharacterConstructorVirtualAddress
+            && CharacterKeyedRecipientNativeLayout.GenericCharacterFactoryCallSiteFileOffset
+                + CharacterKeyedRecipientNativeLayout.RawTextOffsetToVirtualAddressDelta
+                == CharacterKeyedRecipientNativeLayout.GenericCharacterFactoryCallSiteVirtualAddress
+            && CharacterKeyedRecipientNativeLayout.GenericCharacterRegistryInsertionCallFileOffset
+                + CharacterKeyedRecipientNativeLayout.RawTextOffsetToVirtualAddressDelta
+                == CharacterKeyedRecipientNativeLayout.GenericCharacterRegistryInsertionCallVirtualAddress
+            && CharacterKeyedRecipientNativeLayout.GenericCharacterVtableFileOffset
+                + CharacterKeyedRecipientNativeLayout.RawRdataOffsetToVirtualAddressDelta
+                == CharacterKeyedRecipientNativeLayout.GenericCharacterVtableVirtualAddress
+            && keyedRecipientVtableFileOffset
+                == CharacterKeyedRecipientNativeLayout.GenericCharacterVtableFileOffset
+            && VtableRttiName(CharacterKeyedRecipientNativeLayout.GenericCharacterVtableVirtualAddress)
+                == CharacterKeyedRecipientNativeLayout.GenericCharacterRttiName
+            && VtableCompleteObjectOffset(CharacterKeyedRecipientNativeLayout.GenericCharacterVtableVirtualAddress)
+                == 0
+            && Matches(CharacterKeyedRecipientNativeLayout.GenericCharacterAllocationSizePushFileOffset,
+                "68E05A0000")
+            && RelativeBranchTargets(
+                CharacterKeyedRecipientNativeLayout.GenericCharacterAllocatorCallFileOffset,
+                0xE8, 0x12B7FB0)
+            && RelativeBranchTargets(
+                CharacterKeyedRecipientNativeLayout.GenericCharacterCounterIdCallFileOffset,
+                0xE8, CharacterKeyedRecipientNativeLayout.GenericCharacterCounterIdHelperFileOffset)
+            && Matches(0x425DFC, "2501FFFFFF8BCE83C8015250")
+            && RelativeBranchTargets(
+                CharacterKeyedRecipientNativeLayout.GenericCharacterConstructorCallFileOffset,
+                0xE8, CharacterKeyedRecipientNativeLayout.GenericCharacterConstructorFileOffset)
+            && Matches(0x422EBE, "81E201FFFFFF89460C83CA01895608")
+            && Matches(CharacterKeyedRecipientNativeLayout.GenericCharacterPrimaryVptrStoreFileOffset,
+                "C7069839C601")
+            && Matches(CharacterKeyedRecipientNativeLayout.GenericCharacterMemberPointerLoadFileOffset,
+                "8D8FA4460000")
+            && Matches(CharacterKeyedRecipientNativeLayout.GenericCharacterAuxiliaryPointerStoreFileOffset,
+                "8987A0580000")
+            && RelativeBranchTargets(
+                CharacterKeyedRecipientNativeLayout.GenericCharacterFactoryCallSiteFileOffset,
+                0xE8, CharacterKeyedRecipientNativeLayout.GenericCharacterFactoryFileOffset)
+            && Matches(CharacterKeyedRecipientNativeLayout.GenericCharacterReturnedPointerMoveFileOffset,
+                "8BF8")
+            && Matches(CharacterKeyedRecipientNativeLayout.GenericCharacterRegistryAccessorCallFileOffset - 1,
+                "57")
+            && RelativeBranchTargets(
+                CharacterKeyedRecipientNativeLayout.GenericCharacterRegistryAccessorCallFileOffset,
+                0xE8, CharacterKeyedRecipientNativeLayout.RegistryAccessorFileOffset)
+            && Matches(CharacterKeyedRecipientNativeLayout.GenericCharacterRegistryAccessorCallFileOffset + 5,
+                "8BC8")
+            && RelativeBranchTargets(
+                CharacterKeyedRecipientNativeLayout.GenericCharacterRegistryInsertionCallFileOffset,
+                0xE8, CharacterKeyedRecipientNativeLayout.RegistryInsertionFileOffset)
+            && Matches(0x407F2B, "8B7B088D4DF48B430C81E700FFFFFF")
+            && Matches(0x407F42, "8D4E548945F8E8")
+            && Matches(CharacterKeyedRecipientNativeLayout.RegistryInsertionPayloadSetupFileOffset,
+                "8B430C8945E88D45E4508D45F4897DE450895DEC")
+            && RelativeBranchTargets(0x407FB8, 0xE8,
+                CharacterKeyedRecipientNativeLayout.RegistryNodeInsertionHelperFileOffset)
+            && RelativeBranchTargets(0x40C482, 0xE8,
+                CharacterKeyedRecipientNativeLayout.RegistryNodeFieldInitializerFileOffset)
+            && Matches(CharacterKeyedRecipientNativeLayout.RegistryNodeAllocationHelperFileOffset + 3,
+                "6A18")
+            && RelativeBranchTargets(
+                CharacterKeyedRecipientNativeLayout.RegistryNodeAllocationHelperFileOffset + 5,
+                0xE8, 0x12B7FB0)
+            && Matches(0x40E6DD, "890E8B4804894E048B4008894608")
+            && Matches(0x943821, "8B87A44600008B705C"));
         var selectorThreeAdapterVtableFileOffset = VirtualAddressToFileOffset(
             CharacterKeyedDialogCallbackNativeLayout.SelectorThreeConditionalAdapterVtableVirtualAddress);
         var selectorThreeAdapterSlots =

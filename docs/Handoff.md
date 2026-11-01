@@ -24,10 +24,23 @@
   now traced through callbacks for BaseController IDs `0x77..0x79`: exact
   dispatch slots, adapter/context initialization, event ID `285`, and the
   keyed lookup/update path are in `docs\MatrixConnection.md` and
-  `CharacterLocalControllerApplicationNativeLayout.cs`. Field semantics and
-  the callback `0x79` registry recipient type remain unresolved. The
+  `CharacterLocalControllerApplicationNativeLayout.cs`. Callback `0x79`'s
+  exact registry producer for Character-state entries is now traced to a
+  `tfGenericCharacter` constructed at `0x422E80` and inserted by
+  `0x943360 -> 0x35E700 -> 0x407F00`; see
+  `CharacterKeyedRecipientNativeLayout.cs`. The keyed map can contain other
+  producer types, so the class applies to matching generated keys, not every
+  possible lookup. Field semantics and recipient pointee ownership remain
+  unresolved. The
   selector-`0x03` MandMController path remains conditional; no NPC runtime
   binding was inferred, and this work is separate from `tfGameProtocolHandler`.
+- The `tfGenericCharacter` insertion requests `0x5AE0` bytes, initializes the
+  key at `+0x08/+0x0C` with a gate byte of `1`, and installs vtable VA
+  `0x1C63998` at object offset zero (RTTI `.?AVtfGenericCharacter@@`, COL
+  offset zero). Its unchanged allocation-base pointer is stored in node
+  `+0x10`; the node allocation is `0x18` bytes. Getter/constructor/registry
+  fingerprints and raw-to-VA mappings are checked against
+  `FirefallClient.exe.original` by Startup.Checks.
 - Latest parser-consumer pass: raw `0x81CC50`'s two direct callers (`0x821BA0`
   and `0x821DE0`) pass its result through EAX. ReplayReader's `0x65DAF2` call
   to `0x12B7FB0` is allocation (`0xCC` bytes via allocator backend

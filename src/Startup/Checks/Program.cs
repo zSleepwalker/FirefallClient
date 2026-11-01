@@ -4099,6 +4099,51 @@ Check("Bound BaseNetController callback observations retain only evidenced messa
     && CharacterLocalControllerApplicationNativeLayout.Message79RecipientAuxiliaryByteOffset == 0x4D10
     && CharacterLocalControllerApplicationNativeLayout.Message79RecipientArgumentOffsetPassedToAuxiliarySink == 0x58A0
     && CharacterLocalControllerApplicationNativeLayout.Message79RecipientObjectPointerLoadOffset == 0x46A4);
+Check("BaseNetController message 0x79 resolves the inserted tfGenericCharacter at the exact shared keyed registry",
+    CharacterKeyedRecipientNativeLayout.RawTextOffsetToVirtualAddressDelta == 0x400C00
+    && CharacterKeyedRecipientNativeLayout.RawRdataOffsetToVirtualAddressDelta == 0x401400
+    && CharacterKeyedRecipientNativeLayout.CallbackFileOffset == 0x4C9B80
+    && CharacterKeyedRecipientNativeLayout.CallbackVirtualAddress == 0x8CA780
+    && CharacterKeyedRecipientNativeLayout.RegistryAccessorFileOffset == 0x35E700
+    && CharacterKeyedRecipientNativeLayout.RegistryAccessorVirtualAddress == 0x75F300
+    && CharacterKeyedRecipientNativeLayout.RegistryMapOffsetFromAccessorResult == 0x54
+    && CharacterKeyedRecipientNativeLayout.RegistryLookupFileOffset == 0x4093E0
+    && CharacterKeyedRecipientNativeLayout.RegistryInsertionFileOffset == 0x407F00
+    && CharacterKeyedRecipientNativeLayout.RegistryInsertionVirtualAddress == 0x808B00
+    && CharacterKeyedRecipientNativeLayout.RegistryEntryRecipientPointerOffset == 0x10
+    && CharacterKeyedRecipientNativeLayout.GenericCharacterInsertionProducerFileOffset == 0x943360
+    && CharacterKeyedRecipientNativeLayout.GenericCharacterInsertionProducerVirtualAddress == 0xD43F60
+    && CharacterKeyedRecipientNativeLayout.GenericCharacterFactoryFileOffset == 0x425C90
+    && CharacterKeyedRecipientNativeLayout.GenericCharacterFactoryVirtualAddress == 0x826890
+    && CharacterKeyedRecipientNativeLayout.GenericCharacterAllocationSize == 0x5AE0
+    && CharacterKeyedRecipientNativeLayout.GenericCharacterConstructorFileOffset == 0x422E80
+    && CharacterKeyedRecipientNativeLayout.GenericCharacterConstructorVirtualAddress == 0x823A80
+    && CharacterKeyedRecipientNativeLayout.GenericCharacterMemberPointerLoadFileOffset == 0x425E17
+    && CharacterKeyedRecipientNativeLayout.GenericCharacterMemberPointerFieldOffset == 0x46A4
+    && CharacterKeyedRecipientNativeLayout.GenericCharacterAuxiliaryPointerStoreFileOffset == 0x425EBC
+    && CharacterKeyedRecipientNativeLayout.GenericCharacterAuxiliaryPointerFieldOffset == 0x58A0
+    && CharacterKeyedRecipientNativeLayout.GenericCharacterVtableVirtualAddress == 0x1C63998
+    && CharacterKeyedRecipientNativeLayout.GenericCharacterVtableFileOffset == 0x1862598
+    && CharacterKeyedRecipientNativeLayout.GenericCharacterRttiName == ".?AVtfGenericCharacter@@"
+    && CharacterKeyedRecipientNativeLayout.GenericCharacterVptrOffset == 0
+    && CharacterKeyedRecipientNativeLayout.GenericCharacterRegistryAccessorCallFileOffset == 0x94378C
+    && CharacterKeyedRecipientNativeLayout.GenericCharacterRegistryInsertionCallFileOffset == 0x943793
+    && CharacterKeyedRecipientNativeLayout.GenericCharacterFactoryCallSiteVirtualAddress == 0xD4437C
+    && CharacterKeyedRecipientNativeLayout.GenericCharacterRegistryInsertionCallVirtualAddress == 0xD44393
+    && CharacterKeyedRecipientNativeLayout.RegistryInsertionPayloadSetupFileOffset == 0x407FA4
+    && CharacterKeyedRecipientNativeLayout.ObjectKeyFirstDwordOffset == 8
+    && CharacterKeyedRecipientNativeLayout.ObjectKeySecondDwordOffset == 0x0C
+    && CharacterKeyedRecipientNativeLayout.ObjectKeyFirstDwordConstructorMask == 0xFFFFFF01
+    && CharacterKeyedRecipientNativeLayout.ObjectKeyFirstDwordRegistryMask == 0xFFFFFF00
+    && CharacterKeyedRecipientNativeLayout.ObjectKeyLowByteMarker == 1
+    && CharacterKeyedRecipientNativeLayout.CallbackRecipientGateByteOffset == 8
+    && CharacterKeyedRecipientNativeLayout.CallbackFallbackHighestReferencedOffset == 0x58A0
+    && CharacterKeyedRecipientNativeLayout.GenericCharacterAllocationSize
+        > CharacterKeyedRecipientNativeLayout.CallbackFallbackHighestReferencedExtent
+    && CharacterKeyedRecipientNativeLayout.RegistryNodeAllocationSize == 0x18
+    && CharacterKeyedRecipientNativeLayout.RegistryNodeInsertionHelperFileOffset == 0x40C470
+    && CharacterKeyedRecipientNativeLayout.RegistryNodeAllocationHelperFileOffset == 0x40BBC0
+    && CharacterKeyedRecipientNativeLayout.RegistryNodeFieldInitializerFileOffset == 0x40E6C0);
 Check("Selector-3 MandM adapter construction is conditional and does not prove an NPC binding",
     CharacterKeyedDialogCallbackNativeLayout.SelectorThreeConditionalAdapterAllocationFileOffset == 0x4A190F
     && CharacterKeyedDialogCallbackNativeLayout.SelectorThreeConditionalAdapterAllocationSize == 0xB0

@@ -2898,24 +2898,68 @@ updates a presence byte there and, on its populated path, six DWORDs at
 which passes recipient `+0x4CFC` to `0x2FCC90`, stores a DWORD and three
 following DWORDs at `+0x4D00..+0x4D0C`, and conditionally updates a byte at
 `+0x4D10`. Other guarded downstream calls pass recipient `+0x58A0` as an
-argument or load an object pointer from `+0x46A4`. These are observed
-offset-level effects; their field meanings are unresolved. The lookup/update
-path is observed, but there is no removal operation in the direct
-`0x4C9B80` body. The callback code does not write the adapter's `+0x170` or
-`+0x174` fields; the identity/type of the registry recipient and the precise
-semantics of the `message+0x28/+0x38` values remain unresolved. No
-`tfGenericCharacter` callback binding is used in this interpretation. The
-separate selector-`0x03` MandMController code remains conditional, and the
-`tfGameProtocolHandler` findings elsewhere in this document concern a
-different ReplayReader path.
+argument or load an object pointer from `+0x46A4`. These are observed offset-level effects; their field meanings are unresolved.
+The lookup/update path has no removal operation in the direct `0x4C9B80` body.
+The callback does not write adapter `+0x170/+0x174`; the precise semantics of
+`message+0x28/+0x38` also remain unresolved. The recipient's concrete
+registered class is traced below, while the message key still determines
+which entry is returned. The separate selector-`0x03` MandMController code
+remains conditional, and the `tfGameProtocolHandler` findings elsewhere in
+this document concern a different ReplayReader path.
 
-The `tfGenericCharacter` object remains the state created for selector `0x02`,
-not the callback receiver. Its primary vtable at VA `0x1C63998` / raw
-`.rdata` `0x1862598` has RTTI `.?AVtfGenericCharacter@@` and a distinct setup
-slot at `+0x20 -> 0x4263C0`. The former callback-candidate assignment to
-`tfGenericCharacter` and the associated `0x420720/0x420780` `ret 8`
-call-contract concern are withdrawn: they are not the methods in the
-BaseNetController vtable. The actual BaseController `+0x18` target is
+### Concrete keyed-registry recipient
+
+The Character-state producer at raw `0x943360` calls factory `0x425C90`
+(`0x94377C`) and receives its returned pointer in EAX, copied unchanged to
+EDI at `0x943781`. The factory requests `0x5AE0` bytes through allocator
+`0x12B7FB0` (size at `0x425DD7`, call at `0x425DE2`), calls
+`Engine_GenerateCounterId` at `0x425DF7`, and passes its `EDX:EAX` pair to
+constructor `0x422E80` at `0x425E08`. The first DWORD is changed to
+`(EAX & 0xFFFFFF01) | 1`; the constructor stores it at object `+0x08`, stores
+EDX at `+0x0C`, and therefore sets the gate byte `+0x08` to `1`.
+
+The constructor's final primary vptr write is at raw `0x422FEA`, object
+offset `0`, with vtable VA `0x1C63998` (raw `.rdata` offset `0x1862598`).
+The original binary's RTTI name is `.?AVtfGenericCharacter@@`; its Complete
+Object Locator offset is zero. At raw `0x94378B..0x943793`, the producer
+pushes the unadjusted EDI pointer, calls the same getter `0x35E700` used by
+the callback, moves that exact EAX to ECX, and calls insertion setter
+`0x407F00`. The setter uses its `this+0x54` map, reads the object's key at
+`+0x08/+0x0C`, and clears the low byte of the first DWORD. Thus this
+constructor path inserts a complete `tfGenericCharacter` pointer into the
+exact getter-returned registry used by `0x4C9B80`, not merely a same-shaped
+map or a type inferred from the fallback offsets.
+
+The insertion path indexes this object by
+`(EAX & 0xFFFFFF00, EDX)`. The callback independently looks up
+`(message+0x30 & 0xFFFFFF00, message+0x34)` in that same map. The trace proves
+the key comparison and both normalizations; it does not prove that the
+message bytes are directly copied from `Engine_GenerateCounterId`.
+
+Setter `0x407F00` reaches node allocator helper `0x40C470`; `0x40BBC0`
+requests an 0x18-byte node, and `0x40E6C0` stores its key pair and recipient
+pointer at node `+0x08/+0x0C/+0x10`. The callback reads that same value slot
+at `+0x10`; no pointer adjustment appears between allocation, construction,
+insertion, and lookup. Removal helper `0x4088F0` unlinks and passes the node
+to `0x12C8D60`, but does not visibly release the recipient pointer stored at
+node `+0x10`; pointee ownership/lifetime remains unresolved.
+
+The allocation covers the callback's highest observed recipient offset,
+`+0x58A0` (a DWORD extent through `+0x58A4`), and the factory itself writes a
+value at `+0x58A0`. This is layout corroboration only; `+0x4CA8`,
+`+0x4CB0..+0x4CC4`, `+0x4CFC`, `+0x4D00..+0x4D10`, `+0x46A4`, and `+0x58A0`
+remain semantically opaque.
+
+The registry is key-driven and can contain other insertions: a separate
+direct path at `0x96D3E2` also calls `0x35E700` and inserts through
+`0x407660`; its caller allocates `0x460` bytes at `0x9711D8`. Consequently,
+the traced `tfGenericCharacter` producer establishes the concrete recipient
+for entries under its generated key, but does not imply that every possible
+message key in the shared registry resolves to that class. The
+`tfGenericCharacter` state remains separate from the BaseNetController
+callback adapter at receiver `+0x2C`; its primary vtable also has setup slot
+`+0x20 -> 0x4263C0`. The old `0x420720/0x420780` `ret 8` callback-candidate
+assignment remains withdrawn: the actual BaseController `+0x18` callback is
 `0x4C9B80`, which returns with `ret 4`.
 
 ### Conditional selector-`0x03` adapter code, not an NPC runtime binding
