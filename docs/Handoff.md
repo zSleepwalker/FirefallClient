@@ -1,6 +1,15 @@
 # Reverse-engineering handoff
 
-## Resume here (November 1 session)
+## Resume here (end of November 1 session)
+
+Work stopped after reviewing and saving the secondary decoder `0x50..0x57`
+batch. Start tomorrow at `0x58`; do not repeat the earlier decoder or
+keyed-receiver factory batches. All assigned agents have finished.
+The next batch should identify secondary selectors `0x58..0x5F`, using
+`MatrixSecondaryDecoderNativeLayouts.cs` and its binary checks as templates.
+Use GPT-6 Luna with explicit High reasoning for implementation and review.
+Verify field-address setup, primitive widths, count-loop boundaries and
+helper calls against the original binary before committing and pushing.
 
 - Matrix nested selector table raw `0x821844` (selectors `0x53..0x7A`) is
   fully traced; see the summary table in `docs/MatrixConnection.md`.
@@ -22,12 +31,14 @@
 - Secondary selectors in `0x81CC50` use the separate 91-entry table at VA
   `0xC22630` / raw `0x821A30`: `[ebp+8] - 0x20`, bounded through index
   `0x5A`, then indexed by DWORD. The original binary has 91 nonzero, distinct
-  destinations; selectors `0x20..0x4F` now have 48 verified message
-  identities/layouts, leaving 43 identities unresolved. The table index is
-  distinct from the keyed-receiver factory's `0x02..0x35` selectors and the
-  route0 Character table's `0x53..0x7A` selectors. Continue at selector
-  `0x50`; see the C# snapshots and `docs/MatrixConnection.md`.
-- The 48 verified secondary cases are RTTI-backed:
+  destinations; selectors `0x20..0x57` now have 56 verified message
+  identities/layouts, leaving 35 identities unresolved. Continue at selector
+  `0x58`. The table index is distinct from the keyed-receiver factory's
+  `0x02..0x35` selectors and the route0 Character table's `0x53..0x7A`
+  selectors. Secondary selectors `0x53..0x57` and route0 Character selectors
+  with those same numbers are different tables and dispatch namespaces. See
+  the C# snapshots and `docs/MatrixConnection.md`.
+- The 56 verified secondary cases are RTTI-backed:
   `EncounterToUIMessage`, `VotekickInitiated`, `VotekickResponded`,
   `ScoreBoardEnable/Init/SetWinner/Clear/AddPlayer/RemovePlayer/
   UpdatePlayerStats/UpdatePlayerStatsFromStats/UpdatePlayerStatus`,
@@ -44,6 +55,9 @@
   `BountyListActiveAck`, `BountyListActiveDetailsAck`,
   `BountyListAvailableAck`, `BountyClearAck`, `BountyClearPreviousAck`,
   `BountyListPreviousAck`, `BountyRerollResponse`, and `DisplayUiTrackBounty`.
+  The latest batch adds `Achievements`, `AchievementUnlocked`,
+  `TotalAchievementPoints`, `MissionCompletionCounts`, `ContentUnlocked`,
+  `ClientUIAction`, `ArcCompletionHistoryUpdate`, and `JobLedgerEntriesUpdate`.
   Their common base initializer writes marker
   `+0x08`, descriptor anchor `+0x0C`, constructor type DWORD `+0x10`,
   parser-context copies `+0x18/+0x1C`, and zeros `+0x20/+0x24`; body begins
@@ -75,8 +89,19 @@
   object's virtual `+0x10` method only for nonzero WORD lengths. The shared
   text reader uses 256-byte chunks until its NUL terminator, not a 256-byte
   total limit. Parser-local DWORD literals `0x20..0x2F` for selectors
-  `0x40..0x4F` are separately recorded, with roles unknown. All 48 table
-  targets are distinct and nonzero. Selectors `0x28/0x2D`
+  `0x40..0x4F` are separately recorded, with roles unknown. Selectors
+  `0x50..0x57` add a five-byte DWORD-plus-byte record vector (eight-byte
+  stride), QWORD and DWORD scalar readers, a 16-byte DWORD/QWORD/DWORD record
+  vector (24-byte stride) followed by shared text, ordered text/DWORD/QWORD
+  and text-only readers, a 16-byte counted tree-record sequence, and a
+  four-byte DWORD vector (four-byte stride). The tree constructor allocates a
+  `0x20` sentinel, self-links its three pointer fields, and writes the WORD
+  `0x0101` at `+0x0C`; that is one adjacent-byte-spanning word store, not
+  evidence for two independent byte fields. Count bytes use `0xFF`
+  continuation and zero termination where observed. Parser-local DWORD
+  literals `0x30..0x37` are recorded separately from selectors and
+  constructor type IDs; their roles are unknown. All 56 table targets are
+  distinct and nonzero. Selectors `0x28/0x2D`
   and `0x32/0x34` share
   reader continuations despite distinct table destinations and types.
   Out-of-range selectors share zero-return raw `0x8217D9`; selectors `0x26`
@@ -85,8 +110,11 @@
   the object register zero, including `0x2D` through `0x28`'s continuation and
   `0x32/0x34` through their shared text-reader continuation.
   selector `0x4F` instead reaches its direct DWORD helper after forming the
-  destination from zero ESI plus `0x28`. These are static paths only; no
-  runtime consequence is asserted.
+  destination from zero ESI plus `0x28`. Selectors `0x50`, `0x53`, `0x54`,
+  `0x56`, and `0x57` likewise reach readers from local zero-object blocks;
+  `0x51`, `0x52`, and `0x55` use zero-object continuations `0x81F72C`,
+  `0x8206E1`, and `0x81FB25`. These are static paths only; no runtime
+  consequence is asserted.
 - Keep this table distinct from the unrelated keyed-receiver factory
   `0x81B1B0`, route0's nested Character selectors `0x53..0x7A`, and primary
   routes 2-6. `.text` and `.rdata` section-aware vtable RTTI names were

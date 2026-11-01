@@ -970,7 +970,7 @@ Check("Secondary command dispatcher separates primary-byte, secondary-selector, 
     && MatrixSecondaryCommandDispatcherNativeLayout.GetSecondarySelectorIndex(0x20) == 0
     && MatrixSecondaryCommandDispatcherNativeLayout.GetSecondarySelectorIndex(0x7A) == 0x5A
     && MatrixSecondaryCommandDispatcherNativeLayout.GetSecondarySelectorIndex(0x7B) is null);
-Check("Secondary decoder table snapshot records the first 48 of 91 selectors",
+Check("Secondary decoder table snapshot records the first 56 of 91 selectors",
     MatrixSecondaryDecoderTableNativeLayout.ParserFileOffset == 0x81CC50
     && MatrixSecondaryDecoderTableNativeLayout.SelectorComparisonFileOffset == 0x81F3A8
     && MatrixSecondaryDecoderTableNativeLayout.SelectorJumpFileOffset == 0x81F3B4
@@ -989,16 +989,19 @@ Check("Secondary decoder table snapshot records the first 48 of 91 selectors",
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x47) == 39
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x48) == 40
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x4F) == 47
+    && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x50) == 48
+    && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x57) == 55
+    && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x58) == 56
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x7A) == 0x5A
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x1F) is null
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x7B) is null
-    && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries.Count == 48
+    && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries.Count == 56
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .Select(entry => entry.Selector)
-        .SequenceEqual(Enumerable.Range(0x20, 48).Select(selector => (byte)selector))
+        .SequenceEqual(Enumerable.Range(0x20, 56).Select(selector => (byte)selector))
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .Select(entry => entry.TableIndex)
-        .SequenceEqual(Enumerable.Range(0, 48))
+        .SequenceEqual(Enumerable.Range(0, 56))
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .Select(entry => entry.TargetVirtualAddress)
         .SequenceEqual(new uint[]
@@ -1014,7 +1017,9 @@ Check("Secondary decoder table snapshot records the first 48 of 91 selectors",
             0xC20C88, 0xC20CF0, 0xC20D58, 0xC20DC0,
             0xC20E28, 0xC20E90, 0xC20EF8, 0xC20F60,
             0xC20FC8, 0xC21030, 0xC21098, 0xC21100,
-            0xC21168, 0xC211D0, 0xC21238, 0xC212A0
+            0xC21168, 0xC211D0, 0xC21238, 0xC212A0,
+            0xC2130B, 0xC21375, 0xC213BD, 0xC21405,
+            0xC21479, 0xC214E1, 0xC21529, 0xC21593
         })
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .All(entry => entry.TargetKind == MatrixSecondaryDecoderTargetKind.MessageCase)
@@ -1022,7 +1027,7 @@ Check("Secondary decoder table snapshot records the first 48 of 91 selectors",
         .All(entry => entry.TargetVirtualAddress == entry.TargetFileOffset + 0x400C00)
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .Select(entry => entry.TargetVirtualAddress)
-        .Distinct().Count() == 48
+        .Distinct().Count() == 56
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x27)?.TargetFileOffset == 0x81F683
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x28)?.TargetFileOffset == 0x81F6EB
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x2F)?.TargetFileOffset == 0x81F9BE
@@ -1033,7 +1038,9 @@ Check("Secondary decoder table snapshot records the first 48 of 91 selectors",
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x47)?.TargetFileOffset == 0x820360
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x48)?.TargetFileOffset == 0x8203C8
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x4F)?.TargetFileOffset == 0x8206A0
-    && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x50) is null);
+    && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x50)?.TargetFileOffset == 0x82070B
+    && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x57)?.TargetFileOffset == 0x820993
+    && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x58) is null);
 Check("Secondary decoder RTTI and native body layouts retain observed offsets and widths",
     MatrixSecondaryMessageHeaderNativeLayout.BaseMetadataFlagOffset == 0x08
     && MatrixSecondaryMessageHeaderNativeLayout.DescriptorAnchorPointerOffset == 0x0C
@@ -1694,6 +1701,216 @@ Check("Secondary selectors 0x48-0x4F retain RTTI and native body layouts",
     && MatrixSecondaryEmbeddedBlobNativeLayout.LengthPrefixWireWidth == 2
     && MatrixSecondaryEmbeddedBlobNativeLayout.ObjectCopyVirtualMethodOffset == 0x10
     && MatrixSecondaryEmbeddedBlobNativeLayout.ZeroLengthPayloadWidth == 0);
+Check("Secondary selectors 0x50-0x57 retain RTTI identities and native reader shapes",
+    new byte[]
+    {
+        AchievementsNativeLayout.Selector,
+        AchievementUnlockedNativeLayout.Selector,
+        TotalAchievementPointsNativeLayout.Selector,
+        MissionCompletionCountsNativeLayout.Selector,
+        ContentUnlockedNativeLayout.Selector,
+        ClientUIActionNativeLayout.Selector,
+        ArcCompletionHistoryUpdateNativeLayout.Selector,
+        JobLedgerEntriesUpdateNativeLayout.Selector
+    }.SequenceEqual(Enumerable.Range(0x50, 8).Select(value => (byte)value))
+    && new uint[]
+    {
+        AchievementsNativeLayout.CaseFileOffset,
+        AchievementUnlockedNativeLayout.CaseFileOffset,
+        TotalAchievementPointsNativeLayout.CaseFileOffset,
+        MissionCompletionCountsNativeLayout.CaseFileOffset,
+        ContentUnlockedNativeLayout.CaseFileOffset,
+        ClientUIActionNativeLayout.CaseFileOffset,
+        ArcCompletionHistoryUpdateNativeLayout.CaseFileOffset,
+        JobLedgerEntriesUpdateNativeLayout.CaseFileOffset
+    }.SequenceEqual(new uint[]
+    {
+        0x82070B, 0x820775, 0x8207BD, 0x820805,
+        0x820879, 0x8208E1, 0x820929, 0x820993
+    })
+    && new uint[]
+    {
+        AchievementsNativeLayout.CaseVirtualAddress,
+        AchievementUnlockedNativeLayout.CaseVirtualAddress,
+        TotalAchievementPointsNativeLayout.CaseVirtualAddress,
+        MissionCompletionCountsNativeLayout.CaseVirtualAddress,
+        ContentUnlockedNativeLayout.CaseVirtualAddress,
+        ClientUIActionNativeLayout.CaseVirtualAddress,
+        ArcCompletionHistoryUpdateNativeLayout.CaseVirtualAddress,
+        JobLedgerEntriesUpdateNativeLayout.CaseVirtualAddress
+    }.SequenceEqual(new uint[]
+    {
+        0xC2130B, 0xC21375, 0xC213BD, 0xC21405,
+        0xC21479, 0xC214E1, 0xC21529, 0xC21593
+    })
+    && new int[]
+    {
+        AchievementsNativeLayout.AllocationSize,
+        AchievementUnlockedNativeLayout.AllocationSize,
+        TotalAchievementPointsNativeLayout.AllocationSize,
+        MissionCompletionCountsNativeLayout.AllocationSize,
+        ContentUnlockedNativeLayout.AllocationSize,
+        ClientUIActionNativeLayout.AllocationSize,
+        ArcCompletionHistoryUpdateNativeLayout.AllocationSize,
+        JobLedgerEntriesUpdateNativeLayout.AllocationSize
+    }.SequenceEqual(new[] { 0x38, 0x30, 0x30, 0x38, 0x38, 0x30, 0x30, 0x38 })
+    && new uint[]
+    {
+        AchievementsNativeLayout.ConstructorNativeTypeId,
+        AchievementUnlockedNativeLayout.ConstructorNativeTypeId,
+        TotalAchievementPointsNativeLayout.ConstructorNativeTypeId,
+        MissionCompletionCountsNativeLayout.ConstructorNativeTypeId,
+        ContentUnlockedNativeLayout.ConstructorNativeTypeId,
+        ClientUIActionNativeLayout.ConstructorNativeTypeId,
+        ArcCompletionHistoryUpdateNativeLayout.ConstructorNativeTypeId,
+        JobLedgerEntriesUpdateNativeLayout.ConstructorNativeTypeId
+    }.SequenceEqual(Enumerable.Range(0x50, 8).Select(value => (uint)value))
+    && new uint[]
+    {
+        AchievementsNativeLayout.VtableVirtualAddress,
+        AchievementUnlockedNativeLayout.VtableVirtualAddress,
+        TotalAchievementPointsNativeLayout.VtableVirtualAddress,
+        MissionCompletionCountsNativeLayout.VtableVirtualAddress,
+        ContentUnlockedNativeLayout.VtableVirtualAddress,
+        ClientUIActionNativeLayout.VtableVirtualAddress,
+        ArcCompletionHistoryUpdateNativeLayout.VtableVirtualAddress,
+        JobLedgerEntriesUpdateNativeLayout.VtableVirtualAddress
+    }.SequenceEqual(new uint[]
+    {
+        0x1C6DF98, 0x1C6DF48, 0x1C6DF38, 0x1C6DF68,
+        0x1C6DF58, 0x1C6DF08, 0x1C6DF28, 0x1C6DF18
+    })
+    && new uint[]
+    {
+        AchievementsNativeLayout.ConstructorFileOffset,
+        AchievementUnlockedNativeLayout.ConstructorFileOffset,
+        TotalAchievementPointsNativeLayout.ConstructorFileOffset,
+        MissionCompletionCountsNativeLayout.ConstructorFileOffset,
+        ContentUnlockedNativeLayout.ConstructorFileOffset,
+        ClientUIActionNativeLayout.ConstructorFileOffset,
+        ArcCompletionHistoryUpdateNativeLayout.ConstructorFileOffset,
+        JobLedgerEntriesUpdateNativeLayout.ConstructorFileOffset
+    }.SequenceEqual(new uint[]
+    {
+        0x8178C0, 0x817A10, 0x817AD0, 0x817B90,
+        0x817D60, 0x817F20, 0x8180B0, 0x818220
+    })
+    && new uint[]
+    {
+        AchievementsNativeLayout.BaseMetadataConstructorFileOffset,
+        AchievementUnlockedNativeLayout.BaseMetadataConstructorFileOffset,
+        TotalAchievementPointsNativeLayout.BaseMetadataConstructorFileOffset,
+        MissionCompletionCountsNativeLayout.BaseMetadataConstructorFileOffset,
+        ContentUnlockedNativeLayout.BaseMetadataConstructorFileOffset,
+        ClientUIActionNativeLayout.BaseMetadataConstructorFileOffset,
+        ArcCompletionHistoryUpdateNativeLayout.BaseMetadataConstructorFileOffset,
+        JobLedgerEntriesUpdateNativeLayout.BaseMetadataConstructorFileOffset
+    }.SequenceEqual(new uint[]
+    {
+        0x824C20, 0x824D80, 0x824DF0, 0x824E60,
+        0x824FD0, 0x825040, 0x8250B0, 0x825120
+    })
+    && new uint[]
+    {
+        AchievementsNativeLayout.DescriptorAnchorVirtualAddress,
+        AchievementUnlockedNativeLayout.DescriptorAnchorVirtualAddress,
+        TotalAchievementPointsNativeLayout.DescriptorAnchorVirtualAddress,
+        MissionCompletionCountsNativeLayout.DescriptorAnchorVirtualAddress,
+        ContentUnlockedNativeLayout.DescriptorAnchorVirtualAddress,
+        ClientUIActionNativeLayout.DescriptorAnchorVirtualAddress,
+        ArcCompletionHistoryUpdateNativeLayout.DescriptorAnchorVirtualAddress,
+        JobLedgerEntriesUpdateNativeLayout.DescriptorAnchorVirtualAddress
+    }.SequenceEqual(new uint[]
+    {
+        0x1B89B5C, 0x1B89B64, 0x1B89B4C, 0x1B89B54,
+        0x1B89B3C, 0x1B89B44, 0x1B89B2C, 0x1B89B34
+    })
+    && new string[]
+    {
+        AchievementsNativeLayout.RttiName,
+        AchievementUnlockedNativeLayout.RttiName,
+        TotalAchievementPointsNativeLayout.RttiName,
+        MissionCompletionCountsNativeLayout.RttiName,
+        ContentUnlockedNativeLayout.RttiName,
+        ClientUIActionNativeLayout.RttiName,
+        ArcCompletionHistoryUpdateNativeLayout.RttiName,
+        JobLedgerEntriesUpdateNativeLayout.RttiName
+    }.SequenceEqual(new[]
+    {
+        ".?AVAchievements@firefall@@",
+        ".?AVAchievementUnlocked@firefall@@",
+        ".?AVTotalAchievementPoints@firefall@@",
+        ".?AVMissionCompletionCounts@firefall@@",
+        ".?AVContentUnlocked@firefall@@",
+        ".?AVClientUIAction@firefall@@",
+        ".?AVArcCompletionHistoryUpdate@firefall@@",
+        ".?AVJobLedgerEntriesUpdate@firefall@@"
+    })
+    && new uint[]
+    {
+        AchievementsNativeLayout.BodyReaderFileOffset,
+        AchievementUnlockedNativeLayout.BodyReaderFileOffset,
+        TotalAchievementPointsNativeLayout.BodyReaderFileOffset,
+        MissionCompletionCountsNativeLayout.BodyReaderFileOffset,
+        ContentUnlockedNativeLayout.BodyReaderFileOffset,
+        ClientUIActionNativeLayout.BodyReaderFileOffset,
+        ArcCompletionHistoryUpdateNativeLayout.BodyReaderFileOffset,
+        JobLedgerEntriesUpdateNativeLayout.BodyReaderFileOffset
+    }.SequenceEqual(new uint[]
+    {
+        0x848FC0, 0x356F80, 0x3370A0, 0x848610,
+        0x847DC0, 0x12EE010, 0x847A70, 0x6095C0
+    })
+    && new uint[]
+    {
+        AchievementsNativeLayout.BodyReaderCallSiteFileOffset,
+        AchievementUnlockedNativeLayout.BodyReaderCallSiteFileOffset,
+        TotalAchievementPointsNativeLayout.BodyReaderCallSiteFileOffset,
+        MissionCompletionCountsNativeLayout.BodyReaderCallSiteFileOffset,
+        ContentUnlockedNativeLayout.BodyReaderCallSiteFileOffset,
+        ClientUIActionNativeLayout.BodyReaderCallSiteFileOffset,
+        ArcCompletionHistoryUpdateNativeLayout.BodyReaderCallSiteFileOffset,
+        JobLedgerEntriesUpdateNativeLayout.BodyReaderCallSiteFileOffset
+    }.SequenceEqual(new uint[]
+    {
+        0x82075B, 0x81F73C, 0x8206F1, 0x820855,
+        0x8208C7, 0x81FB34, 0x820979, 0x8209E3
+    })
+    && AchievementUnlockedNativeLayout.SharedBodyContinuationFileOffset == 0x81F72E
+    && TotalAchievementPointsNativeLayout.SharedBodyContinuationFileOffset == 0x8206E3
+    && ClientUIActionNativeLayout.SharedBodyContinuationFileOffset == 0x81FB27
+    && AchievementsNativeLayout.RecordWireWidth == 5
+    && AchievementsNativeLayout.RecordNativeStride == 8
+    && AchievementsNativeLayout.CountWireWidth == 1
+    && AchievementsNativeLayout.ChunkContinuationCount == 0xFF
+    && AchievementUnlockedNativeLayout.QwordFieldOffset == 0x28
+    && AchievementUnlockedNativeLayout.QwordWireWidth == 8
+    && TotalAchievementPointsNativeLayout.DwordFieldOffset == 0x28
+    && TotalAchievementPointsNativeLayout.DwordWireWidth == 4
+    && MissionCompletionCountsNativeLayout.RecordWireWidth == 16
+    && MissionCompletionCountsNativeLayout.RecordNativeStride == 24
+    && MissionCompletionCountsNativeLayout.SharedTextFieldOffset == 0x34
+    && ContentUnlockedNativeLayout.SharedTextFieldOffset == 0x28
+    && ContentUnlockedNativeLayout.DwordFieldOffset == 0x2C
+    && ContentUnlockedNativeLayout.QwordFieldOffset == 0x30
+    && ClientUIActionNativeLayout.SharedTextFieldOffset == 0x28
+    && ArcCompletionHistoryUpdateNativeLayout.RecordWireWidth == 16
+    && ArcCompletionHistoryUpdateNativeLayout.TreeSentinelAllocationSize == 0x20
+    && ArcCompletionHistoryUpdateNativeLayout.TreeSentinelMarkerWordOffset == 0x0C
+    && ArcCompletionHistoryUpdateNativeLayout.TreeSentinelMarkerWordValue == 0x0101
+    && JobLedgerEntriesUpdateNativeLayout.RecordWireWidth == 4
+    && JobLedgerEntriesUpdateNativeLayout.RecordNativeStride == 4
+    && new uint[]
+    {
+        AchievementsNativeLayout.CaseLocalDwordValue,
+        AchievementUnlockedNativeLayout.CaseLocalDwordValue,
+        TotalAchievementPointsNativeLayout.CaseLocalDwordValue,
+        MissionCompletionCountsNativeLayout.CaseLocalDwordValue,
+        ContentUnlockedNativeLayout.CaseLocalDwordValue,
+        ClientUIActionNativeLayout.CaseLocalDwordValue,
+        ArcCompletionHistoryUpdateNativeLayout.CaseLocalDwordValue,
+        JobLedgerEntriesUpdateNativeLayout.CaseLocalDwordValue
+    }.SequenceEqual(Enumerable.Range(0x30, 8).Select(value => (uint)value)));
 Check("Secondary parser-local DWORD literals remain separate from selector mapping",
     new uint[]
     {
