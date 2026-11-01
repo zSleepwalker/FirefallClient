@@ -9,7 +9,7 @@ public static class VehicleAbilityActivatedNativeLayout
     public const uint SwitchTableVirtualAddress = 0xC2260C;
     public const uint SwitchTableFileOffset = 0x821A0C;
     public const int SwitchEntryIndex = 0;
-    public const int SwitchArgumentAdjustment = 0xAD;
+    public const int SwitchArgumentAdjustment = -0x53;
     public const uint CaseFileOffset = 0x81EF83;
     public const int CaseLocalDwordValue = 0xD0;
     public const int AllocationSize = 0x30;

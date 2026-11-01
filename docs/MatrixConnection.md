@@ -1049,7 +1049,7 @@ names for the 91 secondary-table entries are unresolved.
 
 The five case-bearing primary routes (indices 2..6) have 17 directly selected
 subcases: three at route2, nine at route3, three at route4, and one each at
-routes5 and6. Five subcases now have native layouts; 12 remain unmapped.
+routes5 and6. Eleven subcases now have native layouts; six remain unmapped.
 Route0's nested table has a separate, complete set of 40 documented selectors
 (`0x53..0x7A`); route1 is the zero-return route. The secondary selector table
 records all 91 targets as dispatch data, but their message identities remain
@@ -1066,12 +1066,36 @@ branches to case `0x81EF1C`. That case requests `0x40` bytes from allocator
 
 The body reader writes a DWORD at object+`0x28`, followed by raw QWORDs at
 `+0x30` and `+0x38`, using readers `0x3370A0` and `0x356F80`. Field meanings
-remain unknown. Dispatcher values `0x54` and `0x55` in this route are not yet
-mapped.
+remain unknown.
+
+Value `0x54` selects case `0x81EECB` (`AreaVisualData::AudioEmitterSpawned`).
+It allocates `0x40` bytes, stores local DWORD `0xCE`, calls constructor
+`0xADBB40`, then reader `0x83ACA0`. The constructor passes `0x54` to base
+helper `0xB076D0` and installs vtable VA `0x1C72358` (RTTI
+`firefall::AreaVisualData::AudioEmitterSpawned`). Its reader writes a QWORD at
+`+0x28`, DWORDs at `+0x30/+0x34/+0x38`, and a WORD at `+0x3C`; helper readers
+are `0x356850`, `0x3568E0`, and `0x336AC0`.
+
+Value `0x55` selects case `0x81EE79` (`AreaVisualData::ParticleEffectSpawned`).
+It allocates `0x70` bytes, stores local DWORD `0xCF`, calls constructor
+`0xADBBC0`, then reader `0x83AAA0`. The constructor passes `0x55` to base
+helper `0xB07740`, installs vtable VA `0x1C72368` (RTTI
+`firefall::AreaVisualData::ParticleEffectSpawned`), and directly zeroes
+DWORDs at `+0x28/+0x2C/+0x30`, bytes at `+0x40/+0x58/+0x64`, a DWORD at
+`+0x5C`, and a WORD at `+0x60`. The reader processes, in order, a QWORD at
+`+0x28`, DWORDs at `+0x30/+0x34/+0x38/+0x3C`, a conditional record at `+0x40`
+(one input presence byte and, when nonzero, three DWORDs at `+0x44/+0x48/+0x4C`),
+four WORDs at `+0x50..+0x56`, a byte at `+0x58`, a DWORD at `+0x5C`, a WORD
+at `+0x60`, and a second conditional record at `+0x64` (one input presence
+byte and, when nonzero, DWORDs at `+0x68/+0x6C`). Helpers `0x5C0270` and
+`0x83A9C0` implement the conditional records; their present values are copied
+into native fields, while an absent input clears only the presence byte.
+No field meanings are inferred from the RTTI names.
 
 ### Route index 3, switch entry 0: `Vehicle::AbilityActivated`
 
-The route3 block `0x81EF6D` computes `arg_0 + 0xAD` and bounds the result to
+The route3 block `0x81EF6D` computes `arg_0 - 0x53`: instruction bytes
+`83 C0 AD` sign-extend the encoded immediate `0xAD` to `-0x53`. It bounds the result to
 indices `0..8` before indexing the nine-entry table at VA `0xC2260C` (raw
 `0x821A0C`). Entry0 reaches case `0x81EF83`, which allocates `0x30` bytes,
 stores local DWORD `0xD0` (role unknown), calls constructor `0xB093C0`, then
@@ -1079,7 +1103,22 @@ reader `0x83A840`. The constructor passes `0x53` to helper `0xB474B0` and
 installs vtable VA `0x1C72998` (RTTI `firefall::Vehicle::AbilityActivated`).
 
 The reader writes DWORDs at object+`0x28` and `+0x2C` through `0x3370A0`.
-Their meanings remain unknown; switch entries1..8 remain unmapped.
+Their meanings remain unknown.
+
+Switch entry1 (dispatcher value `0x54`) selects case `0x81EFD4`,
+`Vehicle::AbilityFailed`. It allocates `0x30` bytes, stores local DWORD
+`0xD1`, calls constructor `0xB09440`, then reader `0x83A7A0`. The constructor
+passes `0x54` to base helper `0xB47520` and installs vtable VA `0x1C72978`
+(RTTI `firefall::Vehicle::AbilityFailed`). The reader writes DWORDs at
+`+0x28/+0x2C` through `0x3370A0`.
+
+Switch entry6 (value `0x59`) selects case `0x81F110`,
+`Vehicle::ForcedMovementCancelled`. It allocates `0x30` bytes, stores local
+DWORD `0xD6`, calls constructor `0xB097A0`, then reader `0x83A440`. The
+constructor passes `0x59` to base helper `0xB47760` and installs vtable VA
+`0x1C72928` (RTTI `firefall::Vehicle::ForcedMovementCancelled`). The reader
+writes a DWORD at `+0x28` and a WORD at `+0x2C`, through `0x3370A0` and
+`0x336AC0`. Entries2,3,4,5,7,8 are still unmapped.
 
 ### Route index 4, dispatcher value `0x53`: `Deployable::TookHit`
 
@@ -1092,7 +1131,33 @@ passes `0x53` to helper `0xB47C40`, installs vtable VA `0x1C727A8` (RTTI
 The body reader calls conditional-record reader `0x5F0CF0` for object+`0x28`,
 reads bytes at `+0x50` and `+0x51`, a WORD at `+0x58`, then a byte at `+0x5A`.
 The conditional record's internal field meanings and all outer field meanings
-remain unknown. Dispatcher values `0x54` and `0x55` remain unmapped.
+remain unknown.
+
+Value `0x54` selects case `0x81F24D`, `Deployable::AbilityProjectileFired`.
+It allocates `0x68` bytes, stores local DWORD `0xDA`, calls constructor
+`0xB27F40`, then reader `0x839F50`. The constructor passes `0x54` to base
+helper `0xB47CB0`, installs vtable VA `0x1C72764` (RTTI
+`firefall::Deployable::AbilityProjectileFired`), and directly zeroes byte
+`+0x58`. The reader writes eight WORDs at `+0x28..+0x36`, DWORDs at
+`+0x38/+0x3C`, byte `+0x40`, DWORD `+0x44`, byte `+0x48`, DWORDs at
+`+0x4C/+0x50`, then an optional QWORD record at `+0x58`: a presence byte
+followed, when nonzero, by QWORD `+0x60`. Reader helpers are `0x336AC0`,
+`0x34B740`, `0x6097B0`, `0x3568E0`, `0x353310`, `0x337180`,
+`0x3370A0`, and `0x5FDA00` (which uses `0x356F80` for the QWORD).
+
+Value `0x55` selects case `0x81F21C`, `Deployable::PublicCombatLog`. It
+allocates `0x40` bytes, stores local DWORD `0xDB`, calls constructor
+`0xB27FE0`, then joins the shared reader tail at `0x81CF5B`, which calls
+`0x5F3350` with `this = object+0x28`. The constructor passes `0x55` to base
+helper `0xB47D20`, installs vtable VA `0x1C72754` (RTTI
+`firefall::Deployable::PublicCombatLog`), zeroes byte `+0x28`, and initializes
+an embedded blob object at `+0x2C` with vtable VA `0x1C80CC4` and three zero
+DWORDs at `+0x30/+0x34/+0x38`. The reader first consumes a DWORD and requires
+it to equal `1`; the nonmatching path reaches an error stub. On the matching
+path, `0x12EE170` reads a WORD byte-count followed by that many bytes and
+passes the span to the embedded blob's indirect vtable slot `+0x10`, then
+advances the input cursor. Blob semantics and the indirect destination remain
+unresolved; RTTI alone does not establish combat-log meaning.
 
 ### Route index 5, dispatcher value `0x53`: `Turret::WeaponProjectileFired`
 

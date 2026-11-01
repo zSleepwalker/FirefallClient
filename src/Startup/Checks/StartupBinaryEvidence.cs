@@ -3677,5 +3677,236 @@ internal static class StartupBinaryEvidence
                 0xE8, LootStoreExtensionLootObjectCollectedNativeLayout.QwordReaderFileOffset)
             && VtableRttiName(LootStoreExtensionLootObjectCollectedNativeLayout.VtableVirtualAddress, 80)
                 == LootStoreExtensionLootObjectCollectedNativeLayout.RttiName);
+        check("Binary route-index-2 value0x54 constructs AreaVisualData AudioEmitterSpawned",
+            ReadUInt32(VirtualAddressToFileOffset(
+                MatrixSecondaryCommandDispatcherNativeLayout.PrimaryJumpTableVirtualAddress) + 2 * 4)
+                == AreaVisualDataAudioEmitterSpawnedNativeLayout.DispatcherFileOffset + 0x400C00
+            && Matches(AreaVisualDataAudioEmitterSpawnedNativeLayout.DispatcherFileOffset,
+                "8B450883E8530F84AD000000487459480F8560290000")
+            && Matches(AreaVisualDataAudioEmitterSpawnedNativeLayout.CaseFileOffset, "6A40")
+            && RelativeBranchTargets(AreaVisualDataAudioEmitterSpawnedNativeLayout.CaseFileOffset + 2, 0xE8,
+                AreaVisualDataAudioEmitterSpawnedNativeLayout.AllocationFunctionFileOffset)
+            && Matches(AreaVisualDataAudioEmitterSpawnedNativeLayout.CaseFileOffset + 0x0E,
+                "C7442420CE000000")
+            && Matches(AreaVisualDataAudioEmitterSpawnedNativeLayout.CaseFileOffset + 0x18, "7410")
+            && RelativeBranchTargets(AreaVisualDataAudioEmitterSpawnedNativeLayout.ConstructorCallSiteFileOffset,
+                0xE8, AreaVisualDataAudioEmitterSpawnedNativeLayout.ConstructorFileOffset)
+            && RelativeBranchTargets(AreaVisualDataAudioEmitterSpawnedNativeLayout.BodyReaderCallSiteFileOffset,
+                0xE8, AreaVisualDataAudioEmitterSpawnedNativeLayout.BodyReaderFileOffset)
+            && Matches(AreaVisualDataAudioEmitterSpawnedNativeLayout.ConstructorFileOffset + 0x12,
+                "C70054000000")
+            && RelativeBranchTargets(AreaVisualDataAudioEmitterSpawnedNativeLayout.ConstructorFileOffset + 0x18,
+                0xE8, AreaVisualDataAudioEmitterSpawnedNativeLayout.BaseConstructorHelperFileOffset)
+            && Matches(AreaVisualDataAudioEmitterSpawnedNativeLayout.ConstructorFileOffset + 0x1D,
+                "C7065823C701")
+            && RelativeBranchTargets(AreaVisualDataAudioEmitterSpawnedNativeLayout.BodyReaderFileOffset + 0x0F,
+                0xE8, AreaVisualDataAudioEmitterSpawnedNativeLayout.QwordReaderFileOffset)
+            && RelativeBranchTargets(AreaVisualDataAudioEmitterSpawnedNativeLayout.BodyReaderFileOffset + 0x1A,
+                0xE8, AreaVisualDataAudioEmitterSpawnedNativeLayout.DwordReaderFileOffset)
+            && RelativeBranchTargets(AreaVisualDataAudioEmitterSpawnedNativeLayout.BodyReaderFileOffset + 0x25,
+                0xE8, AreaVisualDataAudioEmitterSpawnedNativeLayout.DwordReaderFileOffset)
+            && RelativeBranchTargets(AreaVisualDataAudioEmitterSpawnedNativeLayout.BodyReaderFileOffset + 0x30,
+                0xE8, AreaVisualDataAudioEmitterSpawnedNativeLayout.DwordReaderFileOffset)
+            && RelativeBranchTargets(AreaVisualDataAudioEmitterSpawnedNativeLayout.BodyReaderFileOffset + 0x3B,
+                0xE8, AreaVisualDataAudioEmitterSpawnedNativeLayout.WordReaderFileOffset)
+            && VtableRttiName(AreaVisualDataAudioEmitterSpawnedNativeLayout.VtableVirtualAddress, 80)
+                == AreaVisualDataAudioEmitterSpawnedNativeLayout.RttiName);
+        check("Binary route-index-2 value0x55 constructs AreaVisualData ParticleEffectSpawned",
+            ReadUInt32(VirtualAddressToFileOffset(
+                MatrixSecondaryCommandDispatcherNativeLayout.PrimaryJumpTableVirtualAddress) + 2 * 4)
+                == AreaVisualDataParticleEffectSpawnedNativeLayout.DispatcherFileOffset + 0x400C00
+            && Matches(AreaVisualDataParticleEffectSpawnedNativeLayout.CaseFileOffset, "6A70")
+            && RelativeBranchTargets(AreaVisualDataParticleEffectSpawnedNativeLayout.CaseFileOffset + 2, 0xE8,
+                AreaVisualDataParticleEffectSpawnedNativeLayout.AllocationFunctionFileOffset)
+            && Matches(AreaVisualDataParticleEffectSpawnedNativeLayout.CaseFileOffset + 0x0E,
+                "C7442420CF000000")
+            && Matches(AreaVisualDataParticleEffectSpawnedNativeLayout.CaseFileOffset + 0x18, "7410")
+            && RelativeBranchTargets(AreaVisualDataParticleEffectSpawnedNativeLayout.ConstructorCallSiteFileOffset,
+                0xE8, AreaVisualDataParticleEffectSpawnedNativeLayout.ConstructorFileOffset)
+            && RelativeBranchTargets(AreaVisualDataParticleEffectSpawnedNativeLayout.BodyReaderCallSiteFileOffset,
+                0xE8, AreaVisualDataParticleEffectSpawnedNativeLayout.BodyReaderFileOffset)
+            && Matches(AreaVisualDataParticleEffectSpawnedNativeLayout.ConstructorFileOffset + 0x12,
+                "C70055000000")
+            && RelativeBranchTargets(AreaVisualDataParticleEffectSpawnedNativeLayout.ConstructorFileOffset + 0x18,
+                0xE8, AreaVisualDataParticleEffectSpawnedNativeLayout.BaseConstructorHelperFileOffset)
+            && Matches(AreaVisualDataParticleEffectSpawnedNativeLayout.ConstructorFileOffset + 0x1D,
+                "C7066823C701")
+            && Matches(AreaVisualDataParticleEffectSpawnedNativeLayout.ConstructorFileOffset + 0x25,
+                "C7462800000000")
+            && Matches(AreaVisualDataParticleEffectSpawnedNativeLayout.ConstructorFileOffset + 0x2C,
+                "C7462C00000000")
+            && Matches(AreaVisualDataParticleEffectSpawnedNativeLayout.ConstructorFileOffset + 0x33,
+                "C7463000000000")
+            && Matches(AreaVisualDataParticleEffectSpawnedNativeLayout.ConstructorFileOffset + 0x3A, "C6464000")
+            && Matches(AreaVisualDataParticleEffectSpawnedNativeLayout.ConstructorFileOffset + 0x3E, "C6465800")
+            && Matches(AreaVisualDataParticleEffectSpawnedNativeLayout.ConstructorFileOffset + 0x42,
+                "C7465C00000000")
+            && Matches(AreaVisualDataParticleEffectSpawnedNativeLayout.ConstructorFileOffset + 0x49,
+                "66894660")
+            && Matches(AreaVisualDataParticleEffectSpawnedNativeLayout.ConstructorFileOffset + 0x4D,
+                "884664")
+            && RelativeBranchTargets(AreaVisualDataParticleEffectSpawnedNativeLayout.BodyReaderFileOffset + 0x0E,
+                0xE8, AreaVisualDataParticleEffectSpawnedNativeLayout.QwordReaderFileOffset)
+            && RelativeBranchTargets(AreaVisualDataParticleEffectSpawnedNativeLayout.BodyReaderFileOffset + 0x19,
+                0xE8, AreaVisualDataParticleEffectSpawnedNativeLayout.DwordReaderFileOffset)
+            && RelativeBranchTargets(AreaVisualDataParticleEffectSpawnedNativeLayout.BodyReaderFileOffset + 0x44,
+                0xE8, AreaVisualDataParticleEffectSpawnedNativeLayout.ConditionalTripleDwordReaderFileOffset)
+            && RelativeBranchTargets(AreaVisualDataParticleEffectSpawnedNativeLayout.BodyReaderFileOffset + 0x4F,
+                0xE8, AreaVisualDataParticleEffectSpawnedNativeLayout.WordReaderFileOffset)
+            && RelativeBranchTargets(AreaVisualDataParticleEffectSpawnedNativeLayout.BodyReaderFileOffset + 0x7A,
+                0xE8, AreaVisualDataParticleEffectSpawnedNativeLayout.ByteReaderFileOffset)
+            && RelativeBranchTargets(AreaVisualDataParticleEffectSpawnedNativeLayout.BodyReaderFileOffset + 0x85,
+                0xE8, AreaVisualDataParticleEffectSpawnedNativeLayout.DwordReaderFileOffset)
+            && RelativeBranchTargets(AreaVisualDataParticleEffectSpawnedNativeLayout.BodyReaderFileOffset + 0x90,
+                0xE8, AreaVisualDataParticleEffectSpawnedNativeLayout.FinalWordReaderFileOffset)
+            && RelativeBranchTargets(AreaVisualDataParticleEffectSpawnedNativeLayout.BodyReaderFileOffset + 0x9A,
+                0xE8, AreaVisualDataParticleEffectSpawnedNativeLayout.ConditionalPairDwordReaderFileOffset)
+            && VtableRttiName(AreaVisualDataParticleEffectSpawnedNativeLayout.VtableVirtualAddress, 80)
+                == AreaVisualDataParticleEffectSpawnedNativeLayout.RttiName);
+        check("Binary route-index-3 switch entry1 constructs Vehicle AbilityFailed",
+            ReadUInt32(VirtualAddressToFileOffset(
+                MatrixSecondaryCommandDispatcherNativeLayout.PrimaryJumpTableVirtualAddress) + 3 * 4)
+                == VehicleAbilityFailedNativeLayout.DispatcherFileOffset + 0x400C00
+            && ReadUInt32(VirtualAddressToFileOffset(VehicleAbilityFailedNativeLayout.SwitchTableVirtualAddress)
+                + VehicleAbilityFailedNativeLayout.SwitchEntryIndex * 4)
+                == VehicleAbilityFailedNativeLayout.CaseFileOffset + 0x400C00
+            && Matches(VehicleAbilityFailedNativeLayout.DispatcherFileOffset,
+                "8B450883C0AD83F8080F875D280000FF24850C26C200")
+            && Matches(VehicleAbilityFailedNativeLayout.CaseFileOffset, "6A30")
+            && RelativeBranchTargets(VehicleAbilityFailedNativeLayout.CaseFileOffset + 2, 0xE8,
+                VehicleAbilityFailedNativeLayout.AllocationFunctionFileOffset)
+            && Matches(VehicleAbilityFailedNativeLayout.CaseFileOffset + 0x0E, "C7442420D1000000")
+            && Matches(VehicleAbilityFailedNativeLayout.CaseFileOffset + 0x18, "7410")
+            && RelativeBranchTargets(VehicleAbilityFailedNativeLayout.ConstructorCallSiteFileOffset,
+                0xE8, VehicleAbilityFailedNativeLayout.ConstructorFileOffset)
+            && RelativeBranchTargets(VehicleAbilityFailedNativeLayout.BodyReaderCallSiteFileOffset,
+                0xE8, VehicleAbilityFailedNativeLayout.BodyReaderFileOffset)
+            && Matches(VehicleAbilityFailedNativeLayout.ConstructorFileOffset + 0x12, "C70054000000")
+            && RelativeBranchTargets(VehicleAbilityFailedNativeLayout.ConstructorFileOffset + 0x18,
+                0xE8, VehicleAbilityFailedNativeLayout.BaseConstructorHelperFileOffset)
+            && Matches(VehicleAbilityFailedNativeLayout.ConstructorFileOffset + 0x1D, "C7067829C701")
+            && RelativeBranchTargets(VehicleAbilityFailedNativeLayout.BodyReaderFileOffset + 0x0E,
+                0xE8, VehicleAbilityFailedNativeLayout.DwordReaderFileOffset)
+            && RelativeBranchTargets(VehicleAbilityFailedNativeLayout.BodyReaderFileOffset + 0x19,
+                0xE8, VehicleAbilityFailedNativeLayout.DwordReaderFileOffset)
+            && VtableRttiName(VehicleAbilityFailedNativeLayout.VtableVirtualAddress, 80)
+                == VehicleAbilityFailedNativeLayout.RttiName);
+        check("Binary route-index-3 switch entry6 constructs Vehicle ForcedMovementCancelled",
+            ReadUInt32(VirtualAddressToFileOffset(VehicleForcedMovementCancelledNativeLayout.SwitchTableVirtualAddress)
+                + VehicleForcedMovementCancelledNativeLayout.SwitchEntryIndex * 4)
+                == VehicleForcedMovementCancelledNativeLayout.CaseFileOffset + 0x400C00
+            && Matches(VehicleForcedMovementCancelledNativeLayout.CaseFileOffset, "6A30")
+            && RelativeBranchTargets(VehicleForcedMovementCancelledNativeLayout.CaseFileOffset + 2, 0xE8,
+                VehicleForcedMovementCancelledNativeLayout.AllocationFunctionFileOffset)
+            && Matches(VehicleForcedMovementCancelledNativeLayout.CaseFileOffset + 0x0E, "C7442420D6000000")
+            && Matches(VehicleForcedMovementCancelledNativeLayout.CaseFileOffset + 0x18, "7410")
+            && RelativeBranchTargets(VehicleForcedMovementCancelledNativeLayout.ConstructorCallSiteFileOffset,
+                0xE8, VehicleForcedMovementCancelledNativeLayout.ConstructorFileOffset)
+            && RelativeBranchTargets(VehicleForcedMovementCancelledNativeLayout.BodyReaderCallSiteFileOffset,
+                0xE8, VehicleForcedMovementCancelledNativeLayout.BodyReaderFileOffset)
+            && Matches(VehicleForcedMovementCancelledNativeLayout.ConstructorFileOffset + 0x12,
+                "C70059000000")
+            && RelativeBranchTargets(VehicleForcedMovementCancelledNativeLayout.ConstructorFileOffset + 0x18,
+                0xE8, VehicleForcedMovementCancelledNativeLayout.BaseConstructorHelperFileOffset)
+            && Matches(VehicleForcedMovementCancelledNativeLayout.ConstructorFileOffset + 0x1D,
+                "C7062829C701")
+            && RelativeBranchTargets(VehicleForcedMovementCancelledNativeLayout.BodyReaderFileOffset + 0x0E,
+                0xE8, VehicleForcedMovementCancelledNativeLayout.DwordReaderFileOffset)
+            && RelativeBranchTargets(VehicleForcedMovementCancelledNativeLayout.BodyReaderFileOffset + 0x19,
+                0xE8, VehicleForcedMovementCancelledNativeLayout.WordReaderFileOffset)
+            && VtableRttiName(VehicleForcedMovementCancelledNativeLayout.VtableVirtualAddress, 80)
+                == VehicleForcedMovementCancelledNativeLayout.RttiName);
+        check("Binary route-index-4 value0x54 constructs Deployable AbilityProjectileFired",
+            ReadUInt32(VirtualAddressToFileOffset(
+                MatrixSecondaryCommandDispatcherNativeLayout.PrimaryJumpTableVirtualAddress) + 4 * 4)
+                == DeployableAbilityProjectileFiredNativeLayout.DispatcherFileOffset + 0x400C00
+            && Matches(DeployableAbilityProjectileFiredNativeLayout.DispatcherFileOffset,
+                "8B450883E8530F848C000000487438480F85BD250000")
+            && Matches(DeployableAbilityProjectileFiredNativeLayout.CaseFileOffset, "6A68")
+            && RelativeBranchTargets(DeployableAbilityProjectileFiredNativeLayout.CaseFileOffset + 2, 0xE8,
+                DeployableAbilityProjectileFiredNativeLayout.AllocationFunctionFileOffset)
+            && Matches(DeployableAbilityProjectileFiredNativeLayout.CaseFileOffset + 0x0E,
+                "C7442420DA000000")
+            && RelativeBranchTargets(DeployableAbilityProjectileFiredNativeLayout.ConstructorCallSiteFileOffset,
+                0xE8, DeployableAbilityProjectileFiredNativeLayout.ConstructorFileOffset)
+            && RelativeBranchTargets(DeployableAbilityProjectileFiredNativeLayout.BodyReaderCallSiteFileOffset,
+                0xE8, DeployableAbilityProjectileFiredNativeLayout.BodyReaderFileOffset)
+            && Matches(DeployableAbilityProjectileFiredNativeLayout.ConstructorFileOffset + 0x12,
+                "C70054000000")
+            && RelativeBranchTargets(DeployableAbilityProjectileFiredNativeLayout.ConstructorFileOffset + 0x18,
+                0xE8, DeployableAbilityProjectileFiredNativeLayout.BaseConstructorHelperFileOffset)
+            && Matches(DeployableAbilityProjectileFiredNativeLayout.ConstructorFileOffset + 0x1D,
+                "C7066427C701")
+            && Matches(DeployableAbilityProjectileFiredNativeLayout.ConstructorFileOffset + 0x25,
+                "C6465800")
+            && RelativeBranchTargets(DeployableAbilityProjectileFiredNativeLayout.BodyReaderFileOffset + 0x11,
+                0xE8, DeployableAbilityProjectileFiredNativeLayout.WordReaderFileOffset)
+            && RelativeBranchTargets(DeployableAbilityProjectileFiredNativeLayout.BodyReaderFileOffset + 0x1C,
+                0xE8, DeployableAbilityProjectileFiredNativeLayout.AlternateWordReaderFileOffset)
+            && RelativeBranchTargets(DeployableAbilityProjectileFiredNativeLayout.BodyReaderFileOffset + 0x27,
+                0xE8, DeployableAbilityProjectileFiredNativeLayout.AlternateWordReaderFileOffset)
+            && RelativeBranchTargets(DeployableAbilityProjectileFiredNativeLayout.BodyReaderFileOffset + 0x32,
+                0xE8, DeployableAbilityProjectileFiredNativeLayout.AlternateWordReaderFileOffset)
+            && RelativeBranchTargets(DeployableAbilityProjectileFiredNativeLayout.BodyReaderFileOffset + 0x3D,
+                0xE8, DeployableAbilityProjectileFiredNativeLayout.ScalarReaderFileOffset)
+            && RelativeBranchTargets(DeployableAbilityProjectileFiredNativeLayout.BodyReaderFileOffset + 0x5E,
+                0xE8, DeployableAbilityProjectileFiredNativeLayout.WordReaderFileOffset)
+            && RelativeBranchTargets(DeployableAbilityProjectileFiredNativeLayout.BodyReaderFileOffset + 0x69,
+                0xE8, DeployableAbilityProjectileFiredNativeLayout.DwordReaderFileOffset)
+            && RelativeBranchTargets(DeployableAbilityProjectileFiredNativeLayout.BodyReaderFileOffset + 0x74,
+                0xE8, DeployableAbilityProjectileFiredNativeLayout.AlternateDwordReaderFileOffset)
+            && RelativeBranchTargets(DeployableAbilityProjectileFiredNativeLayout.BodyReaderFileOffset + 0x7E,
+                0xE8, DeployableAbilityProjectileFiredNativeLayout.ByteReaderFileOffset)
+            && RelativeBranchTargets(DeployableAbilityProjectileFiredNativeLayout.BodyReaderFileOffset + 0x89,
+                0xE8, DeployableAbilityProjectileFiredNativeLayout.DwordReaderFileOffset)
+            && RelativeBranchTargets(DeployableAbilityProjectileFiredNativeLayout.BodyReaderFileOffset + 0x93,
+                0xE8, DeployableAbilityProjectileFiredNativeLayout.ByteReaderFileOffset)
+            && RelativeBranchTargets(DeployableAbilityProjectileFiredNativeLayout.BodyReaderFileOffset + 0x9E,
+                0xE8, DeployableAbilityProjectileFiredNativeLayout.RawDwordReaderFileOffset)
+            && RelativeBranchTargets(DeployableAbilityProjectileFiredNativeLayout.BodyReaderFileOffset + 0xA9,
+                0xE8, DeployableAbilityProjectileFiredNativeLayout.RawDwordReaderFileOffset)
+            && RelativeBranchTargets(DeployableAbilityProjectileFiredNativeLayout.BodyReaderFileOffset + 0xB3,
+                0xE8, DeployableAbilityProjectileFiredNativeLayout.ConditionalQwordReaderFileOffset)
+            && VtableRttiName(DeployableAbilityProjectileFiredNativeLayout.VtableVirtualAddress, 80)
+                == DeployableAbilityProjectileFiredNativeLayout.RttiName);
+        check("Binary route-index-4 value0x55 constructs Deployable PublicCombatLog and calls its shared tail reader",
+            ReadUInt32(VirtualAddressToFileOffset(
+                MatrixSecondaryCommandDispatcherNativeLayout.PrimaryJumpTableVirtualAddress) + 4 * 4)
+                == DeployablePublicCombatLogNativeLayout.DispatcherFileOffset + 0x400C00
+            && Matches(DeployablePublicCombatLogNativeLayout.CaseFileOffset, "6A40")
+            && RelativeBranchTargets(DeployablePublicCombatLogNativeLayout.CaseFileOffset + 2, 0xE8,
+                DeployablePublicCombatLogNativeLayout.AllocationFunctionFileOffset)
+            && Matches(DeployablePublicCombatLogNativeLayout.CaseFileOffset + 0x0E,
+                "C7442420DB000000")
+            && RelativeBranchTargets(DeployablePublicCombatLogNativeLayout.ConstructorCallSiteFileOffset,
+                0xE8, DeployablePublicCombatLogNativeLayout.ConstructorFileOffset)
+            && RelativeBranchTargets(DeployablePublicCombatLogNativeLayout.BodyReaderCallSiteFileOffset,
+                0xE8, DeployablePublicCombatLogNativeLayout.BodyReaderFileOffset)
+            && Matches(DeployablePublicCombatLogNativeLayout.ConstructorFileOffset + 0x12,
+                "C70055000000")
+            && RelativeBranchTargets(DeployablePublicCombatLogNativeLayout.ConstructorFileOffset + 0x18,
+                0xE8, DeployablePublicCombatLogNativeLayout.BaseConstructorHelperFileOffset)
+            && Matches(DeployablePublicCombatLogNativeLayout.ConstructorFileOffset + 0x1D,
+                "C7065427C701")
+            && Matches(DeployablePublicCombatLogNativeLayout.ConstructorFileOffset + 0x25,
+                "C6462800")
+            && Matches(DeployablePublicCombatLogNativeLayout.ConstructorFileOffset + 0x29,
+                "C7462CC40CC801")
+            && Matches(DeployablePublicCombatLogNativeLayout.ConstructorFileOffset + 0x30,
+                "C7463000000000")
+            && Matches(DeployablePublicCombatLogNativeLayout.ConstructorFileOffset + 0x37,
+                "C7463400000000")
+            && Matches(DeployablePublicCombatLogNativeLayout.ConstructorFileOffset + 0x3E,
+                "C7463800000000")
+            && Matches(DeployablePublicCombatLogNativeLayout.BodyReaderCallSiteFileOffset - 0x0C,
+                "578D4E28C7442424FFFFFFFF")
+            && Matches(DeployablePublicCombatLogNativeLayout.BodyReaderFileOffset + 0x54,
+                "83FF017511")
+            && RelativeBranchTargets(DeployablePublicCombatLogNativeLayout.BodyReaderFileOffset + 0x77,
+                0xE8, 0x159E27A)
+            && RelativeBranchTargets(0x5F33AE, 0xE8,
+                DeployablePublicCombatLogNativeLayout.WordLengthPrefixedBlobReaderFileOffset)
+            && VtableRttiName(DeployablePublicCombatLogNativeLayout.VtableVirtualAddress, 80)
+                == DeployablePublicCombatLogNativeLayout.RttiName);
     }
 }

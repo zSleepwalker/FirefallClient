@@ -990,7 +990,7 @@ Check("Vehicle AbilityActivated route-index-3 switch-entry layout is recorded",
     && VehicleAbilityActivatedNativeLayout.SwitchTableVirtualAddress == 0xC2260C
     && VehicleAbilityActivatedNativeLayout.SwitchTableFileOffset == 0x821A0C
     && VehicleAbilityActivatedNativeLayout.SwitchEntryIndex == 0
-    && VehicleAbilityActivatedNativeLayout.SwitchArgumentAdjustment == 0xAD
+    && VehicleAbilityActivatedNativeLayout.SwitchArgumentAdjustment == -0x53
     && VehicleAbilityActivatedNativeLayout.CaseFileOffset == 0x81EF83
     && VehicleAbilityActivatedNativeLayout.CaseLocalDwordValue == 0xD0
     && VehicleAbilityActivatedNativeLayout.AllocationSize == 0x30
@@ -1053,6 +1053,111 @@ Check("LootStoreExtension LootObjectCollected route-index-6 subcase layout is re
     && LootStoreExtensionLootObjectCollectedNativeLayout.DwordFieldOffset == 0x28
     && LootStoreExtensionLootObjectCollectedNativeLayout.FirstQwordFieldOffset == 0x30
     && LootStoreExtensionLootObjectCollectedNativeLayout.SecondQwordFieldOffset == 0x38);
+Check("AreaVisualData AudioEmitterSpawned value0x54 layout is recorded",
+    AreaVisualDataAudioEmitterSpawnedNativeLayout.DispatcherFileOffset == 0x81EE63
+    && AreaVisualDataAudioEmitterSpawnedNativeLayout.DispatcherValue == 0x54
+    && AreaVisualDataAudioEmitterSpawnedNativeLayout.CaseFileOffset == 0x81EECB
+    && AreaVisualDataAudioEmitterSpawnedNativeLayout.CaseLocalDwordValue == 0xCE
+    && AreaVisualDataAudioEmitterSpawnedNativeLayout.AllocationSize == 0x40
+    && AreaVisualDataAudioEmitterSpawnedNativeLayout.ConstructorFileOffset == 0xADBB40
+    && AreaVisualDataAudioEmitterSpawnedNativeLayout.BaseConstructorHelperFileOffset == 0xB076D0
+    && AreaVisualDataAudioEmitterSpawnedNativeLayout.BaseConstructorArgument == 0x54
+    && AreaVisualDataAudioEmitterSpawnedNativeLayout.BodyReaderFileOffset == 0x83ACA0
+    && AreaVisualDataAudioEmitterSpawnedNativeLayout.VtableVirtualAddress == 0x1C72358
+    && AreaVisualDataAudioEmitterSpawnedNativeLayout.RttiName == ".?AVAudioEmitterSpawned@AreaVisualData@firefall@@"
+    && AreaVisualDataAudioEmitterSpawnedNativeLayout.QwordFieldOffset == 0x28
+    && AreaVisualDataAudioEmitterSpawnedNativeLayout.FirstDwordFieldOffset == 0x30
+    && AreaVisualDataAudioEmitterSpawnedNativeLayout.SecondDwordFieldOffset == 0x34
+    && AreaVisualDataAudioEmitterSpawnedNativeLayout.ThirdDwordFieldOffset == 0x38
+    && AreaVisualDataAudioEmitterSpawnedNativeLayout.WordFieldOffset == 0x3C);
+Check("AreaVisualData ParticleEffectSpawned value0x55 layout preserves conditional records",
+    AreaVisualDataParticleEffectSpawnedNativeLayout.DispatcherValue == 0x55
+    && AreaVisualDataParticleEffectSpawnedNativeLayout.CaseFileOffset == 0x81EE79
+    && AreaVisualDataParticleEffectSpawnedNativeLayout.CaseLocalDwordValue == 0xCF
+    && AreaVisualDataParticleEffectSpawnedNativeLayout.AllocationSize == 0x70
+    && AreaVisualDataParticleEffectSpawnedNativeLayout.ConstructorFileOffset == 0xADBBC0
+    && AreaVisualDataParticleEffectSpawnedNativeLayout.BaseConstructorHelperFileOffset == 0xB07740
+    && AreaVisualDataParticleEffectSpawnedNativeLayout.BaseConstructorArgument == 0x55
+    && AreaVisualDataParticleEffectSpawnedNativeLayout.BodyReaderFileOffset == 0x83AAA0
+    && AreaVisualDataParticleEffectSpawnedNativeLayout.VtableVirtualAddress == 0x1C72368
+    && AreaVisualDataParticleEffectSpawnedNativeLayout.RttiName == ".?AVParticleEffectSpawned@AreaVisualData@firefall@@"
+    && AreaVisualDataParticleEffectSpawnedNativeLayout.QwordFieldOffset == 0x28
+    && AreaVisualDataParticleEffectSpawnedNativeLayout.FirstDwordFieldOffset == 0x30
+    && AreaVisualDataParticleEffectSpawnedNativeLayout.FirstConditionalFlagOffset == 0x40
+    && AreaVisualDataParticleEffectSpawnedNativeLayout.FirstConditionalValuesOffset == 0x44
+    && AreaVisualDataParticleEffectSpawnedNativeLayout.FirstWordFieldOffset == 0x50
+    && AreaVisualDataParticleEffectSpawnedNativeLayout.ByteFieldOffset == 0x58
+    && AreaVisualDataParticleEffectSpawnedNativeLayout.DwordFieldOffset == 0x5C
+    && AreaVisualDataParticleEffectSpawnedNativeLayout.WordFieldOffset == 0x60
+    && AreaVisualDataParticleEffectSpawnedNativeLayout.SecondConditionalFlagOffset == 0x64
+    && AreaVisualDataParticleEffectSpawnedNativeLayout.SecondConditionalValuesOffset == 0x68
+    && AreaVisualDataParticleEffectSpawnedNativeLayout.ConstructorZeroedFirstFlagOffset == 0x40
+    && AreaVisualDataParticleEffectSpawnedNativeLayout.ConstructorZeroedSecondFlagOffset == 0x64);
+Check("Vehicle AbilityFailed route-index-3 switch-entry 1 layout is recorded",
+    VehicleAbilityFailedNativeLayout.SwitchEntryIndex == 1
+    && VehicleAbilityFailedNativeLayout.DispatcherValue + VehicleAbilityFailedNativeLayout.SwitchArgumentAdjustment
+        == VehicleAbilityFailedNativeLayout.SwitchEntryIndex
+    && VehicleAbilityFailedNativeLayout.DispatcherValue == 0x54
+    && VehicleAbilityFailedNativeLayout.CaseFileOffset == 0x81EFD4
+    && VehicleAbilityFailedNativeLayout.CaseLocalDwordValue == 0xD1
+    && VehicleAbilityFailedNativeLayout.AllocationSize == 0x30
+    && VehicleAbilityFailedNativeLayout.ConstructorFileOffset == 0xB09440
+    && VehicleAbilityFailedNativeLayout.BaseConstructorHelperFileOffset == 0xB47520
+    && VehicleAbilityFailedNativeLayout.BaseConstructorArgument == 0x54
+    && VehicleAbilityFailedNativeLayout.BodyReaderFileOffset == 0x83A7A0
+    && VehicleAbilityFailedNativeLayout.VtableVirtualAddress == 0x1C72978
+    && VehicleAbilityFailedNativeLayout.RttiName == ".?AVAbilityFailed@Vehicle@firefall@@"
+    && VehicleAbilityFailedNativeLayout.FirstDwordFieldOffset == 0x28
+    && VehicleAbilityFailedNativeLayout.SecondDwordFieldOffset == 0x2C);
+Check("Vehicle ForcedMovementCancelled route-index-3 switch-entry 6 layout is recorded",
+    VehicleForcedMovementCancelledNativeLayout.SwitchEntryIndex == 6
+    && VehicleForcedMovementCancelledNativeLayout.DispatcherValue + VehicleForcedMovementCancelledNativeLayout.SwitchArgumentAdjustment
+        == VehicleForcedMovementCancelledNativeLayout.SwitchEntryIndex
+    && VehicleForcedMovementCancelledNativeLayout.DispatcherValue == 0x59
+    && VehicleForcedMovementCancelledNativeLayout.CaseFileOffset == 0x81F110
+    && VehicleForcedMovementCancelledNativeLayout.CaseLocalDwordValue == 0xD6
+    && VehicleForcedMovementCancelledNativeLayout.AllocationSize == 0x30
+    && VehicleForcedMovementCancelledNativeLayout.ConstructorFileOffset == 0xB097A0
+    && VehicleForcedMovementCancelledNativeLayout.BaseConstructorHelperFileOffset == 0xB47760
+    && VehicleForcedMovementCancelledNativeLayout.BaseConstructorArgument == 0x59
+    && VehicleForcedMovementCancelledNativeLayout.BodyReaderFileOffset == 0x83A440
+    && VehicleForcedMovementCancelledNativeLayout.VtableVirtualAddress == 0x1C72928
+    && VehicleForcedMovementCancelledNativeLayout.RttiName == ".?AVForcedMovementCancelled@Vehicle@firefall@@"
+    && VehicleForcedMovementCancelledNativeLayout.DwordFieldOffset == 0x28
+    && VehicleForcedMovementCancelledNativeLayout.WordFieldOffset == 0x2C);
+Check("Deployable AbilityProjectileFired route-index-4 value0x54 layout is recorded",
+    DeployableAbilityProjectileFiredNativeLayout.DispatcherValue == 0x54
+    && DeployableAbilityProjectileFiredNativeLayout.CaseFileOffset == 0x81F24D
+    && DeployableAbilityProjectileFiredNativeLayout.CaseLocalDwordValue == 0xDA
+    && DeployableAbilityProjectileFiredNativeLayout.AllocationSize == 0x68
+    && DeployableAbilityProjectileFiredNativeLayout.ConstructorFileOffset == 0xB27F40
+    && DeployableAbilityProjectileFiredNativeLayout.BaseConstructorHelperFileOffset == 0xB47CB0
+    && DeployableAbilityProjectileFiredNativeLayout.BaseConstructorArgument == 0x54
+    && DeployableAbilityProjectileFiredNativeLayout.BodyReaderFileOffset == 0x839F50
+    && DeployableAbilityProjectileFiredNativeLayout.VtableVirtualAddress == 0x1C72764
+    && DeployableAbilityProjectileFiredNativeLayout.RttiName == ".?AVAbilityProjectileFired@Deployable@firefall@@"
+    && DeployableAbilityProjectileFiredNativeLayout.FirstWordFieldOffset == 0x28
+    && DeployableAbilityProjectileFiredNativeLayout.EighthWordFieldOffset == 0x36
+    && DeployableAbilityProjectileFiredNativeLayout.FirstDwordFieldOffset == 0x38
+    && DeployableAbilityProjectileFiredNativeLayout.ConditionalQwordFlagOffset == 0x58
+    && DeployableAbilityProjectileFiredNativeLayout.ConditionalQwordValueOffset == 0x60);
+Check("Deployable PublicCombatLog route-index-4 value0x55 records versioned word-length-prefixed blob",
+    DeployablePublicCombatLogNativeLayout.DispatcherValue == 0x55
+    && DeployablePublicCombatLogNativeLayout.CaseFileOffset == 0x81F21C
+    && DeployablePublicCombatLogNativeLayout.CaseLocalDwordValue == 0xDB
+    && DeployablePublicCombatLogNativeLayout.AllocationSize == 0x40
+    && DeployablePublicCombatLogNativeLayout.ConstructorFileOffset == 0xB27FE0
+    && DeployablePublicCombatLogNativeLayout.BaseConstructorHelperFileOffset == 0xB47D20
+    && DeployablePublicCombatLogNativeLayout.BaseConstructorArgument == 0x55
+    && DeployablePublicCombatLogNativeLayout.BodyReaderFileOffset == 0x5F3350
+    && DeployablePublicCombatLogNativeLayout.WordLengthPrefixedBlobReaderFileOffset == 0x12EE170
+    && DeployablePublicCombatLogNativeLayout.VtableVirtualAddress == 0x1C72754
+    && DeployablePublicCombatLogNativeLayout.RttiName == ".?AVPublicCombatLog@Deployable@firefall@@"
+    && DeployablePublicCombatLogNativeLayout.EmbeddedBlobVtableVirtualAddress == 0x1C80CC4
+    && DeployablePublicCombatLogNativeLayout.RequiredBodyDword == 1
+    && DeployablePublicCombatLogNativeLayout.RequiredBodyDwordWidth == 4
+    && DeployablePublicCombatLogNativeLayout.BlobLengthPrefixWidth == 2
+    && DeployablePublicCombatLogNativeLayout.BlobFieldOffset == 0x2C);
 Check("MarketRequestComplete selector 0x53 preserves its RTTI and native body field offsets",
     CharacterMarketRequestCompleteNativeLayout.InnerSelector == 0x53
     && CharacterMarketRequestCompleteNativeLayout.CaseFileOffset == 0x81CCC3
