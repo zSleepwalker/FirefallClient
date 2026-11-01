@@ -121,13 +121,24 @@
   `Turret::BaseController` (`0x128`), and `Turret::ObserverView` (`0xD8`).
   Their constructors call `0xBCAD70`; vtables map to `.rdata`, their RTTI
   TypeDescriptors resolve through the PE section table, and COL offsets are
-  zero. In total, selectors `0x02..0x29` contain 32 constructors and eight
-  zero-return entries; the remaining 12 selectors `0x2A..0x35` are unmapped.
-  Across the 32 mapped receivers, `+0x04` has eighteen message-ID dispatchers
-  and fourteen forwarding/logging defaults. The newly mapped dispatchers accept
+  zero. The final batch maps selectors `0x2A..0x35`: `0x2A`, `0x2B`, `0x2C`,
+  `0x2E`, `0x2F`, `0x31`, `0x32`, and `0x34` share the zero-return target;
+  `0x2D`, `0x30`, `0x33`, and `0x35` construct `Outpost::ObserverView`
+  (`0x100`), `ResourceNode::ObserverView` (`0x11A0`),
+  `CarryableObject::ObserverView` (`0x1690`), and
+  `LootStoreExtension::LootObjectView` (`0x758`). Their constructors call
+  `0xBCAD70`; vtables map through the PE `.rdata` section, RTTI names resolve
+  from TypeDescriptors, and all four COL subobject offsets are zero. The full
+  `0x02..0x35` table contains 36 constructors and sixteen zero-return entries,
+  all at `0x81BA93` / VA `0xC1C693`.
+  Across the 36 mapped receivers, `+0x04` has nineteen message-ID dispatchers
+  and seventeen forwarding/logging defaults. The mapped dispatchers accept
   exactly `0x54` and `0x55` for `Deployable::ObserverView`, exactly `0x53` for
-  `Deployable::NPCObserverView`, and exactly `0x53` for `Turret::ObserverView`;
-  invalid IDs use `VIBE_LogUnhandledMessageId` with the supplied message ID.
+  `Deployable::NPCObserverView`, exactly `0x53` for `Turret::ObserverView`,
+  and exactly `0x53` for `LootStoreExtension::LootObjectView`; invalid IDs use
+  `VIBE_LogUnhandledMessageId` with `message+0x10`. The new `Outpost`,
+  `ResourceNode`, and `CarryableObject` `+0x04` methods forward to an optional
+  receiver and conditionally emit the fixed no-valid-events diagnostic.
   `Deployable::HardpointView` and `Turret::BaseController` forward to the
   optional `+0x10` receiver and may emit the fixed no-valid-events diagnostic
   without inspecting an ID.
@@ -140,14 +151,17 @@
   emits the fixed no-valid-events log without a message-ID argument.
   `0x800420` uses the receiver for a separate compact-selector dispatch on
   message `+0x10`: `+0x08/+0x0C` paths receive data/length forms, and the
-  five latest `+0x18` wrappers store the `dword_1AC4D24` result at receiver
-  `+0x28` and tail-call `0xBCADF0`. Payload semantics remain out of scope.
+  mapped `+0x18` wrappers store the `dword_1AC4D24` result at receiver `+0x28`
+  and call `0xBCADF0`. Payload semantics remain out of scope.
   `AIObserverView +0x08` has a recovered disassembly boundary at `0x58A6E0`
   (size `0x394`), although Hex-Rays decompilation and payload semantics remain
   unresolved; this is not an unrecovered function boundary. Earlier
   `0x5536C0` / `0x5795A0` boundaries remain unresolved. See
-  `docs/MatrixConnection.md` for exact table entries, constructor/vtable/RTTI
-  snapshots, slot roles, and binary evidence.
+  `docs/MatrixConnection.md` for the complete 52-selector matrix, exact table
+  entries, constructor/vtable/RTTI snapshots, slot roles, and binary evidence.
+  Next concrete targets: trace a keyed `Character` recipient's `+0x04` handler
+  for dialog message `0x79` to distinguish it from the conditional global
+  receiver, then resolve compact-body methods and downstream consumer tails.
 - The gated `0xBD7060` path serializes the message QWORD and message data into
   its output stream, then passes the selector separately to `0xBD7460`,
   which stores it in the recipient callback's local record, not the stream.

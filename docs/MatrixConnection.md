@@ -2379,8 +2379,7 @@ then passes the full key to `0x800070`. That helper searches `this+0x24` and
 `+0x10/+0x14`, and the mapped pointer is at node `+0x18`. On a first-tree
 miss, after the `0x800BF0` creation checks allow it, the callback at context
 `+0x14` is called with the QWORD; its dispatcher `0x81B1B0` accepts low-byte
-values `0x02..0x35`; selectors `0x02..0x21` are resolved in the bounded
-first-thirty-two-entry mapping below.
+values `0x02..0x35`; the full 52-entry selector mapping is resolved below.
 Entry creation uses `0x806910` and tree insertion uses `0x8064C0`; a separate
 guarded path at `0x800300` inserts a QWORD-keyed entry into the `+0x2C` tree.
 These observations establish the keyed lookup and registration mechanism, not
@@ -2388,7 +2387,7 @@ the meaning of an individual factory selector. The mapped construction cases
 are recorded below using their constructors, installed primary vtables, RTTI,
 and subsequent receiver call path.
 
-### QWORD-keyed receiver factory: selectors 0x02..0x21
+### QWORD-keyed receiver factory: selectors 0x02..0x35
 
 Factory `0x81B1B0` receives the key used by the `0x800070` registry-miss path.
 It reads only the low byte of that argument for table selection:
@@ -2609,12 +2608,12 @@ receiver at `+0x2C`. By contrast, the `+0x04` methods for `TinyObjectView`,
 forward to optional nested receivers and conditionally call
 `VIBE_LogEmitWithArgList` with the fixed text
 `"this view doesn't have any valid events"` without a message-ID argument.
-Across the 32 constructing receivers mapped through selector `0x29`, `+0x04`
-has eighteen message-ID dispatchers and fourteen forwarding/logging defaults.
+Across the 36 constructing receivers mapped through selector `0x35`, `+0x04`
+has nineteen message-ID dispatchers and seventeen forwarding/logging defaults.
 The fixed no-events
 diagnostics are not invalid-ID reports or empty stubs.
 
-All thirty-two mapped `+0x18` targets are short state-refresh wrappers: they call
+All thirty-six mapped `+0x18` targets are short state-refresh wrappers: they call
 the indirect helper at `dword_1AC4D24`, store its result at receiver `+0x28`,
 and call `orchestrator_BCADF0`. They ignore payload arguments at this entry
 point but are not no-op stubs. The `+0x08` and `+0x0C` targets are compact-selector
@@ -2630,11 +2629,59 @@ The exact table, constructor/vtable/RTTI snapshots, compact-selector call
 sites, and original-image fingerprints are kept separately in
 `MatrixKeyedReceiverFactoryNativeLayout.cs`,
 `MatrixMessageNamespaceRoutingNativeLayout.cs`, and
-`StartupBinaryEvidence.cs`. Selectors `0x02..0x29` are now bounded: 32 entries
-construct RTTI-backed receivers, while `0x0F`, `0x11`, `0x13`, `0x1A`, `0x20`,
-`0x22`, `0x26`, and `0x29` share the zero-return target. The remaining 12
-table selectors, `0x2A..0x35`, are unmapped and intentionally outside this
-batch.
+`StartupBinaryEvidence.cs`. All selectors `0x02..0x35` are now bounded:
+36 entries construct RTTI-backed receivers and sixteen table entries share the
+zero-return target `0x81BA93` / VA `0xC1C693`.
+
+Each case calls allocator raw `0x12B7FB0` / VA `0x16B8BB0`; its listed
+constructor then calls the shared base-key helper raw `0xBCAD70` / VA
+`0xFCB970`, which stores the full key at `+0x18/+0x1C`. The final four
+constructing cases are:
+
+| Selector | Table entry raw | Case raw / VA | Allocation | Constructor raw / VA | Primary vtable VA / raw | COL VA / raw | TypeDescriptor VA / raw | RTTI |
+| --- | --- | --- | ---: | --- | --- | --- | --- | --- |
+| `2D` | `81BB54` | `81B9A3 / C1C5A3` | `100` | `AF7300 / EF7F00` | `1C72278 / 1870E78` | `1CCA910 / 18C9510` | `1E29EC0 / 1A282C0` | `.?AVObserverView@Outpost@firefall@@` |
+| `30` | `81BB60` | `81B9E1 / C1C5E1` | `11A0` | `B3C0F0 / F3CCF0` | `1C725E4 / 18711E4` | `1CCBA18 / 18CA618` | `1E2A3F0 / 1A287F0` | `.?AVObserverView@ResourceNode@firefall@@` |
+| `33` | `81BB6C` | `81BA1F / C1C61F` | `1690` | `AFC100 / EFCD00` | `1C721E0 / 1870DE0` | `1CCA8A0 / 18C94A0` | `1E29EEC / 1A282EC` | `.?AVObserverView@CarryableObject@firefall@@` |
+| `35` | `81BB74` | `81BA59 / C1C659` | `758` | `B43B10 / F44710` | `1C72574 / 1871174` | `1CCBA04 / 18CA604` | `1E2A3B4 / 1A287B4` | `.?AVLootObjectView@LootStoreExtension@firefall@@` |
+
+Each derived constructor calls the shared base-key helper `0xBCAD70` before
+installing its primary vtable. Text methods use raw+`0x400C00` for VA
+conversion; vtable and RTTI addresses use the original PE `.rdata` section map.
+The COL subobject offset is zero for each. The four `+0x04` methods are at raw
+`AF7420`, `B3C320`, `AFC430`, and `B43CC0`: the first three forward through an
+optional receiver at `+0x10` and conditionally emit the fixed
+`"this view doesn't have any valid events"` diagnostic, without consuming a
+message ID. The `0x35` method accepts exactly message ID `0x53`; invalid IDs
+call `VIBE_LogUnhandledMessageId` with the value at `message+0x10`, while the
+valid route may log `"received %s"` with `"msg-83"` and forward to a nested
+receiver at `+0x2C`.
+
+For these four receivers the `+0x08/+0x0C/+0x18` raw targets are, respectively,
+`AF74C0/AF8DC0/AFBBF0`, `B3C3C0/B3EAB0/B43640`,
+`AFC4D0/AFF670/B070E0`, and `B43D80/B44AD0/B47330`. The `+0x08/+0x0C`
+targets receive compact-body data pointers and lengths; their payload fields
+and consumer tails remain unresolved. Each `+0x18` target stores the
+`dword_1AC4D24` result at receiver `+0x28` and calls `0xBCADF0`.
+
+The following matrix is the complete 52-entry table summary. A zero-return
+entry targets `0x81BA93`; every other selector constructs the RTTI type shown.
+
+| Selector | Factory result | Selector | Factory result | Selector | Factory result | Selector | Factory result |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `02` | `Character::BaseController` | `03` | `Character::NPCController` | `04` | `Character::MissionAndMarkerController` | `05` | `Character::CombatController` |
+| `06` | `Character::LocalEffectsController` | `07` | `Character::SpectatorController` | `08` | `Character::ObserverView` | `09` | `Character::EquipmentView` |
+| `0A` | `Character::AIObserverView` | `0B` | `Character::CombatView` | `0C` | `Character::MovementView` | `0D` | `Character::TinyObjectView` |
+| `0E` | `Character::DynamicProjectileView` | `0F` | zero | `10` | `Melding::ObserverView` | `11` | zero |
+| `12` | `MeldingBubble::ObserverView` | `13` | zero | `14` | `AreaVisualData::ObserverView` | `15` | `AreaVisualData::ParticleEffectsView` |
+| `16` | `AreaVisualData::MapMarkerView` | `17` | `AreaVisualData::TinyObjectView` | `18` | `AreaVisualData::LootObjectView` | `19` | `AreaVisualData::ForceShieldView` |
+| `1A` | zero | `1B` | `Vehicle::BaseController` | `1C` | `Vehicle::CombatController` | `1D` | `Vehicle::ObserverView` |
+| `1E` | `Vehicle::CombatView` | `1F` | `Vehicle::MovementView` | `20` | zero | `21` | `Anchor::AIObserverView` |
+| `22` | zero | `23` | `Deployable::ObserverView` | `24` | `Deployable::NPCObserverView` | `25` | `Deployable::HardpointView` |
+| `26` | zero | `27` | `Turret::BaseController` | `28` | `Turret::ObserverView` | `29` | zero |
+| `2A` | zero | `2B` | zero | `2C` | zero | `2D` | `Outpost::ObserverView` |
+| `2E` | zero | `2F` | zero | `30` | `ResourceNode::ObserverView` | `31` | zero |
+| `32` | zero | `33` | `CarryableObject::ObserverView` | `34` | zero | `35` | `LootStoreExtension::LootObjectView` |
 
 The `0xBD7060` fan-out is a separate conditional side path: `0x7FDC60` reaches
 it when the message predicate at `message+0x18` returns zero and context
