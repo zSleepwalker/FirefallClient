@@ -4443,11 +4443,14 @@ internal static class StartupBinaryEvidence
                 MatrixMessageNamespaceRoutingNativeLayout.EnvelopeRegistrySecondMapInsertCallFileOffset,
                 0xE8,
                 envelopeRegistry.RegistryInsertFileOffset));
-        var keyedReceiverCases = MatrixKeyedReceiverFactoryNativeLayout.FirstEightCases;
+        var keyedReceiverFirstEightCases = MatrixKeyedReceiverFactoryNativeLayout.FirstEightCases;
+        var keyedReceiverNextSixCases = MatrixKeyedReceiverFactoryNativeLayout.NextSixCases;
+        var keyedReceiverCases = keyedReceiverFirstEightCases.Concat(keyedReceiverNextSixCases).ToArray();
+        var keyedReceiverSelectors0ATo11 = MatrixKeyedReceiverFactoryNativeLayout.Selectors0ATo11TableEntries;
         var keyedReceiverCasesBySelector = keyedReceiverCases.ToDictionary(snapshot => snapshot.Selector);
         var keyedReceiverSlots = MatrixKeyedReceiverFactoryNativeLayout.PrimaryVtableSlots;
         var compactSelectorRoutes = MatrixKeyedReceiverFactoryNativeLayout.CompactSelectorRoutes;
-        check("Binary keyed-receiver factory bounds, first eight constructors, vtables, and RTTI match the original image",
+        check("Binary keyed-receiver factory bounds and first sixteen dispatch entries match the original image",
             imageBase == 0x400000
             && MatrixKeyedReceiverFactoryNativeLayout.RawTextOffsetToVirtualAddressDelta
                 == imageBase + textSection.Rva - textSection.RawOffset
@@ -4457,13 +4460,36 @@ internal static class StartupBinaryEvidence
                 == MatrixKeyedReceiverFactoryNativeLayout.JumpTableFileOffset
             && Matches(MatrixKeyedReceiverFactoryNativeLayout.FactoryByteDispatchFileOffset,
                 "0FB6C083C0FE83F8330F87A8080000FF2485A8C6C100")
-            && keyedReceiverCases.Count == 8
+            && Matches(MatrixKeyedReceiverFactoryNativeLayout.SharedBaseConstructorHelperFileOffset + 0x0B,
+                "894618")
+            && Matches(MatrixKeyedReceiverFactoryNativeLayout.SharedBaseConstructorHelperFileOffset + 0x11,
+                "89461C")
+            && Matches(MatrixKeyedReceiverFactoryNativeLayout.SharedBaseConstructorHelperFileOffset + 0x17,
+                "C706" + UInt32LittleEndianHex(
+                    MatrixKeyedReceiverFactoryNativeLayout.SharedBaseVtableVirtualAddress))
+            && Matches(MatrixKeyedReceiverFactoryNativeLayout.SharedBaseConstructorHelperFileOffset + 0x1D,
+                "C6460800")
+            && Matches(MatrixKeyedReceiverFactoryNativeLayout.SharedBaseConstructorHelperFileOffset + 0x21,
+                "C7461000000000")
+            && Matches(MatrixKeyedReceiverFactoryNativeLayout.SharedBaseConstructorHelperFileOffset + 0x28,
+                "894620")
+            && Matches(MatrixKeyedReceiverFactoryNativeLayout.SharedBaseConstructorHelperFileOffset + 0x2B,
+                "C7462400000000")
+            && keyedReceiverFirstEightCases.Count == 8
+            && keyedReceiverNextSixCases.Count == 6
+            && keyedReceiverSelectors0ATo11.Count == 8
+            && keyedReceiverSelectors0ATo11.All(entry =>
+                ReadUInt32(entry.TableEntryFileOffset) == entry.TargetVirtualAddress
+                && VirtualAddressToFileOffset(entry.TargetVirtualAddress) == entry.TargetFileOffset)
             && keyedReceiverCases.All(snapshot =>
                 ReadUInt32(snapshot.TableEntryFileOffset) == snapshot.CaseTargetVirtualAddress
                 && VirtualAddressToFileOffset(snapshot.CaseTargetVirtualAddress)
                     == snapshot.CaseTargetFileOffset
-                && Matches(snapshot.CaseTargetFileOffset,
-                    "68" + UInt32LittleEndianHex(snapshot.AllocationSize))
+                && (snapshot.AllocationSize <= 0x7F
+                    ? Matches(snapshot.CaseTargetFileOffset,
+                        "6A" + ((byte)snapshot.AllocationSize).ToString("X2"))
+                    : Matches(snapshot.CaseTargetFileOffset,
+                        "68" + UInt32LittleEndianHex(snapshot.AllocationSize)))
                 && RelativeBranchTargets(snapshot.AllocatorCallFileOffset, 0xE8,
                     MatrixKeyedReceiverFactoryNativeLayout.AllocatorFileOffset)
                 && RelativeBranchTargets(snapshot.ConstructorCallFileOffset, 0xE8,
@@ -4478,13 +4504,45 @@ internal static class StartupBinaryEvidence
                 && ReadUInt32(snapshot.PrimaryVtableFileOffset - 4)
                     == snapshot.CompleteObjectLocatorVirtualAddress
                 && ReadUInt32(VirtualAddressToFileOffset(
-                    snapshot.CompleteObjectLocatorVirtualAddress) + 12)
-                    == snapshot.TypeDescriptorVirtualAddress
+                    snapshot.CompleteObjectLocatorVirtualAddress) + 4)
+                    == snapshot.CompleteObjectLocatorSubobjectOffset
+                && ReadUInt32(VirtualAddressToFileOffset(
+                    snapshot.CompleteObjectLocatorVirtualAddress) + 12) == snapshot.TypeDescriptorVirtualAddress
                 && VtableRttiName(snapshot.PrimaryVtableVirtualAddress, 80) == snapshot.RttiName)
             && keyedReceiverSlots.All(slot =>
                 ReadUInt32(keyedReceiverCasesBySelector[slot.FactorySelector].PrimaryVtableFileOffset
                     + slot.SlotOffset) == slot.MethodVirtualAddress
                 && VirtualAddressToFileOffset(slot.MethodVirtualAddress) == slot.MethodFileOffset));
+        check("Binary receiver slot logs distinguish invalid message IDs from fixed no-events logs",
+            Matches(0x58A64A, "8B471083F869")
+            && Matches(0x58A652, "50681CF7B501680409E601")
+            && RelativeBranchTargets(0x58A65D, 0xE8, 0x2FC4F0)
+            && Matches(0x58A672, "68FCBDB5016844F7B50150")
+            && RelativeBranchTargets(0x58A67D, 0xE8, 0x322820)
+            && ReadCStringAscii(0x1B5F71C, 48) == "invalid message id %u for this view."
+            && ReadCStringAscii(0x1B5F744, 24) == "received %s"
+            && ReadCStringAscii(0x1B5BDFC, 16) == "msg-105"
+            && Matches(0x58B881, "8D41AC83F818")
+            && Matches(0x58B9BA, "5168DCF7B501680409E601")
+            && RelativeBranchTargets(0x58B9C5, 0xE8, 0x2FC4F0)
+            && ReadCStringAscii(0x1B5F7DC, 48) == "invalid message id %u for this view."
+            && Matches(0x59578A, "8B471083F86E")
+            && Matches(0x595792, "5068B0FDB501680409E601")
+            && RelativeBranchTargets(0x59579D, 0xE8, 0x2FC4F0)
+            && Matches(0x5957B2, "68CCBDB5016878FDB50150")
+            && RelativeBranchTargets(0x5957BD, 0xE8, 0x322820)
+            && ReadCStringAscii(0x1B5FDB0, 48) == "invalid message id %u for this view."
+            && ReadCStringAscii(0x1B5FD78, 24) == "received %s"
+            && ReadCStringAscii(0x1B5BDCC, 16) == "msg-110"
+            && Matches(0x59640A, "516A006824FEB5016A05B90409E601")
+            && RelativeBranchTargets(0x596419, 0xE8, 0x12C2030)
+            && Matches(0x59AFFA, "516A00686CFFB5016A05B90409E601")
+            && RelativeBranchTargets(0x59B009, 0xE8, 0x12C2030)
+            && Matches(0xAD97CA, "516A006818EFBA016A05B90409E601")
+            && RelativeBranchTargets(0xAD97D9, 0xE8, 0x12C2030)
+            && ReadCStringAscii(0x1B5FE24, 64) == "this view doesn't have any valid events"
+            && ReadCStringAscii(0x1B5FF6C, 64) == "this view doesn't have any valid events"
+            && ReadCStringAscii(0x1BAEF18, 64) == "this view doesn't have any valid events");
         check("Binary keyed-receiver lookup result and compact selector routes call the recorded receiver slots",
             Matches(0x800453, "8B7E108B46188B4E1C")
             && RelativeBranchTargets(0x800611, 0xE8,

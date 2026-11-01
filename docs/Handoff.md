@@ -98,15 +98,30 @@
   slots are recorded in `src/Startup/MatrixKeyedReceiverFactoryNativeLayout.cs`.
   This proves these first cases create keyed Character receiver objects, not
   Matrix parser-message instances; the low byte is only the factory selector.
+  Continuation added table entries `0x0A..0x11`: `0x0A..0x0E` construct
+  `AIObserverView`, `CombatView`, `MovementView`, `TinyObjectView`, and
+  `DynamicProjectileView` under RTTI namespace `Character`; `0x10` constructs
+  `Melding::ObserverView`; `0x0F` and `0x11` point to the shared zero-return
+  path. Table index is exactly `selector-2`; `0x01` and `0x36` are rejected
+  outside the stated `0x02..0x35` bounds. The six new primary COL subobject
+  offsets are zero; no secondary vptr stores were observed in their
+  constructors. All six call helper `0xBCAD70`, which writes the key DWORDs
+  at `+0x18/+0x1C` and an initial helper vptr at VA `0x1C660B4`; each derived
+  constructor replaces it with its RTTI-backed primary vtable.
   `0x800420` uses the returned receiver for a separate compact-selector
-  dispatch on message `+0x10`. Its `+0x04` slot includes four internal
-  message-ID dispatchers and four optional-child forwarding/logging defaults;
-  all `+0x18` slots are non-no-op state-refresh wrappers that ignore the
-  payload arguments. The `+0x08/+0x0C` slot bodies are not exhaustively
-  decoded, and `0x5536C0` / `0x5795A0` remain function-boundary unresolved
-  despite code prologues. Cases `0x0A..0x35` and whether later cases include
-  Vehicle or the other parser families remain unverified. See
-  `docs/MatrixConnection.md` for the caller path and bounded evidence.
+  dispatch on message `+0x10`. Across the 14 mapped receivers, `+0x04` has
+  seven message-ID dispatchers and seven forwarding/logging defaults. The
+  defaults' fixed `"this view doesn't have any valid events"` messages use
+  `VIBE_LogEmitWithArgList` without a message-ID argument; they are distinct
+  from `VIBE_LogUnhandledMessageId`. All `+0x18` slots are non-no-op state
+  refresh wrappers. `+0x08/+0x0C` are compact-body handlers taking data and
+  length forms; their payload semantics remain out of scope. The new
+  `AIObserverView +0x08` has a recovered disassembly boundary at `0x58A6E0`,
+  but decompilation/payload semantics remain unresolved. Earlier `0x5536C0` /
+  `0x5795A0` boundaries remain unresolved. Selectors `0x12..0x35` remain
+  unmapped; this batch did not identify Vehicle, AreaVisualData, Deployable,
+  Turret, or LootStoreExtension types. See `docs/MatrixConnection.md` for
+  caller paths, exact selectors, and binary evidence.
 - The gated `0xBD7060` path serializes the message QWORD and message data into
   its output stream, then passes the selector separately to `0xBD7460`,
   which stores it in the recipient callback's local record, not the stream.

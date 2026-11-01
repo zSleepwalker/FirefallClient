@@ -2379,16 +2379,16 @@ then passes the full key to `0x800070`. That helper searches `this+0x24` and
 `+0x10/+0x14`, and the mapped pointer is at node `+0x18`. On a first-tree
 miss, after the `0x800BF0` creation checks allow it, the callback at context
 `+0x14` is called with the QWORD; its dispatcher `0x81B1B0` accepts low-byte
-values `0x02..0x35`; selectors `0x02..0x09` are resolved in the bounded
-first-eight-case mapping below.
+values `0x02..0x35`; selectors `0x02..0x11` are resolved in the bounded
+first-sixteen-entry mapping below.
 Entry creation uses `0x806910` and tree insertion uses `0x8064C0`; a separate
 guarded path at `0x800300` inserts a QWORD-keyed entry into the `+0x2C` tree.
 These observations establish the keyed lookup and registration mechanism, not
-the meaning of an individual factory selector. The first eight factory cases
-are now mapped below using their constructors, installed primary vtables, RTTI,
+the meaning of an individual factory selector. The mapped construction cases
+are recorded below using their constructors, installed primary vtables, RTTI,
 and subsequent receiver call path.
 
-### QWORD-keyed receiver factory: first eight cases
+### QWORD-keyed receiver factory: selectors 0x02..0x11
 
 Factory `0x81B1B0` receives the key used by the `0x800070` registry-miss path.
 It reads only the low byte of that argument for table selection:
@@ -2400,11 +2400,19 @@ QWORD remains the registry key at message `+0x18/+0x1C`. `0x800420` obtains the
 registered object through `0x800070`, then uses the returned pointer as the
 receiver in its compact-selector dispatch.
 
-Only entries `0x02..0x09` are mapped in this pass. Each factory case allocates
-the listed size through `0x12B7FB0`, calls its constructor, and the constructor
-installs the listed RTTI-backed primary vtable. Text targets use the verified
-raw-to-VA delta `+0x400C00`; vtable file offsets use the original PE section
-map (`.rdata`), not that `.text` delta.
+The table index is exactly `selector - 2`: selector `0x02` maps to index 0 and
+`0x35` to index `0x33`; selector `0x01` underflows the unsigned bound and
+`0x36` maps to `0x34`, so both take the out-of-range return. Within the table,
+selectors `0x0F` and `0x11` also point to that same zero-return target
+`0x81BA93` / VA `0xC1C693`; an in-range selector therefore does not imply
+construction.
+
+Each constructing case allocates the listed size through `0x12B7FB0`, calls
+its constructor, and the constructor installs the listed RTTI-backed primary
+vtable. Text targets use the verified raw-to-VA delta `+0x400C00`; vtable file
+offsets use the original PE section map (`.rdata`), not that `.text` delta.
+The `.rdata` mapping yields each vtable file offset, and the preceding pointer
+resolves its Complete Object Locator (COL) and RTTI name.
 
 | Key low byte | Case raw / VA | Allocation | Constructor raw | Primary vtable VA / raw | Primary slots `+04 / +08 / +0C / +18` (raw) | RTTI |
 | --- | --- | ---: | --- | --- | --- | --- |
@@ -2416,12 +2424,45 @@ map (`.rdata`), not that `.text` delta.
 | `07` | `81B328 / C1BF28` | `A0` | `57FF80` | `1C65EB0 / 1864AB0` | `5800E0 / 580150 / 580470 / 580F40` | `.?AVSpectatorController@Character@firefall@@` |
 | `08` | `81B366 / C1BF66` | `4F8` | `581070` | `1C65E2C / 1864A2C` | `581480 / 5817D0 / 5835C0 / 588500` | `.?AVObserverView@Character@firefall@@` |
 | `09` | `81B3A4 / C1BFA4` | `420` | `588830` | `1C65DF4 / 18649F4` | `5889F0 / 588A90 / 589040 / 58A440` | `.?AVEquipmentView@Character@firefall@@` |
+| `0A` | `81B3E2 / C1BFE2` | `58` | `58A530` | `1C65DAC / 18649AC` | `58A620 / 58A6E0 / 58AA90 / 58B4C0` | `.?AVAIObserverView@Character@firefall@@` |
+| `0B` | `81B41D / C1C01D` | `1258` | `58B5F0` | `1C65D88 / 1864988` | `58B850 / 58BA50 / 58EA40 / 595090` | `.?AVCombatView@Character@firefall@@` |
+| `0C` | `81B45B / C1C05B` | `A8` | `595680` | `1C65D58 / 1864958` | `595760 / 595820 / 595E30 / 596250` | `.?AVMovementView@Character@firefall@@` |
+| `0D` | `81B499 / C1C099` | `438` | `5962A0` | `1C65D10 / 1864910` | `5963D0 / 596470 / 597590 / 59ACA0` | `.?AVTinyObjectView@Character@firefall@@` |
+| `0E` | `81B4D7 / C1C0D7` | `1F8` | `59AEB0` | `1C65D34 / 1864934` | `59AFC0 / 59B060 / 59C600 / 59FF40` | `.?AVDynamicProjectileView@Character@firefall@@` |
+| `10` | `81B515 / C1C115` | `88` | `AD9580` | `1C723D8 / 1870FD8` | `AD9790 / AD9830 / AD9BD0 / ADA370` | `.?AVObserverView@Melding@firefall@@` |
+
+Each constructor calls the shared helper at raw `0xBCAD70`. It stores the
+key's low/high DWORDs at receiver offsets `+0x18/+0x1C`, initializes fields
+at `+0x08`, `+0x10`, and `+0x24` to zero, copies its first argument to `+0x20`,
+and first writes the helper's unnamed vtable pointer at VA `0x1C660B4` to
+offset `+0`. The derived constructor then replaces that pointer with the
+listed RTTI-backed vtable. The six added COL offsets are all zero, and no
+secondary vptr stores were observed in their constructor bodies.
+
+These are the eight dispatch entries added in this pass; the default rows have
+no allocator or constructor:
+
+| Selector | Table index | Entry raw | Target VA / raw | Result |
+| --- | ---: | --- | --- | --- |
+| `0A` | 8 | `81BAC8` | `C1BFE2 / 81B3E2` | `AIObserverView@Character` |
+| `0B` | 9 | `81BACC` | `C1C01D / 81B41D` | `CombatView@Character` |
+| `0C` | 10 | `81BAD0` | `C1C05B / 81B45B` | `MovementView@Character` |
+| `0D` | 11 | `81BAD4` | `C1C099 / 81B499` | `TinyObjectView@Character` |
+| `0E` | 12 | `81BAD8` | `C1C0D7 / 81B4D7` | `DynamicProjectileView@Character` |
+| `0F` | 13 | `81BADC` | `C1C693 / 81BA93` | shared zero-return path |
+| `10` | 14 | `81BAE0` | `C1C115 / 81B515` | `ObserverView@Melding` |
+| `11` | 15 | `81BAE4` | `C1C693 / 81BA93` | shared zero-return path |
 
 This family assignment comes from the concrete constructor-installed vtables
 and PE-resolved RTTI names, not from treating the low byte as a namespace ID.
-It also corrects the provisional “message factory” interpretation: these are
-`Character` controller/view receiver objects registered against QWORD keys,
-not per-message parser objects.
+The six newly constructing cases include five RTTI-named `Character` views
+and one `Melding::ObserverView`; these are receiver types, not parsed-message
+types. Their primary COL subobject offsets are zero, and their constructors
+write the primary vptr at `this+0`. No secondary vptr stores were observed in
+these six constructor bodies; this bounded check does not enumerate all
+possible secondary subobjects elsewhere in their hierarchies. This evidence
+also corrects the provisional “message factory” interpretation: these objects
+are registered against QWORD keys, not created as per-message parser objects.
 
 The receiver's primary slots are reached through the separate compact selector
 at message `+0x10`: selector 1 calls `+0x08`; 2 calls `+0x18`; 3 and 4 call
@@ -2439,23 +2480,40 @@ to that optional nested object and conditionally emit the fixed
 argument. These forwarding/logging defaults are not empty stubs and differ
 from the dispatchers' invalid-message-ID reporting.
 
-All eight `+0x18` targets are short state-refresh wrappers: they call the
-indirect helper at `dword_1AC4D24`, store its result at receiver `+0x28`, and
-call `orchestrator_BCADF0`. They ignore the payload arguments at this entry
-point but are not no-op stubs. The `+0x08` and `+0x0C` targets are reached with
-parsed byte data and lengths by their compact-selector paths; their individual
-payload fields and dispatch tables are outside this bounded pass. In
-particular, the vtable targets at `0x5536C0` and `0x5795A0` begin with valid
-code prologues, but IDA did not recover their function boundaries, so they are
-not classified as stubs.
+For selectors `0x0A..0x0C`, the added `+0x04` implementations are also
+message-ID dispatchers: `AIObserverView` handles `0x69`, `CombatView` has a
+table for `0x54..0x6C`, and `MovementView` handles `0x6E`; their invalid-ID
+branches call `VIBE_LogUnhandledMessageId` with `message+0x10`. The `0x69`
+and `0x6E` valid branches separately log `"received %s"` with fixed
+`"msg-105"` / `"msg-110"` text, then may forward to an event receiver at
+`+0x2C`; each also forwards to a separate optional receiver at `+0x10` before
+the ID gate. By contrast,
+the `+0x04` methods for `TinyObjectView`, `DynamicProjectileView`, and
+`Melding::ObserverView` forward to an optional child and conditionally call
+`VIBE_LogEmitWithArgList` with the fixed text `"this view doesn't have any
+valid events"` and no message-ID argument. The logger arguments distinguish
+these fixed messages from the invalid-ID path.
+
+All fourteen mapped `+0x18` targets are short state-refresh wrappers: they call
+the indirect helper at `dword_1AC4D24`, store its result at receiver `+0x28`,
+and call `orchestrator_BCADF0`. They ignore payload arguments at this entry
+point but are not no-op stubs. The `+0x08` and `+0x0C` targets are compact-selector
+body handlers reached with data pointers and lengths; their individual payload
+fields and dispatch tables are outside this bounded pass. The new
+`AIObserverView +0x08` target at `0x58A6E0` has a recovered disassembly
+boundary (size `0x394`, ending in `retn 8` at `0x58AA71`); decompilation and
+payload semantics remain unresolved. The earlier targets at `0x5536C0` and
+`0x5795A0` have a function-boundary limitation, so none are classified
+as empty stubs.
 
 The exact table, constructor/vtable/RTTI snapshots, compact-selector call
 sites, and original-image fingerprints are kept separately in
 `MatrixKeyedReceiverFactoryNativeLayout.cs`,
 `MatrixMessageNamespaceRoutingNativeLayout.cs`, and
-`StartupBinaryEvidence.cs`. Cases `0x0A..0x35` remain unmapped; this batch did
-not find Vehicle, AreaVisualData, Deployable, Turret, or LootStoreExtension
-types in the factory.
+`StartupBinaryEvidence.cs`. Cases `0x0A..0x11` are now bounded, including the
+two table entries that share the zero-return path. Selectors `0x12..0x35`
+remain unmapped; this batch did not find Vehicle, AreaVisualData, Deployable,
+Turret, or LootStoreExtension types in the factory.
 
 The `0xBD7060` fan-out is a separate conditional side path: `0x7FDC60` reaches
 it when the message predicate at `message+0x18` returns zero and context
