@@ -4098,7 +4098,84 @@ Check("Bound BaseNetController callback observations retain only evidenced messa
     && CharacterLocalControllerApplicationNativeLayout.Message79RecipientDescriptorDwordLastOffset == 0x4D0C
     && CharacterLocalControllerApplicationNativeLayout.Message79RecipientAuxiliaryByteOffset == 0x4D10
     && CharacterLocalControllerApplicationNativeLayout.Message79RecipientArgumentOffsetPassedToAuxiliarySink == 0x58A0
-    && CharacterLocalControllerApplicationNativeLayout.Message79RecipientObjectPointerLoadOffset == 0x46A4);
+    && CharacterLocalControllerApplicationNativeLayout.Message79RecipientObjectPointerLoadOffset == 0x46A4
+    && CharacterLocalControllerApplicationNativeLayout.Message79FallbackConditionalSourcePresenceByteOffset == 0x24
+    && CharacterLocalControllerApplicationNativeLayout.Message79FallbackLookupRecordAuxiliaryGateDwordOffset == 0x08
+    && CharacterLocalControllerApplicationNativeLayout.Message79FallbackLookupRecordAuxiliaryValueDwordOffset == 0x10
+    && CharacterLocalControllerApplicationNativeLayout.Message79FallbackLookupRecordDescriptorDwordOffset == 0x14
+    && CharacterLocalControllerApplicationNativeLayout.Message79FallbackRecordConditionalPresenceByteOffset == 0x4CA8
+    && CharacterLocalControllerApplicationNativeLayout.Message79FallbackRecordFirstDwordOffset == 0x4CB0
+    && CharacterLocalControllerApplicationNativeLayout.Message79FallbackRecordDwordCount == 6
+    && CharacterLocalControllerApplicationNativeLayout.Message79FallbackRecordLastDwordOffset == 0x4CC4
+    && CharacterLocalControllerApplicationNativeLayout.Message79FallbackDescriptorTextOffset == 0x4CFC
+    && CharacterLocalControllerApplicationNativeLayout.Message79FallbackDescriptorStateDwordOffset == 0x4D00
+    && CharacterLocalControllerApplicationNativeLayout.Message79FallbackDescriptorFirstValueDwordOffset == 0x4D04
+    && CharacterLocalControllerApplicationNativeLayout.Message79FallbackDescriptorLastValueDwordOffset == 0x4D0C
+    && CharacterLocalControllerApplicationNativeLayout.Message79FallbackDescriptorByteOffset == 0x4D10
+    && CharacterLocalControllerApplicationNativeLayout.Message79FallbackDescriptorControlByteOffset == 0x4C70
+    && CharacterLocalControllerApplicationNativeLayout.Message79FallbackDescriptorClearMask == 0x08
+    && CharacterLocalControllerApplicationNativeLayout.Message79FallbackDescriptorSetMask == 0x10
+    && CharacterLocalControllerApplicationNativeLayout.Message79FallbackStateUpdateFileOffset == 0x457D30
+    && CharacterLocalControllerApplicationNativeLayout.Message79FallbackDescriptorDispatchFileOffset == 0x439380
+    && CharacterLocalControllerApplicationNativeLayout.Message79FallbackDescriptorHelperFileOffset == 0x439410);
+var oldConditionalPayload = new CharacterKeyedSixDwordPayload(
+    0x10101010, 0x20202020, 0x30303030, 0x40404040, 0x50505050, 0x60606060);
+var copiedConditionalPayload = new CharacterKeyedSixDwordPayload(
+    0x11111111, 0x22222222, 0x33333333, 0x44444444, 0x55555555, 0x66666666);
+var conditionalRecord = new CharacterKeyedConditionalRecordSnapshot(0, oldConditionalPayload);
+Check("Message-0x79 fallback leaves the six-DWORD record untouched when the source presence byte is zero",
+    CharacterKeyedRecipientFallbackModel.ApplyConditionalRecord(
+        conditionalRecord, new CharacterKeyedConditionalRecordInput(0, copiedConditionalPayload))
+        == conditionalRecord);
+var firstConditionalCopy = CharacterKeyedRecipientFallbackModel.ApplyConditionalRecord(
+    conditionalRecord, new CharacterKeyedConditionalRecordInput(1, copiedConditionalPayload));
+Check("Message-0x79 fallback copies six ordered DWORDs and sets an absent destination marker",
+    firstConditionalCopy
+        == new CharacterKeyedConditionalRecordSnapshot(1, copiedConditionalPayload));
+var populatedConditionalCopy = CharacterKeyedRecipientFallbackModel.ApplyConditionalRecord(
+    new CharacterKeyedConditionalRecordSnapshot(0x7F, oldConditionalPayload),
+    new CharacterKeyedConditionalRecordInput(0x80, copiedConditionalPayload));
+Check("Message-0x79 fallback preserves a nonzero destination marker while replacing all six DWORDs",
+    populatedConditionalCopy
+        == new CharacterKeyedConditionalRecordSnapshot(0x7F, copiedConditionalPayload));
+var descriptorCurrent = new CharacterKeyedDescriptorSnapshot(
+    "old", 0xA0A0A0A0, new CharacterKeyedThreeDwordPayload(1, 2, 3), 0x44, 0x55);
+var descriptorInput = new CharacterKeyedDescriptorInput(
+    "selected", 0x18, new CharacterKeyedThreeDwordPayload(0x11112222, 0x33334444, 0x55556666), 0x77);
+var descriptorCleared = CharacterKeyedRecipientFallbackModel.ApplyDescriptorFields(
+    descriptorCurrent, descriptorInput);
+Check("Message-0x79 descriptor update preserves +0x4D10 without a 0x02 transition and clear bit wins for +0x4C70",
+    descriptorCleared
+        == new CharacterKeyedDescriptorSnapshot(
+            "selected", 0x18, descriptorInput.ResolvedDwordsAt4D04, 0x44, 0));
+var descriptorSetToSet = CharacterKeyedRecipientFallbackModel.ApplyDescriptorFields(
+    descriptorCurrent with { DwordAt4D00 = 0x02 },
+    descriptorInput with { DwordAt4D00 = 0x12 });
+Check("Message-0x79 descriptor preserves +0x4D10 on a set-to-set state and sets +0x4C70",
+    descriptorSetToSet
+        == new CharacterKeyedDescriptorSnapshot(
+            "selected", 0x12, descriptorInput.ResolvedDwordsAt4D04, 0x44, 1));
+var descriptorClearToSet = CharacterKeyedRecipientFallbackModel.ApplyDescriptorFields(
+    descriptorCurrent, descriptorInput with { DwordAt4D00 = 0x02 });
+Check("Message-0x79 descriptor updates +0x4D10 from the source byte on a clear-to-set state",
+    descriptorClearToSet
+        == new CharacterKeyedDescriptorSnapshot(
+            "selected", 0x02, descriptorInput.ResolvedDwordsAt4D04, 0x77, 0x55));
+var descriptorClearToSetZeroSource = CharacterKeyedRecipientFallbackModel.ApplyDescriptorFields(
+    descriptorCurrent, descriptorInput with { DwordAt4D00 = 0x02, SourceByteAt4D10 = 0 });
+Check("Message-0x79 descriptor can clear +0x4D10 on a clear-to-set state when its source byte is zero",
+    descriptorClearToSetZeroSource.ByteAt4D10 == 0);
+var descriptorSetToClear = CharacterKeyedRecipientFallbackModel.ApplyDescriptorFields(
+    descriptorCurrent with { DwordAt4D00 = 0x02 },
+    descriptorInput with { DwordAt4D00 = 0x08 });
+Check("Message-0x79 descriptor preserves +0x4D10 on a set-to-clear state and clears +0x4C70",
+    descriptorSetToClear
+        == new CharacterKeyedDescriptorSnapshot(
+            "selected", 0x08, descriptorInput.ResolvedDwordsAt4D04, 0x44, 0));
+var descriptorNoControlFlags = CharacterKeyedRecipientFallbackModel.ApplyDescriptorFields(
+    descriptorCurrent, descriptorInput with { DwordAt4D00 = 0 });
+Check("Message-0x79 descriptor preserves +0x4C70 when neither control flag is set",
+    descriptorNoControlFlags.ControlByteAt4C70 == descriptorCurrent.ControlByteAt4C70);
 Check("BaseNetController message 0x79 resolves the inserted tfGenericCharacter at the exact shared keyed registry",
     CharacterKeyedRecipientNativeLayout.RawTextOffsetToVirtualAddressDelta == 0x400C00
     && CharacterKeyedRecipientNativeLayout.RawRdataOffsetToVirtualAddressDelta == 0x401400

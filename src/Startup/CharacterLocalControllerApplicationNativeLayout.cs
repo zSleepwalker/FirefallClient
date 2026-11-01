@@ -73,6 +73,25 @@ public static class CharacterLocalControllerApplicationNativeLayout
     public const int Message79RecipientAuxiliaryByteOffset = 0x4D10;
     public const int Message79RecipientArgumentOffsetPassedToAuxiliarySink = 0x58A0;
     public const int Message79RecipientObjectPointerLoadOffset = 0x46A4;
+    public const int Message79FallbackConditionalSourcePresenceByteOffset = 0x24;
+    public const int Message79FallbackLookupRecordAuxiliaryGateDwordOffset = 0x08;
+    public const int Message79FallbackLookupRecordAuxiliaryValueDwordOffset = 0x10;
+    public const int Message79FallbackLookupRecordDescriptorDwordOffset = 0x14;
+    public const int Message79FallbackRecordConditionalPresenceByteOffset = 0x4CA8;
+    public const int Message79FallbackRecordFirstDwordOffset = 0x4CB0;
+    public const int Message79FallbackRecordDwordCount = 6;
+    public const int Message79FallbackRecordLastDwordOffset = 0x4CC4;
+    public const int Message79FallbackDescriptorTextOffset = 0x4CFC;
+    public const int Message79FallbackDescriptorStateDwordOffset = 0x4D00;
+    public const int Message79FallbackDescriptorFirstValueDwordOffset = 0x4D04;
+    public const int Message79FallbackDescriptorLastValueDwordOffset = 0x4D0C;
+    public const int Message79FallbackDescriptorByteOffset = 0x4D10;
+    public const int Message79FallbackDescriptorControlByteOffset = 0x4C70;
+    public const uint Message79FallbackDescriptorClearMask = 0x08;
+    public const uint Message79FallbackDescriptorSetMask = 0x10;
+    public const uint Message79FallbackStateUpdateFileOffset = 0x457D30;
+    public const uint Message79FallbackDescriptorDispatchFileOffset = 0x439380;
+    public const uint Message79FallbackDescriptorHelperFileOffset = 0x439410;
 
     private static CharacterLocalControllerCallbackSnapshot Callback(
         int messageId,

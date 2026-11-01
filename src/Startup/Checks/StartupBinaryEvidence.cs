@@ -5070,6 +5070,44 @@ internal static class StartupBinaryEvidence
             && Matches(0x439580,
                 "8986004D00008B018986044D00008B41048986084D00008B410889860C4D0000")
             && Matches(0x439539, "888E104D0000"));
+        check("Binary message-0x79 fallback gates recipient fields and routes the 0x02 transition byte",
+            CharacterLocalControllerApplicationNativeLayout.Message79FallbackStateUpdateFileOffset == 0x457D30
+            && CharacterLocalControllerApplicationNativeLayout.Message79FallbackDescriptorDispatchFileOffset == 0x439380
+            && CharacterLocalControllerApplicationNativeLayout.Message79FallbackDescriptorHelperFileOffset == 0x439410
+            && RelativeBranchTargets(0x439A60, 0xE8, 0x421640)
+            && Matches(0x439A67, "85FF0F84B8000000")
+            && Matches(0x439A6F, "807F2400746C")
+            && Matches(0x439ACD, "8D8BA84C000050")
+            && RelativeBranchTargets(0x439AD9, 0xE8,
+                CharacterLocalControllerApplicationNativeLayout.Message79FallbackStateUpdateFileOffset)
+            && Matches(0x457D36, "803E00742B")
+            && Matches(0x457D3B,
+                "8B55088B028946088B420489460C8B42088946108B420C8946148B42108946188B421489461C")
+            && Matches(0x457D66, "8D560885D27425")
+            && Matches(0x457D6D,
+                "8B4D088B0189028B41048942048B41088942088B410C89420C8B41108942108B4114894214")
+            && Matches(0x457D92, "C60601")
+            && Matches(0x439AE1, "837F1400740FFF750C0FB747148BCB50")
+            && RelativeBranchTargets(0x439AF1, 0xE8,
+                CharacterLocalControllerApplicationNativeLayout.Message79FallbackDescriptorDispatchFileOffset)
+            && Matches(0x439AF6, "8B471085C0742A837F08007518")
+            && Matches(0x439B03, "8B0DE8FFDF016A006A006A0750FFB3A0580000")
+            && RelativeBranchTargets(0x439B16, 0xE8, 0x369660)
+            && Matches(0x439B1B, "8B8BA446000056")
+            && RelativeBranchTargets(0x439B22, 0xE8, 0x111BB20)
+            && RelativeBranchTargets(0x4393D5, 0xE8,
+                CharacterLocalControllerApplicationNativeLayout.Message79FallbackDescriptorHelperFileOffset)
+            && RelativeBranchTargets(0x4393F6, 0xE8,
+                CharacterLocalControllerApplicationNativeLayout.Message79FallbackDescriptorHelperFileOffset)
+            && Matches(0x439516, "8B55148B86004D000083E20283E0023BD0")
+            && Matches(0x439527,
+                "744585D2741984C97508388E104D0000741B888E104D0000C644241400EB0E84C9750A8A86104D000088442414")
+            && Matches(0x439539, "888E104D0000")
+            && RelativeBranchTargets(0x439569, 0xE8, 0x438D10)
+            && Matches(0x439580,
+                "8986004D00008B018986044D00008B41048986084D00008B410889860C4D0000")
+            && Matches(0x439754, "8B4514A808741BC686704C000000")
+            && Matches(0x439776, "A8107407C686704C000001"));
         var keyedRecipientVtableFileOffset = VirtualAddressToFileOffset(
             CharacterKeyedRecipientNativeLayout.GenericCharacterVtableVirtualAddress);
         check("Binary message-0x79 recipient is constructed as tfGenericCharacter and inserted unchanged into the exact getter registry",

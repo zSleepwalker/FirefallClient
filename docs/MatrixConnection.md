@@ -2887,25 +2887,83 @@ the keyed registry returned by `0x35E700` at `+0x54`, using the QWORD-key
 lookup at `0x4093E0`. A found entry's `+0x10` pointer is the next recipient;
 byte `+0x08` on that pointed-to recipient must equal `1` to enter the update
 path; other values skip it. On the update path the callback calls
-`0x466660` with the normalized key, the message field at
-`+0x38`, flag `1`, and the address of the key pair at `message+0x30`.
-If that helper returns false, it calls `0x439A50` with the recipient pointer,
-`message+0x38`, and the opaque value at `message+0x28`.
+`0x466660` with the normalized key, the value at `message+0x38`, flag `1`,
+and the address of the key pair at `message+0x30`. If that helper returns
+false, it calls `0x439A50` with `ECX=recipient`, first stack argument
+`message+0x38`, and second stack argument (opaque) `message+0x28`. The callback
+body directly proves these offsets and argument order, but not the meaning
+of either message value.
 
-Inside that fallback, recipient `+0x4CA8` is passed to `0x457D30`, which
-updates a presence byte there and, on its populated path, six DWORDs at
-`+0x4CB0..+0x4CC4`. A separate descriptor-driven call reaches `0x439410`,
-which passes recipient `+0x4CFC` to `0x2FCC90`, stores a DWORD and three
-following DWORDs at `+0x4D00..+0x4D0C`, and conditionally updates a byte at
-`+0x4D10`. Other guarded downstream calls pass recipient `+0x58A0` as an
-argument or load an object pointer from `+0x46A4`. These are observed offset-level effects; their field meanings are unresolved.
-The lookup/update path has no removal operation in the direct `0x4C9B80` body.
-The callback does not write adapter `+0x170/+0x174`; the precise semantics of
-`message+0x28/+0x38` also remain unresolved. The recipient's concrete
-registered class is traced below, while the message key still determines
-which entry is returned. The separate selector-`0x03` MandMController code
-remains conditional, and the `tfGameProtocolHandler` findings elsewhere in
-this document concern a different ReplayReader path.
+#### Bounded fallback state update
+
+The raw `0x439A50` fallback first passes `message+0x38` to `0x421640`, which
+searches a separate table and returns either a record pointer or no match. A
+no-match returns from the fallback without these recipient updates. For a
+match, byte `record+0x24` gates the first update; when nonzero, the fallback
+assembles a six-DWORD input snapshot and calls `0x457D30` with destination
+`recipient+0x4CA8`. The input DWORD order is: the two DWORDs returned through
+`0x49DD40`; three raw 32-bit values at offsets `+0x04/+0x08/+0x0C` of the
+object returned by a virtual call at slot `+0x44`; then the DWORD loaded from
+`[0x1E4E2AC+0x2C]`. The middle three and final value are moved as scalar
+floats in the native instructions, but `0x457D30` copies their exact 32-bit
+patterns. The destination presence byte is at `recipient+0x4CA8`, followed
+by six DWORD stores at `+0x4CB0`, `+0x4CB4`, `+0x4CB8`, `+0x4CBC`,
+`+0x4CC0`, and `+0x4CC4`; the intervening bytes are not written. If the
+destination byte was zero, `0x457D30` sets it to `1` after the copy. A
+pre-existing nonzero byte is preserved. If `record+0x24` is zero, this
+presence byte and all six DWORDs are left unchanged; this path does not clear
+the record.
+
+Next, if the matched record's DWORD at `+0x14` is nonzero, `0x439A50` passes
+its low WORD and the opaque `message+0x28` value to `0x439380`. That helper
+uses the low WORD to find a descriptor-table entry and calls `0x439410` even
+when the lookup misses (with its fallback inputs). On a hit, two descriptor
+strings and the descriptor's state/data fields feed `0x439410`. It assigns
+the selected text through `0x2FCC90` at `recipient+0x4CFC`, writes the state
+DWORD at `+0x4D00`, and three DWORDs at `+0x4D04/+0x4D08/+0x4D0C`. The three DWORDs
+can be replaced together by the native default vector when any input matches
+its masked-float sentinel check; the C# model below takes that vector after
+this choice. The source byte for `+0x4D10` (named `SourceByteAt4D10` in the
+model input to distinguish it from the stored recipient byte) is selected
+from two context bytes based on the opaque argument's comparison with a
+context interval. The helper compares bit `0x02` in the old and incoming
+`+0x4D00` values. On clear-to-set, it stores the source byte only if that byte
+is nonzero or differs from the current `+0x4D10` value; if both are zero, the
+existing zero remains. Set-to-clear and unchanged-bit paths preserve the
+existing `+0x4D10` byte. A transition calls `0x438D10`: set-to-clear passes
+the source byte unless it is zero, in which case it passes the prior
+`+0x4D10`; clear-to-set passes zero. With no transition, that call is skipped.
+Separately, state bit `0x08` clears recipient byte
+`+0x4C70`; otherwise bit `0x10` sets it to `1`; if neither bit is set that
+byte is preserved (when both are set, the clear branch wins). These are
+offset-level effects only; no semantic names are assigned to the fields or
+descriptor ID.
+
+Finally, if the matched record's DWORD at `+0x10` is nonzero, its DWORD at
+`+0x08` gates an auxiliary path: when zero, `0x369660` receives the value
+loaded from `recipient+0x58A0`, the matched record, literal `7`, and two
+zeroes. Regardless of that gate, the fallback then loads an object pointer
+from `recipient+0x46A4` and calls `0x111BB20` with the original
+`message+0x38` value. These downstream calls can have other effects and are
+not simulated by the bounded state model. The keyed lookup/update path has
+no removal operation in the direct `0x4C9B80` body, and the callback does
+not write adapter `+0x170/+0x174`.
+
+The model in `CharacterKeyedRecipientFallbackModel.cs` applies only these
+verified field copies and flag-byte rules from already-resolved input
+snapshots; it does not imitate the native heap, discover the registry entry,
+recreate descriptor-string ownership, perform the descriptor lookup or
+sentinel-vector selection, or execute downstream calls. `Startup.Checks`
+tests its no-op, copy, presence, state-bit transition, and clear/set behavior,
+while binary checks fingerprint the gates, call sites, and field stores in
+the original sample.
+The keyed map is heterogeneous and lookup-key-dependent: the `tfGenericCharacter`
+producer traced below proves one concrete entry path, not the type of every
+recipient. This BaseController callback ID `0x79` is a separate dispatch
+namespace from Matrix nested selector `0x79`; it does not establish
+`PrivateDialog` message semantics for a keyed object. The selector-`0x03`
+MandMController code remains conditional, and the `tfGameProtocolHandler`
+findings elsewhere in this document concern a different ReplayReader path.
 
 ### Concrete keyed-registry recipient
 

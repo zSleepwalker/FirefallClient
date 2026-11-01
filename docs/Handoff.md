@@ -30,8 +30,16 @@
   `0x943360 -> 0x35E700 -> 0x407F00`; see
   `CharacterKeyedRecipientNativeLayout.cs`. The keyed map can contain other
   producer types, so the class applies to matching generated keys, not every
-  possible lookup. Field semantics and recipient pointee ownership remain
-  unresolved. The
+  possible lookup. The `0x439A50` fallback's conditional six-DWORD record copy
+  (`+0x4CA8/+0x4CB0..+0x4CC4`), descriptor field writes
+  (`+0x4CFC/+0x4D00..+0x4D0C`), transition-gated `+0x4D10` update, byte
+  clearing/setting, and gated downstream
+  calls are documented in `docs\MatrixConnection.md`; the bounded pure model
+  and binary fingerprints are in `CharacterKeyedRecipientFallbackModel.cs`
+  and `Startup.Checks`. Those offset-level effects do not establish field
+  meanings or recipient ownership. BaseController callback ID `0x79` is a
+  separate namespace from Matrix nested selector `0x79` and does not imply
+  `PrivateDialog` semantics for a keyed object. The
   selector-`0x03` MandMController path remains conditional; no NPC runtime
   binding was inferred, and this work is separate from `tfGameProtocolHandler`.
 - The `tfGenericCharacter` insertion requests `0x5AE0` bytes, initializes the
