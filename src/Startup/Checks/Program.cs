@@ -3476,6 +3476,65 @@ Check("Matrix parser routes preserve distinct namespaces for duplicate selector 
         0, true, true) == MatrixMessageCallbackDispatchPath.NestedMessageChildren
     && MatrixMessageNamespaceRoutingNativeLayout.ClassifyCallbackPath(
         0, false, false) == MatrixMessageCallbackDispatchPath.ProtocolHandlerUnavailable);
+var envelopeRegistry = MatrixMessageNamespaceRoutingNativeLayout.EnvelopeKeyRegistry;
+Check("Matrix envelope-QWORD registry lookup and insertion layout is recorded",
+    envelopeRegistry.CallbackFileOffset == 0x7FDC60
+    && envelopeRegistry.EnvelopeDispatcherFileOffset == 0x800420
+    && envelopeRegistry.RegistryLookupFileOffset == 0x800070
+    && envelopeRegistry.MessageKeyLowDwordFieldOffset == 0x18
+    && envelopeRegistry.MessageKeyHighDwordFieldOffset == 0x1C
+    && envelopeRegistry.FirstRegistryFieldOffset == 0x24
+    && envelopeRegistry.SecondRegistryFieldOffset == 0x2C
+    && envelopeRegistry.RegistryNodeKeyLowDwordFieldOffset == 0x10
+    && envelopeRegistry.RegistryNodeKeyHighDwordFieldOffset == 0x14
+    && envelopeRegistry.RegistryNodeValuePointerFieldOffset == 0x18
+    && envelopeRegistry.RegistryTreeConstructorFileOffset == 0x805130
+    && envelopeRegistry.RegistrySearchFileOffset == 0x8013B0
+    && envelopeRegistry.RegistryEntryConstructorFileOffset == 0x806910
+    && envelopeRegistry.RegistryInsertFileOffset == 0x8064C0
+    && envelopeRegistry.DynamicFactoryFileOffset == 0x81B1B0
+    && MatrixMessageNamespaceRoutingNativeLayout.EnvelopeRegistryDynamicFactoryByteDispatchFileOffset == 0x81B1DC
+    && MatrixMessageNamespaceRoutingNativeLayout.EnvelopeRegistryDynamicFactoryVirtualAddress == 0xC1BDB0
+    && envelopeRegistry.DynamicFactoryFirstByteMinimum == 2
+    && envelopeRegistry.DynamicFactoryFirstByteMaximum == 0x35
+    && envelopeRegistry.DirectProtocolHandlerDispatcherFileOffset == 0x81BB90
+    && MatrixMessageNamespaceRoutingNativeLayout.EnvelopeRegistrySecondMapUpdateFileOffset == 0x800300
+    && MatrixMessageNamespaceRoutingNativeLayout.EnvelopeRegistrySecondMapInsertCallFileOffset == 0x8003FF);
+Check("Conditional message fan-out records its constructed keyed state and recipient-vector call",
+    MatrixMessageParserFlowNativeLayout.ConditionalFanoutStateLazyConstructionMethodFileOffset == 0x7FE1C0
+    && MatrixMessageParserFlowNativeLayout.ConditionalFanoutStateConstructorFileOffset == 0xBD6E10
+    && MatrixMessageParserFlowNativeLayout.ConditionalFanoutStateAllocationSize == 0x48
+    && MatrixMessageParserFlowNativeLayout.ConditionalFanoutStateQwordArgumentLowFieldOffset == 8
+    && MatrixMessageParserFlowNativeLayout.ConditionalFanoutStateQwordArgumentHighFieldOffset == 0x0C
+    && MatrixMessageParserFlowNativeLayout.ConditionalFanoutStateContextPairSourceOffset == 0x0C
+    && MatrixMessageParserFlowNativeLayout.ConditionalFanoutStateContextPairLowFieldOffset == 0x18
+    && MatrixMessageParserFlowNativeLayout.ConditionalFanoutStateContextPairHighFieldOffset == 0x1C
+    && MatrixMessageParserFlowNativeLayout.ConditionalFanoutStateRecipientVectorBeginFieldOffset == 0x2C
+    && MatrixMessageParserFlowNativeLayout.ConditionalFanoutStateRecipientVectorEndFieldOffset == 0x30
+    && MatrixMessageParserFlowNativeLayout.ConditionalFanoutStateRecipientVectorCapacityFieldOffset == 0x34
+    && MatrixMessageParserFlowNativeLayout.ConditionalFanoutStateRecipientVectorAppendFileOffset == 0xBD8C90
+    && MatrixMessageParserFlowNativeLayout.ConditionalFanoutStateRecipientRegisterMethodFileOffset == 0xBD6F30
+    && MatrixMessageParserFlowNativeLayout.ConditionalFanoutStateRecipientFanoutMethodFileOffset == 0xBD7460
+    && MatrixMessageParserFlowNativeLayout.ConditionalFanoutStateRecipientRegistrationVtableSlotOffset == 4
+    && MatrixMessageParserFlowNativeLayout.ConditionalFanoutStateRecipientDispatchVtableSlotOffset == 0x0C
+    && MatrixMessageParserFlowNativeLayout.ConditionalFanoutStateRecipientPointerSize == 4
+    && MatrixMessageParserFlowNativeLayout.ConditionalFanoutStateRecipientDispatchRecordSize == 0x0C);
+Check("Observed DefaultReplayWriter recipient RTTI resolves the fan-out slot implementation",
+    MatrixMessageParserFlowNativeLayout.DefaultReplayWriterObjectAllocationSize == 0x64
+    && MatrixMessageParserFlowNativeLayout.DefaultReplayWriterConstructorFileOffset == 0xBD7EA0
+    && MatrixMessageParserFlowNativeLayout.DefaultReplayWriterVtableStoreFileOffset == 0xBD7EE6
+    && MatrixMessageParserFlowNativeLayout.DefaultReplayWriterVtableVirtualAddress == 0x1C73ADC
+    && MatrixMessageParserFlowNativeLayout.DefaultReplayWriterCompleteObjectLocatorVirtualAddress == 0x1CCDF9C
+    && MatrixMessageParserFlowNativeLayout.DefaultReplayWriterTypeDescriptorVirtualAddress == 0x1E2C7D4
+    && MatrixMessageParserFlowNativeLayout.DefaultReplayWriterRttiName == ".?AVDefaultReplayWriter@nl@@"
+    && MatrixMessageParserFlowNativeLayout.DefaultReplayWriterFanoutMethodVirtualAddress == 0xFD9010
+    && MatrixMessageParserFlowNativeLayout.DefaultReplayWriterFanoutMethodFileOffset == 0xBD8410
+    && MatrixMessageParserFlowNativeLayout.DefaultReplayWriterFanoutMethodHelperFileOffset == 0x12A0660);
+Check("Direct context+8 selector 0x53 representative remains the RTTI-backed protocol handler",
+    MatrixMessageNamespaceRoutingNativeLayout.ProtocolHandlerRttiName == ".?AVtfGameProtocolHandler@@"
+    && MatrixMessageNamespaceRoutingNativeLayout.Selector53ProtocolHandlerVtableSlotOffset == 0xD0
+    && MatrixMessageNamespaceRoutingNativeLayout.Selector53ProtocolHandlerMethodFileOffset == 0xACA580
+    && MatrixMessageNamespaceRoutingNativeLayout.Selector53ProtocolHandlerObservedMessageReadOffset == 0x34);
 Check("ReplayReader getter and owner construction resolve the concrete message receiver field",
     MatrixMessageParserFlowNativeLayout.ReplayReaderMessageRecipientGetterOwnerRttiName
         == ".?AVtfLookingGlass@@"

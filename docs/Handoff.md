@@ -56,7 +56,8 @@
   nonmatching nested sentinel, a non-null context `+8` is passed to `0x81BB90`.
   Another branch calls `0xBD7060` with the parsed message
   pointer plus a derived selector when the message predicate and context
-  `+0xB0` allow it. The recipients' further semantics remain unknown.
+  `+0xB0` allow it. The fan-out vector is now traced below; recipient identity
+  is established for one insertion candidate but not every vector entry.
   Consumer record byte `+6` maps numerically as `1` -> context `+4`, `2` ->
   context `+8` with argument `1`, and `3` -> context `+8` with argument
   `0`; other bytes skip dispatch. These values have no inferred message
@@ -80,6 +81,34 @@
   The receiver's vtable VA `0x1C71EC0` / raw `0x1870AC0` resolves by RTTI to
   `.?AVtfGameProtocolHandler@@`; the requested original's PE section table
   verifies these VA/raw mappings (including `.text` raw+`0x400C00`).
+- **Nonzero-key registry and fan-out follow-up:** the `tfGameSocketHandler`
+  constructor at raw `0x7FD670` initializes tree headers at `+0x24/+0x2C`
+  with `0x805130` and stores a factory callback at `+0x14` (VA `0xC1BDB0` /
+  raw `0x81B1B0`). `0x800420` passes the full message key at `+0x18/+0x1C`
+  to `0x800070`; its tree search `0x8013B0` compares QWORD keys at node
+  `+0x10/+0x14`, with mapped pointer at `+0x18`. `0x806910` creates entries
+  and `0x8064C0` inserts them; a guarded path at `0x800300` also inserts into
+  `+0x2C`. Factory `0x81B1B0` accepts low-byte selectors `0x02..0x35`, but
+  individual cases were not mapped, so message namespace and Character/
+  Vehicle assignment remain unresolved.
+- The gated `0xBD7060` path serializes the message QWORD and message data into
+  its output stream, then passes the selector separately to `0xBD7460`,
+  which stores it in the recipient callback's local record, not the stream.
+  That function traverses 32-bit
+  recipient pointers in `[+0x2C,+0x30)` (capacity `+0x34`) and calls each
+  recipient's vtable slot `+0x0C` with a local 12-byte record and another
+  argument. A candidate registration path at `0x7FE1C0` allocates `0x48`
+  bytes, constructs it with `0xBD6E10`, appends via `0xBD8C90`, then invokes
+  recipient slot `+4`. `0x7FE360` constructs one RTTI-backed
+  `nl::DefaultReplayWriter` at `0xBD7EA0`; its slot `+0x0C` is VA `0xFD9010`
+  / raw `0xBD8410`, which checks record/input lengths via `0x12A0660` and
+  returns a Boolean. This identifies a representative recipient in that
+  insertion path, not every `0xBD7460` recipient: a direct link between the
+  callback's `+0xB0` field and the `0x7FE1C0` owner is not established by the
+  shared offset alone. Layouts and original-byte assertions are in
+  `src/Startup/MatrixMessageNamespaceRoutingNativeLayout.cs`,
+  `src/Startup/MatrixMessageParserFlowNativeLayout.cs`, and
+  `src/Startup/Checks/StartupBinaryEvidence.cs`.
 - On that conditional path, dispatcher `0x81BB90`'s 91-entry table covers
   `0x20..0x7A` and maps ID to receiver slot `4 + 4*(ID-0x20)`. The concrete dialog mappings are
   `0x78 OpenMovieDialog -> +0x164 -> 0xACE2E0`, `0x79 PrivateDialog ->

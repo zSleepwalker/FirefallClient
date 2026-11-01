@@ -4402,6 +4402,112 @@ internal static class StartupBinaryEvidence
                 MatrixMessageParserFlowNativeLayout.CallbackContextMessageConsumerFileOffset)
             && RelativeBranchTargets(0x7FDD81, 0xE8,
                 MatrixMessageParserFlowNativeLayout.CallbackContextConditionalDispatchFileOffset));
+        var envelopeRegistry = MatrixMessageNamespaceRoutingNativeLayout.EnvelopeKeyRegistry;
+        var textSection = sections.Single(section => section.Name == ".text");
+        check("Binary envelope-QWORD registry lookup, constructor, and insertion paths match the original image",
+            imageBase == 0x400000
+            && textSection.Rva == 0x1000
+            && textSection.RawOffset == 0x400
+            && MatrixMessageNamespaceRoutingNativeLayout.RawTextOffsetToVirtualAddressDelta
+                == imageBase + textSection.Rva - textSection.RawOffset
+            && VirtualAddressToFileOffset(0xBFE860) == envelopeRegistry.CallbackFileOffset
+            && Matches(MatrixMessageNamespaceRoutingNativeLayout.CallbackEnvelopeKeyLowLoadFileOffset,
+                "8B53188ACA8B431C")
+            && RelativeBranchTargets(
+                MatrixMessageNamespaceRoutingNativeLayout.CallbackEnvelopeKeyDispatchCallFileOffset,
+                0xE8,
+                envelopeRegistry.EnvelopeDispatcherFileOffset)
+            && RelativeBranchTargets(0x800611, 0xE8, envelopeRegistry.RegistryLookupFileOffset)
+            && Matches(0x800453, "8B7E108B46188B4E1C")
+            && Matches(0x800088, "8D4324")
+            && RelativeBranchTargets(0x800093, 0xE8, envelopeRegistry.RegistrySearchFileOffset)
+            && Matches(0x8000A4, "8B7818")
+            && Matches(envelopeRegistry.RegistrySearchFileOffset + 0x20, "395814770C7205397810")
+            && Matches(0x80014B, "8B4314")
+            && Matches(0x80019B, "8D432C")
+            && RelativeBranchTargets(0x8001A7, 0xE8, envelopeRegistry.RegistrySearchFileOffset)
+            && Matches(0x80032E, "8B4318")
+            && Matches(0x800337, "8B431C")
+            && RelativeBranchTargets(0x800172, 0xE8, envelopeRegistry.RegistryEntryConstructorFileOffset)
+            && RelativeBranchTargets(0x800184, 0xE8, envelopeRegistry.RegistryInsertFileOffset)
+            && RelativeBranchTargets(0x800268, 0xE8, envelopeRegistry.RegistryEntryConstructorFileOffset)
+            && RelativeBranchTargets(0x80027A, 0xE8, envelopeRegistry.RegistryInsertFileOffset)
+            && RelativeBranchTargets(0x7FD6DD, 0xE8, envelopeRegistry.RegistryTreeConstructorFileOffset)
+            && RelativeBranchTargets(0x7FD6F7, 0xE8, envelopeRegistry.RegistryTreeConstructorFileOffset)
+            && Matches(0x7FD820, "C74710A027C200C74714B0BDC100")
+            && Matches(
+                MatrixMessageNamespaceRoutingNativeLayout.EnvelopeRegistryDynamicFactoryByteDispatchFileOffset,
+                "0FB6C083C0FE83F833")
+            && RelativeBranchTargets(0x8003ED, 0xE8, envelopeRegistry.RegistryEntryConstructorFileOffset)
+            && RelativeBranchTargets(
+                MatrixMessageNamespaceRoutingNativeLayout.EnvelopeRegistrySecondMapInsertCallFileOffset,
+                0xE8,
+                envelopeRegistry.RegistryInsertFileOffset));
+        check("Binary conditional fan-out gate, state construction, recipient insertion, and slot call match the original image",
+            Matches(0x7FDD64, "83BEB0000000007419")
+            && RelativeBranchTargets(0x7FDD81, 0xE8,
+                MatrixMessageParserFlowNativeLayout.CallbackContextConditionalDispatchFileOffset)
+            && Matches(0xBD7116, "8B46188945E08B461C8945E4")
+            && RelativeBranchTargets(0xBD7201, 0xE8,
+                MatrixMessageParserFlowNativeLayout.ConditionalFanoutStateRecipientFanoutMethodFileOffset)
+            && Matches(0xBD747C, "8945F48B4508")
+            && Matches(0xBD7482, "8845FA")
+            && Matches(0xBD748A, "668975F8")
+            && Matches(0xBD7496, "C645FB00")
+            && Matches(0xBD7485, "8B41308B")
+            && Matches(0xBD748E, "8B712C")
+            && Matches(0xBD74A8, "8B0E528D55F4528B01FF500C")
+            && Matches(0xBD74B4, "8B550C8D7604")
+            && Matches(0x7FE1F7, "6A48E8")
+            && RelativeBranchTargets(0x7FE1F9, 0xE8, 0x12B7FB0)
+            && RelativeBranchTargets(0x7FE227, 0xE8,
+                MatrixMessageParserFlowNativeLayout.ConditionalFanoutStateConstructorFileOffset)
+            && Matches(0x7FE217, "8D460C")
+            && Matches(0xBD6E4B, "8943188B42045689431C")
+            && Matches(0xBD6EAA, "897308897B0C")
+            && Matches(0xBD6E5A, "894320894324C6432800C7432C00000000C7433000000000C7433400000000")
+            && Matches(0x7FE2AA, "8D4E2C")
+            && RelativeBranchTargets(0x7FE2AD, 0xE8,
+                MatrixMessageParserFlowNativeLayout.ConditionalFanoutStateRecipientVectorAppendFileOffset)
+            && Matches(0x7FE2B8, "FF5004")
+            && Matches(0x7FE478, "6A64E8")
+            && RelativeBranchTargets(0x7FE47A, 0xE8, 0x12B7FB0)
+            && RelativeBranchTargets(0x7FE4D2, 0xE8,
+                MatrixMessageParserFlowNativeLayout.DefaultReplayWriterConstructorFileOffset)
+            && Matches(0x7FE50A, "89BEB4000000")
+            && Matches(0x7FE569, "FFB6B4000000")
+            && RelativeBranchTargets(0x7FE56F, 0xE8,
+                MatrixMessageParserFlowNativeLayout.ConditionalFanoutStateLazyConstructionMethodFileOffset)
+            && RelativeBranchTargets(0xBD6F3D, 0xE8,
+                MatrixMessageParserFlowNativeLayout.ConditionalFanoutStateRecipientVectorAppendFileOffset)
+            && Matches(0xBD6F48, "FF5004")
+            && Matches(0xBD8CC7, "83460404"));
+        var defaultReplayWriterVtable =
+            MatrixMessageParserFlowNativeLayout.DefaultReplayWriterVtableVirtualAddress;
+        var defaultReplayWriterCol =
+            MatrixMessageParserFlowNativeLayout.DefaultReplayWriterCompleteObjectLocatorVirtualAddress;
+        check("Binary representative fan-out recipient is RTTI-backed and resolves slot 0x0C to its concrete method",
+            Matches(MatrixMessageParserFlowNativeLayout.DefaultReplayWriterVtableStoreFileOffset,
+                "C703DC3AC701")
+            && ReadUInt32(VirtualAddressToFileOffset(defaultReplayWriterVtable) - 4)
+                == defaultReplayWriterCol
+            && ReadUInt32(VirtualAddressToFileOffset(defaultReplayWriterCol) + 4) == 0
+            && ReadUInt32(VirtualAddressToFileOffset(defaultReplayWriterCol) + 12)
+                == MatrixMessageParserFlowNativeLayout.DefaultReplayWriterTypeDescriptorVirtualAddress
+            && VtableRttiName(defaultReplayWriterVtable, 80)
+                == MatrixMessageParserFlowNativeLayout.DefaultReplayWriterRttiName
+            && ReadUInt32(VirtualAddressToFileOffset(defaultReplayWriterVtable)
+                + MatrixMessageParserFlowNativeLayout.ConditionalFanoutStateRecipientDispatchVtableSlotOffset)
+                == MatrixMessageParserFlowNativeLayout.DefaultReplayWriterFanoutMethodVirtualAddress
+            && VirtualAddressToFileOffset(
+                MatrixMessageParserFlowNativeLayout.DefaultReplayWriterFanoutMethodVirtualAddress)
+                == MatrixMessageParserFlowNativeLayout.DefaultReplayWriterFanoutMethodFileOffset
+            && Matches(MatrixMessageParserFlowNativeLayout.DefaultReplayWriterFanoutMethodFileOffset,
+                "558BEC578BF98B4F0C85C97507")
+            && RelativeBranchTargets(
+                MatrixMessageParserFlowNativeLayout.DefaultReplayWriterFanoutMethodFileOffset + 0x1C,
+                0xE8,
+                MatrixMessageParserFlowNativeLayout.DefaultReplayWriterFanoutMethodHelperFileOffset));
         var messageDispatchCases = MatrixMessageParserFlowNativeLayout.MessageDispatchVtableCases;
         check("Binary ReplayReader .text mapping and message discriminator dispatch reach the expected receiver vtable slots",
             VirtualAddressToFileOffset(MatrixMessageParserFlowNativeLayout.CallbackContextDispatchHelperVirtualAddress)

@@ -24,6 +24,26 @@ public readonly record struct MatrixMessageNamespaceSnapshot(
     uint MessageVtableVirtualAddress,
     string MessageRttiName);
 
+public readonly record struct MatrixMessageEnvelopeRegistrySnapshot(
+    uint CallbackFileOffset,
+    uint EnvelopeDispatcherFileOffset,
+    uint RegistryLookupFileOffset,
+    int MessageKeyLowDwordFieldOffset,
+    int MessageKeyHighDwordFieldOffset,
+    int FirstRegistryFieldOffset,
+    int SecondRegistryFieldOffset,
+    int RegistryNodeKeyLowDwordFieldOffset,
+    int RegistryNodeKeyHighDwordFieldOffset,
+    int RegistryNodeValuePointerFieldOffset,
+    uint RegistryTreeConstructorFileOffset,
+    uint RegistrySearchFileOffset,
+    uint RegistryEntryConstructorFileOffset,
+    uint RegistryInsertFileOffset,
+    uint DynamicFactoryFileOffset,
+    int DynamicFactoryFirstByteMinimum,
+    int DynamicFactoryFirstByteMaximum,
+    uint DirectProtocolHandlerDispatcherFileOffset);
+
 /// <summary>
 /// Records parser-family collisions and the conditional callback routing
 /// performed by tfGameSocketHandler. The envelope key's application meaning
@@ -65,6 +85,20 @@ public static class MatrixMessageNamespaceRoutingNativeLayout
     public const int EnvelopeKeyRegistryFieldOffset1 = 0x24;
     public const int EnvelopeKeyRegistryFieldOffset2 = 0x2C;
     public const int EnvelopeKeyReceiverVirtualSlotOffset = 0x20;
+    public const int EnvelopeRegistryNodeKeyLowDwordFieldOffset = 0x10;
+    public const int EnvelopeRegistryNodeKeyHighDwordFieldOffset = 0x14;
+    public const int EnvelopeRegistryNodeValuePointerFieldOffset = 0x18;
+    public const uint EnvelopeRegistryTreeConstructorFileOffset = 0x805130;
+    public const uint EnvelopeRegistrySearchFileOffset = 0x8013B0;
+    public const uint EnvelopeRegistryEntryConstructorFileOffset = 0x806910;
+    public const uint EnvelopeRegistryInsertFileOffset = 0x8064C0;
+    public const uint EnvelopeRegistryDynamicFactoryFileOffset = 0x81B1B0;
+    public const uint EnvelopeRegistryDynamicFactoryVirtualAddress = 0xC1BDB0;
+    public const uint EnvelopeRegistryDynamicFactoryByteDispatchFileOffset = 0x81B1DC;
+    public const int EnvelopeRegistryDynamicFactoryFirstByteMinimum = 2;
+    public const int EnvelopeRegistryDynamicFactoryFirstByteMaximum = 0x35;
+    public const uint EnvelopeRegistrySecondMapUpdateFileOffset = 0x800300;
+    public const uint EnvelopeRegistrySecondMapInsertCallFileOffset = 0x8003FF;
     public const uint CallbackSelectorLoadFileOffset = 0x7FDC8E;
     public const uint CallbackNestedSentinelCompareFileOffset = 0x7FDC91;
     public const uint CallbackProtocolReceiverLoadFileOffset = 0x7FDD47;
@@ -90,6 +124,26 @@ public static class MatrixMessageNamespaceRoutingNativeLayout
     public const uint Selector53ProtocolHandlerMethodVirtualAddress = 0xECB180;
     public const uint Selector53ProtocolHandlerMethodFileOffset = 0xACA580;
     public const int Selector53ProtocolHandlerObservedMessageReadOffset = 0x34;
+
+    public static MatrixMessageEnvelopeRegistrySnapshot EnvelopeKeyRegistry { get; } = new(
+        CallbackDispatcherFileOffset,
+        EnvelopeKeyDispatcherFileOffset,
+        EnvelopeKeyRegistryLookupFileOffset,
+        MessageEnvelopeKeyLowDwordFieldOffset,
+        MessageEnvelopeKeyHighDwordFieldOffset,
+        EnvelopeKeyRegistryFieldOffset1,
+        EnvelopeKeyRegistryFieldOffset2,
+        EnvelopeRegistryNodeKeyLowDwordFieldOffset,
+        EnvelopeRegistryNodeKeyHighDwordFieldOffset,
+        EnvelopeRegistryNodeValuePointerFieldOffset,
+        EnvelopeRegistryTreeConstructorFileOffset,
+        EnvelopeRegistrySearchFileOffset,
+        EnvelopeRegistryEntryConstructorFileOffset,
+        EnvelopeRegistryInsertFileOffset,
+        EnvelopeRegistryDynamicFactoryFileOffset,
+        EnvelopeRegistryDynamicFactoryFirstByteMinimum,
+        EnvelopeRegistryDynamicFactoryFirstByteMaximum,
+        ProtocolHandlerDispatcherFileOffset);
 
     public static IReadOnlyList<MatrixMessageNamespaceSnapshot> Selector53Namespaces { get; } =
         Array.AsReadOnly(new[]

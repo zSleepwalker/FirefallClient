@@ -2369,6 +2369,56 @@ passed the unchanged message pointer at `0x81BB90`. The actual QWORD values
 are runtime input and no sample stream was supplied, so none of the six
 classes can be assigned to one of these callback branches statically.
 
+The nonzero-key branch is backed by two ordered, QWORD-keyed trees embedded in
+the `tfGameSocketHandler` object. At raw `0x7FD670`, its constructor calls
+`0x805130` twice and stores the resulting tree headers at `+0x24` and `+0x2C`;
+the same constructor stores the factory pointer at `+0x14` (VA `0xC1BDB0` /
+raw `0x81B1B0`). `0x800420` copies the message selector and both key DWORDs,
+then passes the full key to `0x800070`. That helper searches `this+0x24` and
+`this+0x2C` through `0x8013B0`; the tree search compares the key with node
+`+0x10/+0x14`, and the mapped pointer is at node `+0x18`. On a first-tree
+miss, after the `0x800BF0` creation checks allow it, the callback at context
+`+0x14` is called with the QWORD; its dispatcher `0x81B1B0` accepts low-byte
+values `0x02..0x35`, but the individual factory cases are not mapped here.
+Entry creation uses `0x806910` and tree insertion uses `0x8064C0`; a separate
+guarded path at `0x800300` inserts a QWORD-keyed entry into the `+0x2C` tree.
+These observations establish a keyed lookup and
+registration mechanism, not a message namespace or a Character/Vehicle
+family assignment. The field offsets and original-image byte checks are
+recorded in `MatrixMessageNamespaceRoutingNativeLayout.cs` and
+`StartupBinaryEvidence.cs`.
+
+The `0xBD7060` fan-out is a separate conditional side path: `0x7FDC60` reaches
+it when the message predicate at `message+0x18` returns zero and context
+`+0xB0` is non-null; its selector is `3` for a zero callback argument and `2`
+otherwise. `0xBD7060` serializes the message QWORD and message data into an
+output stream, then passes the selector separately to `0xBD7460`. The latter
+stores the selector in the recipient callback's local record at `0xBD7482`;
+it is not serialized into that stream. That function iterates 32-bit recipient
+pointers in its owner's vector `[+0x2C,+0x30)` (capacity at `+0x34`), stepping
+four bytes at a time. For each item it performs an indirect `__thiscall`
+through vtable slot `+0x0C`, passing a pointer to a local 12-byte record and
+the other fan-out argument. The exact concrete type of every vector entry is
+not established.
+
+A representative registration path is visible at raw `0x7FE1C0`: it lazily
+allocates a `0x48`-byte state object, calls `0xBD6E10`, appends a recipient
+pointer to the state's `+0x2C` vector with `0xBD8C90`, then calls the
+recipient's vtable slot `+4`. The constructor copies the caller's pair at
+`this+0x0C` to state `+0x18/+0x1C`, stores its QWORD argument at `+0x08/+0x0C`,
+and zeroes vector fields `+0x2C/+0x30/+0x34`. A concrete recipient on this
+observed insertion path is `nl::DefaultReplayWriter`: `0x7FE360` constructs it
+at `0xBD7EA0`, whose final vtable VA `0x1C73ADC` has matching RTTI; its slot
+`+0x0C` resolves to VA `0xFD9010` / raw `0xBD8410`. That method checks the
+record/input lengths through `0x12A0660` and returns a Boolean. This is a
+representative recipient of the observed `0x7FE1C0` insertion path, not proof
+that every `0xBD7460` vector or the `0x7FDC60` context's `+0xB0` state uses
+that class: no direct call from `0x7FDC60` to `0x7FE1C0` was found, and the
+shared `+0xB0` offset alone does not establish object identity. The
+`context+8` route to `0x81BB90` remains separate; its concrete
+`tfGameProtocolHandler` recipient and selector-`0x53` slot mapping below do
+not identify the fan-out recipient type or message namespace.
+
 The concrete `tfGameProtocolHandler` has primary vtable VA `0x1C71EC0`, with
 COL VA `0x1CCA404` and object offset zero. Its RTTI hierarchy contains
 `tfGameProtocolHandler` and `MessageHandler` base descriptors, both at
