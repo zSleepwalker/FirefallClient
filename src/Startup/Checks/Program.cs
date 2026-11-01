@@ -2106,6 +2106,67 @@ Check("Character receiver behavior model preserves selector slots and observed a
     && CharacterAbilityApplicationNativeLayout.NpcInteractionMessageStateEndOffsetExclusive == 0x50
     && CharacterAbilityApplicationNativeLayout.NpcInteractionNumericApplicationEventCode == 356
     && CharacterAbilityApplicationNativeLayout.NpcInteractionEventPayloadTag == 5);
+Check("Character movement application receiver model records concrete slots, helpers, and observed layout conflicts",
+    CharacterMovementApplicationNativeLayout.ReceiverRttiName == ".?AVtfGameProtocolHandler@@"
+    && CharacterMovementApplicationNativeLayout.ReceiverConstructorFileOffset == 0xAC8CA0
+    && CharacterMovementApplicationNativeLayout.ReceiverVtableVirtualAddress == 0x1C71EC0
+    && CharacterMovementApplicationNativeLayout.ReceiverVtableFileOffset == 0x1870AC0
+    && CharacterMovementApplicationNativeLayout.MessageDispatcherFileOffset == 0x81BB90
+    && CharacterMovementApplicationNativeLayout.MessageDispatcherSelectorTableVirtualAddress == 0xC1D6DC
+    && CharacterMovementApplicationNativeLayout.MessageDispatcherSelectorTableFileOffset == 0x81CADC
+    && CharacterMovementApplicationNativeLayout.ReceiverHandlers.SequenceEqual(
+    [
+        new CharacterMovementReceiverHandlerSnapshot(0x70, 0xC1D4E0, 0x81C8E0, 0x144,
+            0xECEBF0, 0xACDFF0, 0xC245A0, 363),
+        new CharacterMovementReceiverHandlerSnapshot(0x71, 0xC1D50B, 0x81C90B, 0x148,
+            0xECED30, 0xACE130, 0xC24780, 365),
+        new CharacterMovementReceiverHandlerSnapshot(0x72, 0xC1D536, 0x81C936, 0x14C,
+            0xECB670, 0xACAA70, 0x9090A0, null),
+        new CharacterMovementReceiverHandlerSnapshot(0x73, 0xC1D561, 0x81C961, 0x150,
+            0xECB6C0, 0xACAAC0, 0x8EDD10, 213)
+    ])
+    && CharacterMovementApplicationNativeLayout.ReceiverHandlers.All(handler =>
+        handler.VtableSlotOffset
+            == CharacterMovementApplicationNativeLayout.VtableSlotBaseOffset
+                + CharacterMovementApplicationNativeLayout.VtableEntrySize
+                    * (handler.MessageSelector - CharacterMovementApplicationNativeLayout.FirstMessageSelector)
+        && handler.DispatcherCaseVirtualAddress == handler.DispatcherCaseFileOffset + 0x400C00
+        && handler.MethodVirtualAddress == handler.MethodFileOffset + 0x400C00)
+    && CharacterMovementApplicationNativeLayout.PublicDebugMovementFirstReaderFieldWidth == 2
+    && CharacterMovementApplicationNativeLayout.PublicDebugMovementFirstHandlerReadWidth == 4
+    && CharacterMovementApplicationNativeLayout.PublicDebugMovementFirstHandlerReadOffset == 0x28
+    && CharacterMovementApplicationNativeLayout.PublicDebugMovementFirstRecordStateOffset == 0x30
+    && CharacterPublicDebugMovementUpdateNativeLayout.ArrayOffset == 0x28
+    && CharacterPublicDebugMovementUpdateNativeLayout.ArrayElementCount == 7
+    && CharacterPublicDebugMovementUpdateNativeLayout.ArrayElementStride == 0xC8
+    && CharacterMovementApplicationNativeLayout.PublicDebugMovementOptionalGateOffset == 0x74
+    && CharacterMovementApplicationNativeLayout.PublicDebugMovementOptionalGateReaderFileOffset == 0x5FF760
+    && CharacterMovementApplicationNativeLayout.PublicDebugMovementOptionalValueReaderFileOffset == 0x5FF520
+    && CharacterMovementApplicationNativeLayout.PublicDebugMovementConditionalPayloadHelperFileOffset == 0xC24780
+    && CharacterMovementApplicationNativeLayout.ForcedMovementNestedStateOffset == 0x28
+    && CharacterMovementApplicationNativeLayout.ForcedMovementNestedStateFirstDwordValue == 0
+    && CharacterMovementApplicationNativeLayout.ForcedMovementNestedReaderFirstWrittenDwordOffset == 0x2C
+    && CharacterMovementApplicationNativeLayout.ForcedMovementDiscriminatorOffset == 0x30
+    && CharacterMovementApplicationNativeLayout.ForcedMovementConditionalPairOffset == 0x138
+    && CharacterMovementApplicationNativeLayout.ForcedMovementTrailingWordOffset == 0x1E0
+    && CharacterMovementApplicationNativeLayout.ForcedMovementCancelledInputListPointerOffset
+        == CharacterForcedMovementCancelledNativeLayout.FirstReaderFieldOffset
+    && CharacterMovementApplicationNativeLayout.ForcedMovementCancelledIgnoredWordOffset
+        == CharacterForcedMovementCancelledNativeLayout.SecondReaderFieldOffset
+    && CharacterMovementApplicationNativeLayout.ForcedMovementCancelledOwnerStateFieldOffset == 0x43C8
+    && CharacterMovementApplicationNativeLayout.ForcedMovementCancelledMissingStateDiagnostic == 1651
+    && CharacterMovementApplicationNativeLayout.GrappleClimbPermissionOwnerStateFieldOffset == 0x43B8
+    && CharacterMovementApplicationNativeLayout.GrappleClimbPermissionMissingStateDiagnostic == 1646
+    && CharacterMovementApplicationNativeLayout.GrappleClimbPermissionNestedStateFirstDwordValue == 0
+    && CharacterMovementApplicationNativeLayout.GrappleClimbPermissionNestedReaderFirstWrittenDwordOffset == 0x2C
+    && CharacterMovementApplicationNativeLayout.GrappleClimbPermissionMessageValueOffset == 0x28
+    && CharacterMovementApplicationNativeLayout.GrappleClimbPermissionMessageListPointerOffset == 0x2C
+    && CharacterMovementApplicationNativeLayout.GrappleClimbPermissionManagedRecordStride == 20
+    && CharacterMovementApplicationNativeLayout.GrappleClimbPermissionGeneratedRecordStride == 84
+    && CharacterMovementApplicationNativeLayout.PublicDebugMovementNumericApplicationEventCode == 363
+    && CharacterMovementApplicationNativeLayout.ForcedMovementNumericApplicationEventCode == 365
+    && CharacterMovementApplicationNativeLayout.GrappleClimbPermissionNumericApplicationEventCode == 213
+    && CharacterMovementApplicationNativeLayout.UiManagerDispatchVtableSlotOffset == 0xAC);
 Check("OpenMovieDialog selector 0x78 records its shared text field",
     CharacterOpenMovieDialogNativeLayout.InnerSelector == 0x78
     && CharacterOpenMovieDialogNativeLayout.InnerSelectorTableEntryOffset == 0x94

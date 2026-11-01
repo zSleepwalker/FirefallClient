@@ -4541,6 +4541,76 @@ internal static class StartupBinaryEvidence
                         + handler.VtableSlotOffset) == handler.MethodVirtualAddress
                     && VirtualAddressToFileOffset(handler.MethodVirtualAddress) == handler.MethodFileOffset;
             }));
+        var movementReceiverHandlers = CharacterMovementApplicationNativeLayout.ReceiverHandlers;
+        check("Binary Character movement selectors 0x70-0x73 map to their tfGameProtocolHandler slots",
+            VirtualAddressToFileOffset(
+                CharacterMovementApplicationNativeLayout.MessageDispatcherSelectorTableVirtualAddress)
+                == CharacterMovementApplicationNativeLayout.MessageDispatcherSelectorTableFileOffset
+            && VirtualAddressToFileOffset(CharacterMovementApplicationNativeLayout.ReceiverVtableVirtualAddress)
+                == CharacterMovementApplicationNativeLayout.ReceiverVtableFileOffset
+            && VtableRttiName(CharacterMovementApplicationNativeLayout.ReceiverVtableVirtualAddress, 80)
+                == CharacterMovementApplicationNativeLayout.ReceiverRttiName
+            && Matches(CharacterMovementApplicationNativeLayout.ReceiverConstructorVtableStoreFileOffset,
+                "C706C01EC701894608")
+            && movementReceiverHandlers.All(handler =>
+            {
+                return handler.VtableSlotOffset
+                        == CharacterMovementApplicationNativeLayout.VtableSlotBaseOffset
+                            + CharacterMovementApplicationNativeLayout.VtableEntrySize
+                                * (handler.MessageSelector
+                                    - CharacterMovementApplicationNativeLayout.FirstMessageSelector)
+                    && ReadUInt32(
+                        CharacterMovementApplicationNativeLayout.MessageDispatcherSelectorTableFileOffset
+                        + 4L * (handler.MessageSelector
+                            - CharacterMovementApplicationNativeLayout.FirstMessageSelector))
+                        == handler.DispatcherCaseVirtualAddress
+                    && VirtualAddressToFileOffset(handler.DispatcherCaseVirtualAddress)
+                        == handler.DispatcherCaseFileOffset
+                    && Matches(handler.DispatcherCaseFileOffset, "8B460485C07413")
+                    && RelativeBranchTargets(handler.DispatcherCaseFileOffset + 0x12, 0xE8,
+                        CharacterMovementApplicationNativeLayout.ReceiverPreDispatchGuardHelperFileOffset)
+                    && Matches(handler.DispatcherCaseFileOffset + 0x1A,
+                        "8B068BCE57FF90" + Convert.ToHexString(BitConverter.GetBytes(handler.VtableSlotOffset)))
+                    && ReadUInt32(VirtualAddressToFileOffset(
+                        CharacterMovementApplicationNativeLayout.ReceiverVtableVirtualAddress)
+                        + handler.VtableSlotOffset) == handler.MethodVirtualAddress
+                    && VirtualAddressToFileOffset(handler.MethodVirtualAddress) == handler.MethodFileOffset;
+            }));
+        check("Binary Character movement receiver handlers expose the observed payload paths and event codes",
+            RelativeBranchTargets(0xACE098, 0xE8,
+                CharacterMovementApplicationNativeLayout.PublicDebugMovementPayloadHelperFileOffset)
+            && Matches(0xACE08D, "FF762CFF762868A8EDBA01")
+            && Matches(0xACE09D, "8B463083C6308BCEFF500C")
+            && RelativeBranchTargets(0xACE0C6, 0xE8,
+                CharacterMovementApplicationNativeLayout.PublicDebugMovementConditionalPayloadHelperFileOffset)
+            && Matches(0xACE0D8, "686B0100008B01FF90AC000000")
+            && Matches(0x5FF970 + 0x17, "8D57048BCBE8")
+            && Matches(0x5FF970 + 0x21, "8D47708BCB50E8")
+            && Matches(0x5FF970 + 0x2C, "8D57748BCB")
+            && Matches(0x5FF760 + 0x2D, "8BF98B4F08")
+            && Matches(0x5FF520 + 0x1E, "8D46048BCB50E8")
+            && Matches(0xACE1A2, "6A018D4628")
+            && RelativeBranchTargets(0xACE1B7, 0xE8,
+                CharacterMovementApplicationNativeLayout.ForcedMovementPayloadHelperFileOffset)
+            && Matches(0xACE1C8, "686D0100008B01FF90AC000000")
+            && RelativeBranchTargets(0xACAA74, 0xE8,
+                CharacterMovementApplicationNativeLayout.ForcedMovementCancelledSingletonAccessorFileOffset)
+            && Matches(0xACAA7B, "83BEC843000000751A")
+            && Matches(0xACAA84, "6A006873060000")
+            && Matches(0xACAAA1, "8B8EC843000083C02850")
+            && RelativeBranchTargets(0xACAAAB, 0xE8,
+                CharacterMovementApplicationNativeLayout.ForcedMovementCancelledListUpdaterFileOffset)
+            && RelativeBranchTargets(0xACAAC4, 0xE8,
+                CharacterMovementApplicationNativeLayout.GrappleClimbPermissionSingletonAccessorFileOffset)
+            && Matches(0xACAACB, "83BEB843000000751A")
+            && Matches(0xACAAD4, "6A00686E060000")
+            && Matches(0xACAAF1, "8D412C50FF7128")
+            && RelativeBranchTargets(0xACAAFE, 0xE8,
+                CharacterMovementApplicationNativeLayout.GrappleClimbPermissionApplicationHelperFileOffset)
+            && Matches(0x8EDF4E, "68D50000008B01FF90AC000000")
+            && CharacterMovementApplicationNativeLayout.PublicDebugMovementNumericApplicationEventCode == 363
+            && CharacterMovementApplicationNativeLayout.ForcedMovementNumericApplicationEventCode == 365
+            && CharacterMovementApplicationNativeLayout.GrappleClimbPermissionNumericApplicationEventCode == 213);
         check("Binary AbilityActivated reaches its state helper and numeric uiManager dispatch",
             RelativeBranchTargets(0xACDD4C, 0xE8,
                 CharacterAbilityApplicationNativeLayout.AbilityActivatedSingletonAccessorFileOffset)

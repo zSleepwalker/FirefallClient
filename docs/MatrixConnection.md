@@ -1957,6 +1957,57 @@ offsets correspond to object `+0x2C`, `+0x30`, and `+0x138/+0x13C`.
 Case-specific tail layouts and field meanings remain unresolved. Allocation
 failure zeroes ESI before the reader setup.
 
+### Receiver application for Character selectors 0x70–0x73
+
+The primary Character dispatcher at raw `0x81BB90` subtracts `0x20` from the
+message discriminator and indexes its selector table at VA `0xC1D6DC` / raw
+`0x81CADC`. For selectors `0x70`–`0x73`, the table targets dispatcher cases
+at VA/raw pairs `0xC1D4E0/0x81C8E0`, `0xC1D50B/0x81C90B`,
+`0xC1D536/0x81C936`, and `0xC1D561/0x81C961`. Each case calls
+`tfGameProtocolHandler` at `4 + 4*(selector - 0x20)`, respectively slots
+`+0x144`, `+0x148`, `+0x14C`, and `+0x150`. The vtable is VA `0x1C71EC0`,
+mapped through the PE `.rdata` section to file offset `0x1870AC0`; the slot
+entries resolve to handler VAs `0xECEBF0`, `0xECED30`, `0xECB670`, and
+`0xECB6C0` (raw `.text` offsets `0xACDFF0`, `0xACE130`, `0xACAA70`, and
+`0xACAAC0`, using VA = raw + `0x400C00`). RTTI is
+`.?AVtfGameProtocolHandler@@`. These are receiver methods reached from the
+dispatcher; selector RTTI alone is not used to infer their behavior.
+
+| Selector | Receiver slot / raw handler | Observed application path |
+|---|---|---|
+| `0x70` | `+0x144` / `0xACDFF0` | Passes message DWORD reads at `+0x28/+0x2C` to `0xC245A0`. It then treats the DWORD at `+0x30` as a virtual object, probes slot `+0x0C`, and conditionally invokes slot `+0x18` and helper `0xC24780`. Dispatches numeric application/UI code `363` through global `0x1E002B8`, vtable slot `+0xAC`. |
+| `0x71` | `+0x148` / `0xACE130` | Passes the address of message `+0x28` to `0xC24780`, whose first operation calls the vtable at the first DWORD's slot `+0x0C`; if active, it copies the following state. Dispatches numeric application/UI code `365` through the same manager slot. |
+| `0x72` | `+0x14C` / `0xACAA70` | Gets an owner-state pointer at singleton `0x49DCC0` offset `+0x43C8` (diagnostic `1651` if null), then passes the address of message `+0x28` to list walker `0x9090A0`. It visits nodes, passes each node's DWORDs at `+0x10/+0x14` to updater `0x909120`, and has no numeric event dispatch in this receiver method. |
+| `0x73` | `+0x150` / `0xACAAC0` | Gets an owner-state pointer at singleton `0x49DCC0` offset `+0x43B8` (diagnostic `1646` if null), then calls `0x8EDD10` with the DWORD at message `+0x28` and the address of `+0x2C`. That helper updates its `+0x28/+0x2C` state, merges list entries against existing 20-byte records, and dispatches numeric application/UI code `213` through manager slot `+0xAC`. Missing records may be materialized as 84-byte records from lookups; their semantics remain unknown. |
+
+These receiver paths have verified producer-consumer layout discrepancies; no
+conversion or repair step was found in the traced dispatch path:
+
+* Selector `0x70` parses seven `0xC8`-stride records beginning at `+0x28`.
+  The receiver consumes only the first record's `+0x28/+0x2C` locations as
+  DWORDs (the parser writes a WORD at `+0x28`) and treats the serialized DWORD
+  at `+0x30` as a virtual-object vtable pointer. The parser's reader writes
+  raw record data there, not a vtable. Its optional gate is byte `+0x74` in
+  each record; that gate controls the parser's nested-value reader and is
+  distinct from the receiver's virtual-call result test.
+* Selector `0x71` constructs a `0x1B8`-byte inline state at `+0x28` and
+  initializes its first DWORD to zero. The reader consumes the discriminator
+  byte at `+0x30` first, then the DWORD at `+0x2C`, and a 14-case tail. The receiver
+  passes the address of `+0x28` to a helper that treats the DWORD stored there
+  as a vtable pointer. It does not read the trailing WORD at `+0x1E0`.
+* Selector `0x72` parses a DWORD at `+0x28` and WORD at `+0x2C`; the receiver
+  treats the DWORD at `+0x28` as a pointer to a linked-list sentinel and
+  ignores the WORD. No pointer conversion was observed.
+* Selector `0x73` likewise initializes `+0x28` to zero and parses its nested
+  state beginning with the discriminator byte at `+0x30`, then the DWORD at
+  `+0x2C`; the receiver passes the value at
+  `+0x28` as an application-state value and the address of `+0x2C` where the
+  helper dereferences a linked-list head. No conversion was observed.
+
+The byte-level mappings and call sites are checked against the original
+executable. The pointer interpretations and downstream runtime consequences
+remain unresolved; this record does not infer a corrected wire format.
+
 The nested table at raw `0x821844` has 40 four-byte entries for selectors
 `0x53` through `0x7A` inclusive; entry `0x7A` is the last one and points to
 VA `0xC1E3EF` / raw `0x81D7EF`. The decoder's secondary dispatch subtracts
