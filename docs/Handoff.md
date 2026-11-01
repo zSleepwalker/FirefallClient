@@ -12,8 +12,9 @@
   loaded as a flat `seg000` at base `0`. Its PE `.text` maps raw file offsets
   to runtime VA with `+0x400C00` (`ImageBase=0x400000`, section RVA `0x1000`,
   raw pointer `0x400`); `.rdata` maps with `+0x401400` (RVA `0x16C4000`,
-  raw pointer `0x16C2C00`). Dispatcher and vtable pointers verify these
-  mappings. The requested `FirefallClient.exe.original` SHA-256 is
+  raw pointer `0x16C2C00`), and `.data` with `+0x401C00` (RVA `0x19C5000`,
+  raw pointer `0x19C3400`). Dispatcher, vtable/COL, and TypeDescriptor pointers
+  verify these mappings. The requested `FirefallClient.exe.original` SHA-256 is
   `E0E8448393AC1CE05BE73E06F62DD70E3EFF3404CC2E7AAF3F04C79DEC0DE235`
   (40,197,848 bytes);
   it differs from the analyzed image in 13 bytes across four ranges, none of
@@ -21,12 +22,12 @@
 - Secondary selectors in `0x81CC50` use the separate 91-entry table at VA
   `0xC22630` / raw `0x821A30`: `[ebp+8] - 0x20`, bounded through index
   `0x5A`, then indexed by DWORD. The original binary has 91 nonzero, distinct
-  destinations; selectors `0x20..0x3F` now have 32 verified message
-  identities/layouts, leaving 59 identities unresolved. The table index is
+  destinations; selectors `0x20..0x47` now have 40 verified message
+  identities/layouts, leaving 51 identities unresolved. The table index is
   distinct from the keyed-receiver factory's `0x02..0x35` selectors and the
   route0 Character table's `0x53..0x7A` selectors. Continue at selector
-  `0x40`; see the C# snapshots and `docs/MatrixConnection.md`.
-- The 32 verified secondary cases are RTTI-backed:
+  `0x48`; see the C# snapshots and `docs/MatrixConnection.md`.
+- The 40 verified secondary cases are RTTI-backed:
   `EncounterToUIMessage`, `VotekickInitiated`, `VotekickResponded`,
   `ScoreBoardEnable/Init/SetWinner/Clear/AddPlayer/RemovePlayer/
   UpdatePlayerStats/UpdatePlayerStatsFromStats/UpdatePlayerStatus`,
@@ -36,7 +37,10 @@
   `NpcMonitoringLog`, `NpcNavigationInfo`, `NpcHostilityDebugInfo`,
   `NpcPositionalDebugInfo`, `NpcShapeDebugInfo`, `NpcVoxelInfo`,
   `DebugDrawInfo`, `NpcDevCmdResponse`, `DevRequestObjectPositions`,
-  `DevRequestSpawnTables`, and `DevRequestResourceNodeDebug`.
+  `DevRequestSpawnTables`, `DevRequestResourceNodeDebug`,
+  `MissionObjectiveUpdated`, `MissionStatusChanged`,
+  `MissionReturnToChanged`, `MissionsAvailable`, `MissionActivationAck`,
+  `BountyStatusChanged`, `BountyAbortAck`, and `BountyActivationAck`.
   Their common base initializer writes marker
   `+0x08`, descriptor anchor `+0x0C`, constructor type DWORD `+0x10`,
   parser-context copies `+0x18/+0x1C`, and zeros `+0x20/+0x24`; body begins
@@ -55,8 +59,11 @@
   QWORD-plus-eight-DWORD and byte-plus-20-DWORD-plus-byte shapes, counted
   three-DWORD/DWORD/byte vectors, paired shared-text reads, and a text/five
   DWORD/byte/text record. Selector `0x3B`'s byte payload remains opaque.
-  Parser-local DWORD literals `0x08..0x1F` for selectors `0x28..0x3F` are
-  recorded separately from table indexes; their role is unknown. All 32 table
+  Selectors `0x40..0x47` add the RTTI-backed mission/bounty cases; their
+  bodies include scalar/text sequences and one byte-counted DWORD+byte vector
+  with five-byte wire items and eight-byte native stride. Parser-local DWORD
+  literals `0x08..0x27` for selectors `0x28..0x47` are recorded separately
+  from table indexes and constructor type IDs; their role is unknown. All 40 table
   targets are distinct and nonzero. Selectors `0x28/0x2D`
   and `0x32/0x34` share
   reader continuations despite distinct table destinations and types.

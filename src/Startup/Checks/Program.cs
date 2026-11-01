@@ -985,16 +985,18 @@ Check("Secondary decoder table snapshot records the first 32 of 91 selectors",
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x2F) == 15
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x30) == 16
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x37) == 23
+    && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x40) == 32
+    && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x47) == 39
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x7A) == 0x5A
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x1F) is null
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x7B) is null
-    && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries.Count == 32
+    && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries.Count == 40
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .Select(entry => entry.Selector)
-        .SequenceEqual(Enumerable.Range(0x20, 32).Select(selector => (byte)selector))
+        .SequenceEqual(Enumerable.Range(0x20, 40).Select(selector => (byte)selector))
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .Select(entry => entry.TableIndex)
-        .SequenceEqual(Enumerable.Range(0, 32))
+        .SequenceEqual(Enumerable.Range(0, 40))
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .Select(entry => entry.TargetVirtualAddress)
         .SequenceEqual(new uint[]
@@ -1006,7 +1008,9 @@ Check("Secondary decoder table snapshot records the first 32 of 91 selectors",
             0xC20628, 0xC20690, 0xC206E4, 0xC2074E,
             0xC207B6, 0xC207FE, 0xC20866, 0xC208CE,
             0xC20936, 0xC2099E, 0xC20A06, 0xC20A6E,
-            0xC20AD8, 0xC20B4C, 0xC20BB4, 0xC20C1E
+            0xC20AD8, 0xC20B4C, 0xC20BB4, 0xC20C1E,
+            0xC20C88, 0xC20CF0, 0xC20D58, 0xC20DC0,
+            0xC20E28, 0xC20E90, 0xC20EF8, 0xC20F60
         })
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .All(entry => entry.TargetKind == MatrixSecondaryDecoderTargetKind.MessageCase)
@@ -1014,7 +1018,7 @@ Check("Secondary decoder table snapshot records the first 32 of 91 selectors",
         .All(entry => entry.TargetVirtualAddress == entry.TargetFileOffset + 0x400C00)
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .Select(entry => entry.TargetVirtualAddress)
-        .Distinct().Count() == 32
+        .Distinct().Count() == 40
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x27)?.TargetFileOffset == 0x81F683
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x28)?.TargetFileOffset == 0x81F6EB
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x2F)?.TargetFileOffset == 0x81F9BE
@@ -1022,7 +1026,8 @@ Check("Secondary decoder table snapshot records the first 32 of 91 selectors",
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x37)?.TargetFileOffset == 0x81FCCE
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x38)?.TargetFileOffset == 0x81FD36
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x3F)?.TargetFileOffset == 0x82001E
-    && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x40) is null);
+    && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x47)?.TargetFileOffset == 0x820360
+    && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x48) is null);
 Check("Secondary decoder RTTI and native body layouts retain observed offsets and widths",
     MatrixSecondaryMessageHeaderNativeLayout.BaseMetadataFlagOffset == 0x08
     && MatrixSecondaryMessageHeaderNativeLayout.DescriptorAnchorPointerOffset == 0x0C
@@ -1374,6 +1379,154 @@ Check("Secondary selectors 0x38-0x3F retain RTTI, positional body shapes, and fr
         DevRequestSpawnTablesNativeLayout.CaseLocalDwordValue,
         DevRequestResourceNodeDebugNativeLayout.CaseLocalDwordValue
     }.SequenceEqual(Enumerable.Range(0x18, 8).Select(value => (uint)value)));
+Check("Secondary selectors 0x40-0x47 retain RTTI, constructor, and native body layouts",
+    new byte[]
+    {
+        MissionObjectiveUpdatedNativeLayout.Selector,
+        MissionStatusChangedNativeLayout.Selector,
+        MissionReturnToChangedNativeLayout.Selector,
+        MissionsAvailableNativeLayout.Selector,
+        MissionActivationAckNativeLayout.Selector,
+        BountyStatusChangedNativeLayout.Selector,
+        BountyAbortAckNativeLayout.Selector,
+        BountyActivationAckNativeLayout.Selector
+    }.SequenceEqual(Enumerable.Range(0x40, 8).Select(value => (byte)value))
+    && new uint[]
+    {
+        MissionObjectiveUpdatedNativeLayout.CaseVirtualAddress,
+        MissionStatusChangedNativeLayout.CaseVirtualAddress,
+        MissionReturnToChangedNativeLayout.CaseVirtualAddress,
+        MissionsAvailableNativeLayout.CaseVirtualAddress,
+        MissionActivationAckNativeLayout.CaseVirtualAddress,
+        BountyStatusChangedNativeLayout.CaseVirtualAddress,
+        BountyAbortAckNativeLayout.CaseVirtualAddress,
+        BountyActivationAckNativeLayout.CaseVirtualAddress
+    }.SequenceEqual(new uint[]
+    {
+        0xC20C88, 0xC20CF0, 0xC20D58, 0xC20DC0,
+        0xC20E28, 0xC20E90, 0xC20EF8, 0xC20F60
+    })
+    && new uint[]
+    {
+        MissionObjectiveUpdatedNativeLayout.CaseFileOffset,
+        MissionStatusChangedNativeLayout.CaseFileOffset,
+        MissionReturnToChangedNativeLayout.CaseFileOffset,
+        MissionsAvailableNativeLayout.CaseFileOffset,
+        MissionActivationAckNativeLayout.CaseFileOffset,
+        BountyStatusChangedNativeLayout.CaseFileOffset,
+        BountyAbortAckNativeLayout.CaseFileOffset,
+        BountyActivationAckNativeLayout.CaseFileOffset
+    }.SequenceEqual(new uint[]
+    {
+        0x820088, 0x8200F0, 0x820158, 0x8201C0,
+        0x820228, 0x820290, 0x8202F8, 0x820360
+    })
+    && new uint[]
+    {
+        MissionObjectiveUpdatedNativeLayout.AllocationSize,
+        MissionStatusChangedNativeLayout.AllocationSize,
+        MissionReturnToChangedNativeLayout.AllocationSize,
+        MissionsAvailableNativeLayout.AllocationSize,
+        MissionActivationAckNativeLayout.AllocationSize,
+        BountyStatusChangedNativeLayout.AllocationSize,
+        BountyAbortAckNativeLayout.AllocationSize,
+        BountyActivationAckNativeLayout.AllocationSize
+    }.SequenceEqual(new uint[] { 0x48, 0x38, 0x30, 0x40, 0x30, 0x30, 0x30, 0x50 })
+    && new uint[]
+    {
+        MissionObjectiveUpdatedNativeLayout.ConstructorNativeTypeId,
+        MissionStatusChangedNativeLayout.ConstructorNativeTypeId,
+        MissionReturnToChangedNativeLayout.ConstructorNativeTypeId,
+        MissionsAvailableNativeLayout.ConstructorNativeTypeId,
+        MissionActivationAckNativeLayout.ConstructorNativeTypeId,
+        BountyStatusChangedNativeLayout.ConstructorNativeTypeId,
+        BountyAbortAckNativeLayout.ConstructorNativeTypeId,
+        BountyActivationAckNativeLayout.ConstructorNativeTypeId
+    }.SequenceEqual(Enumerable.Range(0x40, 8).Select(value => (uint)value))
+    && new uint[]
+    {
+        MissionObjectiveUpdatedNativeLayout.CaseLocalDwordValue,
+        MissionStatusChangedNativeLayout.CaseLocalDwordValue,
+        MissionReturnToChangedNativeLayout.CaseLocalDwordValue,
+        MissionsAvailableNativeLayout.CaseLocalDwordValue,
+        MissionActivationAckNativeLayout.CaseLocalDwordValue,
+        BountyStatusChangedNativeLayout.CaseLocalDwordValue,
+        BountyAbortAckNativeLayout.CaseLocalDwordValue,
+        BountyActivationAckNativeLayout.CaseLocalDwordValue
+    }.SequenceEqual(Enumerable.Range(0x20, 8).Select(value => (uint)value))
+    && new uint[]
+    {
+        MissionObjectiveUpdatedNativeLayout.BaseMetadataConstructorFileOffset,
+        MissionStatusChangedNativeLayout.BaseMetadataConstructorFileOffset,
+        MissionReturnToChangedNativeLayout.BaseMetadataConstructorFileOffset,
+        MissionsAvailableNativeLayout.BaseMetadataConstructorFileOffset,
+        MissionActivationAckNativeLayout.BaseMetadataConstructorFileOffset,
+        BountyStatusChangedNativeLayout.BaseMetadataConstructorFileOffset,
+        BountyAbortAckNativeLayout.BaseMetadataConstructorFileOffset,
+        BountyActivationAckNativeLayout.BaseMetadataConstructorFileOffset
+    }.SequenceEqual(new uint[]
+    {
+        0x824430, 0x8244A0, 0x824510, 0x824580,
+        0x8246E0, 0x824750, 0x8247C0, 0x824830
+    })
+    && new uint[]
+    {
+        MissionObjectiveUpdatedNativeLayout.BodyReaderFileOffset,
+        MissionStatusChangedNativeLayout.BodyReaderFileOffset,
+        MissionReturnToChangedNativeLayout.BodyReaderFileOffset,
+        MissionsAvailableNativeLayout.BodyReaderFileOffset,
+        MissionActivationAckNativeLayout.BodyReaderFileOffset,
+        BountyStatusChangedNativeLayout.BodyReaderFileOffset,
+        BountyAbortAckNativeLayout.BodyReaderFileOffset,
+        BountyActivationAckNativeLayout.BodyReaderFileOffset
+    }.SequenceEqual(new uint[]
+    {
+        0x84A7F0, 0x84A640, 0x84A520, 0x84A480,
+        0x849AB0, 0x8499F0, 0x8498D0, 0x849790
+    })
+    && new uint[]
+    {
+        MissionObjectiveUpdatedNativeLayout.VtableVirtualAddress,
+        MissionStatusChangedNativeLayout.VtableVirtualAddress,
+        MissionReturnToChangedNativeLayout.VtableVirtualAddress,
+        MissionsAvailableNativeLayout.VtableVirtualAddress,
+        MissionActivationAckNativeLayout.VtableVirtualAddress,
+        BountyStatusChangedNativeLayout.VtableVirtualAddress,
+        BountyAbortAckNativeLayout.VtableVirtualAddress,
+        BountyActivationAckNativeLayout.VtableVirtualAddress
+    }.SequenceEqual(new uint[]
+    {
+        0x1C6E098, 0x1C6E048, 0x1C6E038, 0x1C6E068,
+        0x1C6E058, 0x1C6E008, 0x1C6E028, 0x1C6E018
+    })
+    && MissionObjectiveUpdatedNativeLayout.RttiName == ".?AVMissionObjectiveUpdated@firefall@@"
+    && MissionStatusChangedNativeLayout.RttiName == ".?AVMissionStatusChanged@firefall@@"
+    && MissionReturnToChangedNativeLayout.RttiName == ".?AVMissionReturnToChanged@firefall@@"
+    && MissionsAvailableNativeLayout.RttiName == ".?AVMissionsAvailable@firefall@@"
+    && BountyStatusChangedNativeLayout.RttiName == ".?AVBountyStatusChanged@firefall@@"
+    && MissionActivationAckNativeLayout.RttiName == ".?AVMissionActivationAck@firefall@@"
+    && BountyAbortAckNativeLayout.RttiName == ".?AVBountyAbortAck@firefall@@"
+    && BountyActivationAckNativeLayout.RttiName == ".?AVBountyActivationAck@firefall@@"
+    && MissionObjectiveUpdatedNativeLayout.FirstSharedTextFieldOffset == 0x34
+    && MissionObjectiveUpdatedNativeLayout.SecondSharedTextFieldOffset == 0x38
+    && MissionObjectiveUpdatedNativeLayout.ByteFieldOffset == 0x3C
+    && MissionStatusChangedNativeLayout.RawQwordFieldOffset == 0x28
+    && MissionStatusChangedNativeLayout.ByteFieldOffset == 0x30
+    && MissionReturnToChangedNativeLayout.DwordFieldOffset == 0x28
+    && MissionReturnToChangedNativeLayout.ByteFieldOffset == 0x2C
+    && MissionsAvailableNativeLayout.RecordWireWidth == 5
+    && MissionsAvailableNativeLayout.RecordNativeStride == 8
+    && MissionsAvailableNativeLayout.CountWireWidth == 1
+    && MissionsAvailableNativeLayout.ChunkContinuationCount == 0xFF
+    && MissionsAvailableNativeLayout.RawQwordFieldOffset == 0x38
+    && MissionActivationAckNativeLayout.SecondByteFieldOffset == 0x2D
+    && BountyStatusChangedNativeLayout.ByteFieldOffset == 0x2C
+    && BountyAbortAckNativeLayout.SecondByteFieldOffset == 0x2D
+    && BountyActivationAckNativeLayout.FirstTrailingDwordFieldOffset == 0x30
+    && BountyActivationAckNativeLayout.SecondTrailingDwordFieldOffset == 0x34
+    && BountyActivationAckNativeLayout.TrailingByteFieldOffset == 0x38
+    && BountyActivationAckNativeLayout.QwordFieldOffset == 0x40
+    && BountyActivationAckNativeLayout.SharedTextFieldOffset == 0x48);
 Check("Secondary parser-local DWORD literals remain separate from selector mapping",
     new uint[]
     {
