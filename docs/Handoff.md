@@ -21,19 +21,22 @@
 - Secondary selectors in `0x81CC50` use the separate 91-entry table at VA
   `0xC22630` / raw `0x821A30`: `[ebp+8] - 0x20`, bounded through index
   `0x5A`, then indexed by DWORD. The original binary has 91 nonzero, distinct
-  destinations; selectors `0x20..0x37` now have 24 verified message
-  identities/layouts, leaving 67 identities unresolved. The table index is
+  destinations; selectors `0x20..0x3F` now have 32 verified message
+  identities/layouts, leaving 59 identities unresolved. The table index is
   distinct from the keyed-receiver factory's `0x02..0x35` selectors and the
   route0 Character table's `0x53..0x7A` selectors. Continue at selector
-  `0x38`; see the C# snapshots and `docs/MatrixConnection.md`.
-- The 24 verified secondary cases are RTTI-backed:
+  `0x40`; see the C# snapshots and `docs/MatrixConnection.md`.
+- The 32 verified secondary cases are RTTI-backed:
   `EncounterToUIMessage`, `VotekickInitiated`, `VotekickResponded`,
   `ScoreBoardEnable/Init/SetWinner/Clear/AddPlayer/RemovePlayer/
   UpdatePlayerStats/UpdatePlayerStatsFromStats/UpdatePlayerStatus`,
   `MatchLoadingState`, `MatchEndAck`, and `ServerProfiler_SendNames/
   ServerProfiler_SendFrame`, plus `TempConsoleMessage`, `ReloadStaticData`,
   `EncDebugChatMessage`, `SendRadioMessage`, `NpcBehaviorInfo`,
-  `NpcMonitoringLog`, `NpcNavigationInfo`, and `NpcHostilityDebugInfo`.
+  `NpcMonitoringLog`, `NpcNavigationInfo`, `NpcHostilityDebugInfo`,
+  `NpcPositionalDebugInfo`, `NpcShapeDebugInfo`, `NpcVoxelInfo`,
+  `DebugDrawInfo`, `NpcDevCmdResponse`, `DevRequestObjectPositions`,
+  `DevRequestSpawnTables`, and `DevRequestResourceNodeDebug`.
   Their common base initializer writes marker
   `+0x08`, descriptor anchor `+0x0C`, constructor type DWORD `+0x10`,
   parser-context copies `+0x18/+0x1C`, and zeros `+0x20/+0x24`; body begins
@@ -47,9 +50,14 @@
   QWORD-plus-vector shapes at `0x36/0x37`. Selector `0x36`'s second vector
   has `0x70`-byte native records and a float-derived conditional tail; its
   predicate is unresolved. Selector `0x37`'s wire items are QWORD+DWORD with
-  `0x10` native stride. Parser-local DWORD literals `0x08..0x17` for selectors
-  `0x28..0x37` are recorded separately from table indexes; their role is
-  unknown. All 24 table targets are distinct and nonzero. Selectors `0x28/0x2D`
+  `0x10` native stride. Selectors `0x38..0x3F` continue with the RTTI-backed
+  positional/shape/voxel/debug/dev-request layouts: counted records include
+  QWORD-plus-eight-DWORD and byte-plus-20-DWORD-plus-byte shapes, counted
+  three-DWORD/DWORD/byte vectors, paired shared-text reads, and a text/five
+  DWORD/byte/text record. Selector `0x3B`'s byte payload remains opaque.
+  Parser-local DWORD literals `0x08..0x1F` for selectors `0x28..0x3F` are
+  recorded separately from table indexes; their role is unknown. All 32 table
+  targets are distinct and nonzero. Selectors `0x28/0x2D`
   and `0x32/0x34` share
   reader continuations despite distinct table destinations and types.
   Out-of-range selectors share zero-return raw `0x8217D9`; selectors `0x26`

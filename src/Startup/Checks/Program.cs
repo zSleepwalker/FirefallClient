@@ -970,7 +970,7 @@ Check("Secondary command dispatcher separates primary-byte, secondary-selector, 
     && MatrixSecondaryCommandDispatcherNativeLayout.GetSecondarySelectorIndex(0x20) == 0
     && MatrixSecondaryCommandDispatcherNativeLayout.GetSecondarySelectorIndex(0x7A) == 0x5A
     && MatrixSecondaryCommandDispatcherNativeLayout.GetSecondarySelectorIndex(0x7B) is null);
-Check("Secondary decoder table snapshot records the first 24 of 91 selectors",
+Check("Secondary decoder table snapshot records the first 32 of 91 selectors",
     MatrixSecondaryDecoderTableNativeLayout.ParserFileOffset == 0x81CC50
     && MatrixSecondaryDecoderTableNativeLayout.SelectorComparisonFileOffset == 0x81F3A8
     && MatrixSecondaryDecoderTableNativeLayout.SelectorJumpFileOffset == 0x81F3B4
@@ -988,13 +988,13 @@ Check("Secondary decoder table snapshot records the first 24 of 91 selectors",
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x7A) == 0x5A
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x1F) is null
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x7B) is null
-    && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries.Count == 24
+    && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries.Count == 32
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .Select(entry => entry.Selector)
-        .SequenceEqual(Enumerable.Range(0x20, 24).Select(selector => (byte)selector))
+        .SequenceEqual(Enumerable.Range(0x20, 32).Select(selector => (byte)selector))
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .Select(entry => entry.TableIndex)
-        .SequenceEqual(Enumerable.Range(0, 24))
+        .SequenceEqual(Enumerable.Range(0, 32))
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .Select(entry => entry.TargetVirtualAddress)
         .SequenceEqual(new uint[]
@@ -1004,7 +1004,9 @@ Check("Secondary decoder table snapshot records the first 24 of 91 selectors",
             0xC202EB, 0xC20356, 0xC203BE, 0xC20426,
             0xC2048E, 0xC20502, 0xC2054A, 0xC205BE,
             0xC20628, 0xC20690, 0xC206E4, 0xC2074E,
-            0xC207B6, 0xC207FE, 0xC20866, 0xC208CE
+            0xC207B6, 0xC207FE, 0xC20866, 0xC208CE,
+            0xC20936, 0xC2099E, 0xC20A06, 0xC20A6E,
+            0xC20AD8, 0xC20B4C, 0xC20BB4, 0xC20C1E
         })
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .All(entry => entry.TargetKind == MatrixSecondaryDecoderTargetKind.MessageCase)
@@ -1012,13 +1014,15 @@ Check("Secondary decoder table snapshot records the first 24 of 91 selectors",
         .All(entry => entry.TargetVirtualAddress == entry.TargetFileOffset + 0x400C00)
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .Select(entry => entry.TargetVirtualAddress)
-        .Distinct().Count() == 24
+        .Distinct().Count() == 32
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x27)?.TargetFileOffset == 0x81F683
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x28)?.TargetFileOffset == 0x81F6EB
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x2F)?.TargetFileOffset == 0x81F9BE
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x30)?.TargetFileOffset == 0x81FA28
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x37)?.TargetFileOffset == 0x81FCCE
-    && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x38) is null);
+    && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x38)?.TargetFileOffset == 0x81FD36
+    && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x3F)?.TargetFileOffset == 0x82001E
+    && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x40) is null);
 Check("Secondary decoder RTTI and native body layouts retain observed offsets and widths",
     MatrixSecondaryMessageHeaderNativeLayout.BaseMetadataFlagOffset == 0x08
     && MatrixSecondaryMessageHeaderNativeLayout.DescriptorAnchorPointerOffset == 0x0C
@@ -1145,6 +1149,231 @@ Check("Secondary selectors 0x30-0x37 retain RTTI, constructor, and body read lay
     && NpcHostilityDebugInfoNativeLayout.EntryWireWidth == 0x0C
     && NpcHostilityDebugInfoNativeLayout.EntryNativeStride == 0x10
     && NpcHostilityDebugInfoNativeLayout.ChunkContinuationCount == 0xFF);
+Check("Secondary selectors 0x38-0x3F retain RTTI, positional body shapes, and framing",
+    NpcPositionalDebugInfoNativeLayout.Selector == 0x38
+    && new byte[]
+    {
+        NpcPositionalDebugInfoNativeLayout.Selector,
+        NpcShapeDebugInfoNativeLayout.Selector,
+        NpcVoxelInfoNativeLayout.Selector,
+        DebugDrawInfoNativeLayout.Selector,
+        NpcDevCmdResponseNativeLayout.Selector,
+        DevRequestObjectPositionsNativeLayout.Selector,
+        DevRequestSpawnTablesNativeLayout.Selector,
+        DevRequestResourceNodeDebugNativeLayout.Selector
+    }.SequenceEqual(Enumerable.Range(0x38, 8).Select(value => (byte)value))
+    && new uint[]
+    {
+        NpcPositionalDebugInfoNativeLayout.CaseVirtualAddress,
+        NpcShapeDebugInfoNativeLayout.CaseVirtualAddress,
+        NpcVoxelInfoNativeLayout.CaseVirtualAddress,
+        DebugDrawInfoNativeLayout.CaseVirtualAddress,
+        NpcDevCmdResponseNativeLayout.CaseVirtualAddress,
+        DevRequestObjectPositionsNativeLayout.CaseVirtualAddress,
+        DevRequestSpawnTablesNativeLayout.CaseVirtualAddress,
+        DevRequestResourceNodeDebugNativeLayout.CaseVirtualAddress
+    }.SequenceEqual(new uint[]
+    {
+        0xC20936, 0xC2099E, 0xC20A06, 0xC20A6E,
+        0xC20AD8, 0xC20B4C, 0xC20BB4, 0xC20C1E
+    })
+    && new uint[]
+    {
+        NpcPositionalDebugInfoNativeLayout.CaseFileOffset,
+        NpcShapeDebugInfoNativeLayout.CaseFileOffset,
+        NpcVoxelInfoNativeLayout.CaseFileOffset,
+        DebugDrawInfoNativeLayout.CaseFileOffset,
+        NpcDevCmdResponseNativeLayout.CaseFileOffset,
+        DevRequestObjectPositionsNativeLayout.CaseFileOffset,
+        DevRequestSpawnTablesNativeLayout.CaseFileOffset,
+        DevRequestResourceNodeDebugNativeLayout.CaseFileOffset
+    }.SequenceEqual(new uint[]
+    {
+        0x81FD36, 0x81FD9E, 0x81FE06, 0x81FE6E,
+        0x81FED8, 0x81FF4C, 0x81FFB4, 0x82001E
+    })
+    && new uint[]
+    {
+        NpcPositionalDebugInfoNativeLayout.ConstructorFileOffset,
+        NpcShapeDebugInfoNativeLayout.ConstructorFileOffset,
+        NpcVoxelInfoNativeLayout.ConstructorFileOffset,
+        DebugDrawInfoNativeLayout.ConstructorFileOffset,
+        NpcDevCmdResponseNativeLayout.ConstructorFileOffset,
+        DevRequestObjectPositionsNativeLayout.ConstructorFileOffset,
+        DevRequestSpawnTablesNativeLayout.ConstructorFileOffset,
+        DevRequestResourceNodeDebugNativeLayout.ConstructorFileOffset
+    }.SequenceEqual(new uint[]
+    {
+        0x815890, 0x815A80, 0x815C70, 0x815E40,
+        0x815F90, 0x8161A0, 0x8163A0, 0x8164E0
+    })
+    && new uint[]
+    {
+        NpcPositionalDebugInfoNativeLayout.BaseMetadataConstructorFileOffset,
+        NpcShapeDebugInfoNativeLayout.BaseMetadataConstructorFileOffset,
+        NpcVoxelInfoNativeLayout.BaseMetadataConstructorFileOffset,
+        DebugDrawInfoNativeLayout.BaseMetadataConstructorFileOffset,
+        NpcDevCmdResponseNativeLayout.BaseMetadataConstructorFileOffset,
+        DevRequestObjectPositionsNativeLayout.BaseMetadataConstructorFileOffset,
+        DevRequestSpawnTablesNativeLayout.BaseMetadataConstructorFileOffset,
+        DevRequestResourceNodeDebugNativeLayout.BaseMetadataConstructorFileOffset
+    }.SequenceEqual(new uint[]
+    {
+        0x823DB0, 0x823F20, 0x824090, 0x824100,
+        0x824170, 0x8241E0, 0x824250, 0x8243C0
+    })
+    && new uint[]
+    {
+        NpcPositionalDebugInfoNativeLayout.ConstructorNativeTypeId,
+        NpcShapeDebugInfoNativeLayout.ConstructorNativeTypeId,
+        NpcVoxelInfoNativeLayout.ConstructorNativeTypeId,
+        DebugDrawInfoNativeLayout.ConstructorNativeTypeId,
+        NpcDevCmdResponseNativeLayout.ConstructorNativeTypeId,
+        DevRequestObjectPositionsNativeLayout.ConstructorNativeTypeId,
+        DevRequestSpawnTablesNativeLayout.ConstructorNativeTypeId,
+        DevRequestResourceNodeDebugNativeLayout.ConstructorNativeTypeId
+    }.SequenceEqual(Enumerable.Range(0x38, 8).Select(value => (uint)value))
+    && new uint[]
+    {
+        NpcPositionalDebugInfoNativeLayout.BodyReaderFileOffset,
+        NpcShapeDebugInfoNativeLayout.BodyReaderFileOffset,
+        NpcVoxelInfoNativeLayout.BodyReaderFileOffset,
+        DebugDrawInfoNativeLayout.BodyReaderFileOffset,
+        NpcDevCmdResponseNativeLayout.SharedTextReaderFileOffset,
+        DevRequestObjectPositionsNativeLayout.BodyReaderFileOffset,
+        DevRequestSpawnTablesNativeLayout.BodyReaderFileOffset,
+        DevRequestResourceNodeDebugNativeLayout.BodyReaderFileOffset
+    }.SequenceEqual(new uint[]
+    {
+        0x84D830, 0x84C960, 0x84BC10, 0x609E50,
+        0x12EE010, 0x84BA20, 0x84B470, 0x84E230
+    })
+    && new uint[]
+    {
+        NpcPositionalDebugInfoNativeLayout.BodyReaderCallSiteFileOffset,
+        NpcShapeDebugInfoNativeLayout.BodyReaderCallSiteFileOffset,
+        NpcVoxelInfoNativeLayout.BodyReaderCallSiteFileOffset,
+        DebugDrawInfoNativeLayout.BodyReaderCallSiteFileOffset,
+        NpcDevCmdResponseNativeLayout.FirstSharedTextReaderCallSiteFileOffset,
+        DevRequestObjectPositionsNativeLayout.BodyReaderCallSiteFileOffset,
+        DevRequestSpawnTablesNativeLayout.BodyReaderCallSiteFileOffset,
+        DevRequestResourceNodeDebugNativeLayout.BodyReaderCallSiteFileOffset
+    }.SequenceEqual(new uint[]
+    {
+        0x81FD84, 0x81FDEC, 0x81FE54, 0x81FEBE,
+        0x81FF28, 0x81FF9A, 0x820004, 0x82006E
+    })
+    && new uint[]
+    {
+        NpcPositionalDebugInfoNativeLayout.AllocationFailureZeroObjectFileOffset,
+        NpcShapeDebugInfoNativeLayout.AllocationFailureZeroObjectFileOffset,
+        NpcVoxelInfoNativeLayout.AllocationFailureZeroObjectFileOffset,
+        DebugDrawInfoNativeLayout.AllocationFailureZeroObjectFileOffset,
+        NpcDevCmdResponseNativeLayout.AllocationFailureZeroObjectFileOffset,
+        DevRequestObjectPositionsNativeLayout.AllocationFailureZeroObjectFileOffset,
+        DevRequestSpawnTablesNativeLayout.AllocationFailureZeroObjectFileOffset,
+        DevRequestResourceNodeDebugNativeLayout.AllocationFailureZeroObjectFileOffset
+    }.SequenceEqual(new uint[]
+    {
+        0x81FD77, 0x81FDDF, 0x81FE47, 0x81FEAF,
+        0x81FF19, 0x81FF8D, 0x81FFF5, 0x82005F
+    })
+    && new uint[]
+    {
+        NpcPositionalDebugInfoNativeLayout.VtableVirtualAddress,
+        NpcShapeDebugInfoNativeLayout.VtableVirtualAddress,
+        NpcVoxelInfoNativeLayout.VtableVirtualAddress,
+        DebugDrawInfoNativeLayout.VtableVirtualAddress,
+        NpcDevCmdResponseNativeLayout.VtableVirtualAddress,
+        DevRequestObjectPositionsNativeLayout.VtableVirtualAddress,
+        DevRequestSpawnTablesNativeLayout.VtableVirtualAddress,
+        DevRequestResourceNodeDebugNativeLayout.VtableVirtualAddress
+    }.SequenceEqual(new uint[]
+    {
+        0x1C6E0D8, 0x1C6E0F8, 0x1C6E0E8, 0x1C6E0B8,
+        0x1C6E0A8, 0x1C6E0C8, 0x1C6E088, 0x1C6E078
+    })
+    && NpcPositionalDebugInfoNativeLayout.AllocationSize == 0x48
+    && NpcPositionalDebugInfoNativeLayout.RecordVectorBeginPointerOffset == 0x34
+    && NpcPositionalDebugInfoNativeLayout.RecordVectorEndPointerOffset == 0x38
+    && NpcPositionalDebugInfoNativeLayout.RecordVectorCapacityPointerOffset == 0x3C
+    && NpcPositionalDebugInfoNativeLayout.RecordCountWireWidth == 1
+    && NpcPositionalDebugInfoNativeLayout.ChunkContinuationCount == 0xFF
+    && NpcPositionalDebugInfoNativeLayout.RecordQwordWireWidth == 8
+    && NpcPositionalDebugInfoNativeLayout.RecordDwordCount == 8
+    && NpcPositionalDebugInfoNativeLayout.RecordWireWidth == 0x28
+    && NpcPositionalDebugInfoNativeLayout.RecordNativeStride == 0x28
+    && NpcPositionalDebugInfoNativeLayout.TrailingByteFieldOffset == 0x40
+    && NpcShapeDebugInfoNativeLayout.RttiName == ".?AVNpcShapeDebugInfo@firefall@@"
+    && NpcShapeDebugInfoNativeLayout.RecordLeadingByteOffset == 0
+    && NpcShapeDebugInfoNativeLayout.RecordFixedDwordBlockOffset == 4
+    && NpcShapeDebugInfoNativeLayout.RecordFixedDwordBlockCount == 16
+    && NpcShapeDebugInfoNativeLayout.RecordTrailingDwordBlockOffset == 0x44
+    && NpcShapeDebugInfoNativeLayout.RecordTrailingDwordCount == 4
+    && NpcShapeDebugInfoNativeLayout.RecordTrailingByteOffset == 0x54
+    && NpcShapeDebugInfoNativeLayout.RecordWireFixedWidth == 0x52
+    && NpcShapeDebugInfoNativeLayout.RecordNativeStride == 0x58
+    && NpcVoxelInfoNativeLayout.RawQwordFieldOffset == 0x28
+    && NpcVoxelInfoNativeLayout.ThreeDwordVectorBeginPointerOffset == 0x30
+    && NpcVoxelInfoNativeLayout.DwordVectorBeginPointerOffset == 0x3C
+    && NpcVoxelInfoNativeLayout.ThreeDwordItemWireWidth == 0x0C
+    && NpcVoxelInfoNativeLayout.ThreeDwordItemNativeStride == 0x0C
+    && NpcVoxelInfoNativeLayout.DwordItemWireWidth == 4
+    && NpcVoxelInfoNativeLayout.DwordItemNativeStride == 4
+    && NpcVoxelInfoNativeLayout.CountWireWidth == 1
+    && NpcVoxelInfoNativeLayout.ChunkContinuationCount == 0xFF
+    && NpcVoxelInfoNativeLayout.TrailingByteFieldOffset == 0x48
+    && DebugDrawInfoNativeLayout.ByteVectorBeginPointerOffset == 0x28
+    && DebugDrawInfoNativeLayout.ByteVectorEndPointerOffset == 0x2C
+    && DebugDrawInfoNativeLayout.ByteVectorCapacityPointerOffset == 0x30
+    && DebugDrawInfoNativeLayout.CountWireWidth == 1
+    && DebugDrawInfoNativeLayout.ItemWireWidth == 1
+    && DebugDrawInfoNativeLayout.ItemNativeStride == 1
+    && DebugDrawInfoNativeLayout.ChunkContinuationCount == 0xFF
+    && NpcDevCmdResponseNativeLayout.FirstSharedTextFieldOffset == 0x28
+    && NpcDevCmdResponseNativeLayout.SecondSharedTextFieldOffset == 0x2C
+    && DevRequestObjectPositionsNativeLayout.FirstByteFieldOffset == 0x28
+    && DevRequestObjectPositionsNativeLayout.SecondByteFieldOffset == 0x29
+    && DevRequestObjectPositionsNativeLayout.ThreeDwordVectorBeginPointerOffset == 0x2C
+    && DevRequestObjectPositionsNativeLayout.FirstDwordVectorBeginPointerOffset == 0x38
+    && DevRequestObjectPositionsNativeLayout.SecondDwordVectorBeginPointerOffset == 0x44
+    && DevRequestObjectPositionsNativeLayout.ThirdDwordVectorBeginPointerOffset == 0x50
+    && DevRequestObjectPositionsNativeLayout.CountWireWidth == 1
+    && DevRequestObjectPositionsNativeLayout.ChunkContinuationCount == 0xFF
+    && DevRequestObjectPositionsNativeLayout.ThreeDwordItemWireWidth == 0x0C
+    && DevRequestObjectPositionsNativeLayout.ThreeDwordItemNativeStride == 0x0C
+    && DevRequestObjectPositionsNativeLayout.DwordItemWireWidth == 4
+    && DevRequestObjectPositionsNativeLayout.DwordItemNativeStride == 4
+    && DevRequestSpawnTablesNativeLayout.RecordVectorBeginPointerOffset == 0x28
+    && DevRequestSpawnTablesNativeLayout.RecordVectorEndPointerOffset == 0x2C
+    && DevRequestSpawnTablesNativeLayout.RecordVectorCapacityPointerOffset == 0x30
+    && DevRequestSpawnTablesNativeLayout.CountWireWidth == 1
+    && DevRequestSpawnTablesNativeLayout.ChunkContinuationCount == 0xFF
+    && DevRequestSpawnTablesNativeLayout.RecordFirstSharedTextOffset == 0
+    && DevRequestSpawnTablesNativeLayout.RecordDwordCount == 5
+    && DevRequestSpawnTablesNativeLayout.RecordFirstDwordOffset == 4
+    && DevRequestSpawnTablesNativeLayout.RecordByteOffset == 0x18
+    && DevRequestSpawnTablesNativeLayout.RecordSecondSharedTextOffset == 0x1C
+    && DevRequestSpawnTablesNativeLayout.RecordNativeStride == 0x20
+    && DevRequestResourceNodeDebugNativeLayout.RecordVectorBeginPointerOffset == 0x28
+    && DevRequestResourceNodeDebugNativeLayout.RecordVectorEndPointerOffset == 0x2C
+    && DevRequestResourceNodeDebugNativeLayout.RecordVectorCapacityPointerOffset == 0x30
+    && DevRequestResourceNodeDebugNativeLayout.CountWireWidth == 1
+    && DevRequestResourceNodeDebugNativeLayout.ChunkContinuationCount == 0xFF
+    && DevRequestResourceNodeDebugNativeLayout.RecordDwordCount == 3
+    && DevRequestResourceNodeDebugNativeLayout.RecordWireWidth == 0x0C
+    && DevRequestResourceNodeDebugNativeLayout.RecordNativeStride == 0x0C
+    && new uint[]
+    {
+        NpcPositionalDebugInfoNativeLayout.CaseLocalDwordValue,
+        NpcShapeDebugInfoNativeLayout.CaseLocalDwordValue,
+        NpcVoxelInfoNativeLayout.CaseLocalDwordValue,
+        DebugDrawInfoNativeLayout.CaseLocalDwordValue,
+        NpcDevCmdResponseNativeLayout.CaseLocalDwordValue,
+        DevRequestObjectPositionsNativeLayout.CaseLocalDwordValue,
+        DevRequestSpawnTablesNativeLayout.CaseLocalDwordValue,
+        DevRequestResourceNodeDebugNativeLayout.CaseLocalDwordValue
+    }.SequenceEqual(Enumerable.Range(0x18, 8).Select(value => (uint)value)));
 Check("Secondary parser-local DWORD literals remain separate from selector mapping",
     new uint[]
     {
@@ -1163,14 +1392,24 @@ Check("Secondary parser-local DWORD literals remain separate from selector mappi
         NpcBehaviorInfoNativeLayout.CaseLocalDwordValue,
         NpcMonitoringLogNativeLayout.CaseLocalDwordValue,
         NpcNavigationInfoNativeLayout.CaseLocalDwordValue,
-        NpcHostilityDebugInfoNativeLayout.CaseLocalDwordValue
-    }.SequenceEqual(Enumerable.Range(8, 16).Select(value => (uint)value))
+        NpcHostilityDebugInfoNativeLayout.CaseLocalDwordValue,
+        NpcPositionalDebugInfoNativeLayout.CaseLocalDwordValue,
+        NpcShapeDebugInfoNativeLayout.CaseLocalDwordValue,
+        NpcVoxelInfoNativeLayout.CaseLocalDwordValue,
+        DebugDrawInfoNativeLayout.CaseLocalDwordValue,
+        NpcDevCmdResponseNativeLayout.CaseLocalDwordValue,
+        DevRequestObjectPositionsNativeLayout.CaseLocalDwordValue,
+        DevRequestSpawnTablesNativeLayout.CaseLocalDwordValue,
+        DevRequestResourceNodeDebugNativeLayout.CaseLocalDwordValue
+    }.SequenceEqual(Enumerable.Range(8, 24).Select(value => (uint)value))
     && ScoreBoardRemovePlayerNativeLayout.ParserLocalDwordValue !=
         ScoreBoardRemovePlayerNativeLayout.Selector
     && ServerProfilerSendFrameNativeLayout.ParserLocalDwordValue !=
         ServerProfilerSendFrameNativeLayout.Selector
     && NpcHostilityDebugInfoNativeLayout.CaseLocalDwordValue ==
-        NpcHostilityDebugInfoNativeLayout.Selector - 0x20);
+        NpcHostilityDebugInfoNativeLayout.Selector - 0x20
+    && DevRequestResourceNodeDebugNativeLayout.CaseLocalDwordValue ==
+        DevRequestResourceNodeDebugNativeLayout.Selector - 0x20);
 Check("AreaVisualData LootObjectCollected route-index-2 subcase layout is recorded",
     AreaVisualDataLootObjectCollectedNativeLayout.DispatcherFileOffset == 0x81EE63
     && AreaVisualDataLootObjectCollectedNativeLayout.DispatcherValue == 0x53
