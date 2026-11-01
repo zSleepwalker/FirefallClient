@@ -970,7 +970,7 @@ Check("Secondary command dispatcher separates primary-byte, secondary-selector, 
     && MatrixSecondaryCommandDispatcherNativeLayout.GetSecondarySelectorIndex(0x20) == 0
     && MatrixSecondaryCommandDispatcherNativeLayout.GetSecondarySelectorIndex(0x7A) == 0x5A
     && MatrixSecondaryCommandDispatcherNativeLayout.GetSecondarySelectorIndex(0x7B) is null);
-Check("Secondary decoder table snapshot records the first 16 of 91 selectors",
+Check("Secondary decoder table snapshot records the first 24 of 91 selectors",
     MatrixSecondaryDecoderTableNativeLayout.ParserFileOffset == 0x81CC50
     && MatrixSecondaryDecoderTableNativeLayout.SelectorComparisonFileOffset == 0x81F3A8
     && MatrixSecondaryDecoderTableNativeLayout.SelectorJumpFileOffset == 0x81F3B4
@@ -978,20 +978,23 @@ Check("Secondary decoder table snapshot records the first 16 of 91 selectors",
     && MatrixSecondaryDecoderTableNativeLayout.TableFileOffset == 0x821A30
     && MatrixSecondaryDecoderTableNativeLayout.EntryCount == 0x5B
     && MatrixSecondaryDecoderTableNativeLayout.DefaultZeroReturnFileOffset == 0x8217D9
+    && MatrixSecondaryDecoderTableNativeLayout.SharedCaseSetupArgument3VirtualAddress == 0x1E60904
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x20) == 0
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x27) == 7
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x28) == 8
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x2F) == 15
+    && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x30) == 16
+    && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x37) == 23
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x7A) == 0x5A
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x1F) is null
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x7B) is null
-    && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries.Count == 16
+    && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries.Count == 24
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .Select(entry => entry.Selector)
-        .SequenceEqual(Enumerable.Range(0x20, 16).Select(selector => (byte)selector))
+        .SequenceEqual(Enumerable.Range(0x20, 24).Select(selector => (byte)selector))
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .Select(entry => entry.TableIndex)
-        .SequenceEqual(Enumerable.Range(0, 16))
+        .SequenceEqual(Enumerable.Range(0, 24))
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .Select(entry => entry.TargetVirtualAddress)
         .SequenceEqual(new uint[]
@@ -999,7 +1002,9 @@ Check("Secondary decoder table snapshot records the first 16 of 91 selectors",
             0xC1FFBB, 0xC20023, 0xC2008B, 0xC200F3,
             0xC2015D, 0xC201C5, 0xC2022F, 0xC20283,
             0xC202EB, 0xC20356, 0xC203BE, 0xC20426,
-            0xC2048E, 0xC20502, 0xC2054A, 0xC205BE
+            0xC2048E, 0xC20502, 0xC2054A, 0xC205BE,
+            0xC20628, 0xC20690, 0xC206E4, 0xC2074E,
+            0xC207B6, 0xC207FE, 0xC20866, 0xC208CE
         })
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .All(entry => entry.TargetKind == MatrixSecondaryDecoderTargetKind.MessageCase)
@@ -1007,11 +1012,13 @@ Check("Secondary decoder table snapshot records the first 16 of 91 selectors",
         .All(entry => entry.TargetVirtualAddress == entry.TargetFileOffset + 0x400C00)
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .Select(entry => entry.TargetVirtualAddress)
-        .Distinct().Count() == 16
+        .Distinct().Count() == 24
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x27)?.TargetFileOffset == 0x81F683
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x28)?.TargetFileOffset == 0x81F6EB
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x2F)?.TargetFileOffset == 0x81F9BE
-    && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x30) is null);
+    && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x30)?.TargetFileOffset == 0x81FA28
+    && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x37)?.TargetFileOffset == 0x81FCCE
+    && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x38) is null);
 Check("Secondary decoder RTTI and native body layouts retain observed offsets and widths",
     MatrixSecondaryMessageHeaderNativeLayout.BaseMetadataFlagOffset == 0x08
     && MatrixSecondaryMessageHeaderNativeLayout.DescriptorAnchorPointerOffset == 0x0C
@@ -1098,7 +1105,47 @@ Check("Secondary decoder RTTI and native body layouts retain observed offsets an
     && ServerProfilerSendFrameNativeLayout.RecursiveEntryTrailingWordCount == 8
     && ServerProfilerSendFrameNativeLayout.CountByteWidth == 1
     && ServerProfilerSendFrameNativeLayout.ChunkContinuationCount == 0xFF);
-Check("Secondary parser-local DWORD literals remain distinct from selector-table indexes",
+Check("Secondary selectors 0x30-0x37 retain RTTI, constructor, and body read layouts",
+    TempConsoleMessageNativeLayout.AllocationSize == 0x48
+    && TempConsoleMessageNativeLayout.BaseMetadataConstructorFileOffset == 0x823840
+    && TempConsoleMessageNativeLayout.FirstSharedTextFieldOffset == 0x28
+    && TempConsoleMessageNativeLayout.FourthSharedTextFieldOffset == 0x34
+    && TempConsoleMessageNativeLayout.BlobFieldOffset == 0x38
+    && TempConsoleMessageNativeLayout.BlobLengthPrefixWidth == 2
+    && TempConsoleMessageNativeLayout.ConstructorDefaultBlobValue == 0x1C80CC4
+    && ReloadStaticDataNativeLayout.AllocationSize == 0x28
+    && !ReloadStaticDataNativeLayout.HasBodyReader
+    && ReloadStaticDataNativeLayout.AllocationFailureZeroReturnFileOffset == 0x8217D9
+    && EncDebugChatMessageNativeLayout.SharedTextFieldOffset == 0x28
+    && EncDebugChatMessageNativeLayout.BodyReaderFileOffset ==
+        NpcBehaviorInfoNativeLayout.BodyReaderFileOffset
+    && NpcBehaviorInfoNativeLayout.SharedBodyContinuationFileOffset == 0x81FB27
+    && EncDebugChatMessageNativeLayout.AllocationFailureZeroObjectFileOffset ==
+        NpcBehaviorInfoNativeLayout.AllocationFailureZeroObjectFileOffset
+    && SendRadioMessageNativeLayout.FirstDwordFieldOffset == 0x28
+    && SendRadioMessageNativeLayout.SecondDwordFieldOffset == 0x2C
+    && SendRadioMessageNativeLayout.DwordWireWidth == 4
+    && NpcMonitoringLogNativeLayout.FirstSharedTextFieldOffset == 0x28
+    && NpcMonitoringLogNativeLayout.ByteFieldOffset == 0x2C
+    && NpcMonitoringLogNativeLayout.SecondSharedTextFieldOffset == 0x30
+    && NpcNavigationInfoNativeLayout.RawQwordFieldOffset == 0x28
+    && NpcNavigationInfoNativeLayout.ThreeDwordVectorBeginPointerOffset == 0x30
+    && NpcNavigationInfoNativeLayout.ThreeDwordVectorItemWireWidth == 0x0C
+    && NpcNavigationInfoNativeLayout.ThreeDwordVectorNativeStride == 0x0C
+    && NpcNavigationInfoNativeLayout.ConditionalVectorBeginPointerOffset == 0x3C
+    && NpcNavigationInfoNativeLayout.ConditionalVectorEntryPrefixDwordCount == 7
+    && NpcNavigationInfoNativeLayout.ConditionalVectorEntryTailDwordCount == 3
+    && NpcNavigationInfoNativeLayout.ConditionalVectorEntryTailByteCount == 1
+    && NpcNavigationInfoNativeLayout.ConditionalVectorNativeStride == 0x70
+    && NpcNavigationInfoNativeLayout.ConditionalVectorBranchFileOffset == 0x84EF54
+    && NpcHostilityDebugInfoNativeLayout.RawQwordFieldOffset == 0x28
+    && NpcHostilityDebugInfoNativeLayout.NestedVectorBeginPointerOffset == 0x30
+    && NpcHostilityDebugInfoNativeLayout.EntryQwordOffset == 0
+    && NpcHostilityDebugInfoNativeLayout.EntryDwordOffset == 8
+    && NpcHostilityDebugInfoNativeLayout.EntryWireWidth == 0x0C
+    && NpcHostilityDebugInfoNativeLayout.EntryNativeStride == 0x10
+    && NpcHostilityDebugInfoNativeLayout.ChunkContinuationCount == 0xFF);
+Check("Secondary parser-local DWORD literals remain separate from selector mapping",
     new uint[]
     {
         ScoreBoardRemovePlayerNativeLayout.ParserLocalDwordValue,
@@ -1108,12 +1155,22 @@ Check("Secondary parser-local DWORD literals remain distinct from selector-table
         MatchLoadingStateNativeLayout.ParserLocalDwordValue,
         MatchEndAckNativeLayout.ParserLocalDwordValue,
         ServerProfilerSendNamesNativeLayout.ParserLocalDwordValue,
-        ServerProfilerSendFrameNativeLayout.ParserLocalDwordValue
-    }.SequenceEqual(Enumerable.Range(8, 8).Select(value => (uint)value))
+        ServerProfilerSendFrameNativeLayout.ParserLocalDwordValue,
+        TempConsoleMessageNativeLayout.CaseLocalDwordValue,
+        ReloadStaticDataNativeLayout.CaseLocalDwordValue,
+        EncDebugChatMessageNativeLayout.CaseLocalDwordValue,
+        SendRadioMessageNativeLayout.CaseLocalDwordValue,
+        NpcBehaviorInfoNativeLayout.CaseLocalDwordValue,
+        NpcMonitoringLogNativeLayout.CaseLocalDwordValue,
+        NpcNavigationInfoNativeLayout.CaseLocalDwordValue,
+        NpcHostilityDebugInfoNativeLayout.CaseLocalDwordValue
+    }.SequenceEqual(Enumerable.Range(8, 16).Select(value => (uint)value))
     && ScoreBoardRemovePlayerNativeLayout.ParserLocalDwordValue !=
         ScoreBoardRemovePlayerNativeLayout.Selector
     && ServerProfilerSendFrameNativeLayout.ParserLocalDwordValue !=
-        ServerProfilerSendFrameNativeLayout.Selector);
+        ServerProfilerSendFrameNativeLayout.Selector
+    && NpcHostilityDebugInfoNativeLayout.CaseLocalDwordValue ==
+        NpcHostilityDebugInfoNativeLayout.Selector - 0x20);
 Check("AreaVisualData LootObjectCollected route-index-2 subcase layout is recorded",
     AreaVisualDataLootObjectCollectedNativeLayout.DispatcherFileOffset == 0x81EE63
     && AreaVisualDataLootObjectCollectedNativeLayout.DispatcherValue == 0x53

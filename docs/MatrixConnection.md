@@ -1089,12 +1089,12 @@ subcases: three at route2, nine at route3, three at route4, and one each at
 routes5 and6. All 17 subcases now have native layouts.
 Route0's nested table has a separate, complete set of 40 documented selectors
 (`0x53..0x7A`); route1 is the zero-return route. The secondary selector table
-records 91 dispatch targets. Selectors `0x20..0x2F` now have 16 RTTI-backed
-class and body-reader layouts; the remaining 75 identities are unresolved.
+records 91 dispatch targets. Selectors `0x20..0x37` now have 24 RTTI-backed
+class and body-reader layouts; the remaining 67 identities are unresolved.
 All 91 table entries are nonzero and have distinct targets in the original
 binary, which establishes address uniqueness, not 91 completed identities.
 
-### Secondary-selector entries `0x20..0x2F`
+### Secondary-selector entries `0x20..0x37`
 
 This is the separate second table used by the leading-byte-zero and
 `0xF0..0xFF` path in `0x81CC50`. Its index is `selector - 0x20`, with accepted
@@ -1126,29 +1126,42 @@ Selectors outside `0x20..0x7A` reach the shared zero-return block at raw
 | `0x2D` | 13 | `0xC20502` / `0x81F902` | `0x30` | `0x814780` | `0x1C6E1C8` / `MatchEndAck` | `0x356F80` (shared continuation) |
 | `0x2E` | 14 | `0xC2054A` / `0x81F94A` | `0x40` | `0x814840` | `0x1C6E188` / `ServerProfiler_SendNames` | `0x34E700` twice |
 | `0x2F` | 15 | `0xC205BE` / `0x81F9BE` | `0x38` | `0x8149D0` | `0x1C6E178` / `ServerProfiler_SendFrame` | `0x34D6D0` |
+| `0x30` | 16 | `0xC20628` / `0x81FA28` | `0x48` | `0x814B50` | `0x1C6E198` / `TempConsoleMessage` | `0x84F7F0` |
+| `0x31` | 17 | `0xC20690` / `0x81FA90` | `0x28` | `0x814EF0` | `0x1C6E148` / `ReloadStaticData` | none |
+| `0x32` | 18 | `0xC206E4` / `0x81FAE4` | `0x30` | `0x814F60` | `0x1C6E138` / `EncDebugChatMessage` | `0x12EE010` |
+| `0x33` | 19 | `0xC2074E` / `0x81FB4E` | `0x30` | `0x8150F0` | `0x1C6E168` / `SendRadioMessage` | `0x84F650` |
+| `0x34` | 20 | `0xC207B6` / `0x81FBB6` | `0x30` | `0x8151B0` | `0x1C6E158` / `NpcBehaviorInfo` | `0x12EE010` (shared with `0x32`) |
+| `0x35` | 21 | `0xC207FE` / `0x81FBFE` | `0x38` | `0x815340` | `0x1C6E108` / `NpcMonitoringLog` | `0x84F550` |
+| `0x36` | 22 | `0xC20866` / `0x81FC66` | `0x48` | `0x815560` | `0x1C6E128` / `NpcNavigationInfo` | `0x84F490` |
+| `0x37` | 23 | `0xC208CE` / `0x81FCCE` | `0x40` | `0x815730` | `0x1C6E118` / `NpcHostilityDebugInfo` | `0x84E200` |
 
-These sixteen entries have sixteen distinct, nonzero table destinations. No
-shared case or zero-valued table slot occurs in this verified prefix. Selector
-`0x26` does have a distinct allocation-failure branch to the common zero-return
-block; that is a case-path result, not a zero table entry. Selectors `0x28`
-and `0x2D` share a body-reader continuation at raw `0x81F72E`, but their
-selector-table destinations and RTTI-identified types remain distinct.
+The first 24 entries have 24 distinct, nonzero table destinations. No shared
+case or zero-valued table slot occurs in this verified prefix. Selector `0x26`
+does have a distinct allocation-failure branch to the common zero-return block;
+that is a case-path result, not a zero table entry. Selectors `0x28` and `0x2D`
+share a body-reader continuation at raw `0x81F72E`, but their selector-table
+destinations and RTTI-identified types remain distinct. Selectors `0x32` and
+`0x34` likewise have separate table targets, constructors, and RTTI, while
+sharing the NUL-terminated text reader at raw `0x12EE010` through continuation
+`0x81FB27`.
 
-All sixteen constructors call a selector-specific base-metadata initializer
+All 24 constructors call a selector-specific base-metadata initializer
 before storing the derived vtable. For selectors `0x20..0x27` these helpers
 are `0x823020`, `0x823090`, `0x823100`, `0x823170`, `0x8231E0`, `0x823250`,
 `0x8232C0`, and `0x823330`; for `0x28..0x2F` they are `0x8233C0`, `0x823430`,
-`0x8234A0`, `0x823510`, `0x823580`, `0x8236F0`, `0x823760`, and `0x8237D0`.
+`0x8234A0`, `0x823510`, `0x823580`, `0x8236F0`, `0x823760`, and `0x8237D0`;
+for `0x30..0x37` they are `0x823840`, `0x8238B0`, `0x823920`, `0x823990`,
+`0x823A00`, `0x823A70`, `0x823AE0`, and `0x823C50`.
 Each helper sets a base flag DWORD at `+0x08` to 1, stores its
 descriptor-anchor pointer at `+0x0C`, stores the constructor-supplied type
 DWORD at `+0x10`, copies the parser input's first two DWORDs to `+0x18/+0x1C`,
 and zeros DWORDs at `+0x20/+0x24`. Thus the message body begins at `+0x28`.
 The descriptor anchors are opaque metadata pointers; class identities in the
-table come from the section-aware vtable RTTI names. The cases also write
-parser-local DWORD literals `0x08..0x0F` into a separate stack slot for this
-batch. Their role is unknown; their numerical coincidence with table indexes
-8..15 does not establish that they are selector indexes or message
-discriminators.
+table come from the section-aware vtable RTTI names. The cases for selectors
+`0x28..0x2F` write parser-local DWORD literals `0x08..0x0F` into a separate
+stack slot. The cases for selectors `0x30..0x37` write `0x10..0x17` there.
+Their roles are unknown; numerical coincidence with table indexes 8..23 does
+not establish that they are selector indexes or message discriminators.
 
 Body reads, with field labels deliberately limited to offsets and widths:
 
@@ -1222,18 +1235,61 @@ Body reads, with field labels deliberately limited to offsets and widths:
   native stride (first WORD at `+0`, child vector at `+4`, eight trailing
   WORDs at `+0x10..+0x1E`), and recursively repeats the same nested shape.
   These WORDs remain offset-only fields.
+- `0x30` `TempConsoleMessage`: four NUL-terminated shared-text reads at
+  `+0x28`, `+0x2C`, `+0x30`, and `+0x34`, then a WORD-length-prefixed byte
+  blob at `+0x38`. The prefix is a 16-bit little-endian length; zero skips the
+  blob read. Its constructor writes `0x1C80CC4` to `+0x38`; that initializer
+  value is recorded without assigning it a semantic name.
+- `0x31` `ReloadStaticData`: allocation is `0x28` bytes, exactly the common
+  message header. No body-reader call follows its constructor.
+- `0x32` `EncDebugChatMessage`: one NUL-terminated shared-text field at
+  `+0x28` via `0x12EE010`.
+- `0x33` `SendRadioMessage`: DWORDs at `+0x28` and `+0x2C`, in that order,
+  through the four-byte stream readers `0x3370A0` and `0x353310`.
+- `0x34` `NpcBehaviorInfo`: one NUL-terminated shared-text field at `+0x28`
+  via the same reader and continuation as selector `0x32`.
+- `0x35` `NpcMonitoringLog`: NUL-terminated shared text at `+0x28`, one byte
+  at `+0x2C`, then NUL-terminated shared text at `+0x30`.
+- `0x36` `NpcNavigationInfo`: raw QWORD at `+0x28`, followed by two distinct
+  byte-counted vectors. The first vector at `+0x30/+0x34/+0x38` uses count
+  bytes (`0xFF` continues with another count; zero ends); each item is three
+  DWORDs (12 wire bytes) and is appended with 12-byte native stride. The
+  reader zero-extends each count byte into its item-loop counter and
+  decrements it at raw `0x84E390`; the `jnz` at `0x84E391` returns to the
+  item reader at `0x84E294`. The second vector at `+0x3C/+0x40/+0x44` uses
+  the same count framing and has `0x70`-byte native entries. Each entry begins
+  with seven 32-bit values. Its byte counter is incremented and compared with
+  the current chunk count at `0x84F374`; `jb` at `0x84F376` returns to raw
+  `0x84EC90` while the count is not reached. The instruction-aligned gate
+  producer starts at raw `0x84EF2E` (raw `0x84EF30` is inside its `mulss`
+  instruction): it squares and sums staged scalar values, subtracts a
+  referenced DWORD, ANDs with a referenced 128-bit value, then uses `comiss`
+  against a referenced scalar. The following `jb` at `0x84EF54` targets
+  cleanup/exit at raw `0x84F3A4`; because `comiss` sets CF for below and
+  unordered comparisons, the branch can cover either case. The referenced
+  constants and the predicate's application meaning remain unresolved. When
+  the branch is not taken, the reader consumes three more DWORDs and one byte.
+- `0x37` `NpcHostilityDebugInfo`: raw QWORD at `+0x28`, then a byte-counted
+  vector at `+0x30/+0x34/+0x38`. Each wire item is a QWORD followed by a DWORD
+  (12 wire bytes), stored at `0x10`-byte native stride. Count `0xFF` continues
+  with another count; zero ends the vector.
 
 The binary checks fingerprint each reader's receiver displacements and helper
 call order from instruction bytes, along with the observed primitive and
-count/gate widths. They assert wire framing only; unresolved field, gate,
-count, and tag meanings remain unassigned.
+count/gate widths, including the selector-`0x36` conditional tail and its
+`0x70` native stride. They assert wire framing only; unresolved field, gate,
+count, predicate, and tag meanings remain unassigned.
 
 On allocation failure, selectors `0x20..0x25`, `0x27..0x2C`, and `0x2E..0x2F`
 set the object register to zero but still fall through to their body-reader
 call. Selector `0x2D` branches through selector `0x28`'s zero-object block and
 shared reader continuation. Selector `0x26` instead branches directly to the
-shared zero-return block. These are static control-flow observations only;
-their runtime consequence is not asserted.
+shared zero-return block. In the new prefix, selector `0x31` also branches
+directly to the shared zero-return block; other new cases continue through
+their readers with the object register set to zero on allocation failure.
+Selectors `0x32` and `0x34` share the zero-object continuation at raw
+`0x81FB25` and the text-reader continuation at `0x81FB27`. These are static
+control-flow observations only; their runtime consequence is not asserted.
 
 ### Route index 2, dispatcher value `0x53`: `AreaVisualData::LootObjectCollected`
 
