@@ -4771,6 +4771,110 @@ internal static class StartupBinaryEvidence
                 && (route.DirectHelperFileOffset is null
                     || RelativeBranchTargets(route.CallSiteFileOffset, 0xE8,
                         route.DirectHelperFileOffset.Value))));
+        var keyedCharacterDialogCases = CharacterKeyedDialogDispatchNativeLayout.Cases;
+        var keyedCharacterBaseDialogCases = keyedCharacterDialogCases
+            .Where(snapshot => snapshot.FactorySelector == 0x02)
+            .ToArray();
+        var keyedCharacterNpcDialogCases = keyedCharacterDialogCases
+            .Where(snapshot => snapshot.FactorySelector == 0x03)
+            .ToArray();
+        var baseDialog77 = keyedCharacterBaseDialogCases.Single(snapshot => snapshot.MessageId == 0x77);
+        var baseDialog78 = keyedCharacterBaseDialogCases.Single(snapshot => snapshot.MessageId == 0x78);
+        var baseDialog79 = keyedCharacterBaseDialogCases.Single(snapshot => snapshot.MessageId == 0x79);
+        var baseDialog7A = keyedCharacterBaseDialogCases.Single(snapshot => snapshot.MessageId == 0x7A);
+        var npcDialog77 = keyedCharacterNpcDialogCases.Single(snapshot => snapshot.MessageId == 0x77);
+        var npcDialog78 = keyedCharacterNpcDialogCases.Single(snapshot => snapshot.MessageId == 0x78);
+        var npcDialog79 = keyedCharacterNpcDialogCases.Single(snapshot => snapshot.MessageId == 0x79);
+        var npcDialog7A = keyedCharacterNpcDialogCases.Single(snapshot => snapshot.MessageId == 0x7A);
+        var baseControllerVtable =
+            MatrixKeyedReceiverFactoryNativeLayout.FirstEightCases.Single(snapshot => snapshot.Selector == 0x02);
+        var npcControllerVtable =
+            MatrixKeyedReceiverFactoryNativeLayout.FirstEightCases.Single(snapshot => snapshot.Selector == 0x03);
+        check("Binary keyed Character dialog IDs resolve the actual factory vtable methods, lookup tables, case bodies, and defaults",
+            VirtualAddressToFileOffset(baseControllerVtable.PrimaryVtableVirtualAddress)
+                == baseControllerVtable.PrimaryVtableFileOffset
+            && VirtualAddressToFileOffset(npcControllerVtable.PrimaryVtableVirtualAddress)
+                == npcControllerVtable.PrimaryVtableFileOffset
+            && ReadUInt32(VirtualAddressToFileOffset(baseControllerVtable.PrimaryVtableVirtualAddress) + 4)
+                == CharacterKeyedDialogDispatchNativeLayout.BaseControllerMessageDispatcherFileOffset
+                    + CharacterKeyedDialogDispatchNativeLayout.RawTextOffsetToVirtualAddressDelta
+            && ReadUInt32(VirtualAddressToFileOffset(npcControllerVtable.PrimaryVtableVirtualAddress) + 4)
+                == CharacterKeyedDialogDispatchNativeLayout.NpcControllerMessageDispatcherFileOffset
+                    + CharacterKeyedDialogDispatchNativeLayout.RawTextOffsetToVirtualAddressDelta
+            && Matches(CharacterKeyedDialogDispatchNativeLayout.BaseControllerConstructorFileOffset + 0x4B,
+                "C7462800000000C7462C00000000C7463000000000")
+            && Matches(CharacterKeyedDialogDispatchNativeLayout.NpcControllerConstructorFileOffset + 0x4B,
+                "C7462800000000C7462C00000000C7463000000000")
+            && Matches(CharacterKeyedDialogDispatchNativeLayout.BaseControllerMessageDispatcherFileOffset,
+                "558BEC56578BF1FF15244DAC018B4E10")
+            && Matches(CharacterKeyedDialogDispatchNativeLayout.BaseControllerMessageDispatcherFileOffset + 0x16,
+                "85C9740AFF77248B015756FF5004837E2C000F84")
+            && Matches(CharacterKeyedDialogDispatchNativeLayout.BaseControllerMessageDispatcherFileOffset + 0x2E,
+                "8B4F108D41AD83F8710F87950C00000FB6809C1D9400FF24856C1C9400")
+            && Matches(CharacterKeyedDialogDispatchNativeLayout.NpcControllerMessageDispatcherFileOffset,
+                "558BEC56578BF1FF15244DAC018B4E10")
+            && Matches(CharacterKeyedDialogDispatchNativeLayout.NpcControllerMessageDispatcherFileOffset + 0x16,
+                "85C9740AFF77248B015756FF5004837E2C000F84")
+            && Matches(CharacterKeyedDialogDispatchNativeLayout.NpcControllerMessageDispatcherFileOffset + 0x2E,
+                "8B4F108D41AD83F8710F87190D00000FB6804C0F9500FF2485100E9500")
+            && Matches(CharacterKeyedDialogDispatchNativeLayout.BaseControllerSelectorMapFileOffset + 0x24,
+                "08090A4B")
+            && Matches(CharacterKeyedDialogDispatchNativeLayout.BaseControllerJumpTableFileOffset + 0x20,
+                "461094006F1094009810940013119400")
+            && Matches(CharacterKeyedDialogDispatchNativeLayout.BaseControllerJumpTableFileOffset + 0x12C,
+                "521C9400")
+            && Matches(CharacterKeyedDialogDispatchNativeLayout.NpcControllerSelectorMapFileOffset + 0x24,
+                "0A0B4E4E")
+            && Matches(CharacterKeyedDialogDispatchNativeLayout.NpcControllerJumpTableFileOffset + 0x28,
+                "8F019500B8019500")
+            && Matches(CharacterKeyedDialogDispatchNativeLayout.NpcControllerJumpTableFileOffset + 0x138,
+                "F60D9500")
+            && Matches(baseDialog77.CaseTargetFileOffset,
+                "8B463085C074136884BDB5016880D1B50150E8C323DEFF83C40C8B4E2C578B01FF50105F5E5DC20400")
+            && Matches(baseDialog78.CaseTargetFileOffset,
+                "8B463085C07413688CBDB5016844D1B50150E89A23DEFF83C40C8B4E2C578B01FF50145F5E5DC20400")
+            && Matches(baseDialog79.CaseTargetFileOffset,
+                "8B463085C07413687CBDB5016838D1B50150E87123DEFF83C40C8B4E2C578B01FF50185F5E5DC20400")
+            && Matches(npcDialog77.CaseTargetFileOffset,
+                "8B463085C07413688CBDB501686CDAB50150E87A32DDFF83C40C8B4E2C578B01FF50145F5E5DC20400")
+            && Matches(npcDialog78.CaseTargetFileOffset,
+                "8B463085C07413687CBDB5016860DAB50150E85132DDFF83C40C8B4E2C578B01FF50185F5E5DC20400")
+            && new[] { baseDialog77, baseDialog78, baseDialog79, npcDialog77, npcDialog78 }
+                .All(snapshot => RelativeBranchTargets(snapshot.CaseTargetFileOffset + 0x12, 0xE8,
+                    CharacterKeyedDialogDispatchNativeLayout.VibeLogIfSeverityLe2FileOffset)
+                    && Matches(snapshot.CaseTargetFileOffset + 0x1A, "8B4E2C")
+                    && Matches(snapshot.CaseTargetFileOffset + 0x20,
+                        snapshot.CallbackVtableSlotOffset switch
+                        {
+                            0x10 => "FF5010",
+                            0x14 => "FF5014",
+                            0x18 => "FF5018",
+                            _ => ""
+                        }))
+            && new[]
+            {
+                (Snapshot: baseDialog77, Label: "msg-119"),
+                (Snapshot: baseDialog78, Label: "msg-120"),
+                (Snapshot: baseDialog79, Label: "msg-121"),
+                (Snapshot: npcDialog77, Label: "msg-120"),
+                (Snapshot: npcDialog78, Label: "msg-121")
+            }.All(item => item.Snapshot.LoggerFormatStringImmediate is uint formatAddress
+                && item.Snapshot.LoggerMessageLabelImmediate is uint labelAddress
+                && ReadCStringAscii(formatAddress, 24) == "received %s"
+                && ReadCStringAscii(labelAddress, 16) == item.Label)
+            && Matches(baseDialog7A.CaseTargetFileOffset,
+                "5168F4D4B501680409E601E88EB4DBFF83C40C5F5E5DC20400")
+            && Matches(npcDialog79.CaseTargetFileOffset,
+                "51683CDEB501680409E601E8EAC2DAFF83C40C5F5E5DC20400")
+            && npcDialog79.CaseTargetFileOffset == npcDialog7A.CaseTargetFileOffset
+            && RelativeBranchTargets(baseDialog7A.CaseTargetFileOffset + 0x0B, 0xE8,
+                CharacterKeyedDialogDispatchNativeLayout.VibeLogUnhandledMessageIdFileOffset)
+            && RelativeBranchTargets(npcDialog79.CaseTargetFileOffset + 0x0B, 0xE8,
+                CharacterKeyedDialogDispatchNativeLayout.VibeLogUnhandledMessageIdFileOffset)
+            && Matches(CharacterKeyedDialogDispatchNativeLayout.OuterSelectorDefaultBranchFileOffset,
+                "4F83FF080F8732020000")
+            && Matches(CharacterKeyedDialogDispatchNativeLayout.OuterSelectorDefaultReceiverCallFileOffset,
+                "8B038BCB56FF5004"));
         check("Binary conditional fan-out gate, state construction, recipient insertion, and slot call match the original image",
             Matches(0x7FDD64, "83BEB0000000007419")
             && RelativeBranchTargets(0x7FDD81, 0xE8,

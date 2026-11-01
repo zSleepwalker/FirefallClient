@@ -3891,6 +3891,76 @@ Check("Matrix keyed receiver selector routes distinguish message dispatchers, fo
         .Single().MethodFileOffset == 0x5536C0
     && keyedReceiverSlots.Where(slot => slot.FactorySelector == 0x06 && slot.SlotOffset == 0x0C)
         .Single().MethodFileOffset == 0x5795A0);
+var keyedCharacterDialogCases = CharacterKeyedDialogDispatchNativeLayout.Cases;
+var keyedCharacterBaseDialogCases = keyedCharacterDialogCases
+    .Where(snapshot => snapshot.FactorySelector == 0x02)
+    .ToArray();
+var keyedCharacterNpcDialogCases = keyedCharacterDialogCases
+    .Where(snapshot => snapshot.FactorySelector == 0x03)
+    .ToArray();
+Check("Keyed Character receiver dialog IDs map through their actual BaseController and NPCController slots",
+    CharacterKeyedDialogDispatchNativeLayout.RawTextOffsetToVirtualAddressDelta
+        == MatrixKeyedReceiverFactoryNativeLayout.RawTextOffsetToVirtualAddressDelta
+    && MatrixKeyedReceiverFactoryNativeLayout.FirstEightCases
+        .Single(snapshot => snapshot.Selector == 0x02).RttiName
+        == ".?AVBaseController@Character@firefall@@"
+    && MatrixKeyedReceiverFactoryNativeLayout.FirstEightCases
+        .Single(snapshot => snapshot.Selector == 0x02).PrimaryVtableVirtualAddress
+        == CharacterKeyedDialogDispatchNativeLayout.BaseControllerPrimaryVtableVirtualAddress
+    && MatrixKeyedReceiverFactoryNativeLayout.FirstEightCases
+        .Single(snapshot => snapshot.Selector == 0x03).RttiName
+        == ".?AVNPCController@Character@firefall@@"
+    && MatrixKeyedReceiverFactoryNativeLayout.FirstEightCases
+        .Single(snapshot => snapshot.Selector == 0x03).PrimaryVtableVirtualAddress
+        == CharacterKeyedDialogDispatchNativeLayout.NpcControllerPrimaryVtableVirtualAddress
+    && MatrixKeyedReceiverFactoryNativeLayout.PrimaryVtableSlots.Single(slot =>
+        slot.FactorySelector == 0x02 && slot.SlotOffset == 0x04).MethodFileOffset
+        == CharacterKeyedDialogDispatchNativeLayout.BaseControllerMessageDispatcherFileOffset
+    && MatrixKeyedReceiverFactoryNativeLayout.PrimaryVtableSlots.Single(slot =>
+        slot.FactorySelector == 0x03 && slot.SlotOffset == 0x04).MethodFileOffset
+        == CharacterKeyedDialogDispatchNativeLayout.NpcControllerMessageDispatcherFileOffset
+    && CharacterKeyedDialogDispatchNativeLayout.MessageIdFieldOffset == 0x10
+    && CharacterKeyedDialogDispatchNativeLayout.MessageForwardedToNestedReceiverFieldOffset == 0x24
+    && CharacterKeyedDialogDispatchNativeLayout.ReceiverOptionalNestedObjectFieldOffset == 0x10
+    && CharacterKeyedDialogDispatchNativeLayout.ReceiverDispatchGateFieldOffset == 0x2C
+    && CharacterKeyedDialogDispatchNativeLayout.ReceiverLoggerContextFieldOffset == 0x30
+    && CharacterKeyedDialogDispatchNativeLayout.DispatchMessageIdMinimum == 0x53
+    && CharacterKeyedDialogDispatchNativeLayout.DispatchMessageIdMaximum == 0xC4
+    && keyedCharacterDialogCases.Count == 8
+    && keyedCharacterBaseDialogCases.Select(snapshot => snapshot.MessageId)
+        .SequenceEqual(Enumerable.Range(0x77, 4))
+    && keyedCharacterNpcDialogCases.Select(snapshot => snapshot.MessageId)
+        .SequenceEqual(Enumerable.Range(0x77, 4))
+    && keyedCharacterBaseDialogCases.Select(snapshot => snapshot.SelectorMapValue)
+        .SequenceEqual(new byte[] { 0x08, 0x09, 0x0A, 0x4B })
+    && keyedCharacterNpcDialogCases.Select(snapshot => snapshot.SelectorMapValue)
+        .SequenceEqual(new byte[] { 0x0A, 0x0B, 0x4E, 0x4E })
+    && keyedCharacterBaseDialogCases.Select(snapshot => snapshot.HasSpecificHandler)
+        .SequenceEqual([true, true, true, false])
+    && keyedCharacterNpcDialogCases.Select(snapshot => snapshot.HasSpecificHandler)
+        .SequenceEqual([true, true, false, false])
+    && keyedCharacterDialogCases.All(snapshot =>
+        snapshot.CaseTargetVirtualAddress
+            == snapshot.CaseTargetFileOffset
+                + CharacterKeyedDialogDispatchNativeLayout.RawTextOffsetToVirtualAddressDelta
+        && !snapshot.ReadsMessagePayload)
+    && keyedCharacterBaseDialogCases.Where(snapshot => snapshot.HasSpecificHandler)
+        .Select(snapshot => snapshot.CallbackVtableSlotOffset)
+        .SequenceEqual([0x10, 0x14, 0x18])
+    && keyedCharacterNpcDialogCases.Where(snapshot => snapshot.HasSpecificHandler)
+        .Select(snapshot => snapshot.CallbackVtableSlotOffset)
+        .SequenceEqual([0x14, 0x18])
+    && keyedCharacterBaseDialogCases.Where(snapshot => snapshot.HasSpecificHandler)
+        .All(snapshot => snapshot.ForwardsOriginalMessagePointer
+            && snapshot.CallbackObjectFieldOffset == 0x2C
+            && snapshot.LoggerContextFieldOffset == 0x30)
+    && keyedCharacterNpcDialogCases.Where(snapshot => snapshot.HasSpecificHandler)
+        .All(snapshot => snapshot.ForwardsOriginalMessagePointer
+            && snapshot.CallbackObjectFieldOffset == 0x2C
+            && snapshot.LoggerContextFieldOffset == 0x30)
+    && CharacterKeyedDialogDispatchNativeLayout.OuterEnvelopeDispatcherFileOffset == 0x800420
+    && CharacterKeyedDialogDispatchNativeLayout.OuterSelectorDefaultBranchFileOffset == 0x800697
+    && CharacterKeyedDialogDispatchNativeLayout.OuterSelectorDefaultReceiverCallFileOffset == 0x8008D3);
 Check("Conditional message fan-out records its constructed keyed state and recipient-vector call",
     MatrixMessageParserFlowNativeLayout.ConditionalFanoutStateLazyConstructionMethodFileOffset == 0x7FE1C0
     && MatrixMessageParserFlowNativeLayout.ConditionalFanoutStateConstructorFileOffset == 0xBD6E10

@@ -2734,6 +2734,66 @@ IDB edits, or sample edits were performed. This resolves the static routing
 conditions and parser-family collisions; it does not repair or reinterpret
 the already-recorded field/extent conflicts.
 
+## Keyed Character receiver dispatch for IDs 0x77..0x7A
+
+The QWORD-keyed factory table distinguishes the two Character receiver
+classes: selector `0x02` installs `Character::BaseController`, whose primary
+vtable `+0x04` target is raw `0x540380` (VA `0x940F80`); selector `0x03`
+installs `Character::NPCController`, whose `+0x04` target is raw `0x54F4A0`
+(VA `0x94F0A0`). Thus `0x54F4A0` is the NPC controller method, not the
+selector-`0x02` BaseController method. These are factory selector identities;
+this mapping does not establish which selector is used by a particular runtime
+key.
+
+The keyed envelope dispatcher at raw `0x800420` first obtains the registry
+receiver from the QWORD at envelope `+0x18/+0x1C`. It uses envelope `+0x10`
+for its compact selector; after decrementing the value, the `> 8` branch at
+`0x800697` takes the default receiver `+0x04` call at `0x8008D3`. Therefore
+the values `0x77..0x7A` reach the Character method through that default, with
+the original envelope pointer unchanged. The receiver method then reads the
+message ID at `message+0x10`. This is distinct from the direct compact
+selector table's explicit `0x07/0x08` entries, which also call `+0x04`.
+
+The per-class lookup bytes and targets are:
+
+| Message ID | BaseController map / target | BaseController follow-up | NPCController map / target | NPCController follow-up |
+| --- | --- | --- | --- | --- |
+| `0x77` | map raw `0x5411C0`=`08`; target raw `0x540446` / VA `0x941046` | optional log, then callback object's vtable `+0x10` | map raw `0x550371`=`0A`; target raw `0x54F58F` / VA `0x95018F` | optional log, then callback object's vtable `+0x14` |
+| `0x78` | map raw `0x5411C1`=`09`; target raw `0x54046F` / VA `0x94106F` | optional log, then callback object's vtable `+0x14` | map raw `0x550372`=`0B`; target raw `0x54F5B8` / VA `0x9501B8` | optional log, then callback object's vtable `+0x18` |
+| `0x79` | map raw `0x5411C2`=`0A`; target raw `0x540498` / VA `0x941098` | optional log, then callback object's vtable `+0x18` | map raw `0x550373`=`4E`; default raw `0x5501F6` / VA `0x950DF6` | unhandled-ID logger |
+| `0x7A` | map raw `0x5411C3`=`4B`; default raw `0x541052` / VA `0x941C52` | unhandled-ID logger | map raw `0x550374`=`4E`; default raw `0x5501F6` / VA `0x950DF6` | unhandled-ID logger |
+
+Both `+0x04` methods first call the indirect helper at `dword_1AC4D24` with
+the receiver and store its result at receiver `+0x28`. If receiver `+0x10` is
+non-null, they call that nested object's vtable `+0x04` with the receiver,
+the original message pointer, and the DWORD at `message+0x24`. Only when
+receiver `+0x2C` is non-null do they dispatch `message+0x10`; the accepted
+range is `0x53..0xC4`. An ID outside that range or a table sentinel (`0x4B`
+for BaseController, `0x4E` for NPCController) reaches
+`VIBE_LogUnhandledMessageId` with the supplied ID. The constructors at
+`0x53F980` and `0x54E7B0` initialize receiver `+0x28/+0x2C/+0x30` to zero;
+where or whether runtime setup later installs those optional objects was not
+resolved here.
+
+The five concrete routes do not parse `message+0x28` or other dialog payload
+fields, update message-driven application state, or directly dispatch a
+numeric UI event. They optionally call `VIBE_LogIfSeverityLe2` using receiver
+`+0x30`, with the format string `received %s` and a fixed diagnostic label:
+BaseController IDs `0x77/0x78/0x79` log `msg-119`/`msg-120`/`msg-121`;
+NPCController IDs `0x77/0x78` log `msg-120`/`msg-121`. These strings are
+logger arguments, not event names. The cases then pass the unchanged message
+pointer to the object at receiver `+0x2C` through the class/ID-specific
+virtual slot shown above. The concrete type and implementation behind those
+calls remain unknown, so downstream application effects cannot be inferred
+from these cases alone.
+
+This keyed path is separate from the conditional zero-low-byte branch in
+`0x7FDC60`, which can call the `tfGameProtocolHandler` via callback-context
+`+0x08`. The present trace does not show the keyed callback object at receiver
+`+0x2C` to be that protocol handler. Parser-object consumers and numeric UI
+codes documented elsewhere likewise do not establish reuse by these keyed
+receiver cases.
+
 ## Parser result path and dialog-message primary vftables
 
 The large dispatcher/parser at raw file offset `0x81CC50` has two direct

@@ -150,18 +150,36 @@
   `VIBE_LogUnhandledMessageId` with `message+0x10`. `Anchor::AIObserverView`
   emits the fixed no-valid-events log without a message-ID argument.
   `0x800420` uses the receiver for a separate compact-selector dispatch on
-  message `+0x10`: `+0x08/+0x0C` paths receive data/length forms, and the
-  mapped `+0x18` wrappers store the `dword_1AC4D24` result at receiver `+0x28`
-  and call `0xBCADF0`. Payload semantics remain out of scope.
+  message `+0x10`: its explicit selectors `0x07/0x08` call receiver `+0x04`,
+  while values above `0x09` take the default `+0x04` call, allowing message
+  IDs such as `0x77..0x7A` to reach the receiver's ID dispatcher.
+  `+0x08/+0x0C` paths receive data/length forms, and the mapped `+0x18`
+  wrappers store the `dword_1AC4D24` result at receiver `+0x28` and call
+  `0xBCADF0`. Payload semantics remain out of scope.
   `AIObserverView +0x08` has a recovered disassembly boundary at `0x58A6E0`
   (size `0x394`), although Hex-Rays decompilation and payload semantics remain
   unresolved; this is not an unrecovered function boundary. Earlier
   `0x5536C0` / `0x5795A0` boundaries remain unresolved. See
   `docs/MatrixConnection.md` for the complete 52-selector matrix, exact table
   entries, constructor/vtable/RTTI snapshots, slot roles, and binary evidence.
-  Next concrete targets: trace a keyed `Character` recipient's `+0x04` handler
-  for dialog message `0x79` to distinguish it from the conditional global
-  receiver, then resolve compact-body methods and downstream consumer tails.
+  The keyed Character dialog dispatch is now mapped for `0x77..0x7A`:
+  factory selector `0x02` is `BaseController` with `+0x04` at raw `0x540380`
+  (not `0x54F4A0`); selector `0x03` is `NPCController` with `+0x04` at
+  `0x54F4A0`. BaseController handles `0x77/0x78/0x79` through receiver
+  `+0x2C` vtable slots `+0x10/+0x14/+0x18`; `0x7A` is unsupported.
+  NPCController handles `0x77/0x78` through `+0x14/+0x18`; `0x79/0x7A` are
+  unsupported. Both methods refresh receiver `+0x28`, optionally forward
+  `(receiver, message, message+0x24)` through a nested object at `+0x10`, then
+  require receiver `+0x2C` before ID dispatch. Specific cases optionally log
+  through receiver `+0x30` and pass the original message pointer unchanged;
+  they do not directly read dialog payloads or emit numeric UI events. The
+  callback object's type and downstream app effects remain unknown. This does
+  not alter the conditional `0x7FDC60` global route: nonzero message
+  `+0x18` low byte goes to `0x800420`, while the zero-low-byte, non-nested,
+  non-null callback-context `+0x08` branch can reach the separate
+  `tfGameProtocolHandler`. Next concrete target: resolve the keyed callback
+  object's setup/implementation and downstream consumer, then compact-body
+  methods.
 - The gated `0xBD7060` path serializes the message QWORD and message data into
   its output stream, then passes the selector separately to `0xBD7460`,
   which stores it in the recipient callback's local record, not the stream.
@@ -1400,14 +1418,17 @@ These updates supersede older next-step suggestions below where they overlap.
   the opaque embedded state at +0x28 (virtual +0x10 reader); its receiver
   iterates 0x40-byte records into chat processing, but their semantics and
   cooldown timing remain unknown.
-  Selector0x77 constructs `NPCInteraction` and reads one raw QWORD at +0x28;
+  In the parser-message path, selector `0x77` constructs `NPCInteraction` and
+  reads one raw QWORD at +0x28;
   its receiver uses it as a two-DWORD map key and dispatches numeric UI code
   356, with no event name assigned. The parser requests 0x30 bytes and writes
   only through exclusive +0x30, while the unchanged object pointer reaches a
   consumer that swaps 0x20 bytes at [+0x30,+0x50). Its vtable reader/writer
   also touch only +0x28; no alternative direct constructor/callsite or body
-  transform explains the consumer state. An untraced indirect entry is not
-  excluded. Actual block extent and runtime consequences remain unknown.
+  transform explains the consumer state. This parser-message consumer is not
+  evidence that the keyed selector-0x02/0x03 Character dispatchers reuse that
+  method. An untraced indirect entry is not excluded. Actual block extent and
+  runtime consequences remain unknown.
   Selector0x78 constructs `OpenMovieDialog` and passes input through the shared NUL-terminated text reader at +0x28; field meaning and allocation-failure consequence remain unknown.
   Selector0x79 constructs `PrivateDialog` and reads DWORD +0x28, QWORD +0x30, and DWORD +0x38; this ends at +0x3C despite a +0x40 request, while the same parsed pointer reaches event-229 handling that reads through +0x48. The actual allocator block extent remains unresolved.
   Selector0x7A constructs `PublicDialog` and reads DWORDs +0x28/+0x2C; field meanings and allocation-failure consequence remain unknown.
