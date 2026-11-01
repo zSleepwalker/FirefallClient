@@ -2379,14 +2379,83 @@ then passes the full key to `0x800070`. That helper searches `this+0x24` and
 `+0x10/+0x14`, and the mapped pointer is at node `+0x18`. On a first-tree
 miss, after the `0x800BF0` creation checks allow it, the callback at context
 `+0x14` is called with the QWORD; its dispatcher `0x81B1B0` accepts low-byte
-values `0x02..0x35`, but the individual factory cases are not mapped here.
+values `0x02..0x35`; selectors `0x02..0x09` are resolved in the bounded
+first-eight-case mapping below.
 Entry creation uses `0x806910` and tree insertion uses `0x8064C0`; a separate
 guarded path at `0x800300` inserts a QWORD-keyed entry into the `+0x2C` tree.
-These observations establish a keyed lookup and
-registration mechanism, not a message namespace or a Character/Vehicle
-family assignment. The field offsets and original-image byte checks are
-recorded in `MatrixMessageNamespaceRoutingNativeLayout.cs` and
-`StartupBinaryEvidence.cs`.
+These observations establish the keyed lookup and registration mechanism, not
+the meaning of an individual factory selector. The first eight factory cases
+are now mapped below using their constructors, installed primary vtables, RTTI,
+and subsequent receiver call path.
+
+### QWORD-keyed receiver factory: first eight cases
+
+Factory `0x81B1B0` receives the key used by the `0x800070` registry-miss path.
+It reads only the low byte of that argument for table selection:
+`movzx eax, al; add eax, -2; cmp eax, 0x33; ja 0x81BA93; jmp
+[0xC1C6A8+eax*4]`. Thus the table has 52 entries and accepts low-byte values
+`0x02..0x35`; table VA `0xC1C6A8` maps to raw `0x81BAA8`. The low byte is a
+factory selector, not evidence by itself of a message namespace. The full
+QWORD remains the registry key at message `+0x18/+0x1C`. `0x800420` obtains the
+registered object through `0x800070`, then uses the returned pointer as the
+receiver in its compact-selector dispatch.
+
+Only entries `0x02..0x09` are mapped in this pass. Each factory case allocates
+the listed size through `0x12B7FB0`, calls its constructor, and the constructor
+installs the listed RTTI-backed primary vtable. Text targets use the verified
+raw-to-VA delta `+0x400C00`; vtable file offsets use the original PE section
+map (`.rdata`), not that `.text` delta.
+
+| Key low byte | Case raw / VA | Allocation | Constructor raw | Primary vtable VA / raw | Primary slots `+04 / +08 / +0C / +18` (raw) | RTTI |
+| --- | --- | ---: | --- | --- | --- | --- |
+| `02` | `81B1F2 / C1BDF2` | `B80` | `53F980` | `1C66080 / 1864C80` | `540380 / 541220 / 5441B0 / 54DE00` | `.?AVBaseController@Character@firefall@@` |
+| `03` | `81B230 / C1BE30` | `D80` | `54E7B0` | `1C65F1C / 1864B1C` | `54F4A0 / 5503D0 / 5536C0 / 55E160` | `.?AVNPCController@Character@firefall@@` |
+| `04` | `81B26E / C1BE6E` | `11D8` | `55E830` | `1C65EF8 / 1864AF8` | `55EAA0 / 55EB10 / 561CF0 / 56B310` | `.?AVMissionAndMarkerController@Character@firefall@@` |
+| `05` | `81B2AC / C1BEAC` | `12C0` | `56B970` | `1C65ED4 / 1864AD4` | `56BC20 / 56C0D0 / 56F3A0 / 576C80` | `.?AVCombatController@Character@firefall@@` |
+| `06` | `81B2EA / C1BEEA` | `538` | `577320` | `1C65E8C / 1864A8C` | `577410 / 577480 / 5795A0 / 57FBD0` | `.?AVLocalEffectsController@Character@firefall@@` |
+| `07` | `81B328 / C1BF28` | `A0` | `57FF80` | `1C65EB0 / 1864AB0` | `5800E0 / 580150 / 580470 / 580F40` | `.?AVSpectatorController@Character@firefall@@` |
+| `08` | `81B366 / C1BF66` | `4F8` | `581070` | `1C65E2C / 1864A2C` | `581480 / 5817D0 / 5835C0 / 588500` | `.?AVObserverView@Character@firefall@@` |
+| `09` | `81B3A4 / C1BFA4` | `420` | `588830` | `1C65DF4 / 18649F4` | `5889F0 / 588A90 / 589040 / 58A440` | `.?AVEquipmentView@Character@firefall@@` |
+
+This family assignment comes from the concrete constructor-installed vtables
+and PE-resolved RTTI names, not from treating the low byte as a namespace ID.
+It also corrects the provisional “message factory” interpretation: these are
+`Character` controller/view receiver objects registered against QWORD keys,
+not per-message parser objects.
+
+The receiver's primary slots are reached through the separate compact selector
+at message `+0x10`: selector 1 calls `+0x08`; 2 calls `+0x18`; 3 and 4 call
+`+0x0C`; 7 and 8 call `+0x04`; and 9 calls `+0x18`. Selectors 5 and 6 share
+the direct helper at `0x800300` and do not call one of these primary slots.
+The `+0x04` methods for `BaseController`, `NPCController`, `CombatController`,
+and `ObserverView` dispatch message IDs from `message+0x10` over respective
+observed ranges `0x53..0xC4`, `0x53..0xC4`, `0x56..0xA8`, and `0x5B..0xAB`,
+subject to the receiver state flag. They first forward to an optional nested
+object at receiver `+0x10`; the dispatcher tables themselves are not decoded
+here. The `+0x04` methods for `MissionAndMarkerController`,
+`LocalEffectsController`, `SpectatorController`, and `EquipmentView` forward
+to that optional nested object and conditionally emit the fixed
+"this view doesn't have any valid events" message, without a message-ID
+argument. These forwarding/logging defaults are not empty stubs and differ
+from the dispatchers' invalid-message-ID reporting.
+
+All eight `+0x18` targets are short state-refresh wrappers: they call the
+indirect helper at `dword_1AC4D24`, store its result at receiver `+0x28`, and
+call `orchestrator_BCADF0`. They ignore the payload arguments at this entry
+point but are not no-op stubs. The `+0x08` and `+0x0C` targets are reached with
+parsed byte data and lengths by their compact-selector paths; their individual
+payload fields and dispatch tables are outside this bounded pass. In
+particular, the vtable targets at `0x5536C0` and `0x5795A0` begin with valid
+code prologues, but IDA did not recover their function boundaries, so they are
+not classified as stubs.
+
+The exact table, constructor/vtable/RTTI snapshots, compact-selector call
+sites, and original-image fingerprints are kept separately in
+`MatrixKeyedReceiverFactoryNativeLayout.cs`,
+`MatrixMessageNamespaceRoutingNativeLayout.cs`, and
+`StartupBinaryEvidence.cs`. Cases `0x0A..0x35` remain unmapped; this batch did
+not find Vehicle, AreaVisualData, Deployable, Turret, or LootStoreExtension
+types in the factory.
 
 The `0xBD7060` fan-out is a separate conditional side path: `0x7FDC60` reaches
 it when the message predicate at `message+0x18` returns zero and context

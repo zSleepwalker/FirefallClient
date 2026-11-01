@@ -3500,6 +3500,85 @@ Check("Matrix envelope-QWORD registry lookup and insertion layout is recorded",
     && envelopeRegistry.DirectProtocolHandlerDispatcherFileOffset == 0x81BB90
     && MatrixMessageNamespaceRoutingNativeLayout.EnvelopeRegistrySecondMapUpdateFileOffset == 0x800300
     && MatrixMessageNamespaceRoutingNativeLayout.EnvelopeRegistrySecondMapInsertCallFileOffset == 0x8003FF);
+var keyedReceiverCases = MatrixKeyedReceiverFactoryNativeLayout.FirstEightCases;
+Check("Matrix keyed receiver factory bounds and first eight RTTI-backed Character constructors are recorded",
+    MatrixKeyedReceiverFactoryNativeLayout.FactoryFileOffset == 0x81B1B0
+    && MatrixKeyedReceiverFactoryNativeLayout.FactoryVirtualAddress == 0xC1BDB0
+    && MatrixKeyedReceiverFactoryNativeLayout.FactoryByteDispatchFileOffset == 0x81B1DC
+    && MatrixKeyedReceiverFactoryNativeLayout.JumpTableFileOffset == 0x81BAA8
+    && MatrixKeyedReceiverFactoryNativeLayout.JumpTableVirtualAddress == 0xC1C6A8
+    && MatrixKeyedReceiverFactoryNativeLayout.JumpTableEntryCount == 0x34
+    && MatrixKeyedReceiverFactoryNativeLayout.JumpTableEntrySize == 4
+    && MatrixKeyedReceiverFactoryNativeLayout.FactoryIndexSubtract == 2
+    && MatrixKeyedReceiverFactoryNativeLayout.FactoryIndexMaximum == 0x33
+    && MatrixKeyedReceiverFactoryNativeLayout.FactorySelectorMinimum == 2
+    && MatrixKeyedReceiverFactoryNativeLayout.FactorySelectorMaximum == 0x35
+    && MatrixKeyedReceiverFactoryNativeLayout.EnvelopeKeyLowDwordFieldOffset == 0x18
+    && MatrixKeyedReceiverFactoryNativeLayout.EnvelopeKeyHighDwordFieldOffset == 0x1C
+    && keyedReceiverCases.Count == 8
+    && keyedReceiverCases.Select(snapshot => snapshot.Selector).SequenceEqual(Enumerable.Range(2, 8))
+    && keyedReceiverCases.All(snapshot =>
+        snapshot.CaseTargetVirtualAddress
+            == snapshot.CaseTargetFileOffset
+                + MatrixKeyedReceiverFactoryNativeLayout.RawTextOffsetToVirtualAddressDelta
+        && snapshot.TableEntryFileOffset
+            == MatrixKeyedReceiverFactoryNativeLayout.JumpTableFileOffset
+                + (uint)((snapshot.Selector
+                    - MatrixKeyedReceiverFactoryNativeLayout.FactorySelectorMinimum)
+                    * MatrixKeyedReceiverFactoryNativeLayout.JumpTableEntrySize)
+        && snapshot.AllocatorCallFileOffset == snapshot.CaseTargetFileOffset + 5
+        && snapshot.ConstructorCallFileOffset == snapshot.CaseTargetFileOffset + 0x29
+        && snapshot.RttiName.Contains("Character@firefall@@", StringComparison.Ordinal))
+    && keyedReceiverCases.Select(snapshot => snapshot.AllocationSize).SequenceEqual(
+        [0xB80u, 0xD80u, 0x11D8u, 0x12C0u, 0x538u, 0xA0u, 0x4F8u, 0x420u])
+    && keyedReceiverCases.Select(snapshot => snapshot.ConstructorFileOffset).SequenceEqual(
+        [0x53F980u, 0x54E7B0u, 0x55E830u, 0x56B970u, 0x577320u, 0x57FF80u, 0x581070u, 0x588830u])
+    && keyedReceiverCases.Select(snapshot => snapshot.PrimaryVtableVirtualAddress).Distinct().Count() == 8
+    && keyedReceiverCases.Select(snapshot => snapshot.PrimaryVtableFileOffset).SequenceEqual(
+        [0x1864C80u, 0x1864B1Cu, 0x1864AF8u, 0x1864AD4u, 0x1864A8Cu, 0x1864AB0u, 0x1864A2Cu, 0x18649F4u])
+    && keyedReceiverCases.All(snapshot => snapshot.TypeDescriptorVirtualAddress != 0
+        && snapshot.CompleteObjectLocatorVirtualAddress != 0));
+var keyedReceiverSlots = MatrixKeyedReceiverFactoryNativeLayout.PrimaryVtableSlots;
+Check("Matrix keyed receiver selector routes distinguish message dispatchers, forwarding defaults, and setup wrappers",
+    keyedReceiverSlots.Count == 32
+    && keyedReceiverCases.All(receiverCase => keyedReceiverSlots
+        .Where(slot => slot.FactorySelector == receiverCase.Selector)
+        .Select(slot => slot.SlotOffset)
+        .SequenceEqual([0x04, 0x08, 0x0C, 0x18]))
+    && keyedReceiverSlots.All(slot =>
+        slot.MethodVirtualAddress
+            == slot.MethodFileOffset
+                + MatrixKeyedReceiverFactoryNativeLayout.RawTextOffsetToVirtualAddressDelta)
+    && keyedReceiverSlots.Where(slot => slot.SlotOffset == 0x18)
+        .All(slot => slot.ImplementationObservation.Contains("State-refresh wrapper", StringComparison.Ordinal))
+    && keyedReceiverSlots.Count(slot => slot.SlotOffset == 0x04
+        && slot.ImplementationObservation.Contains("Message-ID dispatcher", StringComparison.Ordinal)) == 4
+    && keyedReceiverSlots.Count(slot => slot.SlotOffset == 0x04
+        && slot.ImplementationObservation.Contains("Optional nested-receiver forwarder", StringComparison.Ordinal)) == 4
+    && MatrixKeyedReceiverFactoryNativeLayout.CompactSelectorDispatcherFileOffset == 0x800420
+    && MatrixKeyedReceiverFactoryNativeLayout.CompactMessageSelectorFieldOffset == 0x10
+    && MatrixKeyedReceiverFactoryNativeLayout.CompactSelectorRoutes.Select(route => route.Selector)
+        .SequenceEqual(Enumerable.Range(1, 9))
+    && MatrixKeyedReceiverFactoryNativeLayout.CompactSelectorRoutes
+        .Where(route => route.ReceiverVtableSlotOffset is not null)
+        .Select(route => (route.Selector, route.ReceiverVtableSlotOffset))
+        .SequenceEqual(
+        [
+            (1, (int?)0x08),
+            (2, 0x18),
+            (3, 0x0C),
+            (4, 0x0C),
+            (7, 0x04),
+            (8, 0x04),
+            (9, 0x18)
+        ])
+    && MatrixKeyedReceiverFactoryNativeLayout.CompactSelectorRoutes
+        .Where(route => route.DirectHelperFileOffset is not null)
+        .Select(route => route.Selector).SequenceEqual([5, 6])
+    && keyedReceiverSlots.Where(slot => slot.FactorySelector == 0x03 && slot.SlotOffset == 0x0C)
+        .Single().MethodFileOffset == 0x5536C0
+    && keyedReceiverSlots.Where(slot => slot.FactorySelector == 0x06 && slot.SlotOffset == 0x0C)
+        .Single().MethodFileOffset == 0x5795A0);
 Check("Conditional message fan-out records its constructed keyed state and recipient-vector call",
     MatrixMessageParserFlowNativeLayout.ConditionalFanoutStateLazyConstructionMethodFileOffset == 0x7FE1C0
     && MatrixMessageParserFlowNativeLayout.ConditionalFanoutStateConstructorFileOffset == 0xBD6E10

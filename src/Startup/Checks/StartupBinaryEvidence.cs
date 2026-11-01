@@ -4443,6 +4443,66 @@ internal static class StartupBinaryEvidence
                 MatrixMessageNamespaceRoutingNativeLayout.EnvelopeRegistrySecondMapInsertCallFileOffset,
                 0xE8,
                 envelopeRegistry.RegistryInsertFileOffset));
+        var keyedReceiverCases = MatrixKeyedReceiverFactoryNativeLayout.FirstEightCases;
+        var keyedReceiverCasesBySelector = keyedReceiverCases.ToDictionary(snapshot => snapshot.Selector);
+        var keyedReceiverSlots = MatrixKeyedReceiverFactoryNativeLayout.PrimaryVtableSlots;
+        var compactSelectorRoutes = MatrixKeyedReceiverFactoryNativeLayout.CompactSelectorRoutes;
+        check("Binary keyed-receiver factory bounds, first eight constructors, vtables, and RTTI match the original image",
+            imageBase == 0x400000
+            && MatrixKeyedReceiverFactoryNativeLayout.RawTextOffsetToVirtualAddressDelta
+                == imageBase + textSection.Rva - textSection.RawOffset
+            && VirtualAddressToFileOffset(MatrixKeyedReceiverFactoryNativeLayout.FactoryVirtualAddress)
+                == MatrixKeyedReceiverFactoryNativeLayout.FactoryFileOffset
+            && VirtualAddressToFileOffset(MatrixKeyedReceiverFactoryNativeLayout.JumpTableVirtualAddress)
+                == MatrixKeyedReceiverFactoryNativeLayout.JumpTableFileOffset
+            && Matches(MatrixKeyedReceiverFactoryNativeLayout.FactoryByteDispatchFileOffset,
+                "0FB6C083C0FE83F8330F87A8080000FF2485A8C6C100")
+            && keyedReceiverCases.Count == 8
+            && keyedReceiverCases.All(snapshot =>
+                ReadUInt32(snapshot.TableEntryFileOffset) == snapshot.CaseTargetVirtualAddress
+                && VirtualAddressToFileOffset(snapshot.CaseTargetVirtualAddress)
+                    == snapshot.CaseTargetFileOffset
+                && Matches(snapshot.CaseTargetFileOffset,
+                    "68" + UInt32LittleEndianHex(snapshot.AllocationSize))
+                && RelativeBranchTargets(snapshot.AllocatorCallFileOffset, 0xE8,
+                    MatrixKeyedReceiverFactoryNativeLayout.AllocatorFileOffset)
+                && RelativeBranchTargets(snapshot.ConstructorCallFileOffset, 0xE8,
+                    snapshot.ConstructorFileOffset)
+                && ContainsConstructorCall(snapshot.ConstructorFileOffset,
+                    MatrixKeyedReceiverFactoryNativeLayout.SharedBaseConstructorHelperFileOffset)
+                && Matches(snapshot.PrimaryVtableStoreImmediateFileOffset - 2,
+                    snapshot.PrimaryVtableStoreOpcodeHex
+                        + UInt32LittleEndianHex(snapshot.PrimaryVtableVirtualAddress))
+                && VirtualAddressToFileOffset(snapshot.PrimaryVtableVirtualAddress)
+                    == snapshot.PrimaryVtableFileOffset
+                && ReadUInt32(snapshot.PrimaryVtableFileOffset - 4)
+                    == snapshot.CompleteObjectLocatorVirtualAddress
+                && ReadUInt32(VirtualAddressToFileOffset(
+                    snapshot.CompleteObjectLocatorVirtualAddress) + 12)
+                    == snapshot.TypeDescriptorVirtualAddress
+                && VtableRttiName(snapshot.PrimaryVtableVirtualAddress, 80) == snapshot.RttiName)
+            && keyedReceiverSlots.All(slot =>
+                ReadUInt32(keyedReceiverCasesBySelector[slot.FactorySelector].PrimaryVtableFileOffset
+                    + slot.SlotOffset) == slot.MethodVirtualAddress
+                && VirtualAddressToFileOffset(slot.MethodVirtualAddress) == slot.MethodFileOffset));
+        check("Binary keyed-receiver lookup result and compact selector routes call the recorded receiver slots",
+            Matches(0x800453, "8B7E108B46188B4E1C")
+            && RelativeBranchTargets(0x800611, 0xE8,
+                MatrixMessageNamespaceRoutingNativeLayout.EnvelopeKeyRegistryLookupFileOffset)
+            && Matches(0x800616, "8BD8")
+            && Matches(0x800698, "83FF08")
+            && Matches(0x8006A1, "FF24BD7015C000")
+            && compactSelectorRoutes.All(route =>
+                ReadUInt32(VirtualAddressToFileOffset(
+                    MatrixKeyedReceiverFactoryNativeLayout.CompactSelectorJumpTableVirtualAddress)
+                    + (route.Selector
+                        - MatrixKeyedReceiverFactoryNativeLayout.CompactSelectorFirstValue) * 4)
+                    == route.DispatcherCaseFileOffset
+                        + MatrixKeyedReceiverFactoryNativeLayout.RawTextOffsetToVirtualAddressDelta
+                && Matches(route.CallSiteFileOffset, route.ExpectedCallInstructionHex)
+                && (route.DirectHelperFileOffset is null
+                    || RelativeBranchTargets(route.CallSiteFileOffset, 0xE8,
+                        route.DirectHelperFileOffset.Value))));
         check("Binary conditional fan-out gate, state construction, recipient insertion, and slot call match the original image",
             Matches(0x7FDD64, "83BEB0000000007419")
             && RelativeBranchTargets(0x7FDD81, 0xE8,

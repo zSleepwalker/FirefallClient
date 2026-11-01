@@ -88,9 +88,25 @@
   to `0x800070`; its tree search `0x8013B0` compares QWORD keys at node
   `+0x10/+0x14`, with mapped pointer at `+0x18`. `0x806910` creates entries
   and `0x8064C0` inserts them; a guarded path at `0x800300` also inserts into
-  `+0x2C`. Factory `0x81B1B0` accepts low-byte selectors `0x02..0x35`, but
-  individual cases were not mapped, so message namespace and Character/
-  Vehicle assignment remain unresolved.
+  `+0x2C`. Factory `0x81B1B0` indexes a 52-entry absolute-VA table at
+  `0xC1C6A8` / raw `0x81BAA8` using `lowByte-2` and accepts `0x02..0x35`.
+  The first eight entries (`0x02..0x09`) now resolve to RTTI-backed
+  `Character` controller/view classes: `BaseController`, `NPCController`,
+  `MissionAndMarkerController`, `CombatController`, `LocalEffectsController`,
+  `SpectatorController`, `ObserverView`, and `EquipmentView`. Their allocator
+  sizes, constructor/vtable addresses, `.rdata` raw mappings, and primary
+  slots are recorded in `src/Startup/MatrixKeyedReceiverFactoryNativeLayout.cs`.
+  This proves these first cases create keyed Character receiver objects, not
+  Matrix parser-message instances; the low byte is only the factory selector.
+  `0x800420` uses the returned receiver for a separate compact-selector
+  dispatch on message `+0x10`. Its `+0x04` slot includes four internal
+  message-ID dispatchers and four optional-child forwarding/logging defaults;
+  all `+0x18` slots are non-no-op state-refresh wrappers that ignore the
+  payload arguments. The `+0x08/+0x0C` slot bodies are not exhaustively
+  decoded, and `0x5536C0` / `0x5795A0` remain function-boundary unresolved
+  despite code prologues. Cases `0x0A..0x35` and whether later cases include
+  Vehicle or the other parser families remain unverified. See
+  `docs/MatrixConnection.md` for the caller path and bounded evidence.
 - The gated `0xBD7060` path serializes the message QWORD and message data into
   its output stream, then passes the selector separately to `0xBD7460`,
   which stores it in the recipient callback's local record, not the stream.
