@@ -1089,23 +1089,24 @@ subcases: three at route2, nine at route3, three at route4, and one each at
 routes5 and6. All 17 subcases now have native layouts.
 Route0's nested table has a separate, complete set of 40 documented selectors
 (`0x53..0x7A`); route1 is the zero-return route. The secondary selector table
-records 91 dispatch targets. Selectors `0x20..0x27` now have RTTI-backed class
-and body-reader layouts; the remaining 83 identities are unresolved. All 91
-table entries are nonzero and have distinct targets in the original binary,
-which establishes address uniqueness, not 91 completed identities.
+records 91 dispatch targets. Selectors `0x20..0x2F` now have 16 RTTI-backed
+class and body-reader layouts; the remaining 75 identities are unresolved.
+All 91 table entries are nonzero and have distinct targets in the original
+binary, which establishes address uniqueness, not 91 completed identities.
 
-### Secondary-selector entries `0x20..0x27`
+### Secondary-selector entries `0x20..0x2F`
 
 This is the separate second table used by the leading-byte-zero and
-`0xF0..0xFF` path in `0x81CC50`, not the primary byte map, route0's nested
-Character table, or the keyed-receiver factory at `0x81B1B0`. In that path the
-parser reads its selector argument from `[ebp+8]`, subtracts `0x20`, accepts
-indices `0..0x5A`, then dispatches through the DWORD table at VA `0xC22630`
-(raw file offset `0x821A30`). The original PE confirms `.text` raw offsets map
-to VA with `+0x400C00` and `.rdata` offsets with `+0x401400`; vtable RTTI below
-was resolved through each section's file-backed range and MSVC complete-object
-locator, not by treating a VA as a raw offset. Selector values outside
-`0x20..0x7A` reach the shared zero-return block at raw `0x8217D9`.
+`0xF0..0xFF` path in `0x81CC50`. Its index is `selector - 0x20`, with accepted
+selectors `0x20..0x7A`, and the DWORD table is at VA `0xC22630` (raw file
+offset `0x821A30`). It is distinct from the keyed-receiver factory's selector
+range `0x02..0x35` and route0's nested Character selectors `0x53..0x7A`.
+The original PE confirms `.text` raw offsets map to VA with `+0x400C00`;
+`.rdata` vtable/RTTI locations use section-aware file-backed mapping (the
+section start delta is `+0x401400`). Vtable names below were resolved through
+their MSVC complete-object locators, not by treating VAs as raw offsets.
+Selectors outside `0x20..0x7A` reach the shared zero-return block at raw
+`0x8217D9`.
 
 | Selector | Table index | Target VA / raw | Alloc size | Constructor (raw) | Vtable VA / RTTI | Body reader (raw) |
 | ---: | ---: | ---: | ---: | ---: | --- | ---: |
@@ -1117,22 +1118,37 @@ locator, not by treating a VA as a raw offset. Selector values outside
 | `0x25` | 5 | `0xC201C5` / `0x81F5C5` | `0x30` | `0x813EA0` | `0x1C6E238` / `ScoreBoardSetWinner` | `0x337180` |
 | `0x26` | 6 | `0xC2022F` / `0x81F62F` | `0x28` | `0x813F50` | `0x1C6E1F8` / `ScoreBoardClear` | none |
 | `0x27` | 7 | `0xC20283` / `0x81F683` | `0x58` | `0x813FC0` | `0x1C6E218` / `ScoreBoardAddPlayer` | `0x851490` |
+| `0x28` | 8 | `0xC202EB` / `0x81F6EB` | `0x30` | `0x814170` | `0x1C6E208` / `ScoreBoardRemovePlayer` | `0x356F80` |
+| `0x29` | 9 | `0xC20356` / `0x81F756` | `0x48` | `0x814230` | `0x1C6E1D8` / `ScoreBoardUpdatePlayerStats` | `0x851410` |
+| `0x2A` | 10 | `0xC203BE` / `0x81F7BE` | `0x40` | `0x814390` | `0x1C6E1E8` / `ScoreBoardUpdatePlayerStatsFromStats` | `0x851370` |
+| `0x2B` | 11 | `0xC20426` / `0x81F826` | `0x48` | `0x814500` | `0x1C6E1B8` / `ScoreBoardUpdatePlayerStatus` | `0x8506B0` |
+| `0x2C` | 12 | `0xC2048E` / `0x81F88E` | `0x38` | `0x8145F0` | `0x1C6E1A8` / `MatchLoadingState` | `0x356CF0`, `0x8503E0` |
+| `0x2D` | 13 | `0xC20502` / `0x81F902` | `0x30` | `0x814780` | `0x1C6E1C8` / `MatchEndAck` | `0x356F80` (shared continuation) |
+| `0x2E` | 14 | `0xC2054A` / `0x81F94A` | `0x40` | `0x814840` | `0x1C6E188` / `ServerProfiler_SendNames` | `0x34E700` twice |
+| `0x2F` | 15 | `0xC205BE` / `0x81F9BE` | `0x38` | `0x8149D0` | `0x1C6E178` / `ServerProfiler_SendFrame` | `0x34D6D0` |
 
-These eight entries have eight distinct, nonzero table destinations. No shared
-case or zero-valued table slot occurs in this verified prefix. Selector `0x26`
-does have a distinct allocation-failure branch to the common zero-return block;
-that is a case-path result, not a zero table entry.
+These sixteen entries have sixteen distinct, nonzero table destinations. No
+shared case or zero-valued table slot occurs in this verified prefix. Selector
+`0x26` does have a distinct allocation-failure branch to the common zero-return
+block; that is a case-path result, not a zero table entry. Selectors `0x28`
+and `0x2D` share a body-reader continuation at raw `0x81F72E`, but their
+selector-table destinations and RTTI-identified types remain distinct.
 
-All eight constructors call a selector-specific base-metadata initializer
-(`0x823020`, `0x823090`, `0x823100`, `0x823170`, `0x8231E0`, `0x823250`,
-`0x8232C0`, `0x823330`) before storing the derived vtable. The initializer
-sets a base flag DWORD at `+0x08` to 1, stores its descriptor-anchor pointer at
-`+0x0C`, stores the selector/type DWORD at `+0x10`, copies the parser input's
-first two DWORDs to `+0x18/+0x1C`, and zeros DWORDs at `+0x20/+0x24`. Thus the
-message body begins at `+0x28`. The descriptor anchors are opaque metadata
-pointers; class identities in the table come from the section-aware vtable
-RTTI names. No field semantics are inferred from the class names or from a
-reader being shared.
+All sixteen constructors call a selector-specific base-metadata initializer
+before storing the derived vtable. For selectors `0x20..0x27` these helpers
+are `0x823020`, `0x823090`, `0x823100`, `0x823170`, `0x8231E0`, `0x823250`,
+`0x8232C0`, and `0x823330`; for `0x28..0x2F` they are `0x8233C0`, `0x823430`,
+`0x8234A0`, `0x823510`, `0x823580`, `0x8236F0`, `0x823760`, and `0x8237D0`.
+Each helper sets a base flag DWORD at `+0x08` to 1, stores its
+descriptor-anchor pointer at `+0x0C`, stores the constructor-supplied type
+DWORD at `+0x10`, copies the parser input's first two DWORDs to `+0x18/+0x1C`,
+and zeros DWORDs at `+0x20/+0x24`. Thus the message body begins at `+0x28`.
+The descriptor anchors are opaque metadata pointers; class identities in the
+table come from the section-aware vtable RTTI names. The cases also write
+parser-local DWORD literals `0x08..0x0F` into a separate stack slot for this
+batch. Their role is unknown; their numerical coincidence with table indexes
+8..15 does not establish that they are selector indexes or message
+discriminators.
 
 Body reads, with field labels deliberately limited to offsets and widths:
 
@@ -1164,12 +1180,60 @@ Body reads, with field labels deliberately limited to offsets and widths:
 - `0x27` `ScoreBoardAddPlayer`: raw QWORDs at `+0x28/+0x30`, shared text at
   `+0x38`, DWORD at `+0x3C`, byte at `+0x40`, DWORD at `+0x44`, byte at
   `+0x48`, then byte at `+0x4C`, byte at `+0x51`, and byte at `+0x50`.
+- `0x28` `ScoreBoardRemovePlayer`: raw QWORD at `+0x28`.
+- `0x29` `ScoreBoardUpdatePlayerStats`: raw QWORD at `+0x28`, then a
+  four-byte wire gate. Gate value 1 reads a WORD-length-prefixed blob into
+  `+0x34`; other values reset/default that blob destination. The gate is not
+  retained by this reader. The constructor initializes `+0x34` to the
+  static value `0x1C80CC4`; neither the gate's application meaning nor the
+  blob's semantic type is inferred.
+- `0x2A` `ScoreBoardUpdatePlayerStatsFromStats`: raw QWORD at `+0x28`, then a
+  byte-counted collection at `+0x30` (begin/end/capacity pointers at
+  `+0x30/+0x34/+0x38`). Count `0xFF` continues with another count byte; zero
+  ends the collection. Each collection item reads a DWORD, then a nested
+  structure whose DWORD count frames repeated NUL-terminated shared-text
+  entries followed by DWORD tags. The nested tag reader dispatches values
+  1..16; the exact per-tag payload layouts remain unresolved (one branch is
+  observed to read NUL-terminated shared text). Native top-level entries
+  have `0x10`-byte stride. These count/tag values are framing observations; no
+  application meanings or field names are assigned.
+- `0x2B` `ScoreBoardUpdatePlayerStatus`: raw QWORD at `+0x28`, then byte at
+  `+0x30`, DWORD at `+0x34`, byte at `+0x38`, byte at `+0x3C`, byte at
+  `+0x41`, and byte at `+0x40`, in that read order. The constructor
+  initializes WORD `+0x40` to 1; meanings of the scalar fields remain open.
+- `0x2C` `MatchLoadingState`: byte at `+0x28`, then a byte-counted vector at
+  `+0x2C/+0x30/+0x34`. Count `0xFF` continues with another count byte; zero
+  ends the vector. Each `0x10`-stride item reads raw QWORD, NUL-terminated
+  shared text, then one byte.
+- `0x2D` `MatchEndAck`: raw QWORD at `+0x28`; it reuses selector `0x28`'s
+  `0x356F80` body-reader continuation. On allocation failure, its case
+  branches to selector `0x28`'s zero-object block at `0x81F72C`, then reaches
+  the same reader at `0x81F72E`.
+- `0x2E` `ServerProfiler_SendNames`: two vectors at
+  `+0x28/+0x2C/+0x30` and `+0x34/+0x38/+0x3C`, each read by `0x34E700`.
+  Each vector uses a byte count with `0xFF` continuation and zero termination;
+  each item reads a WORD followed by NUL-terminated shared text and has
+  `0x08`-byte native stride.
+- `0x2F` `ServerProfiler_SendFrame`: root vector at
+  `+0x28/+0x2C/+0x30`, with byte counts and `0xFF` continuation. Each root
+  entry is a WORD followed by a recursively counted child vector. Root entries
+  have `0x10`-byte native stride (WORD at `+0`, child vector at `+4`). Each
+  nested entry reads nine WORDs before its child vector, uses `0x20`-byte
+  native stride (first WORD at `+0`, child vector at `+4`, eight trailing
+  WORDs at `+0x10..+0x1E`), and recursively repeats the same nested shape.
+  These WORDs remain offset-only fields.
 
-On allocation failure, selectors `0x20..0x25` and `0x27` set the object
-register to zero but still fall through to their body-reader call; selector
-`0x26` instead branches directly to the shared zero-return block. These are
-static control-flow observations only; their runtime consequence is not
-asserted.
+The binary checks fingerprint each reader's receiver displacements and helper
+call order from instruction bytes, along with the observed primitive and
+count/gate widths. They assert wire framing only; unresolved field, gate,
+count, and tag meanings remain unassigned.
+
+On allocation failure, selectors `0x20..0x25`, `0x27..0x2C`, and `0x2E..0x2F`
+set the object register to zero but still fall through to their body-reader
+call. Selector `0x2D` branches through selector `0x28`'s zero-object block and
+shared reader continuation. Selector `0x26` instead branches directly to the
+shared zero-return block. These are static control-flow observations only;
+their runtime consequence is not asserted.
 
 ### Route index 2, dispatcher value `0x53`: `AreaVisualData::LootObjectCollected`
 

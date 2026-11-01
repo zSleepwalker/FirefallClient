@@ -21,20 +21,31 @@
 - Secondary selectors in `0x81CC50` use the separate 91-entry table at VA
   `0xC22630` / raw `0x821A30`: `[ebp+8] - 0x20`, bounded through index
   `0x5A`, then indexed by DWORD. The original binary has 91 nonzero, distinct
-  destinations; only selectors `0x20..0x27` now have verified message
-  identities/layouts, so the remaining 83 identities are unresolved. See the
-  new C# snapshots and `docs/MatrixConnection.md`.
-- The first eight secondary cases are RTTI-backed `EncounterToUIMessage`,
-  `VotekickInitiated`, `VotekickResponded`, and `ScoreBoardEnable/Init/
-  SetWinner/Clear/AddPlayer`. Their common base initializer writes marker
-  `+0x08`, descriptor anchor `+0x0C`, selector ID `+0x10`, parser-context
-  copies `+0x18/+0x1C`, and zeros `+0x20/+0x24`; body begins `+0x28`.
-  `ScoreBoardInit` owns the nontrivial `0xA8`-stride nested record sequence.
-  Table targets are all unique in this batch (no shared/zero table slots);
-  out-of-range selectors share zero-return raw `0x8217D9`. Selector `0x26`
-  also branches there on allocation failure, while the other seven cases
-  fall through to readers with a zero object register; no runtime consequence
-  is asserted.
+  destinations; selectors `0x20..0x2F` now have 16 verified message
+  identities/layouts, leaving 75 identities unresolved. The table index is
+  distinct from the keyed-receiver factory's `0x02..0x35` selectors and the
+  route0 Character table's `0x53..0x7A` selectors. Continue at selector
+  `0x30`; see the C# snapshots and `docs/MatrixConnection.md`.
+- The first sixteen secondary cases are RTTI-backed:
+  `EncounterToUIMessage`, `VotekickInitiated`, `VotekickResponded`,
+  `ScoreBoardEnable/Init/SetWinner/Clear/AddPlayer/RemovePlayer/
+  UpdatePlayerStats/UpdatePlayerStatsFromStats/UpdatePlayerStatus`,
+  `MatchLoadingState`, `MatchEndAck`, and `ServerProfiler_SendNames/
+  ServerProfiler_SendFrame`. Their common base initializer writes marker
+  `+0x08`, descriptor anchor `+0x0C`, constructor type DWORD `+0x10`,
+  parser-context copies `+0x18/+0x1C`, and zeros `+0x20/+0x24`; body begins
+  `+0x28`. Selector `0x2A` contains a byte-counted collection with nested
+  DWORD-counted tagged entries; tags 1..16 dispatch, but their full variant
+  layouts remain unresolved. Selectors `0x2E/0x2F` use byte-counted (`0xFF`
+  continuation) lists; `0x2F` recurses through nested 0x20-byte records.
+  Parser-local DWORD literals `0x08..0x0F` are preserved separately from
+  table indexes; their role is unknown. All 16 table targets are distinct and
+  nonzero. Selectors `0x28` and `0x2D` share a body-reader continuation even
+  though their table destinations/types differ. Out-of-range selectors share
+  zero-return raw `0x8217D9`; selector `0x26` branches there on allocation
+  failure, while the other cases continue to readers with a zero object
+  register, including `0x2D` through `0x28`'s continuation. No runtime
+  consequence is asserted.
 - Keep this table distinct from the unrelated keyed-receiver factory
   `0x81B1B0`, route0's nested Character selectors `0x53..0x7A`, and primary
   routes 2-6. `.text` and `.rdata` section-aware vtable RTTI names were

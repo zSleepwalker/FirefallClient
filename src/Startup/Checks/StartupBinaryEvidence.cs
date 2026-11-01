@@ -1262,6 +1262,187 @@ internal static class StartupBinaryEvidence
                 (0x8514F4, 0x356CF0), (0x8514FE, 0x337180)
             }.All(call => RelativeBranchTargets(call.CallSite, 0xE8, call.Target))
             && Matches(0x81F65E, "0F8475210000"));
+        check("Binary secondary selectors 0x28-0x2F map to eight unique section-aware RTTI-backed message cases",
+            MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
+                .Where(entry => entry.Selector >= 0x28 && entry.Selector <= 0x2F)
+                .Select((entry, index) => ReadUInt32(
+                    MatrixSecondaryDecoderTableNativeLayout.TableFileOffset + (uint)((index + 8) * 4))
+                    == entry.TargetVirtualAddress
+                    && entry.TargetVirtualAddress == entry.TargetFileOffset + 0x400C00)
+                .All(matches => matches)
+            && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
+                .Where(entry => entry.Selector >= 0x28 && entry.Selector <= 0x2F)
+                .All(entry => entry.TargetVirtualAddress != 0
+                    && entry.TargetKind == MatrixSecondaryDecoderTargetKind.MessageCase)
+            && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
+                .Where(entry => entry.Selector >= 0x28 && entry.Selector <= 0x2F)
+                .Select(entry => entry.TargetVirtualAddress)
+                .Distinct().Count() == 8
+            && VtableRttiName(ScoreBoardRemovePlayerNativeLayout.VtableVirtualAddress, 80)
+                == ScoreBoardRemovePlayerNativeLayout.RttiName
+            && VtableRttiName(ScoreBoardUpdatePlayerStatsNativeLayout.VtableVirtualAddress, 80)
+                == ScoreBoardUpdatePlayerStatsNativeLayout.RttiName
+            && VtableRttiName(ScoreBoardUpdatePlayerStatsFromStatsNativeLayout.VtableVirtualAddress, 80)
+                == ScoreBoardUpdatePlayerStatsFromStatsNativeLayout.RttiName
+            && VtableRttiName(ScoreBoardUpdatePlayerStatusNativeLayout.VtableVirtualAddress, 80)
+                == ScoreBoardUpdatePlayerStatusNativeLayout.RttiName
+            && VtableRttiName(MatchLoadingStateNativeLayout.VtableVirtualAddress, 80)
+                == MatchLoadingStateNativeLayout.RttiName
+            && VtableRttiName(MatchEndAckNativeLayout.VtableVirtualAddress, 80)
+                == MatchEndAckNativeLayout.RttiName
+            && VtableRttiName(ServerProfilerSendNamesNativeLayout.VtableVirtualAddress, 80)
+                == ServerProfilerSendNamesNativeLayout.RttiName
+            && VtableRttiName(ServerProfilerSendFrameNativeLayout.VtableVirtualAddress, 80)
+                == ServerProfilerSendFrameNativeLayout.RttiName);
+        check("Binary secondary case prologues allocate, call the recorded constructors, and preserve separate parser-local DWORDs",
+            new (uint CallSite, uint Target)[]
+            {
+                (0x81F6FA, 0x3571B0), (0x81F765, 0x3571B0),
+                (0x81F7CD, 0x3571B0), (0x81F835, 0x3571B0),
+                (0x81F89D, 0x3571B0), (0x81F911, 0x3571B0),
+                (0x81F959, 0x3571B0), (0x81F9CD, 0x3571B0),
+                (0x81F704, 0x12B7FB0), (0x81F76F, 0x12B7FB0),
+                (0x81F7D7, 0x12B7FB0), (0x81F83F, 0x12B7FB0),
+                (0x81F8A7, 0x12B7FB0), (0x81F91B, 0x12B7FB0),
+                (0x81F963, 0x12B7FB0), (0x81F9D7, 0x12B7FB0),
+                (0x81F723, 0x814170), (0x81F78E, 0x814230),
+                (0x81F7F6, 0x814390), (0x81F85E, 0x814500),
+                (0x81F8C6, 0x8145F0), (0x81F93E, 0x814780),
+                (0x81F982, 0x814840), (0x81F9F6, 0x8149D0),
+                (0x814188, 0x8233C0), (0x814248, 0x823430),
+                (0x8143A8, 0x8234A0), (0x814518, 0x823510),
+                (0x814608, 0x823580), (0x814798, 0x8236F0),
+                (0x814858, 0x823760), (0x8149E8, 0x8237D0)
+            }.All(call => RelativeBranchTargets(call.CallSite, 0xE8, call.Target))
+            && new (long Offset, string Bytes)[]
+            {
+                (0x81F6EB, "681C9DB8016804C8B801680409E601"),
+                (0x81F756, "68249DB801681CC8B801680409E601"),
+                (0x81F7BE, "680C9DB8016834C8B801680409E601"),
+                (0x81F826, "68149DB801684CC8B801680409E601"),
+                (0x81F88E, "68FC9CB8016864C8B801680409E601"),
+                (0x81F902, "68049DB80168FCC6B801680409E601"),
+                (0x81F94A, "68EC9CB8016814C7B801680409E601"),
+                (0x81F9BE, "68F49CB801682CC7B801680409E601"),
+                (0x81F702, "6A30"), (0x81F76D, "6A48"),
+                (0x81F7D5, "6A40"), (0x81F83D, "6A48"),
+                (0x81F8A5, "6A38"), (0x81F919, "6A30"),
+                (0x81F961, "6A40"), (0x81F9D5, "6A38"),
+                (0x81F710, "C744242008000000"), (0x81F77B, "C744242009000000"),
+                (0x81F7E3, "C74424200A000000"), (0x81F84B, "C74424200B000000"),
+                (0x81F8B3, "C74424200C000000"), (0x81F927, "C74424200D000000"),
+                (0x81F96F, "C74424200E000000"), (0x81F9E3, "C74424200F000000")
+            }.All(fingerprint => Matches(fingerprint.Offset, fingerprint.Bytes))
+            && new (uint CallSite, uint Target)[]
+            {
+                (0x81F73C, 0x356F80), (0x81F7A4, 0x851410),
+                (0x81F80C, 0x851370), (0x81F874, 0x8506B0),
+                (0x81F8DE, 0x356CF0), (0x81F8E8, 0x8503E0),
+                (0x81F99A, 0x34E700), (0x81F9A4, 0x34E700),
+                (0x81FA0E, 0x34D6D0)
+            }.All(call => RelativeBranchTargets(call.CallSite, 0xE8, call.Target))
+            && Matches(0x81F931, "0F84F5FDFFFF")
+            && RelativeBranchTargets(0x81F945, 0xE9, MatchEndAckNativeLayout.SharedBodyContinuationFileOffset));
+        check("Binary secondary base constructors write shared header metadata and install the recorded derived vtables",
+            new (uint Constructor, uint TypeId, uint Helper, uint Anchor, uint Vtable)[]
+            {
+                (0x814170, 0x28, 0x8233C0, 0x1B89D1C, 0x1C6E208),
+                (0x814230, 0x29, 0x823430, 0x1B89D24, 0x1C6E1D8),
+                (0x814390, 0x2A, 0x8234A0, 0x1B89D0C, 0x1C6E1E8),
+                (0x814500, 0x2B, 0x823510, 0x1B89D14, 0x1C6E1B8),
+                (0x8145F0, 0x2C, 0x823580, 0x1B89CFC, 0x1C6E1A8),
+                (0x814780, 0x2D, 0x8236F0, 0x1B89D04, 0x1C6E1C8),
+                (0x814840, 0x2E, 0x823760, 0x1B89CEC, 0x1C6E188),
+                (0x8149D0, 0x2F, 0x8237D0, 0x1B89CF4, 0x1C6E178)
+            }.All(constructor =>
+                RelativeBranchTargets(constructor.Constructor + 0x18, 0xE8, constructor.Helper)
+                && Matches(constructor.Constructor + 0x12,
+                    "C700" + UInt32LittleEndianHex(constructor.TypeId))
+                && Matches(constructor.Constructor + 0x1D,
+                    "C706" + UInt32LittleEndianHex(constructor.Vtable))
+                && Matches(constructor.Helper + 0x13,
+                    "C7460C" + UInt32LittleEndianHex(constructor.Anchor))
+                && Matches(constructor.Helper + 0x1A, "C7460801000000")
+                && Matches(constructor.Helper + 0x21, "894610")
+                && Matches(constructor.Helper + 0x2B, "894618")
+                && Matches(constructor.Helper + 0x31, "89461C")
+                && Matches(constructor.Helper + 0x34, "C7462000000000C7462400000000"))
+            && new (long Offset, string Bytes)[]
+            {
+                (0x814195, "C7462800000000C7462C00000000"),
+                (0x814255, "C7462800000000C7462C00000000C6463000C74634C40CC801C7463800000000C7463C00000000C7464000000000"),
+                (0x8143B5, "C7462800000000C7462C00000000C7463000000000C7463400000000C7463800000000"),
+                (0x814525, "C7462800000000C7462C00000000C6463000C7463400000000C6463800C7463C0000000066C746400100"),
+                (0x814615, "C6462800C7462C00000000C7463000000000C7463400000000"),
+                (0x8147A5, "C7462800000000C7462C00000000"),
+                (0x814865, "C7462800000000C7462C00000000C7463000000000C7463400000000C7463800000000C7463C00000000"),
+                (0x8149F5, "C7462800000000C7462C00000000C7463000000000")
+            }.All(fingerprint => Matches(fingerprint.Offset, fingerprint.Bytes)));
+        check("Binary secondary body readers retain the observed QWORD, scalar, conditional blob, count, and recursive collection flows",
+            new (uint CallSite, uint Target)[]
+            {
+                (0x85141E, 0x356F80), (0x851427, 0x5F3350),
+                (0x85137F, 0x356F80), (0x851389, 0x851040),
+                (0x8506C0, 0x356F80), (0x8506CA, 0x337180),
+                (0x8506D5, 0x3370A0), (0x8506DF, 0x337180),
+                (0x8506E9, 0x851780), (0x8506F3, 0x356CF0),
+                (0x8506FD, 0x337180),
+                (0x5F33AE, 0x12EE170),
+                (0x851072, 0x850740), (0x851136, 0x12F5760),
+                (0x12F5826, 0x12EE010), (0x12F5830, 0x12F49C0),
+                (0x12F5842, 0x9A0AC0), (0x12F584C, 0x12F55D0),
+                (0x12F49F4, 0x3370A0),
+                (0x85041E, 0x84FED0), (0x8504FD, 0x12EE010),
+                (0x850555, 0x850300),
+                (0x34E809, 0x12EE010), (0x34E815, 0x34E610),
+                (0x34D7FA, 0x34BE80), (0x34C22D, 0x34BE80)
+            }.All(call => RelativeBranchTargets(call.CallSite, 0xE8, call.Target))
+            && Matches(0x5F33A4, "83FF017511")
+            && Matches(0x12F49F9, "8B064883F80F0F8752020000")
+            && Matches(0x8505C3, "80FBFF0F8464FEFFFF")
+            && Matches(0x8512A8, "80F9FF0F84C6FDFFFF")
+            && Matches(0x34E883, "80FBFF0F84C4FEFFFF")
+            && Matches(0x34D98F, "80FAFF0F8488FDFFFF")
+            && Matches(0x34C443, "80FAFF0F848CFAFFFF"));
+        check("Binary secondary body readers preserve exact receiver offsets and ordered helper calls",
+            new (long Offset, string Bytes)[]
+            {
+                (0x81F72E, "8D4628C7442420FFFFFFFF508BCFE83F78B3FF"),
+                (0x85141A, "8D462850E85D5BB0FF578D4E30E8241FDAFF"),
+                (0x85137B, "8D462850E8FC5BB0FF8D56308BCFE8B2FCFFFF"),
+                (0x8506BC, "8D462850E8BB68B0FF8D56308BCFE8B16AAEFF8D46348BCF50E8C669AEFF8D56388BCFE89C6AAEFF8D563C8BCFE8921000008D56418BCFE8F865B0FF8D56408BCFE87E6AAEFF"),
+                (0x81F8D1, "8D5628C7442420FFFFFFFF8BCFE80D74B3FF8D562C8BCFE8F30A0300"),
+                (0x81F98D, "8D5628C7442420FFFFFFFF8BCFE861EDB2FF8D56348BCFE857EDB2FF"),
+                (0x81FA01, "8D5628C7442420FFFFFFFF8BCFE8BDDCB2FF")
+            }.All(fingerprint => Matches(fingerprint.Offset, fingerprint.Bytes))
+            && new (long Offset, string Bytes)[]
+            {
+                (0x356F89, "83F908730F8B16B808000000"),
+                (0x356FA3, "8B0289018B420489410483460408"),
+                (0x5F335B, "8B7E0883FF04730F8B16B8040000002BC78BCE50FF52088B46048B3883C004837E0804894604"),
+                (0x5F33A4, "83FF0175118D53048BCEE8"),
+                (0x12EE17B, "8B4F0883F902730F8B37B8020000002BC18BCF50FF56088B47040FB73083C002"),
+                (0x3370A9, "83F904730F8B16B804000000"),
+                (0x3370C0, "8B088B4508890883460404"),
+                (0x337189, "83F9017311568B37B801000000"),
+                (0x33719F, "8B47048A008803FF4704"),
+                (0x356CF9, "83F9017311568B37B801000000"),
+                (0x356D0F, "8B47048A008803FF4704"),
+                (0x851091, "8A0840837B0801884C2417894304"),
+                (0x8510E4, "8B4B0883F904730F8B13B8040000002BC18BCB50FF5208837B08048B4B048B01894424248D4104894304"),
+                (0x12F57D2, "8B4E0883F904730F8B16B8040000002BC18BCE50FF52088B46048B3883C004837E0804894604"),
+                (0x851791, "83F90173128B37B801000000"),
+                (0x8517A8, "8B47048A1840837F0801894704"),
+                (0x85044A, "8A1840837E0801885C2417894604"),
+                (0x8504BA, "837E08088B4E048B018944241C8B4104894424208D4108894604"),
+                (0x850519, "837E08018B4E048A01884424288D4101894604"),
+                (0x34E76A, "8A1840837E0801885C2417894604"),
+                (0x34E7CF, "8B4E04668B01668944241C8D4102894604"),
+                (0x34D73A, "8A1040837B080188542413894304"),
+                (0x34D7BC, "837B08028B4B04668B01668944241C8D4102894304"),
+                (0x34BEF2, "8A1040837E080188542413894604"),
+                (0x34BF7E, "668B0166894424248D4102894604")
+            }.All(fingerprint => Matches(fingerprint.Offset, fingerprint.Bytes)));
         check("Binary inner selector 0x53 constructs the RTTI MarketRequestComplete body layout",
             ReadUInt32(VirtualAddressToFileOffset(
                 CharacterMarketRequestCompleteNativeLayout.InnerSelectorTableVirtualAddress)) == 0xC1D8C3
