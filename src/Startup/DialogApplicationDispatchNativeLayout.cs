@@ -21,6 +21,16 @@ public readonly record struct DialogApplicationEventDispatchSnapshot(
     int EventCode,
     bool PassesPayloadRecord);
 
+public readonly record struct DialogApplicationEventNameBindingSnapshot(
+    int EventCode,
+    string? EventName,
+    string? SubscriberCallback);
+
+public readonly record struct DialogApplicationNativeEventNameLiteralSnapshot(
+    string Name,
+    uint FileOffset,
+    uint VirtualAddress);
+
 public static class DialogApplicationDispatchNativeLayout
 {
     public const uint UiManagerGlobalPointerFileOffset = 0x19FE6B8;
@@ -37,6 +47,19 @@ public static class DialogApplicationDispatchNativeLayout
     public const int UiManagerListenerEventMapOffset = 0x168;
     public const int UiManagerListenerPendingDispatchOffset = 0x4C4;
     public const uint UiManagerEventNameToIdMethodFileOffset = 0xBF9AB0;
+    public const int UiManagerEventNameMapEntryEventIdOffset = 0x14;
+    public const int UiManagerEventNameArrayEntrySize = 4;
+    public const int UiManagerEventNameArrayInitialCount = 0;
+    public const uint UiManagerEventNameMapLookupHelperFileOffset = 0x3E63B0;
+    public const uint UiManagerEventNameMapInsertHelperFileOffset = 0xC079A0;
+    public const uint UiManagerEventNameArrayAppendHelperFileOffset = 0xC07D10;
+    public const uint UiManagerEventNameMapLookupCallSiteFileOffset = 0xBF9ACE;
+    public const uint UiManagerEventNameMapInsertCallSiteFileOffset = 0xBF9AFE;
+    public const uint UiManagerEventNameArrayAppendCallSiteFileOffset = 0xBF9B2B;
+    public const uint UiManagerEventNameExistingIdReadFileOffset = 0xBF9ADA;
+    public const uint UiManagerEventNameArrayCountCalculationFileOffset = 0xBF9AE6;
+    public const uint UiManagerEventNameMapSharedStringCleanupCallSiteFileOffset = 0xC07A34;
+    public const uint UiManagerEventNameMapSharedStringCleanupMethodFileOffset = 0xC08B40;
     public const uint UiManagerEventListenerRegisterMethodFileOffset = 0xBF9B40;
     public const uint UiManagerEventListenerDispatchMethodFileOffset = 0xBF9C40;
     public const uint UiManagerEventListenerCallbackCallSiteFileOffset = 0xBF9D5B;
@@ -129,6 +152,27 @@ public static class DialogApplicationDispatchNativeLayout
                 PublicDialogEventCodeFileOffset,
                 PublicDialogEventCode,
                 PublicDialogDispatchPassesPayloadRecord)
+        });
+
+    public static IReadOnlyList<DialogApplicationEventNameBindingSnapshot> SelectedEventNameBindings { get; } =
+        Array.AsReadOnly(new[]
+        {
+            new DialogApplicationEventNameBindingSnapshot(228, null, null),
+            new DialogApplicationEventNameBindingSnapshot(229, null, null),
+            new DialogApplicationEventNameBindingSnapshot(357, null, null)
+        });
+
+    public static IReadOnlyList<DialogApplicationNativeEventNameLiteralSnapshot> UnreferencedNativeEventNameLiterals { get; } =
+        Array.AsReadOnly(new[]
+        {
+            new DialogApplicationNativeEventNameLiteralSnapshot(
+                "ON_VENDOR_PURCHASE_RESPONSE",
+                0x1749050,
+                0x1B4A450),
+            new DialogApplicationNativeEventNameLiteralSnapshot(
+                "ON_PLAY_MOVIE",
+                0x1749578,
+                0x1B4A978)
         });
 
     public static IReadOnlyList<DialogApplicationPayloadFieldSnapshot> OpenMoviePayloadFields { get; } =

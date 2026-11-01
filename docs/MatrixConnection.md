@@ -56,6 +56,43 @@ The `uiManager` constructor initializes the name-array begin/end pointers at
 new name receives ID 0. ID `0x145` is therefore the 326th distinct
 first-time insertion; repeated names reuse their existing ID.
 
+The internal allocator mechanics were also verified directly. On a name-map
+hit, `0xBF9AB0` returns the event ID at entry `+0x14` (`mov eax,[eax+0x14]`
+at raw `0xBF9ADA`). On a miss, it computes
+`(name_array_end - name_array_begin) / 4` from `+0x71C/+0x720` at
+`0xBF9AE6`, passes that current count into insertion helper `0xC079A0`
+(`0xBF9AFE`), and appends the name pointer to the 4-byte-entry array through
+`0xC07D10` (`0xBF9B2B`). This is first-seen insertion order, not a compiled
+numeric-name table.
+
+The ID data flow is distinct from the shared-text cleanup that follows insertion.
+`0xBF9AB0` prepares the computed count in a stack local and passes its address to
+`0xC079A0` (`0xBF9AFE`). The helper forwards that pointer at `0xC079F4` to pair
+construction `0xC14660` (`0xC079FE`), which dereferences it and writes the ID
+to the pair's `+4` field at `0xC14694`. Node construction `0xC16CB0`
+(`0xC07A11`) copies the pair's second dword into node `+0x14` at
+`0xC16D2D` (the node base is adjusted by `+0x10` at `0xC16CEC`), then the
+map insertion call reaches `0xC16D60` at `0xC07A23`. Only afterward does the
+call at `0xC07A34` reach `0xC08B40` to release the temporary shared-text
+reference; that cleanup is not an ID store.
+
+Component XML parser `0xC35740` reads an `<Event>`'s `name` attribute and
+calls `0xBF9AB0` at `0xC358AF` before reading `bind` at `0xC358FE`; it
+registers the listener through `0xBF9B40` at `0xC35AD8`. The separate
+`Component.BindEvent(event, function)` route calls named-subscription helper
+`0xC35BB0` from wrapper `0xC32460` at `0xC32643`; that helper also uses
+`0xBF9AB0` and `0xBF9B40` (call sites `0xC35BE4` and `0xC35CF0`). Therefore
+both XML registrations and runtime script calls contribute to the same ID
+allocation order.
+
+The native binary and tracked repository do not contain a complete static
+first-insertion order. UI-set roots are traversed in declared order, but the
+folder loader enumerates files using `_wfindfirst64i32`/`_wfindnext64i32`
+without sorting, and script `Component.BindEvent` calls add names at runtime.
+No static table assigning these application codes to names was found; codes
+`228`, `229`, and `357` remain unbound rather than inferred from dialog class
+names or payload keys.
+
 The UI-set loader's folder path uses `0x30AB90`, which calls directory
 enumerator `0x12B6A00` with search pattern `%s\*`. The enumerator uses CRT
 `_wfindfirst64i32`, `_wfindnext64i32`, and `_findclose`; it splits entries by
@@ -2321,6 +2358,27 @@ name-to-ID insertion order is not reconstructed, it is **not verified** as
 subscriber to numeric code `229`, and no name is assigned to any of the three
 numeric codes.
 
+A focused read-only verification of the installed UI source at
+`D:\SteamLibrary\steamapps\common\Firefall\system\gui\` confirms
+`components\MainUI\Panels\Vendor\Vendor.xml:24` binds
+`ON_VENDOR_PURCHASE_RESPONSE` to `OnVendorPurchaseResponse`. Its handler at
+`components\MainUI\Panels\Vendor\Vendor.lua:258-282` finds the product by
+`product_id`; success creates a loot event, plays the purchase-confirmation
+sound, and refreshes product highlights (`270-273`), while failure clears the
+pending product and chooses an error voice line (`275-280`). This is a
+verified handler effect for that named subscription, but not proof that the
+subscription's runtime ID is `229`.
+
+The analyzed executable also contains native event-like string literals
+`ON_VENDOR_PURCHASE_RESPONSE` at raw file offset `0x1749050` (VA
+`0x1B4A450`) and `ON_PLAY_MOVIE` at raw `0x1749578` (VA `0x1B4A978`). IDA
+reports no xrefs to either literal. The latter was not found in the focused
+installed `system\gui` source search. These literals are candidates, not
+registration evidence; no subscriber callback was proven for codes `228`,
+`229`, or `357`. The public-dialog helper prepares `action_id` and `activated`
+but passes null payload arguments, so those fields cannot identify a callback
+or its effect.
+
 None of these three selected entries is a null or empty stub: two target
 direct functions and the `PrivateDialog` entry is a five-byte no-adjustment
 tail-jump thunk. The 91 receiver-table entries have distinct function-pointer
@@ -2331,10 +2389,12 @@ classified as inherited, default, or message-specific methods.
 recipient path; `DialogApplicationDispatchNativeLayout.cs` records this
 separate uiManager dispatch target, dynamic registry path, and observed dialog
 payload fields. Startup checks fingerprint the vtable/slot mapping, registry
-edges, payload construction, string keys, numeric call arguments, and PE
-section translations from the requested binary. These models do not emulate
-parsing, assign event-name semantics to numeric IDs, identify a concrete
-runtime listener, or claim a complete ownership policy.
+edges and first-seen ID allocator, payload construction, string keys, native
+event-like literals, numeric call arguments, and PE section translations from
+the requested binary. The model stores null name/callback bindings for
+`228/229/357` rather than guessing. These models do not emulate parsing,
+assign event-name semantics to numeric IDs, identify a concrete runtime
+listener, or claim a complete ownership policy.
 
 The nested table at VA `0xC22444` (raw `0x821844`) is now traced from selector
 `0x53` through `0x7A`, inclusive:

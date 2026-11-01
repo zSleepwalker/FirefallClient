@@ -3367,6 +3367,52 @@ internal static class StartupBinaryEvidence
                 "E868350000")
             && RelativeBranchTargets(UiManagerNativeLayout.ComponentBindEventNamedSubscriptionCallSiteFileOffset,
                 0xE8, UiManagerNativeLayout.UiManagerNamedSubscriptionFileOffset));
+        check("Binary UI event IDs are per-instance first-seen name-array indexes, not static dialog-name assignments",
+            Matches(UiManagerNativeLayout.UiManagerEventNameExistingIdReadFileOffset, "8B4014")
+            && Matches(UiManagerNativeLayout.UiManagerEventNameArrayCountCalculationFileOffset,
+                "8D861C0700008BCB8B70042B30")
+            && Matches(UiManagerNativeLayout.UiManagerEventNameArrayCountCalculationFileOffset + 0x11,
+                "C1FE02")
+            && RelativeBranchTargets(UiManagerNativeLayout.UiManagerEventNameMapLookupCallSiteFileOffset,
+                0xE8, UiManagerNativeLayout.UiManagerEventNameMapLookupHelperFileOffset)
+            && RelativeBranchTargets(UiManagerNativeLayout.UiManagerEventNameMapInsertCallSiteFileOffset,
+                0xE8, UiManagerNativeLayout.UiManagerEventNameMapInsertHelperFileOffset)
+            && RelativeBranchTargets(UiManagerNativeLayout.UiManagerEventNameArrayAppendCallSiteFileOffset,
+                0xE8, UiManagerNativeLayout.UiManagerEventNameArrayAppendHelperFileOffset)
+            && Matches(UiManagerNativeLayout.UiManagerEventNameMapIdCountArgumentPreparationFileOffset,
+                "8D45FC50C1FE02578975FCE89DDE0000")
+            && Matches(UiManagerNativeLayout.UiManagerEventNameMapEntryPairIdInputFileOffset,
+                "FF750C8B55088D4C2410")
+            && RelativeBranchTargets(
+                UiManagerNativeLayout.UiManagerEventNameMapEntryPairConstructionCallSiteFileOffset,
+                0xE8, UiManagerNativeLayout.UiManagerEventNameMapEntryPairConstructionMethodFileOffset)
+            && Matches(UiManagerNativeLayout.UiManagerEventNameMapEntryPairIdInputLoadInstructionFileOffset,
+                "8B00894604")
+            && Matches(UiManagerNativeLayout.UiManagerEventNameMapEntryPairIdStoreInstructionFileOffset, "894604")
+            && RelativeBranchTargets(
+                UiManagerNativeLayout.UiManagerEventNameMapNodeConstructionCallSiteFileOffset,
+                0xE8, UiManagerNativeLayout.UiManagerEventNameMapNodeConstructionMethodFileOffset)
+            && RelativeBranchTargets(
+                UiManagerNativeLayout.UiManagerEventNameMapNodeInsertCallSiteFileOffset,
+                0xE8, UiManagerNativeLayout.UiManagerEventNameMapNodeInsertMethodFileOffset)
+            && Matches(UiManagerNativeLayout.UiManagerEventNameMapNodeIdBaseInitializationFileOffset, "8D7710")
+            && Matches(UiManagerNativeLayout.UiManagerEventNameMapNodePairIdInputLoadInstructionFileOffset, "8B4004")
+            && Matches(UiManagerNativeLayout.UiManagerEventNameMapNodePairIdStoreInstructionFileOffset, "894604")
+            && RelativeBranchTargets(
+                UiManagerNativeLayout.UiManagerEventNameMapSharedStringCleanupCallSiteFileOffset,
+                0xE8, UiManagerNativeLayout.UiManagerEventNameMapSharedStringCleanupMethodFileOffset)
+            && VirtualAddressToFileOffset(
+                DialogApplicationDispatchNativeLayout.UnreferencedNativeEventNameLiterals[0].VirtualAddress)
+                == DialogApplicationDispatchNativeLayout.UnreferencedNativeEventNameLiterals[0].FileOffset
+            && ReadCStringAscii(
+                DialogApplicationDispatchNativeLayout.UnreferencedNativeEventNameLiterals[0].VirtualAddress, 64)
+                == "ON_VENDOR_PURCHASE_RESPONSE"
+            && VirtualAddressToFileOffset(
+                DialogApplicationDispatchNativeLayout.UnreferencedNativeEventNameLiterals[1].VirtualAddress)
+                == DialogApplicationDispatchNativeLayout.UnreferencedNativeEventNameLiterals[1].FileOffset
+            && ReadCStringAscii(
+                DialogApplicationDispatchNativeLayout.UnreferencedNativeEventNameLiterals[1].VirtualAddress, 32)
+                == "ON_PLAY_MOVIE");
         check("UI-set folders are scanned through CRT FindFirst/Next and routed through the folder loader",
             Matches(UiComponentLoadingNativeLayout.DirectoryEnumerationMethodFileOffset,
                 "558BEC83E4F86AFF681147A90164A10000000050")

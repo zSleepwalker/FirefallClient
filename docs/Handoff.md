@@ -85,18 +85,30 @@
   `uiManager` global VA `0x1E002B8`, whose vtable slot `+0xAC` maps to
   `0xBF9D80`. That method indexes the dynamic event bucket at manager `+0x6F0`;
   names are allocated IDs by `0xBF9AB0` through the map at `+0x6E8` and name
-  array at `+0x71C..+0x720`. Numeric-to-name mapping and the actual runtime
-  listener for `228/229/357` remain unresolved.
+  array at `+0x71C..+0x720`. On a map hit, the event ID is read from node
+  `+0x14` (`0xBF9ADA`); on a miss, `(end-begin)/4` is passed as the new ID
+  before the name pointer is appended (`0xBF9AE6`, `0xBF9AFE`, `0xBF9B2B`).
+  XML `<Event>` parsing inserts its `name` before reading `bind`, and
+  `Component.BindEvent` uses the same map. File enumeration is unsorted and
+  script calls add runtime first insertions, so exact IDs/names and concrete
+  subscribers for `228/229/357` remain unresolved.
 - Recorded payload keys/fields: `228` passes `vendor_id` from message `+0x28`;
   `229` passes `success` (`+0x28` byte), `product_id` (`+0x30/+0x34`),
   `price_id` (`+0x38/+0x3C`), `vendor_id` (`+0x40`), and a code-string
   pointer from `+0x44` (fallback value `PURCHASE_SUCCESSFUL`); `357` prepares
   `action_id` (`+0x30`) and `activated` (`+0x84`) but passes null payload arguments.
   These strings are payload property keys/values, not event names.
-  `ON_VENDOR_PURCHASE_RESPONSE` / `OnVendorPurchaseResponse` exists in local
-  UI assets and consumes matching fields, but its registration-order-derived
-  ID is not proven to be `229`; a fresh plain-text scan of `localassets` found
-  no additional registration string tying that name to numeric ID `229`.
+  The focused installed-source check confirms
+  `system\gui\components\MainUI\Panels\Vendor\Vendor.xml:24` binds
+  `ON_VENDOR_PURCHASE_RESPONSE` to `OnVendorPurchaseResponse`; its Lua handler
+  at `Vendor.lua:258-282` creates a loot event, confirms successful purchase,
+  and refreshes highlights, or clears pending state and plays an error voice
+  line on failure. The content-level handler matches the `229` payload shape,
+  but its registration-order-derived ID is not proven to be `229`. Native
+  literals `ON_VENDOR_PURCHASE_RESPONSE` (raw `0x1749050`, VA `0x1B4A450`)
+  and `ON_PLAY_MOVIE` (raw `0x1749578`, VA `0x1B4A978`) have no IDA xrefs;
+  neither binds a name to these codes. The dispatch model now records all
+  three name/callback associations as null.
 - Selector `0x79`'s parser requests `0x40` bytes, reads through `+0x3B`, and
   returns the same object pointer to the `tfGameProtocolHandler` slot `+0x168`
   (`0xACE300 -> 0x991510`). That handler reads `vendor_id` at `+0x40` and a
@@ -111,9 +123,9 @@
   at listener `+0x4C4` and `uiManager+0x5EC`. The concrete listener and later
   callback execution are not statically identified. Details and binary
   fingerprints are in `docs/MatrixConnection.md` and the separate
-  `src/Startup/DialogApplicationDispatchNativeLayout.cs`. Next bounded
-  unknowns: recover the exact event names/registered subscribers for these
-  numeric IDs, then separately revisit the recipient iteration behind
+  `src/Startup/DialogApplicationDispatchNativeLayout.cs`. Do not repeat the
+  registration-order trace unless new static registration-order evidence is
+  available; the next distinct boundary is the recipient iteration behind
   `0xBD7060` and wrapper `0x821DE0`'s application caller. Continue read-only;
   do not modify the sample/IDB or commit/push unless explicitly requested.
 - Open items: field semantics, allocation-failure consequences, selector

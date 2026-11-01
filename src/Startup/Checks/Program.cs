@@ -3359,6 +3359,19 @@ Check("Dialog application event routes use the uiManager dispatcher and preserve
     && DialogApplicationDispatchNativeLayout.UiManagerEventRegistryOffset == 0x6F0
     && DialogApplicationDispatchNativeLayout.UiManagerEventNameArrayBeginOffset == 0x71C
     && DialogApplicationDispatchNativeLayout.UiManagerEventNameArrayEndOffset == 0x720
+    && DialogApplicationDispatchNativeLayout.UiManagerEventNameMapEntryEventIdOffset == 0x14
+    && DialogApplicationDispatchNativeLayout.UiManagerEventNameArrayEntrySize == 4
+    && DialogApplicationDispatchNativeLayout.UiManagerEventNameArrayInitialCount == 0
+    && DialogApplicationDispatchNativeLayout.UiManagerEventNameMapLookupHelperFileOffset == 0x3E63B0
+    && DialogApplicationDispatchNativeLayout.UiManagerEventNameMapInsertHelperFileOffset == 0xC079A0
+    && DialogApplicationDispatchNativeLayout.UiManagerEventNameArrayAppendHelperFileOffset == 0xC07D10
+    && DialogApplicationDispatchNativeLayout.UiManagerEventNameMapLookupCallSiteFileOffset == 0xBF9ACE
+    && DialogApplicationDispatchNativeLayout.UiManagerEventNameMapInsertCallSiteFileOffset == 0xBF9AFE
+    && DialogApplicationDispatchNativeLayout.UiManagerEventNameArrayAppendCallSiteFileOffset == 0xBF9B2B
+    && DialogApplicationDispatchNativeLayout.UiManagerEventNameExistingIdReadFileOffset == 0xBF9ADA
+    && DialogApplicationDispatchNativeLayout.UiManagerEventNameArrayCountCalculationFileOffset == 0xBF9AE6
+    && DialogApplicationDispatchNativeLayout.UiManagerEventNameMapSharedStringCleanupCallSiteFileOffset == 0xC07A34
+    && DialogApplicationDispatchNativeLayout.UiManagerEventNameMapSharedStringCleanupMethodFileOffset == 0xC08B40
     && DialogApplicationDispatchNativeLayout.UiManagerEventDeliveryQueueOffset == 0x5EC
     && DialogApplicationDispatchNativeLayout.UiManagerListenerEventMapOffset == 0x168
     && DialogApplicationDispatchNativeLayout.UiManagerListenerPendingDispatchOffset == 0x4C4
@@ -3411,7 +3424,46 @@ Check("Dialog application event routes use the uiManager dispatcher and preserve
             "activated", 0x84, DialogApplicationPayloadValueKind.BooleanByte)
     ])
     && DialogApplicationDispatchNativeLayout.PrivateDialogCodeFallback == "PURCHASE_SUCCESSFUL"
-    && !DialogApplicationDispatchNativeLayout.PublicDialogDispatchPassesPayloadRecord);
+    && !DialogApplicationDispatchNativeLayout.PublicDialogDispatchPassesPayloadRecord
+    && UiManagerNativeLayout.UiManagerEventNameMapLookupHelperFileOffset == 0x3E63B0
+    && UiManagerNativeLayout.UiManagerEventNameMapInsertHelperFileOffset == 0xC079A0
+    && UiManagerNativeLayout.UiManagerEventNameArrayAppendHelperFileOffset == 0xC07D10
+    && UiManagerNativeLayout.UiManagerEventNameMapIdCountArgumentPreparationFileOffset == 0xBF9AF3
+    && UiManagerNativeLayout.UiManagerEventNameMapEntryPairConstructionCallSiteFileOffset == 0xC079FE
+    && UiManagerNativeLayout.UiManagerEventNameMapEntryPairIdInputFileOffset == 0xC079F4
+    && UiManagerNativeLayout.UiManagerEventNameMapEntryPairConstructionMethodFileOffset == 0xC14660
+    && UiManagerNativeLayout.UiManagerEventNameMapEntryPairIdInputLoadInstructionFileOffset == 0xC14692
+    && UiManagerNativeLayout.UiManagerEventNameMapEntryPairIdStoreInstructionFileOffset == 0xC14694
+    && UiManagerNativeLayout.UiManagerEventNameMapNodeConstructionCallSiteFileOffset == 0xC07A11
+    && UiManagerNativeLayout.UiManagerEventNameMapNodeConstructionMethodFileOffset == 0xC16CB0
+    && UiManagerNativeLayout.UiManagerEventNameMapNodeInsertCallSiteFileOffset == 0xC07A23
+    && UiManagerNativeLayout.UiManagerEventNameMapNodeInsertMethodFileOffset == 0xC16D60
+    && UiManagerNativeLayout.UiManagerEventNameMapNodeIdBaseInitializationFileOffset == 0xC16CEC
+    && UiManagerNativeLayout.UiManagerEventNameMapNodePairIdInputLoadInstructionFileOffset == 0xC16D2A
+    && UiManagerNativeLayout.UiManagerEventNameMapNodePairIdStoreInstructionFileOffset == 0xC16D2D
+    && UiManagerNativeLayout.UiManagerEventNameMapSharedStringCleanupCallSiteFileOffset == 0xC07A34
+    && UiManagerNativeLayout.UiManagerEventNameMapSharedStringCleanupMethodFileOffset == 0xC08B40
+    && UiManagerNativeLayout.UiManagerEventNameMapEntryEventIdOffset == 0x14
+    && UiManagerNativeLayout.UiManagerEventNameArrayEntrySize == 4
+    && UiManagerNativeLayout.UiManagerEventNameArrayBeginInitialValue == 0
+    && UiManagerNativeLayout.UiManagerEventNameArrayEndInitialValue == 0);
+Check("Selected application event IDs remain explicitly unbound; native event-like literals are kept as candidates only",
+    DialogApplicationDispatchNativeLayout.SelectedEventNameBindings.SequenceEqual(
+    [
+        new DialogApplicationEventNameBindingSnapshot(228, null, null),
+        new DialogApplicationEventNameBindingSnapshot(229, null, null),
+        new DialogApplicationEventNameBindingSnapshot(357, null, null)
+    ])
+    && DialogApplicationDispatchNativeLayout.UnreferencedNativeEventNameLiterals.SequenceEqual(
+    [
+        new DialogApplicationNativeEventNameLiteralSnapshot(
+            "ON_VENDOR_PURCHASE_RESPONSE", 0x1749050, 0x1B4A450),
+        new DialogApplicationNativeEventNameLiteralSnapshot(
+            "ON_PLAY_MOVIE", 0x1749578, 0x1B4A978)
+    ])
+    && DialogApplicationDispatchNativeLayout.UnreferencedNativeEventNameLiterals.All(literal =>
+        !DialogApplicationDispatchNativeLayout.SelectedEventNameBindings.Any(binding =>
+            binding.EventName == literal.Name)));
 
 if (args.Length != 0)
 {
