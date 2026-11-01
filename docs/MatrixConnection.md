@@ -2107,18 +2107,43 @@ message's byte at `+0x18` to `0x809D20` and logs the resulting label along
 with message fields `+0x0C` and `+0x10`; when nonzero, it calls
 `0x7FDC60` with the message-pointer reference and selector argument.
 
-In the nonzero-mode branch, `0x7FDC60` has conditional direct calls to
-`0x81BB90` with the parsed message pointer (when context `+8` is non-null)
-and to `0xBD7060` with that pointer plus a derived small selector (when the
-message predicate and context `+0xB0` allow it). For the message discriminator
-equal to `dword_1DFC030`, it also walks the 16-bit range at message `+0x38`
-through `+0x3A`, calls `0xBCA850` to parse a child, recurses through
-`0x7FDC60`, and releases each child through its vtable slot `+8` when the
-reference count reaches zero. Since `ReplayReader_Initialize` sets the context
-mode to `1` immediately before registration, this nonzero branch is the
-registered path observed here. The recipients' further semantics, message
-field meanings, and producer-side reference policy/ownership transfer remain
-unproven.
+For registered mode, raw `0x7FDC60` first tests message byte `+0x18`. If it is
+nonzero, it calls `0x800420`; if zero, it compares message DWORD `+0x10` with
+`dword_1DFC030`. Equality takes the existing nested-message path: it iterates
+the 16-bit range at message `+0x38` with count at `+0x3A`, parses children
+through `0xBCA850`, recurses through `0x7FDC60`, and releases a returned child
+through its vtable slot `+8` if the reference count reaches zero. For a
+nonmatching discriminator, `0x81BB90` is called only when callback-context
+field `+8` is non-null.
+
+That `+8` value is not a fixed global target. In `ReplayReader_Initialize`,
+the object in EDI invokes its vtable slot `+0x24` at raw `0x65DB10`; the
+returned pointer's field `+0x78` is loaded at `0x65DB38` and passed as the
+constructor's second stack argument to `0x7FD670`. The constructor stores that
+argument at callback-context `+8` (`0x7FD6B2`). Thus the `0x81BB90` receiver
+is the value read from `[getter-result+0x78]`; the receiver's concrete type
+and RTTI are not established here.
+
+At `0x81BB90`, ECX is that receiver and the parsed-message pointer is the
+stack argument. The function loads the message discriminator from `+0x10`,
+subtracts `0x20`, rejects values above `0x5A`, and indexes a 91-entry table at
+VA `0xC1D6DC` (raw `0x81CADC`). Each case calls a receiver vtable slot with the
+message pointer: discriminator `0x20` reaches raw `0x81BBCD` and slot `+4`,
+`0x21` reaches `0x81BBF5` and slot `+8`, and `0x40` reaches `0x81C0D0` and
+slot `+0x84`. Static decoding of all 91 cases gives slot offsets
+`4 + 4 * (discriminator - 0x20)` through `+0x16C`; no message names or
+receiver RTTI are inferred from this numeric switch.
+
+The other direct call, `0xBD7060`, is separately gated by a zero return from
+`0x80A030(message[+0x18])` and non-null context field `+0xB0`. Its selector
+argument is `3` when the callback-supplied argument is zero, otherwise `2`.
+The recipient iteration behind this route is not assigned a concrete type in
+this pass. The analyzed PE's `.text` header maps raw offsets to VAs with
+`+0x400C00` (`ImageBase=0x400000`, section RVA `0x1000`, raw pointer
+`0x400`), so raw `0x7FDC60` maps to VA `0xBFE860`; the binary check validates
+this mapping and the selector-table entries against the requested executable.
+Message-field meanings and producer-side reference policy/ownership transfer
+remain unproven.
 
 The parser's returned pointer is still passed through EAX by both `0x821BA0`
 and the wrapper `0x821DE0`. The registration field is therefore distinct
@@ -2151,13 +2176,15 @@ application event handlers.
 
 `MatrixMessageParserFlowNativeLayout.cs` records the direct parser callsites,
 allocator/registration split, callback load/call, input arguments, result
-queue, ReplayReader context RTTI/vtable slots, dispatch routes, and observed
-reference decrement. Startup checks fingerprint those binary edges together
-with the registration field copies, constructor-return/context-field
-identity, context vtable targets and dispatch calls, parser-return epilogs,
-and each dialog vtable entry and RTTI name from the requested binary. This
-model does not emulate parsing, assign semantic meaning to the context
-message tags/fields, or claim a complete ownership policy.
+queue, ReplayReader context RTTI/vtable slots, conditional message-recipient
+selector cases, dispatch routes, and observed reference decrement. Startup
+checks fingerprint those binary edges together with the registration field
+copies, constructor-return/context-field identity, context vtable targets and
+dispatch calls, selector-table targets and representative receiver slots,
+parser-return epilogs, and each dialog vtable entry and RTTI name from the
+requested binary. This model does not emulate parsing, assign semantic
+meaning to the context message tags/fields, or claim a complete ownership
+policy.
 
 The nested table at VA `0xC22444` (raw `0x821844`) is now traced from selector
 `0x53` through `0x7A`, inclusive:

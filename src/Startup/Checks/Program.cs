@@ -3214,6 +3214,27 @@ Check("ReplayReader callback context resolves its constructor-returned primary v
     && MatrixMessageParserFlowNativeLayout.CallbackObjectModeFlagFieldOffset == 0x18
     && MatrixMessageParserFlowNativeLayout.CallbackObjectDispatchSinkFieldOffset == 8
     && MatrixMessageParserFlowNativeLayout.CallbackObjectAlternateDispatchSinkFieldOffset == 0xB0);
+Check("ReplayReader message dispatch receiver and discriminator vtable cases remain explicit",
+    MatrixMessageParserFlowNativeLayout.CallbackContextDispatchHelperVirtualAddress == 0xBFE860
+    && MatrixMessageParserFlowNativeLayout.CallbackContextDispatchHelperVirtualAddress
+        == MatrixMessageParserFlowNativeLayout.CallbackContextDispatchHelperFileOffset + 0x400C00
+    && MatrixMessageParserFlowNativeLayout.CallbackContextMessageDispatchReceiverFieldOffset == 8
+    && MatrixMessageParserFlowNativeLayout.CallbackContextMessageSelectorSwitchFileOffset == 0x81BBBA
+    && MatrixMessageParserFlowNativeLayout.CallbackContextMessageSelectorTableVirtualAddress == 0xC1D6DC
+    && MatrixMessageParserFlowNativeLayout.CallbackContextMessageSelectorTableFileOffset == 0x81CADC
+    && MatrixMessageParserFlowNativeLayout.CallbackContextMessageSelectorFirstDiscriminator == 0x20
+    && MatrixMessageParserFlowNativeLayout.CallbackContextMessageSelectorLastDiscriminator == 0x7A
+    && MatrixMessageParserFlowNativeLayout.CallbackContextMessageSelectorCaseCount == 0x5B
+    && MatrixMessageParserFlowNativeLayout.ReplayReaderMessageRecipientGetterCallFileOffset == 0x65DB10
+    && MatrixMessageParserFlowNativeLayout.ReplayReaderMessageRecipientFieldLoadFileOffset == 0x65DB38
+    && MatrixMessageParserFlowNativeLayout.ReplayReaderMessageRecipientSourceFieldOffset == 0x78
+    && MatrixMessageParserFlowNativeLayout.MessageDispatchVtableCases.SequenceEqual(
+    [
+        new MatrixMessageDispatchVtableCaseSnapshot(0x20, 0xC1C7CD, 0x81BBCD, 0x81BBEC, 4),
+        new MatrixMessageDispatchVtableCaseSnapshot(0x21, 0xC1C7F5, 0x81BBF5, 0x81BC14, 8),
+        new MatrixMessageDispatchVtableCaseSnapshot(0x40, 0xC1CCD0, 0x81C0D0, 0x81C0EF, 0x84),
+        new MatrixMessageDispatchVtableCaseSnapshot(0x7A, 0xC1D68E, 0x81CA8E, 0x81CAAD, 0x16C)
+    ]));
 Check("Dialog message primary vftables map stream readers and writers separately from destruction",
     dialogMessageVtables.Count == 3
     && dialogMessageVtables.Select(vtable => vtable.VtableVirtualAddress)

@@ -61,11 +61,24 @@
   meaning. The readiness probe at `0xBD68F4` remains separate. Details and
   byte fingerprints are in `docs/MatrixConnection.md` and
   `src/Startup/MatrixMessageParserFlowNativeLayout.cs`.
-- Next static target: follow the recipients behind `0x81BB90` / `0xBD7060`
-  and identify record-tag meanings only from direct evidence. The separate
-  parser wrapper `0x821DE0` still has no proven application caller. Continue
-  read-only; do not modify the sample/IDB or commit/push unless explicitly
-  requested.
+- The next recipient-dispatch pass traced `0x7FDC60` into `0x81BB90`.
+  `ReplayReader_Initialize` calls a virtual getter at raw `0x65DB10`, loads
+  field `+0x78` from its result at `0x65DB38`, and passes that value to the
+  `0x7FD670` constructor, which stores its second stack argument at context
+  `+8`. When that field is non-null and message byte `+0x18` is zero, a
+  non-`dword_1DFC030` message reaches `0x81BB90`; its 91-entry discriminator
+  table covers `0x20..0x7A` and maps each ID to receiver vtable slot
+  `4 + 4*(ID-0x20)`. Verified examples: `0x20 -> +4`, `0x21 -> +8`,
+  `0x40 -> +0x84`. No concrete RTTI was found for this dynamic receiver.
+  The `.text` section maps raw+`0x400C00` to VA (the requested original's
+  section header confirms ImageBase `0x400000`, RVA `0x1000`, raw pointer
+  `0x400`; raw `0x7FDC60` is VA `0xBFE860`).
+- Next static target: resolve the concrete receiver behind context `+8` or
+  trace the callback-list fan-out behind `0xBD7060` (including its per-entry
+  slot `+0x0C`) without assigning meanings to numeric tags absent evidence.
+  The separate parser wrapper `0x821DE0` still has no proven application
+  caller. Continue read-only; do not modify the sample/IDB or commit/push
+  unless explicitly requested.
 - Open items: field semantics, allocation-failure consequences, selector
   `0x55` 12-byte temp prefix, selector `0x6D` body consumption.
 - Workflow per batch: preserve native evidence in the existing layout,

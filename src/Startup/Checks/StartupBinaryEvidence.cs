@@ -4279,6 +4279,32 @@ internal static class StartupBinaryEvidence
                 MatrixMessageParserFlowNativeLayout.CallbackContextMessageConsumerFileOffset)
             && RelativeBranchTargets(0x7FDD81, 0xE8,
                 MatrixMessageParserFlowNativeLayout.CallbackContextConditionalDispatchFileOffset));
+        var messageDispatchCases = MatrixMessageParserFlowNativeLayout.MessageDispatchVtableCases;
+        check("Binary ReplayReader .text mapping and message discriminator dispatch reach the expected receiver vtable slots",
+            VirtualAddressToFileOffset(MatrixMessageParserFlowNativeLayout.CallbackContextDispatchHelperVirtualAddress)
+                == MatrixMessageParserFlowNativeLayout.CallbackContextDispatchHelperFileOffset
+            && VirtualAddressToFileOffset(
+                MatrixMessageParserFlowNativeLayout.CallbackContextMessageSelectorTableVirtualAddress)
+                == MatrixMessageParserFlowNativeLayout.CallbackContextMessageSelectorTableFileOffset
+            && Matches(MatrixMessageParserFlowNativeLayout.CallbackContextMessageSelectorSwitchFileOffset,
+                "83C0E083F85A0F87F30E0000FF2485DCD6C100")
+            && Matches(MatrixMessageParserFlowNativeLayout.ReplayReaderMessageRecipientGetterCallFileOffset - 4,
+                "8B178BCFFF5224")
+            && Matches(MatrixMessageParserFlowNativeLayout.ReplayReaderMessageRecipientFieldLoadFileOffset,
+                "FF70788BCE6A00")
+            && Matches(MatrixMessageParserFlowNativeLayout.CallbackObjectConstructorFileOffset + 0x3C,
+                "8947048B450C894708")
+            && messageDispatchCases.All(@case =>
+                ReadUInt32(MatrixMessageParserFlowNativeLayout.CallbackContextMessageSelectorTableFileOffset
+                    + (@case.MessageDiscriminator
+                        - MatrixMessageParserFlowNativeLayout.CallbackContextMessageSelectorFirstDiscriminator) * 4)
+                    == @case.SwitchTargetVirtualAddress
+                && VirtualAddressToFileOffset(@case.SwitchTargetVirtualAddress)
+                    == @case.SwitchTargetFileOffset)
+            && Matches(0x81BBE7, "8B068BCE57FF50045F5E5DC20400")
+            && Matches(0x81BC0F, "8B068BCE57FF50085F5E5DC20400")
+            && Matches(0x81C0EA, "8B068BCE57FF90840000005F5E5DC20400")
+            && Matches(0x81CAA8, "8B068BCE57FF906C0100005F5E5DC20400"));
         check("Binary dialog-message primary vftables point to stream writers, stream readers, and deleting destructors",
             MatrixMessageParserFlowNativeLayout.DialogMessageVtables.All(vtable =>
                 vtable.PrimarySlots.All(slot =>
