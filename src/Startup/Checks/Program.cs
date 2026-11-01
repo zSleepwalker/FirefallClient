@@ -2061,6 +2061,29 @@ Check("NPCInteraction selector 0x77 records its raw QWORD body field",
     && CharacterNPCInteractionNativeLayout.BodyReaderFileOffset == 0x81F72E
     && CharacterNPCInteractionNativeLayout.QwordReaderFileOffset == 0x356F80
     && CharacterNPCInteractionNativeLayout.FirstQwordFieldOffset == 0x28);
+Check("Character receiver behavior model preserves selector slots and observed application paths",
+    CharacterAbilityApplicationNativeLayout.ReceiverRttiName == ".?AVtfGameProtocolHandler@@"
+    && CharacterAbilityApplicationNativeLayout.ReceiverConstructorFileOffset == 0xAC8CA0
+    && CharacterAbilityApplicationNativeLayout.ReceiverVtableVirtualAddress == 0x1C71EC0
+    && CharacterAbilityApplicationNativeLayout.ReceiverVtableFileOffset == 0x1870AC0
+    && CharacterAbilityApplicationNativeLayout.ReceiverHandlers.SequenceEqual(
+    [
+        new CharacterAbilityReceiverHandlerSnapshot(0x74, 0x154, 0xECE940, 0xACDD40),
+        new CharacterAbilityReceiverHandlerSnapshot(0x75, 0x158, 0xECE9E0, 0xACDDE0),
+        new CharacterAbilityReceiverHandlerSnapshot(0x76, 0x15C, 0xECEE10, 0xACE210),
+        new CharacterAbilityReceiverHandlerSnapshot(0x77, 0x160, 0xECEEA0, 0xACE2A0)
+    ])
+    && CharacterAbilityApplicationNativeLayout.AbilityActivatedEventPayloadTag == 1
+    && CharacterAbilityApplicationNativeLayout.AbilityActivatedNumericApplicationEventCode == 230
+    && CharacterAbilityApplicationNativeLayout.AbilityFailedApplicationHelperFileOffset == 0x909C60
+    && CharacterAbilityApplicationNativeLayout.AbilityCooldownsObservedRecordStride == 0x40
+    && CharacterAbilityApplicationNativeLayout.AbilityCooldownsChatProcessorFileOffset == 0x6E2590
+    && CharacterAbilityApplicationNativeLayout.AbilityCooldownsObservedOptionalBranchOffset == 0x14
+    && CharacterAbilityApplicationNativeLayout.AbilityCooldownsObservedOptionalDataOffset == 0x18
+    && CharacterAbilityApplicationNativeLayout.NpcInteractionOwnerMapOffset == 0x4338
+    && CharacterAbilityApplicationNativeLayout.NpcInteractionMessageStateSwapByteCount == 0x20
+    && CharacterAbilityApplicationNativeLayout.NpcInteractionNumericApplicationEventCode == 356
+    && CharacterAbilityApplicationNativeLayout.NpcInteractionEventPayloadTag == 5);
 Check("OpenMovieDialog selector 0x78 records its shared text field",
     CharacterOpenMovieDialogNativeLayout.InnerSelector == 0x78
     && CharacterOpenMovieDialogNativeLayout.InnerSelectorTableEntryOffset == 0x94
@@ -3283,6 +3306,10 @@ Check("ReplayReader message dispatch receiver and discriminator vtable cases rem
         new MatrixMessageDispatchVtableCaseSnapshot(0x20, 0xC1C7CD, 0x81BBCD, 0x81BBEC, 4),
         new MatrixMessageDispatchVtableCaseSnapshot(0x21, 0xC1C7F5, 0x81BBF5, 0x81BC14, 8),
         new MatrixMessageDispatchVtableCaseSnapshot(0x40, 0xC1CCD0, 0x81C0D0, 0x81C0EF, 0x84),
+        new MatrixMessageDispatchVtableCaseSnapshot(0x74, 0xC1D58C, 0x81C98C, 0x81C9AB, 0x154),
+        new MatrixMessageDispatchVtableCaseSnapshot(0x75, 0xC1D5B7, 0x81C9B7, 0x81C9D6, 0x158),
+        new MatrixMessageDispatchVtableCaseSnapshot(0x76, 0xC1D5E2, 0x81C9E2, 0x81CA01, 0x15C),
+        new MatrixMessageDispatchVtableCaseSnapshot(0x77, 0xC1D60D, 0x81CA0D, 0x81CA2C, 0x160),
         new MatrixMessageDispatchVtableCaseSnapshot(0x78, 0xC1D638, 0x81CA38, 0x81CA57, 0x164),
         new MatrixMessageDispatchVtableCaseSnapshot(0x79, 0xC1D663, 0x81CA63, 0x81CA82, 0x168),
         new MatrixMessageDispatchVtableCaseSnapshot(0x7A, 0xC1D68E, 0x81CA8E, 0x81CAAD, 0x16C)

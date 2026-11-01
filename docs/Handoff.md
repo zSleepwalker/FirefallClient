@@ -118,6 +118,20 @@
   unsplittable free block, but actual capacity is runtime-dependent and the
   parser does not populate the additional fields. Preserve this as an
   unresolved parser/receiver extent conflict; see `docs/MatrixConnection.md`.
+- The `tfGameProtocolHandler` entries for Character selectors `0x74`–`0x77`
+  now map to slots `+0x154/+0x158/+0x15C/+0x160` and raw handlers
+  `0xACDD40/0xACDDE0/0xACE210/0xACE2A0`; PE-translated vtable pointers and
+  `0x81BB90` switch cases are checked against the original. `0x74` updates a
+  keyed owner-state record and dispatches numeric UI code `230`; `0x75` passes
+  field addresses into an owner-state updater; `0x76` walks `0x40`-byte records
+  and calls chat processing; `0x77` gates on the LookingGlass state, updates a
+  QWORD-keyed record, swaps `0x20` bytes from message `+0x30`, and dispatches
+  numeric UI code `356`. No names are assigned to those codes. `0x75`/`0x76`
+  wire-state semantics remain incomplete. For `0x77`, the reader's `0x30`-byte
+  allocation ends exactly where the receiver's `0x20`-byte transfer begins;
+  that extent conflict and its runtime consequence are unresolved.
+  Evidence is in `docs/MatrixConnection.md` and
+  `src/Startup/CharacterAbilityApplicationNativeLayout.cs`.
 - The dynamic listener path is traced through `0xBF9C40` to `0xC38400`, which
   resolves a listener-local event callback and stages delivery in structures
   at listener `+0x4C4` and `uiManager+0x5EC`. The concrete listener and later
@@ -129,7 +143,8 @@
   `0xBD7060` and wrapper `0x821DE0`'s application caller. Continue read-only;
   do not modify the sample/IDB or commit/push unless explicitly requested.
 - Open items: field semantics, allocation-failure consequences, selector
-  `0x55` 12-byte temp prefix, selector `0x6D` body consumption.
+  `0x55` 12-byte temp prefix, selector `0x6D` body consumption, selector
+  `0x75`/`0x76` wire-state semantics, selector `0x77` trailing-state extent.
 - Workflow per batch: preserve native evidence in the existing layout,
   binary checks, and documentation; validate the focused build and binary
   checks, without committing or pushing unless the user requests it.
@@ -1237,10 +1252,23 @@ These updates supersede older next-step suggestions below where they overlap.
   Selector0x71 constructs `ForcedMovement` with an initialized 0x1B8 nested state, a 14-case discriminator reader, and trailing WORD +0x1E0; case-specific meanings remain unresolved.
   Selector0x72 constructs `ForcedMovementCancelled` and reads DWORD +0x28 then WORD +0x2C; field meanings remain unresolved.
   Selector0x73 constructs `GrappleClimbPermission` with the same initialized 0x1B8 nested state as selector0x71 and its 14-case reader; case-specific meanings remain unresolved.
-  Selector0x74 constructs `AbilityActivated`, reads DWORDs +0x28/+0x2C, then passes remaining input to the opaque embedded state at +0x30 (virtual +0x10 reader).
-  Selector0x75 constructs `AbilityFailed` with the same observed DWORD/opaque-state reader shape as selector0x74; event semantics remain unproven.
-  Selector0x76 constructs `AbilityCooldowns` and passes remaining input to the opaque embedded state at +0x28 (virtual +0x10 reader); field meaning remains unknown.
-  Selector0x77 constructs `NPCInteraction` and reads one raw QWORD at +0x28; field meaning and allocation-failure consequence remain unknown.
+  Selector0x74 constructs `AbilityActivated`, reads DWORDs +0x28/+0x2C, and
+  passes remaining input to the opaque embedded state at +0x30 (virtual
+  +0x10 reader). Its receiver updates a keyed state record and dispatches
+  numeric UI code 230; no event name is assigned.
+  Selector0x75 constructs `AbilityFailed` with the same observed
+  DWORD/opaque-state reader shape as selector0x74; its receiver passes
+  addresses +0x28/+0x30 into an owner-state updater. Wire-field meaning
+  remains unknown; no UI event dispatch was observed.
+  Selector0x76 constructs `AbilityCooldowns` and passes remaining input to
+  the opaque embedded state at +0x28 (virtual +0x10 reader); its receiver
+  iterates 0x40-byte records into chat processing, but their semantics and
+  cooldown timing remain unknown.
+  Selector0x77 constructs `NPCInteraction` and reads one raw QWORD at +0x28;
+  its receiver uses it as a two-DWORD map key and dispatches numeric UI code
+  356, with no event name assigned. The receiver's 0x20-byte transfer from
+  +0x30 begins beyond the parser's 0x30-byte allocation; storage and runtime
+  consequence remain unknown.
   Selector0x78 constructs `OpenMovieDialog` and passes input through the shared NUL-terminated text reader at +0x28; field meaning and allocation-failure consequence remain unknown.
   Selector0x79 constructs `PrivateDialog` and reads DWORD +0x28, QWORD +0x30, and DWORD +0x38; this ends at +0x3C despite a +0x40 request, while the same parsed pointer reaches event-229 handling that reads through +0x48. The actual allocator block extent remains unresolved.
   Selector0x7A constructs `PublicDialog` and reads DWORDs +0x28/+0x2C; field meanings and allocation-failure consequence remain unknown.

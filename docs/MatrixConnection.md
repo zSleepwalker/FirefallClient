@@ -2024,6 +2024,75 @@ advances the input stream by eight. The allocation-failure branch reaches
 address calculation is recorded as observed; its runtime consequence and the
 QWORD's field meanings remain unknown.
 
+### `tfGameProtocolHandler` application for selectors 0x74–0x77
+
+The recipient is the concrete `tfGameProtocolHandler` constructed at raw
+`0xAC8CA0`; its constructor writes vtable VA `0x1C71EC0` at raw `.rdata`
+`0x1870AC0`. The RTTI-backed table bytes and all four selected method pointers
+were checked in the requested original. `.text` code addresses map to raw file
+offsets by subtracting `0x400C00`; the receiver vtable resides in `.rdata` and
+is translated by the parsed PE section table.
+
+Dispatcher `0x81BB90` subtracts `0x20` and bounds the discriminator at `0x7A`.
+Its jump table at VA `0xC1D6DC` / raw `0x81CADC` reaches these methods and
+issues the recorded virtual calls:
+
+| Selector | Switch target VA / raw | Receiver slot | Method VA / raw |
+| --- | --- | --- | --- |
+| `0x74` | `0xC1D58C` / `0x81C98C` | `+0x154` | `0xECE940` / `0xACDD40` |
+| `0x75` | `0xC1D5B7` / `0x81C9B7` | `+0x158` | `0xECE9E0` / `0xACDDE0` |
+| `0x76` | `0xC1D5E2` / `0x81C9E2` | `+0x15C` | `0xECEE10` / `0xACE210` |
+| `0x77` | `0xC1D60D` / `0x81CA0D` | `+0x160` | `0xECEEA0` / `0xACE2A0` |
+
+The slots agree with `4 + 4*(selector - 0x20)` and with the neighbouring
+dialog slots already verified at `0x78`–`0x7A`.
+
+* **`0x74 AbilityActivated` → `0xACDD40`.** The method calls accessor
+  `0x49DCC0`, then uses owner field `+0x43C8`; a missing field reaches an
+  assertion call (code `0x673`) but is not followed by a null-return branch.
+  It hashes/compares the key at message `+0x28` in the map at owner-state
+  `+0x2C`, inserting a record when absent. The first two DWORDs at message
+  `+0x30/+0x34` are copied to the selected record `+0x18/+0x1C`; these remain
+  opaque state words. Helper `0x909B40` builds a tag-`1` application payload
+  using the record value and calls the global `uiManager` (`0x1E002B8`)
+  dispatch slot `+0xAC` with numeric code `230` and null dispatch arguments.
+  No event name is assigned to `230`.
+* **`0x75 AbilityFailed` → `0xACDDE0`.** It uses the same accessor and asserted
+  owner field `+0x43C8`, then passes the *addresses* of message fields `+0x28`
+  and `+0x30` to `0x909C60`. That helper resets/initializes a per-owner tree,
+  follows the state reached through those pointers, resolves keys through
+  owner-state `+0x2C`, and stores a source record value at result-node `+0x10`.
+  This is the observed state-update path; the wire fields and embedded-state
+  type remain unknown. No `uiManager` event dispatch was observed in this
+  helper.
+* **`0x76 AbilityCooldowns` → `0xACE210`.** The receiver treats state
+  `+0x28/+0x2C` as range endpoints, computes `(end-begin)/0x40`, and walks
+  `0x40`-byte records. It forwards each record's QWORD `+0`, nullable strings
+  `+0x8/+0xC` (empty-string fallback), bytes `+0x10/+0x11/+0x12`, and address
+  `+0x14` to `0x6E2590`. That routine branches on the byte at `+0x14`: the
+  nonzero path requires a current chat and calls `0x6E3670` with data at
+  `+0x18`; the zero path obtains a category label from byte `+0x10`, lowercases
+  it, and posts a display notification through `0x6E3460` when a current chat
+  exists. This proves how the handler consumes the embedded state, but not the
+  meaning of individual records or cooldown timing.
+* **`0x77 NPCInteraction` → `0xACE2A0`.** It returns without dispatch if the
+  `0x49DDD0` root accessor is null or root `+0x4D20` is null; otherwise
+  `0x49DCC0` supplies the owner state. The QWORD at message `+0x28` is passed
+  as two DWORD key components to helper `0x4C9250`, which looks up/inserts a
+  record in owner-state map `+0x4338`. The helper swaps `0x20` bytes between
+  that record `+0x14` and the address message `+0x30`, stores the opaque
+  two-DWORD result of indirect helper `0x1AC48D8` at record `+0x38/+0x3C`, then
+  builds a tag-`5` payload containing the key and dispatches numeric code `356`
+  through `uiManager` slot `+0xAC`. Neither the QWORD's identity nor code
+  `356`'s event name is established.
+
+   **Extent caveat:** the selector `0x77` parser allocates `0x30` bytes and
+   writes a QWORD ending at `+0x30`; the receiver then passes `+0x30` to a
+   helper that swaps `0x20` bytes there. Those trailing bytes are outside the
+   recorded allocation and are not written by the parser. The native access is
+   confirmed, but its storage/ownership explanation and runtime consequence
+   remain unresolved.
+
 ### Selector 0x78: `OpenMovieDialog`
 
 Entry37 maps selector `0x78` to VA `0xC1E36D` / raw case `0x81D76D`. It
@@ -2423,15 +2492,16 @@ The nested table at VA `0xC22444` (raw `0x821844`) is now traced from selector
 | `0x79` | `PrivateDialog` | `0x7A` | `PublicDialog` |
 
 This closes the nested selector mapping, not the overall Matrix analysis.
-All 17 primary-route subcases have native layouts, but field semantics,
-allocation-failure consequences, selector `0x55`'s 12-byte temporary prefix,
-and selector `0x6D` body consumption remain open. The immediate
-`0x81CC50` result pass-throughs, dialog primary-vftable method roles, and
-ReplayReader allocation/registration path are now recorded above. Next, find
-the code that consumes registered callback-state `+0x1C/+0x20`, then establish
-the indirect parser invocation, parsed-object ownership, and first recipient.
-The vtable call at `0xBD68F4` is not identified as that invocation. No
-application handler name is inferred from RTTI or vtable slots.
+All 17 primary-route subcases have native layouts. Parser-level field
+semantics and allocation-failure consequences remain open for many; the
+receiver paths for `0x74`–`0x77` are now traced above, but `0x75`/`0x76`
+embedded-state meaning and `0x77`'s out-of-extent transfer remain unresolved.
+Selector `0x55`'s 12-byte temporary prefix and selector `0x6D` body
+consumption also remain open. The immediate `0x81CC50` pass-throughs, dialog
+primary-vftable roles, ReplayReader registration, and concrete recipient
+dispatch through `0x81BB90` are recorded above. The indirect parser invocation
+and parsed-object ownership details are still open; numeric application codes
+are not assigned event names.
 
 ## Message35 application body
 

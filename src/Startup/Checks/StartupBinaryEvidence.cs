@@ -4440,6 +4440,92 @@ internal static class StartupBinaryEvidence
                 0x4D6C10)
             && Matches(MatrixMessageParserFlowNativeLayout.PublicDialogEventCodeFileOffset,
                 "68650100008B01FF90AC000000"));
+        var characterReceiverHandlers = CharacterAbilityApplicationNativeLayout.ReceiverHandlers;
+        check("Binary character receiver selectors 0x74-0x77 map through the dispatcher table to RTTI-verified slots",
+            VirtualAddressToFileOffset(CharacterAbilityApplicationNativeLayout.ReceiverVtableVirtualAddress)
+                == CharacterAbilityApplicationNativeLayout.ReceiverVtableFileOffset
+            && VtableRttiName(CharacterAbilityApplicationNativeLayout.ReceiverVtableVirtualAddress, 80)
+                == CharacterAbilityApplicationNativeLayout.ReceiverRttiName
+            && Matches(CharacterAbilityApplicationNativeLayout.ReceiverConstructorVtableStoreFileOffset,
+                "C706C01EC701894608")
+            && characterReceiverHandlers.All(handler =>
+            {
+                var dispatchCase = MatrixMessageParserFlowNativeLayout.MessageDispatchVtableCases
+                    .Single(messageCase => messageCase.MessageDiscriminator == handler.MessageDiscriminator);
+                return handler.VtableSlotOffset
+                        == 4 + 4 * (handler.MessageDiscriminator
+                            - MatrixMessageParserFlowNativeLayout.CallbackContextMessageSelectorFirstDiscriminator)
+                    && dispatchCase.VtableSlotOffset == handler.VtableSlotOffset
+                    && dispatchCase.VtableCallFileOffset == dispatchCase.SwitchTargetFileOffset + 0x1F
+                    && ReadUInt32(VirtualAddressToFileOffset(
+                        MatrixMessageParserFlowNativeLayout.CallbackContextMessageSelectorTableVirtualAddress)
+                        + 4L * (handler.MessageDiscriminator
+                            - MatrixMessageParserFlowNativeLayout.CallbackContextMessageSelectorFirstDiscriminator))
+                        == dispatchCase.SwitchTargetVirtualAddress
+                    && VirtualAddressToFileOffset(dispatchCase.SwitchTargetVirtualAddress)
+                        == dispatchCase.SwitchTargetFileOffset
+                    && Matches(dispatchCase.SwitchTargetFileOffset + 0x1A,
+                        "8B068BCE57FF90" + Convert.ToHexString(BitConverter.GetBytes(handler.VtableSlotOffset)))
+                    && ReadUInt32(VirtualAddressToFileOffset(
+                        CharacterAbilityApplicationNativeLayout.ReceiverVtableVirtualAddress)
+                        + handler.VtableSlotOffset) == handler.MethodVirtualAddress
+                    && VirtualAddressToFileOffset(handler.MethodVirtualAddress) == handler.MethodFileOffset;
+            }));
+        check("Binary AbilityActivated reaches its state helper and numeric uiManager dispatch",
+            RelativeBranchTargets(0xACDD4C, 0xE8,
+                CharacterAbilityApplicationNativeLayout.AbilityActivatedSingletonAccessorFileOffset)
+            && Matches(0xACDD53, "83BEC843000000751A")
+            && Matches(0xACDD7F, "8B48308D7028")
+            && Matches(0xACDD89, "8B4834")
+            && RelativeBranchTargets(0xACDDD2, 0xE8,
+                CharacterAbilityApplicationNativeLayout.AbilityActivatedApplicationHelperFileOffset)
+            && RelativeBranchTargets(0x909C01, 0xE8,
+                CharacterAbilityApplicationNativeLayout.AbilityActivatedEventPayloadHelperFileOffset)
+            && Matches(0xC24254, "895610C70601000000")
+            && Matches(0x909C06, "8B0DB802E001")
+            && Matches(0x909C10, "68E60000008B01FF90AC000000")
+            && CharacterAbilityApplicationNativeLayout.AbilityActivatedNumericApplicationEventCode == 230
+            && CharacterAbilityApplicationNativeLayout.UiManagerGlobalVirtualAddress == 0x1E002B8
+            && CharacterAbilityApplicationNativeLayout.UiManagerDispatchVtableSlotOffset == 0xAC);
+        check("Binary AbilityFailed forwards message field addresses into its singleton state updater",
+            RelativeBranchTargets(0xACDDE4, 0xE8,
+                CharacterAbilityApplicationNativeLayout.AbilityFailedSingletonAccessorFileOffset)
+            && Matches(0xACDDEB, "83BEC843000000751A")
+            && Matches(0xACDE11, "8D4130508D41288B8EC843000050")
+            && RelativeBranchTargets(0xACDE1F, 0xE8,
+                CharacterAbilityApplicationNativeLayout.AbilityFailedApplicationHelperFileOffset));
+        check("Binary AbilityCooldowns iterates 0x40-byte records and calls the chat processor",
+            Matches(0xACE225, "8B472C2B4728C1F806")
+            && Matches(0xACE243, "8B410C85C00F45F0")
+            && Matches(0xACE24B, "8B410885C00F45D0")
+            && RelativeBranchTargets(0xACE267, 0xE8,
+                CharacterAbilityApplicationNativeLayout.AbilityCooldownsChatProcessorFileOffset)
+            && Matches(0xACE276, "83C340")
+            && Matches(0x6E2590, "558BEC83E4F883EC34"));
+        check("Binary NPCInteraction gates on its singleton, swaps state, and dispatches numeric uiManager code 356",
+            RelativeBranchTargets(0xACE2A6, 0xE8,
+                CharacterAbilityApplicationNativeLayout.NpcInteractionRootAccessorFileOffset)
+            && Matches(0xACE2AB, "85C0742283B8204D0000007419")
+            && Matches(0xACE2BB, "FF702CFF702883C03050")
+            && RelativeBranchTargets(0xACE2C5, 0xE8,
+                CharacterAbilityApplicationNativeLayout.NpcInteractionSingletonAccessorFileOffset)
+            && RelativeBranchTargets(0xACE2CC, 0xE8,
+                CharacterAbilityApplicationNativeLayout.NpcInteractionApplicationHelperFileOffset)
+            && Matches(0x4C9285, "8DB938430000")
+            && RelativeBranchTargets(0x4C9291, 0xE8, 0x4E3490)
+            && RelativeBranchTargets(0x4C92BD, 0xE8,
+                CharacterAbilityApplicationNativeLayout.NpcInteractionMessageStateSwapHelperFileOffset)
+            && Matches(CharacterAbilityApplicationNativeLayout.NpcInteractionMessageStateSwapHelperFileOffset,
+                "558BEC51568B7508578BF98B068B17890789168D56088B4F048B4604894704894E048D4F08E8A62EF0FF8D560C8D4F0CE89B2EF0FF")
+            && Matches(CharacterAbilityApplicationNativeLayout.NpcInteractionMessageStateSwapHelperFileOffset + 0x35,
+                "8B4F108B461089471083C714894E1083C6143BFE74208B0F8B068907890E8B4F048B4604894704894E048B4F088B4608894708894E085F5E595DC20400")
+            && Matches(0x4C9341, "8B0DB802E001")
+            && Matches(0x4C934D, "68640100008B01FF90AC000000")
+            && Matches(0xC245E4, "8956088B551089560CC70605")
+            && CharacterAbilityApplicationNativeLayout.UiManagerGlobalVirtualAddress == 0x1E002B8
+            && CharacterAbilityApplicationNativeLayout.UiManagerDispatchVtableSlotOffset == 0xAC
+            && CharacterAbilityApplicationNativeLayout.NpcInteractionNumericApplicationEventCode == 356
+            && CharacterAbilityApplicationNativeLayout.NpcInteractionEventPayloadTag == 5);
         var privateDialogDispatchCase = MatrixMessageParserFlowNativeLayout.MessageDispatchVtableCases
             .Single(messageCase => messageCase.MessageDiscriminator == 0x79);
         var privateDialogReceiverSlot = messageReceiverVtable.DialogSlots
