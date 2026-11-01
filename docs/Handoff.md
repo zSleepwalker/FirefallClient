@@ -11,9 +11,12 @@
   (SHA-256 `97362D668FF64778193A64759265E4AE90842043C4A15B627DF9902FD9135445`)
   loaded as a flat `seg000` at base `0`. Its PE `.text` maps raw file offsets
   to runtime VA with `+0x400C00` (`ImageBase=0x400000`, section RVA `0x1000`,
-  raw pointer `0x400`); dispatcher table pointers verify this mapping. The
-  requested check binary `FirefallClient.exe.original` is fingerprinted
-  separately.
+  raw pointer `0x400`); `.rdata` maps with `+0x401400` (RVA `0x16C4000`,
+  raw pointer `0x16C2C00`). Dispatcher and vtable pointers verify these
+  mappings. The requested `FirefallClient.exe.original` SHA-256 is
+  `E0E8448393AC1CE05BE73E06F62DD70E3EFF3404CC2E7AAF3F04C79DEC0DE235`;
+  it differs from the analyzed image in 13 bytes across four ranges, none of
+  which overlap this batch's code/vtable evidence.
 - The 91 secondary-table entries (VA `0xC22630` / raw `0x821A30`) are mapped
   as dispatch data, but their message identities are still unresolved.
 - Latest parser-consumer pass: raw `0x81CC50`'s two direct callers (`0x821BA0`
@@ -31,15 +34,38 @@
   through the stored `this+0x20` context's vtable slots `+4/+8`; it then
   decrements the message pointer's `+8` counter and calls its vtable slot
   `+8` when the old count is one. The enqueue contains no visible retain, so
-  producer ownership/ref-transfer policy and tag/context method semantics
-  remain unknown. The readiness probe at `0xBD68F4` is separate. Details and
+  producer ownership/ref-transfer policy and tag meanings remain unknown.
+- ReplayReader context vtable: `0x65DB3F` calls constructor `0x7FD670`;
+  the returned EAX is copied to ESI and stored at `[edi+0x54]` at `0x65DB75`.
+  The `0x65DBD3` registration passes that pointer to `0xBD6260`, which copies
+  it directly to state `+0x20`. The vptr at object `+0` and the RTTI
+  Complete Object Locator's object offset `0` confirm the pointer is not an
+  adjusted secondary interface. Vtable VA `0x1C6D624` (raw `.rdata`
+  `0x186C224`) names `.?AVtfGameSocketHandler@@`. Slot `+4` is VA `0xBFE7E0`
+  / raw `0x7FDBE0` and only logs before `ret 4`; slot `+8` is VA `0xBFE800`
+  / raw `0x7FDC00`.
+- The constructor initializes context byte `+0x18` to zero, but
+  `ReplayReader_Initialize` sets it to `1` at `0x65DBC5` before registration.
+  Slot `+8`'s zero-mode path looks up a label from message byte `+0x18` via
+  `0x809D20` and logs message fields `+0x0C/+0x10`; the registered context
+  takes the nonzero path through `0x7FDC60`. There, `0xBCA850` parses entries
+  from the message's 16-bit range `+0x38..+0x3A` when its `+0x10` value matches
+  `dword_1DFC030`; returned children recurse through `0x7FDC60` and are
+  released through message vtable slot `+8`. Other branches call `0x81BB90`
+  when context `+8` is non-null and call `0xBD7060` with the parsed message
+  pointer plus a derived selector when the message predicate and context
+  `+0xB0` allow it. The recipients' further semantics remain unknown.
+  Consumer record byte `+6` maps numerically as `1` -> context `+4`, `2` ->
+  context `+8` with argument `1`, and `3` -> context `+8` with argument
+  `0`; other bytes skip dispatch. These values have no inferred message
+  meaning. The readiness probe at `0xBD68F4` remains separate. Details and
   byte fingerprints are in `docs/MatrixConnection.md` and
   `src/Startup/MatrixMessageParserFlowNativeLayout.cs`.
-- Next static target: identify the `+0x20` context vtable methods and message
-  refcount/release implementation, and map the record tags without assuming
-  event semantics. The separate parser wrapper `0x821DE0` still has no proven
-  application caller. Continue read-only; do not modify the sample/IDB or
-  commit/push unless explicitly requested.
+- Next static target: follow the recipients behind `0x81BB90` / `0xBD7060`
+  and identify record-tag meanings only from direct evidence. The separate
+  parser wrapper `0x821DE0` still has no proven application caller. Continue
+  read-only; do not modify the sample/IDB or commit/push unless explicitly
+  requested.
 - Open items: field semantics, allocation-failure consequences, selector
   `0x55` 12-byte temp prefix, selector `0x6D` body consumption.
 - Workflow per batch: preserve native evidence in the existing layout,

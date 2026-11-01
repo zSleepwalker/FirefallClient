@@ -88,7 +88,14 @@ internal static class StartupBinaryEvidence
             var raw = ReadAt(VirtualAddressToFileOffset(td) + 8, maximumNameLength);
             int end = Array.IndexOf(raw, (byte)0);
             return Encoding.ASCII.GetString(raw, 0, end < 0 ? raw.Length : end);
-        }        check("Binary world scene factory resolves all three named scenes, builds and returns its root, and is stored by tfWorld",
+        }
+        string ReplayCallbackContextRttiName(uint vtableVa, int maximumNameLength)
+        {
+            uint completeObjectLocator = ReadUInt32(VirtualAddressToFileOffset(vtableVa) - 4);
+            uint typeDescriptor = ReadUInt32(VirtualAddressToFileOffset(completeObjectLocator) + 12);
+            return ReadCStringAscii(checked(typeDescriptor + 8), maximumNameLength);
+        }
+        check("Binary world scene factory resolves all three named scenes, builds and returns its root, and is stored by tfWorld",
             Matches(SceneFactoryNativeLayout.FactoryFileOffset + 0x2D, "68A0000000")
             && Matches(SceneFactoryNativeLayout.FactoryFileOffset + 0x4D, "E8AE0E0000")
             && Matches(0x9B7D22, "6828D1B9018B108B4230FFD08907")
@@ -4221,6 +4228,57 @@ internal static class StartupBinaryEvidence
                 "83CAFF8D4708F00FC11083FA01750C85FF74088B078BCF52FF5008")
             && Matches(MatrixMessageParserFlowNativeLayout.CallbackResultFinalReleaseCallFileOffset,
                 "FF5008"));
+        var callbackContextVtable = MatrixMessageParserFlowNativeLayout.ReplayReaderCallbackContextVtable;
+        check("Binary ReplayReader callback context resolves its primary vtable and message dispatch path",
+            Matches(MatrixMessageParserFlowNativeLayout.CallbackObjectVtableStoreFileOffset,
+                "C70724D6C601")
+            && Matches(MatrixMessageParserFlowNativeLayout.CallbackObjectConstructorFileOffset + 0x54,
+                "884718")
+            && Matches(MatrixMessageParserFlowNativeLayout.ReplayReaderCallbackObjectCallFileOffset + 5,
+                "8BF0")
+            && Matches(MatrixMessageParserFlowNativeLayout.ReplayReaderContextPointerStoreFileOffset,
+                "897754")
+            && Matches(MatrixMessageParserFlowNativeLayout.ReplayReaderCallbackRegistrationCallFileOffset - 10,
+                "8D442414FF77548BCB50")
+            && Matches(MatrixMessageParserFlowNativeLayout.ReplayReaderCallbackRegistrationFieldStoresFileOffset,
+                "8B4D088B018946188B41048B4E0489461C0FB74618897E20")
+            && Matches(MatrixMessageParserFlowNativeLayout.ReplayReaderContextModeFlagSetFileOffset,
+                "C6461801")
+            && ReadUInt32(VirtualAddressToFileOffset(callbackContextVtable.VtableVirtualAddress) - 4)
+                == MatrixMessageParserFlowNativeLayout.CallbackContextCompleteObjectLocatorVirtualAddress
+            && ReadUInt32(VirtualAddressToFileOffset(
+                MatrixMessageParserFlowNativeLayout.CallbackContextCompleteObjectLocatorVirtualAddress) + 4)
+                == MatrixMessageParserFlowNativeLayout.CallbackContextCompleteObjectLocatorObjectOffset
+            && ReadUInt32(VirtualAddressToFileOffset(
+                MatrixMessageParserFlowNativeLayout.CallbackContextCompleteObjectLocatorVirtualAddress) + 12)
+                == MatrixMessageParserFlowNativeLayout.CallbackContextRttiTypeDescriptorVirtualAddress
+            && ReplayCallbackContextRttiName(
+                callbackContextVtable.VtableVirtualAddress,
+                80) == callbackContextVtable.RttiName
+            && callbackContextVtable.PrimarySlots.All(slot =>
+                ReadUInt32(VirtualAddressToFileOffset(callbackContextVtable.VtableVirtualAddress)
+                    + slot.SlotOffset) == slot.MethodVirtualAddress
+                && VirtualAddressToFileOffset(slot.MethodVirtualAddress) == slot.MethodFileOffset)
+            && Matches(MatrixMessageParserFlowNativeLayout.CallbackContextLogMethodFileOffset,
+                "686C94B8016890000000688FCFB4016A00FF15A05EC10183C410C20400")
+            && Matches(MatrixMessageParserFlowNativeLayout.CallbackContextDispatchMethodFileOffset + 9,
+                "80791800753B")
+            && RelativeBranchTargets(
+                MatrixMessageParserFlowNativeLayout.CallbackContextDispatchMethodFileOffset + 0x26,
+                0xE8,
+                MatrixMessageParserFlowNativeLayout.CallbackContextMessageLabelLookupFileOffset)
+            && RelativeBranchTargets(
+                MatrixMessageParserFlowNativeLayout.CallbackContextDispatchMethodFileOffset + 0x52,
+                0xE8,
+                MatrixMessageParserFlowNativeLayout.CallbackContextDispatchHelperFileOffset)
+            && RelativeBranchTargets(0x7FDCFF, 0xE8,
+                MatrixMessageParserFlowNativeLayout.CallbackContextDispatchHelperFileOffset)
+            && RelativeBranchTargets(0x7FDCCC, 0xE8,
+                MatrixMessageParserFlowNativeLayout.CallbackContextNestedMessageParserFileOffset)
+            && RelativeBranchTargets(0x7FDD4F, 0xE8,
+                MatrixMessageParserFlowNativeLayout.CallbackContextMessageConsumerFileOffset)
+            && RelativeBranchTargets(0x7FDD81, 0xE8,
+                MatrixMessageParserFlowNativeLayout.CallbackContextConditionalDispatchFileOffset));
         check("Binary dialog-message primary vftables point to stream writers, stream readers, and deleting destructors",
             MatrixMessageParserFlowNativeLayout.DialogMessageVtables.All(vtable =>
                 vtable.PrimarySlots.All(slot =>

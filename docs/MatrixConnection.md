@@ -2073,13 +2073,52 @@ no retain/add-reference operation is visible in that insertion. The native
 consumer at `0xBD62F0` drains that same `this+0xB4` queue and stages records
 in a second queue at `this+0xC8`. It reads the stored context from `this+0x20`
 and dispatches through its vtable slots `+4` or `+8`, selected by the record's
-byte at `+6`; the message-pointer slot is passed by reference, and the
-consumer reloads the possibly updated pointer after dispatch. It atomically
-decrements that pointer's DWORD at `+8`; when the old count is one, it calls
-that object's vtable slot `+8` with argument `1`. This establishes a
-downstream context-dispatch and reference-release path, but not the semantic
-meaning of the tags or context methods, nor the producer-side reference
-policy/ownership transfer.
+byte at `+6`. The observed numeric routing is: byte `1` calls slot `+4`;
+byte `2` calls slot `+8` with argument `1`; byte `3` calls slot `+8` with
+argument `0`; other values skip these virtual calls. The message-pointer slot
+is passed by reference, and the consumer reloads the possibly updated pointer
+after dispatch. It atomically decrements that pointer's DWORD at `+8`; when
+the old count is one, it calls that object's vtable slot `+8` with argument
+`1`. These are numeric routing facts only; no message semantics are inferred
+from the tag byte.
+
+The ReplayReader context type and primary vtable are now identified from the
+registration path. At `0x65DB3F`, `ReplayReader_Initialize` calls constructor
+`0x7FD670`; the return in EAX is copied to ESI and stored directly at
+`[edi+0x54]` (`0x65DB44`, `0x65DB75`). The later registration call at
+`0x65DBD3` passes that same field, and `0xBD6260` copies its third argument
+to registration-state `+0x20`. The context therefore points to the
+constructor-returned object start, not an adjusted secondary-interface
+pointer: its vptr is written at object `+0`, and the vtable's RTTI Complete
+Object Locator has object offset `0`. The constructor initializes the mode
+byte at `+0x18` to zero and stores the parser callback address at `+0x10`; `ReplayReader_Initialize`
+sets that mode byte to `1` at `0x65DBC5`, before registering the context.
+
+The vptr is VA `0x1C6D624` (file offset `0x186C224` via the `.rdata` section
+mapping, raw-to-VA delta `0x401400`). Its Complete Object Locator is VA
+`0x1CBF794` (raw `0x18BE394`); its type descriptor pointer at `+0x0C` is VA
+`0x1E239BC` (raw `0x1A21DBC`) and resolves to `.?AVtfGameSocketHandler@@`.
+The primary table's slot `+4` is VA `0xBFE7E0`
+(raw `0x7FDBE0` under the `.text` delta `0x400C00`): this method logs through
+`dword_1C15EA0` and returns with `ret 4`; it does not read or replace the
+message-pointer argument. Slot `+8` is VA `0xBFE800` (raw `0x7FDC00`).
+That method tests context byte `+0x18`: while zero, it passes the parsed
+message's byte at `+0x18` to `0x809D20` and logs the resulting label along
+with message fields `+0x0C` and `+0x10`; when nonzero, it calls
+`0x7FDC60` with the message-pointer reference and selector argument.
+
+In the nonzero-mode branch, `0x7FDC60` has conditional direct calls to
+`0x81BB90` with the parsed message pointer (when context `+8` is non-null)
+and to `0xBD7060` with that pointer plus a derived small selector (when the
+message predicate and context `+0xB0` allow it). For the message discriminator
+equal to `dword_1DFC030`, it also walks the 16-bit range at message `+0x38`
+through `+0x3A`, calls `0xBCA850` to parse a child, recurses through
+`0x7FDC60`, and releases each child through its vtable slot `+8` when the
+reference count reaches zero. Since `ReplayReader_Initialize` sets the context
+mode to `1` immediately before registration, this nonzero branch is the
+registered path observed here. The recipients' further semantics, message
+field meanings, and producer-side reference policy/ownership transfer remain
+unproven.
 
 The parser's returned pointer is still passed through EAX by both `0x821BA0`
 and the wrapper `0x821DE0`. The registration field is therefore distinct
@@ -2112,11 +2151,13 @@ application event handlers.
 
 `MatrixMessageParserFlowNativeLayout.cs` records the direct parser callsites,
 allocator/registration split, callback load/call, input arguments, result
-queue, context dispatch, and observed reference decrement. Startup checks
-fingerprint those binary edges together with the registration field copies,
-parser-return epilogs, and each dialog vtable entry and RTTI name from the
-requested binary. This model does not emulate parsing or assign semantic
-meaning to the context methods/tags or claim a complete ownership policy.
+queue, ReplayReader context RTTI/vtable slots, dispatch routes, and observed
+reference decrement. Startup checks fingerprint those binary edges together
+with the registration field copies, constructor-return/context-field
+identity, context vtable targets and dispatch calls, parser-return epilogs,
+and each dialog vtable entry and RTTI name from the requested binary. This
+model does not emulate parsing, assign semantic meaning to the context
+message tags/fields, or claim a complete ownership policy.
 
 The nested table at VA `0xC22444` (raw `0x821844`) is now traced from selector
 `0x53` through `0x7A`, inclusive:

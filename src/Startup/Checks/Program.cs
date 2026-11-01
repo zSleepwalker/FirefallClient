@@ -3146,6 +3146,20 @@ var expectedDialogSlots = new IReadOnlyList<MatrixMessageVtableSlotSnapshot>[]
         new MatrixMessageVtableSlotSnapshot(8, 0x526900, MatrixMessageVtableSlotRole.DeletingDestructor)
     }
 };
+var callbackContextVtable = MatrixMessageParserFlowNativeLayout.ReplayReaderCallbackContextVtable;
+var expectedCallbackContextSlots = new[]
+{
+    new MatrixCallbackContextVtableSlotSnapshot(
+        4,
+        0xBFE7E0,
+        0x7FDBE0,
+        MatrixCallbackContextVtableSlotRole.LogOnly),
+    new MatrixCallbackContextVtableSlotSnapshot(
+        8,
+        0xBFE800,
+        0x7FDC00,
+        MatrixCallbackContextVtableSlotRole.ModeDependentMessageDispatch)
+};
 Check("Matrix parser callsites, callback invocation, and result consumption remain explicit",
     MatrixMessageParserFlowNativeLayout.NestedCommandParserFileOffset == 0x81CC50
     && MatrixMessageParserFlowNativeLayout.DirectParserCallSites.SequenceEqual(
@@ -3188,6 +3202,18 @@ Check("Matrix parser callsites, callback invocation, and result consumption rema
     && MatrixMessageParserFlowNativeLayout.ReplayReaderRegisteredParserFieldOffset == 0x1C
     && MatrixMessageParserFlowNativeLayout.ReplayReaderRegisteredContextFieldOffset == 0x20
     && MatrixMessageParserFlowNativeLayout.CallbackObjectParserPointerFieldOffset == 0x10);
+Check("ReplayReader callback context resolves its constructor-returned primary vtable and dispatch slots",
+    callbackContextVtable.RttiName == ".?AVtfGameSocketHandler@@"
+    && callbackContextVtable.VtableVirtualAddress == 0x1C6D624
+    && callbackContextVtable.ObjectVtableFieldOffset == 0
+    && callbackContextVtable.PrimarySlots.SequenceEqual(expectedCallbackContextSlots)
+    && MatrixMessageParserFlowNativeLayout.CallbackContextCompleteObjectLocatorVirtualAddress == 0x1CBF794
+    && MatrixMessageParserFlowNativeLayout.CallbackContextCompleteObjectLocatorObjectOffset == 0
+    && MatrixMessageParserFlowNativeLayout.CallbackContextRttiTypeDescriptorVirtualAddress == 0x1E239BC
+    && MatrixMessageParserFlowNativeLayout.ReplayReaderContextPointerOwnerFieldOffset == 0x54
+    && MatrixMessageParserFlowNativeLayout.CallbackObjectModeFlagFieldOffset == 0x18
+    && MatrixMessageParserFlowNativeLayout.CallbackObjectDispatchSinkFieldOffset == 8
+    && MatrixMessageParserFlowNativeLayout.CallbackObjectAlternateDispatchSinkFieldOffset == 0xB0);
 Check("Dialog message primary vftables map stream readers and writers separately from destruction",
     dialogMessageVtables.Count == 3
     && dialogMessageVtables.Select(vtable => vtable.VtableVirtualAddress)

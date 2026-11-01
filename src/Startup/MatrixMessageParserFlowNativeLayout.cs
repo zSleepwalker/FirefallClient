@@ -18,11 +18,29 @@ public readonly record struct MatrixDialogMessageVtableSnapshot(
     IReadOnlyList<int> SerializedFieldOffsets,
     IReadOnlyList<MatrixMessageVtableSlotSnapshot> PrimarySlots);
 
+public enum MatrixCallbackContextVtableSlotRole
+{
+    LogOnly,
+    ModeDependentMessageDispatch
+}
+
+public readonly record struct MatrixCallbackContextVtableSlotSnapshot(
+    int SlotOffset,
+    uint MethodVirtualAddress,
+    uint MethodFileOffset,
+    MatrixCallbackContextVtableSlotRole Role);
+
+public readonly record struct MatrixCallbackContextVtableSnapshot(
+    string RttiName,
+    uint VtableVirtualAddress,
+    int ObjectVtableFieldOffset,
+    IReadOnlyList<MatrixCallbackContextVtableSlotSnapshot> PrimarySlots);
+
 /// <summary>
 /// Records parser return pass-through, the ReplayReader callback registration,
 /// invocation, result-queue path, and primary dialog-message vftable slots.
-/// The native context dispatch and final-release path are recorded without
-/// assigning semantic meanings to the context methods or message tags.
+/// The ReplayReader context's primary dispatch methods and final-release path
+/// are recorded without assigning semantic meanings to the message tags.
 /// </summary>
 public static class MatrixMessageParserFlowNativeLayout
 {
@@ -60,14 +78,36 @@ public static class MatrixMessageParserFlowNativeLayout
     public const uint CallbackResultReferenceDecrementFileOffset = 0xBD6721;
     public const uint CallbackResultFinalReleaseCallFileOffset = 0xBD6733;
     public const uint CallbackResultQueueRecordCopyFileOffset = 0xBD8BE3;
+    public const uint ReplayReaderContextPointerStoreFileOffset = 0x65DB75;
     public const int CallbackResultQueueFieldOffset = 0xB4;
     public const int CallbackResultDispatchQueueFieldOffset = 0xC8;
     public const int ReplayReaderCallbackRecordParserFieldOffset = 4;
     public const int ReplayReaderRegisteredParserFieldOffset = 0x1C;
     public const int ReplayReaderRegisteredContextFieldOffset = 0x20;
+    public const int ReplayReaderContextPointerOwnerFieldOffset = 0x54;
     public const uint CallbackObjectConstructorFileOffset = 0x7FD670;
+    public const uint CallbackObjectVtableStoreFileOffset = 0x7FD6B7;
     public const uint CallbackObjectParserPointerStoreFileOffset = 0x7FD820;
+    public const uint ReplayReaderContextModeFlagSetFileOffset = 0x65DBC5;
+    public const int CallbackObjectVtableFieldOffset = 0;
     public const int CallbackObjectParserPointerFieldOffset = 0x10;
+    public const int CallbackObjectModeFlagFieldOffset = 0x18;
+    public const int CallbackObjectDispatchSinkFieldOffset = 8;
+    public const int CallbackObjectAlternateDispatchSinkFieldOffset = 0xB0;
+    public const uint CallbackContextVtableVirtualAddress = 0x1C6D624;
+    public const uint CallbackContextCompleteObjectLocatorVirtualAddress = 0x1CBF794;
+    public const int CallbackContextCompleteObjectLocatorObjectOffset = 0;
+    public const uint CallbackContextRttiTypeDescriptorVirtualAddress = 0x1E239BC;
+    public const string CallbackContextRttiName = ".?AVtfGameSocketHandler@@";
+    public const uint CallbackContextLogMethodVirtualAddress = 0xBFE7E0;
+    public const uint CallbackContextLogMethodFileOffset = 0x7FDBE0;
+    public const uint CallbackContextDispatchMethodVirtualAddress = 0xBFE800;
+    public const uint CallbackContextDispatchMethodFileOffset = 0x7FDC00;
+    public const uint CallbackContextDispatchHelperFileOffset = 0x7FDC60;
+    public const uint CallbackContextMessageLabelLookupFileOffset = 0x809D20;
+    public const uint CallbackContextNestedMessageParserFileOffset = 0xBCA850;
+    public const uint CallbackContextMessageConsumerFileOffset = 0x81BB90;
+    public const uint CallbackContextConditionalDispatchFileOffset = 0xBD7060;
 
     public static IReadOnlyList<MatrixParserCallSiteSnapshot> DirectParserCallSites { get; } =
         Array.AsReadOnly(new[]
@@ -75,6 +115,25 @@ public static class MatrixMessageParserFlowNativeLayout
             new MatrixParserCallSiteSnapshot(StreamParserCallerFileOffset, StreamParserCallSiteFileOffset),
             new MatrixParserCallSiteSnapshot(ParserWrapperFileOffset, ParserWrapperCallSiteFileOffset)
         });
+
+    public static MatrixCallbackContextVtableSnapshot ReplayReaderCallbackContextVtable { get; } =
+        new(
+            CallbackContextRttiName,
+            CallbackContextVtableVirtualAddress,
+            CallbackObjectVtableFieldOffset,
+            Array.AsReadOnly(new[]
+            {
+                new MatrixCallbackContextVtableSlotSnapshot(
+                    4,
+                    CallbackContextLogMethodVirtualAddress,
+                    CallbackContextLogMethodFileOffset,
+                    MatrixCallbackContextVtableSlotRole.LogOnly),
+                new MatrixCallbackContextVtableSlotSnapshot(
+                    8,
+                    CallbackContextDispatchMethodVirtualAddress,
+                    CallbackContextDispatchMethodFileOffset,
+                    MatrixCallbackContextVtableSlotRole.ModeDependentMessageDispatch)
+            }));
 
     public static IReadOnlyList<MatrixDialogMessageVtableSnapshot> DialogMessageVtables { get; } =
         Array.AsReadOnly(new[]
