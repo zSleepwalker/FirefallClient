@@ -42,7 +42,7 @@ public readonly record struct MatrixKeyedReceiverCompactSelectorRouteSnapshot(
     uint? DirectHelperFileOffset);
 
 /// <summary>
-/// Bounded mapping of the first twenty-four entries in the QWORD-keyed
+/// Bounded mapping of the first thirty-two entries in the QWORD-keyed
 /// receiver factory. Constructed types are receivers, not parser messages.
 /// </summary>
 public static class MatrixKeyedReceiverFactoryNativeLayout
@@ -136,6 +136,19 @@ public static class MatrixKeyedReceiverFactoryNativeLayout
             new MatrixKeyedReceiverFactoryDispatchSnapshot(0x19, 23, 0x81BB04, 0x81B6C4, 0xC1C2C4, true)
         });
 
+    public static IReadOnlyList<MatrixKeyedReceiverFactoryDispatchSnapshot> Selectors1ATo21TableEntries { get; } =
+        Array.AsReadOnly(new[]
+        {
+            new MatrixKeyedReceiverFactoryDispatchSnapshot(0x1A, 24, 0x81BB08, 0x81BA93, 0xC1C693, false),
+            new MatrixKeyedReceiverFactoryDispatchSnapshot(0x1B, 25, 0x81BB0C, 0x81B702, 0xC1C302, true),
+            new MatrixKeyedReceiverFactoryDispatchSnapshot(0x1C, 26, 0x81BB10, 0x81B740, 0xC1C340, true),
+            new MatrixKeyedReceiverFactoryDispatchSnapshot(0x1D, 27, 0x81BB14, 0x81B77E, 0xC1C37E, true),
+            new MatrixKeyedReceiverFactoryDispatchSnapshot(0x1E, 28, 0x81BB18, 0x81B7BC, 0xC1C3BC, true),
+            new MatrixKeyedReceiverFactoryDispatchSnapshot(0x1F, 29, 0x81BB1C, 0x81B7FA, 0xC1C3FA, true),
+            new MatrixKeyedReceiverFactoryDispatchSnapshot(0x20, 30, 0x81BB20, 0x81BA93, 0xC1C693, false),
+            new MatrixKeyedReceiverFactoryDispatchSnapshot(0x21, 31, 0x81BB24, 0x81B838, 0xC1C438, true)
+        });
+
     public static IReadOnlyList<MatrixKeyedReceiverFactoryCaseSnapshot> NextSixCases { get; } =
         Array.AsReadOnly(new[]
         {
@@ -196,6 +209,35 @@ public static class MatrixKeyedReceiverFactoryNativeLayout
                 0x19, 0x81BB04, 0x81B6C4, 0xC1C2C4, 0x5C8, 0x81B6C9, 0x81B6ED,
                 0xAF1C00, 0xAF1C4B, "C706", 0x1C722A4, 0x1870EA4,
                 0x1CCA960, 0x1E2A010, ".?AVForceShieldView@AreaVisualData@firefall@@", 0)
+        });
+
+    public static IReadOnlyList<MatrixKeyedReceiverFactoryCaseSnapshot> Selectors1ATo21ConstructingCases { get; } =
+        Array.AsReadOnly(new[]
+        {
+            new MatrixKeyedReceiverFactoryCaseSnapshot(
+                0x1B, 0x81BB0C, 0x81B702, 0xC1C302, 0x570, 0x81B707, 0x81B72B,
+                0xB0A990, 0xB0A9D8, "C706", 0x1C72868, 0x1871468,
+                0x1CCBC20, 0x1E2AA88, ".?AVBaseController@Vehicle@firefall@@", 0),
+            new MatrixKeyedReceiverFactoryCaseSnapshot(
+                0x1C, 0x81BB10, 0x81B740, 0xC1C340, 0x1120, 0x81B745, 0x81B769,
+                0xB12490, 0xB124EA, "C706", 0x1C72824, 0x1871424,
+                0x1CCBC5C, 0x1E2AB30, ".?AVCombatController@Vehicle@firefall@@", 0),
+            new MatrixKeyedReceiverFactoryCaseSnapshot(
+                0x1D, 0x81BB14, 0x81B77E, 0xC1C37E, 0x478, 0x81B783, 0x81B7A7,
+                0xB19380, 0xB193C8, "C706", 0x1C727E8, 0x18713E8,
+                0x1CCBC70, 0x1E2AB04, ".?AVObserverView@Vehicle@firefall@@", 0),
+            new MatrixKeyedReceiverFactoryCaseSnapshot(
+                0x1E, 0x81BB18, 0x81B7BC, 0xC1C3BC, 0x10F8, 0x81B7C1, 0x81B7E5,
+                0xB204A0, 0xB204FA, "C706", 0x1C727C4, 0x18713C4,
+                0x1CCBC48, 0x1E2A9F0, ".?AVCombatView@Vehicle@firefall@@", 0),
+            new MatrixKeyedReceiverFactoryCaseSnapshot(
+                0x1F, 0x81BB1C, 0x81B7FA, 0xC1C3FA, 0xB8, 0x81B7FF, 0x81B823,
+                0xB26D40, 0xB26D86, "C706", 0x1C72784, 0x1871384,
+                0x1CCBC0C, 0x1E2A9C4, ".?AVMovementView@Vehicle@firefall@@", 0),
+            new MatrixKeyedReceiverFactoryCaseSnapshot(
+                0x21, 0x81BB24, 0x81B838, 0xC1C438, 0x78, 0x81B83A, 0x81B85E,
+                0xAF6AE0, 0xAF6B22, "C706", 0x1C72254, 0x1870E54,
+                0x1CCA8FC, 0x1E29FE0, ".?AVAIObserverView@Anchor@firefall@@", 0)
         });
 
     public static IReadOnlyList<MatrixKeyedReceiverVtableSlotSnapshot> PrimaryVtableSlots { get; } =
@@ -284,7 +326,31 @@ public static class MatrixKeyedReceiverFactoryNativeLayout
             Slot(0x19, 0x04, 0xAF1D30, "Optional nested-receiver forwarder with conditional fixed 'this view doesn't have any valid events' logging; no message-ID argument."),
             Slot(0x19, 0x08, 0xAF1DD0, "Compact-selector body handler called with a byte-data pointer and length; body not exhaustively mapped."),
             Slot(0x19, 0x0C, 0xAF3170, "Compact-selector body handler called with a data pointer and length; body not exhaustively mapped."),
-            Slot(0x19, 0x18, 0xAF68C0, "State-refresh wrapper; stores the dword_1AC4D24 result at receiver +0x28 and calls 0xBCADF0.")
+            Slot(0x19, 0x18, 0xAF68C0, "State-refresh wrapper; stores the dword_1AC4D24 result at receiver +0x28 and calls 0xBCADF0."),
+            Slot(0x1B, 0x04, 0xB0AD20, "Message-ID dispatcher for exactly 0x5B, gated by receiver +0x2C; it forwards to an optional receiver at +0x10 before the ID gate and logs invalid IDs with message +0x10."),
+            Slot(0x1B, 0x08, 0xB0ADB0, "Compact-selector 1 body handler; consumes a byte-data pointer and length, dispatches byte values through 0xC1, and logs values above that bound; body not exhaustively mapped."),
+            Slot(0x1B, 0x0C, 0xB0CE40, "Compact-selector 3/4 body handler called with data pointer and length; it may forward to a nested receiver at +0x10; body not exhaustively mapped."),
+            Slot(0x1B, 0x18, 0xB120B0, "State-refresh wrapper; stores the dword_1AC4D24 result at receiver +0x28 and calls 0xBCADF0."),
+            Slot(0x1C, 0x04, 0xB12650, "Message-ID dispatcher for 0x53..0x5A, gated by receiver +0x2C; forwards to a nested receiver at +0x10 and logs invalid IDs with message +0x10."),
+            Slot(0x1C, 0x08, 0xB127E0, "Compact-selector 1 body handler called with data pointer and length; body not exhaustively mapped."),
+            Slot(0x1C, 0x0C, 0xB14E20, "Compact-selector 3/4 body handler called with data pointer and length; body not exhaustively mapped."),
+            Slot(0x1C, 0x18, 0xB18EB0, "State-refresh wrapper; stores the dword_1AC4D24 result at receiver +0x28 and calls 0xBCADF0."),
+            Slot(0x1D, 0x04, 0xB196E0, "Message-ID dispatcher for exactly 0x55; invalid IDs call VIBE_LogUnhandledMessageId with message +0x10, while the valid path logs received msg-85 and may forward to receiver +0x2C."),
+            Slot(0x1D, 0x08, 0xB197A0, "Compact-selector 1 body handler called with data pointer and length; body not exhaustively mapped."),
+            Slot(0x1D, 0x0C, 0xB1B630, "Compact-selector 3/4 body handler called with data pointer and length; body not exhaustively mapped."),
+            Slot(0x1D, 0x18, 0xB20100, "State-refresh wrapper; stores the dword_1AC4D24 result at receiver +0x28 and calls 0xBCADF0."),
+            Slot(0x1E, 0x04, 0xB20660, "Message-ID dispatcher for exactly 0x57; invalid IDs call VIBE_LogUnhandledMessageId with message +0x10, while the valid path logs received msg-87 and may forward to receiver +0x2C."),
+            Slot(0x1E, 0x08, 0xB20720, "Compact-selector 1 body handler called with data pointer and length; body not exhaustively mapped."),
+            Slot(0x1E, 0x0C, 0xB22A80, "Compact-selector 3/4 body handler called with data pointer and length; body not exhaustively mapped."),
+            Slot(0x1E, 0x18, 0xB26990, "State-refresh wrapper; stores the dword_1AC4D24 result at receiver +0x28 and calls 0xBCADF0."),
+            Slot(0x1F, 0x04, 0xB26E50, "Message-ID dispatcher for exactly 0x56; invalid IDs call VIBE_LogUnhandledMessageId with message +0x10, while the valid path logs received msg-86 and may forward to receiver +0x2C."),
+            Slot(0x1F, 0x08, 0xB26F20, "Compact-selector 1 body handler called with data pointer and length; body not exhaustively mapped."),
+            Slot(0x1F, 0x0C, 0xB27670, "Compact-selector 3/4 body handler called with data pointer and length; body not exhaustively mapped."),
+            Slot(0x1F, 0x18, 0xB27E20, "State-refresh wrapper; stores the dword_1AC4D24 result at receiver +0x28 and calls 0xBCADF0."),
+            Slot(0x21, 0x04, 0xAF6C40, "Optional nested-receiver forwarder with the fixed 'this view doesn't have any valid events' log; no message-ID argument."),
+            Slot(0x21, 0x08, 0xAF6CE0, "Compact-selector 1 body handler called with data pointer and length; body not exhaustively mapped."),
+            Slot(0x21, 0x0C, 0xAF6E50, "Compact-selector 3/4 body handler called with data pointer and length; body not exhaustively mapped."),
+            Slot(0x21, 0x18, 0xAF7260, "State-refresh wrapper; stores the dword_1AC4D24 result at receiver +0x28 and calls 0xBCADF0.")
         });
 
     public static IReadOnlyList<MatrixKeyedReceiverCompactSelectorRouteSnapshot> CompactSelectorRoutes { get; } =

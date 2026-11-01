@@ -102,29 +102,31 @@
   `AIObserverView`, `CombatView`, `MovementView`, `TinyObjectView`, and
   `DynamicProjectileView` under RTTI namespace `Character`; `0x10` constructs
   `Melding::ObserverView`; `0x0F` and `0x11` share the zero-return path.
-  The current bounded batch adds selectors `0x12..0x19`: `0x12` constructs
-  `MeldingBubble::ObserverView`; `0x14..0x19` construct `AreaVisualData`
-  `ObserverView`, `ParticleEffectsView`, `MapMarkerView`, `TinyObjectView`,
-  `LootObjectView`, and `ForceShieldView`; `0x13` shares the zero-return path.
-  All seven added cases call allocator `0x12B7FB0`, then their listed
-  constructors; each constructor calls base helper `0xBCAD70`, which stores
-  the QWORD key at `+0x18/+0x1C` and an initial helper vptr at VA `0x1C660B4`,
-  before installing the RTTI-backed primary vtable. Their `.rdata` vtable
-  offsets and COL subobject offsets are pinned in the C# layout and binary
-  checks. The index remains `selector-2`; the first 24 selectors (`0x02..0x19`)
-  now include 21 receiver constructors and three zero-return entries
-  (`0x0F`, `0x11`, `0x13`). The remaining 28 selectors `0x1A..0x35` are
-  intentionally unmapped.
-  `0x800420` uses the returned receiver for a separate compact-selector
-  dispatch on message `+0x10`. Across the 21 mapped receivers, `+0x04` has
-  ten message-ID dispatchers and eleven forwarding/logging defaults. The new
-  dispatchers accept only message IDs `0x54` (AreaVisualData `ObserverView`),
-  `0x55` (`ParticleEffectsView`), and `0x53` (`LootObjectView`); invalid IDs
-  reach `VIBE_LogUnhandledMessageId` with `message+0x10`. New defaults emit
-  the fixed `"this view doesn't have any valid events"` message through
-  `VIBE_LogEmitWithArgList` without a message-ID argument. Every mapped
-  `+0x18` is a non-no-op state-refresh wrapper; `+0x08/+0x0C` are compact-body
-  handlers taking data/length forms, with payload semantics out of scope.
+  The latest bounded batch adds selectors `0x1A..0x21`: `0x1A` and `0x20`
+  share the zero-return path; `0x1B..0x1F` construct `Vehicle::BaseController`,
+  `CombatController`, `ObserverView`, `CombatView`, and `MovementView`; `0x21`
+  constructs `Anchor::AIObserverView`. Sizes are `0x570`, `0x1120`, `0x478`,
+  `0x10F8`, `0xB8`, and `0x78`, respectively. Each constructing case calls
+  allocator `0x12B7FB0`, then its constructor; each constructor calls base
+  helper `0xBCAD70`, which stores the QWORD key at `+0x18/+0x1C` before the
+  derived primary vtable is installed. Section-aware `.rdata` mapping,
+  RTTI TypeDescriptors, and zero COL subobject offsets are pinned in
+  `MatrixKeyedReceiverFactoryNativeLayout.cs` and original-image checks. The
+  index remains `selector-2`: entries `0x02..0x21` include 27 constructors
+  and five zero-return entries (`0x0F`, `0x11`, `0x13`, `0x1A`, `0x20`); the
+  remaining 20 selectors `0x22..0x35` are unmapped.
+  Across the 27 mapped receivers, `+0x04` has fifteen message-ID dispatchers
+  and twelve forwarding/logging defaults. The newly mapped dispatchers accept
+  exactly `0x5B` for `Vehicle::BaseController`, `0x53..0x5A` for
+  `Vehicle::CombatController`, exactly `0x55`
+  (`Vehicle::ObserverView`), `0x57` (`CombatView`), and `0x56`
+  (`MovementView`); their invalid-ID paths call
+  `VIBE_LogUnhandledMessageId` with `message+0x10`. `Anchor::AIObserverView`
+  emits the fixed no-valid-events log without a message-ID argument.
+  `0x800420` uses the receiver for a separate compact-selector dispatch on
+  message `+0x10`: `+0x08/+0x0C` paths receive data/length forms, and the
+  mapped `+0x18` slots are non-no-op state-refresh wrappers. Payload semantics
+  remain out of scope.
   `AIObserverView +0x08` has a recovered disassembly boundary at `0x58A6E0`
   (size `0x394`), although Hex-Rays decompilation and payload semantics remain
   unresolved; this is not an unrecovered function boundary. Earlier
