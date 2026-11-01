@@ -22,12 +22,12 @@
 - Secondary selectors in `0x81CC50` use the separate 91-entry table at VA
   `0xC22630` / raw `0x821A30`: `[ebp+8] - 0x20`, bounded through index
   `0x5A`, then indexed by DWORD. The original binary has 91 nonzero, distinct
-  destinations; selectors `0x20..0x47` now have 40 verified message
-  identities/layouts, leaving 51 identities unresolved. The table index is
+  destinations; selectors `0x20..0x4F` now have 48 verified message
+  identities/layouts, leaving 43 identities unresolved. The table index is
   distinct from the keyed-receiver factory's `0x02..0x35` selectors and the
   route0 Character table's `0x53..0x7A` selectors. Continue at selector
-  `0x48`; see the C# snapshots and `docs/MatrixConnection.md`.
-- The 40 verified secondary cases are RTTI-backed:
+  `0x50`; see the C# snapshots and `docs/MatrixConnection.md`.
+- The 48 verified secondary cases are RTTI-backed:
   `EncounterToUIMessage`, `VotekickInitiated`, `VotekickResponded`,
   `ScoreBoardEnable/Init/SetWinner/Clear/AddPlayer/RemovePlayer/
   UpdatePlayerStats/UpdatePlayerStatsFromStats/UpdatePlayerStatus`,
@@ -40,7 +40,10 @@
   `DevRequestSpawnTables`, `DevRequestResourceNodeDebug`,
   `MissionObjectiveUpdated`, `MissionStatusChanged`,
   `MissionReturnToChanged`, `MissionsAvailable`, `MissionActivationAck`,
-  `BountyStatusChanged`, `BountyAbortAck`, and `BountyActivationAck`.
+  `BountyStatusChanged`, `BountyAbortAck`, `BountyActivationAck`,
+  `BountyListActiveAck`, `BountyListActiveDetailsAck`,
+  `BountyListAvailableAck`, `BountyClearAck`, `BountyClearPreviousAck`,
+  `BountyListPreviousAck`, `BountyRerollResponse`, and `DisplayUiTrackBounty`.
   Their common base initializer writes marker
   `+0x08`, descriptor anchor `+0x0C`, constructor type DWORD `+0x10`,
   parser-context copies `+0x18/+0x1C`, and zeros `+0x20/+0x24`; body begins
@@ -63,15 +66,27 @@
   bodies include scalar/text sequences and one byte-counted DWORD+byte vector
   with five-byte wire items and eight-byte native stride. Parser-local DWORD
   literals `0x08..0x27` for selectors `0x28..0x47` are recorded separately
-  from table indexes and constructor type IDs; their role is unknown. All 40 table
+  from table indexes and constructor type IDs; their role is unknown.
+  Selectors `0x48..0x4F` add the RTTI-backed
+  bounty list/clear/response and UI-track cases: their bodies are scalar bytes
+  and DWORDs, WORD-length-prefixed spans sent to embedded objects, and a
+  NUL-terminated shared-text field. The `0x5BCFA0` reader consumes one byte but
+  stores its zero-extended value as a DWORD; the blob reader uses the embedded
+  object's virtual `+0x10` method only for nonzero WORD lengths. The shared
+  text reader uses 256-byte chunks until its NUL terminator, not a 256-byte
+  total limit. Parser-local DWORD literals `0x20..0x2F` for selectors
+  `0x40..0x4F` are separately recorded, with roles unknown. All 48 table
   targets are distinct and nonzero. Selectors `0x28/0x2D`
   and `0x32/0x34` share
   reader continuations despite distinct table destinations and types.
   Out-of-range selectors share zero-return raw `0x8217D9`; selectors `0x26`
-  and `0x31` branch there on allocation failure, while other cases continue
-  to readers with a zero object register, including `0x2D` through `0x28`'s
-  continuation and `0x32/0x34` through their shared text-reader continuation.
-  No runtime consequence is asserted.
+  and `0x31` branch there on allocation failure. Selectors `0x20..0x25`,
+  `0x27..0x30`, and `0x32..0x4E` continue through their body-reader calls with
+  the object register zero, including `0x2D` through `0x28`'s continuation and
+  `0x32/0x34` through their shared text-reader continuation.
+  selector `0x4F` instead reaches its direct DWORD helper after forming the
+  destination from zero ESI plus `0x28`. These are static paths only; no
+  runtime consequence is asserted.
 - Keep this table distinct from the unrelated keyed-receiver factory
   `0x81B1B0`, route0's nested Character selectors `0x53..0x7A`, and primary
   routes 2-6. `.text` and `.rdata` section-aware vtable RTTI names were

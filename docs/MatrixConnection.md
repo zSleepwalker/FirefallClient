@@ -1089,12 +1089,12 @@ subcases: three at route2, nine at route3, three at route4, and one each at
 routes5 and6. All 17 subcases now have native layouts.
 Route0's nested table has a separate, complete set of 40 documented selectors
 (`0x53..0x7A`); route1 is the zero-return route. The secondary selector table
-records 91 dispatch targets. Selectors `0x20..0x47` now have 40 RTTI-backed
-class and body-reader layouts; the remaining 51 identities are unresolved.
+records 91 dispatch targets. Selectors `0x20..0x4F` now have 48 RTTI-backed
+class and body-reader layouts; the remaining 43 identities are unresolved.
 All 91 table entries are nonzero and have distinct targets in the original
 binary, which establishes address uniqueness, not 91 completed identities.
 
-### Secondary-selector entries `0x20..0x47`
+### Secondary-selector entries `0x20..0x4F`
 
 This is the separate second table used by the leading-byte-zero and
 `0xF0..0xFF` path in `0x81CC50`. Its index is `selector - 0x20`, with accepted
@@ -1150,8 +1150,16 @@ Selectors outside `0x20..0x7A` reach the shared zero-return block at raw
 | `0x45` | 37 | `0xC20E90` / `0x820290` | `0x30` | `0x816C40` | `0x1C6E008` / `BountyStatusChanged` | `0x8499F0` |
 | `0x46` | 38 | `0xC20EF8` / `0x8202F8` | `0x30` | `0x816D00` | `0x1C6E028` / `BountyAbortAck` | `0x8498D0` |
 | `0x47` | 39 | `0xC20F60` / `0x820360` | `0x50` | `0x816DC0` | `0x1C6E018` / `BountyActivationAck` | `0x849790` |
+| `0x48` | 40 | `0xC20FC8` / `0x8203C8` | `0x40` | `0x816FC0` | `0x1C6DFD8` / `BountyListActiveAck` | `0x849760` |
+| `0x49` | 41 | `0xC21030` / `0x820430` | `0x40` | `0x817120` | `0x1C6DFF8` / `BountyListActiveDetailsAck` | `0x8496A0` |
+| `0x4A` | 42 | `0xC21098` / `0x820498` | `0x40` | `0x817260` | `0x1C6DFE8` / `BountyListAvailableAck` | `0x849600` |
+| `0x4B` | 43 | `0xC21100` / `0x820500` | `0x30` | `0x8173A0` | `0x1C6DFB8` / `BountyClearAck` | `0x849560` |
+| `0x4C` | 44 | `0xC21168` / `0x820568` | `0x30` | `0x817460` | `0x1C6DFA8` / `BountyClearPreviousAck` | `0x8494C0` |
+| `0x4D` | 45 | `0xC211D0` / `0x8205D0` | `0x40` | `0x817520` | `0x1C6DFC8` / `BountyListPreviousAck` | `0x849420` |
+| `0x4E` | 46 | `0xC21238` / `0x820638` | `0x38` | `0x817660` | `0x1C6DF88` / `BountyRerollResponse` | `0x849380` |
+| `0x4F` | 47 | `0xC212A0` / `0x8206A0` | `0x30` | `0x817800` | `0x1C6DF78` / `DisplayUiTrackBounty` | `0x3370A0` (direct) |
 
-The first 40 entries have 40 distinct, nonzero table destinations. No shared
+The first 48 entries have 48 distinct, nonzero table destinations. No shared
 case or zero-valued table slot occurs in this verified prefix. Selector `0x26`
 does have a distinct allocation-failure branch to the common zero-return block;
 that is a case-path result, not a zero table entry. Selectors `0x28` and `0x2D`
@@ -1161,7 +1169,7 @@ destinations and RTTI-identified types remain distinct. Selectors `0x32` and
 sharing the NUL-terminated text reader at raw `0x12EE010` through continuation
 `0x81FB27`.
 
-All 32 constructors call a selector-specific base-metadata initializer
+All 48 constructors call a selector-specific base-metadata initializer
 before storing the derived vtable. For selectors `0x20..0x27` these helpers
 are `0x823020`, `0x823090`, `0x823100`, `0x823170`, `0x8231E0`, `0x823250`,
 `0x8232C0`, and `0x823330`; for `0x28..0x2F` they are `0x8233C0`, `0x823430`,
@@ -1171,7 +1179,8 @@ for `0x30..0x37` they are `0x823840`, `0x8238B0`, `0x823920`, `0x823990`,
 use `0x823DB0`, `0x823F20`, `0x824090`, `0x824100`, `0x824170`, `0x8241E0`,
 `0x824250`, and `0x8243C0`; selectors `0x40..0x47` use `0x824430`,
 `0x8244A0`, `0x824510`, `0x824580`, `0x8246E0`, `0x824750`, `0x8247C0`,
-and `0x824830`.
+and `0x824830`; selectors `0x48..0x4F` use `0x8248A0`, `0x824910`,
+`0x824980`, `0x8249F0`, `0x824A60`, `0x824AD0`, `0x824B40`, and `0x824BB0`.
 Each helper sets a base flag DWORD at `+0x08` to 1, stores its
 descriptor-anchor pointer at `+0x0C`, stores the constructor-supplied type
 DWORD at `+0x10`, copies the parser input's first two DWORDs to `+0x18/+0x1C`,
@@ -1184,7 +1193,9 @@ Their roles are unknown; numerical coincidence with table indexes does not
 establish that they are selector indexes or message discriminators.
 Selectors `0x38..0x3F` likewise store parser-local DWORD literals `0x18..0x1F`;
 these are recorded separately from selector/table indexes and their roles are
-unknown.
+unknown. Selectors `0x40..0x4F` store parser-local DWORD literals `0x20..0x2F`
+in the same separate slot; their roles are also unresolved and they are not
+the constructor type IDs or table indexes.
 
 Body reads, with field labels deliberately limited to offsets and widths:
 
@@ -1354,6 +1365,48 @@ Body reads, with field labels deliberately limited to offsets and widths:
   `+0x28/+0x2C/+0x2E/+0x30/+0x34/+0x38/+0x40/+0x44/+0x48`. The zeroing
   WORD store at `+0x2C` also initializes byte `+0x2D`; no allocator zero-fill
   behavior is inferred.
+- `0x48` `BountyListActiveAck`: byte at `+0x28`, then one wire byte at `+0x2C`
+  stored zero-extended as a DWORD, then a WORD-length-prefixed byte span passed
+  to the embedded object at `+0x30`. Its constructor initializes byte `+0x28`,
+  DWORD `+0x2C`, and the four-DWORD embedded-object region at `+0x30..+0x3C`;
+  the first embedded DWORD is `0x1C80CC4`, the remaining three are zero.
+- `0x49` `BountyListActiveDetailsAck` and `0x4A` `BountyListAvailableAck`:
+  byte at `+0x28`, then a WORD-length-prefixed byte span passed to the embedded
+  object at `+0x2C`. Each constructor initializes byte `+0x28`, stores
+  `0x1C80CC4` at `+0x2C`, and zeros DWORDs `+0x30/+0x34/+0x38`.
+- `0x4B` `BountyClearAck` and `0x4C` `BountyClearPreviousAck`: byte at `+0x28`,
+  then one wire byte at `+0x2C` stored zero-extended as a DWORD. Each
+  constructor initializes byte `+0x28` and DWORD `+0x2C`; the second reader
+  consumes one byte, not the entire initialized DWORD.
+- `0x4D` `BountyListPreviousAck`: byte at `+0x28`, then a WORD-length-prefixed
+  byte span passed to the embedded object at `+0x2C`. Its constructor
+  initializes byte `+0x28`, stores `0x1C80CC4` at `+0x2C`, and zeros DWORDs
+  `+0x30/+0x34/+0x38`.
+- `0x4E` `BountyRerollResponse`: DWORD at `+0x28`, byte at `+0x2C`, then
+  NUL-terminated shared text at `+0x30`. The constructor initializes DWORD
+  `+0x28`, byte `+0x2C`, and DWORD `+0x30`; it does not write the intervening
+  bytes `+0x2D..+0x2F`, and this reader does not consume them.
+- `0x4F` `DisplayUiTrackBounty`: one DWORD at `+0x28`, read directly by the
+  case through `0x3370A0`; unlike `0x48..0x4E`, it has no separate body-reader
+  function.
+
+The `0x48..0x4E` body-reader functions are called with the stream in ECX and
+the message-object pointer on the stack. Selector `0x4F` instead calls the
+DWORD helper with the stream in ECX and the destination pointer
+`object+0x28` on the stack. The scalar readers consume 1 or 4 wire bytes as
+listed; the `0x5BCFA0` helper consumes one byte and stores its zero-extended
+value as a DWORD at `+0x2C`.
+
+The shared `0x12EE170` blob reader consumes a 16-bit little-endian length.
+Length zero skips the embedded object's virtual `+0x10` copy method. A
+nonzero length is checked against available stream bytes, passed with the
+source pointer to that method, and then advances the stream by the payload
+length. The embedded object's contents and semantics remain unresolved.
+`0x12EE010` reads bytewise through the NUL terminator, using an internal
+256-byte temporary chunk and repeating until termination; this is a chunk
+size, not a total-string limit. Encoding and malformed-input behavior remain
+unresolved. These selectors contain no count-framed item loops; no field
+semantics are inferred from the RTTI names.
 
 The cases for `0x40..0x47` push a descriptor-anchor VA, a distinct setup
 argument, and `0x1E60904` to `0x3571B0`; that target is a one-byte `ret`
@@ -1369,13 +1422,26 @@ derived vtables resolve through section-aware COL/TypeDescriptor reads in the
 original image. RTTI class names do not establish the meaning of the wire
 fields.
 
+Selectors `0x48..0x4F` follow the same setup-call and allocation sequence, with
+distinct per-case setup arguments and descriptor anchors recorded in their
+layout classes. They store parser-local DWORDs `0x28..0x2F` separately, call
+constructors whose base helpers receive type IDs `0x48..0x4F`, and install
+distinct RTTI-resolved vtables. These selectors, parser-local values, metadata
+anchors, and constructor type IDs remain separate observed values; their
+numerical relationships do not establish semantic meaning. The `0x4F`
+allocation-failure path zeroes ESI and then forms the direct DWORD-reader
+destination as `[ESI+0x28]`; this records the static path only and does not
+assert a runtime consequence.
+
 Binary fingerprints include table indexes and targets, case setup arguments,
 allocation sizes and failure blocks, constructor type/metadata/vtable order,
 reader field arguments, primitive-reader calls, byte-count consumption,
 native vector increments, and the count-loop continuation and termination
 branches. They cover selector `0x36`'s conditional tail and its `0x70` native
 stride as well as selector `0x43`'s byte count, DWORD-plus-byte items, and
-eight-byte stride. These checks
+eight-byte stride, plus the `0x48..0x4F` scalar/embedded-object/text-reader
+argument order, byte/DWORD/WORD widths, zero-length blob gate, and shared-text
+NUL/chunk loop. These checks
 assert wire framing only; unresolved field, gate, count, predicate, and tag
 meanings remain unassigned.
 
@@ -1384,8 +1450,11 @@ set the object register to zero but still fall through to their body-reader
 call. Selector `0x2D` branches through selector `0x28`'s zero-object block and
 shared reader continuation. Selector `0x26` instead branches directly to the
 shared zero-return block. Selector `0x31` also branches directly to the shared
-zero-return block; the other cases through `0x47` continue through their
-readers with the object register set to zero on allocation failure.
+zero-return block; selectors through `0x4E` continue through their readers with
+the object register set to zero on allocation failure. Selector `0x4F` instead
+continues to its direct DWORD helper after forming the destination from the
+zero object register. These are static control-flow observations only; their
+runtime consequence is not asserted.
 Selectors `0x32` and `0x34` share the zero-object continuation at raw
 `0x81FB25` and the text-reader continuation at `0x81FB27`. These are static
 control-flow observations only; their runtime consequence is not asserted.

@@ -970,7 +970,7 @@ Check("Secondary command dispatcher separates primary-byte, secondary-selector, 
     && MatrixSecondaryCommandDispatcherNativeLayout.GetSecondarySelectorIndex(0x20) == 0
     && MatrixSecondaryCommandDispatcherNativeLayout.GetSecondarySelectorIndex(0x7A) == 0x5A
     && MatrixSecondaryCommandDispatcherNativeLayout.GetSecondarySelectorIndex(0x7B) is null);
-Check("Secondary decoder table snapshot records the first 32 of 91 selectors",
+Check("Secondary decoder table snapshot records the first 48 of 91 selectors",
     MatrixSecondaryDecoderTableNativeLayout.ParserFileOffset == 0x81CC50
     && MatrixSecondaryDecoderTableNativeLayout.SelectorComparisonFileOffset == 0x81F3A8
     && MatrixSecondaryDecoderTableNativeLayout.SelectorJumpFileOffset == 0x81F3B4
@@ -987,16 +987,18 @@ Check("Secondary decoder table snapshot records the first 32 of 91 selectors",
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x37) == 23
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x40) == 32
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x47) == 39
+    && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x48) == 40
+    && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x4F) == 47
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x7A) == 0x5A
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x1F) is null
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x7B) is null
-    && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries.Count == 40
+    && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries.Count == 48
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .Select(entry => entry.Selector)
-        .SequenceEqual(Enumerable.Range(0x20, 40).Select(selector => (byte)selector))
+        .SequenceEqual(Enumerable.Range(0x20, 48).Select(selector => (byte)selector))
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .Select(entry => entry.TableIndex)
-        .SequenceEqual(Enumerable.Range(0, 40))
+        .SequenceEqual(Enumerable.Range(0, 48))
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .Select(entry => entry.TargetVirtualAddress)
         .SequenceEqual(new uint[]
@@ -1010,7 +1012,9 @@ Check("Secondary decoder table snapshot records the first 32 of 91 selectors",
             0xC20936, 0xC2099E, 0xC20A06, 0xC20A6E,
             0xC20AD8, 0xC20B4C, 0xC20BB4, 0xC20C1E,
             0xC20C88, 0xC20CF0, 0xC20D58, 0xC20DC0,
-            0xC20E28, 0xC20E90, 0xC20EF8, 0xC20F60
+            0xC20E28, 0xC20E90, 0xC20EF8, 0xC20F60,
+            0xC20FC8, 0xC21030, 0xC21098, 0xC21100,
+            0xC21168, 0xC211D0, 0xC21238, 0xC212A0
         })
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .All(entry => entry.TargetKind == MatrixSecondaryDecoderTargetKind.MessageCase)
@@ -1018,7 +1022,7 @@ Check("Secondary decoder table snapshot records the first 32 of 91 selectors",
         .All(entry => entry.TargetVirtualAddress == entry.TargetFileOffset + 0x400C00)
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .Select(entry => entry.TargetVirtualAddress)
-        .Distinct().Count() == 40
+        .Distinct().Count() == 48
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x27)?.TargetFileOffset == 0x81F683
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x28)?.TargetFileOffset == 0x81F6EB
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x2F)?.TargetFileOffset == 0x81F9BE
@@ -1027,7 +1031,9 @@ Check("Secondary decoder table snapshot records the first 32 of 91 selectors",
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x38)?.TargetFileOffset == 0x81FD36
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x3F)?.TargetFileOffset == 0x82001E
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x47)?.TargetFileOffset == 0x820360
-    && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x48) is null);
+    && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x48)?.TargetFileOffset == 0x8203C8
+    && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x4F)?.TargetFileOffset == 0x8206A0
+    && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x50) is null);
 Check("Secondary decoder RTTI and native body layouts retain observed offsets and widths",
     MatrixSecondaryMessageHeaderNativeLayout.BaseMetadataFlagOffset == 0x08
     && MatrixSecondaryMessageHeaderNativeLayout.DescriptorAnchorPointerOffset == 0x0C
@@ -1527,6 +1533,167 @@ Check("Secondary selectors 0x40-0x47 retain RTTI, constructor, and native body l
     && BountyActivationAckNativeLayout.TrailingByteFieldOffset == 0x38
     && BountyActivationAckNativeLayout.QwordFieldOffset == 0x40
     && BountyActivationAckNativeLayout.SharedTextFieldOffset == 0x48);
+Check("Secondary selectors 0x48-0x4F retain RTTI and native body layouts",
+    new byte[]
+    {
+        BountyListActiveAckNativeLayout.Selector,
+        BountyListActiveDetailsAckNativeLayout.Selector,
+        BountyListAvailableAckNativeLayout.Selector,
+        BountyClearAckNativeLayout.Selector,
+        BountyClearPreviousAckNativeLayout.Selector,
+        BountyListPreviousAckNativeLayout.Selector,
+        BountyRerollResponseNativeLayout.Selector,
+        DisplayUiTrackBountyNativeLayout.Selector
+    }.SequenceEqual(Enumerable.Range(0x48, 8).Select(value => (byte)value))
+    && new uint[]
+    {
+        BountyListActiveAckNativeLayout.CaseVirtualAddress,
+        BountyListActiveDetailsAckNativeLayout.CaseVirtualAddress,
+        BountyListAvailableAckNativeLayout.CaseVirtualAddress,
+        BountyClearAckNativeLayout.CaseVirtualAddress,
+        BountyClearPreviousAckNativeLayout.CaseVirtualAddress,
+        BountyListPreviousAckNativeLayout.CaseVirtualAddress,
+        BountyRerollResponseNativeLayout.CaseVirtualAddress,
+        DisplayUiTrackBountyNativeLayout.CaseVirtualAddress
+    }.SequenceEqual(new uint[]
+    {
+        0xC20FC8, 0xC21030, 0xC21098, 0xC21100,
+        0xC21168, 0xC211D0, 0xC21238, 0xC212A0
+    })
+    && new uint[]
+    {
+        BountyListActiveAckNativeLayout.CaseFileOffset,
+        BountyListActiveDetailsAckNativeLayout.CaseFileOffset,
+        BountyListAvailableAckNativeLayout.CaseFileOffset,
+        BountyClearAckNativeLayout.CaseFileOffset,
+        BountyClearPreviousAckNativeLayout.CaseFileOffset,
+        BountyListPreviousAckNativeLayout.CaseFileOffset,
+        BountyRerollResponseNativeLayout.CaseFileOffset,
+        DisplayUiTrackBountyNativeLayout.CaseFileOffset
+    }.SequenceEqual(new uint[]
+    {
+        0x8203C8, 0x820430, 0x820498, 0x820500,
+        0x820568, 0x8205D0, 0x820638, 0x8206A0
+    })
+    && new uint[]
+    {
+        BountyListActiveAckNativeLayout.AllocationSize,
+        BountyListActiveDetailsAckNativeLayout.AllocationSize,
+        BountyListAvailableAckNativeLayout.AllocationSize,
+        BountyClearAckNativeLayout.AllocationSize,
+        BountyClearPreviousAckNativeLayout.AllocationSize,
+        BountyListPreviousAckNativeLayout.AllocationSize,
+        BountyRerollResponseNativeLayout.AllocationSize,
+        DisplayUiTrackBountyNativeLayout.AllocationSize
+    }.SequenceEqual(new uint[] { 0x40, 0x40, 0x40, 0x30, 0x30, 0x40, 0x38, 0x30 })
+    && new uint[]
+    {
+        BountyListActiveAckNativeLayout.ConstructorNativeTypeId,
+        BountyListActiveDetailsAckNativeLayout.ConstructorNativeTypeId,
+        BountyListAvailableAckNativeLayout.ConstructorNativeTypeId,
+        BountyClearAckNativeLayout.ConstructorNativeTypeId,
+        BountyClearPreviousAckNativeLayout.ConstructorNativeTypeId,
+        BountyListPreviousAckNativeLayout.ConstructorNativeTypeId,
+        BountyRerollResponseNativeLayout.ConstructorNativeTypeId,
+        DisplayUiTrackBountyNativeLayout.ConstructorNativeTypeId
+    }.SequenceEqual(Enumerable.Range(0x48, 8).Select(value => (uint)value))
+    && new uint[]
+    {
+        BountyListActiveAckNativeLayout.CaseLocalDwordValue,
+        BountyListActiveDetailsAckNativeLayout.CaseLocalDwordValue,
+        BountyListAvailableAckNativeLayout.CaseLocalDwordValue,
+        BountyClearAckNativeLayout.CaseLocalDwordValue,
+        BountyClearPreviousAckNativeLayout.CaseLocalDwordValue,
+        BountyListPreviousAckNativeLayout.CaseLocalDwordValue,
+        BountyRerollResponseNativeLayout.CaseLocalDwordValue,
+        DisplayUiTrackBountyNativeLayout.CaseLocalDwordValue
+    }.SequenceEqual(Enumerable.Range(0x28, 8).Select(value => (uint)value))
+    && new uint[]
+    {
+        BountyListActiveAckNativeLayout.BaseMetadataConstructorFileOffset,
+        BountyListActiveDetailsAckNativeLayout.BaseMetadataConstructorFileOffset,
+        BountyListAvailableAckNativeLayout.BaseMetadataConstructorFileOffset,
+        BountyClearAckNativeLayout.BaseMetadataConstructorFileOffset,
+        BountyClearPreviousAckNativeLayout.BaseMetadataConstructorFileOffset,
+        BountyListPreviousAckNativeLayout.BaseMetadataConstructorFileOffset,
+        BountyRerollResponseNativeLayout.BaseMetadataConstructorFileOffset,
+        DisplayUiTrackBountyNativeLayout.BaseMetadataConstructorFileOffset
+    }.SequenceEqual(new uint[]
+    {
+        0x8248A0, 0x824910, 0x824980, 0x8249F0,
+        0x824A60, 0x824AD0, 0x824B40, 0x824BB0
+    })
+    && new uint[]
+    {
+        BountyListActiveAckNativeLayout.BodyReaderFileOffset,
+        BountyListActiveDetailsAckNativeLayout.BodyReaderFileOffset,
+        BountyListAvailableAckNativeLayout.BodyReaderFileOffset,
+        BountyClearAckNativeLayout.BodyReaderFileOffset,
+        BountyClearPreviousAckNativeLayout.BodyReaderFileOffset,
+        BountyListPreviousAckNativeLayout.BodyReaderFileOffset,
+        BountyRerollResponseNativeLayout.BodyReaderFileOffset,
+        DisplayUiTrackBountyNativeLayout.BodyReaderFileOffset
+    }.SequenceEqual(new uint[]
+    {
+        0x849760, 0x8496A0, 0x849600, 0x849560,
+        0x8494C0, 0x849420, 0x849380, 0x3370A0
+    })
+    && new uint[]
+    {
+        BountyListActiveAckNativeLayout.VtableVirtualAddress,
+        BountyListActiveDetailsAckNativeLayout.VtableVirtualAddress,
+        BountyListAvailableAckNativeLayout.VtableVirtualAddress,
+        BountyClearAckNativeLayout.VtableVirtualAddress,
+        BountyClearPreviousAckNativeLayout.VtableVirtualAddress,
+        BountyListPreviousAckNativeLayout.VtableVirtualAddress,
+        BountyRerollResponseNativeLayout.VtableVirtualAddress,
+        DisplayUiTrackBountyNativeLayout.VtableVirtualAddress
+    }.SequenceEqual(new uint[]
+    {
+        0x1C6DFD8, 0x1C6DFF8, 0x1C6DFE8, 0x1C6DFB8,
+        0x1C6DFA8, 0x1C6DFC8, 0x1C6DF88, 0x1C6DF78
+    })
+    && new string[]
+    {
+        BountyListActiveAckNativeLayout.RttiName,
+        BountyListActiveDetailsAckNativeLayout.RttiName,
+        BountyListAvailableAckNativeLayout.RttiName,
+        BountyClearAckNativeLayout.RttiName,
+        BountyClearPreviousAckNativeLayout.RttiName,
+        BountyListPreviousAckNativeLayout.RttiName,
+        BountyRerollResponseNativeLayout.RttiName,
+        DisplayUiTrackBountyNativeLayout.RttiName
+    }.SequenceEqual(new[]
+    {
+        ".?AVBountyListActiveAck@firefall@@",
+        ".?AVBountyListActiveDetailsAck@firefall@@",
+        ".?AVBountyListAvailableAck@firefall@@",
+        ".?AVBountyClearAck@firefall@@",
+        ".?AVBountyClearPreviousAck@firefall@@",
+        ".?AVBountyListPreviousAck@firefall@@",
+        ".?AVBountyRerollResponse@firefall@@",
+        ".?AVDisplayUiTrackBounty@firefall@@"
+    })
+    && BountyListActiveAckNativeLayout.FirstByteFieldOffset == 0x28
+    && BountyListActiveAckNativeLayout.ByteWireValueDwordOffset == 0x2C
+    && BountyListActiveAckNativeLayout.EmbeddedBlobObjectOffset == 0x30
+    && BountyListActiveDetailsAckNativeLayout.ByteFieldOffset == 0x28
+    && BountyListActiveDetailsAckNativeLayout.EmbeddedBlobObjectOffset == 0x2C
+    && BountyListAvailableAckNativeLayout.ByteFieldOffset == 0x28
+    && BountyListAvailableAckNativeLayout.EmbeddedBlobObjectOffset == 0x2C
+    && BountyClearAckNativeLayout.FirstByteFieldOffset == 0x28
+    && BountyClearAckNativeLayout.ByteWireValueDwordOffset == 0x2C
+    && BountyClearPreviousAckNativeLayout.FirstByteFieldOffset == 0x28
+    && BountyClearPreviousAckNativeLayout.ByteWireValueDwordOffset == 0x2C
+    && BountyListPreviousAckNativeLayout.ByteFieldOffset == 0x28
+    && BountyListPreviousAckNativeLayout.EmbeddedBlobObjectOffset == 0x2C
+    && BountyRerollResponseNativeLayout.DwordFieldOffset == 0x28
+    && BountyRerollResponseNativeLayout.ByteFieldOffset == 0x2C
+    && BountyRerollResponseNativeLayout.SharedTextFieldOffset == 0x30
+    && DisplayUiTrackBountyNativeLayout.DwordFieldOffset == 0x28
+    && MatrixSecondaryEmbeddedBlobNativeLayout.LengthPrefixWireWidth == 2
+    && MatrixSecondaryEmbeddedBlobNativeLayout.ObjectCopyVirtualMethodOffset == 0x10
+    && MatrixSecondaryEmbeddedBlobNativeLayout.ZeroLengthPayloadWidth == 0);
 Check("Secondary parser-local DWORD literals remain separate from selector mapping",
     new uint[]
     {

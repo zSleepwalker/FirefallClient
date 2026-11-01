@@ -110,6 +110,22 @@ public static class MatrixSecondaryDecoderTableNativeLayout
             new MatrixSecondaryDecoderEntrySnapshot(0x46, 38, 0xC20EF8, 0x8202F8,
                 MatrixSecondaryDecoderTargetKind.MessageCase),
             new MatrixSecondaryDecoderEntrySnapshot(0x47, 39, 0xC20F60, 0x820360,
+                MatrixSecondaryDecoderTargetKind.MessageCase),
+            new MatrixSecondaryDecoderEntrySnapshot(0x48, 40, 0xC20FC8, 0x8203C8,
+                MatrixSecondaryDecoderTargetKind.MessageCase),
+            new MatrixSecondaryDecoderEntrySnapshot(0x49, 41, 0xC21030, 0x820430,
+                MatrixSecondaryDecoderTargetKind.MessageCase),
+            new MatrixSecondaryDecoderEntrySnapshot(0x4A, 42, 0xC21098, 0x820498,
+                MatrixSecondaryDecoderTargetKind.MessageCase),
+            new MatrixSecondaryDecoderEntrySnapshot(0x4B, 43, 0xC21100, 0x820500,
+                MatrixSecondaryDecoderTargetKind.MessageCase),
+            new MatrixSecondaryDecoderEntrySnapshot(0x4C, 44, 0xC21168, 0x820568,
+                MatrixSecondaryDecoderTargetKind.MessageCase),
+            new MatrixSecondaryDecoderEntrySnapshot(0x4D, 45, 0xC211D0, 0x8205D0,
+                MatrixSecondaryDecoderTargetKind.MessageCase),
+            new MatrixSecondaryDecoderEntrySnapshot(0x4E, 46, 0xC21238, 0x820638,
+                MatrixSecondaryDecoderTargetKind.MessageCase),
+            new MatrixSecondaryDecoderEntrySnapshot(0x4F, 47, 0xC212A0, 0x8206A0,
                 MatrixSecondaryDecoderTargetKind.MessageCase)
         });
 
@@ -1184,4 +1200,172 @@ public static class BountyActivationAckNativeLayout
     public const int TrailingByteFieldOffset = 0x38;
     public const int QwordFieldOffset = 0x40;
     public const int SharedTextFieldOffset = 0x48;
+}
+
+public static class BountyListActiveAckNativeLayout
+{
+    public const byte Selector = 0x48;
+    public const uint CaseVirtualAddress = 0xC20FC8;
+    public const uint CaseFileOffset = 0x8203C8;
+    public const uint CaseLocalDwordValue = 0x28;
+    public const uint CaseSetupArgument2VirtualAddress = 0x1B8CB04;
+    public const int AllocationSize = 0x40;
+    public const uint ConstructorFileOffset = 0x816FC0;
+    public const uint BaseMetadataConstructorFileOffset = 0x8248A0;
+    public const uint ConstructorNativeTypeId = 0x48;
+    public const uint DescriptorAnchorVirtualAddress = 0x1B89C1C;
+    public const uint BodyReaderFileOffset = 0x849760;
+    public const uint BodyReaderCallSiteFileOffset = 0x820416;
+    public const uint VtableVirtualAddress = 0x1C6DFD8;
+    public const string RttiName = ".?AVBountyListActiveAck@firefall@@";
+    public const int FirstByteFieldOffset = 0x28;
+    public const int ByteWireValueDwordOffset = 0x2C;
+    public const int EmbeddedBlobObjectOffset = 0x30;
+}
+
+public static class BountyListActiveDetailsAckNativeLayout
+{
+    public const byte Selector = 0x49;
+    public const uint CaseVirtualAddress = 0xC21030;
+    public const uint CaseFileOffset = 0x820430;
+    public const uint CaseLocalDwordValue = 0x29;
+    public const uint CaseSetupArgument2VirtualAddress = 0x1B8CB1C;
+    public const int AllocationSize = 0x40;
+    public const uint ConstructorFileOffset = 0x817120;
+    public const uint BaseMetadataConstructorFileOffset = 0x824910;
+    public const uint ConstructorNativeTypeId = 0x49;
+    public const uint DescriptorAnchorVirtualAddress = 0x1B89C24;
+    public const uint BodyReaderFileOffset = 0x8496A0;
+    public const uint BodyReaderCallSiteFileOffset = 0x82047E;
+    public const uint VtableVirtualAddress = 0x1C6DFF8;
+    public const string RttiName = ".?AVBountyListActiveDetailsAck@firefall@@";
+    public const int ByteFieldOffset = 0x28;
+    public const int EmbeddedBlobObjectOffset = 0x2C;
+}
+
+public static class BountyListAvailableAckNativeLayout
+{
+    public const byte Selector = 0x4A;
+    public const uint CaseVirtualAddress = 0xC21098;
+    public const uint CaseFileOffset = 0x820498;
+    public const uint CaseLocalDwordValue = 0x2A;
+    public const uint CaseSetupArgument2VirtualAddress = 0x1B8CB34;
+    public const int AllocationSize = 0x40;
+    public const uint ConstructorFileOffset = 0x817260;
+    public const uint BaseMetadataConstructorFileOffset = 0x824980;
+    public const uint ConstructorNativeTypeId = 0x4A;
+    public const uint DescriptorAnchorVirtualAddress = 0x1B89C0C;
+    public const uint BodyReaderFileOffset = 0x849600;
+    public const uint BodyReaderCallSiteFileOffset = 0x8204E6;
+    public const uint VtableVirtualAddress = 0x1C6DFE8;
+    public const string RttiName = ".?AVBountyListAvailableAck@firefall@@";
+    public const int ByteFieldOffset = 0x28;
+    public const int EmbeddedBlobObjectOffset = 0x2C;
+}
+
+public static class BountyClearAckNativeLayout
+{
+    public const byte Selector = 0x4B;
+    public const uint CaseVirtualAddress = 0xC21100;
+    public const uint CaseFileOffset = 0x820500;
+    public const uint CaseLocalDwordValue = 0x2B;
+    public const uint CaseSetupArgument2VirtualAddress = 0x1B8CB4C;
+    public const int AllocationSize = 0x30;
+    public const uint ConstructorFileOffset = 0x8173A0;
+    public const uint BaseMetadataConstructorFileOffset = 0x8249F0;
+    public const uint ConstructorNativeTypeId = 0x4B;
+    public const uint DescriptorAnchorVirtualAddress = 0x1B89C14;
+    public const uint BodyReaderFileOffset = 0x849560;
+    public const uint BodyReaderCallSiteFileOffset = 0x82054E;
+    public const uint VtableVirtualAddress = 0x1C6DFB8;
+    public const string RttiName = ".?AVBountyClearAck@firefall@@";
+    public const int FirstByteFieldOffset = 0x28;
+    public const int ByteWireValueDwordOffset = 0x2C;
+}
+
+public static class BountyClearPreviousAckNativeLayout
+{
+    public const byte Selector = 0x4C;
+    public const uint CaseVirtualAddress = 0xC21168;
+    public const uint CaseFileOffset = 0x820568;
+    public const uint CaseLocalDwordValue = 0x2C;
+    public const uint CaseSetupArgument2VirtualAddress = 0x1B8CB64;
+    public const int AllocationSize = 0x30;
+    public const uint ConstructorFileOffset = 0x817460;
+    public const uint BaseMetadataConstructorFileOffset = 0x824A60;
+    public const uint ConstructorNativeTypeId = 0x4C;
+    public const uint DescriptorAnchorVirtualAddress = 0x1B89BFC;
+    public const uint BodyReaderFileOffset = 0x8494C0;
+    public const uint BodyReaderCallSiteFileOffset = 0x8205B6;
+    public const uint VtableVirtualAddress = 0x1C6DFA8;
+    public const string RttiName = ".?AVBountyClearPreviousAck@firefall@@";
+    public const int FirstByteFieldOffset = 0x28;
+    public const int ByteWireValueDwordOffset = 0x2C;
+}
+
+public static class BountyListPreviousAckNativeLayout
+{
+    public const byte Selector = 0x4D;
+    public const uint CaseVirtualAddress = 0xC211D0;
+    public const uint CaseFileOffset = 0x8205D0;
+    public const uint CaseLocalDwordValue = 0x2D;
+    public const uint CaseSetupArgument2VirtualAddress = 0x1B8C9FC;
+    public const int AllocationSize = 0x40;
+    public const uint ConstructorFileOffset = 0x817520;
+    public const uint BaseMetadataConstructorFileOffset = 0x824AD0;
+    public const uint ConstructorNativeTypeId = 0x4D;
+    public const uint DescriptorAnchorVirtualAddress = 0x1B89C04;
+    public const uint BodyReaderFileOffset = 0x849420;
+    public const uint BodyReaderCallSiteFileOffset = 0x82061E;
+    public const uint VtableVirtualAddress = 0x1C6DFC8;
+    public const string RttiName = ".?AVBountyListPreviousAck@firefall@@";
+    public const int ByteFieldOffset = 0x28;
+    public const int EmbeddedBlobObjectOffset = 0x2C;
+}
+
+public static class BountyRerollResponseNativeLayout
+{
+    public const byte Selector = 0x4E;
+    public const uint CaseVirtualAddress = 0xC21238;
+    public const uint CaseFileOffset = 0x820638;
+    public const uint CaseLocalDwordValue = 0x2E;
+    public const uint CaseSetupArgument2VirtualAddress = 0x1B8CA14;
+    public const int AllocationSize = 0x38;
+    public const uint ConstructorFileOffset = 0x817660;
+    public const uint BaseMetadataConstructorFileOffset = 0x824B40;
+    public const uint ConstructorNativeTypeId = 0x4E;
+    public const uint DescriptorAnchorVirtualAddress = 0x1B89BEC;
+    public const uint BodyReaderFileOffset = 0x849380;
+    public const uint BodyReaderCallSiteFileOffset = 0x820686;
+    public const uint VtableVirtualAddress = 0x1C6DF88;
+    public const string RttiName = ".?AVBountyRerollResponse@firefall@@";
+    public const int DwordFieldOffset = 0x28;
+    public const int ByteFieldOffset = 0x2C;
+    public const int SharedTextFieldOffset = 0x30;
+}
+
+public static class DisplayUiTrackBountyNativeLayout
+{
+    public const byte Selector = 0x4F;
+    public const uint CaseVirtualAddress = 0xC212A0;
+    public const uint CaseFileOffset = 0x8206A0;
+    public const uint CaseLocalDwordValue = 0x2F;
+    public const uint CaseSetupArgument2VirtualAddress = 0x1B8CA2C;
+    public const int AllocationSize = 0x30;
+    public const uint ConstructorFileOffset = 0x817800;
+    public const uint BaseMetadataConstructorFileOffset = 0x824BB0;
+    public const uint ConstructorNativeTypeId = 0x4F;
+    public const uint DescriptorAnchorVirtualAddress = 0x1B89BF4;
+    public const uint BodyReaderFileOffset = 0x3370A0;
+    public const uint BodyReaderCallSiteFileOffset = 0x8206F1;
+    public const uint VtableVirtualAddress = 0x1C6DF78;
+    public const string RttiName = ".?AVDisplayUiTrackBounty@firefall@@";
+    public const int DwordFieldOffset = 0x28;
+}
+
+public static class MatrixSecondaryEmbeddedBlobNativeLayout
+{
+    public const int LengthPrefixWireWidth = 2;
+    public const int ObjectCopyVirtualMethodOffset = 0x10;
+    public const int ZeroLengthPayloadWidth = 0;
 }
