@@ -1959,10 +1959,11 @@ offsets correspond to object `+0x2C`, `+0x30`, and `+0x138/+0x13C`.
 Case-specific tail layouts and field meanings remain unresolved. Allocation
 failure zeroes ESI before the reader setup.
 
-### Receiver application for Character selectors 0x70–0x73
+### Conditional receiver application for Character selectors 0x70–0x73
 
-The primary Character dispatcher at raw `0x81BB90` subtracts `0x20` from the
-message discriminator and indexes its selector table at VA `0xC1D6DC` / raw
+When callback routing selects the protocol handler, dispatcher raw `0x81BB90`
+subtracts `0x20` from the message discriminator and indexes its selector table
+at VA `0xC1D6DC` / raw
 `0x81CADC`. For selectors `0x70`–`0x73`, the table targets dispatcher cases
 at VA/raw pairs `0xC1D4E0/0x81C8E0`, `0xC1D50B/0x81C90B`,
 `0xC1D536/0x81C936`, and `0xC1D561/0x81C961`. Each case calls
@@ -2085,9 +2086,10 @@ reader (`0x5EECE0`) likewise serialize/deserialize only the raw QWORD at
 address calculation is recorded as observed; its runtime consequence and the
 QWORD's field meanings remain unknown.
 
-### `tfGameProtocolHandler` application for selectors 0x74–0x77
+### Conditional `tfGameProtocolHandler` application for selectors 0x74–0x77
 
-The recipient is the concrete `tfGameProtocolHandler` constructed at raw
+For messages that take the `0x81BB90` callback branch, the recipient is the
+concrete `tfGameProtocolHandler` constructed at raw
 `0xAC8CA0`; its constructor writes vtable VA `0x1C71EC0` at raw `.rdata`
 `0x1870AC0`. The RTTI-backed table bytes and all four selected method pointers
 were checked in the requested original. `.text` code addresses map to raw file
@@ -2149,9 +2151,11 @@ dialog slots already verified at `0x78`–`0x7A`.
 
 The nested parser returns its ESI object pointer in EAX; its known direct
 callers (`0x821BA0` and `0x821DE0`) return that result, and the registered
-callback path queues the returned pointer value. The message pointer is not
-replaced on the receiving path: callback dispatch loads it from `[EDI]` at
-raw `0x7FDC6E`, pushes that value into `0x81BB90` at `0x7FDD4F`, and
+callback path queues the returned pointer value. When message `+0x18`'s low
+byte is zero, `+0x10` does not match the nested sentinel, and callback-context
+`+8` is non-null, the message pointer is not replaced on the receiving path:
+callback dispatch loads it from `[EDI]` at raw `0x7FDC6E`, pushes that value
+into `0x81BB90` at `0x7FDD4F`, and
 `0x81BB90` loads its argument into EDI at `0x81BB95`. The selector-`0x77` case
 pushes that same EDI value at `0x81CA2B` before the virtual call through
 receiver slot `+0x160` (`0x81CA2C`). The receiver's vtable pointer at VA
@@ -2160,7 +2164,8 @@ receiver slot `+0x160` (`0x81CA2C`). The receiver's vtable pointer at VA
 its message argument from `[EBP+8]`, pushes its DWORDs at `+0x2C` and `+0x28`,
 and passes the same message address plus `0x30` to `0x4C9250`.
 
-**Extent caveat (unresolved):** selector `0x77` requests `0x30` bytes and its
+**Conditional extent caveat (unresolved):** if selector `0x77` takes the
+`0x81BB90` callback branch, it requests `0x30` bytes and its
 constructor plus parser reader write only through exclusive `+0x30`. The
 receiver passes the one-past-requested pointer `message+0x30` to
 `0x4C9250`; at `0x4C927E` it loads that first argument into EBX and at
@@ -2209,14 +2214,17 @@ respectively; the last read ends at `+0x3C` (exclusive). The allocation-failure
 branch zeroes ESI before reaching this reader; its runtime consequence and the
 fields' meanings remain unresolved.
 
-The application-receiver route confirms a native extent disagreement rather
-than a pointer conversion. The selector case at raw `0x81D79E` requests
+The conditional application-receiver route indicates a native extent
+disagreement rather than a pointer conversion. The selector case at raw
+`0x81D79E` requests
 `0x40` bytes from `0x12B7FB0`, constructs `PrivateDialog` with `0x526840`, and
 reads the body through `0x5EE900`. The registered parser returns its object
 pointer in EAX; the caller at `0x821BA0` returns that pointer unchanged, and
-the ReplayReader result queue stores and later dispatches that same pointer.
-In registered mode, `0x7FDC60` loads the queued pointer at `0x7FDC6E`, pushes
-it at `0x7FDD4E`, and calls `0x81BB90` at `0x7FDD4F`. The `0x79` case at raw
+the ReplayReader result queue stores the same pointer. Whether a queued object
+takes the protocol-handler branch depends on the envelope-key and nested
+sentinel tests described below. On that branch, `0x7FDC60` loads the queued
+pointer at `0x7FDC6E`, pushes it at `0x7FDD4E`, and calls `0x81BB90` at
+`0x7FDD4F`. The `0x79` case at raw
 `0x81CA63` pushes the same parser argument and calls receiver slot `+0x168`
 at `0x81CA82`. That `tfGameProtocolHandler` vtable slot contains VA
 `0xECEF00` (raw `.text` `0xACE300`), whose first instruction tail-jumps to
@@ -2264,10 +2272,11 @@ runtime consequence and the fields' meanings remain unresolved.
 
 ### Message discriminator provenance cross-check
 
-The four examples below resolve the namespace of the integer consumed by the
-`tfGameProtocolHandler` dispatcher. In each parser case, the seemingly
-discriminator-like DWORD is a stack local at `[esp+0x20]`, not a field in the
-allocated message: selector `0x71` writes `0x79` at raw `0x81D560`, selector
+The four examples below trace constructor-written message `+0x10` values and
+the conditional `0x81BB90` slot mapping only; they do not establish a global
+selector namespace. In each parser case, the seemingly discriminator-like
+DWORD is a stack local at `[esp+0x20]`, not a field in the allocated message:
+selector `0x71` writes `0x79` at raw `0x81D560`, selector
 `0x77` writes `0x7F` at `0x81D74A`, selector `0x79` writes `0x81` at
 `0x81D7AC`, and route-3 `Vehicle::AbilityActivated` writes `0xD0` at
 `0x81EF91`. Those local values remain semantically unassigned.
@@ -2308,19 +2317,77 @@ pushes the unchanged EDI message pointer before its virtual call:
 | `0x79` Character `PrivateDialog` | `0x81` at `0x81D7AC` | `0x81CA63` / `0x81CA82` | `+0x168` | `0xECEF00` / `0xACE300` |
 | `0x53` Vehicle `AbilityActivated` | `0xD0` at `0x81EF91` | `0x81C401` / `0x81C420` | `+0xD0` | `0xECB180` / `0xACA580` |
 
-These are IDs in the receiver's single `0x20..0x7A` discriminator namespace:
-the slot formula is `4 + 4*(id-0x20)`. In particular, the `0xD0` parser
-stack local for Vehicle `AbilityActivated` is not its discriminator; `0xD0`
-is also that selector's receiver vtable byte offset, while the message field
-is `0x53`. No nonzero message-pointer adjustment or secondary-vtable route
-appears in these traced paths. The original executable (`FirefallClient.exe.original`,
-40,197,848 bytes, SHA-256
-`E0E8448393AC1CE05BE73E06F62DD70E3EFF3404CC2E7AAF3F04C79DEC0DE235`) was
-read directly; `.text` VAs are raw offsets plus `0x400C00`, and `.rdata`
-references are translated using its PE section table. The focused binary
-check records these stores, table destinations, receiver calls, and RTTI
-offsets. This resolves discriminator provenance only; it does not repair or
-reinterpret the already-recorded field/extent conflicts.
+For messages that actually reach `0x81BB90`, the slot formula is
+`4 + 4*(id-0x20)`. In particular, the `0xD0` parser stack local for Vehicle
+`AbilityActivated` is not its discriminator; `0xD0` is that selector's
+receiver-vtable byte offset, while the message field is `0x53`. The unchanged
+message pointer and primary-vtable calls are proven only for this conditional
+dispatcher path, not for every parser family.
+
+### Parser-family collisions and callback route gate
+
+The route-specific parser families below all construct different RTTI types
+with the same value, `message+0x10 = 0x53`. The route-local stack DWORDs shown
+are separate parser temporaries, not namespace IDs. Character route 0 and
+Vehicle route 3 use selector tables; AreaVisualData route 2, Deployable route
+4, Turret route 5, and LootStoreExtension route 6 branch directly in their
+route dispatchers.
+
+| Parser route | Route dispatcher / selector table | Case raw offset | Message class | Allocation | Parser stack local | Constructor → base helper | `+0x0C` metadata pointer | Primary vtable / RTTI |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Character nested route 0 | `0x81CCAD` / VA `0xC22444` | `0x81CCC3` | `Character::MarketRequestComplete` | `0x48` | `0x5B` at `0x81CCD1` | `0x524C30` → `0x5A0400` | `0x1B5BEAC` (`msg-83…`) | `0x1C67278` / `.?AVMarketRequestComplete@Character@firefall@@` |
+| AreaVisualData route 2 | `0x81EE63` / direct case | `0x81EF1C` | `AreaVisualData::LootObjectCollected` | `0x40` | `0xCD` at `0x81EF2A` | `0xADBAA0` → `0xB07660` | `0x1BB0224` (`msg-83…`) | `0x1C723C0` / `.?AVLootObjectCollected@AreaVisualData@firefall@@` |
+| Vehicle route 3 | `0x81EF6D` / VA `0xC2260C` | `0x81EF83` | `Vehicle::AbilityActivated` | `0x30` | `0xD0` at `0x81EF91` | `0xB093C0` → `0xB474B0` | `0x1BB04E0` (`msg-83…`) | `0x1C72998` / `.?AVAbilityActivated@Vehicle@firefall@@` |
+| Deployable route 4 | `0x81F206` / direct case | `0x81F29E` | `Deployable::TookHit` | `0x60` | `0xD9` at `0x81F2AC` | `0xB27E80` → `0xB47C40` | `0x1BB03C4` (`msg-83…`) | `0x1C727A8` / `.?AVTookHit@Deployable@firefall@@` |
+| Turret route 5 | `0x81F2EF` / direct case | `0x81F2F9` | `Turret::WeaponProjectileFired` | `0x48` | `0xDC` at `0x81F307` | `0xB36520` → `0xB47D90` | `0x1BB033C` (`msg-83…`) | `0x1C726E8` / `.?AVWeaponProjectileFired@Turret@firefall@@` |
+| LootStoreExtension route 6 | `0x81F34A` / direct case | `0x81F354` | `LootStoreExtension::LootObjectCollected` | `0x40` | `0xDD` at `0x81F362` | `0xB43A70` → `0xB48040` | `0x1BB0280` (`msg-83…`) | `0x1C72608` / `.?AVLootObjectCollected@LootStoreExtension@firefall@@` |
+
+The base helpers temporarily install a common vptr and then a class-specific
+base vptr at `+0x00`; the derived constructors replace that with each
+route-specific primary vptr. The helpers initialize `+0x08` to 1, store the
+route-specific metadata pointer at `+0x0C`, store the compact parser selector
+at `+0x10`, copy the stream QWORD to `+0x18/+0x1C`, and zero `+0x20/+0x24`.
+They do not write `+0x14` in the observed common initialization sequence; its
+meaning is unresolved. The metadata pointers differ, but their strings all
+begin `msg-83`; neither that text nor the pointer is proven to be the runtime
+namespace selector. The distinct derived RTTI/vptrs and parser-route cases
+establish the parser family. A C# snapshot and byte checks for these
+constructors and fields live in
+`MatrixMessageNamespaceRoutingNativeLayout.cs` and
+`StartupBinaryEvidence.cs`.
+
+The stream parser at raw `0x821BA0` reads the envelope QWORD before the compact
+selector and passes the QWORD address into `0x81CC50`; each route-specific
+constructor passes its two source DWORDs to the base helper, which copies them
+to `+0x18/+0x1C`. `tfGameSocketHandler` callback `0x7FDC60` first tests only
+the low byte at `message+0x18`. If nonzero, it calls `0x800420`, which consumes
+the full `+0x18/+0x1C` key through lookup helper `0x800070` and the socket
+handler registries at `+0x24` and `+0x2C`. If the low byte is zero, it compares
+`message+0x10` with the nested-message sentinel at `0x1DFC030`; a match takes
+the nested path. Otherwise, a non-null callback-context `+8` receiver is
+passed the unchanged message pointer at `0x81BB90`. The actual QWORD values
+are runtime input and no sample stream was supplied, so none of the six
+classes can be assigned to one of these callback branches statically.
+
+The concrete `tfGameProtocolHandler` has primary vtable VA `0x1C71EC0`, with
+COL VA `0x1CCA404` and object offset zero. Its RTTI hierarchy contains
+`tfGameProtocolHandler` and `MessageHandler` base descriptors, both at
+subobject offset zero; no secondary vtable group was observed for this class.
+On the conditional `0x81BB90` path, selector `0x53` indexes slot `+0xD0`,
+target VA `0xECB180` / raw `0xACA580`. That method reads `message+0x34`.
+Consequently, a `Vehicle::AbilityActivated` object of allocated size `0x30`
+would have an apparent extent mismatch if it reached this slot; the unknown
+envelope-key branch means that runtime path has not been established. This is
+an unresolved conditional observation, not a claim that the parser routes
+Vehicle messages to that method.
+
+The original executable (`FirefallClient.exe.original`, 40,197,848 bytes,
+SHA-256 `E0E8448393AC1CE05BE73E06F62DD70E3EFF3404CC2E7AAF3F04C79DEC0DE235`)
+was read directly; `.text` VAs are raw offsets plus `0x400C00`, and `.rdata`
+references are translated using its PE section table. No native execution,
+IDB edits, or sample edits were performed. This resolves the static routing
+conditions and parser-family collisions; it does not repair or reinterpret
+the already-recorded field/extent conflicts.
 
 ## Parser result path and dialog-message primary vftables
 
@@ -2409,7 +2476,8 @@ the 16-bit range at message `+0x38` with count at `+0x3A`, parses children
 through `0xBCA850`, recurses through `0x7FDC60`, and releases a returned child
 through its vtable slot `+8` if the reference count reaches zero. For a
 nonmatching discriminator, `0x81BB90` is called only when callback-context
-field `+8` is non-null.
+field `+8` is non-null; this remains conditional on the earlier `+0x18`
+low-byte test being zero.
 
 That `+8` value is not a fixed global target. In `ReplayReader_Initialize`,
 the object in EDI invokes its vtable slot `+0x24` at raw `0x65DB10`; the
@@ -2645,7 +2713,7 @@ receiver paths for `0x74`–`0x77` are now traced above, but `0x75`/`0x76`
 embedded-state meaning and `0x77`'s out-of-extent transfer remain unresolved.
 Selector `0x55`'s 12-byte temporary prefix and selector `0x6D` body
 consumption also remain open. The immediate `0x81CC50` pass-throughs, dialog
-primary-vftable roles, ReplayReader registration, and concrete recipient
+primary-vftable roles, ReplayReader registration, and conditional recipient
 dispatch through `0x81BB90` are recorded above. The indirect parser invocation
 and parsed-object ownership details are still open; numeric application codes
 are not assigned event names.

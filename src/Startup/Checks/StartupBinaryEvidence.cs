@@ -4771,11 +4771,194 @@ internal static class StartupBinaryEvidence
                 && VirtualAddressToFileOffset(provenance.ReceiverMethodVirtualAddress)
                     == provenance.ReceiverMethodFileOffset;
         }
-        check("Binary message discriminator provenance is constructor-written at +0x10 and dispatched without pointer adjustment",
+        check("Binary 0x81BB90 conditional path reads +0x10 and preserves the message pointer",
             messageDiscriminatorProvenanceMatches
             && messageReceiverVtable.ObjectVtableFieldOffset
                 == MatrixMessageParserFlowNativeLayout.MessagePrimaryVtableFieldOffset
             && messageReceiverVtable.CompleteObjectLocatorObjectOffset == 0);
+        var namespaceRouting = MatrixMessageNamespaceRoutingNativeLayout.Selector53Namespaces;
+        bool callbackRoutingMatches =
+            RelativeBranchTargets(
+                MatrixMessageNamespaceRoutingNativeLayout.StreamEnvelopeQwordReadCallFileOffset,
+                0xE8,
+                MatrixMessageNamespaceRoutingNativeLayout.StreamEnvelopeQwordReaderVirtualAddress
+                    - MatrixMessageNamespaceRoutingNativeLayout.RawTextOffsetToVirtualAddressDelta)
+            && RelativeBranchTargets(
+                MatrixMessageNamespaceRoutingNativeLayout.StreamCompactSelectorReadCallFileOffset,
+                0xE8,
+                MatrixMessageNamespaceRoutingNativeLayout.StreamCompactSelectorReaderVirtualAddress
+                    - MatrixMessageNamespaceRoutingNativeLayout.RawTextOffsetToVirtualAddressDelta)
+            && Matches(
+                MatrixMessageNamespaceRoutingNativeLayout.StreamParserDispatchCallFileOffset - 0x0B,
+                "8D4DE8518BC48D55D88930")
+            && RelativeBranchTargets(
+                MatrixMessageNamespaceRoutingNativeLayout.StreamParserDispatchCallFileOffset,
+                0xE8,
+                MatrixMessageNamespaceRoutingNativeLayout.ParserDispatcherFileOffset)
+            && Matches(MatrixMessageNamespaceRoutingNativeLayout.CallbackEnvelopeKeyLowLoadFileOffset,
+                "8B53188ACA8B431C")
+            && Matches(MatrixMessageNamespaceRoutingNativeLayout.CallbackEnvelopeKeyGateTestFileOffset,
+                "84D20F85C8000000")
+            && RelativeBranchTargets(
+                MatrixMessageNamespaceRoutingNativeLayout.CallbackEnvelopeKeyDispatchCallFileOffset,
+                0xE8,
+                MatrixMessageNamespaceRoutingNativeLayout.EnvelopeKeyDispatcherFileOffset)
+            && Matches(MatrixMessageNamespaceRoutingNativeLayout.CallbackSelectorLoadFileOffset,
+                "8B43103B0530C0DF01")
+            && Matches(MatrixMessageNamespaceRoutingNativeLayout.CallbackProtocolReceiverLoadFileOffset,
+                "8B4E08")
+            && Matches(0x7FDD4A, "85C97410")
+            && RelativeBranchTargets(0x7FDD4F, 0xE8,
+                MatrixMessageNamespaceRoutingNativeLayout.ProtocolHandlerDispatcherFileOffset)
+            && Matches(0x800453, "8B7E108B46188B4E1C")
+            && RelativeBranchTargets(0x800611, 0xE8,
+                MatrixMessageNamespaceRoutingNativeLayout.EnvelopeKeyRegistryLookupFileOffset)
+            && Matches(0x800088, "8D4324")
+            && Matches(0x80019B, "8D432C")
+            && RelativeBranchTargets(0x8001A7, 0xE8, 0x8013B0);
+        bool parserRouteDispatchMatches =
+            Matches(0x81CCB0, "83C0AD83F8710F871D4B0000")
+            && Matches(0x81EE66, "83E8530F84AD000000")
+            && Matches(0x81EF70, "83C0AD83F8080F875D280000")
+            && Matches(0x81F209, "83E8530F848C000000")
+            && Matches(0x81F2EF, "837D08530F85E0240000")
+            && Matches(0x81F34A, "837D08530F8585240000");
+        bool parserNamespaceConstructorsMatch = true;
+        foreach (var snapshot in namespaceRouting)
+        {
+            uint tableTarget = snapshot.RouteSelectorTableVirtualAddress == 0
+                ? 0
+                : ReadUInt32(
+                    VirtualAddressToFileOffset(snapshot.RouteSelectorTableVirtualAddress)
+                    + 4L * (snapshot.ParserSelector - MatrixMessageNamespaceRoutingNativeLayout.CollisionSelector));
+            uint messageCol = ReadUInt32(VirtualAddressToFileOffset(snapshot.MessageVtableVirtualAddress) - 4);
+            bool parserCaseMatches =
+                snapshot.ParserSelector == MatrixMessageNamespaceRoutingNativeLayout.CollisionSelector
+                && Matches(snapshot.ParserCaseFileOffset, "6A" + snapshot.AllocationSize.ToString("X2"))
+                && Matches(snapshot.ParserStackLocalDwordFileOffset,
+                    "C7442420" + UInt32LittleEndianHex(snapshot.ParserStackLocalDwordValue));
+            bool constructorMatches =
+                Matches(snapshot.ConstructorFileOffset + 5, "FF750C8BF1FF750883EC088BC4")
+                && Matches(snapshot.ConstructorFileOffset + 0x12, "C70053000000")
+                && RelativeBranchTargets(
+                    snapshot.ConstructorFileOffset + 0x18,
+                    0xE8,
+                    snapshot.BaseConstructorHelperFileOffset)
+                && Matches(snapshot.ConstructorFileOffset + 0x1D,
+                    "C706" + UInt32LittleEndianHex(snapshot.MessageVtableVirtualAddress));
+            bool baseHelperMatches =
+                Matches(snapshot.BaseConstructorHelperFileOffset + 4, "8B4508568BF18945FC")
+                && Matches(snapshot.BaseConstructorHelperFileOffset + 0x0D,
+                    "C706" + UInt32LittleEndianHex(
+                        MatrixMessageParserFlowNativeLayout.BaseHelperInitialVtableVirtualAddress))
+                && Matches(snapshot.BaseConstructorHelperFileOffset + 0x13,
+                    "C7460C" + UInt32LittleEndianHex(snapshot.BaseMetadataStringVirtualAddress))
+                && Matches(snapshot.BaseConstructorHelperFileOffset + 0x1A, "C7460801000000")
+                && Matches(snapshot.BaseConstructorHelperFileOffset + 0x5D,
+                    "C706" + UInt32LittleEndianHex(snapshot.BaseHelperFinalVtableVirtualAddress))
+                && Matches(
+                    snapshot.BaseConstructorHelperFileOffset
+                        + MatrixMessageParserFlowNativeLayout.BaseHelperDiscriminatorFieldStoreInstructionOffset,
+                    "894610")
+                && Matches(
+                    snapshot.BaseConstructorHelperFileOffset
+                        + MatrixMessageParserFlowNativeLayout.BaseHelperConstructorArgumentStoresInstructionOffset,
+                    "8B45108946188B451489461CC7462000000000C7462400000000");
+            bool metadataAndVtableMatches =
+                ReadCStringAscii(snapshot.BaseMetadataStringVirtualAddress, 7) == "msg-83"
+                && VtableRttiName(snapshot.MessageVtableVirtualAddress, 80) == snapshot.MessageRttiName
+                && ReadUInt32(VirtualAddressToFileOffset(messageCol) + 4) == 0;
+            bool parserTableMatches = snapshot.RouteSelectorTableVirtualAddress == 0
+                || tableTarget == snapshot.ParserCaseFileOffset
+                    + MatrixMessageNamespaceRoutingNativeLayout.RawTextOffsetToVirtualAddressDelta;
+            bool constructorMatchesAll = parserCaseMatches
+                && constructorMatches
+                && baseHelperMatches
+                && metadataAndVtableMatches
+                && parserTableMatches;
+            check($"Binary selector 0x53 parser family {snapshot.MessageRttiName} selects its route case",
+                parserCaseMatches);
+            check($"Binary selector 0x53 parser family {snapshot.MessageRttiName} writes its selector and vptr",
+                constructorMatches);
+            check($"Binary selector 0x53 parser family {snapshot.MessageRttiName} base helper stores fields",
+                baseHelperMatches);
+            check($"Binary selector 0x53 parser family {snapshot.MessageRttiName} has distinct metadata and RTTI",
+                metadataAndVtableMatches);
+            check($"Binary selector 0x53 parser family {snapshot.MessageRttiName} route table target matches",
+                parserTableMatches);
+            parserNamespaceConstructorsMatch =
+                parserNamespaceConstructorsMatch && constructorMatchesAll;
+        }
+        check("Binary stream envelope key gates callback receiver selection",
+            callbackRoutingMatches);
+        check("Binary duplicate selectors enter their route-specific parser cases",
+            parserRouteDispatchMatches && parserNamespaceConstructorsMatch);
+        uint protocolHandlerCol = ReadUInt32(VirtualAddressToFileOffset(
+            MatrixMessageNamespaceRoutingNativeLayout.ProtocolHandlerVtableVirtualAddress) - 4);
+        uint protocolHandlerHierarchy = ReadUInt32(VirtualAddressToFileOffset(protocolHandlerCol) + 16);
+        uint protocolHandlerBaseArray = ReadUInt32(VirtualAddressToFileOffset(protocolHandlerHierarchy) + 12);
+        uint protocolHandlerBaseCount = ReadUInt32(VirtualAddressToFileOffset(protocolHandlerHierarchy) + 8);
+        var protocolHandlerBases = Enumerable.Range(0, checked((int)protocolHandlerBaseCount))
+            .Select(index =>
+            {
+                uint descriptor = ReadUInt32(VirtualAddressToFileOffset(protocolHandlerBaseArray) + 4L * index);
+                uint typeDescriptor = ReadUInt32(VirtualAddressToFileOffset(descriptor));
+                return (
+                    Name: ReadCStringAscii(checked(typeDescriptor + 8), 128),
+                    SubobjectOffset: ReadUInt32(VirtualAddressToFileOffset(descriptor) + 8));
+            })
+            .ToArray();
+        var rdataSection = sections.Single(section => section.Name == ".rdata");
+        byte[] rdataBytes = ReadAt(rdataSection.RawOffset, checked((int)rdataSection.RawSize));
+        var protocolHandlerColGroups = new List<uint>();
+        for (int offset = 0; offset <= rdataBytes.Length - 20; offset += 4)
+        {
+            if (BinaryPrimitives.ReadUInt32LittleEndian(rdataBytes.AsSpan(offset, 4)) == 0
+                && BinaryPrimitives.ReadUInt32LittleEndian(rdataBytes.AsSpan(offset + 12, 4))
+                    == MatrixMessageNamespaceRoutingNativeLayout.ProtocolHandlerTypeDescriptorVirtualAddress
+                && BinaryPrimitives.ReadUInt32LittleEndian(rdataBytes.AsSpan(offset + 16, 4))
+                    == MatrixMessageNamespaceRoutingNativeLayout.ProtocolHandlerClassHierarchyDescriptorVirtualAddress)
+                protocolHandlerColGroups.Add(checked(
+                    imageBase + rdataSection.Rva + (uint)offset));
+        }
+        bool protocolHandlerGroupMatches =
+            Matches(MatrixMessageNamespaceRoutingNativeLayout.ProtocolHandlerVtableStoreFileOffset,
+                "C706C01EC701")
+            && VtableRttiName(MatrixMessageNamespaceRoutingNativeLayout.ProtocolHandlerVtableVirtualAddress)
+                == MatrixMessageNamespaceRoutingNativeLayout.ProtocolHandlerRttiName
+            && protocolHandlerCol
+                == MatrixMessageNamespaceRoutingNativeLayout.ProtocolHandlerCompleteObjectLocatorVirtualAddress
+            && ReadUInt32(VirtualAddressToFileOffset(protocolHandlerCol) + 4)
+                == MatrixMessageNamespaceRoutingNativeLayout.ProtocolHandlerCompleteObjectOffset
+            && ReadUInt32(VirtualAddressToFileOffset(protocolHandlerCol) + 12)
+                == MatrixMessageNamespaceRoutingNativeLayout.ProtocolHandlerTypeDescriptorVirtualAddress
+            && protocolHandlerHierarchy
+                == MatrixMessageNamespaceRoutingNativeLayout.ProtocolHandlerClassHierarchyDescriptorVirtualAddress
+            && protocolHandlerBaseCount == 2
+            && protocolHandlerColGroups.Count
+                == MatrixMessageNamespaceRoutingNativeLayout.ProtocolHandlerObservedVtableGroupCount
+            && protocolHandlerColGroups.Contains(protocolHandlerCol)
+            && protocolHandlerBases.Any(baseClass =>
+                baseClass.Name == MatrixMessageNamespaceRoutingNativeLayout.ProtocolHandlerRttiName
+                && baseClass.SubobjectOffset
+                    == MatrixMessageNamespaceRoutingNativeLayout.ProtocolHandlerCompleteObjectOffset)
+            && protocolHandlerBases.Any(baseClass =>
+                baseClass.Name == MatrixMessageNamespaceRoutingNativeLayout.ProtocolHandlerSecondBaseRttiName
+                && baseClass.SubobjectOffset
+                    == MatrixMessageNamespaceRoutingNativeLayout.ProtocolHandlerSecondBaseSubobjectOffset)
+            && protocolHandlerBases.All(baseClass => baseClass.SubobjectOffset == 0)
+            && ReadUInt32(VirtualAddressToFileOffset(
+                MatrixMessageNamespaceRoutingNativeLayout.ProtocolHandlerVtableVirtualAddress)
+                + MatrixMessageNamespaceRoutingNativeLayout.Selector53ProtocolHandlerVtableSlotOffset)
+                == MatrixMessageNamespaceRoutingNativeLayout.Selector53ProtocolHandlerMethodVirtualAddress
+            && VirtualAddressToFileOffset(
+                MatrixMessageNamespaceRoutingNativeLayout.Selector53ProtocolHandlerMethodVirtualAddress)
+                == MatrixMessageNamespaceRoutingNativeLayout.Selector53ProtocolHandlerMethodFileOffset
+            && Matches(
+                MatrixMessageNamespaceRoutingNativeLayout.Selector53ProtocolHandlerMethodFileOffset + 0x0D,
+                "8B4734");
+        check("Binary tfGameProtocolHandler RTTI and selector 0x53 primary slot are verified",
+            protocolHandlerGroupMatches);
         var npcInteractionDispatchCase = MatrixMessageParserFlowNativeLayout.MessageDispatchVtableCases
             .Single(messageCase => messageCase.MessageDiscriminator == 0x77);
         check("Binary selector 0x77 forwards the same parsed object pointer through the virtual receiver",

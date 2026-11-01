@@ -52,8 +52,9 @@
   takes the nonzero path through `0x7FDC60`. There, `0xBCA850` parses entries
   from the message's 16-bit range `+0x38..+0x3A` when its `+0x10` value matches
   `dword_1DFC030`; returned children recurse through `0x7FDC60` and are
-  released through message vtable slot `+8`. Other branches call `0x81BB90`
-  when context `+8` is non-null and call `0xBD7060` with the parsed message
+  released through message vtable slot `+8`. With a zero key low byte and a
+  nonmatching nested sentinel, a non-null context `+8` is passed to `0x81BB90`.
+  Another branch calls `0xBD7060` with the parsed message
   pointer plus a derived selector when the message predicate and context
   `+0xB0` allow it. The recipients' further semantics remain unknown.
   Consumer record byte `+6` maps numerically as `1` -> context `+4`, `2` ->
@@ -62,8 +63,13 @@
   meaning. The readiness probe at `0xBD68F4` remains separate. Details and
   byte fingerprints are in `docs/MatrixConnection.md` and
   `src/Startup/MatrixMessageParserFlowNativeLayout.cs`.
-- The recipient-dispatch pass traced `0x7FDC60` into `0x81BB90`. The receiver
-  at callback-context `+8` is now identified as `tfGameProtocolHandler`:
+- The callback dispatch at `0x7FDC60` is conditional. It tests the low byte of
+  message `+0x18`; nonzero goes through `0x800420`, which uses the full
+  `+0x18/+0x1C` QWORD key and the socket-handler registries at `+0x24/+0x2C`.
+  With a zero low byte, it compares message `+0x10` with the nested-message
+  sentinel; only the non-nested branch with callback-context `+8` non-null
+  reaches `0x81BB90`. The receiver at callback-context `+8` is identified as
+  `tfGameProtocolHandler`:
   `ReplayReader_Initialize` calls the `tfLookingGlass` getter at raw
   `0x65DB10`, loads its result's `+0x78` field at `0x65DB38`, and passes that
   value to constructor `0x7FD670`. The getter is `tfLookingGlass` vtable slot
@@ -74,8 +80,8 @@
   The receiver's vtable VA `0x1C71EC0` / raw `0x1870AC0` resolves by RTTI to
   `.?AVtfGameProtocolHandler@@`; the requested original's PE section table
   verifies these VA/raw mappings (including `.text` raw+`0x400C00`).
-- Dispatcher `0x81BB90`'s 91-entry table covers `0x20..0x7A` and maps ID to
-  receiver slot `4 + 4*(ID-0x20)`. The concrete dialog mappings are
+- On that conditional path, dispatcher `0x81BB90`'s 91-entry table covers
+  `0x20..0x7A` and maps ID to receiver slot `4 + 4*(ID-0x20)`. The concrete dialog mappings are
   `0x78 OpenMovieDialog -> +0x164 -> 0xACE2E0`, `0x79 PrivateDialog ->
   +0x168 -> 0xACE300 -> tail-jump 0x991510`, and `0x7A PublicDialog ->
   +0x16C -> 0xACE390`. The OpenMovie path dispatches numeric application code
@@ -92,19 +98,30 @@
   `Component.BindEvent` uses the same map. File enumeration is unsorted and
   script calls add runtime first insertions, so exact IDs/names and concrete
   subscribers for `228/229/357` remain unresolved.
-- **Discriminator provenance cross-check (read-only original):** dispatcher
-  `0x81BB90` reads message `[+0x10]`; the selected constructors' first
-  base-helper argument is the parser selector, and each helper stores it at
-  that field. This is verified for Character `0x71/0x77/0x79` and Vehicle
-  `AbilityActivated` `0x53`. Their apparent local DWORDs (`0x79/0x7F/0x81/0xD0`)
-  are parser stack locals, not object discriminators. Parser-result dispatch
-  passes the same message pointer; the tested message vtables and receiver
-  use primary subobject offset zero. This rules out a wrong-ID namespace or
-  secondary-pointer adjustment as the cause of these traced field/extent
-  conflicts, without resolving those native conflicts. Evidence and focused
-  binary assertions are in `docs/MatrixConnection.md`,
-  `src/Startup/MatrixMessageParserFlowNativeLayout.cs`, and
-  `src/Startup/Checks/StartupBinaryEvidence.cs`.
+- **Parser-family selector collisions (read-only original):** Character
+  nested route 0 `MarketRequestComplete`, AreaVisualData route 2
+  `LootObjectCollected`, Vehicle route 3 `AbilityActivated`, and Deployable
+  route 4 `TookHit`, Turret route 5 `WeaponProjectileFired`, and
+  LootStoreExtension route 6 `LootObjectCollected` all store `0x53` at
+  message `+0x10`, but have distinct parser cases, constructors, derived
+  vptrs/RTTI, and `+0x0C` metadata pointers. The common base helpers write
+  `+0x00`, `+0x08`, `+0x0C`, `+0x10`, `+0x18/+0x1C`, and `+0x20/+0x24`; they do
+  not write `+0x14` in the observed initialization sequence. Metadata strings
+  begin `msg-83` and do not prove a namespace by themselves. The parser stack
+  locals (`0x5B/0xCD/0xD0/0xD9/0xDC/0xDD` for these six `0x53` cases) are not
+  message discriminators.
+- `0x81BB90` still maps `0x53` to primary receiver slot `+0xD0` / raw handler
+  `0xACA580`, but only if the message takes that conditional path. The concrete
+  handler RTTI group has a COL object offset of zero and `tfGameProtocolHandler`
+  plus `MessageHandler` base subobjects at offset zero; no secondary vtable
+  group was observed. The handler reads message `+0x34`, so a Vehicle message
+  of allocation size `0x30` would present an apparent extent mismatch if it
+  reached that slot. Runtime envelope QWORD values were not available, so
+  whether it does remains unresolved. Therefore the prior conclusion that
+  these examples rule out a wrong-ID namespace was too broad; do not apply
+  `0x81BB90`'s selector table universally. The route snapshot and original-byte
+  assertions are in `src/Startup/MatrixMessageNamespaceRoutingNativeLayout.cs`,
+  `docs/MatrixConnection.md`, and `src/Startup/Checks/StartupBinaryEvidence.cs`.
 - Recorded payload keys/fields: `228` passes `vendor_id` from message `+0x28`;
   `229` passes `success` (`+0x28` byte), `product_id` (`+0x30/+0x34`),
   `price_id` (`+0x38/+0x3C`), `vendor_id` (`+0x40`), and a code-string

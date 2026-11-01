@@ -186,8 +186,8 @@ public static class MatrixMessageParserFlowNativeLayout
     public const int MessagePrimaryVtableFieldOffset = 0;
     public const int MessageBaseAuxiliaryPointerFieldOffset = 0xC;
     public const int MessageDiscriminatorFieldOffset = 0x10;
-    public const int MessageBaseConstructorArgument0FieldOffset = 0x18;
-    public const int MessageBaseConstructorArgument1FieldOffset = 0x1C;
+    public const int MessageEnvelopeKeyLowDwordFieldOffset = 0x18;
+    public const int MessageEnvelopeKeyHighDwordFieldOffset = 0x1C;
     public const int ParserStackLocalDwordOffset = 0x20;
     public const int ForcedMovementInlineStateOffset = 0x28;
     public const uint ForcedMovementInlineStateInitializerFileOffset = 0x92B8A0;

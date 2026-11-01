@@ -3404,8 +3404,8 @@ Check("Matrix message discriminator provenance distinguishes parser stack locals
     MatrixMessageParserFlowNativeLayout.MessagePrimaryVtableFieldOffset == 0
     && MatrixMessageParserFlowNativeLayout.MessageBaseAuxiliaryPointerFieldOffset == 0xC
     && MatrixMessageParserFlowNativeLayout.MessageDiscriminatorFieldOffset == 0x10
-    && MatrixMessageParserFlowNativeLayout.MessageBaseConstructorArgument0FieldOffset == 0x18
-    && MatrixMessageParserFlowNativeLayout.MessageBaseConstructorArgument1FieldOffset == 0x1C
+    && MatrixMessageParserFlowNativeLayout.MessageEnvelopeKeyLowDwordFieldOffset == 0x18
+    && MatrixMessageParserFlowNativeLayout.MessageEnvelopeKeyHighDwordFieldOffset == 0x1C
     && MatrixMessageParserFlowNativeLayout.ParserStackLocalDwordOffset == 0x20
     && MatrixMessageParserFlowNativeLayout.ForcedMovementInlineStateOffset == 0x28
     && MatrixMessageParserFlowNativeLayout.ForcedMovementInlineStateInitializerFileOffset == 0x92B8A0
@@ -3443,6 +3443,39 @@ Check("Matrix message discriminator provenance distinguishes parser stack locals
             (0x79, 0x81u, 0x168, 0xECEF00u),
             (0x53, 0xD0u, 0xD0, 0xECB180u)
         ]));
+var selector53Namespaces = MatrixMessageNamespaceRoutingNativeLayout.Selector53Namespaces;
+Check("Matrix parser routes preserve distinct namespaces for duplicate selector 0x53",
+    selector53Namespaces.Count == 6
+    && selector53Namespaces.Select(snapshot => snapshot.ParserRouteIndex)
+        .SequenceEqual(new[] { 0, 2, 3, 4, 5, 6 })
+    && selector53Namespaces.All(snapshot => snapshot.ParserSelector
+        == MatrixMessageNamespaceRoutingNativeLayout.CollisionSelector)
+    && selector53Namespaces.Select(snapshot => snapshot.MessageRttiName).Distinct().Count() == 6
+    && selector53Namespaces.Select(snapshot => snapshot.MessageVtableVirtualAddress).Distinct().Count() == 6
+    && selector53Namespaces.Select(snapshot => snapshot.BaseMetadataStringVirtualAddress).Distinct().Count() == 6
+    && MatrixMessageNamespaceRoutingNativeLayout.MessagePrimaryVtableFieldOffset == 0
+    && MatrixMessageNamespaceRoutingNativeLayout.MessageReferenceCountFieldOffset == 0x08
+    && MatrixMessageNamespaceRoutingNativeLayout.MessageMetadataPointerFieldOffset == 0x0C
+    && MatrixMessageNamespaceRoutingNativeLayout.MessageSelectorFieldOffset == 0x10
+    && MatrixMessageNamespaceRoutingNativeLayout.MessageFieldOffset14 == 0x14
+    && MatrixMessageNamespaceRoutingNativeLayout.MessageEnvelopeKeyLowDwordFieldOffset == 0x18
+    && MatrixMessageNamespaceRoutingNativeLayout.MessageEnvelopeKeyHighDwordFieldOffset == 0x1C
+    && MatrixMessageNamespaceRoutingNativeLayout.MessageClearedDwordFieldOffset1 == 0x20
+    && MatrixMessageNamespaceRoutingNativeLayout.MessageClearedDwordFieldOffset2 == 0x24
+    && MatrixMessageNamespaceRoutingNativeLayout.BaseConstructorReferenceCountValue == 1
+    && MatrixMessageNamespaceRoutingNativeLayout.EnvelopeKeyGateByteOffset == 0x18
+    && MatrixMessageNamespaceRoutingNativeLayout.GetProtocolHandlerVtableSlotOffset(0x53) == 0xD0
+    && MatrixMessageNamespaceRoutingNativeLayout.ProtocolHandlerObservedVtableGroupCount == 1
+    && MatrixMessageNamespaceRoutingNativeLayout.ProtocolHandlerCompleteObjectOffset == 0
+    && MatrixMessageNamespaceRoutingNativeLayout.ProtocolHandlerSecondBaseSubobjectOffset == 0
+    && MatrixMessageNamespaceRoutingNativeLayout.ClassifyCallbackPath(
+        0, false, true) == MatrixMessageCallbackDispatchPath.ProtocolHandlerPrimaryVtable
+    && MatrixMessageNamespaceRoutingNativeLayout.ClassifyCallbackPath(
+        1, false, true) == MatrixMessageCallbackDispatchPath.EnvelopeKeyRegistry
+    && MatrixMessageNamespaceRoutingNativeLayout.ClassifyCallbackPath(
+        0, true, true) == MatrixMessageCallbackDispatchPath.NestedMessageChildren
+    && MatrixMessageNamespaceRoutingNativeLayout.ClassifyCallbackPath(
+        0, false, false) == MatrixMessageCallbackDispatchPath.ProtocolHandlerUnavailable);
 Check("ReplayReader getter and owner construction resolve the concrete message receiver field",
     MatrixMessageParserFlowNativeLayout.ReplayReaderMessageRecipientGetterOwnerRttiName
         == ".?AVtfLookingGlass@@"
