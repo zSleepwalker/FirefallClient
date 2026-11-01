@@ -4875,6 +4875,90 @@ internal static class StartupBinaryEvidence
                 "4F83FF080F8732020000")
             && Matches(CharacterKeyedDialogDispatchNativeLayout.OuterSelectorDefaultReceiverCallFileOffset,
                 "8B038BCB56FF5004"));
+        var genericCharacterVtableFileOffset = VirtualAddressToFileOffset(
+            CharacterKeyedDialogCallbackNativeLayout.GenericCharacterPrimaryVtableVirtualAddress);
+        check("Binary keyed Character callback targets match the tfGenericCharacter RTTI vtable and selector-2 state construction",
+            genericCharacterVtableFileOffset
+                == CharacterKeyedDialogCallbackNativeLayout.GenericCharacterPrimaryVtableFileOffset
+            && VtableRttiName(CharacterKeyedDialogCallbackNativeLayout.GenericCharacterPrimaryVtableVirtualAddress)
+                == CharacterKeyedDialogCallbackNativeLayout.GenericCharacterRttiName
+            && ReadUInt32(genericCharacterVtableFileOffset + 0x10)
+                == CharacterKeyedDialogCallbackNativeLayout.BaseControllerPointerSelectionCallbackFileOffset
+                    + CharacterKeyedDialogCallbackNativeLayout.RawTextOffsetToVirtualAddressDelta
+            && ReadUInt32(genericCharacterVtableFileOffset + 0x14)
+                == CharacterKeyedDialogCallbackNativeLayout.BaseControllerPointerMapCallbackFileOffset
+                    + CharacterKeyedDialogCallbackNativeLayout.RawTextOffsetToVirtualAddressDelta
+            && ReadUInt32(genericCharacterVtableFileOffset + 0x18)
+                == CharacterKeyedDialogCallbackNativeLayout.BaseControllerPointerRangeCallbackFileOffset
+                    + CharacterKeyedDialogCallbackNativeLayout.RawTextOffsetToVirtualAddressDelta
+            && ReadUInt32(genericCharacterVtableFileOffset + 0x1C)
+                == CharacterKeyedDialogCallbackNativeLayout.ReversePointerRangeCallbackFileOffset
+                    + CharacterKeyedDialogCallbackNativeLayout.RawTextOffsetToVirtualAddressDelta
+            && ReadUInt32(genericCharacterVtableFileOffset + 0x20)
+                == CharacterKeyedDialogCallbackNativeLayout.GenericCharacterSetupDispatcherFileOffset
+                    + CharacterKeyedDialogCallbackNativeLayout.RawTextOffsetToVirtualAddressDelta
+            && ReadAt(CharacterKeyedDialogCallbackNativeLayout.StateFactorySelectorMapFileOffset, 2)
+                .SequenceEqual(new byte[] { 0x00, 0x09 })
+            && ReadUInt32(CharacterKeyedDialogCallbackNativeLayout.StateFactoryJumpTableFileOffset)
+                == 0x00ECA083
+            && ReadUInt32(CharacterKeyedDialogCallbackNativeLayout.StateFactoryJumpTableFileOffset + 9 * 4)
+                == 0x00ECA2A8
+            && Matches(CharacterKeyedDialogCallbackNativeLayout.GenericCharacterAllocationSizeImmediateFileOffset,
+                "68E05A0000E8F3EA7E0083C404")
+            && RelativeBranchTargets(CharacterKeyedDialogCallbackNativeLayout.GenericCharacterAllocationSizeImmediateFileOffset + 5,
+                0xE8, 0x12B7FB0)
+            && RelativeBranchTargets(CharacterKeyedDialogCallbackNativeLayout.GenericCharacterConstructorCallFileOffset,
+                0xE8, CharacterKeyedDialogCallbackNativeLayout.GenericCharacterConstructorFileOffset)
+            && Matches(CharacterKeyedDialogCallbackNativeLayout.GenericCharacterVtableInstallFileOffset,
+                "C7069839C601")
+            && RelativeBranchTargets(CharacterKeyedDialogCallbackNativeLayout.GenericCharacterSetupSelectorTwoCaseFileOffset + 2,
+                0xE8, CharacterKeyedDialogCallbackNativeLayout.GenericCharacterSetupMethodFileOffset)
+            && Matches(CharacterKeyedDialogCallbackNativeLayout.StateFactorySetupVirtualCallFileOffset - 9,
+                "8B0383C4188BCB5657FF5020")
+            && RelativeBranchTargets(CharacterKeyedDialogCallbackNativeLayout.UnsupportedNpcStateFactoryBranchFileOffset + 0x13,
+                0xE8, CharacterKeyedDialogDispatchNativeLayout.VibeLogUnhandledMessageIdFileOffset));
+        check("Binary tfGenericCharacter callback-body candidates preserve their distinct call contracts",
+            Matches(CharacterKeyedDialogCallbackNativeLayout.BaseControllerPointerMapCallbackFileOffset,
+                "558BEC81C1C01B00005DE9")
+            && RelativeBranchTargets(
+                CharacterKeyedDialogCallbackNativeLayout.BaseControllerPointerMapCallbackFileOffset + 0x0A,
+                0xE9, CharacterKeyedDialogCallbackNativeLayout.PointerMapHelperFileOffset)
+            && RelativeBranchTargets(
+                CharacterKeyedDialogCallbackNativeLayout.PointerMapHelperFileOffset + 0x62,
+                0xE8, CharacterKeyedDialogCallbackNativeLayout.PointerMapInterpolationHelperFileOffset)
+            && Matches(CharacterKeyedDialogCallbackNativeLayout.BaseControllerPointerSelectionCallbackFileOffset,
+                "558BEC578BF98B078B4004FFD084C07408")
+            && Matches(CharacterKeyedDialogCallbackNativeLayout.BaseControllerPointerSelectionCallbackFileOffset + 0x54,
+                "FF5608")
+            && Matches(CharacterKeyedDialogCallbackNativeLayout.BaseControllerPointerSelectionCallbackFileOffset + 0x5A,
+                "FF561C")
+            && Matches(CharacterKeyedDialogCallbackNativeLayout.BaseControllerPointerRangeCallbackFileOffset,
+                "558BEC807D0C00568BF174138B068B4004FFD084C07408")
+            && Matches(CharacterKeyedDialogCallbackNativeLayout.BaseControllerPointerRangeCallbackFileOffset + 0x1F,
+                "83BE4C1C000000578DBEE81B00007509")
+            && RelativeBranchTargets(
+                CharacterKeyedDialogCallbackNativeLayout.BaseControllerPointerRangeCallbackFileOffset + 0x40,
+                0xE8, CharacterKeyedDialogCallbackNativeLayout.PointerRangeSearchHelperFileOffset)
+            && Matches(CharacterKeyedDialogCallbackNativeLayout.BaseControllerPointerRangeCallbackFileOffset,
+                "558BEC807D0C00")
+            && Matches(CharacterKeyedDialogCallbackNativeLayout.BaseControllerPointerRangeCallbackFileOffset + 0x1C,
+                "C20800")
+            && Matches(CharacterKeyedDialogCallbackNativeLayout.BaseControllerPointerRangeCallbackFileOffset + 0x35,
+                "C20800")
+            && Matches(CharacterKeyedDialogCallbackNativeLayout.BaseControllerPointerRangeCallbackFileOffset + 0x52,
+                "C20800")
+            && Matches(CharacterKeyedDialogCallbackNativeLayout.ReversePointerRangeCallbackFileOffset,
+                "558BEC807D0C00")
+            && Matches(CharacterKeyedDialogCallbackNativeLayout.ReversePointerRangeCallbackFileOffset + 0x1C,
+                "C20800")
+            && Matches(CharacterKeyedDialogCallbackNativeLayout.ReversePointerRangeCallbackFileOffset + 0x35,
+                "C20800")
+            && Matches(CharacterKeyedDialogCallbackNativeLayout.ReversePointerRangeCallbackFileOffset + 0x52,
+                "C20800")
+            && Matches(CharacterKeyedDialogCallbackNativeLayout.BaseControllerPointerRangeCallSequenceFileOffset,
+                "8B4E2C578B01FF5018")
+            && Matches(CharacterKeyedDialogCallbackNativeLayout.ReversePointerRangeCallSequenceFileOffset,
+                "508BCFFF561C"));
         check("Binary conditional fan-out gate, state construction, recipient insertion, and slot call match the original image",
             Matches(0x7FDD64, "83BEB0000000007419")
             && RelativeBranchTargets(0x7FDD81, 0xE8,

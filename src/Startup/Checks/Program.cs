@@ -3961,6 +3961,51 @@ Check("Keyed Character receiver dialog IDs map through their actual BaseControll
     && CharacterKeyedDialogDispatchNativeLayout.OuterEnvelopeDispatcherFileOffset == 0x800420
     && CharacterKeyedDialogDispatchNativeLayout.OuterSelectorDefaultBranchFileOffset == 0x800697
     && CharacterKeyedDialogDispatchNativeLayout.OuterSelectorDefaultReceiverCallFileOffset == 0x8008D3);
+var keyedCharacterCallbackSlots = CharacterKeyedDialogCallbackNativeLayout.VtableSlots;
+var keyedCharacterCallbackMethods = CharacterKeyedDialogCallbackNativeLayout.CallbackMethods;
+var keyedCharacterCallbackContractCandidates = CharacterKeyedDialogCallbackNativeLayout.ContractCandidates;
+Check("Keyed Character callback methods match the RTTI-backed tfGenericCharacter vtable and state-factory path",
+    CharacterKeyedDialogCallbackNativeLayout.RawTextOffsetToVirtualAddressDelta
+        == CharacterKeyedDialogDispatchNativeLayout.RawTextOffsetToVirtualAddressDelta
+    && CharacterKeyedDialogCallbackNativeLayout.GenericCharacterRttiName == ".?AVtfGenericCharacter@@"
+    && CharacterKeyedDialogCallbackNativeLayout.GenericCharacterPrimaryVtableVirtualAddress == 0x1C63998
+    && CharacterKeyedDialogCallbackNativeLayout.GenericCharacterPrimaryVtableFileOffset == 0x1862598
+    && CharacterKeyedDialogCallbackNativeLayout.GenericCharacterAllocationSize == 0x5AE0
+    && CharacterKeyedDialogCallbackNativeLayout.GenericCharacterConstructorFileOffset == 0x422E80
+    && CharacterKeyedDialogCallbackNativeLayout.GenericCharacterVtableInstallFileOffset == 0x422FEA
+    && CharacterKeyedDialogCallbackNativeLayout.GenericCharacterSetupDispatcherFileOffset == 0x4263C0
+    && CharacterKeyedDialogCallbackNativeLayout.GenericCharacterSetupMethodFileOffset == 0x426840
+    && CharacterKeyedDialogCallbackNativeLayout.GenericCharacterSetupSelectorTwoCaseFileOffset == 0x426436
+    && CharacterKeyedDialogCallbackNativeLayout.StateFactoryMethodFileOffset == 0xAC9350
+    && CharacterKeyedDialogCallbackNativeLayout.StateFactorySelectorMapFileOffset == 0xAC9704
+    && CharacterKeyedDialogCallbackNativeLayout.StateFactoryJumpTableFileOffset == 0xAC96DC
+    && CharacterKeyedDialogCallbackNativeLayout.GenericCharacterStateFactoryBranchFileOffset == 0xAC9483
+    && CharacterKeyedDialogCallbackNativeLayout.UnsupportedNpcStateFactoryBranchFileOffset == 0xAC96A8
+    && keyedCharacterCallbackSlots.Select(slot => slot.SlotOffset)
+        .SequenceEqual([0x10, 0x14, 0x18, 0x1C, 0x20])
+    && keyedCharacterCallbackSlots.Select(slot => slot.MethodFileOffset)
+        .SequenceEqual([0x4206B0u, 0x4206A0u, 0x420720u, 0x420780u, 0x4263C0u])
+    && keyedCharacterCallbackSlots.All(slot =>
+        slot.MethodVirtualAddress
+            == slot.MethodFileOffset
+                + CharacterKeyedDialogCallbackNativeLayout.RawTextOffsetToVirtualAddressDelta)
+    && keyedCharacterCallbackMethods.Select(method => method.SlotOffset)
+        .SequenceEqual([0x10, 0x14, 0x18])
+    && keyedCharacterCallbackMethods.All(method => method.ReceivesOriginalMessagePointer
+        && !method.ReadsMessagePayload
+        && !method.WritesCallbackObjectDirectly)
+    && keyedCharacterCallbackContractCandidates.Select(candidate => candidate.SlotOffset)
+        .SequenceEqual([0x18, 0x1C])
+    && keyedCharacterCallbackContractCandidates.Select(candidate => candidate.CandidateMethodFileOffset)
+        .SequenceEqual([0x420720u, 0x420780u])
+    && keyedCharacterCallbackContractCandidates.All(candidate =>
+        candidate.ExpectedStackArgumentCount == 2
+        && candidate.CalleeStackCleanupBytes == 8
+        && candidate.ObservedCallerStackArgumentPushCount == 1)
+    && keyedCharacterCallbackContractCandidates.Select(candidate => candidate.CallerMethodFileOffset)
+        .SequenceEqual([0x540380u, 0x4206B0u])
+    && keyedCharacterCallbackContractCandidates.Select(candidate => candidate.CallerCallInstructionFileOffset)
+        .SequenceEqual([0x5404B8u, 0x42070Au]));
 Check("Conditional message fan-out records its constructed keyed state and recipient-vector call",
     MatrixMessageParserFlowNativeLayout.ConditionalFanoutStateLazyConstructionMethodFileOffset == 0x7FE1C0
     && MatrixMessageParserFlowNativeLayout.ConditionalFanoutStateConstructorFileOffset == 0xBD6E10

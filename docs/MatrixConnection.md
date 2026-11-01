@@ -2772,8 +2772,8 @@ range is `0x53..0xC4`. An ID outside that range or a table sentinel (`0x4B`
 for BaseController, `0x4E` for NPCController) reaches
 `VIBE_LogUnhandledMessageId` with the supplied ID. The constructors at
 `0x53F980` and `0x54E7B0` initialize receiver `+0x28/+0x2C/+0x30` to zero;
-where or whether runtime setup later installs those optional objects was not
-resolved here.
+the `+0x10` nested-object type and any later writer of these optional fields
+remain unresolved.
 
 The five concrete routes do not parse `message+0x28` or other dialog payload
 fields, update message-driven application state, or directly dispatch a
@@ -2783,9 +2783,64 @@ BaseController IDs `0x77/0x78/0x79` log `msg-119`/`msg-120`/`msg-121`;
 NPCController IDs `0x77/0x78` log `msg-120`/`msg-121`. These strings are
 logger arguments, not event names. The cases then pass the unchanged message
 pointer to the object at receiver `+0x2C` through the class/ID-specific
-virtual slot shown above. The concrete type and implementation behind those
-calls remain unknown, so downstream application effects cannot be inferred
-from these cases alone.
+virtual slot shown above.
+
+The callback implementation targets now have a concrete vtable owner. In
+the original PE, vtable VA `0x1C63998` maps to raw `.rdata` offset `0x1862598`;
+its COL/TypeDescriptor resolves to RTTI `.?AVtfGenericCharacter@@`. The
+constructor at raw `0x422E80` installs this vtable, and its slots match the
+callback destinations exactly: `+0x10 -> 0x4206B0`, `+0x14 -> 0x4206A0`,
+`+0x18 -> 0x420720`, `+0x1C -> 0x420780`, and setup `+0x20 -> 0x4263C0`.
+This identity is based on constructor/vtable/target equality; the RTTI name
+alone is not evidence of message semantics.
+
+The keyed state factory at raw `0xAC9350` maps selector `0x02` to a
+`0x5AE0`-byte allocation followed by constructor `0x422E80`; selector `0x03`
+maps to its unhandled-ID path and returns no state from this factory. For
+selector `0x02`, the state setup vtable slot `+0x20` reaches `0x4263C0`, whose
+selector-2 case calls `0x426840`. The creation path calls the state's `+0x20`
+method with the keyed receiver and outer manager, then registers the state
+with the manager. This associates a `tfGenericCharacter` state object with
+the BaseController key, and its vtable targets match the BaseController
+callback slots. It does **not** prove that this state pointer is written to
+the controller's optional `+0x2C` gate: the observed constructors zero that
+field, and the examined state setup/registration path contains no such
+receiver-field store. The actual runtime value behind the gate therefore
+remains conditional. The same setup factory does not create an NPCController
+selector-`0x03` state, so it cannot establish the NPC callback receiver
+either.
+
+Two representative callback bodies show pointer-processing behavior rather
+than payload parsing. If the optional callback object is a
+`tfGenericCharacter`, BaseController ID `0x77` reaches its slot `+0x10` /
+raw `0x4206B0` with the original message pointer. It first
+calls the object's slot `+0x04` predicate; a true result returns that pointer
+unchanged. Otherwise a guarded global-state branch can return the object
+member at `+0x1BE4`; the remaining path calls slots `+0x08` and `+0x1C` in
+sequence and returns the latter result. BaseController ID `0x78` (and
+NPCController ID `0x77`) would reach slot `+0x14` / raw `0x4206A0`, which passes
+the same original pointer to `0x444AA0` with `this+0x1BC0`; that helper selects
+an endpoint or interpolates across the stored ranges through `0x447220`.
+The vtable target at slot `+0x18` / raw `0x420720` has a narrower status:
+it tests the second stack argument at `[ebp+0x0C]` and uses `ret 8` on every
+return path, so its body expects two stack arguments and callee-cleans eight
+bytes. The BaseController case at raw `0x540498` reaches the slot call at
+`0x5404B8` after pushing only the original message pointer once. Likewise,
+the sibling slot `+0x1C` target `0x420780` tests `[ebp+0x0C]` and returns
+with `ret 8`; `0x4206B0` reaches that virtual slot at `0x42070A` after one
+`push eax` of its intermediate pointer. These are statically observed
+call-contract differences if those calls dispatch to the candidate targets.
+The optional controller field `+0x2C` is initialized to null in the observed
+constructors, and no store binding it to a `tfGenericCharacter` instance has
+been found. The actual runtime callback-object binding is therefore
+unresolved: this evidence does not establish a runtime mismatch or its
+consequences. The pointer-mapping bodies treat their arguments as addresses,
+not message contents; `0x4206B0` passes its input through the `+0x08`/`+0x1C`
+virtual-helper chain. No downstream application-state effect is proven. The
+controller reads the message ID from `message+0x10` and forwards
+`message+0x24` only to the separate optional nested object at receiver
+`+0x10`; neither field is substituted for the callback's original-pointer
+argument. The callback result is not used by the outer `0x800420` call site.
 
 This keyed path is separate from the conditional zero-low-byte branch in
 `0x7FDC60`, which can call the `tfGameProtocolHandler` via callback-context

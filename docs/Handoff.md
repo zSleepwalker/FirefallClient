@@ -173,13 +173,33 @@
   require receiver `+0x2C` before ID dispatch. Specific cases optionally log
   through receiver `+0x30` and pass the original message pointer unchanged;
   they do not directly read dialog payloads or emit numeric UI events. The
-  callback object's type and downstream app effects remain unknown. This does
-  not alter the conditional `0x7FDC60` global route: nonzero message
+  callback targets match slots `+0x10/+0x14/+0x18` of the constructor-installed,
+  RTTI-backed `tfGenericCharacter` vtable at VA `0x1C63998` / raw `.rdata`
+  `0x1862598`. Selector `0x02` state creation allocates `0x5AE0` bytes and
+  calls `0x422E80`; its setup `+0x20` path reaches `0x426840`. The
+  selector-`0x03` state-factory branch is unhandled. The state factory
+  associates the selector-`0x02` state with its keyed receiver, but no
+  observed store binds it to receiver `+0x2C`; the gate's runtime target
+  remains conditional, and this does not establish the NPC callback object's
+  identity. The `+0x18` candidate `0x420720` and sibling `+0x1C` candidate
+  `0x420780` each test `[ebp+0x0C]` and return with `ret 8` (two stack
+  arguments expected). Their observed callers at `0x5404B8` and `0x42070A`
+  push one stack argument each. This is only a conditional call-contract
+  incompatibility if the unresolved `+0x2C` receiver binding dispatches to
+  `tfGenericCharacter`; do not conclude an actual runtime mismatch or effect.
+  The other representative bodies `0x4206B0` and `0x4206A0` process their
+  pointer arguments rather than parse message fields; `0x4206B0` delegates
+  through two virtual helpers whose payload use and side effects are not
+  established. None directly writes the callback object. This does not alter
+  the conditional
+  `0x7FDC60` global route: nonzero message
   `+0x18` low byte goes to `0x800420`, while the zero-low-byte, non-nested,
   non-null callback-context `+0x08` branch can reach the separate
-  `tfGameProtocolHandler`. Next concrete target: resolve the keyed callback
-  object's setup/implementation and downstream consumer, then compact-body
-  methods.
+  `tfGameProtocolHandler`. Next concrete target: identify any writer of
+  receiver `+0x2C` outside the state-factory path (or confirm the gate stays
+  null for these constructors), then resolve the distinct nested `+0x10`
+  receiver type; do not infer callback semantics from the `tfGenericCharacter`
+  RTTI name.
 - The gated `0xBD7060` path serializes the message QWORD and message data into
   its output stream, then passes the selector separately to `0xBD7460`,
   which stores it in the recipient callback's local record, not the stream.
