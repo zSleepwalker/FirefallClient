@@ -3326,6 +3326,66 @@ Check("Dialog message primary vftables map stream readers and writers separately
     && dialogMessageVtables[0].SerializedFieldOffsets.SequenceEqual([0x28])
     && dialogMessageVtables[1].SerializedFieldOffsets.SequenceEqual([0x28, 0x30, 0x38])
     && dialogMessageVtables[2].SerializedFieldOffsets.SequenceEqual([0x28, 0x2C]));
+Check("Dialog application event routes use the uiManager dispatcher and preserve observed payload keys and offsets",
+    DialogApplicationDispatchNativeLayout.UiManagerGlobalPointerFileOffset == 0x19FE6B8
+    && DialogApplicationDispatchNativeLayout.UiManagerVtableFileOffset == 0x1872ABC
+    && DialogApplicationDispatchNativeLayout.UiManagerEventDispatchSlotFileOffset == 0x1872B68
+    && DialogApplicationDispatchNativeLayout.UiManagerEventDispatchMethodVirtualAddress == 0xFFA980
+    && DialogApplicationDispatchNativeLayout.UiManagerEventDispatchMethodFileOffset == 0xBF9D80
+    && DialogApplicationDispatchNativeLayout.UiManagerEventDispatchVtableSlotOffset == 0xAC
+    && DialogApplicationDispatchNativeLayout.UiManagerEventNameMapOffset == 0x6E8
+    && DialogApplicationDispatchNativeLayout.UiManagerEventRegistryOffset == 0x6F0
+    && DialogApplicationDispatchNativeLayout.UiManagerEventNameArrayBeginOffset == 0x71C
+    && DialogApplicationDispatchNativeLayout.UiManagerEventNameArrayEndOffset == 0x720
+    && DialogApplicationDispatchNativeLayout.UiManagerEventDeliveryQueueOffset == 0x5EC
+    && DialogApplicationDispatchNativeLayout.UiManagerListenerEventMapOffset == 0x168
+    && DialogApplicationDispatchNativeLayout.UiManagerListenerPendingDispatchOffset == 0x4C4
+    && DialogApplicationDispatchNativeLayout.UiManagerEventListenerCallbackCallSiteFileOffset == 0xBF9D5B
+    && DialogApplicationDispatchNativeLayout.UiManagerEventCallbackLookupCallSiteFileOffset == 0xC38438
+    && DialogApplicationDispatchNativeLayout.UiManagerEventListenerMapLookupMethodFileOffset == 0xC41BC0
+    && DialogApplicationDispatchNativeLayout.UiManagerEventListenerDispatchInsertCallSiteFileOffset == 0xC3847C
+    && DialogApplicationDispatchNativeLayout.UiManagerEventListenerDispatchInsertMethodFileOffset == 0xC42180
+    && DialogApplicationDispatchNativeLayout.UiManagerEventDeliveryQueueInsertCallSiteFileOffset == 0xC384D3
+    && DialogApplicationDispatchNativeLayout.PayloadInt32FieldWriterMethodFileOffset == 0xC24210
+    && DialogApplicationDispatchNativeLayout.PayloadBooleanFieldWriterMethodFileOffset == 0xC243E0
+    && DialogApplicationDispatchNativeLayout.PayloadInt32PairFieldWriterMethodFileOffset == 0xC245A0
+    && DialogApplicationDispatchNativeLayout.PayloadInt32FieldWriterFileOffset == 0xC24254
+    && DialogApplicationDispatchNativeLayout.PayloadBooleanFieldWriterFileOffset == 0xC24424
+    && DialogApplicationDispatchNativeLayout.PayloadInt32PairFieldWriterFileOffset == 0xC245E4
+    && DialogApplicationDispatchNativeLayout.PayloadTextFieldWriterFileOffset == 0xC240F0
+    && DialogApplicationDispatchNativeLayout.Dispatches.SequenceEqual(
+    [
+        new DialogApplicationEventDispatchSnapshot(0x78, 0xACE2E0, 0x991320, 0x99147C, 228, true),
+        new DialogApplicationEventDispatchSnapshot(0x79, 0xACE300, 0x991510, 0x99165B, 229, true),
+        new DialogApplicationEventDispatchSnapshot(0x7A, 0xACE390, 0x4D6C10, 0x4D6D43, 357, false)
+    ])
+    && DialogApplicationDispatchNativeLayout.OpenMoviePayloadFields.SequenceEqual(
+    [
+        new DialogApplicationPayloadFieldSnapshot(
+            "vendor_id", 0x28, DialogApplicationPayloadValueKind.Int32)
+    ])
+    && DialogApplicationDispatchNativeLayout.PrivateDialogPayloadFields.SequenceEqual(
+    [
+        new DialogApplicationPayloadFieldSnapshot(
+            "success", 0x28, DialogApplicationPayloadValueKind.BooleanByte),
+        new DialogApplicationPayloadFieldSnapshot(
+            "vendor_id", 0x40, DialogApplicationPayloadValueKind.Int32),
+        new DialogApplicationPayloadFieldSnapshot(
+            "product_id", 0x30, DialogApplicationPayloadValueKind.Int32Pair),
+        new DialogApplicationPayloadFieldSnapshot(
+            "price_id", 0x38, DialogApplicationPayloadValueKind.Int32Pair),
+        new DialogApplicationPayloadFieldSnapshot(
+            "code", 0x44, DialogApplicationPayloadValueKind.NullTerminatedText)
+    ])
+    && DialogApplicationDispatchNativeLayout.PublicDialogPreparedFields.SequenceEqual(
+    [
+        new DialogApplicationPayloadFieldSnapshot(
+            "action_id", 0x30, DialogApplicationPayloadValueKind.Int32),
+        new DialogApplicationPayloadFieldSnapshot(
+            "activated", 0x84, DialogApplicationPayloadValueKind.BooleanByte)
+    ])
+    && DialogApplicationDispatchNativeLayout.PrivateDialogCodeFallback == "PURCHASE_SUCCESSFUL"
+    && !DialogApplicationDispatchNativeLayout.PublicDialogDispatchPassesPayloadRecord);
 
 if (args.Length != 0)
 {

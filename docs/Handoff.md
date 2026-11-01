@@ -78,16 +78,31 @@
   `0x78 OpenMovieDialog -> +0x164 -> 0xACE2E0`, `0x79 PrivateDialog ->
   +0x168 -> 0xACE300 -> tail-jump 0x991510`, and `0x7A PublicDialog ->
   +0x16C -> 0xACE390`. The OpenMovie path dispatches numeric application code
-  `228`; the other two dispatch `229` and `357`. These IDs are structural
-  evidence only; application/dialog semantics remain unresolved. The other
-  receiver slots are not semantically classified.
-- Next static target: trace the concrete application-dispatch vtable
-  implementation behind `dword_1E002B8` slot `+0xAC` for codes `228`, `229`,
-  and `357`, without inferring their meanings. The separate recipient
-  iteration behind `0xBD7060` (including its per-entry slot `+0x0C`) and the
-  wrapper `0x821DE0`'s application caller also remain unknown. Continue
-  read-only; do not modify the sample/IDB or commit/push unless explicitly
-  requested.
+  `228`; the other two dispatch `229` and `357`. The exact app endpoint is
+  `uiManager` global VA `0x1E002B8`, whose vtable slot `+0xAC` maps to
+  `0xBF9D80`. That method indexes the dynamic event bucket at manager `+0x6F0`;
+  names are allocated IDs by `0xBF9AB0` through the map at `+0x6E8` and name
+  array at `+0x71C..+0x720`. Numeric-to-name mapping and the actual runtime
+  listener for `228/229/357` remain unresolved.
+- Recorded payload keys/fields: `228` passes `vendor_id` from message `+0x28`;
+  `229` passes `success` (`+0x28` byte), `product_id` (`+0x30/+0x34`),
+  `price_id` (`+0x38/+0x3C`), `vendor_id` (`+0x40`), and `code` (`+0x44`,
+  with fallback value `PURCHASE_SUCCESSFUL`); `357` prepares `action_id`
+  (`+0x30`) and `activated` (`+0x84`) but passes null payload arguments.
+  These strings are payload property keys/values, not event names.
+  `ON_VENDOR_PURCHASE_RESPONSE` / `OnVendorPurchaseResponse` exists in local
+  UI assets and consumes matching fields, but its registration-order-derived
+  ID is not proven to be `229`.
+- The dynamic listener path is traced through `0xBF9C40` to `0xC38400`, which
+  resolves a listener-local event callback and stages delivery in structures
+  at listener `+0x4C4` and `uiManager+0x5EC`. The concrete listener and later
+  callback execution are not statically identified. Details and binary
+  fingerprints are in `docs/MatrixConnection.md` and the separate
+  `src/Startup/DialogApplicationDispatchNativeLayout.cs`. Next bounded
+  unknowns: recover the exact event names/registered subscribers for these
+  numeric IDs, then separately revisit the recipient iteration behind
+  `0xBD7060` and wrapper `0x821DE0`'s application caller. Continue read-only;
+  do not modify the sample/IDB or commit/push unless explicitly requested.
 - Open items: field semantics, allocation-failure consequences, selector
   `0x55` 12-byte temp prefix, selector `0x6D` body consumption.
 - Workflow per batch: preserve native evidence in the existing layout,

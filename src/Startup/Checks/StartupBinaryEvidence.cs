@@ -4417,5 +4417,106 @@ internal static class StartupBinaryEvidence
             && Matches(0x5EE760 + 0x12, "8B4D088D472C50E8")
             && Matches(0x526900, "558BECF6450801568BF1C706841BC6017405")
             && Matches(0x526900 + 0x12, "E84924DA00"));
+        var uiManagerVtableVirtualAddress = UiManagerNativeLayout.UiManagerVtableVirtualAddress;
+        check("Binary dialog application dispatch resolves to uiManager slot+0xAC and its dynamic listener registry",
+            imageBase == 0x400000
+            && VirtualAddressToFileOffset(uiManagerVtableVirtualAddress) == DialogApplicationDispatchNativeLayout.UiManagerVtableFileOffset
+            && VirtualAddressToFileOffset(uiManagerVtableVirtualAddress)
+                + DialogApplicationDispatchNativeLayout.UiManagerEventDispatchVtableSlotOffset
+                == DialogApplicationDispatchNativeLayout.UiManagerEventDispatchSlotFileOffset
+            && ReadUInt32(DialogApplicationDispatchNativeLayout.UiManagerEventDispatchSlotFileOffset)
+                == DialogApplicationDispatchNativeLayout.UiManagerEventDispatchMethodVirtualAddress
+            && VirtualAddressToFileOffset(DialogApplicationDispatchNativeLayout.UiManagerEventDispatchMethodVirtualAddress)
+                == DialogApplicationDispatchNativeLayout.UiManagerEventDispatchMethodFileOffset
+            && VtableRttiName(uiManagerVtableVirtualAddress, 80) == UiManagerNativeLayout.UiManagerRttiName
+            && Matches(UiManagerNativeLayout.UiManagerConstructorFileOffset + 0x3B, "C703BC3EC701")
+            && VirtualAddressToFileOffset(UiManagerNativeLayout.UiManagerGlobalPointerVirtualAddress)
+                == DialogApplicationDispatchNativeLayout.UiManagerGlobalPointerFileOffset
+            && ReadUInt32(DialogApplicationDispatchNativeLayout.UiManagerGlobalPointerFileOffset) == 0
+            && Matches(DialogApplicationDispatchNativeLayout.UiManagerEventNameToIdMethodFileOffset + 0x12, "8D9EE8060000")
+            && Matches(DialogApplicationDispatchNativeLayout.UiManagerEventDispatchMethodFileOffset + 0x165, "8D8FF0060000")
+            && Matches(DialogApplicationDispatchNativeLayout.UiManagerEventListenerRegisterMethodFileOffset + 0x1C, "8DBEF0060000")
+            && RelativeBranchTargets(
+                DialogApplicationDispatchNativeLayout.UiManagerEventListenerCallbackCallSiteFileOffset,
+                0xE8,
+                DialogApplicationDispatchNativeLayout.UiManagerEventCallbackRouteMethodFileOffset)
+            && Matches(DialogApplicationDispatchNativeLayout.UiManagerEventCallbackRouteMethodFileOffset + 0x32, "8D8B68010000")
+            && RelativeBranchTargets(
+                DialogApplicationDispatchNativeLayout.UiManagerEventCallbackLookupCallSiteFileOffset,
+                0xE8,
+                DialogApplicationDispatchNativeLayout.UiManagerEventListenerMapLookupMethodFileOffset)
+            && RelativeBranchTargets(
+                DialogApplicationDispatchNativeLayout.UiManagerEventListenerDispatchInsertCallSiteFileOffset,
+                0xE8,
+                DialogApplicationDispatchNativeLayout.UiManagerEventListenerDispatchInsertMethodFileOffset)
+            && RelativeBranchTargets(
+                DialogApplicationDispatchNativeLayout.UiManagerEventDeliveryQueueInsertCallSiteFileOffset,
+                0xE8,
+                0xC53B90));
+        check("Binary dialog handlers preserve exact application payload inputs, keys, and numeric dispatch arguments",
+            Matches(
+                DialogApplicationDispatchNativeLayout.OpenMovieDialogHandlerArgumentSetupFileOffset,
+                "8D413050FF71288B0D1C03E001")
+            && RelativeBranchTargets(
+                DialogApplicationDispatchNativeLayout.OpenMovieDialogHandlerCallFileOffset,
+                0xE8,
+                DialogApplicationDispatchNativeLayout.OpenMovieDialogApplicationHelperFileOffset)
+            && RelativeBranchTargets(
+                DialogApplicationDispatchNativeLayout.OpenMovieDialogPayloadFieldCallFileOffset,
+                0xE8,
+                DialogApplicationDispatchNativeLayout.PayloadInt32FieldWriterMethodFileOffset)
+            && Matches(DialogApplicationDispatchNativeLayout.PayloadInt32FieldWriterFileOffset, "895610C70601000000")
+            && Matches(DialogApplicationDispatchNativeLayout.PayloadBooleanFieldWriterFileOffset, "885618C70603000000")
+            && Matches(DialogApplicationDispatchNativeLayout.PayloadInt32PairFieldWriterFileOffset, "8956088B551089560CC70605000000")
+            && Matches(0x9915D7, "8D4C240C0FB646285068089BB901")
+            && RelativeBranchTargets(
+                DialogApplicationDispatchNativeLayout.PrivateDialogSuccessFieldCallFileOffset,
+                0xE8,
+                DialogApplicationDispatchNativeLayout.PayloadBooleanFieldWriterMethodFileOffset)
+            && Matches(0x9915EA, "FF76408D4C241068109BB901")
+            && RelativeBranchTargets(
+                DialogApplicationDispatchNativeLayout.PrivateDialogVendorFieldCallFileOffset,
+                0xE8,
+                DialogApplicationDispatchNativeLayout.PayloadInt32FieldWriterMethodFileOffset)
+            && Matches(0x9915FB, "FF76348D4C2410FF763068549AB901")
+            && RelativeBranchTargets(
+                DialogApplicationDispatchNativeLayout.PrivateDialogProductFieldsCallFileOffset,
+                0xE8,
+                DialogApplicationDispatchNativeLayout.PayloadInt32PairFieldWriterMethodFileOffset)
+            && Matches(0x99160F, "FF763C8D4C2410FF763868609AB901")
+            && RelativeBranchTargets(
+                DialogApplicationDispatchNativeLayout.PrivateDialogPriceFieldsCallFileOffset,
+                0xE8,
+                DialogApplicationDispatchNativeLayout.PayloadInt32PairFieldWriterMethodFileOffset)
+            && RelativeBranchTargets(
+                DialogApplicationDispatchNativeLayout.PrivateDialogCodeFieldCallFileOffset,
+                0xE8,
+                DialogApplicationDispatchNativeLayout.PayloadTextFieldWriterFileOffset)
+            && Matches(0x991548,
+                "807E280074288B46448D4E4485C07414668378F80074060FB740FAEB038B40F485C0750A68289BB901E81AB796FF")
+            && Matches(0x991623,
+                "8B4644BA68EAC50185C00F45D08BC28D70018A084084C975F92BC68D4C240C505268089AB901")
+            && Matches(DialogApplicationDispatchNativeLayout.PublicDialogHandlerFileOffset + 6, "80B984000000000F95C00FB6C0508D412850")
+            && RelativeBranchTargets(
+                DialogApplicationDispatchNativeLayout.PublicDialogActionFieldCallFileOffset,
+                0xE8,
+                DialogApplicationDispatchNativeLayout.PayloadInt32FieldWriterMethodFileOffset)
+            && RelativeBranchTargets(
+                DialogApplicationDispatchNativeLayout.PublicDialogActivatedFieldCallFileOffset,
+                0xE8,
+                DialogApplicationDispatchNativeLayout.PayloadBooleanFieldWriterMethodFileOffset)
+            && Matches(0x4D6C52, "8B7D088D77085650")
+            && ReadCStringAscii(DialogApplicationDispatchNativeLayout.VendorIdKeyVirtualAddress, 32) == "vendor_id"
+            && ReadCStringAscii(DialogApplicationDispatchNativeLayout.SuccessKeyVirtualAddress, 32) == "success"
+            && ReadCStringAscii(DialogApplicationDispatchNativeLayout.ProductIdKeyVirtualAddress, 32) == "product_id"
+            && ReadCStringAscii(DialogApplicationDispatchNativeLayout.PriceIdKeyVirtualAddress, 32) == "price_id"
+            && ReadCStringAscii(DialogApplicationDispatchNativeLayout.CodeKeyVirtualAddress, 32) == "code"
+            && ReadCStringAscii(DialogApplicationDispatchNativeLayout.PurchaseSuccessfulFallbackVirtualAddress, 32)
+                == DialogApplicationDispatchNativeLayout.PrivateDialogCodeFallback
+            && ReadCStringAscii(DialogApplicationDispatchNativeLayout.ActionIdKeyVirtualAddress, 32) == "action_id"
+            && ReadCStringAscii(DialogApplicationDispatchNativeLayout.ActivatedKeyVirtualAddress, 32) == "activated"
+            && Matches(DialogApplicationDispatchNativeLayout.OpenMovieDialogEventCodeFileOffset, "68E40000008B01FF90AC000000")
+            && Matches(DialogApplicationDispatchNativeLayout.PrivateDialogEventCodeFileOffset, "68E50000008B01FF90AC000000")
+            && Matches(DialogApplicationDispatchNativeLayout.PublicDialogEventCodeFileOffset, "68650100008B01FF90AC000000"));
     }
 }

@@ -2225,24 +2225,74 @@ boolean derived from byte `+0x84`; that helper dispatches numeric code `357`
 (`0x165`; raw `0x4D6D43`). These are observed dispatch codes and arguments,
 not inferred UI or dialog semantics.
 
+### uiManager dispatch target, registry, and dialog payloads
+
+The `.text` mapping in the requested PE is `VA = raw file offset + 0x400C00`
+(`ImageBase=0x400000`, section RVA `0x1000`, raw pointer `0x400`). The receiver
+is the process `uiManager` instance at VA `0x1E002B8` (raw `.data` offset
+`0x19FE6B8`, initially zero in the image). Its constructor `0xBF7A80` writes
+the `uiManager` vtable VA `0x1C73EBC`; the vtable is at raw `.rdata` offset
+`0x1872ABC`. Its slot `+0xAC` is at raw `0x1872B68` and contains method VA
+`0xFFA980`, which maps back to raw `.text` function `0xBF9D80`. The configured
+singleton wrapper at VA `0x1E002A8` and the allocation/initialization path are
+described at the start of this document. The slot target is established from
+the vtable entry and PE mapping, not by guessing from the dialog RTTI.
+
+`0xBF9D80` gates dispatch on `uiManager+0x672`, then indexes the event registry
+at `+0x6F0` by the numeric event ID and visits that bucket through
+`0xBF9C40`. This does not resolve an ID to a name. The separate name-to-ID map
+is at `+0x6E8`; `0xBF9AB0` returns an existing ID or assigns the current count
+of the event-name array at `+0x71C..+0x720`. The component XML parser
+`0xC35740` registers each event name before its listener (`0xC358AF` then
+`0xC35AD8`); `Component.BindEvent` uses the named-subscription helper
+`0xC35BB0`. The first-insertion order also depends on component load order and
+script registration, so the static binary does not bind numeric IDs `228`,
+`229`, or `357` to exact event-name strings.
+
+One downstream route is statically visible but not a specific listener
+instance: `0xBF9C40` visits the dynamically registered listener bucket and
+optionally compares a listener name at `+0x70`; it calls `0xC38400` for a
+match. That routine looks up the listener's per-event callback map at `+0x168`,
+updates its pending-dispatch structure at `+0x4C4`, and adds a record to the
+manager-side delivery structure at `+0x5EC`. The later consumer/function invocation and
+which runtime listener receives these three codes remain unresolved.
+
+The application-dispatch records built immediately before the virtual call
+have these verified fields (offsets are from the receiver method's input
+pointer):
+
+| Receiver route | Numeric code | Prepared record |
+| --- | ---: | --- |
+| `OpenMovieDialog` (`0x991320`) | `228` | `vendor_id` = DWORD at `+0x28`; the separate text pointer at `+0x30` also enters a helper/cache path through the object referenced by global `dword_1E0031C`, but is not placed in the dispatched record. The virtual call receives the record and trailing zero. |
+| `PrivateDialog` (`0x991510`) | `229` | `success` = byte at `+0x28`; `product_id` = DWORD pair at `+0x30/+0x34`; `price_id` = DWORD pair at `+0x38/+0x3C`; `vendor_id` = DWORD at `+0x40`; `code` = NUL-terminated text at `+0x44`. If the success byte is nonzero and the text is absent/empty, the code field is filled with the literal `PURCHASE_SUCCESSFUL`. The virtual call receives this record and trailing zero. |
+| `PublicDialog` (`0x4D6C10`) | `357` | Prepares `action_id` = DWORD at `+0x30` and `activated` = byte at `+0x84`, but the actual `uiManager+0xAC` call passes null for both payload arguments. Do not treat those prepared values as dispatched payload fields. |
+
+These are dictionary keys and a fallback **value**, not event subscription
+names. The `PrivateDialog` handler reads through `+0x44`, beyond the currently
+fingerprinted serialized field set (`+0x28`, `+0x30`, `+0x38`); how the extra
+fields are populated remains unresolved. The local UI assets contain
+`ON_VENDOR_PURCHASE_RESPONSE` bound to `OnVendorPurchaseResponse`
+(`system/gui/components/MainUI/Panels/Vendor/Vendor.xml:24`); its Lua handler
+uses `product_id`, `success`, and `code` (`Vendor.lua:258-275`). This is a
+plausible content-level candidate for the private record only. Because the
+name-to-ID insertion order is not reconstructed, it is **not verified** as
+subscriber to numeric code `229`, and no name is assigned to any of the three
+numeric codes.
+
 None of these three selected entries is a null or empty stub: two target
 direct functions and the `PrivateDialog` entry is a five-byte no-adjustment
 tail-jump thunk. The 91 receiver-table entries have distinct function-pointer
 values in the analyzed database, but the other slots have not been semantically
 classified as inherited, default, or message-specific methods.
 
-`MatrixMessageParserFlowNativeLayout.cs` records the direct parser callsites,
-allocator/registration split, callback load/call, input arguments, result
-queue, ReplayReader context RTTI/vtable slots, conditional message-recipient
-selector cases, concrete recipient constructor/RTTI, representative dialog
-receiver slots and observed application-dispatch codes, and reference
-decrement. Startup checks fingerprint those binary edges together with the
-registration field copies, constructor-return/context-field identity, context
-vtable targets and dispatch calls, selector-table targets, parser-return
-epilogs, and each dialog vtable entry and RTTI name from the requested binary.
-This model does not emulate parsing, assign semantic meaning to context
-message tags/fields or numeric application-dispatch codes, or claim a complete
-ownership policy.
+`MatrixMessageParserFlowNativeLayout.cs` records the parser and concrete
+recipient path; `DialogApplicationDispatchNativeLayout.cs` records this
+separate uiManager dispatch target, dynamic registry path, and observed dialog
+payload fields. Startup checks fingerprint the vtable/slot mapping, registry
+edges, payload construction, string keys, numeric call arguments, and PE
+section translations from the requested binary. These models do not emulate
+parsing, assign event-name semantics to numeric IDs, identify a concrete
+runtime listener, or claim a complete ownership policy.
 
 The nested table at VA `0xC22444` (raw `0x821844`) is now traced from selector
 `0x53` through `0x7A`, inclusive:
