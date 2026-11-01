@@ -16,26 +16,35 @@
   separately.
 - The 91 secondary-table entries (VA `0xC22630` / raw `0x821A30`) are mapped
   as dispatch data, but their message identities are still unresolved.
-- Latest consumer pass: raw `0x81CC50`'s two direct callers (`0x821BA0` and
-  `0x821DE0`) pass its result through EAX. ReplayReader's `0x65DAF2` call to
-  `0x12B7FB0` is allocation (`0xCC` bytes via allocator backend `0x12C8A20`),
-  not callback registration. Registration is the later `0x65DBD3` call to
-  `0xBD6260`, which stores the callback pointer at state `+0x1C` and context
-  at `+0x20`; the constructor also stores it at object `+0x10`.
-  The actual indirect parser invoker, returned-object owner, and first
-  application consumer remain unresolved. The separate vtable call at
-  `0xBD68F4` is not proven to invoke that parser. Details and binary checks
-  are in `docs/MatrixConnection.md` and
-  `MatrixMessageParserFlowNativeLayout.cs`.
-- Next static target: trace readers of the registration state at `+0x1C/+0x20`
-  and resolve the indirect call and returned-message ownership. Preserve the
-  explicit distinction between this dispatch path and the readiness probe at
-  `0xBD68F4`.
+- Latest parser-consumer pass: raw `0x81CC50`'s two direct callers (`0x821BA0`
+  and `0x821DE0`) pass its result through EAX. ReplayReader's `0x65DAF2` call
+  to `0x12B7FB0` is allocation (`0xCC` bytes via allocator backend
+  `0x12C8A20`), not callback registration. Registration is the later
+  `0x65DBD3` call to `0xBD6260`, which stores the callback at state `+0x1C`
+  and context at `+0x20`; the constructor also stores the parser VA at object
+  `+0x10`.
+- The registered callback invocation is in raw `0xBD6B40`: it loads
+  `[this+0x1C]` at `0xBD6D29` and calls it at `0xBD6D3C` with
+  `(stream, 0, header_length, 0)`. A non-null EAX result is copied into a
+  12-byte record and queued at `this+0xB4` through `0xBD8B80`. Consumer
+  `0xBD62F0` drains that queue, stages records at `this+0xC8`, and dispatches
+  through the stored `this+0x20` context's vtable slots `+4/+8`; it then
+  decrements the message pointer's `+8` counter and calls its vtable slot
+  `+8` when the old count is one. The enqueue contains no visible retain, so
+  producer ownership/ref-transfer policy and tag/context method semantics
+  remain unknown. The readiness probe at `0xBD68F4` is separate. Details and
+  byte fingerprints are in `docs/MatrixConnection.md` and
+  `src/Startup/MatrixMessageParserFlowNativeLayout.cs`.
+- Next static target: identify the `+0x20` context vtable methods and message
+  refcount/release implementation, and map the record tags without assuming
+  event semantics. The separate parser wrapper `0x821DE0` still has no proven
+  application caller. Continue read-only; do not modify the sample/IDB or
+  commit/push unless explicitly requested.
 - Open items: field semantics, allocation-failure consequences, selector
   `0x55` 12-byte temp prefix, selector `0x6D` body consumption.
-- Workflow per batch: Luna agent reconstructs (layout + Program.cs +
-  StartupBinaryEvidence.cs + MatrixConnection.md + Handoff note), Luna
-  `code-review` QA, then build, binary checks, commit and push.
+- Workflow per batch: preserve native evidence in the existing layout,
+  binary checks, and documentation; validate the focused build and binary
+  checks, without committing or pushing unless the user requests it.
 
 Latest Matrix transport follow-up: deferred-control opcodes2/3 carry two
 network-order frontier WORDs and optional selective sequence WORDs.

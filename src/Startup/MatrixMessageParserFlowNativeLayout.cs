@@ -19,9 +19,10 @@ public readonly record struct MatrixDialogMessageVtableSnapshot(
     IReadOnlyList<MatrixMessageVtableSlotSnapshot> PrimarySlots);
 
 /// <summary>
-/// Records parser return pass-through, the ReplayReader callback registration
-/// path, and primary dialog-message vftable slots without claiming a resolved
-/// indirect callback invoker or application-level consumer.
+/// Records parser return pass-through, the ReplayReader callback registration,
+/// invocation, result-queue path, and primary dialog-message vftable slots.
+/// The native context dispatch and final-release path are recorded without
+/// assigning semantic meanings to the context methods or message tags.
 /// </summary>
 public static class MatrixMessageParserFlowNativeLayout
 {
@@ -43,6 +44,24 @@ public static class MatrixMessageParserFlowNativeLayout
     public const uint ReplayReaderCallbackRegistrationFieldStoresFileOffset = 0xBD62AE;
     public const uint ReplayReaderReadinessProbeFileOffset = 0xBD68D0;
     public const uint ReplayReaderReadinessProbeCallFileOffset = 0xBD68F4;
+    public const uint RegisteredParserInvokerFileOffset = 0xBD6B40;
+    public const uint RegisteredParserCallbackLoadFileOffset = 0xBD6D29;
+    public const uint RegisteredParserCallbackCallFileOffset = 0xBD6D3C;
+    public const uint CallbackResultQueueInsertionCallFileOffset = 0xBD6D66;
+    public const uint CallbackResultQueueHelperFileOffset = 0xBD8B80;
+    public const uint CallbackResultConsumerFileOffset = 0xBD62F0;
+    public const uint CallbackResultConsumerQueueFieldSetupFileOffset = 0xBD65B6;
+    public const uint CallbackResultDispatchQueueFieldSetupFileOffset = 0xBD6615;
+    public const uint CallbackResultDispatchQueueInsertionCallFileOffset = 0xBD661B;
+    public const uint CallbackResultConsumerContextLoadFileOffset = 0xBD66B3;
+    public const uint CallbackResultConsumerContextDispatchFileOffset = 0xBD66F2;
+    public const uint CallbackResultConsumerAlternateContextDispatchFileOffset = 0xBD6702;
+    public const uint CallbackResultConsumerContextDispatchOtherFileOffset = 0xBD6710;
+    public const uint CallbackResultReferenceDecrementFileOffset = 0xBD6721;
+    public const uint CallbackResultFinalReleaseCallFileOffset = 0xBD6733;
+    public const uint CallbackResultQueueRecordCopyFileOffset = 0xBD8BE3;
+    public const int CallbackResultQueueFieldOffset = 0xB4;
+    public const int CallbackResultDispatchQueueFieldOffset = 0xC8;
     public const int ReplayReaderCallbackRecordParserFieldOffset = 4;
     public const int ReplayReaderRegisteredParserFieldOffset = 0x1C;
     public const int ReplayReaderRegisteredContextFieldOffset = 0x20;

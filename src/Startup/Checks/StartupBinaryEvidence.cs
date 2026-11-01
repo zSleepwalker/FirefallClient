@@ -4184,6 +4184,43 @@ internal static class StartupBinaryEvidence
                 "C74714B0BDC100")
             && Matches(MatrixMessageParserFlowNativeLayout.ReplayReaderCallbackRecordFunctionPointerStoreFileOffset,
                 "C744241CA027C200"));
+        check("Binary registered parser callback arguments, result queue, context dispatch, and reference release match",
+            Matches(0xBD6BEE, "8B75E485F60F842D01000083FE06760983FE090F851F010000")
+            && Matches(0xBD66DE, "487426487413487530")
+            && Matches(MatrixMessageParserFlowNativeLayout.RegisteredParserCallbackLoadFileOffset,
+                "8B4E1C85C974130FB743046A00506A00FF7510FFD183C4108BF8")
+            && Matches(MatrixMessageParserFlowNativeLayout.CallbackResultQueueInsertionCallFileOffset - 28,
+                "85FF741D8B038D8EB40000008945C08B43048945C48D45C050897DC8")
+            && RelativeBranchTargets(
+                MatrixMessageParserFlowNativeLayout.CallbackResultQueueInsertionCallFileOffset,
+                0xE8,
+                MatrixMessageParserFlowNativeLayout.CallbackResultQueueHelperFileOffset)
+            && Matches(MatrixMessageParserFlowNativeLayout.CallbackResultQueueRecordCopyFileOffset,
+                "660FD6018B4008894108")
+            && Matches(MatrixMessageParserFlowNativeLayout.CallbackResultQueueRecordCopyFileOffset - 4,
+                "F30F7E00660FD6018B4008894108")
+            && Matches(MatrixMessageParserFlowNativeLayout.CallbackResultConsumerQueueFieldSetupFileOffset,
+                "8DBEB4000000")
+            && Matches(MatrixMessageParserFlowNativeLayout.CallbackResultDispatchQueueFieldSetupFileOffset,
+                "8D8EC8000000")
+            && RelativeBranchTargets(
+                MatrixMessageParserFlowNativeLayout.CallbackResultDispatchQueueInsertionCallFileOffset,
+                0xE8,
+                MatrixMessageParserFlowNativeLayout.CallbackResultQueueHelperFileOffset)
+            && Matches(MatrixMessageParserFlowNativeLayout.CallbackResultConsumerContextLoadFileOffset,
+                "8B5620")
+            && Matches(MatrixMessageParserFlowNativeLayout.CallbackResultConsumerContextDispatchFileOffset,
+                "FF5008")
+            && Matches(MatrixMessageParserFlowNativeLayout.CallbackResultConsumerAlternateContextDispatchFileOffset,
+                "FF5008")
+            && Matches(MatrixMessageParserFlowNativeLayout.CallbackResultConsumerContextDispatchOtherFileOffset,
+                "FF5004")
+            && Matches(MatrixMessageParserFlowNativeLayout.CallbackResultReferenceDecrementFileOffset,
+                "F00FC11083FA01750C")
+            && Matches(MatrixMessageParserFlowNativeLayout.CallbackResultReferenceDecrementFileOffset - 6,
+                "83CAFF8D4708F00FC11083FA01750C85FF74088B078BCF52FF5008")
+            && Matches(MatrixMessageParserFlowNativeLayout.CallbackResultFinalReleaseCallFileOffset,
+                "FF5008"));
         check("Binary dialog-message primary vftables point to stream writers, stream readers, and deleting destructors",
             MatrixMessageParserFlowNativeLayout.DialogMessageVtables.All(vtable =>
                 vtable.PrimarySlots.All(slot =>

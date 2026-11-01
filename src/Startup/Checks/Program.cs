@@ -3146,7 +3146,7 @@ var expectedDialogSlots = new IReadOnlyList<MatrixMessageVtableSlotSnapshot>[]
         new MatrixMessageVtableSlotSnapshot(8, 0x526900, MatrixMessageVtableSlotRole.DeletingDestructor)
     }
 };
-Check("Matrix parser callsites and ReplayReader callback registration remain explicit",
+Check("Matrix parser callsites, callback invocation, and result consumption remain explicit",
     MatrixMessageParserFlowNativeLayout.NestedCommandParserFileOffset == 0x81CC50
     && MatrixMessageParserFlowNativeLayout.DirectParserCallSites.SequenceEqual(
     [
@@ -3166,6 +3166,24 @@ Check("Matrix parser callsites and ReplayReader callback registration remain exp
     && MatrixMessageParserFlowNativeLayout.ReplayReaderCallbackRegistrationHelperFileOffset == 0xBD6260
     && MatrixMessageParserFlowNativeLayout.ReplayReaderReadinessProbeFileOffset == 0xBD68D0
     && MatrixMessageParserFlowNativeLayout.ReplayReaderReadinessProbeCallFileOffset == 0xBD68F4
+    && MatrixMessageParserFlowNativeLayout.RegisteredParserInvokerFileOffset == 0xBD6B40
+    && MatrixMessageParserFlowNativeLayout.RegisteredParserCallbackLoadFileOffset == 0xBD6D29
+    && MatrixMessageParserFlowNativeLayout.RegisteredParserCallbackCallFileOffset == 0xBD6D3C
+    && MatrixMessageParserFlowNativeLayout.CallbackResultQueueInsertionCallFileOffset == 0xBD6D66
+    && MatrixMessageParserFlowNativeLayout.CallbackResultQueueHelperFileOffset == 0xBD8B80
+    && MatrixMessageParserFlowNativeLayout.CallbackResultConsumerFileOffset == 0xBD62F0
+    && MatrixMessageParserFlowNativeLayout.CallbackResultConsumerQueueFieldSetupFileOffset == 0xBD65B6
+    && MatrixMessageParserFlowNativeLayout.CallbackResultDispatchQueueFieldSetupFileOffset == 0xBD6615
+    && MatrixMessageParserFlowNativeLayout.CallbackResultDispatchQueueInsertionCallFileOffset == 0xBD661B
+    && MatrixMessageParserFlowNativeLayout.CallbackResultConsumerContextLoadFileOffset == 0xBD66B3
+    && MatrixMessageParserFlowNativeLayout.CallbackResultConsumerContextDispatchFileOffset == 0xBD66F2
+    && MatrixMessageParserFlowNativeLayout.CallbackResultConsumerAlternateContextDispatchFileOffset == 0xBD6702
+    && MatrixMessageParserFlowNativeLayout.CallbackResultConsumerContextDispatchOtherFileOffset == 0xBD6710
+    && MatrixMessageParserFlowNativeLayout.CallbackResultReferenceDecrementFileOffset == 0xBD6721
+    && MatrixMessageParserFlowNativeLayout.CallbackResultFinalReleaseCallFileOffset == 0xBD6733
+    && MatrixMessageParserFlowNativeLayout.CallbackResultQueueRecordCopyFileOffset == 0xBD8BE3
+    && MatrixMessageParserFlowNativeLayout.CallbackResultQueueFieldOffset == 0xB4
+    && MatrixMessageParserFlowNativeLayout.CallbackResultDispatchQueueFieldOffset == 0xC8
     && MatrixMessageParserFlowNativeLayout.ReplayReaderCallbackRecordParserFieldOffset == 4
     && MatrixMessageParserFlowNativeLayout.ReplayReaderRegisteredParserFieldOffset == 0x1C
     && MatrixMessageParserFlowNativeLayout.ReplayReaderRegisteredContextFieldOffset == 0x20

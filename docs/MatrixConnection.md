@@ -2056,22 +2056,37 @@ allocation from callback registration:
   `0x7FEB50`; this is another observed state update, not proof of a parser
   invocation.
 
-The callback's invocation remains unresolved. The static references to VA
-`0xC227A0` in the active IDA database are stores (`0x65DAB6`, `0x65DAEA`,
-`0x7FD820`, `0x7FEA1C`); the callback target itself is reached through the
-registered function pointer, so those references do not identify a callsite.
-The nearby ReplayReader readiness probe at `0xBD68F4` is a distinct vtable
-call through an object at `this+0x24`; its AL result sets or clears
-`this+0xB1`, with no proven relation to the registered parser pointer at
-state `+0x1C`.
+The registered callback is invoked indirectly in `0xBD6B40`. At raw offset
+`0xBD6D29`, the function loads `[this+0x1C]`; the call at `0xBD6D3C` is made
+only when that pointer is non-null and the compact type read earlier in the
+function is outside the built-in values `1..6` and `9`. The pushes establish
+the cdecl arguments `(a4, 0, *(uint16_t *)(a3+4), 0)`: `a4` is the caller's
+stream/reader object, the second argument is offset zero, the third is the
+message length from the header, and the fourth is a null secondary stream.
+This matches `0x821BA0`'s four-argument stream parser shape. The separately
+registered context at `this+0x20` is not passed to this parser call.
 
-The parser's returned pointer is passed through EAX by both `0x821BA0` and
-the wrapper `0x821DE0`. No retaining/releasing operation or application-level
-consumer is proven after those returns. The first known direct consumer of
-the callback *registration data* is `0xBD6260`, which stores the callback and
-context; it is not a consumer of a parsed message. Ownership/lifetime of the
-message object after the indirect callback, and the callback's first caller,
-remain open. `0x821DE0` also has no proven application caller in this pass.
+On a non-null EAX return, `0xBD6B40` constructs a 12-byte record from the
+first two DWORDs at `a3` and the returned pointer, then appends it to the
+queue at `this+0xB4` via `0xBD8B80`. The queue helper copies the three DWORDs;
+no retain/add-reference operation is visible in that insertion. The native
+consumer at `0xBD62F0` drains that same `this+0xB4` queue and stages records
+in a second queue at `this+0xC8`. It reads the stored context from `this+0x20`
+and dispatches through its vtable slots `+4` or `+8`, selected by the record's
+byte at `+6`; the message-pointer slot is passed by reference, and the
+consumer reloads the possibly updated pointer after dispatch. It atomically
+decrements that pointer's DWORD at `+8`; when the old count is one, it calls
+that object's vtable slot `+8` with argument `1`. This establishes a
+downstream context-dispatch and reference-release path, but not the semantic
+meaning of the tags or context methods, nor the producer-side reference
+policy/ownership transfer.
+
+The parser's returned pointer is still passed through EAX by both `0x821BA0`
+and the wrapper `0x821DE0`. The registration field is therefore distinct
+from the readiness probe at `0xBD68F4`, which calls a vtable slot through an
+object at `this+0x24`; its AL result sets or clears `this+0xB1`. The separate
+store of `0xC227A0` into `qword_1EDD1EC` at `0x7FE9F0` remains an independent
+state update. `0x821DE0` still has no proven application caller in this pass.
 
 The three dialog-message RTTI vtables have a primary three-slot prefix. VAs
 are runtime addresses; the mapped `.rdata` file offsets below follow the PE
@@ -2096,11 +2111,12 @@ stream read/write and destruction methods; they should not be treated as
 application event handlers.
 
 `MatrixMessageParserFlowNativeLayout.cs` records the direct parser callsites,
-allocator/registration split, record and context offsets, and callback-like
-pointer stores. Startup checks fingerprint the allocation and registration
-calls, the registration field copies, parser-return epilogs, and each vtable
-entry and RTTI name from the requested binary. This model does not emulate
-parsing or claim the unresolved indirect invocation or message ownership.
+allocator/registration split, callback load/call, input arguments, result
+queue, context dispatch, and observed reference decrement. Startup checks
+fingerprint those binary edges together with the registration field copies,
+parser-return epilogs, and each dialog vtable entry and RTTI name from the
+requested binary. This model does not emulate parsing or assign semantic
+meaning to the context methods/tags or claim a complete ownership policy.
 
 The nested table at VA `0xC22444` (raw `0x821844`) is now traced from selector
 `0x53` through `0x7A`, inclusive:
