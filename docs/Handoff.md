@@ -92,6 +92,19 @@
   `Component.BindEvent` uses the same map. File enumeration is unsorted and
   script calls add runtime first insertions, so exact IDs/names and concrete
   subscribers for `228/229/357` remain unresolved.
+- **Discriminator provenance cross-check (read-only original):** dispatcher
+  `0x81BB90` reads message `[+0x10]`; the selected constructors' first
+  base-helper argument is the parser selector, and each helper stores it at
+  that field. This is verified for Character `0x71/0x77/0x79` and Vehicle
+  `AbilityActivated` `0x53`. Their apparent local DWORDs (`0x79/0x7F/0x81/0xD0`)
+  are parser stack locals, not object discriminators. Parser-result dispatch
+  passes the same message pointer; the tested message vtables and receiver
+  use primary subobject offset zero. This rules out a wrong-ID namespace or
+  secondary-pointer adjustment as the cause of these traced field/extent
+  conflicts, without resolving those native conflicts. Evidence and focused
+  binary assertions are in `docs/MatrixConnection.md`,
+  `src/Startup/MatrixMessageParserFlowNativeLayout.cs`, and
+  `src/Startup/Checks/StartupBinaryEvidence.cs`.
 - Recorded payload keys/fields: `228` passes `vendor_id` from message `+0x28`;
   `229` passes `success` (`+0x28` byte), `product_id` (`+0x30/+0x34`),
   `price_id` (`+0x38/+0x3C`), `vendor_id` (`+0x40`), and a code-string

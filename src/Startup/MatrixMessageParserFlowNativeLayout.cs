@@ -43,6 +43,33 @@ public readonly record struct MatrixMessageDispatchVtableCaseSnapshot(
     uint VtableCallFileOffset,
     int VtableSlotOffset);
 
+public readonly record struct MatrixMessageDiscriminatorProvenanceSnapshot(
+    int ConstructionSelector,
+    int MessageDiscriminator,
+    string MessageRttiName,
+    uint ParserCaseFileOffset,
+    uint ParserStackLocalDwordStoreFileOffset,
+    uint ParserStackLocalDwordValue,
+    uint ParserConstructorCallFileOffset,
+    uint ParserConstructorResultObjectMoveFileOffset,
+    uint ConstructorFileOffset,
+    uint ConstructorDiscriminatorStackStoreFileOffset,
+    uint ConstructorBaseHelperCallFileOffset,
+    uint BaseHelperFileOffset,
+    uint BaseHelperAuxiliaryPointerVirtualAddress,
+    uint BaseHelperFinalVtableVirtualAddress,
+    uint BaseHelperFinalVtableStoreFileOffset,
+    uint BaseHelperDiscriminatorFieldStoreFileOffset,
+    uint MessageVtableVirtualAddress,
+    uint ConstructorPrimaryVtableStoreFileOffset,
+    int MessageVtableCompleteObjectLocatorObjectOffset,
+    uint ReceiverSwitchTargetVirtualAddress,
+    uint ReceiverSwitchTargetFileOffset,
+    uint ReceiverVtableCallFileOffset,
+    int ReceiverVtableSlotOffset,
+    uint ReceiverMethodVirtualAddress,
+    uint ReceiverMethodFileOffset);
+
 public enum MatrixMessageReceiverVtableTargetKind
 {
     DirectFunction,
@@ -64,6 +91,7 @@ public readonly record struct MatrixMessageReceiverVtableSnapshot(
     uint CompleteObjectLocatorVirtualAddress,
     uint TypeDescriptorVirtualAddress,
     int ObjectVtableFieldOffset,
+    int CompleteObjectLocatorObjectOffset,
     uint ConstructorFileOffset,
     IReadOnlyList<MatrixMessageReceiverDialogSlotSnapshot> DialogSlots);
 
@@ -71,8 +99,9 @@ public readonly record struct MatrixMessageReceiverVtableSnapshot(
 /// Records parser return pass-through, the ReplayReader callback registration,
 /// invocation, result-queue path, and primary dialog-message vftable slots.
 /// The ReplayReader context's primary dispatch methods and final-release path,
-/// concrete message-recipient construction path, and representative dialog
-/// receiver slots are recorded without assigning unverified meanings to fields.
+/// concrete message-recipient construction path, representative message
+/// discriminator provenance, and dialog receiver slots are recorded without
+/// assigning unverified meanings to fields.
 /// </summary>
 public static class MatrixMessageParserFlowNativeLayout
 {
@@ -144,14 +173,30 @@ public static class MatrixMessageParserFlowNativeLayout
     public const uint CallbackContextConditionalDispatchFileOffset = 0xBD7060;
     public const int CallbackContextMessageDispatchReceiverFieldOffset = 8;
     public const uint CallbackContextProtocolMessagePointerLoadFileOffset = 0x7FDC6E;
+    public const uint CallbackContextMessageDispatchReceiverLoadFileOffset = 0x7FDD47;
     public const uint CallbackContextProtocolMessageDispatchCallFileOffset = 0x7FDD4F;
     public const uint CallbackContextMessageSelectorSwitchFileOffset = 0x81BBBA;
+    public const uint MessageDispatcherDiscriminatorLoadFileOffset = 0x81BBB7;
     public const uint MessageDispatcherArgumentLoadFileOffset = 0x81BB95;
     public const uint CallbackContextMessageSelectorTableVirtualAddress = 0xC1D6DC;
     public const uint CallbackContextMessageSelectorTableFileOffset = 0x81CADC;
     public const int CallbackContextMessageSelectorFirstDiscriminator = 0x20;
     public const int CallbackContextMessageSelectorLastDiscriminator = 0x7A;
     public const int CallbackContextMessageSelectorCaseCount = 0x5B;
+    public const int MessagePrimaryVtableFieldOffset = 0;
+    public const int MessageBaseAuxiliaryPointerFieldOffset = 0xC;
+    public const int MessageDiscriminatorFieldOffset = 0x10;
+    public const int MessageBaseConstructorArgument0FieldOffset = 0x18;
+    public const int MessageBaseConstructorArgument1FieldOffset = 0x1C;
+    public const int ParserStackLocalDwordOffset = 0x20;
+    public const int ForcedMovementInlineStateOffset = 0x28;
+    public const uint ForcedMovementInlineStateInitializerFileOffset = 0x92B8A0;
+    public const uint ConstructorDiscriminatorStackStoreInstructionOffset = 0x12;
+    public const uint ConstructorBaseHelperCallInstructionOffset = 0x18;
+    public const uint BaseHelperInitialVtableVirtualAddress = 0x1C61B84;
+    public const uint BaseHelperFinalVtableStoreInstructionOffset = 0x5D;
+    public const uint BaseHelperDiscriminatorFieldStoreInstructionOffset = 0x21;
+    public const uint BaseHelperConstructorArgumentStoresInstructionOffset = 0x28;
     public const uint ReplayReaderMessageRecipientGetterCallFileOffset = 0x65DB10;
     public const uint ReplayReaderMessageRecipientFieldLoadFileOffset = 0x65DB38;
     public const int ReplayReaderMessageRecipientSourceFieldOffset = 0x78;
@@ -223,6 +268,10 @@ public static class MatrixMessageParserFlowNativeLayout
             new MatrixMessageDispatchVtableCaseSnapshot(
                 0x40, 0xC1CCD0, 0x81C0D0, 0x81C0EF, 0x84),
             new MatrixMessageDispatchVtableCaseSnapshot(
+                0x53, 0xC1D001, 0x81C401, 0x81C420, 0xD0),
+            new MatrixMessageDispatchVtableCaseSnapshot(
+                0x71, 0xC1D50B, 0x81C90B, 0x81C92A, 0x148),
+            new MatrixMessageDispatchVtableCaseSnapshot(
                 0x74, 0xC1D58C, 0x81C98C, 0x81C9AB, 0x154),
             new MatrixMessageDispatchVtableCaseSnapshot(
                 0x75, 0xC1D5B7, 0x81C9B7, 0x81C9D6, 0x158),
@@ -238,12 +287,42 @@ public static class MatrixMessageParserFlowNativeLayout
                 0x7A, 0xC1D68E, 0x81CA8E, 0x81CAAD, 0x16C)
         });
 
+    public static IReadOnlyList<MatrixMessageDiscriminatorProvenanceSnapshot> MessageDiscriminatorProvenance { get; } =
+        Array.AsReadOnly(new[]
+        {
+            new MatrixMessageDiscriminatorProvenanceSnapshot(
+                0x71, 0x71, ".?AVForcedMovement@Character@firefall@@",
+                0x81D54F, 0x81D560, 0x79, 0x81D573, 0x81D578,
+                0x526230, 0x526242, 0x526248, 0x5A1170, 0x1B5BDBC, 0x1C65AF0, 0x5A11CD, 0x5A1191,
+                0x1C67098, 0x526252, 0,
+                0xC1D50B, 0x81C90B, 0x81C92A, 0x148, 0xECED30, 0xACE130),
+            new MatrixMessageDiscriminatorProvenanceSnapshot(
+                0x77, 0x77, ".?AVNPCInteraction@Character@firefall@@",
+                0x81D73C, 0x81D74A, 0x7F, 0x81D761, 0x81D766,
+                0x5266A0, 0x5266B2, 0x5266B8, 0x5A1430, 0x1B5BD84, 0x1C65AD0, 0x5A148D, 0x5A1451,
+                0x1C67048, 0x5266BD, 0,
+                0xC1D60D, 0x81CA0D, 0x81CA2C, 0x160, 0xECEEA0, 0xACE2A0),
+            new MatrixMessageDiscriminatorProvenanceSnapshot(
+                0x79, 0x79, ".?AVPrivateDialog@Character@firefall@@",
+                0x81D79E, 0x81D7AC, 0x81, 0x81D7BF, 0x81D7C4,
+                0x526840, 0x526852, 0x526858, 0x5A1510, 0x1B5BD7C, 0x1C65A70, 0x5A156D, 0x5A1531,
+                0x1C67018, 0x52685D, 0,
+                0xC1D663, 0x81CA63, 0x81CA82, 0x168, 0xECEF00, 0xACE300),
+            new MatrixMessageDiscriminatorProvenanceSnapshot(
+                0x53, 0x53, ".?AVAbilityActivated@Vehicle@firefall@@",
+                0x81EF83, 0x81EF91, 0xD0, 0x81EFA4, 0x81EFA9,
+                0xB093C0, 0xB093D2, 0xB093D8, 0xB474B0, 0x1BB04E0, 0x1C72554, 0xB4750D, 0xB474D1,
+                0x1C72998, 0xB093DD, 0,
+                0xC1D001, 0x81C401, 0x81C420, 0xD0, 0xECB180, 0xACA580)
+        });
+
     public static MatrixMessageReceiverVtableSnapshot ReplayReaderMessageReceiver { get; } =
         new(
             ".?AVtfGameProtocolHandler@@",
             0x1C71EC0,
             0x1CCA404,
             0x1E29DF8,
+            0,
             0,
             ReplayMessageReceiverConstructorFileOffset,
             Array.AsReadOnly(new[]

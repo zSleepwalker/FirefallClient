@@ -1134,9 +1134,10 @@ No field meanings are inferred from the RTTI names.
 The route3 block `0x81EF6D` computes `arg_0 - 0x53`: instruction bytes
 `83 C0 AD` sign-extend the encoded immediate `0xAD` to `-0x53`. It bounds the
 result to indices `0..8` before indexing the nine-entry table at VA `0xC2260C` (raw
-`0x821A0C`). Entry0 reaches case `0x81EF83`, which allocates `0x30` bytes,
-stores local DWORD `0xD0` (role unknown), calls constructor `0xB093C0`, then
-reader `0x83A840`. The constructor passes `0x53` to helper `0xB474B0` and
+`0x821A0C`). Entry0 reaches case `0x81EF83`, which allocates `0x30` bytes
+and writes stack local `[esp+0x20]=0xD0` at raw `0x81EF91` (role unknown; not
+the message discriminator). It calls constructor `0xB093C0`, then reader
+`0x83A840`. The constructor passes `0x53` to helper `0xB474B0` and
 installs vtable VA `0x1C72998` (RTTI `firefall::Vehicle::AbilityActivated`).
 
 The reader writes DWORDs at object+`0x28` and `+0x2C` through `0x3370A0`.
@@ -1910,7 +1911,8 @@ reader setup; the consequences of that path are not inferred.
 ### Selector 0x71: `ForcedMovement`
 
 Entry30 maps selector `0x71` to VA `0xC1E14F` / raw case `0x81D54F`. It
-allocates `0x1E8` bytes, stores local DWORD `0x79` (role unknown), and calls
+allocates `0x1E8` bytes and writes stack local `[esp+0x20]=0x79` at raw
+`0x81D560` (role unknown; not the message discriminator), then calls
 constructor `0x526230`. The constructor passes `0x71` to helper `0x5A1170`,
 installs vtable VA `0x1C67098` (RTTI
 `firefall::Character::ForcedMovement`), and initializes the nested state at
@@ -2062,7 +2064,8 @@ failure consequences remain unresolved.
 ### Selector 0x77: `NPCInteraction`
 
 Entry36 maps selector `0x77` to VA `0xC1E33C` / raw case `0x81D73C`. It
-requests `0x30` bytes, stores local DWORD `0x7F` (role unknown), and calls
+requests `0x30` bytes and writes stack local `[esp+0x20]=0x7F` at raw
+`0x81D74A` (role unknown; not the message discriminator), then calls
 constructor `0x5266A0` at raw `0x81D761`. The constructor passes selector
 `0x77` to base helper `0x5A1430`, installs vtable VA `0x1C67048` (RTTI
 `firefall::Character::NPCInteraction`), and zero-initializes DWORDs at
@@ -2193,7 +2196,8 @@ consequence remain unresolved.
 ### Selector 0x79: `PrivateDialog`
 
 Entry38 maps selector `0x79` to VA `0xC1E39E` / raw case `0x81D79E`. It
-allocates `0x40` bytes, stores local DWORD `0x81` (role unknown), and calls
+allocates `0x40` bytes and writes stack local `[esp+0x20]=0x81` at raw
+`0x81D7AC` (role unknown; not the message discriminator), then calls
 constructor `0x526840`. The constructor passes selector `0x79` to helper
 `0x5A1510`, installs vtable VA `0x1C67018` (RTTI
 `firefall::Character::PrivateDialog`), and zero-initializes DWORDs at `+0x30`
@@ -2257,6 +2261,66 @@ constructor `0x5268D0`. The constructor passes selector `0x7A` to helper
 Reader `0x5EE730` reads DWORDs at `+0x28` and `+0x2C` through `0x3370A0`.
 The allocation-failure branch zeroes ESI before reaching this reader; its
 runtime consequence and the fields' meanings remain unresolved.
+
+### Message discriminator provenance cross-check
+
+The four examples below resolve the namespace of the integer consumed by the
+`tfGameProtocolHandler` dispatcher. In each parser case, the seemingly
+discriminator-like DWORD is a stack local at `[esp+0x20]`, not a field in the
+allocated message: selector `0x71` writes `0x79` at raw `0x81D560`, selector
+`0x77` writes `0x7F` at `0x81D74A`, selector `0x79` writes `0x81` at
+`0x81D7AC`, and route-3 `Vehicle::AbilityActivated` writes `0xD0` at
+`0x81EF91`. Those local values remain semantically unassigned.
+
+The constructors instead place their parser/message selector in the first
+stack argument to the base helper, then that helper stores the argument at
+message `+0x10`. For `Character::ForcedMovement` (`0x71`), `NPCInteraction`
+(`0x77`), `PrivateDialog` (`0x79`), and `Vehicle::AbilityActivated` (`0x53`),
+the constructor's stack immediate is respectively `0x71`, `0x77`, `0x79`,
+and `0x53`; helper store instructions at `0x5A1191`, `0x5A1451`, `0x5A1531`,
+and `0xB474D1` write that first helper argument to `[this+0x10]`. The helper
+also writes a class-specific pointer to `+0x0C` (`0x1B5BDBC`, `0x1B5BD84`,
+`0x1B5BD7C`, `0x1BB04E0`, respectively), copies the two constructor arguments
+to `+0x18/+0x1C`, and zeros `+0x20/+0x24`; these other fields are not the
+discriminator. The parser call sites pass source DWORDs `[ESI]` and
+`[ESI+4]` as the constructor arguments. The helper temporarily installs its
+common vptr `0x1C61B84` at `+0`, then its class-specific base vptr
+(`0x1C65AF0`, `0x1C65AD0`, `0x1C65A70`, `0x1C72554`, respectively); each
+derived constructor replaces that same primary vptr at `+0`. The four
+concrete message vtables have RTTI Complete Object Locator offsets of zero.
+For selector `0x71`, the separate state initializer
+at `0x92B8A0` begins with a zero DWORD at message `+0x28`, not a secondary
+vptr.
+
+The receiver chain preserves the allocated message pointer: callback helper
+`0x7FDC60` loads it from `[record]` into EBX at `0x7FDC6E`, loads the receiver
+from callback-context `+8` at `0x7FDD47`, pushes the unchanged EBX at
+`0x7FDD4E`, and calls `0x81BB90` at `0x7FDD4F`. The dispatcher loads its
+message argument into EDI at `0x81BB95`, reads the DWORD at `[EDI+0x10]` at
+`0x81BBB7`, subtracts `0x20`, bounds it through `0x7A`, and indexes the
+receiver switch table. Each representative case sets ECX to the receiver and
+pushes the unchanged EDI message pointer before its virtual call:
+
+| Construction selector / stored discriminator | Parser stack local | Switch target / slot-call raw | Receiver slot | Vtable method VA / raw |
+| --- | --- | --- | --- | --- |
+| `0x71` Character `ForcedMovement` | `0x79` at `0x81D560` | `0x81C90B` / `0x81C92A` | `+0x148` | `0xECED30` / `0xACE130` |
+| `0x77` Character `NPCInteraction` | `0x7F` at `0x81D74A` | `0x81CA0D` / `0x81CA2C` | `+0x160` | `0xECEEA0` / `0xACE2A0` |
+| `0x79` Character `PrivateDialog` | `0x81` at `0x81D7AC` | `0x81CA63` / `0x81CA82` | `+0x168` | `0xECEF00` / `0xACE300` |
+| `0x53` Vehicle `AbilityActivated` | `0xD0` at `0x81EF91` | `0x81C401` / `0x81C420` | `+0xD0` | `0xECB180` / `0xACA580` |
+
+These are IDs in the receiver's single `0x20..0x7A` discriminator namespace:
+the slot formula is `4 + 4*(id-0x20)`. In particular, the `0xD0` parser
+stack local for Vehicle `AbilityActivated` is not its discriminator; `0xD0`
+is also that selector's receiver vtable byte offset, while the message field
+is `0x53`. No nonzero message-pointer adjustment or secondary-vtable route
+appears in these traced paths. The original executable (`FirefallClient.exe.original`,
+40,197,848 bytes, SHA-256
+`E0E8448393AC1CE05BE73E06F62DD70E3EFF3404CC2E7AAF3F04C79DEC0DE235`) was
+read directly; `.text` VAs are raw offsets plus `0x400C00`, and `.rdata`
+references are translated using its PE section table. The focused binary
+check records these stores, table destinations, receiver calls, and RTTI
+offsets. This resolves discriminator provenance only; it does not repair or
+reinterpret the already-recorded field/extent conflicts.
 
 ## Parser result path and dialog-message primary vftables
 

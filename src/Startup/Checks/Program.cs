@@ -3389,6 +3389,8 @@ Check("ReplayReader message dispatch receiver and discriminator vtable cases rem
         new MatrixMessageDispatchVtableCaseSnapshot(0x20, 0xC1C7CD, 0x81BBCD, 0x81BBEC, 4),
         new MatrixMessageDispatchVtableCaseSnapshot(0x21, 0xC1C7F5, 0x81BBF5, 0x81BC14, 8),
         new MatrixMessageDispatchVtableCaseSnapshot(0x40, 0xC1CCD0, 0x81C0D0, 0x81C0EF, 0x84),
+        new MatrixMessageDispatchVtableCaseSnapshot(0x53, 0xC1D001, 0x81C401, 0x81C420, 0xD0),
+        new MatrixMessageDispatchVtableCaseSnapshot(0x71, 0xC1D50B, 0x81C90B, 0x81C92A, 0x148),
         new MatrixMessageDispatchVtableCaseSnapshot(0x74, 0xC1D58C, 0x81C98C, 0x81C9AB, 0x154),
         new MatrixMessageDispatchVtableCaseSnapshot(0x75, 0xC1D5B7, 0x81C9B7, 0x81C9D6, 0x158),
         new MatrixMessageDispatchVtableCaseSnapshot(0x76, 0xC1D5E2, 0x81C9E2, 0x81CA01, 0x15C),
@@ -3397,6 +3399,50 @@ Check("ReplayReader message dispatch receiver and discriminator vtable cases rem
         new MatrixMessageDispatchVtableCaseSnapshot(0x79, 0xC1D663, 0x81CA63, 0x81CA82, 0x168),
         new MatrixMessageDispatchVtableCaseSnapshot(0x7A, 0xC1D68E, 0x81CA8E, 0x81CAAD, 0x16C)
     ]));
+var messageDiscriminatorProvenance = MatrixMessageParserFlowNativeLayout.MessageDiscriminatorProvenance;
+Check("Matrix message discriminator provenance distinguishes parser stack locals from the message field",
+    MatrixMessageParserFlowNativeLayout.MessagePrimaryVtableFieldOffset == 0
+    && MatrixMessageParserFlowNativeLayout.MessageBaseAuxiliaryPointerFieldOffset == 0xC
+    && MatrixMessageParserFlowNativeLayout.MessageDiscriminatorFieldOffset == 0x10
+    && MatrixMessageParserFlowNativeLayout.MessageBaseConstructorArgument0FieldOffset == 0x18
+    && MatrixMessageParserFlowNativeLayout.MessageBaseConstructorArgument1FieldOffset == 0x1C
+    && MatrixMessageParserFlowNativeLayout.ParserStackLocalDwordOffset == 0x20
+    && MatrixMessageParserFlowNativeLayout.ForcedMovementInlineStateOffset == 0x28
+    && MatrixMessageParserFlowNativeLayout.ForcedMovementInlineStateInitializerFileOffset == 0x92B8A0
+    && MatrixMessageParserFlowNativeLayout.ConstructorDiscriminatorStackStoreInstructionOffset == 0x12
+    && MatrixMessageParserFlowNativeLayout.ConstructorBaseHelperCallInstructionOffset == 0x18
+    && MatrixMessageParserFlowNativeLayout.BaseHelperInitialVtableVirtualAddress == 0x1C61B84
+    && MatrixMessageParserFlowNativeLayout.BaseHelperFinalVtableStoreInstructionOffset == 0x5D
+    && MatrixMessageParserFlowNativeLayout.BaseHelperDiscriminatorFieldStoreInstructionOffset == 0x21
+    && messageDiscriminatorProvenance.Count == 4
+    && messageDiscriminatorProvenance.All(provenance =>
+        provenance.ConstructionSelector == provenance.MessageDiscriminator
+        && provenance.ReceiverVtableSlotOffset
+            == 4 + 4 * (provenance.MessageDiscriminator - 0x20)
+        && provenance.BaseHelperDiscriminatorFieldStoreFileOffset
+            == provenance.BaseHelperFileOffset
+                + MatrixMessageParserFlowNativeLayout.BaseHelperDiscriminatorFieldStoreInstructionOffset
+        && provenance.BaseHelperFinalVtableStoreFileOffset
+            == provenance.BaseHelperFileOffset
+                + MatrixMessageParserFlowNativeLayout.BaseHelperFinalVtableStoreInstructionOffset
+        && provenance.ConstructorDiscriminatorStackStoreFileOffset
+            == provenance.ConstructorFileOffset
+                + MatrixMessageParserFlowNativeLayout.ConstructorDiscriminatorStackStoreInstructionOffset
+        && provenance.ConstructorBaseHelperCallFileOffset
+            == provenance.ConstructorFileOffset
+                + MatrixMessageParserFlowNativeLayout.ConstructorBaseHelperCallInstructionOffset
+        && provenance.ReceiverVtableCallFileOffset == provenance.ReceiverSwitchTargetFileOffset + 0x1F
+        && provenance.MessageVtableCompleteObjectLocatorObjectOffset == 0)
+    && messageDiscriminatorProvenance.Select(provenance =>
+        (provenance.ConstructionSelector, provenance.ParserStackLocalDwordValue,
+            provenance.ReceiverVtableSlotOffset, provenance.ReceiverMethodVirtualAddress))
+        .SequenceEqual(
+        [
+            (0x71, 0x79u, 0x148, 0xECED30u),
+            (0x77, 0x7Fu, 0x160, 0xECEEA0u),
+            (0x79, 0x81u, 0x168, 0xECEF00u),
+            (0x53, 0xD0u, 0xD0, 0xECB180u)
+        ]));
 Check("ReplayReader getter and owner construction resolve the concrete message receiver field",
     MatrixMessageParserFlowNativeLayout.ReplayReaderMessageRecipientGetterOwnerRttiName
         == ".?AVtfLookingGlass@@"
@@ -3441,6 +3487,7 @@ Check("tfGameProtocolHandler RTTI and concrete dialog receiver slots remain expl
     && messageReceiverVtable.CompleteObjectLocatorVirtualAddress == 0x1CCA404
     && messageReceiverVtable.TypeDescriptorVirtualAddress == 0x1E29DF8
     && messageReceiverVtable.ObjectVtableFieldOffset == 0
+    && messageReceiverVtable.CompleteObjectLocatorObjectOffset == 0
     && messageReceiverVtable.ConstructorFileOffset == 0xAC8CA0
     && messageReceiverVtable.DialogSlots.SequenceEqual(expectedMessageReceiverDialogSlots));
 Check("Dialog message primary vftables map stream readers and writers separately from destruction",

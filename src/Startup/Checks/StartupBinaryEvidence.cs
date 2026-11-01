@@ -25,6 +25,13 @@ internal static class StartupBinaryEvidence
             return ReadAt(offset, expected.Length).SequenceEqual(expected);
         }
 
+        string UInt32LittleEndianHex(uint value)
+        {
+            var bytes = new byte[4];
+            BinaryPrimitives.WriteUInt32LittleEndian(bytes, value);
+            return Convert.ToHexString(bytes);
+        }
+
         bool RelativeBranchTargets(long offset, byte opcode, uint target)
         {
             byte[] instruction = ReadAt(offset, 5);
@@ -4479,7 +4486,7 @@ internal static class StartupBinaryEvidence
                 == messageReceiverVtable.CompleteObjectLocatorVirtualAddress
             && ReadUInt32(VirtualAddressToFileOffset(
                 messageReceiverVtable.CompleteObjectLocatorVirtualAddress) + 4)
-                == messageReceiverVtable.ObjectVtableFieldOffset
+                == messageReceiverVtable.CompleteObjectLocatorObjectOffset
             && ReadUInt32(VirtualAddressToFileOffset(
                 messageReceiverVtable.CompleteObjectLocatorVirtualAddress) + 12)
                 == messageReceiverVtable.TypeDescriptorVirtualAddress
@@ -4682,6 +4689,93 @@ internal static class StartupBinaryEvidence
             && CharacterAbilityApplicationNativeLayout.UiManagerDispatchVtableSlotOffset == 0xAC
             && CharacterAbilityApplicationNativeLayout.NpcInteractionNumericApplicationEventCode == 356
             && CharacterAbilityApplicationNativeLayout.NpcInteractionEventPayloadTag == 5);
+        bool messageDiscriminatorProvenanceMatches =
+            Matches(MatrixMessageParserFlowNativeLayout.CallbackContextProtocolMessagePointerLoadFileOffset,
+                "8B1F")
+            && Matches(MatrixMessageParserFlowNativeLayout.CallbackContextMessageDispatchReceiverLoadFileOffset,
+                "8B4E0885C9741053E83CDE0100")
+            && RelativeBranchTargets(
+                MatrixMessageParserFlowNativeLayout.CallbackContextProtocolMessageDispatchCallFileOffset,
+                0xE8,
+                MatrixMessageParserFlowNativeLayout.CallbackContextMessageConsumerFileOffset)
+            && Matches(MatrixMessageParserFlowNativeLayout.MessageDispatcherArgumentLoadFileOffset,
+                "8B7D088BF1")
+            && Matches(MatrixMessageParserFlowNativeLayout.MessageDispatcherDiscriminatorLoadFileOffset,
+                "8B471083C0E083F85A0F87F30E00")
+            && Matches(0x52624F, "8D4E28C7069870C601E8")
+            && RelativeBranchTargets(0x526258, 0xE8,
+                MatrixMessageParserFlowNativeLayout.ForcedMovementInlineStateInitializerFileOffset)
+            && Matches(
+                MatrixMessageParserFlowNativeLayout.ForcedMovementInlineStateInitializerFileOffset + 0x0B,
+                "C70100000000");
+        foreach (var provenance in MatrixMessageParserFlowNativeLayout.MessageDiscriminatorProvenance)
+        {
+            uint tableTarget = ReadUInt32(
+                MatrixMessageParserFlowNativeLayout.CallbackContextMessageSelectorTableFileOffset
+                + 4L * (provenance.MessageDiscriminator
+                    - MatrixMessageParserFlowNativeLayout.CallbackContextMessageSelectorFirstDiscriminator));
+            uint messageCol = ReadUInt32(VirtualAddressToFileOffset(provenance.MessageVtableVirtualAddress) - 4);
+            var dispatchCase = MatrixMessageParserFlowNativeLayout.MessageDispatchVtableCases
+                .Single(messageCase => messageCase.MessageDiscriminator == provenance.MessageDiscriminator);
+            messageDiscriminatorProvenanceMatches &=
+                provenance.ConstructionSelector == provenance.MessageDiscriminator
+                && provenance.ParserStackLocalDwordStoreFileOffset
+                    == provenance.ParserCaseFileOffset + (provenance.MessageDiscriminator == 0x71 ? 0x11u : 0x0Eu)
+                && Matches(provenance.ParserStackLocalDwordStoreFileOffset,
+                    "C7442420" + UInt32LittleEndianHex(provenance.ParserStackLocalDwordValue))
+                && Matches(provenance.ParserConstructorCallFileOffset - 7,
+                    "FF76048BC8FF36")
+                && RelativeBranchTargets(
+                    provenance.ParserConstructorCallFileOffset,
+                    0xE8,
+                    provenance.ConstructorFileOffset)
+                && Matches(provenance.ParserConstructorResultObjectMoveFileOffset, "8BF0")
+                && Matches(provenance.ConstructorFileOffset + 5,
+                    "FF750C8BF1FF750883EC088BC4")
+                && Matches(provenance.ConstructorDiscriminatorStackStoreFileOffset,
+                    "C700" + UInt32LittleEndianHex((uint)provenance.MessageDiscriminator))
+                && RelativeBranchTargets(
+                    provenance.ConstructorBaseHelperCallFileOffset,
+                    0xE8,
+                    provenance.BaseHelperFileOffset)
+                && Matches(provenance.BaseHelperFileOffset + 4,
+                    "8B4508568BF18945FC")
+                && Matches(provenance.BaseHelperFileOffset + 0x0D,
+                    "C706" + UInt32LittleEndianHex(
+                        MatrixMessageParserFlowNativeLayout.BaseHelperInitialVtableVirtualAddress))
+                && Matches(provenance.BaseHelperFileOffset + 0x13,
+                    "C7460C" + UInt32LittleEndianHex(provenance.BaseHelperAuxiliaryPointerVirtualAddress))
+                && Matches(provenance.BaseHelperFinalVtableStoreFileOffset,
+                    "C706" + UInt32LittleEndianHex(provenance.BaseHelperFinalVtableVirtualAddress))
+                && Matches(provenance.BaseHelperDiscriminatorFieldStoreFileOffset,
+                    "894610")
+                && Matches(
+                    provenance.BaseHelperFileOffset
+                        + MatrixMessageParserFlowNativeLayout.BaseHelperConstructorArgumentStoresInstructionOffset,
+                    "8B45108946188B451489461CC7462000000000C7462400000000")
+                && Matches(provenance.ConstructorPrimaryVtableStoreFileOffset,
+                    "C706" + UInt32LittleEndianHex(provenance.MessageVtableVirtualAddress))
+                && VtableRttiName(provenance.MessageVtableVirtualAddress) == provenance.MessageRttiName
+                && ReadUInt32(VirtualAddressToFileOffset(messageCol) + 4)
+                    == (uint)provenance.MessageVtableCompleteObjectLocatorObjectOffset
+                && tableTarget == provenance.ReceiverSwitchTargetVirtualAddress
+                && tableTarget == dispatchCase.SwitchTargetVirtualAddress
+                && provenance.ReceiverSwitchTargetFileOffset == dispatchCase.SwitchTargetFileOffset
+                && provenance.ReceiverVtableCallFileOffset == dispatchCase.VtableCallFileOffset
+                && provenance.ReceiverVtableSlotOffset == dispatchCase.VtableSlotOffset
+                && Matches(provenance.ReceiverSwitchTargetFileOffset + 0x1A,
+                    "8B068BCE57FF90" + UInt32LittleEndianHex((uint)provenance.ReceiverVtableSlotOffset))
+                && ReadUInt32(VirtualAddressToFileOffset(messageReceiverVtable.VtableVirtualAddress)
+                    + provenance.ReceiverVtableSlotOffset)
+                    == provenance.ReceiverMethodVirtualAddress
+                && VirtualAddressToFileOffset(provenance.ReceiverMethodVirtualAddress)
+                    == provenance.ReceiverMethodFileOffset;
+        }
+        check("Binary message discriminator provenance is constructor-written at +0x10 and dispatched without pointer adjustment",
+            messageDiscriminatorProvenanceMatches
+            && messageReceiverVtable.ObjectVtableFieldOffset
+                == MatrixMessageParserFlowNativeLayout.MessagePrimaryVtableFieldOffset
+            && messageReceiverVtable.CompleteObjectLocatorObjectOffset == 0);
         var npcInteractionDispatchCase = MatrixMessageParserFlowNativeLayout.MessageDispatchVtableCases
             .Single(messageCase => messageCase.MessageDiscriminator == 0x77);
         check("Binary selector 0x77 forwards the same parsed object pointer through the virtual receiver",
