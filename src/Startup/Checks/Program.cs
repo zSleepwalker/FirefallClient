@@ -3506,15 +3506,19 @@ var keyedReceiverSelectors12To19Cases =
     MatrixKeyedReceiverFactoryNativeLayout.Selectors12To19ConstructingCases;
 var keyedReceiverSelectors1ATo21Cases =
     MatrixKeyedReceiverFactoryNativeLayout.Selectors1ATo21ConstructingCases;
+var keyedReceiverSelectors22To29Cases =
+    MatrixKeyedReceiverFactoryNativeLayout.Selectors22To29ConstructingCases;
 var keyedReceiverCases = keyedReceiverFirstEightCases
     .Concat(keyedReceiverNextSixCases)
     .Concat(keyedReceiverSelectors12To19Cases)
     .Concat(keyedReceiverSelectors1ATo21Cases)
+    .Concat(keyedReceiverSelectors22To29Cases)
     .ToArray();
 var keyedReceiverSelectors0ATo11 = MatrixKeyedReceiverFactoryNativeLayout.Selectors0ATo11TableEntries;
 var keyedReceiverSelectors12To19 = MatrixKeyedReceiverFactoryNativeLayout.Selectors12To19TableEntries;
 var keyedReceiverSelectors1ATo21 = MatrixKeyedReceiverFactoryNativeLayout.Selectors1ATo21TableEntries;
-Check("Matrix keyed receiver factory bounds and twenty-seven RTTI-backed receiver constructors are recorded",
+var keyedReceiverSelectors22To29 = MatrixKeyedReceiverFactoryNativeLayout.Selectors22To29TableEntries;
+Check("Matrix keyed receiver factory bounds and thirty-two RTTI-backed receiver constructors are recorded",
     MatrixKeyedReceiverFactoryNativeLayout.FactoryFileOffset == 0x81B1B0
     && MatrixKeyedReceiverFactoryNativeLayout.FactoryVirtualAddress == 0xC1BDB0
     && MatrixKeyedReceiverFactoryNativeLayout.FactoryByteDispatchFileOffset == 0x81B1DC
@@ -3534,7 +3538,8 @@ Check("Matrix keyed receiver factory bounds and twenty-seven RTTI-backed receive
     && keyedReceiverNextSixCases.Count == 6
     && keyedReceiverSelectors12To19Cases.Count == 7
     && keyedReceiverSelectors1ATo21Cases.Count == 6
-    && keyedReceiverCases.Length == 27
+    && keyedReceiverSelectors22To29Cases.Count == 5
+    && keyedReceiverCases.Length == 32
     && keyedReceiverFirstEightCases.Select(snapshot => snapshot.Selector).SequenceEqual(Enumerable.Range(2, 8))
     && keyedReceiverCases.All(snapshot =>
         snapshot.CaseTargetVirtualAddress
@@ -3546,9 +3551,9 @@ Check("Matrix keyed receiver factory bounds and twenty-seven RTTI-backed receive
                     - MatrixKeyedReceiverFactoryNativeLayout.FactorySelectorMinimum)
                     * MatrixKeyedReceiverFactoryNativeLayout.JumpTableEntrySize)
         && snapshot.AllocatorCallFileOffset == snapshot.CaseTargetFileOffset
-            + (snapshot.Selector is 0x0A or 0x12 or 0x21 ? 2u : 5u)
+            + (snapshot.AllocationSize <= 0x7F ? 2u : 5u)
         && snapshot.ConstructorCallFileOffset == snapshot.CaseTargetFileOffset
-            + (snapshot.Selector is 0x0A or 0x12 or 0x21 ? 0x26u : 0x29u)
+            + (snapshot.AllocationSize <= 0x7F ? 0x26u : 0x29u)
         && snapshot.RttiName.Contains("@firefall@@", StringComparison.Ordinal)
         && snapshot.CompleteObjectLocatorSubobjectOffset == 0)
     && keyedReceiverFirstEightCases.Select(snapshot => snapshot.AllocationSize).SequenceEqual(
@@ -3679,6 +3684,52 @@ Check("Matrix keyed receiver selectors 1A..21 map exact table indexes, cases, an
     && keyedReceiverSelectors1ATo21.Count(entry => !entry.ConstructsReceiver) == 2
     && keyedReceiverSelectors1ATo21.Where(entry => !entry.ConstructsReceiver)
         .All(entry => entry.TargetFileOffset == MatrixKeyedReceiverFactoryNativeLayout.OutOfRangeReturnFileOffset));
+Check("Matrix keyed receiver selectors 22..29 map exact table indexes, five constructors, and three default entries",
+    keyedReceiverSelectors22To29.Count == 8
+    && keyedReceiverSelectors22To29.Select(entry => entry.Selector).SequenceEqual(Enumerable.Range(0x22, 8))
+    && keyedReceiverSelectors22To29.Select(entry => entry.TableIndex).SequenceEqual(Enumerable.Range(32, 8))
+    && keyedReceiverSelectors22To29.All(entry =>
+        entry.TableIndex == entry.Selector - MatrixKeyedReceiverFactoryNativeLayout.FactoryIndexSubtract
+        && entry.TableEntryFileOffset
+            == MatrixKeyedReceiverFactoryNativeLayout.JumpTableFileOffset
+                + (uint)(entry.TableIndex * MatrixKeyedReceiverFactoryNativeLayout.JumpTableEntrySize))
+    && keyedReceiverSelectors22To29.Select(entry => entry.TargetFileOffset).SequenceEqual(
+        [0x81BA93u, 0x81B873u, 0x81B8B1u, 0x81B8ECu, 0x81BA93u, 0x81B927u, 0x81B965u, 0x81BA93u])
+    && keyedReceiverSelectors22To29.Select(entry => entry.ConstructsReceiver)
+        .SequenceEqual([false, true, true, true, false, true, true, false])
+    && keyedReceiverSelectors22To29.Count(entry => !entry.ConstructsReceiver) == 3
+    && keyedReceiverSelectors22To29.All(entry =>
+        entry.TargetVirtualAddress
+            == entry.TargetFileOffset
+                + MatrixKeyedReceiverFactoryNativeLayout.RawTextOffsetToVirtualAddressDelta)
+    && keyedReceiverSelectors22To29.Where(entry => !entry.ConstructsReceiver)
+        .All(entry => entry.TargetFileOffset == MatrixKeyedReceiverFactoryNativeLayout.OutOfRangeReturnFileOffset)
+    && keyedReceiverSelectors22To29Cases.Select(snapshot => snapshot.Selector)
+        .SequenceEqual([0x23, 0x24, 0x25, 0x27, 0x28])
+    && keyedReceiverSelectors22To29Cases.Select(snapshot => snapshot.AllocationSize)
+        .SequenceEqual([0x1710u, 0x48u, 0x48u, 0x128u, 0xD8u])
+    && keyedReceiverSelectors22To29Cases.Select(snapshot => snapshot.ConstructorFileOffset)
+        .SequenceEqual([0xB281A0u, 0xB34FC0u, 0xB35CC0u, 0xB37030u, 0xB39900u])
+    && keyedReceiverSelectors22To29Cases.Select(snapshot => snapshot.PrimaryVtableVirtualAddress)
+        .SequenceEqual([0x1C72730u, 0x1C72700u, 0x1C726C4u, 0x1C72648u, 0x1C72618u])
+    && keyedReceiverSelectors22To29Cases.Select(snapshot => snapshot.PrimaryVtableFileOffset)
+        .SequenceEqual([0x1871330u, 0x1871300u, 0x18712C4u, 0x1871248u, 0x1871218u])
+    && keyedReceiverSelectors22To29Cases.Select(snapshot => snapshot.RttiName).SequenceEqual(
+        [
+            ".?AVObserverView@Deployable@firefall@@",
+            ".?AVNPCObserverView@Deployable@firefall@@",
+            ".?AVHardpointView@Deployable@firefall@@",
+            ".?AVBaseController@Turret@firefall@@",
+            ".?AVObserverView@Turret@firefall@@"
+        ])
+    && keyedReceiverSelectors22To29Cases.All(snapshot => snapshot.CompleteObjectLocatorSubobjectOffset == 0));
+Check("Matrix keyed receiver selectors 02..29 total thirty-two constructors, eight zero returns, and twelve unmapped selectors",
+    keyedReceiverCases.Length == 32
+    && keyedReceiverSelectors0ATo11.Count(entry => !entry.ConstructsReceiver)
+        + keyedReceiverSelectors12To19.Count(entry => !entry.ConstructsReceiver)
+        + keyedReceiverSelectors1ATo21.Count(entry => !entry.ConstructsReceiver)
+        + keyedReceiverSelectors22To29.Count(entry => !entry.ConstructsReceiver) == 8
+    && MatrixKeyedReceiverFactoryNativeLayout.FactorySelectorMaximum - 0x29 == 0x0C);
 var keyedReceiverSlots = MatrixKeyedReceiverFactoryNativeLayout.PrimaryVtableSlots;
 Check("Matrix keyed receiver selector routes distinguish message dispatchers, forwarding defaults, and setup wrappers",
     keyedReceiverSlots.Count == keyedReceiverCases.Length * 4
@@ -3693,11 +3744,12 @@ Check("Matrix keyed receiver selector routes distinguish message dispatchers, fo
     && keyedReceiverSlots.Where(slot => slot.SlotOffset == 0x18)
         .All(slot => slot.ImplementationObservation.Contains("State-refresh wrapper", StringComparison.Ordinal))
     && keyedReceiverSlots.Count(slot => slot.SlotOffset == 0x04
-        && slot.ImplementationObservation.Contains("Message-ID dispatcher", StringComparison.Ordinal)) == 15
+        && slot.ImplementationObservation.Contains("Message-ID dispatcher", StringComparison.Ordinal)) == 18
     && keyedReceiverSlots.Count(slot => slot.SlotOffset == 0x04
-        && slot.ImplementationObservation.Contains("Optional nested-receiver forwarder", StringComparison.Ordinal)) == 12
+        && slot.ImplementationObservation.Contains("Optional nested-receiver forwarder", StringComparison.Ordinal)) == 14
     && keyedReceiverSlots.Where(slot =>
-            (slot.FactorySelector is 0x0D or 0x0E or 0x10 or 0x12 or 0x16 or 0x17 or 0x19 or 0x21)
+            (slot.FactorySelector is 0x0D or 0x0E or 0x10 or 0x12 or 0x16 or 0x17 or 0x19 or 0x21
+                or 0x25 or 0x27)
             && slot.SlotOffset == 0x04)
         .All(slot => slot.ImplementationObservation.Contains(
             "fixed 'this view doesn't have any valid events' log", StringComparison.Ordinal)
@@ -3724,21 +3776,29 @@ Check("Matrix keyed receiver selector routes distinguish message dispatchers, fo
         .ImplementationObservation.Contains("exactly 0x55", StringComparison.Ordinal)
     && keyedReceiverSlots.Single(slot => slot.FactorySelector == 0x18 && slot.SlotOffset == 0x04)
         .ImplementationObservation.Contains("exactly 0x53", StringComparison.Ordinal)
+    && keyedReceiverSlots.Single(slot => slot.FactorySelector == 0x23 && slot.SlotOffset == 0x04)
+        .ImplementationObservation.Contains("0x54 and 0x55", StringComparison.Ordinal)
+    && keyedReceiverSlots.Single(slot => slot.FactorySelector == 0x24 && slot.SlotOffset == 0x04)
+        .ImplementationObservation.Contains("exactly 0x53", StringComparison.Ordinal)
+    && keyedReceiverSlots.Single(slot => slot.FactorySelector == 0x28 && slot.SlotOffset == 0x04)
+        .ImplementationObservation.Contains("exactly 0x53", StringComparison.Ordinal)
     && keyedReceiverSlots.Where(slot =>
             (slot.FactorySelector is 0x12 or 0x14 or 0x15 or 0x16 or 0x17 or 0x18 or 0x19
-                or 0x1B or 0x1C or 0x1D or 0x1E or 0x1F or 0x21)
+                or 0x1B or 0x1C or 0x1D or 0x1E or 0x1F or 0x21
+                or 0x23 or 0x24 or 0x25 or 0x27 or 0x28)
             && slot.SlotOffset == 0x18)
         .All(slot => slot.ImplementationObservation.Contains(
             "stores the dword_1AC4D24 result at receiver +0x28 and calls 0xBCADF0",
             StringComparison.Ordinal))
     && keyedReceiverSlots.Where(slot =>
             (slot.FactorySelector is 0x12 or 0x14 or 0x15 or 0x16 or 0x17 or 0x18 or 0x19
-                or 0x1B or 0x1C or 0x1D or 0x1E or 0x1F or 0x21)
+                or 0x1B or 0x1C or 0x1D or 0x1E or 0x1F or 0x21
+                or 0x23 or 0x24 or 0x25 or 0x27 or 0x28)
             && (slot.SlotOffset is 0x08 or 0x0C))
         .All(slot => slot.ImplementationObservation.Contains(
                 "pointer and length", StringComparison.Ordinal)
             && slot.ImplementationObservation.Contains("body not exhaustively mapped", StringComparison.Ordinal))
-    && MatrixKeyedReceiverFactoryNativeLayout.FactorySelectorMaximum - 0x21 == 0x14
+    && MatrixKeyedReceiverFactoryNativeLayout.FactorySelectorMaximum - 0x29 == 0x0C
     && MatrixKeyedReceiverFactoryNativeLayout.CompactSelectorDispatcherFileOffset == 0x800420
     && MatrixKeyedReceiverFactoryNativeLayout.CompactMessageSelectorFieldOffset == 0x10
     && MatrixKeyedReceiverFactoryNativeLayout.CompactSelectorRoutes.Select(route => route.Selector)

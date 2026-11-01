@@ -114,9 +114,24 @@
   `MatrixKeyedReceiverFactoryNativeLayout.cs` and original-image checks. The
   index remains `selector-2`: entries `0x02..0x21` include 27 constructors
   and five zero-return entries (`0x0F`, `0x11`, `0x13`, `0x1A`, `0x20`); the
-  remaining 20 selectors `0x22..0x35` are unmapped.
-  Across the 27 mapped receivers, `+0x04` has fifteen message-ID dispatchers
-  and twelve forwarding/logging defaults. The newly mapped dispatchers accept
+  latest batch maps selectors `0x22..0x29`: `0x22`, `0x26`, and `0x29` are
+  zero-return entries; `0x23`, `0x24`, `0x25`, `0x27`, and `0x28` construct
+  RTTI-backed `Deployable::ObserverView` (`0x1710` bytes),
+  `Deployable::NPCObserverView` (`0x48`), `Deployable::HardpointView` (`0x48`),
+  `Turret::BaseController` (`0x128`), and `Turret::ObserverView` (`0xD8`).
+  Their constructors call `0xBCAD70`; vtables map to `.rdata`, their RTTI
+  TypeDescriptors resolve through the PE section table, and COL offsets are
+  zero. In total, selectors `0x02..0x29` contain 32 constructors and eight
+  zero-return entries; the remaining 12 selectors `0x2A..0x35` are unmapped.
+  Across the 32 mapped receivers, `+0x04` has eighteen message-ID dispatchers
+  and fourteen forwarding/logging defaults. The newly mapped dispatchers accept
+  exactly `0x54` and `0x55` for `Deployable::ObserverView`, exactly `0x53` for
+  `Deployable::NPCObserverView`, and exactly `0x53` for `Turret::ObserverView`;
+  invalid IDs use `VIBE_LogUnhandledMessageId` with the supplied message ID.
+  `Deployable::HardpointView` and `Turret::BaseController` forward to the
+  optional `+0x10` receiver and may emit the fixed no-valid-events diagnostic
+  without inspecting an ID.
+  The prior newly mapped dispatchers accept
   exactly `0x5B` for `Vehicle::BaseController`, `0x53..0x5A` for
   `Vehicle::CombatController`, exactly `0x55`
   (`Vehicle::ObserverView`), `0x57` (`CombatView`), and `0x56`
@@ -125,8 +140,8 @@
   emits the fixed no-valid-events log without a message-ID argument.
   `0x800420` uses the receiver for a separate compact-selector dispatch on
   message `+0x10`: `+0x08/+0x0C` paths receive data/length forms, and the
-  mapped `+0x18` slots are non-no-op state-refresh wrappers. Payload semantics
-  remain out of scope.
+  five latest `+0x18` wrappers store the `dword_1AC4D24` result at receiver
+  `+0x28` and tail-call `0xBCADF0`. Payload semantics remain out of scope.
   `AIObserverView +0x08` has a recovered disassembly boundary at `0x58A6E0`
   (size `0x394`), although Hex-Rays decompilation and payload semantics remain
   unresolved; this is not an unrecovered function boundary. Earlier
