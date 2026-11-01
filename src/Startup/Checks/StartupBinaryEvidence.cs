@@ -4995,6 +4995,76 @@ internal static class StartupBinaryEvidence
             && Matches(baseAdapterSlots[2].MethodFileOffset,
                 "558BEC83E4F883EC0C")
             && Matches(baseAdapterSlots[2].MethodFileOffset + 0x83, "C20400"));
+        check("Binary BaseNetController initialization stores its context/receiver, binds the keyed receiver, and installs the private-context back-pointer",
+            baseAdapterVtableFileOffset
+                == CharacterLocalControllerApplicationNativeLayout.AdapterVtableFileOffset
+            && VtableRttiName(CharacterLocalControllerApplicationNativeLayout.AdapterVtableVirtualAddress)
+                == CharacterLocalControllerApplicationNativeLayout.AdapterRttiName
+            && Matches(CharacterLocalControllerApplicationNativeLayout.AdapterConstructorContextStoreFileOffset,
+                "898670010000")
+            && Matches(CharacterLocalControllerApplicationNativeLayout.AdapterConstructorVtableStoreFileOffset,
+                "C7064846C601")
+            && Matches(CharacterLocalControllerApplicationNativeLayout.AdapterConstructorZeroDwordStoreFileOffset,
+                "C7866C01000000000000")
+            && Matches(CharacterLocalControllerApplicationNativeLayout.AdapterConstructorReceiverStoreFileOffset,
+                "898674010000")
+            && Matches(CharacterLocalControllerApplicationNativeLayout.PrivateContextAdapterPointerInstallCallFileOffset - 0x0B,
+                "508D4E18")
+            && RelativeBranchTargets(
+                CharacterLocalControllerApplicationNativeLayout.PrivateContextAdapterPointerInstallCallFileOffset,
+                0xE8, CharacterLocalControllerApplicationNativeLayout.PrivateContextAdapterPointerSetterFileOffset)
+            && RelativeBranchTargets(
+                CharacterLocalControllerApplicationNativeLayout.AdapterInitialBindCallFileOffset,
+                0xE8, CharacterLocalControllerApplicationNativeLayout.AdapterBindingMethodFileOffset)
+            && RelativeBranchTargets(
+                CharacterLocalControllerApplicationNativeLayout.AdapterContextRefreshCallFileOffset,
+                0xE8, CharacterLocalControllerApplicationNativeLayout.AdapterBindingMethodFileOffset)
+            && Matches(CharacterLocalControllerApplicationNativeLayout.AdapterReceiverPointerLoadFileOffset,
+                "8B837401000089582C8B83700100008B50048B8374010000895024")
+            && Matches(CharacterLocalControllerApplicationNativeLayout.AdapterCallbackObjectStoreFileOffset,
+                "89582C")
+            && Matches(CharacterLocalControllerApplicationNativeLayout.AdapterContextPointerRefreshFileOffset,
+                "8B83700100008B50048B8374010000895024")
+            && Matches(CharacterLocalControllerApplicationNativeLayout.AdapterContextPointerStoreFileOffset,
+                "895024"));
+        check("Binary bound BaseNetController callback implementations preserve message-ID mapping, one-argument returns, event 285, and key update offsets",
+            Matches(CharacterLocalControllerApplicationNativeLayout.Callbacks[0].CallbackFileOffset,
+                "680098B5016800B2E401E80142E3FF83C408C20400")
+            && RelativeBranchTargets(
+                CharacterLocalControllerApplicationNativeLayout.Callbacks[0].CallbackFileOffset + 0x0A,
+                0xE8, CharacterLocalControllerApplicationNativeLayout.Message77UnhandledLoggerFileOffset)
+            && Matches(CharacterLocalControllerApplicationNativeLayout.Callbacks[1].CallbackFileOffset,
+                "558BEC6AFF6888DC9E0164A1000000005083EC64")
+            && RelativeBranchTargets(0x4C8385, 0xE8, 0xC23FE0)
+            && RelativeBranchTargets(0x4C8393, 0xE8, 0xC23FE0)
+            && RelativeBranchTargets(0x4C83A2, 0xE8, 0xC243E0)
+            && Matches(0x4C83A7, "8B0DB802E0018D55946A0052681D0100008B01FF90AC000000")
+            && Matches(CharacterLocalControllerApplicationNativeLayout.Callbacks[1].CallbackFileOffset + 0xF7,
+                "C20400")
+            && Matches(CharacterLocalControllerApplicationNativeLayout.Callbacks[2].CallbackFileOffset,
+                "558BEC83E4F883EC0C")
+            && Matches(0x4C9B8F, "8B7B308B7334")
+            && RelativeBranchTargets(0x4C9B95, 0xE8, 0x35E700)
+            && Matches(0x4C9BA8, "8D70548D4424108BCE")
+            && Matches(0x4C9B9E, "81E700FFFFFF")
+            && RelativeBranchTargets(0x4C9BB7, 0xE8,
+                CharacterLocalControllerApplicationNativeLayout.Message79RegistryLookupFileOffset)
+            && Matches(0x4C9BC4, "8B701085F67432807E08018B460C")
+            && RelativeBranchTargets(0x4C9BE7, 0xE8,
+                CharacterLocalControllerApplicationNativeLayout.Message79KeyedUpdateFileOffset)
+            && Matches(0x4C9BF0, "FF73288BCEFF7338")
+            && RelativeBranchTargets(0x4C9BF8, 0xE8,
+                CharacterLocalControllerApplicationNativeLayout.Message79RecipientFallbackFileOffset)
+            && Matches(CharacterLocalControllerApplicationNativeLayout.Callbacks[2].CallbackFileOffset + 0x83,
+                "C20400")
+            && Matches(0x439ACD, "8D8BA84C000050")
+            && RelativeBranchTargets(0x439AD9, 0xE8, 0x457D30)
+            && Matches(0x457D30, "558BEC568BF1803E00742B")
+            && Matches(0x43956E, "578D8EFC4C0000")
+            && RelativeBranchTargets(0x439575, 0xE8, 0x2FCC90)
+            && Matches(0x439580,
+                "8986004D00008B018986044D00008B41048986084D00008B410889860C4D0000")
+            && Matches(0x439539, "888E104D0000"));
         var selectorThreeAdapterVtableFileOffset = VirtualAddressToFileOffset(
             CharacterKeyedDialogCallbackNativeLayout.SelectorThreeConditionalAdapterVtableVirtualAddress);
         var selectorThreeAdapterSlots =

@@ -2793,9 +2793,10 @@ below; the selector-`0x03` NPC runtime binding is not. The separate nested
 object at `+0x10` remains optional, with its type and later non-null writer
 unresolved.
 
-The five concrete routes do not parse `message+0x28` or other dialog payload
-fields, update message-driven application state, or directly dispatch a
-numeric UI event. They optionally call `VIBE_LogIfSeverityLe2` using receiver
+The five concrete BaseController/NPCController dispatch stubs do not parse
+`message+0x28` or other dialog payload fields, update message-driven
+application state, or directly dispatch a numeric UI event. They optionally
+call `VIBE_LogIfSeverityLe2` using receiver
 `+0x30`, with the format string `received %s` and a fixed diagnostic label:
 BaseController IDs `0x77/0x78/0x79` log `msg-119`/`msg-120`/`msg-121`;
 NPCController IDs `0x77/0x78` log `msg-120`/`msg-121`. These strings are
@@ -2841,6 +2842,72 @@ original message pointer as one stack argument and use the loaded object as
 directly at these methods and the constructor installs the vptr at object
 offset zero, so no secondary-subobject adjustment is observed in this
 binding. This matches the dispatch call contract.
+
+### BaseNetController callback implementations for BaseController IDs 0x77..0x79
+
+The selector-`0x02` setup constructs a `0x228`-byte adapter with RTTI
+`.?AVBaseNetController@tfLocalCharacter@@` and vtable VA `0x1C64648` (raw
+`.rdata` offset `0x1863248`). Its constructor at raw `0x4C66D0` stores the
+private context at adapter `+0x170`, installs the vptr at `+0`, clears the
+DWORD at `+0x16C`, and stores the keyed BaseController receiver at `+0x174`.
+The setup path writes the adapter pointer into private-context `+0x18` through
+`0x4DB1E0`; its initial update at `0x4A18D6` and later update at `0x4A2EE5`
+call `0x4C7360`. That update writes the unadjusted adapter pointer to
+`[BaseController+0x2C]` and copies `[private-context+0x04]` to
+`[BaseController+0x24]`. These are separate fields.
+
+The previously recorded dispatch table fixes the message-to-slot mapping:
+
+| BaseController message ID | Case stub (raw) | Adapter vtable slot | Direct callback target (raw) |
+| --- | --- | --- | --- |
+| `0x77` | `0x540446` | `+0x10` | `0x4C82E0` |
+| `0x78` | `0x54046F` | `+0x14` | `0x4C8300` |
+| `0x79` | `0x540498` | `+0x18` | `0x4C9B80` |
+
+This mapping follows the BaseController's current selector-map and jump-table
+case snapshots, not message RTTI. The vtable points directly to these code
+addresses; all consume one stack argument and return with `ret 4`. The raw
+address-to-VA mapping for `.text` is `+0x400C00`, giving callback VAs
+`0x8C8EE0`, `0x8C8F00`, and `0x8CA780`. The `0x4C82E0` target is a short
+direct logger stub not recognized as a function by IDA; its bytes contain a direct call to
+`VIBE_LogUnhandledMessageId` (`0x2FC4F0`) and `ret 4`, with no thunk jump or
+adjustment.
+
+The `0x4C8300` callback uses the message argument's shared-text reference at
+`message+0x28` in diagnostic-object construction, then calls the vtable slot
+`+0xAC` of the object pointer loaded from global VA `0x1E002B8` with numeric
+event ID `285`,
+that local object, and zero. The numeric ID is the observed effect; its event
+name or meaning is unresolved. The callback does not directly write a field
+in the adapter or private context.
+
+The `0x4C9B80` callback reads the message DWORDs at `+0x30/+0x34` to form a
+key, clearing the low byte of the first DWORD (`& 0xFFFFFF00`). It searches
+the keyed registry returned by `0x35E700` at `+0x54`, using the QWORD-key
+lookup at `0x4093E0`. A found entry's `+0x10` pointer is the next recipient;
+byte `+0x08` on that pointed-to recipient must equal `1` to enter the update
+path; other values skip it. On the update path the callback calls
+`0x466660` with the normalized key, the message field at
+`+0x38`, flag `1`, and the address of the key pair at `message+0x30`.
+If that helper returns false, it calls `0x439A50` with the recipient pointer,
+`message+0x38`, and the opaque value at `message+0x28`.
+
+Inside that fallback, recipient `+0x4CA8` is passed to `0x457D30`, which
+updates a presence byte there and, on its populated path, six DWORDs at
+`+0x4CB0..+0x4CC4`. A separate descriptor-driven call reaches `0x439410`,
+which passes recipient `+0x4CFC` to `0x2FCC90`, stores a DWORD and three
+following DWORDs at `+0x4D00..+0x4D0C`, and conditionally updates a byte at
+`+0x4D10`. Other guarded downstream calls pass recipient `+0x58A0` as an
+argument or load an object pointer from `+0x46A4`. These are observed
+offset-level effects; their field meanings are unresolved. The lookup/update
+path is observed, but there is no removal operation in the direct
+`0x4C9B80` body. The callback code does not write the adapter's `+0x170` or
+`+0x174` fields; the identity/type of the registry recipient and the precise
+semantics of the `message+0x28/+0x38` values remain unresolved. No
+`tfGenericCharacter` callback binding is used in this interpretation. The
+separate selector-`0x03` MandMController code remains conditional, and the
+`tfGameProtocolHandler` findings elsewhere in this document concern a
+different ReplayReader path.
 
 The `tfGenericCharacter` object remains the state created for selector `0x02`,
 not the callback receiver. Its primary vtable at VA `0x1C63998` / raw

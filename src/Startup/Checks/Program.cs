@@ -4039,6 +4039,66 @@ Check("Selector-2 BaseController +0x2C binding resolves to its constructed BaseN
         slot.MethodVirtualAddress
             == slot.MethodFileOffset
                 + CharacterKeyedDialogCallbackNativeLayout.RawTextOffsetToVirtualAddressDelta));
+var localControllerDialogCases = CharacterKeyedDialogDispatchNativeLayout.Cases
+    .Where(snapshot => snapshot.FactorySelector == 0x02
+        && snapshot.MessageId is >= 0x77 and <= 0x79)
+    .ToArray();
+Check("BaseNetController callback targets match the exact BaseController message-ID case slots",
+    CharacterLocalControllerApplicationNativeLayout.Callbacks.SequenceEqual(
+    [
+        new CharacterLocalControllerCallbackSnapshot(0x77, 0x10, 0x540446, 0x4C82E0),
+        new CharacterLocalControllerCallbackSnapshot(0x78, 0x14, 0x54046F, 0x4C8300),
+        new CharacterLocalControllerCallbackSnapshot(0x79, 0x18, 0x540498, 0x4C9B80)
+    ])
+    && localControllerDialogCases.Select(snapshot =>
+            (snapshot.MessageId, snapshot.CallbackVtableSlotOffset ?? -1, snapshot.CaseTargetFileOffset))
+        .SequenceEqual(CharacterLocalControllerApplicationNativeLayout.Callbacks.Select(callback =>
+            (callback.MessageId, callback.VtableSlotOffset, callback.DispatchCaseFileOffset)))
+    && CharacterLocalControllerApplicationNativeLayout.RawTextOffsetToVirtualAddressDelta
+        == CharacterKeyedDialogCallbackNativeLayout.RawTextOffsetToVirtualAddressDelta
+    && CharacterLocalControllerApplicationNativeLayout.Callbacks.Select(callback =>
+            callback.CallbackFileOffset
+                + CharacterLocalControllerApplicationNativeLayout.RawTextOffsetToVirtualAddressDelta)
+        .SequenceEqual(keyedCharacterBaseAdapterSlots.Select(slot => slot.MethodVirtualAddress))
+    && CharacterLocalControllerApplicationNativeLayout.AdapterAllocationSize == 0x228
+    && CharacterLocalControllerApplicationNativeLayout.AdapterConstructorFileOffset == 0x4C66D0
+    && CharacterLocalControllerApplicationNativeLayout.AdapterContextPointerOffset == 0x170
+    && CharacterLocalControllerApplicationNativeLayout.AdapterKeyedReceiverPointerOffset == 0x174
+    && CharacterLocalControllerApplicationNativeLayout.AdapterConstructorZeroedDwordOffset == 0x16C
+    && CharacterLocalControllerApplicationNativeLayout.PrivateContextAdapterPointerOffset == 0x18
+    && CharacterLocalControllerApplicationNativeLayout.PrivateContextPointerSourceOffset == 4
+    && CharacterLocalControllerApplicationNativeLayout.AdapterBindingMethodFileOffset == 0x4C7360
+    && CharacterLocalControllerApplicationNativeLayout.AdapterReceiverPointerLoadFileOffset == 0x4C738D
+    && CharacterLocalControllerApplicationNativeLayout.KeyedReceiverCallbackObjectPointerOffset == 0x2C
+    && CharacterLocalControllerApplicationNativeLayout.KeyedReceiverContextPointerOffset == 0x24);
+Check("Bound BaseNetController callback observations retain only evidenced message offsets and numeric effects",
+    CharacterLocalControllerApplicationNativeLayout.Message77UnhandledLoggerFileOffset == 0x2FC4F0
+    && CharacterLocalControllerApplicationNativeLayout.Message78SharedTextFieldOffset == 0x28
+    && CharacterLocalControllerApplicationNativeLayout.Message78EventSinkGlobalVirtualAddress == 0x1E002B8
+    && CharacterLocalControllerApplicationNativeLayout.Message78EventSinkVtableOffset == 0xAC
+    && CharacterLocalControllerApplicationNativeLayout.Message78NumericEventId == 285
+    && CharacterLocalControllerApplicationNativeLayout.Message78EventDispatchFileOffset == 0x4C83BA
+    && CharacterLocalControllerApplicationNativeLayout.Message79RegistryAccessorFileOffset == 0x35E700
+    && CharacterLocalControllerApplicationNativeLayout.Message79RegistryMapOffsetFromAccessorResult == 0x54
+    && CharacterLocalControllerApplicationNativeLayout.Message79RegistryLookupFileOffset == 0x4093E0
+    && CharacterLocalControllerApplicationNativeLayout.Message79KeyFirstDwordOffset == 0x30
+    && CharacterLocalControllerApplicationNativeLayout.Message79KeyFirstDwordMask == 0xFFFFFF00
+    && CharacterLocalControllerApplicationNativeLayout.Message79KeySecondDwordOffset == 0x34
+    && CharacterLocalControllerApplicationNativeLayout.Message79OpaqueMessageFieldOffset == 0x28
+    && CharacterLocalControllerApplicationNativeLayout.Message79LookupValueFieldOffset == 0x38
+    && CharacterLocalControllerApplicationNativeLayout.Message79RecipientGateByteOffset == 8
+    && CharacterLocalControllerApplicationNativeLayout.Message79RegistryEntryRecipientPointerOffset == 0x10
+    && CharacterLocalControllerApplicationNativeLayout.Message79KeyedUpdateFileOffset == 0x466660
+    && CharacterLocalControllerApplicationNativeLayout.Message79RecipientFallbackFileOffset == 0x439A50
+    && CharacterLocalControllerApplicationNativeLayout.Message79RecipientConditionalStatePresenceByteOffset == 0x4CA8
+    && CharacterLocalControllerApplicationNativeLayout.Message79RecipientConditionalStateFirstDwordOffset == 0x4CB0
+    && CharacterLocalControllerApplicationNativeLayout.Message79RecipientConditionalStateLastDwordOffset == 0x4CC4
+    && CharacterLocalControllerApplicationNativeLayout.Message79RecipientHelperFieldOffset == 0x4CFC
+    && CharacterLocalControllerApplicationNativeLayout.Message79RecipientDescriptorDwordFirstOffset == 0x4D00
+    && CharacterLocalControllerApplicationNativeLayout.Message79RecipientDescriptorDwordLastOffset == 0x4D0C
+    && CharacterLocalControllerApplicationNativeLayout.Message79RecipientAuxiliaryByteOffset == 0x4D10
+    && CharacterLocalControllerApplicationNativeLayout.Message79RecipientArgumentOffsetPassedToAuxiliarySink == 0x58A0
+    && CharacterLocalControllerApplicationNativeLayout.Message79RecipientObjectPointerLoadOffset == 0x46A4);
 Check("Selector-3 MandM adapter construction is conditional and does not prove an NPC binding",
     CharacterKeyedDialogCallbackNativeLayout.SelectorThreeConditionalAdapterAllocationFileOffset == 0x4A190F
     && CharacterKeyedDialogCallbackNativeLayout.SelectorThreeConditionalAdapterAllocationSize == 0xB0

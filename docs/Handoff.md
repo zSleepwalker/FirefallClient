@@ -20,6 +20,14 @@
   which overlap this batch's code/vtable evidence.
 - The 91 secondary-table entries (VA `0xC22630` / raw `0x821A30`) are mapped
   as dispatch data, but their message identities are still unresolved.
+- Selector-`0x02`'s actual `tfLocalCharacter::BaseNetController` adapter is
+  now traced through callbacks for BaseController IDs `0x77..0x79`: exact
+  dispatch slots, adapter/context initialization, event ID `285`, and the
+  keyed lookup/update path are in `docs\MatrixConnection.md` and
+  `CharacterLocalControllerApplicationNativeLayout.cs`. Field semantics and
+  the callback `0x79` registry recipient type remain unresolved. The
+  selector-`0x03` MandMController path remains conditional; no NPC runtime
+  binding was inferred, and this work is separate from `tfGameProtocolHandler`.
 - Latest parser-consumer pass: raw `0x81CC50`'s two direct callers (`0x821BA0`
   and `0x821DE0`) pass its result through EAX. ReplayReader's `0x65DAF2` call
   to `0x12B7FB0` is allocation (`0xCC` bytes via allocator backend
