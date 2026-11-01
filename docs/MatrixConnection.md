@@ -2379,8 +2379,8 @@ then passes the full key to `0x800070`. That helper searches `this+0x24` and
 `+0x10/+0x14`, and the mapped pointer is at node `+0x18`. On a first-tree
 miss, after the `0x800BF0` creation checks allow it, the callback at context
 `+0x14` is called with the QWORD; its dispatcher `0x81B1B0` accepts low-byte
-values `0x02..0x35`; selectors `0x02..0x11` are resolved in the bounded
-first-sixteen-entry mapping below.
+values `0x02..0x35`; selectors `0x02..0x19` are resolved in the bounded
+first-twenty-four-entry mapping below.
 Entry creation uses `0x806910` and tree insertion uses `0x8064C0`; a separate
 guarded path at `0x800300` inserts a QWORD-keyed entry into the `+0x2C` tree.
 These observations establish the keyed lookup and registration mechanism, not
@@ -2388,7 +2388,7 @@ the meaning of an individual factory selector. The mapped construction cases
 are recorded below using their constructors, installed primary vtables, RTTI,
 and subsequent receiver call path.
 
-### QWORD-keyed receiver factory: selectors 0x02..0x11
+### QWORD-keyed receiver factory: selectors 0x02..0x19
 
 Factory `0x81B1B0` receives the key used by the `0x800070` registry-miss path.
 It reads only the low byte of that argument for table selection:
@@ -2430,6 +2430,13 @@ resolves its Complete Object Locator (COL) and RTTI name.
 | `0D` | `81B499 / C1C099` | `438` | `5962A0` | `1C65D10 / 1864910` | `5963D0 / 596470 / 597590 / 59ACA0` | `.?AVTinyObjectView@Character@firefall@@` |
 | `0E` | `81B4D7 / C1C0D7` | `1F8` | `59AEB0` | `1C65D34 / 1864934` | `59AFC0 / 59B060 / 59C600 / 59FF40` | `.?AVDynamicProjectileView@Character@firefall@@` |
 | `10` | `81B515 / C1C115` | `88` | `AD9580` | `1C723D8 / 1870FD8` | `AD9790 / AD9830 / AD9BD0 / ADA370` | `.?AVObserverView@Melding@firefall@@` |
+| `12` | `81B553 / C1C153` | `58` | `ADA400` | `1C7239C / 1870F9C` | `ADA4D0 / ADA570 / ADAB00 / ADBA10` | `.?AVObserverView@MeldingBubble@firefall@@` |
+| `14` | `81B58E / C1C18E` | `158` | `ADBCE0` | `1C72378 / 1870F78` | `ADBE80 / ADBF40 / ADD790 / AE0EF0` | `.?AVObserverView@AreaVisualData@firefall@@` |
+| `15` | `81B5CC / C1C1CC` | `628` | `AE10D0` | `1C72334 / 1870F34` | `AE1280 / AE1340 / AE1E80 / AE4170` | `.?AVParticleEffectsView@AreaVisualData@firefall@@` |
+| `16` | `81B60A / C1C20A` | `760` | `AE42E0` | `1C722EC / 1870EEC` | `AE44A0 / AE4540 / AE5970 / AE9410` | `.?AVMapMarkerView@AreaVisualData@firefall@@` |
+| `17` | `81B648 / C1C248` | `438` | `AE9640` | `1C72310 / 1870F10` | `AE9770 / AE9810 / AEA930 / AEE040` | `.?AVTinyObjectView@AreaVisualData@firefall@@` |
+| `18` | `81B686 / C1C286` | `758` | `AEE240` | `1C722C8 / 1870EC8` | `AEE3F0 / AEE4B0 / AEF200 / AF1A60` | `.?AVLootObjectView@AreaVisualData@firefall@@` |
+| `19` | `81B6C4 / C1C2C4` | `5C8` | `AF1C00` | `1C722A4 / 1870EA4` | `AF1D30 / AF1DD0 / AF3170 / AF68C0` | `.?AVForceShieldView@AreaVisualData@firefall@@` |
 
 Each constructor calls the shared helper at raw `0xBCAD70`. It stores the
 key's low/high DWORDs at receiver offsets `+0x18/+0x1C`, initializes fields
@@ -2439,8 +2446,8 @@ offset `+0`. The derived constructor then replaces that pointer with the
 listed RTTI-backed vtable. The six added COL offsets are all zero, and no
 secondary vptr stores were observed in their constructor bodies.
 
-These are the eight dispatch entries added in this pass; the default rows have
-no allocator or constructor:
+These are the eight dispatch entries for selectors `0x0A..0x11`; the default
+rows have no allocator or constructor:
 
 | Selector | Table index | Entry raw | Target VA / raw | Result |
 | --- | ---: | --- | --- | --- |
@@ -2453,16 +2460,30 @@ no allocator or constructor:
 | `10` | 14 | `81BAE0` | `C1C115 / 81B515` | `ObserverView@Melding` |
 | `11` | 15 | `81BAE4` | `C1C693 / 81BA93` | shared zero-return path |
 
+The bounded continuation for selectors `0x12..0x19` is:
+
+| Selector | Table index | Entry raw | Target VA / raw | Result |
+| --- | ---: | --- | --- | --- |
+| `12` | 16 | `81BAE8` | `C1C153 / 81B553` | `MeldingBubble::ObserverView` |
+| `13` | 17 | `81BAEC` | `C1C693 / 81BA93` | shared zero-return path |
+| `14` | 18 | `81BAF0` | `C1C18E / 81B58E` | `AreaVisualData::ObserverView` |
+| `15` | 19 | `81BAF4` | `C1C1CC / 81B5CC` | `AreaVisualData::ParticleEffectsView` |
+| `16` | 20 | `81BAF8` | `C1C20A / 81B60A` | `AreaVisualData::MapMarkerView` |
+| `17` | 21 | `81BAFC` | `C1C248 / 81B648` | `AreaVisualData::TinyObjectView` |
+| `18` | 22 | `81BB00` | `C1C286 / 81B686` | `AreaVisualData::LootObjectView` |
+| `19` | 23 | `81BB04` | `C1C2C4 / 81B6C4` | `AreaVisualData::ForceShieldView` |
+
 This family assignment comes from the concrete constructor-installed vtables
 and PE-resolved RTTI names, not from treating the low byte as a namespace ID.
-The six newly constructing cases include five RTTI-named `Character` views
-and one `Melding::ObserverView`; these are receiver types, not parsed-message
-types. Their primary COL subobject offsets are zero, and their constructors
-write the primary vptr at `this+0`. No secondary vptr stores were observed in
-these six constructor bodies; this bounded check does not enumerate all
-possible secondary subobjects elsewhere in their hierarchies. This evidence
-also corrects the provisional “message factory” interpretation: these objects
-are registered against QWORD keys, not created as per-message parser objects.
+The earlier six additions include five RTTI-named `Character` views and one
+`Melding::ObserverView`; the current seven include `MeldingBubble::ObserverView`
+and six `AreaVisualData` views. These are receiver types, not parsed-message
+types. Their primary COL subobject offsets are zero, and each constructor
+installs the listed primary vptr at `this+0`. The earlier six constructor
+bodies showed no secondary vptr stores; this bounded check does not enumerate
+possible secondary subobjects throughout the hierarchies. This evidence also
+corrects the provisional “message factory” interpretation: these objects are
+registered against QWORD keys, not created as per-message parser objects.
 
 The receiver's primary slots are reached through the separate compact selector
 at message `+0x10`: selector 1 calls `+0x08`; 2 calls `+0x18`; 3 and 4 call
@@ -2480,26 +2501,34 @@ to that optional nested object and conditionally emit the fixed
 argument. These forwarding/logging defaults are not empty stubs and differ
 from the dispatchers' invalid-message-ID reporting.
 
-For selectors `0x0A..0x0C`, the added `+0x04` implementations are also
-message-ID dispatchers: `AIObserverView` handles `0x69`, `CombatView` has a
-table for `0x54..0x6C`, and `MovementView` handles `0x6E`; their invalid-ID
-branches call `VIBE_LogUnhandledMessageId` with `message+0x10`. The `0x69`
-and `0x6E` valid branches separately log `"received %s"` with fixed
-`"msg-105"` / `"msg-110"` text, then may forward to an event receiver at
-`+0x2C`; each also forwards to a separate optional receiver at `+0x10` before
-the ID gate. By contrast,
-the `+0x04` methods for `TinyObjectView`, `DynamicProjectileView`, and
-`Melding::ObserverView` forward to an optional child and conditionally call
-`VIBE_LogEmitWithArgList` with the fixed text `"this view doesn't have any
-valid events"` and no message-ID argument. The logger arguments distinguish
-these fixed messages from the invalid-ID path.
+For selectors `0x0A..0x0C`, the `+0x04` implementations are message-ID
+dispatchers: `AIObserverView` handles `0x69`, `CombatView` has a table for
+`0x54..0x6C`, and `MovementView` handles `0x6E`; their invalid-ID branches
+call `VIBE_LogUnhandledMessageId` with `message+0x10`. The `0x69` and `0x6E`
+valid branches separately log `"received %s"` with fixed `"msg-105"` /
+`"msg-110"` text, then may forward to an event receiver at `+0x2C`; each also
+forwards to a separate optional receiver at `+0x10` before the ID gate.
+The new `AreaVisualData::ObserverView`, `ParticleEffectsView`, and
+`LootObjectView` `+0x04` methods dispatch only `0x54`, `0x55`, and `0x53`,
+respectively; their invalid-ID branches also report `message+0x10` through
+`VIBE_LogUnhandledMessageId`, while their valid paths may forward to the
+receiver at `+0x2C`. By contrast, the `+0x04` methods for `TinyObjectView`,
+`DynamicProjectileView`, `Melding::ObserverView`,
+`MeldingBubble::ObserverView`, `AreaVisualData::MapMarkerView`,
+`AreaVisualData::TinyObjectView`, and `AreaVisualData::ForceShieldView`
+forward to optional nested receivers and conditionally call
+`VIBE_LogEmitWithArgList` with the fixed text
+`"this view doesn't have any valid events"` without a message-ID argument.
+Across the 21 constructing receivers, `+0x04` therefore has ten
+message-ID dispatchers and eleven forwarding/logging defaults; the fixed
+no-events diagnostics are not invalid-ID reports or empty stubs.
 
-All fourteen mapped `+0x18` targets are short state-refresh wrappers: they call
+All twenty-one mapped `+0x18` targets are short state-refresh wrappers: they call
 the indirect helper at `dword_1AC4D24`, store its result at receiver `+0x28`,
 and call `orchestrator_BCADF0`. They ignore payload arguments at this entry
 point but are not no-op stubs. The `+0x08` and `+0x0C` targets are compact-selector
 body handlers reached with data pointers and lengths; their individual payload
-fields and dispatch tables are outside this bounded pass. The new
+fields remain outside this bounded pass. The
 `AIObserverView +0x08` target at `0x58A6E0` has a recovered disassembly
 boundary (size `0x394`, ending in `retn 8` at `0x58AA71`); decompilation and
 payload semantics remain unresolved. The earlier targets at `0x5536C0` and
@@ -2510,10 +2539,10 @@ The exact table, constructor/vtable/RTTI snapshots, compact-selector call
 sites, and original-image fingerprints are kept separately in
 `MatrixKeyedReceiverFactoryNativeLayout.cs`,
 `MatrixMessageNamespaceRoutingNativeLayout.cs`, and
-`StartupBinaryEvidence.cs`. Cases `0x0A..0x11` are now bounded, including the
-two table entries that share the zero-return path. Selectors `0x12..0x35`
-remain unmapped; this batch did not find Vehicle, AreaVisualData, Deployable,
-Turret, or LootStoreExtension types in the factory.
+`StartupBinaryEvidence.cs`. Selectors `0x02..0x19` are now bounded: 21 entries
+construct RTTI-backed receivers, and selectors `0x0F`, `0x11`, and `0x13`
+share the zero-return target. The remaining 28 table selectors, `0x1A..0x35`,
+are unmapped and intentionally outside this batch.
 
 The `0xBD7060` fan-out is a separate conditional side path: `0x7FDC60` reaches
 it when the message predicate at `message+0x18` returns zero and context

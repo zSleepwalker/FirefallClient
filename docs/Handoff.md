@@ -98,30 +98,39 @@
   slots are recorded in `src/Startup/MatrixKeyedReceiverFactoryNativeLayout.cs`.
   This proves these first cases create keyed Character receiver objects, not
   Matrix parser-message instances; the low byte is only the factory selector.
-  Continuation added table entries `0x0A..0x11`: `0x0A..0x0E` construct
+  Continuation mapped selectors `0x0A..0x11`: `0x0A..0x0E` construct
   `AIObserverView`, `CombatView`, `MovementView`, `TinyObjectView`, and
   `DynamicProjectileView` under RTTI namespace `Character`; `0x10` constructs
-  `Melding::ObserverView`; `0x0F` and `0x11` point to the shared zero-return
-  path. Table index is exactly `selector-2`; `0x01` and `0x36` are rejected
-  outside the stated `0x02..0x35` bounds. The six new primary COL subobject
-  offsets are zero; no secondary vptr stores were observed in their
-  constructors. All six call helper `0xBCAD70`, which writes the key DWORDs
-  at `+0x18/+0x1C` and an initial helper vptr at VA `0x1C660B4`; each derived
-  constructor replaces it with its RTTI-backed primary vtable.
+  `Melding::ObserverView`; `0x0F` and `0x11` share the zero-return path.
+  The current bounded batch adds selectors `0x12..0x19`: `0x12` constructs
+  `MeldingBubble::ObserverView`; `0x14..0x19` construct `AreaVisualData`
+  `ObserverView`, `ParticleEffectsView`, `MapMarkerView`, `TinyObjectView`,
+  `LootObjectView`, and `ForceShieldView`; `0x13` shares the zero-return path.
+  All seven added cases call allocator `0x12B7FB0`, then their listed
+  constructors; each constructor calls base helper `0xBCAD70`, which stores
+  the QWORD key at `+0x18/+0x1C` and an initial helper vptr at VA `0x1C660B4`,
+  before installing the RTTI-backed primary vtable. Their `.rdata` vtable
+  offsets and COL subobject offsets are pinned in the C# layout and binary
+  checks. The index remains `selector-2`; the first 24 selectors (`0x02..0x19`)
+  now include 21 receiver constructors and three zero-return entries
+  (`0x0F`, `0x11`, `0x13`). The remaining 28 selectors `0x1A..0x35` are
+  intentionally unmapped.
   `0x800420` uses the returned receiver for a separate compact-selector
-  dispatch on message `+0x10`. Across the 14 mapped receivers, `+0x04` has
-  seven message-ID dispatchers and seven forwarding/logging defaults. The
-  defaults' fixed `"this view doesn't have any valid events"` messages use
-  `VIBE_LogEmitWithArgList` without a message-ID argument; they are distinct
-  from `VIBE_LogUnhandledMessageId`. All `+0x18` slots are non-no-op state
-  refresh wrappers. `+0x08/+0x0C` are compact-body handlers taking data and
-  length forms; their payload semantics remain out of scope. The new
-  `AIObserverView +0x08` has a recovered disassembly boundary at `0x58A6E0`,
-  but decompilation/payload semantics remain unresolved. Earlier `0x5536C0` /
-  `0x5795A0` boundaries remain unresolved. Selectors `0x12..0x35` remain
-  unmapped; this batch did not identify Vehicle, AreaVisualData, Deployable,
-  Turret, or LootStoreExtension types. See `docs/MatrixConnection.md` for
-  caller paths, exact selectors, and binary evidence.
+  dispatch on message `+0x10`. Across the 21 mapped receivers, `+0x04` has
+  ten message-ID dispatchers and eleven forwarding/logging defaults. The new
+  dispatchers accept only message IDs `0x54` (AreaVisualData `ObserverView`),
+  `0x55` (`ParticleEffectsView`), and `0x53` (`LootObjectView`); invalid IDs
+  reach `VIBE_LogUnhandledMessageId` with `message+0x10`. New defaults emit
+  the fixed `"this view doesn't have any valid events"` message through
+  `VIBE_LogEmitWithArgList` without a message-ID argument. Every mapped
+  `+0x18` is a non-no-op state-refresh wrapper; `+0x08/+0x0C` are compact-body
+  handlers taking data/length forms, with payload semantics out of scope.
+  `AIObserverView +0x08` has a recovered disassembly boundary at `0x58A6E0`
+  (size `0x394`), although Hex-Rays decompilation and payload semantics remain
+  unresolved; this is not an unrecovered function boundary. Earlier
+  `0x5536C0` / `0x5795A0` boundaries remain unresolved. See
+  `docs/MatrixConnection.md` for exact table entries, constructor/vtable/RTTI
+  snapshots, slot roles, and binary evidence.
 - The gated `0xBD7060` path serializes the message QWORD and message data into
   its output stream, then passes the selector separately to `0xBD7460`,
   which stores it in the recipient callback's local record, not the stream.

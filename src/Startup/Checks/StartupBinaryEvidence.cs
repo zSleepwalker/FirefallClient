@@ -4445,12 +4445,18 @@ internal static class StartupBinaryEvidence
                 envelopeRegistry.RegistryInsertFileOffset));
         var keyedReceiverFirstEightCases = MatrixKeyedReceiverFactoryNativeLayout.FirstEightCases;
         var keyedReceiverNextSixCases = MatrixKeyedReceiverFactoryNativeLayout.NextSixCases;
-        var keyedReceiverCases = keyedReceiverFirstEightCases.Concat(keyedReceiverNextSixCases).ToArray();
+        var keyedReceiverSelectors12To19Cases =
+            MatrixKeyedReceiverFactoryNativeLayout.Selectors12To19ConstructingCases;
+        var keyedReceiverCases = keyedReceiverFirstEightCases
+            .Concat(keyedReceiverNextSixCases)
+            .Concat(keyedReceiverSelectors12To19Cases)
+            .ToArray();
         var keyedReceiverSelectors0ATo11 = MatrixKeyedReceiverFactoryNativeLayout.Selectors0ATo11TableEntries;
+        var keyedReceiverSelectors12To19 = MatrixKeyedReceiverFactoryNativeLayout.Selectors12To19TableEntries;
         var keyedReceiverCasesBySelector = keyedReceiverCases.ToDictionary(snapshot => snapshot.Selector);
         var keyedReceiverSlots = MatrixKeyedReceiverFactoryNativeLayout.PrimaryVtableSlots;
         var compactSelectorRoutes = MatrixKeyedReceiverFactoryNativeLayout.CompactSelectorRoutes;
-        check("Binary keyed-receiver factory bounds and first sixteen dispatch entries match the original image",
+        check("Binary keyed-receiver factory bounds and first twenty-four selector entries match the original image",
             imageBase == 0x400000
             && MatrixKeyedReceiverFactoryNativeLayout.RawTextOffsetToVirtualAddressDelta
                 == imageBase + textSection.Rva - textSection.RawOffset
@@ -4477,8 +4483,14 @@ internal static class StartupBinaryEvidence
                 "C7462400000000")
             && keyedReceiverFirstEightCases.Count == 8
             && keyedReceiverNextSixCases.Count == 6
+            && keyedReceiverSelectors12To19Cases.Count == 7
+            && keyedReceiverCases.Length == 21
             && keyedReceiverSelectors0ATo11.Count == 8
+            && keyedReceiverSelectors12To19.Count == 8
             && keyedReceiverSelectors0ATo11.All(entry =>
+                ReadUInt32(entry.TableEntryFileOffset) == entry.TargetVirtualAddress
+                && VirtualAddressToFileOffset(entry.TargetVirtualAddress) == entry.TargetFileOffset)
+            && keyedReceiverSelectors12To19.All(entry =>
                 ReadUInt32(entry.TableEntryFileOffset) == entry.TargetVirtualAddress
                 && VirtualAddressToFileOffset(entry.TargetVirtualAddress) == entry.TargetFileOffset)
             && keyedReceiverCases.All(snapshot =>
@@ -4490,6 +4502,10 @@ internal static class StartupBinaryEvidence
                         "6A" + ((byte)snapshot.AllocationSize).ToString("X2"))
                     : Matches(snapshot.CaseTargetFileOffset,
                         "68" + UInt32LittleEndianHex(snapshot.AllocationSize)))
+                && snapshot.AllocatorCallFileOffset == snapshot.CaseTargetFileOffset
+                    + (snapshot.Selector is 0x0A or 0x12 ? 2u : 5u)
+                && snapshot.ConstructorCallFileOffset == snapshot.CaseTargetFileOffset
+                    + (snapshot.Selector is 0x0A or 0x12 ? 0x26u : 0x29u)
                 && RelativeBranchTargets(snapshot.AllocatorCallFileOffset, 0xE8,
                     MatrixKeyedReceiverFactoryNativeLayout.AllocatorFileOffset)
                 && RelativeBranchTargets(snapshot.ConstructorCallFileOffset, 0xE8,
@@ -4543,6 +4559,29 @@ internal static class StartupBinaryEvidence
             && ReadCStringAscii(0x1B5FE24, 64) == "this view doesn't have any valid events"
             && ReadCStringAscii(0x1B5FF6C, 64) == "this view doesn't have any valid events"
             && ReadCStringAscii(0x1BAEF18, 64) == "this view doesn't have any valid events");
+        check("Binary selectors 14, 15, and 18 dispatch only message IDs 54, 55, and 53",
+            Matches(0xADBEAA, "8B471083F8547419")
+            && RelativeBranchTargets(0xADBEBD, 0xE8, 0x2FC4F0)
+            && Matches(0xAE12AA, "8B471083F8557419")
+            && RelativeBranchTargets(0xAE12BD, 0xE8, 0x2FC4F0)
+            && Matches(0xAEE41A, "8B471083F8537419")
+            && RelativeBranchTargets(0xAEE42D, 0xE8, 0x2FC4F0)
+            && ReadCStringAscii(0x1BAF008, 48) == "invalid message id %u for this view."
+            && ReadCStringAscii(0x1BAF120, 48) == "invalid message id %u for this view."
+            && ReadCStringAscii(0x1BAF680, 48) == "invalid message id %u for this view.");
+        check("Binary selectors 12, 16, 17, and 19 use fixed no-valid-events forwarding logs",
+            Matches(0xADA50A, "516A0068A4EEBA016A05B90409E601")
+            && RelativeBranchTargets(0xADA519, 0xE8, 0x12C2030)
+            && Matches(0xAE44DA, "516A0068B0F2BA016A05B90409E601")
+            && RelativeBranchTargets(0xAE44E9, 0xE8, 0x12C2030)
+            && Matches(0xAE97AA, "516A006834F4BA016A05B90409E601")
+            && RelativeBranchTargets(0xAE97B9, 0xE8, 0x12C2030)
+            && Matches(0xAF1D6A, "516A006804F7BA016A05B90409E601")
+            && RelativeBranchTargets(0xAF1D79, 0xE8, 0x12C2030)
+            && ReadCStringAscii(0x1BAEEA4, 64) == "this view doesn't have any valid events"
+            && ReadCStringAscii(0x1BAF2B0, 64) == "this view doesn't have any valid events"
+            && ReadCStringAscii(0x1BAF434, 64) == "this view doesn't have any valid events"
+            && ReadCStringAscii(0x1BAF704, 64) == "this view doesn't have any valid events");
         check("Binary keyed-receiver lookup result and compact selector routes call the recorded receiver slots",
             Matches(0x800453, "8B7E108B46188B4E1C")
             && RelativeBranchTargets(0x800611, 0xE8,
