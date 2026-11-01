@@ -1049,7 +1049,7 @@ names for the 91 secondary-table entries are unresolved.
 
 The five case-bearing primary routes (indices 2..6) have 17 directly selected
 subcases: three at route2, nine at route3, three at route4, and one each at
-routes5 and6. Eleven subcases now have native layouts; six remain unmapped.
+routes5 and6. All 17 subcases now have native layouts.
 Route0's nested table has a separate, complete set of 40 documented selectors
 (`0x53..0x7A`); route1 is the zero-return route. The secondary selector table
 records all 91 targets as dispatch data, but their message identities remain
@@ -1095,8 +1095,8 @@ No field meanings are inferred from the RTTI names.
 ### Route index 3, switch entry 0: `Vehicle::AbilityActivated`
 
 The route3 block `0x81EF6D` computes `arg_0 - 0x53`: instruction bytes
-`83 C0 AD` sign-extend the encoded immediate `0xAD` to `-0x53`. It bounds the result to
-indices `0..8` before indexing the nine-entry table at VA `0xC2260C` (raw
+`83 C0 AD` sign-extend the encoded immediate `0xAD` to `-0x53`. It bounds the
+result to indices `0..8` before indexing the nine-entry table at VA `0xC2260C` (raw
 `0x821A0C`). Entry0 reaches case `0x81EF83`, which allocates `0x30` bytes,
 stores local DWORD `0xD0` (role unknown), calls constructor `0xB093C0`, then
 reader `0x83A840`. The constructor passes `0x53` to helper `0xB474B0` and
@@ -1112,13 +1112,142 @@ passes `0x54` to base helper `0xB47520` and installs vtable VA `0x1C72978`
 (RTTI `firefall::Vehicle::AbilityFailed`). The reader writes DWORDs at
 `+0x28/+0x2C` through `0x3370A0`.
 
-Switch entry6 (value `0x59`) selects case `0x81F110`,
-`Vehicle::ForcedMovementCancelled`. It allocates `0x30` bytes, stores local
-DWORD `0xD6`, calls constructor `0xB097A0`, then reader `0x83A440`. The
-constructor passes `0x59` to base helper `0xB47760` and installs vtable VA
-`0x1C72928` (RTTI `firefall::Vehicle::ForcedMovementCancelled`). The reader
-writes a DWORD at `+0x28` and a WORD at `+0x2C`, through `0x3370A0` and
-`0x336AC0`. Entries2,3,4,5,7,8 are still unmapped.
+#### Switch entry2 (`0x55`): `Vehicle::PublicCombatLog`
+
+Entry2 selects case `0x81F025`, allocates `0x40` bytes, stores local DWORD
+`0xD2`, and calls constructor `0xB094C0`. Its success path joins the shared
+reader tail at `0x81CF5B`, which calls body reader `0x5F3350` at `0x81CF67`.
+The constructor passes `0x55` to base helper `0xB47590`, installs vtable VA
+`0x1C72988` (RTTI `firefall::Vehicle::PublicCombatLog`), zeroes the byte at
+`+0x28`, seeds DWORD `+0x2C` with `0x1C80CC4`, and zeroes DWORDs `+0x30`,
+`+0x34`, and `+0x38`.
+
+The body reader consumes a DWORD at `+0x28`. Only value `1` continues to
+`0x12EE170`, which reads a little-endian WORD length and passes that span to
+the embedded blob object at `+0x2C` through its virtual `+0x10` method,
+rather than copying payload bytes inline at that offset. A zero length
+performs no copy. Other values take the reader's
+error path. The gate's application meaning and blob contents remain unknown.
+
+#### Switch entry3 (`0x56`): `Vehicle::CurrentPoseUpdate`
+
+Entry3 selects `0x81F056`, allocates `0x58` bytes, stores local DWORD `0xD3`,
+and calls constructor `0xB095B0`; the body reader `0x83A530` is called at
+`0x81F08E`. The constructor passes `0x56` to `0xB47600` and installs vtable VA
+`0x1C72958` (RTTI `firefall::Vehicle::CurrentPoseUpdate`).
+
+The reader begins at object `+0x28` with a flag byte:
+
+1. Bit `0x01` selects a byte at `+0x29`; otherwise it reads a WORD at `+0x2A`.
+2. It always reads a byte at `+0x2C`. If bit `0x02` is clear, it reads a WORD
+   at `+0x2E`.
+3. If any bit in `0x0C` is set, it zeroes DWORD `+0x30` and copies three raw
+   bytes there; otherwise it reads DWORDs `+0x34`, `+0x38`, and `+0x3C`.
+4. For `flags & 0x30 == 0`, it reads four WORDs at `+0x44..+0x4A`. The exact
+   value `0x10` selects one byte at `+0x40`; `0x20` selects bytes `+0x41..+0x43`;
+   `0x30` reads none of these union fields.
+5. For `flags & 0xC0 == 0`, it reads WORDs at `+0x50`, `+0x52`, and `+0x54`.
+   If the masked value is `0x40` or `0x80`, it zeroes DWORD `+0x4C` and copies
+   three bytes there; `0xC0` reads no final payload.
+
+These are observed layout and branch conditions only; the flag and field
+meanings are unresolved.
+
+#### Switch entry4 (`0x57`): `Vehicle::TookDebugWeaponHitPublic`
+
+Entry4 selects `0x81F0A8`, allocates `0xA8` bytes, stores local DWORD `0xD4`,
+and calls constructor `0xB09630`. It joins the shared body-reader tail at
+`0x81CD94` (`0x81CDA0` calls `0x5F60F0`). The constructor passes `0x57` to
+`0xB47680`, installs vtable VA `0x1C72968` (RTTI
+`firefall::Vehicle::TookDebugWeaponHitPublic`), and zeroes bytes `+0x58` and
+`+0x88`.
+
+The reader consumes a byte at `+0x28`, DWORDs at `+0x2C/+0x30`, a WORD at
+`+0x34`, six DWORDs at `+0x38..+0x4C`, and another DWORD at `+0x50`.
+`0x5F4FD0` then reads a presence byte for state at `+0x58`; when present,
+`0x5F4D60` reads a QWORD, three DWORDs, four values through the shared
+four-value reader, and two bytes into a temporary record before `0x5F4F60`
+updates the object. When absent, it clears the existing presence byte.
+
+`0x5F5FB0` reads a second presence byte at `+0x88`. When set, it reads a raw
+QWORD, then `0x5F5420` consumes a sequence of counted, 64-byte records using
+`0x6087E0`; `0x5F5EB0` applies that opaque state. The absent path clears any
+existing state. The embedded record and field semantics are unresolved.
+
+#### Switch entry5 (`0x58`): `Vehicle::ForcedMovement`
+
+Entry5 selects `0x81F0DC`, allocates `0x1E0` bytes, stores local DWORD `0xD5`,
+and calls constructor `0xB09710`. The constructor passes `0x58` to `0xB476F0`,
+installs vtable VA `0x1C72938` (RTTI
+`firefall::Vehicle::ForcedMovement`), then initializes the embedded `0x1B8`
+state at `+0x28` through `0x92B8A0`. Relative to that embedded state, the
+initializer sets DWORDs at `+0/+0x08/+0xEC/+0xF0/+0x110/+0x114/+0x190..+0x19C`
+and WORDs at `+0x0C/+0xE8/+0x1A4` to zero, sets `+0x6C/+0xD8/+0x174` WORDs
+to `0x0101`, and sets `+0x04` to its zero argument.
+
+The body reader `0x92F800` is called at `0x81D62F`. It reads a selector byte
+into embedded `+0x08`, a DWORD into `+0x04`, then calls `0x5FDA00` for an
+optional QWORD. The QWORD halves, when present, are copied to embedded
+`+0x110/+0x114`; otherwise those slots are initialized from data at VA
+`0x1E68530`. The selector is bounds-checked to `0..13`, then indexes the
+14-entry table at VA `0xD308BC` (raw `0x92FCBC`). The reader also clears
+embedded byte `+0x0D` on its common return. No case names or state semantics
+are inferred; each case below records only its observed reads:
+
+| State case | Reader target (raw) | Additional reads, relative to embedded state, in order |
+|---:|---:|---|
+| 0 | `0x92FC83` | None |
+| 1 | `0x92F8E8` | Three DWORDs at `+0x118`, `+0x184`, `+0x178`; DWORD `+0x190`; derives `+0x194 = +0x190 + 1` |
+| 2 | `0x92F92E` | Three DWORDs `+0x118`, three DWORDs `+0x178`, DWORDs `+0x190/+0x194/+0x19C`, bytes `+0x1A4/+0x1A5` |
+| 3 | `0x92F990` | DWORDs `+0x190/+0x194`; three DWORDs `+0x10`; 16 bytes at `+0x1C` then constant WORD `1` at `+0x2C`; three DWORDs `+0x118`; 16 bytes at `+0x124` then constant WORD `1` at `+0x134`; DWORDs `+0x198/+0x19C`; bytes `+0x1A4/+0x1A5` |
+| 4 | `0x92FA16` | Three DWORDs `+0x118`; DWORDs `+0x190/+0x194/+0x19C`; three DWORDs `+0x184` |
+| 5 | `0x92FA5E` | Three DWORDs `+0x178`; DWORDs `+0x190/+0x194`; byte `+0x0C` |
+| 6 | `0x92FA94` | Three DWORDs `+0x178`; DWORDs `+0x190/+0x194/+0x19C` |
+| 7 | `0x92FBCF` | DWORDs `+0x190/+0x194` |
+| 8 | `0x92FAC6` | Three DWORDs `+0x118`; DWORDs `+0x190/+0x194/+0x198` |
+| 9 | `0x92FAF8` | DWORDs `+0x190/+0x194/+0x198`; three DWORDs `+0x178` |
+| 10 | `0x92FB32` | DWORDs `+0x190/+0x194`; three DWORDs `+0x178`; DWORDs `+0x198/+0x19C`; byte `+0x1A5` |
+| 11 | `0x92FB87` | DWORDs `+0x190/+0x194`; three DWORDs `+0x118`; 16 bytes at `+0x124` then constant WORD `1` at `+0x134` |
+| 12 | `0x92FBC1` | Three DWORDs `+0x118`; DWORDs `+0x190/+0x194` |
+| 13 | `0x92FBED` | DWORDs `+0x190/+0x194`; QWORD `+0x110`; three DWORDs `+0x118`; DWORDs `+0x1A8/+0x1AC/+0x19C/+0x198`; byte `+0x1A4`; DWORDs `+0x1A0/+0x1B0` |
+
+`0x384C80` reads three DWORDs; `0x384C20` reads four DWORDs and writes its
+following WORD marker. Its shared `0x384B40` reader treats the four values as
+floats and applies a numeric range check. The discriminator variants remain
+opaque despite this structural mapping.
+
+#### Switch entry6 (`0x59`): `Vehicle::ForcedMovementCancelled`
+
+Entry6 selects case `0x81F110`, `Vehicle::ForcedMovementCancelled`. It
+allocates `0x30` bytes, stores local DWORD `0xD6`, calls constructor
+`0xB097A0`, then reader `0x83A440`. The constructor passes `0x59` to base
+helper `0xB47760` and installs vtable VA `0x1C72928` (RTTI
+`firefall::Vehicle::ForcedMovementCancelled`). The reader writes a DWORD at
+`+0x28` and a WORD at `+0x2C`, through `0x3370A0` and `0x336AC0`.
+
+#### Switch entry7 (`0x5A`): `Vehicle::FlipPunch`
+
+Entry7 selects `0x81F161`, allocates `0x40` bytes, stores local DWORD `0xD7`,
+and calls constructor `0xB09820`; body reader `0x83A370` is called at
+`0x81F198`. The constructor passes `0x5A` to `0xB477D0` and installs vtable
+VA `0x1C72948` (RTTI `firefall::Vehicle::FlipPunch`). The reader consumes six
+DWORDs, in order, at `+0x28/+0x2C/+0x30/+0x34/+0x38/+0x3C`. Their meanings
+remain unknown.
+
+#### Switch entry8 (`0x5B`): `Vehicle::DebugMovementUpdate`
+
+Entry8 selects `0x81F1B2`, allocates `0xA0` bytes, stores local DWORD `0xD8`,
+and calls constructor `0xB098A0`. The constructor passes `0x5B` to
+`0xB47840`, installs vtable VA `0x1C728F8` (RTTI
+`firefall::Vehicle::DebugMovementUpdate`), and seeds WORD `+0x88` with
+`0x0101`.
+
+Reader `0x83A230` reads a byte at `+0x28`, then delegates at `+0x2C` to
+`0x608370`. That helper reads DWORDs `+0x2C/+0x30/+0x34`, reads four values
+through `0x384B40` and copies their 16 bytes from temporary storage to
+`+0x78..+0x87`, writes WORD `1` at `+0x88`, and reads DWORDs
+`+0x8C/+0x90/+0x94`. The outer reader then reads WORD `+0x98` and DWORD
+`+0x9C`. Field meanings remain unknown.
 
 ### Route index 4, dispatcher value `0x53`: `Deployable::TookHit`
 

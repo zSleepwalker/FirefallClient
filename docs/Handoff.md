@@ -4,10 +4,9 @@
 
 - Matrix nested selector table raw `0x821844` (selectors `0x53..0x7A`) is
   fully traced; see the summary table in `docs/MatrixConnection.md`.
-- Primary-dispatcher routes 2-6 hold 17 subcases; 11 are reconstructed.
-  Route2 values `0x53-0x55`, route3 entries `0,1,6`, route4 values `0x53-0x55`,
-  and routes5/6 value `0x53` are saved. Remaining: route3 entries
-  `2,3,4,5,7,8` only.
+- Primary-dispatcher routes 2-6 hold 17 subcases; all 17 now have native
+  layouts. The six formerly unmapped route3 entries (`2,3,4,5,7,8`) are reconstructed
+  in `docs/MatrixConnection.md` and `src/Startup/Vehicle*NativeLayout.cs`.
 - IDA MCP instance `13337` is the active `FirefallClient.exe` image
   (SHA-256 `97362D668FF64778193A64759265E4AE90842043C4A15B627DF9902FD9135445`)
   loaded as a flat `seg000` at base `0`. Its PE `.text` maps raw file offsets
@@ -17,9 +16,8 @@
   separately.
 - The 91 secondary-table entries (VA `0xC22630` / raw `0x821A30`) are mapped
   as dispatch data, but their message identities are still unresolved.
-- Next suggested work: the remaining six primary subcases, then the
-  message-object consumers (vtable handler methods, e.g. vtables VA
-  `0x1C67028`, `0x1C67018`, `0x1C66FF8`).
+- Next suggested work: trace message-object consumers (vtable handler methods,
+  e.g. vtables VA `0x1C67028`, `0x1C67018`, `0x1C66FF8`).
 - Open items: field semantics, allocation-failure consequences, selector
   `0x55` 12-byte temp prefix, selector `0x6D` body consumption.
 - Workflow per batch: Luna agent reconstructs (layout + Program.cs +
@@ -1136,7 +1134,10 @@ These updates supersede older next-step suggestions below where they overlap.
   Selector0x78 constructs `OpenMovieDialog` and passes input through the shared NUL-terminated text reader at +0x28; field meaning and allocation-failure consequence remain unknown.
   Selector0x79 constructs `PrivateDialog` and reads DWORD +0x28, QWORD +0x30, and DWORD +0x38; field meanings and allocation-failure consequence remain unknown.
   Selector0x7A constructs `PublicDialog` and reads DWORDs +0x28/+0x2C; field meanings and allocation-failure consequence remain unknown.
-  The nested selector table 0x53..0x7A is fully traced. Eleven of 17 case-bearing primary-route subcases are now mapped; only route3 switch entries2,3,4,5,7,8 remain. Next trace those entries, then parsed-object consumers; field semantics remain open.
+  The nested selector table 0x53..0x7A is fully traced, and all 17 case-bearing
+  primary-route subcases have native layouts. Route3 entries2,3,4,5,7,8 are
+  mapped in `docs/MatrixConnection.md`; next trace parsed-object consumers.
+  Field semantics remain open.
   RTTI names the results `nl::RoutedMessage` and
   `nl::RoutedMultipleMessage`; QWORD and message semantics remain unknown.
 - **Header/factory roles corrected by instructions.** 34A020 reads compact

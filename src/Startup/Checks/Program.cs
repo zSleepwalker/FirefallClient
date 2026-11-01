@@ -1125,6 +1125,180 @@ Check("Vehicle ForcedMovementCancelled route-index-3 switch-entry 6 layout is re
     && VehicleForcedMovementCancelledNativeLayout.RttiName == ".?AVForcedMovementCancelled@Vehicle@firefall@@"
     && VehicleForcedMovementCancelledNativeLayout.DwordFieldOffset == 0x28
     && VehicleForcedMovementCancelledNativeLayout.WordFieldOffset == 0x2C);
+Check("Vehicle PublicCombatLog route-index-3 switch-entry 2 layout is recorded",
+    VehiclePublicCombatLogNativeLayout.DispatcherFileOffset == 0x81EF6D
+    && VehiclePublicCombatLogNativeLayout.SwitchTableVirtualAddress == 0xC2260C
+    && VehiclePublicCombatLogNativeLayout.SwitchTableFileOffset == 0x821A0C
+    && VehiclePublicCombatLogNativeLayout.SwitchEntryIndex == 2
+    && VehiclePublicCombatLogNativeLayout.DispatcherValue + VehiclePublicCombatLogNativeLayout.SwitchArgumentAdjustment
+        == VehiclePublicCombatLogNativeLayout.SwitchEntryIndex
+    && VehiclePublicCombatLogNativeLayout.DispatcherValue == 0x55
+    && VehiclePublicCombatLogNativeLayout.CaseFileOffset == 0x81F025
+    && VehiclePublicCombatLogNativeLayout.CaseLocalDwordValue == 0xD2
+    && VehiclePublicCombatLogNativeLayout.AllocationSize == 0x40
+    && VehiclePublicCombatLogNativeLayout.ConstructorFileOffset == 0xB094C0
+    && VehiclePublicCombatLogNativeLayout.BaseConstructorHelperFileOffset == 0xB47590
+    && VehiclePublicCombatLogNativeLayout.BaseConstructorArgument == 0x55
+    && VehiclePublicCombatLogNativeLayout.BodyReaderFileOffset == 0x5F3350
+    && VehiclePublicCombatLogNativeLayout.LengthPrefixedBlobReaderFileOffset == 0x12EE170
+    && VehiclePublicCombatLogNativeLayout.VtableVirtualAddress == 0x1C72988
+    && VehiclePublicCombatLogNativeLayout.RttiName == ".?AVPublicCombatLog@Vehicle@firefall@@"
+    && VehiclePublicCombatLogNativeLayout.DwordGateFieldOffset == 0x28
+    && VehiclePublicCombatLogNativeLayout.LengthPrefixedBlobFieldOffset == 0x2C
+    && VehiclePublicCombatLogNativeLayout.LengthPrefixWidth == 2
+    && VehiclePublicCombatLogNativeLayout.ConstructorSeededDwordValue == 0x1C80CC4);
+Check("Vehicle CurrentPoseUpdate route-index-3 switch-entry 3 layout is recorded",
+    VehicleCurrentPoseUpdateNativeLayout.SwitchEntryIndex == 3
+    && VehicleCurrentPoseUpdateNativeLayout.DispatcherValue + VehicleCurrentPoseUpdateNativeLayout.SwitchArgumentAdjustment
+        == VehicleCurrentPoseUpdateNativeLayout.SwitchEntryIndex
+    && VehicleCurrentPoseUpdateNativeLayout.DispatcherValue == 0x56
+    && VehicleCurrentPoseUpdateNativeLayout.CaseFileOffset == 0x81F056
+    && VehicleCurrentPoseUpdateNativeLayout.CaseLocalDwordValue == 0xD3
+    && VehicleCurrentPoseUpdateNativeLayout.AllocationSize == 0x58
+    && VehicleCurrentPoseUpdateNativeLayout.ConstructorFileOffset == 0xB095B0
+    && VehicleCurrentPoseUpdateNativeLayout.BaseConstructorHelperFileOffset == 0xB47600
+    && VehicleCurrentPoseUpdateNativeLayout.BaseConstructorArgument == 0x56
+    && VehicleCurrentPoseUpdateNativeLayout.BodyReaderFileOffset == 0x83A530
+    && VehicleCurrentPoseUpdateNativeLayout.ByteReaderFileOffset == 0x337180
+    && VehicleCurrentPoseUpdateNativeLayout.WordReaderFileOffset == 0x336AC0
+    && VehicleCurrentPoseUpdateNativeLayout.DwordReaderFileOffset == 0x3568E0
+    && VehicleCurrentPoseUpdateNativeLayout.ThreeByteReaderFileOffset == 0x336B50
+    && VehicleCurrentPoseUpdateNativeLayout.FinalWordReaderFileOffset == 0x6097B0
+    && VehicleCurrentPoseUpdateNativeLayout.AlternateByteReaderFileOffset == 0x356CF0
+    && VehicleCurrentPoseUpdateNativeLayout.VtableVirtualAddress == 0x1C72958
+    && VehicleCurrentPoseUpdateNativeLayout.RttiName == ".?AVCurrentPoseUpdate@Vehicle@firefall@@"
+    && VehicleCurrentPoseUpdateNativeLayout.FlagFieldOffset == 0x28
+    && VehicleCurrentPoseUpdateNativeLayout.FirstConditionalByteFieldOffset == 0x29
+    && VehicleCurrentPoseUpdateNativeLayout.FirstConditionalWordFieldOffset == 0x2A
+    && VehicleCurrentPoseUpdateNativeLayout.FollowingByteFieldOffset == 0x2C
+    && VehicleCurrentPoseUpdateNativeLayout.SecondConditionalWordFieldOffset == 0x2E
+    && VehicleCurrentPoseUpdateNativeLayout.FirstThreeByteFieldOffset == 0x30
+    && VehicleCurrentPoseUpdateNativeLayout.FirstDwordRunOffset == 0x34
+    && VehicleCurrentPoseUpdateNativeLayout.FirstDwordRunCount == 3
+    && VehicleCurrentPoseUpdateNativeLayout.FirstByteUnionOffset == 0x40
+    && VehicleCurrentPoseUpdateNativeLayout.FirstWordRunOffset == 0x44
+    && VehicleCurrentPoseUpdateNativeLayout.FirstWordRunCount == 4
+    && VehicleCurrentPoseUpdateNativeLayout.SecondThreeByteFieldOffset == 0x4C
+    && VehicleCurrentPoseUpdateNativeLayout.FinalWordRunOffset == 0x50
+    && VehicleCurrentPoseUpdateNativeLayout.FinalWordRunCount == 3
+    && VehicleCurrentPoseUpdateNativeLayout.FirstByteChoiceFlag == 0x01
+    && VehicleCurrentPoseUpdateNativeLayout.SecondWordChoiceFlag == 0x02
+    && VehicleCurrentPoseUpdateNativeLayout.ThreeByteChoiceFlags == 0x0C
+    && VehicleCurrentPoseUpdateNativeLayout.FirstUnionChoiceFlags == 0x30
+    && VehicleCurrentPoseUpdateNativeLayout.FinalThreeByteChoiceFlags == 0xC0);
+Check("Vehicle TookDebugWeaponHitPublic route-index-3 switch-entry 4 layout is recorded",
+    VehicleTookDebugWeaponHitPublicNativeLayout.SwitchEntryIndex == 4
+    && VehicleTookDebugWeaponHitPublicNativeLayout.DispatcherValue + VehicleTookDebugWeaponHitPublicNativeLayout.SwitchArgumentAdjustment
+        == VehicleTookDebugWeaponHitPublicNativeLayout.SwitchEntryIndex
+    && VehicleTookDebugWeaponHitPublicNativeLayout.DispatcherValue == 0x57
+    && VehicleTookDebugWeaponHitPublicNativeLayout.CaseFileOffset == 0x81F0A8
+    && VehicleTookDebugWeaponHitPublicNativeLayout.CaseLocalDwordValue == 0xD4
+    && VehicleTookDebugWeaponHitPublicNativeLayout.AllocationSize == 0xA8
+    && VehicleTookDebugWeaponHitPublicNativeLayout.ConstructorFileOffset == 0xB09630
+    && VehicleTookDebugWeaponHitPublicNativeLayout.BaseConstructorHelperFileOffset == 0xB47680
+    && VehicleTookDebugWeaponHitPublicNativeLayout.BaseConstructorArgument == 0x57
+    && VehicleTookDebugWeaponHitPublicNativeLayout.BodyReaderFileOffset == 0x5F60F0
+    && VehicleTookDebugWeaponHitPublicNativeLayout.FirstConditionalReaderFileOffset == 0x5F4FD0
+    && VehicleTookDebugWeaponHitPublicNativeLayout.FirstConditionalValueReaderFileOffset == 0x5F4D60
+    && VehicleTookDebugWeaponHitPublicNativeLayout.FirstConditionalCopyHelperFileOffset == 0x5F4F60
+    && VehicleTookDebugWeaponHitPublicNativeLayout.SecondConditionalReaderFileOffset == 0x5F5FB0
+    && VehicleTookDebugWeaponHitPublicNativeLayout.SecondConditionalValueReaderFileOffset == 0x5F5420
+    && VehicleTookDebugWeaponHitPublicNativeLayout.SecondConditionalCopyHelperFileOffset == 0x5F5EB0
+    && VehicleTookDebugWeaponHitPublicNativeLayout.ScalarDwordReaderFileOffset == 0x3568E0
+    && VehicleTookDebugWeaponHitPublicNativeLayout.QwordReaderFileOffset == 0x356F80
+    && VehicleTookDebugWeaponHitPublicNativeLayout.FourValueReaderFileOffset == 0x384B40
+    && VehicleTookDebugWeaponHitPublicNativeLayout.VtableVirtualAddress == 0x1C72968
+    && VehicleTookDebugWeaponHitPublicNativeLayout.RttiName == ".?AVTookDebugWeaponHitPublic@Vehicle@firefall@@"
+    && VehicleTookDebugWeaponHitPublicNativeLayout.FirstByteFieldOffset == 0x28
+    && VehicleTookDebugWeaponHitPublicNativeLayout.FirstDwordFieldOffset == 0x2C
+    && VehicleTookDebugWeaponHitPublicNativeLayout.SecondDwordFieldOffset == 0x30
+    && VehicleTookDebugWeaponHitPublicNativeLayout.WordFieldOffset == 0x34
+    && VehicleTookDebugWeaponHitPublicNativeLayout.FirstDwordRunOffset == 0x38
+    && VehicleTookDebugWeaponHitPublicNativeLayout.FirstDwordRunCount == 6
+    && VehicleTookDebugWeaponHitPublicNativeLayout.FollowingDwordFieldOffset == 0x50
+    && VehicleTookDebugWeaponHitPublicNativeLayout.FirstConditionalFlagOffset == 0x58
+    && VehicleTookDebugWeaponHitPublicNativeLayout.SecondConditionalFlagOffset == 0x88
+    && VehicleTookDebugWeaponHitPublicNativeLayout.ConditionalRecordStride == 0x40);
+Check("Vehicle ForcedMovement route-index-3 switch-entry 5 layout is recorded",
+    VehicleForcedMovementNativeLayout.SwitchEntryIndex == 5
+    && VehicleForcedMovementNativeLayout.DispatcherValue + VehicleForcedMovementNativeLayout.SwitchArgumentAdjustment
+        == VehicleForcedMovementNativeLayout.SwitchEntryIndex
+    && VehicleForcedMovementNativeLayout.DispatcherValue == 0x58
+    && VehicleForcedMovementNativeLayout.CaseFileOffset == 0x81F0DC
+    && VehicleForcedMovementNativeLayout.CaseLocalDwordValue == 0xD5
+    && VehicleForcedMovementNativeLayout.AllocationSize == 0x1E0
+    && VehicleForcedMovementNativeLayout.ConstructorFileOffset == 0xB09710
+    && VehicleForcedMovementNativeLayout.BaseConstructorHelperFileOffset == 0xB476F0
+    && VehicleForcedMovementNativeLayout.BaseConstructorArgument == 0x58
+    && VehicleForcedMovementNativeLayout.NestedStateInitializationHelperFileOffset == 0x92B8A0
+    && VehicleForcedMovementNativeLayout.BodyReaderFileOffset == 0x92F800
+    && VehicleForcedMovementNativeLayout.DwordReaderFileOffset == 0x3370A0
+    && VehicleForcedMovementNativeLayout.ByteReaderFileOffset == 0x337180
+    && VehicleForcedMovementNativeLayout.ThreeDwordReaderFileOffset == 0x384C80
+    && VehicleForcedMovementNativeLayout.FourValueReaderFileOffset == 0x384C20
+    && VehicleForcedMovementNativeLayout.ScalarDwordReaderFileOffset == 0x3568E0
+    && VehicleForcedMovementNativeLayout.QwordReaderFileOffset == 0x356F80
+    && VehicleForcedMovementNativeLayout.OptionalQwordReaderFileOffset == 0x5FDA00
+    && VehicleForcedMovementNativeLayout.VtableVirtualAddress == 0x1C72938
+    && VehicleForcedMovementNativeLayout.RttiName == ".?AVForcedMovement@Vehicle@firefall@@"
+    && VehicleForcedMovementNativeLayout.NestedStateOffset == 0x28
+    && VehicleForcedMovementNativeLayout.NestedStateSize == 0x1B8
+    && VehicleForcedMovementNativeLayout.StateDiscriminatorObjectOffset == 0x30
+    && VehicleForcedMovementNativeLayout.StateSwitchTableVirtualAddress == 0xD308BC
+    && VehicleForcedMovementNativeLayout.StateSwitchTableFileOffset == 0x92FCBC
+    && VehicleForcedMovementNativeLayout.StateSwitchCaseCount == 14
+    && VehicleForcedMovementNativeLayout.StateSwitchCaseTargetFileOffsets.SequenceEqual(new uint[]
+    {
+        0x92FC83, 0x92F8E8, 0x92F92E, 0x92F990, 0x92FA16, 0x92FA5E, 0x92FA94,
+        0x92FBCF, 0x92FAC6, 0x92FAF8, 0x92FB32, 0x92FB87, 0x92FBC1, 0x92FBED
+    }));
+Check("Vehicle FlipPunch route-index-3 switch-entry 7 layout is recorded",
+    VehicleFlipPunchNativeLayout.SwitchEntryIndex == 7
+    && VehicleFlipPunchNativeLayout.DispatcherValue + VehicleFlipPunchNativeLayout.SwitchArgumentAdjustment
+        == VehicleFlipPunchNativeLayout.SwitchEntryIndex
+    && VehicleFlipPunchNativeLayout.DispatcherValue == 0x5A
+    && VehicleFlipPunchNativeLayout.CaseFileOffset == 0x81F161
+    && VehicleFlipPunchNativeLayout.CaseLocalDwordValue == 0xD7
+    && VehicleFlipPunchNativeLayout.AllocationSize == 0x40
+    && VehicleFlipPunchNativeLayout.ConstructorFileOffset == 0xB09820
+    && VehicleFlipPunchNativeLayout.BaseConstructorHelperFileOffset == 0xB477D0
+    && VehicleFlipPunchNativeLayout.BaseConstructorArgument == 0x5A
+    && VehicleFlipPunchNativeLayout.BodyReaderFileOffset == 0x83A370
+    && VehicleFlipPunchNativeLayout.DwordReaderFileOffset == 0x3568E0
+    && VehicleFlipPunchNativeLayout.VtableVirtualAddress == 0x1C72948
+    && VehicleFlipPunchNativeLayout.RttiName == ".?AVFlipPunch@Vehicle@firefall@@"
+    && VehicleFlipPunchNativeLayout.FirstDwordFieldOffset == 0x28
+    && VehicleFlipPunchNativeLayout.DwordFieldCount == 6);
+Check("Vehicle DebugMovementUpdate route-index-3 switch-entry 8 layout is recorded",
+    VehicleDebugMovementUpdateNativeLayout.SwitchEntryIndex == 8
+    && VehicleDebugMovementUpdateNativeLayout.DispatcherValue + VehicleDebugMovementUpdateNativeLayout.SwitchArgumentAdjustment
+        == VehicleDebugMovementUpdateNativeLayout.SwitchEntryIndex
+    && VehicleDebugMovementUpdateNativeLayout.DispatcherValue == 0x5B
+    && VehicleDebugMovementUpdateNativeLayout.CaseFileOffset == 0x81F1B2
+    && VehicleDebugMovementUpdateNativeLayout.CaseLocalDwordValue == 0xD8
+    && VehicleDebugMovementUpdateNativeLayout.AllocationSize == 0xA0
+    && VehicleDebugMovementUpdateNativeLayout.ConstructorFileOffset == 0xB098A0
+    && VehicleDebugMovementUpdateNativeLayout.BaseConstructorHelperFileOffset == 0xB47840
+    && VehicleDebugMovementUpdateNativeLayout.BaseConstructorArgument == 0x5B
+    && VehicleDebugMovementUpdateNativeLayout.BodyReaderFileOffset == 0x83A230
+    && VehicleDebugMovementUpdateNativeLayout.NestedBodyReaderFileOffset == 0x608370
+    && VehicleDebugMovementUpdateNativeLayout.FourValueReaderFileOffset == 0x384B40
+    && VehicleDebugMovementUpdateNativeLayout.VtableVirtualAddress == 0x1C728F8
+    && VehicleDebugMovementUpdateNativeLayout.RttiName == ".?AVDebugMovementUpdate@Vehicle@firefall@@"
+    && VehicleDebugMovementUpdateNativeLayout.FirstByteFieldOffset == 0x28
+    && VehicleDebugMovementUpdateNativeLayout.NestedReadFieldOffset == 0x2C
+    && VehicleDebugMovementUpdateNativeLayout.FirstNestedDwordOffset == 0x2C
+    && VehicleDebugMovementUpdateNativeLayout.NestedDwordCount == 3
+    && VehicleDebugMovementUpdateNativeLayout.FourValueInputOffset == 0x38
+    && VehicleDebugMovementUpdateNativeLayout.FourValueInputSize == 0x10
+    && VehicleDebugMovementUpdateNativeLayout.FourValueCopyOffset == 0x78
+    && VehicleDebugMovementUpdateNativeLayout.ConstructorSeededWordOffset == 0x88
+    && VehicleDebugMovementUpdateNativeLayout.ConstructorSeededWordValue == 0x0101
+    && VehicleDebugMovementUpdateNativeLayout.NestedReaderWordOffset == 0x88
+    && VehicleDebugMovementUpdateNativeLayout.FinalDwordRunOffset == 0x8C
+    && VehicleDebugMovementUpdateNativeLayout.FinalDwordRunCount == 3
+    && VehicleDebugMovementUpdateNativeLayout.TrailingWordFieldOffset == 0x98
+    && VehicleDebugMovementUpdateNativeLayout.TrailingDwordFieldOffset == 0x9C);
 Check("Deployable AbilityProjectileFired route-index-4 value0x54 layout is recorded",
     DeployableAbilityProjectileFiredNativeLayout.DispatcherValue == 0x54
     && DeployableAbilityProjectileFiredNativeLayout.CaseFileOffset == 0x81F24D
