@@ -2059,8 +2059,22 @@ Check("NPCInteraction selector 0x77 records its raw QWORD body field",
     && CharacterNPCInteractionNativeLayout.BaseConstructorHelperFileOffset == 0x5A1430
     && CharacterNPCInteractionNativeLayout.BaseConstructorArgument == 0x77
     && CharacterNPCInteractionNativeLayout.BodyReaderFileOffset == 0x81F72E
+    && CharacterNPCInteractionNativeLayout.BodyReaderQwordCallSiteFileOffset == 0x81F73C
+    && CharacterNPCInteractionNativeLayout.BodyReaderReturnPointerLoadFileOffset == 0x81F741
     && CharacterNPCInteractionNativeLayout.QwordReaderFileOffset == 0x356F80
-    && CharacterNPCInteractionNativeLayout.FirstQwordFieldOffset == 0x28);
+    && CharacterNPCInteractionNativeLayout.FirstQwordFieldOffset == 0x28
+    && CharacterNPCInteractionNativeLayout.FirstQwordFieldSize == 0x08
+    && CharacterNPCInteractionNativeLayout.ConstructorInitializedEndOffsetExclusive == 0x30
+    && CharacterNPCInteractionNativeLayout.ParserBodyReadEndOffsetExclusive == 0x30
+    && CharacterNPCInteractionNativeLayout.ConsumerStateBufferOffset == 0x30
+    && CharacterNPCInteractionNativeLayout.ConsumerStateBufferByteCount == 0x20
+    && CharacterNPCInteractionNativeLayout.ConsumerStateBufferEndOffsetExclusive == 0x50
+    && CharacterNPCInteractionNativeLayout.VtableWriterMethodVirtualAddress == 0x9EF950
+    && CharacterNPCInteractionNativeLayout.VtableWriterFileOffset == 0x5EED50
+    && CharacterNPCInteractionNativeLayout.VtableReaderMethodVirtualAddress == 0x9EF8E0
+    && CharacterNPCInteractionNativeLayout.VtableReaderFileOffset == 0x5EECE0
+    && CharacterNPCInteractionNativeLayout.VtableDeletingDestructorMethodVirtualAddress == 0x9272E0
+    && CharacterNPCInteractionNativeLayout.VtableDeletingDestructorFileOffset == 0x5266E0);
 Check("Character receiver behavior model preserves selector slots and observed application paths",
     CharacterAbilityApplicationNativeLayout.ReceiverRttiName == ".?AVtfGameProtocolHandler@@"
     && CharacterAbilityApplicationNativeLayout.ReceiverConstructorFileOffset == 0xAC8CA0
@@ -2080,8 +2094,16 @@ Check("Character receiver behavior model preserves selector slots and observed a
     && CharacterAbilityApplicationNativeLayout.AbilityCooldownsChatProcessorFileOffset == 0x6E2590
     && CharacterAbilityApplicationNativeLayout.AbilityCooldownsObservedOptionalBranchOffset == 0x14
     && CharacterAbilityApplicationNativeLayout.AbilityCooldownsObservedOptionalDataOffset == 0x18
+    && CharacterAbilityApplicationNativeLayout.NpcInteractionMessagePointerLoadFileOffset == 0xACE2B8
+    && CharacterAbilityApplicationNativeLayout.NpcInteractionMessageKeyOffset == 0x28
+    && CharacterAbilityApplicationNativeLayout.NpcInteractionMessageStateOffset == 0x30
+    && CharacterAbilityApplicationNativeLayout.NpcInteractionApplicationHelperCallFileOffset == 0xACE2CC
+    && CharacterAbilityApplicationNativeLayout.NpcInteractionMessageStateArgumentLoadFileOffset == 0x4C927E
+    && CharacterAbilityApplicationNativeLayout.NpcInteractionMessageStateArgumentPushFileOffset == 0x4C92B9
+    && CharacterAbilityApplicationNativeLayout.NpcInteractionMessageStateSwapCallFileOffset == 0x4C92BD
     && CharacterAbilityApplicationNativeLayout.NpcInteractionOwnerMapOffset == 0x4338
     && CharacterAbilityApplicationNativeLayout.NpcInteractionMessageStateSwapByteCount == 0x20
+    && CharacterAbilityApplicationNativeLayout.NpcInteractionMessageStateEndOffsetExclusive == 0x50
     && CharacterAbilityApplicationNativeLayout.NpcInteractionNumericApplicationEventCode == 356
     && CharacterAbilityApplicationNativeLayout.NpcInteractionEventPayloadTag == 5);
 Check("OpenMovieDialog selector 0x78 records its shared text field",

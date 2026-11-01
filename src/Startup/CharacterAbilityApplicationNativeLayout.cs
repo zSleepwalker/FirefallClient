@@ -55,12 +55,19 @@ public static class CharacterAbilityApplicationNativeLayout
     public const uint NpcInteractionRootAccessorFileOffset = 0x49DDD0;
     public const uint NpcInteractionSingletonAccessorFileOffset = 0x49DCC0;
     public const int NpcInteractionRootStatePointerOffset = 0x4D20;
+    public const uint NpcInteractionMessagePointerLoadFileOffset = 0xACE2B8;
     public const int NpcInteractionMessageKeyOffset = 0x28;
     public const int NpcInteractionMessageStateOffset = 0x30;
     public const uint NpcInteractionApplicationHelperFileOffset = 0x4C9250;
+    public const uint NpcInteractionApplicationHelperCallFileOffset = 0xACE2CC;
+    public const uint NpcInteractionMessageStateArgumentLoadFileOffset = 0x4C927E;
+    public const uint NpcInteractionMessageStateArgumentPushFileOffset = 0x4C92B9;
+    public const uint NpcInteractionMessageStateSwapCallFileOffset = 0x4C92BD;
     public const int NpcInteractionOwnerMapOffset = 0x4338;
     public const uint NpcInteractionMessageStateSwapHelperFileOffset = 0x51C9D0;
     public const int NpcInteractionMessageStateSwapByteCount = 0x20;
+    public const int NpcInteractionMessageStateEndOffsetExclusive =
+        NpcInteractionMessageStateOffset + NpcInteractionMessageStateSwapByteCount;
     public const uint NpcInteractionEventPayloadHelperFileOffset = 0xC245A0;
     public const int NpcInteractionNumericApplicationEventCode = 356;
     public const int NpcInteractionEventPayloadTag = 5;

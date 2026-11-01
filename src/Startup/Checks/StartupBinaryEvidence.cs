@@ -39,7 +39,8 @@ internal static class StartupBinaryEvidence
         var sections = Enumerable.Range(0, sectionCount).Select(i =>
         {
             long offset = peOffset + 24 + optionalHeaderSize + i * 40;
-            return (Rva: ReadUInt32(offset + 12), RawSize: ReadUInt32(offset + 16),
+            return (Name: Encoding.ASCII.GetString(ReadAt(offset, 8)).TrimEnd('\0'),
+                Rva: ReadUInt32(offset + 12), RawSize: ReadUInt32(offset + 16),
                 RawOffset: ReadUInt32(offset + 20));
         }).ToArray();
         long VirtualAddressToFileOffset(uint address)
@@ -80,6 +81,29 @@ internal static class StartupBinaryEvidence
                     && (long)offset + i + 5 + BinaryPrimitives.ReadInt32LittleEndian(bytes.AsSpan(i + 1)) == target)
                     return true;
             return false;
+        }
+        IReadOnlyDictionary<uint, IReadOnlyList<long>> RelativeCallSites(params uint[] targets)
+        {
+            var matches = targets.ToDictionary(
+                target => target,
+                _ => (IReadOnlyList<long>)new List<long>());
+            var mutableMatches = matches.ToDictionary(
+                pair => pair.Key,
+                pair => (List<long>)pair.Value);
+            var text = sections.Single(section => section.Name == ".text");
+            byte[] textBytes = ReadAt(text.RawOffset, checked((int)text.RawSize));
+            for (int i = 0; i <= textBytes.Length - 5; i++)
+            {
+                if (textBytes[i] != 0xE8)
+                    continue;
+
+                long target = (long)text.RawOffset + i + 5
+                    + BinaryPrimitives.ReadInt32LittleEndian(textBytes.AsSpan(i + 1));
+                if (target >= 0 && target <= uint.MaxValue
+                    && mutableMatches.TryGetValue((uint)target, out var callSites))
+                    callSites.Add((long)text.RawOffset + i);
+            }
+            return matches;
         }
         string VtableRttiName(uint vtableVa, int maximumNameLength = 40)
         {
@@ -2284,6 +2308,12 @@ internal static class StartupBinaryEvidence
             && Matches(CharacterAbilityCooldownsNativeLayout.BodyReaderFileOffset + 0x0A, "83C128")
             && VtableRttiName(CharacterAbilityCooldownsNativeLayout.VtableVirtualAddress, 80)
                 == CharacterAbilityCooldownsNativeLayout.RttiName);
+        var npcInteractionCallSites = RelativeCallSites(
+            CharacterNPCInteractionNativeLayout.ConstructorFileOffset,
+            CharacterNPCInteractionNativeLayout.BaseConstructorHelperFileOffset,
+            CharacterAbilityApplicationNativeLayout.NpcInteractionApplicationHelperFileOffset,
+            CharacterAbilityApplicationNativeLayout.NpcInteractionMessageStateSwapHelperFileOffset,
+            CharacterAbilityApplicationNativeLayout.NpcInteractionHandlerFileOffset);
         check("Binary inner selector 0x77 routes NPCInteraction through the shared raw QWORD reader",
             ReadUInt32(VirtualAddressToFileOffset(
                 CharacterNPCInteractionNativeLayout.InnerSelectorTableVirtualAddress)
@@ -2298,6 +2328,7 @@ internal static class StartupBinaryEvidence
             && Matches(CharacterNPCInteractionNativeLayout.AllocationFailureContinuationFileOffset, "33F6")
             && RelativeBranchTargets(CharacterNPCInteractionNativeLayout.ConstructorCallSiteFileOffset,
                 0xE8, CharacterNPCInteractionNativeLayout.ConstructorFileOffset)
+            && Matches(CharacterNPCInteractionNativeLayout.ConstructorCallSiteFileOffset + 5, "8BF0")
             && RelativeBranchTargets(CharacterNPCInteractionNativeLayout.BodyReaderCallSiteFileOffset,
                 0xE9, CharacterNPCInteractionNativeLayout.BodyReaderFileOffset)
             && Matches(CharacterNPCInteractionNativeLayout.ConstructorFileOffset + 0x12,
@@ -2310,12 +2341,51 @@ internal static class StartupBinaryEvidence
                 "C7462800000000")
             && Matches(CharacterNPCInteractionNativeLayout.ConstructorFileOffset + 0x2C,
                 "C7462C00000000")
+            && Matches(CharacterNPCInteractionNativeLayout.BaseConstructorHelperFileOffset + 0x34,
+                "C7462000000000")
+            && Matches(CharacterNPCInteractionNativeLayout.BaseConstructorHelperFileOffset + 0x3B,
+                "C7462400000000")
             && Matches(CharacterNPCInteractionNativeLayout.BodyReaderFileOffset,
                 "8D4628C7442420FFFFFFFF508BCF")
-            && RelativeBranchTargets(CharacterNPCInteractionNativeLayout.BodyReaderFileOffset + 0x0E,
+            && RelativeBranchTargets(CharacterNPCInteractionNativeLayout.BodyReaderQwordCallSiteFileOffset,
                 0xE8, CharacterNPCInteractionNativeLayout.QwordReaderFileOffset)
+            && Matches(CharacterNPCInteractionNativeLayout.BodyReaderReturnPointerLoadFileOffset, "8BC6")
+            && CharacterNPCInteractionNativeLayout.ConstructorInitializedEndOffsetExclusive
+                == CharacterNPCInteractionNativeLayout.AllocationSize
+            && CharacterNPCInteractionNativeLayout.ParserBodyReadEndOffsetExclusive
+                == CharacterNPCInteractionNativeLayout.AllocationSize
+            && npcInteractionCallSites[CharacterNPCInteractionNativeLayout.ConstructorFileOffset]
+                .SequenceEqual(new long[] { CharacterNPCInteractionNativeLayout.ConstructorCallSiteFileOffset })
+            && npcInteractionCallSites[CharacterNPCInteractionNativeLayout.BaseConstructorHelperFileOffset]
+                .SequenceEqual(new long[]
+                {
+                    CharacterNPCInteractionNativeLayout.ConstructorFileOffset + 0x18
+                })
             && VtableRttiName(CharacterNPCInteractionNativeLayout.VtableVirtualAddress, 80)
                 == CharacterNPCInteractionNativeLayout.RttiName);
+        check("Binary NPCInteraction vtable and generic stream methods expose only the raw QWORD at +0x28",
+            ReadUInt32(VirtualAddressToFileOffset(CharacterNPCInteractionNativeLayout.VtableVirtualAddress)
+                + CharacterNPCInteractionNativeLayout.VtableWriterSlotOffset)
+                == CharacterNPCInteractionNativeLayout.VtableWriterMethodVirtualAddress
+            && ReadUInt32(VirtualAddressToFileOffset(CharacterNPCInteractionNativeLayout.VtableVirtualAddress)
+                + CharacterNPCInteractionNativeLayout.VtableReaderSlotOffset)
+                == CharacterNPCInteractionNativeLayout.VtableReaderMethodVirtualAddress
+            && ReadUInt32(VirtualAddressToFileOffset(CharacterNPCInteractionNativeLayout.VtableVirtualAddress)
+                + CharacterNPCInteractionNativeLayout.VtableDeletingDestructorSlotOffset)
+                == CharacterNPCInteractionNativeLayout.VtableDeletingDestructorMethodVirtualAddress
+            && VirtualAddressToFileOffset(CharacterNPCInteractionNativeLayout.VtableWriterMethodVirtualAddress)
+                == CharacterNPCInteractionNativeLayout.VtableWriterFileOffset
+            && VirtualAddressToFileOffset(CharacterNPCInteractionNativeLayout.VtableReaderMethodVirtualAddress)
+                == CharacterNPCInteractionNativeLayout.VtableReaderFileOffset
+            && VirtualAddressToFileOffset(
+                CharacterNPCInteractionNativeLayout.VtableDeletingDestructorMethodVirtualAddress)
+                == CharacterNPCInteractionNativeLayout.VtableDeletingDestructorFileOffset
+            && Matches(CharacterNPCInteractionNativeLayout.VtableWriterFileOffset, "558BEC8D41288B4D0850E8")
+            && RelativeBranchTargets(CharacterNPCInteractionNativeLayout.VtableWriterFileOffset + 0x0A,
+                0xE8, 0x325BE0)
+            && Matches(CharacterNPCInteractionNativeLayout.VtableReaderFileOffset, "558BEC8D41288B4D0850E8")
+            && RelativeBranchTargets(CharacterNPCInteractionNativeLayout.VtableReaderFileOffset + 0x0A,
+                0xE8, CharacterNPCInteractionNativeLayout.QwordReaderFileOffset));
         check("Binary inner selector 0x78 routes OpenMovieDialog through the shared text reader",
             ReadUInt32(VirtualAddressToFileOffset(
                 CharacterOpenMovieDialogNativeLayout.InnerSelectorTableVirtualAddress)
@@ -4506,15 +4576,31 @@ internal static class StartupBinaryEvidence
             RelativeBranchTargets(0xACE2A6, 0xE8,
                 CharacterAbilityApplicationNativeLayout.NpcInteractionRootAccessorFileOffset)
             && Matches(0xACE2AB, "85C0742283B8204D0000007419")
+            && Matches(CharacterAbilityApplicationNativeLayout.NpcInteractionMessagePointerLoadFileOffset,
+                "8B4508FF702CFF702883C03050")
             && Matches(0xACE2BB, "FF702CFF702883C03050")
             && RelativeBranchTargets(0xACE2C5, 0xE8,
                 CharacterAbilityApplicationNativeLayout.NpcInteractionSingletonAccessorFileOffset)
-            && RelativeBranchTargets(0xACE2CC, 0xE8,
+            && RelativeBranchTargets(
+                CharacterAbilityApplicationNativeLayout.NpcInteractionApplicationHelperCallFileOffset, 0xE8,
                 CharacterAbilityApplicationNativeLayout.NpcInteractionApplicationHelperFileOffset)
             && Matches(0x4C9285, "8DB938430000")
             && RelativeBranchTargets(0x4C9291, 0xE8, 0x4E3490)
-            && RelativeBranchTargets(0x4C92BD, 0xE8,
+            && Matches(CharacterAbilityApplicationNativeLayout.NpcInteractionMessageStateArgumentLoadFileOffset,
+                "8B5D08")
+            && Matches(CharacterAbilityApplicationNativeLayout.NpcInteractionMessageStateArgumentPushFileOffset,
+                "538D4E14")
+            && RelativeBranchTargets(
+                CharacterAbilityApplicationNativeLayout.NpcInteractionMessageStateSwapCallFileOffset, 0xE8,
                 CharacterAbilityApplicationNativeLayout.NpcInteractionMessageStateSwapHelperFileOffset)
+            && CharacterAbilityApplicationNativeLayout.NpcInteractionMessageStateOffset
+                == CharacterNPCInteractionNativeLayout.ConsumerStateBufferOffset
+            && CharacterAbilityApplicationNativeLayout.NpcInteractionMessageStateSwapByteCount
+                == CharacterNPCInteractionNativeLayout.ConsumerStateBufferByteCount
+            && CharacterAbilityApplicationNativeLayout.NpcInteractionMessageStateEndOffsetExclusive
+                == CharacterNPCInteractionNativeLayout.ConsumerStateBufferEndOffsetExclusive
+            && CharacterNPCInteractionNativeLayout.ConsumerStateBufferOffset
+                == CharacterNPCInteractionNativeLayout.AllocationSize
             && Matches(CharacterAbilityApplicationNativeLayout.NpcInteractionMessageStateSwapHelperFileOffset,
                 "558BEC51568B7508578BF98B068B17890789168D56088B4F048B4604894704894E048D4F08E8A62EF0FF8D560C8D4F0CE89B2EF0FF")
             && Matches(CharacterAbilityApplicationNativeLayout.NpcInteractionMessageStateSwapHelperFileOffset + 0x35,
@@ -4526,6 +4612,43 @@ internal static class StartupBinaryEvidence
             && CharacterAbilityApplicationNativeLayout.UiManagerDispatchVtableSlotOffset == 0xAC
             && CharacterAbilityApplicationNativeLayout.NpcInteractionNumericApplicationEventCode == 356
             && CharacterAbilityApplicationNativeLayout.NpcInteractionEventPayloadTag == 5);
+        var npcInteractionDispatchCase = MatrixMessageParserFlowNativeLayout.MessageDispatchVtableCases
+            .Single(messageCase => messageCase.MessageDiscriminator == 0x77);
+        check("Binary selector 0x77 forwards the same parsed object pointer through the virtual receiver",
+            Matches(MatrixMessageParserFlowNativeLayout.CallbackContextProtocolMessagePointerLoadFileOffset,
+                "8B1F")
+            && Matches(MatrixMessageParserFlowNativeLayout.CallbackContextProtocolMessageDispatchCallFileOffset - 1,
+                "53")
+            && RelativeBranchTargets(
+                MatrixMessageParserFlowNativeLayout.CallbackContextProtocolMessageDispatchCallFileOffset,
+                0xE8,
+                MatrixMessageParserFlowNativeLayout.CallbackContextMessageConsumerFileOffset)
+            && Matches(MatrixMessageParserFlowNativeLayout.MessageDispatcherArgumentLoadFileOffset,
+                "8B7D088BF1")
+            && Matches(npcInteractionDispatchCase.SwitchTargetFileOffset + 0x1A,
+                "8B068BCE57FF9060010000")
+            && npcInteractionDispatchCase.VtableSlotOffset == 0x160
+            && MatrixMessageParserFlowNativeLayout.NpcInteractionDispatchMessageArgumentPushFileOffset
+                == npcInteractionDispatchCase.SwitchTargetFileOffset + 0x1E
+            && Matches(MatrixMessageParserFlowNativeLayout.NpcInteractionDispatchMessageArgumentPushFileOffset,
+                "57")
+            && CharacterAbilityApplicationNativeLayout.NpcInteractionMessagePointerLoadFileOffset == 0xACE2B8
+            && npcInteractionCallSites[CharacterNPCInteractionNativeLayout.ConstructorFileOffset]
+                .SequenceEqual(new long[] { CharacterNPCInteractionNativeLayout.ConstructorCallSiteFileOffset })
+            && npcInteractionCallSites[
+                CharacterAbilityApplicationNativeLayout.NpcInteractionApplicationHelperFileOffset]
+                .SequenceEqual(new long[]
+                {
+                    CharacterAbilityApplicationNativeLayout.NpcInteractionApplicationHelperCallFileOffset
+                })
+            && npcInteractionCallSites[
+                CharacterAbilityApplicationNativeLayout.NpcInteractionMessageStateSwapHelperFileOffset]
+                .SequenceEqual(new long[]
+                {
+                    CharacterAbilityApplicationNativeLayout.NpcInteractionMessageStateSwapCallFileOffset
+                })
+            && npcInteractionCallSites[CharacterAbilityApplicationNativeLayout.NpcInteractionHandlerFileOffset]
+                .Count == 0);
         var privateDialogDispatchCase = MatrixMessageParserFlowNativeLayout.MessageDispatchVtableCases
             .Single(messageCase => messageCase.MessageDiscriminator == 0x79);
         var privateDialogReceiverSlot = messageReceiverVtable.DialogSlots

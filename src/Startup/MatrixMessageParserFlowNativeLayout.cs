@@ -109,6 +109,7 @@ public static class MatrixMessageParserFlowNativeLayout
     public const uint CallbackResultConsumerContextDispatchOtherFileOffset = 0xBD6710;
     public const uint CallbackResultReferenceDecrementFileOffset = 0xBD6721;
     public const uint CallbackResultFinalReleaseCallFileOffset = 0xBD6733;
+    public const uint NpcInteractionDispatchMessageArgumentPushFileOffset = 0x81CA2B;
     public const uint CallbackResultQueueRecordCopyFileOffset = 0xBD8BE3;
     public const uint ReplayReaderContextPointerStoreFileOffset = 0x65DB75;
     public const int CallbackResultQueueFieldOffset = 0xB4;
@@ -145,6 +146,7 @@ public static class MatrixMessageParserFlowNativeLayout
     public const uint CallbackContextProtocolMessagePointerLoadFileOffset = 0x7FDC6E;
     public const uint CallbackContextProtocolMessageDispatchCallFileOffset = 0x7FDD4F;
     public const uint CallbackContextMessageSelectorSwitchFileOffset = 0x81BBBA;
+    public const uint MessageDispatcherArgumentLoadFileOffset = 0x81BB95;
     public const uint CallbackContextMessageSelectorTableVirtualAddress = 0xC1D6DC;
     public const uint CallbackContextMessageSelectorTableFileOffset = 0x81CADC;
     public const int CallbackContextMessageSelectorFirstDiscriminator = 0x20;

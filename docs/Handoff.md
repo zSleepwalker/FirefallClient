@@ -127,9 +127,15 @@
   and calls chat processing; `0x77` gates on the LookingGlass state, updates a
   QWORD-keyed record, swaps `0x20` bytes from message `+0x30`, and dispatches
   numeric UI code `356`. No names are assigned to those codes. `0x75`/`0x76`
-  wire-state semantics remain incomplete. For `0x77`, the reader's `0x30`-byte
-  allocation ends exactly where the receiver's `0x20`-byte transfer begins;
-  that extent conflict and its runtime consequence are unresolved.
+  wire-state semantics remain incomplete. For `0x77`, the parser request and
+  constructor/reader writes end at exclusive `+0x30`; the same parsed pointer
+  reaches the receiver unchanged, which swaps `0x20` bytes at `[+0x30,+0x50)`.
+  The class's virtual stream reader/writer also handle only the QWORD at
+  `+0x28`; the original `.text` scan found one direct constructor call and one
+  direct call each to `0x4C9250` and `0x51C9D0`, with no parser body transform.
+  This does not exclude an untraced indirect entry. Requested size is not
+  actual runtime capacity: slack/ownership and runtime consequences remain
+  unresolved. See `docs/MatrixConnection.md`.
   Evidence is in `docs/MatrixConnection.md` and
   `src/Startup/CharacterAbilityApplicationNativeLayout.cs`.
 - The dynamic listener path is traced through `0xBF9C40` to `0xC38400`, which
@@ -1266,9 +1272,12 @@ These updates supersede older next-step suggestions below where they overlap.
   cooldown timing remain unknown.
   Selector0x77 constructs `NPCInteraction` and reads one raw QWORD at +0x28;
   its receiver uses it as a two-DWORD map key and dispatches numeric UI code
-  356, with no event name assigned. The receiver's 0x20-byte transfer from
-  +0x30 begins beyond the parser's 0x30-byte allocation; storage and runtime
-  consequence remain unknown.
+  356, with no event name assigned. The parser requests 0x30 bytes and writes
+  only through exclusive +0x30, while the unchanged object pointer reaches a
+  consumer that swaps 0x20 bytes at [+0x30,+0x50). Its vtable reader/writer
+  also touch only +0x28; no alternative direct constructor/callsite or body
+  transform explains the consumer state. An untraced indirect entry is not
+  excluded. Actual block extent and runtime consequences remain unknown.
   Selector0x78 constructs `OpenMovieDialog` and passes input through the shared NUL-terminated text reader at +0x28; field meaning and allocation-failure consequence remain unknown.
   Selector0x79 constructs `PrivateDialog` and reads DWORD +0x28, QWORD +0x30, and DWORD +0x38; this ends at +0x3C despite a +0x40 request, while the same parsed pointer reaches event-229 handling that reads through +0x48. The actual allocator block extent remains unresolved.
   Selector0x7A constructs `PublicDialog` and reads DWORDs +0x28/+0x2C; field meanings and allocation-failure consequence remain unknown.

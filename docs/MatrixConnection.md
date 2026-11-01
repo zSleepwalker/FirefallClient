@@ -2011,16 +2011,23 @@ failure consequences remain unresolved.
 ### Selector 0x77: `NPCInteraction`
 
 Entry36 maps selector `0x77` to VA `0xC1E33C` / raw case `0x81D73C`. It
-allocates `0x30` bytes, stores local DWORD `0x7F` (role unknown), and calls
-constructor `0x5266A0`. The constructor passes selector `0x77` to helper
-`0x5A1430`, installs vtable VA `0x1C67048` (RTTI
+requests `0x30` bytes, stores local DWORD `0x7F` (role unknown), and calls
+constructor `0x5266A0` at raw `0x81D761`. The constructor passes selector
+`0x77` to base helper `0x5A1430`, installs vtable VA `0x1C67048` (RTTI
 `firefall::Character::NPCInteraction`), and zero-initializes DWORDs at
-`+0x28` and `+0x2C`.
+`+0x28` and `+0x2C`. The base helper's last object stores are at `+0x20` and
+`+0x24`; together, base plus derived construction writes through exclusive
+`+0x30`. This describes observed writes, not allocator capacity.
 
 The success path jumps to shared reader setup at raw `0x81F72E`, which reads
-one raw QWORD into `+0x28` via `0x356F80`; the reader copies eight bytes and
-advances the input stream by eight. The allocation-failure branch reaches
-`0x81F72C`, zeroes ESI, and joins that setup. The resulting failure-path
+one raw QWORD into `+0x28` via `0x356F80`; it copies eight bytes and advances
+the input stream by eight, ending at exclusive `+0x30`. The parser carries
+the constructor's EAX pointer in ESI (`0x81D766`), passes `ESI+0x28` to the
+reader, then restores EAX from ESI at `0x81F741`; no conversion or write past
+the QWORD is visible. The object's vtable writer (`0x5EED50`) and virtual
+reader (`0x5EECE0`) likewise serialize/deserialize only the raw QWORD at
+`+0x28`; neither populates `+0x30`. The allocation-failure branch reaches
+`0x81F72C`, zeroes ESI, and joins the same setup. The resulting failure-path
 address calculation is recorded as observed; its runtime consequence and the
 QWORD's field meanings remain unknown.
 
@@ -2086,12 +2093,37 @@ dialog slots already verified at `0x78`–`0x7A`.
   through `uiManager` slot `+0xAC`. Neither the QWORD's identity nor code
   `356`'s event name is established.
 
-   **Extent caveat:** the selector `0x77` parser allocates `0x30` bytes and
-   writes a QWORD ending at `+0x30`; the receiver then passes `+0x30` to a
-   helper that swaps `0x20` bytes there. Those trailing bytes are outside the
-   recorded allocation and are not written by the parser. The native access is
-   confirmed, but its storage/ownership explanation and runtime consequence
-   remain unresolved.
+The nested parser returns its ESI object pointer in EAX; its known direct
+callers (`0x821BA0` and `0x821DE0`) return that result, and the registered
+callback path queues the returned pointer value. The message pointer is not
+replaced on the receiving path: callback dispatch loads it from `[EDI]` at
+raw `0x7FDC6E`, pushes that value into `0x81BB90` at `0x7FDD4F`, and
+`0x81BB90` loads its argument into EDI at `0x81BB95`. The selector-`0x77` case
+pushes that same EDI value at `0x81CA2B` before the virtual call through
+receiver slot `+0x160` (`0x81CA2C`). The receiver's vtable pointer at VA
+`0x1C71EC0` / raw `.rdata` `0x1870AC0` has
+`0xECEEA0` in that slot, mapping to handler raw `0xACE2A0`. The handler loads
+its message argument from `[EBP+8]`, pushes its DWORDs at `+0x2C` and `+0x28`,
+and passes the same message address plus `0x30` to `0x4C9250`.
+
+**Extent caveat (unresolved):** selector `0x77` requests `0x30` bytes and its
+constructor plus parser reader write only through exclusive `+0x30`. The
+receiver passes the one-past-requested pointer `message+0x30` to
+`0x4C9250`; at `0x4C927E` it loads that first argument into EBX and at
+`0x4C92B9` pushes the same EBX while setting ECX to map-record `+0x14`, then
+calls `0x51C9D0`. That function swaps `0x20` bytes with map-record state,
+covering message offsets `[+0x30,+0x50)`. Those bytes are not populated by
+either the selector body reader or the class's virtual stream reader. A
+direct-call scan of the requested original's `.text` finds one constructor
+call (raw `0x81D761`), one call to `0x4C9250` (raw `0xACE2CC`), and one call to
+`0x51C9D0` (raw `0x4C92BD`); IDA xrefs also connect the latter two only through
+this handler/helper pair. The generic `NPCInteraction` writer and reader
+touch only `+0x28`. No alternative producer or field-transforming parser path
+was found in the analyzed route; this does not exclude an untraced indirect entry.
+These facts establish a producer/consumer extent contradiction, not the
+runtime allocation extent: the allocator may return slack, but actual block
+capacity/ownership and the resulting runtime consequence remain unknown. Do
+not equate the `0x30` request with actual block capacity.
 
 ### Selector 0x78: `OpenMovieDialog`
 
