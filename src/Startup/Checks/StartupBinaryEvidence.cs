@@ -4394,6 +4394,48 @@ internal static class StartupBinaryEvidence
                 0x4D6C10)
             && Matches(MatrixMessageParserFlowNativeLayout.PublicDialogEventCodeFileOffset,
                 "68650100008B01FF90AC000000"));
+        var privateDialogDispatchCase = MatrixMessageParserFlowNativeLayout.MessageDispatchVtableCases
+            .Single(messageCase => messageCase.MessageDiscriminator == 0x79);
+        var privateDialogReceiverSlot = messageReceiverVtable.DialogSlots
+            .Single(receiverSlot => receiverSlot.MessageDiscriminator == 0x79);
+        check("Binary selector 0x79 forwards the parsed object to its receiver without reconciling its field extents",
+            ReadUInt32(VirtualAddressToFileOffset(
+                MatrixMessageParserFlowNativeLayout.CallbackContextMessageSelectorTableVirtualAddress)
+                + 4L * (privateDialogDispatchCase.MessageDiscriminator
+                    - MatrixMessageParserFlowNativeLayout.CallbackContextMessageSelectorFirstDiscriminator))
+                == privateDialogDispatchCase.SwitchTargetVirtualAddress
+            && Matches(MatrixMessageParserFlowNativeLayout.CallbackContextProtocolMessagePointerLoadFileOffset,
+                "8B1F")
+            && Matches(MatrixMessageParserFlowNativeLayout.CallbackContextProtocolMessageDispatchCallFileOffset - 1,
+                "53")
+            && RelativeBranchTargets(
+                MatrixMessageParserFlowNativeLayout.CallbackContextProtocolMessageDispatchCallFileOffset,
+                0xE8,
+                MatrixMessageParserFlowNativeLayout.CallbackContextMessageConsumerFileOffset)
+            && Matches(MatrixMessageParserFlowNativeLayout.CallbackContextMessageConsumerFileOffset + 5,
+                "8B7D088BF1")
+            && Matches(privateDialogDispatchCase.SwitchTargetFileOffset + 0x1A,
+                "8B068BCE57FF9068010000")
+            && privateDialogDispatchCase.VtableSlotOffset == privateDialogReceiverSlot.VtableSlotOffset
+            && privateDialogReceiverSlot.VtableSlotOffset == 0x168
+            && ReadUInt32(VirtualAddressToFileOffset(messageReceiverVtable.VtableVirtualAddress)
+                + privateDialogReceiverSlot.VtableSlotOffset)
+                == privateDialogReceiverSlot.MethodVirtualAddress
+            && VirtualAddressToFileOffset(privateDialogReceiverSlot.MethodVirtualAddress)
+                == privateDialogReceiverSlot.MethodFileOffset
+            && privateDialogReceiverSlot.TailJumpTargetFileOffset is uint privateDialogTailTarget
+            && RelativeBranchTargets(
+                privateDialogReceiverSlot.MethodFileOffset, 0xE9, privateDialogTailTarget)
+            && Matches(DialogApplicationDispatchNativeLayout.PrivateDialogVendorFieldCallFileOffset - 0xC,
+                "FF7640")
+            && Matches(DialogApplicationDispatchNativeLayout.PrivateDialogCodeFieldCallFileOffset - 0x26,
+                "8B4644")
+            && CharacterPrivateDialogNativeLayout.AllocationSize == 0x40
+            && CharacterPrivateDialogNativeLayout.ParserBodyReadEndOffsetExclusive == 0x3C
+            && DialogApplicationDispatchNativeLayout.PrivateDialogVendorIdOffset
+                == CharacterPrivateDialogNativeLayout.AllocationSize
+            && DialogApplicationDispatchNativeLayout.PrivateDialogReceiverFixedExtentEndOffsetExclusive
+                == 0x48);
         check("Binary dialog-message primary vftables point to stream writers, stream readers, and deleting destructors",
             MatrixMessageParserFlowNativeLayout.DialogMessageVtables.All(vtable =>
                 vtable.PrimarySlots.All(slot =>

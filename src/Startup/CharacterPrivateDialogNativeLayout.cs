@@ -1,7 +1,7 @@
 namespace Firefall.Reconstruction.Startup;
 
 /// <summary>
-/// Selector-0x79 raw field layout. Field meanings remain unknown.
+/// Selector-0x79 parser allocation and raw body-reader layout.
 /// </summary>
 public static class CharacterPrivateDialogNativeLayout
 {
@@ -29,4 +29,5 @@ public static class CharacterPrivateDialogNativeLayout
     public const int FirstDwordFieldOffset = 0x28;
     public const int QwordFieldOffset = 0x30;
     public const int SecondDwordFieldOffset = 0x38;
+    public const int ParserBodyReadEndOffsetExclusive = SecondDwordFieldOffset + 4;
 }

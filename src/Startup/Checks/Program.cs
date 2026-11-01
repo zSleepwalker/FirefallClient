@@ -2075,7 +2075,7 @@ Check("OpenMovieDialog selector 0x78 records its shared text field",
     && CharacterOpenMovieDialogNativeLayout.BodyReaderSetupFileOffset == 0x81FB27
     && CharacterOpenMovieDialogNativeLayout.BodyReaderFileOffset == 0x12EE010
     && CharacterOpenMovieDialogNativeLayout.FirstTextFieldOffset == 0x28);
-Check("PrivateDialog selector 0x79 records its DWORD/QWORD/DWORD reader fields",
+Check("PrivateDialog selector 0x79 records its parser-side DWORD/QWORD/DWORD reader fields",
     CharacterPrivateDialogNativeLayout.InnerSelector == 0x79
     && CharacterPrivateDialogNativeLayout.InnerSelectorTableEntryOffset == 0x98
     && CharacterPrivateDialogNativeLayout.CaseVirtualAddress == 0xC1E39E
@@ -2090,7 +2090,27 @@ Check("PrivateDialog selector 0x79 records its DWORD/QWORD/DWORD reader fields",
     && CharacterPrivateDialogNativeLayout.QwordReaderFileOffset == 0x356F80
     && CharacterPrivateDialogNativeLayout.FirstDwordFieldOffset == 0x28
     && CharacterPrivateDialogNativeLayout.QwordFieldOffset == 0x30
-    && CharacterPrivateDialogNativeLayout.SecondDwordFieldOffset == 0x38);
+    && CharacterPrivateDialogNativeLayout.SecondDwordFieldOffset == 0x38
+    && CharacterPrivateDialogNativeLayout.ParserBodyReadEndOffsetExclusive == 0x3C);
+Check("PrivateDialog parser allocation and application receiver extents remain explicitly inconsistent",
+    CharacterPrivateDialogNativeLayout.AllocationSize == 0x40
+    && CharacterPrivateDialogNativeLayout.ParserBodyReadEndOffsetExclusive == 0x3C
+    && DialogApplicationDispatchNativeLayout.PrivateDialogVendorIdOffset == 0x40
+    && DialogApplicationDispatchNativeLayout.PrivateDialogCodePointerOffset == 0x44
+    && DialogApplicationDispatchNativeLayout.PrivateDialogCodePointerWidth == 4
+    && DialogApplicationDispatchNativeLayout.PrivateDialogReceiverFixedExtentEndOffsetExclusive == 0x48
+    && DialogApplicationDispatchNativeLayout.PrivateDialogVendorIdOffset
+        >= CharacterPrivateDialogNativeLayout.AllocationSize
+    && DialogApplicationDispatchNativeLayout.PrivateDialogReceiverFixedExtentEndOffsetExclusive
+        > CharacterPrivateDialogNativeLayout.AllocationSize
+    && MatrixMessageParserFlowNativeLayout.MessageDispatchVtableCases.Any(
+        messageCase => messageCase.MessageDiscriminator == 0x79
+            && messageCase.VtableSlotOffset == 0x168)
+    && MatrixMessageParserFlowNativeLayout.ReplayReaderMessageReceiver.DialogSlots.Any(
+        receiverSlot => receiverSlot.MessageDiscriminator == 0x79
+            && receiverSlot.VtableSlotOffset == 0x168
+            && receiverSlot.MethodFileOffset == 0xACE300
+            && receiverSlot.TailJumpTargetFileOffset == 0x991510));
 Check("PublicDialog selector 0x7A records two DWORD reader fields",
     CharacterPublicDialogNativeLayout.InnerSelector == 0x7A
     && CharacterPublicDialogNativeLayout.InnerSelectorTableEntryOffset == 0x9C
@@ -3253,6 +3273,8 @@ Check("ReplayReader message dispatch receiver and discriminator vtable cases rem
     && MatrixMessageParserFlowNativeLayout.CallbackContextMessageSelectorFirstDiscriminator == 0x20
     && MatrixMessageParserFlowNativeLayout.CallbackContextMessageSelectorLastDiscriminator == 0x7A
     && MatrixMessageParserFlowNativeLayout.CallbackContextMessageSelectorCaseCount == 0x5B
+    && MatrixMessageParserFlowNativeLayout.CallbackContextProtocolMessagePointerLoadFileOffset == 0x7FDC6E
+    && MatrixMessageParserFlowNativeLayout.CallbackContextProtocolMessageDispatchCallFileOffset == 0x7FDD4F
     && MatrixMessageParserFlowNativeLayout.ReplayReaderMessageRecipientGetterCallFileOffset == 0x65DB10
     && MatrixMessageParserFlowNativeLayout.ReplayReaderMessageRecipientFieldLoadFileOffset == 0x65DB38
     && MatrixMessageParserFlowNativeLayout.ReplayReaderMessageRecipientSourceFieldOffset == 0x78
@@ -3369,13 +3391,17 @@ Check("Dialog application event routes use the uiManager dispatcher and preserve
         new DialogApplicationPayloadFieldSnapshot(
             "success", 0x28, DialogApplicationPayloadValueKind.BooleanByte),
         new DialogApplicationPayloadFieldSnapshot(
-            "vendor_id", 0x40, DialogApplicationPayloadValueKind.Int32),
+            "vendor_id",
+            DialogApplicationDispatchNativeLayout.PrivateDialogVendorIdOffset,
+            DialogApplicationPayloadValueKind.Int32),
         new DialogApplicationPayloadFieldSnapshot(
             "product_id", 0x30, DialogApplicationPayloadValueKind.Int32Pair),
         new DialogApplicationPayloadFieldSnapshot(
             "price_id", 0x38, DialogApplicationPayloadValueKind.Int32Pair),
         new DialogApplicationPayloadFieldSnapshot(
-            "code", 0x44, DialogApplicationPayloadValueKind.NullTerminatedText)
+            "code",
+            DialogApplicationDispatchNativeLayout.PrivateDialogCodePointerOffset,
+            DialogApplicationPayloadValueKind.NullTerminatedText)
     ])
     && DialogApplicationDispatchNativeLayout.PublicDialogPreparedFields.SequenceEqual(
     [

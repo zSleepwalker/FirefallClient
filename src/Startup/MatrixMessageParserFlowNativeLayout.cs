@@ -142,6 +142,8 @@ public static class MatrixMessageParserFlowNativeLayout
     public const uint CallbackContextMessageConsumerFileOffset = 0x81BB90;
     public const uint CallbackContextConditionalDispatchFileOffset = 0xBD7060;
     public const int CallbackContextMessageDispatchReceiverFieldOffset = 8;
+    public const uint CallbackContextProtocolMessagePointerLoadFileOffset = 0x7FDC6E;
+    public const uint CallbackContextProtocolMessageDispatchCallFileOffset = 0x7FDD4F;
     public const uint CallbackContextMessageSelectorSwitchFileOffset = 0x81BBBA;
     public const uint CallbackContextMessageSelectorTableVirtualAddress = 0xC1D6DC;
     public const uint CallbackContextMessageSelectorTableFileOffset = 0x81CADC;

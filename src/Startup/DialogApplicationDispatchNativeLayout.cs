@@ -71,6 +71,11 @@ public static class DialogApplicationDispatchNativeLayout
     public const uint PrivateDialogEventCodeFileOffset = 0x99165B;
     public const int PrivateDialogEventCode = 229;
     public const string PrivateDialogCodeFallback = "PURCHASE_SUCCESSFUL";
+    public const int PrivateDialogVendorIdOffset = 0x40;
+    public const int PrivateDialogCodePointerOffset = 0x44;
+    public const int PrivateDialogCodePointerWidth = 4;
+    public const int PrivateDialogReceiverFixedExtentEndOffsetExclusive =
+        PrivateDialogCodePointerOffset + PrivateDialogCodePointerWidth;
 
     public const uint PublicDialogHandlerFileOffset = 0xACE390;
     public const uint PublicDialogContextFactoryCallFileOffset = 0xACE3A8;
@@ -144,7 +149,7 @@ public static class DialogApplicationDispatchNativeLayout
                 DialogApplicationPayloadValueKind.BooleanByte),
             new DialogApplicationPayloadFieldSnapshot(
                 "vendor_id",
-                0x40,
+                PrivateDialogVendorIdOffset,
                 DialogApplicationPayloadValueKind.Int32),
             new DialogApplicationPayloadFieldSnapshot(
                 "product_id",
@@ -156,7 +161,7 @@ public static class DialogApplicationDispatchNativeLayout
                 DialogApplicationPayloadValueKind.Int32Pair),
             new DialogApplicationPayloadFieldSnapshot(
                 "code",
-                0x44,
+                PrivateDialogCodePointerOffset,
                 DialogApplicationPayloadValueKind.NullTerminatedText)
         });
 

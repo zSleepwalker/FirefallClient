@@ -2012,8 +2012,50 @@ and `+0x34`.
 
 Reader `0x5EE900` reads a DWORD at `+0x28`, a raw QWORD at `+0x30`, and a
 DWORD at `+0x38`, using readers `0x3370A0`, `0x356F80`, and `0x3370A0`
-respectively. The allocation-failure branch zeroes ESI before reaching this
-reader; its runtime consequence and the fields' meanings remain unresolved.
+respectively; the last read ends at `+0x3C` (exclusive). The allocation-failure
+branch zeroes ESI before reaching this reader; its runtime consequence and the
+fields' meanings remain unresolved.
+
+The application-receiver route confirms a native extent disagreement rather
+than a pointer conversion. The selector case at raw `0x81D79E` requests
+`0x40` bytes from `0x12B7FB0`, constructs `PrivateDialog` with `0x526840`, and
+reads the body through `0x5EE900`. The registered parser returns its object
+pointer in EAX; the caller at `0x821BA0` returns that pointer unchanged, and
+the ReplayReader result queue stores and later dispatches that same pointer.
+In registered mode, `0x7FDC60` loads the queued pointer at `0x7FDC6E`, pushes
+it at `0x7FDD4E`, and calls `0x81BB90` at `0x7FDD4F`. The `0x79` case at raw
+`0x81CA63` pushes the same parser argument and calls receiver slot `+0x168`
+at `0x81CA82`. That `tfGameProtocolHandler` vtable slot contains VA
+`0xECEF00` (raw `.text` `0xACE300`), whose first instruction tail-jumps to
+`0x991510` (VA `0xD92110`). No message-object copy, field expansion, or
+adjustment appears on this route. The discriminator switch assigns distinct
+slots with `4 + 4*(id - 0x20)`; an exact-pointer scan of the requested original
+found the `0xECEF00` vtable target only once, at raw `.rdata` `0x1870C28`
+(slot `+0x168`). There is no evidence this thunk is shared by another
+discriminator in that receiver route.
+
+At `0x991510`, the handler reads `success` from `+0x28`, `product_id` from
+`+0x30/+0x34`, `price_id` from `+0x38/+0x3C`, `vendor_id` from `+0x40`, and a
+four-byte code-string pointer from `+0x44`; the pointed-to C string is external
+to the message object. Its fixed fields therefore extend through `+0x48`
+(exclusive), eight bytes beyond the parser's requested `0x40`. The parser's
+reader ends at `+0x3C`; it does not read the second price DWORD or either
+receiver field at `+0x40/+0x44`. The concrete constructor zeroes `+0x30` and
+`+0x34`; its base helper writes through `+0x24`. No observed constructor or
+reader store initializes `+0x3C`, `+0x40`, or `+0x44`. On a successful
+response with a null or empty code string, the handler passes the `+0x44` slot
+by reference to its fallback-string helper.
+
+The allocation helper forwards the requested size to backend `0x12C8A20`.
+For a `0x40` request, that allocator's small-block calculation uses an
+eight-byte header and a rounded `0x48` total chunk. When a selected free block
+has less than `0x10` bytes remaining, it keeps the whole block rather than
+splitting it; a returned payload can consequently have eight bytes of slack.
+The specific free block selected is runtime heap state, so this does not prove
+that this message has a `0x48`-byte payload area. Even if it does, the
+`+0x3C/+0x40/+0x44` contents are not serialized or initialized by the traced
+parser path. The parser/receiver mismatch remains unresolved; no larger
+`PrivateDialog` layout is inferred.
 
 ### Selector 0x7A: `PublicDialog`
 

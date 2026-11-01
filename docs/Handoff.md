@@ -14,7 +14,8 @@
   raw pointer `0x400`); `.rdata` maps with `+0x401400` (RVA `0x16C4000`,
   raw pointer `0x16C2C00`). Dispatcher and vtable pointers verify these
   mappings. The requested `FirefallClient.exe.original` SHA-256 is
-  `E0E8448393AC1CE05BE73E06F62DD70E3EFF3404CC2E7AAF3F04C79DEC0DE235`;
+  `E0E8448393AC1CE05BE73E06F62DD70E3EFF3404CC2E7AAF3F04C79DEC0DE235`
+  (40,197,848 bytes);
   it differs from the analyzed image in 13 bytes across four ranges, none of
   which overlap this batch's code/vtable evidence.
 - The 91 secondary-table entries (VA `0xC22630` / raw `0x821A30`) are mapped
@@ -78,7 +79,9 @@
   `0x78 OpenMovieDialog -> +0x164 -> 0xACE2E0`, `0x79 PrivateDialog ->
   +0x168 -> 0xACE300 -> tail-jump 0x991510`, and `0x7A PublicDialog ->
   +0x16C -> 0xACE390`. The OpenMovie path dispatches numeric application code
-  `228`; the other two dispatch `229` and `357`. The exact app endpoint is
+  `228`; the other two dispatch `229` and `357`. The `0xECEF00` vtable pointer
+  occurs only once in the requested original, at raw `.rdata` `0x1870C28`.
+  The exact app endpoint is
   `uiManager` global VA `0x1E002B8`, whose vtable slot `+0xAC` maps to
   `0xBF9D80`. That method indexes the dynamic event bucket at manager `+0x6F0`;
   names are allocated IDs by `0xBF9AB0` through the map at `+0x6E8` and name
@@ -86,13 +89,23 @@
   listener for `228/229/357` remain unresolved.
 - Recorded payload keys/fields: `228` passes `vendor_id` from message `+0x28`;
   `229` passes `success` (`+0x28` byte), `product_id` (`+0x30/+0x34`),
-  `price_id` (`+0x38/+0x3C`), `vendor_id` (`+0x40`), and `code` (`+0x44`,
-  with fallback value `PURCHASE_SUCCESSFUL`); `357` prepares `action_id`
-  (`+0x30`) and `activated` (`+0x84`) but passes null payload arguments.
+  `price_id` (`+0x38/+0x3C`), `vendor_id` (`+0x40`), and a code-string
+  pointer from `+0x44` (fallback value `PURCHASE_SUCCESSFUL`); `357` prepares
+  `action_id` (`+0x30`) and `activated` (`+0x84`) but passes null payload arguments.
   These strings are payload property keys/values, not event names.
   `ON_VENDOR_PURCHASE_RESPONSE` / `OnVendorPurchaseResponse` exists in local
   UI assets and consumes matching fields, but its registration-order-derived
-  ID is not proven to be `229`.
+  ID is not proven to be `229`; a fresh plain-text scan of `localassets` found
+  no additional registration string tying that name to numeric ID `229`.
+- Selector `0x79`'s parser requests `0x40` bytes, reads through `+0x3B`, and
+  returns the same object pointer to the `tfGameProtocolHandler` slot `+0x168`
+  (`0xACE300 -> 0x991510`). That handler reads `vendor_id` at `+0x40` and a
+  code-string pointer at `+0x44`, with fixed fields ending at `+0x48`
+  (exclusive); no object conversion or field expansion occurs in the traced route. Allocator
+  `0x12C8A20` can return a block with eight bytes of slack when it keeps an
+  unsplittable free block, but actual capacity is runtime-dependent and the
+  parser does not populate the additional fields. Preserve this as an
+  unresolved parser/receiver extent conflict; see `docs/MatrixConnection.md`.
 - The dynamic listener path is traced through `0xBF9C40` to `0xC38400`, which
   resolves a listener-local event callback and stages delivery in structures
   at listener `+0x4C4` and `uiManager+0x5EC`. The concrete listener and later
@@ -1217,7 +1230,7 @@ These updates supersede older next-step suggestions below where they overlap.
   Selector0x76 constructs `AbilityCooldowns` and passes remaining input to the opaque embedded state at +0x28 (virtual +0x10 reader); field meaning remains unknown.
   Selector0x77 constructs `NPCInteraction` and reads one raw QWORD at +0x28; field meaning and allocation-failure consequence remain unknown.
   Selector0x78 constructs `OpenMovieDialog` and passes input through the shared NUL-terminated text reader at +0x28; field meaning and allocation-failure consequence remain unknown.
-  Selector0x79 constructs `PrivateDialog` and reads DWORD +0x28, QWORD +0x30, and DWORD +0x38; field meanings and allocation-failure consequence remain unknown.
+  Selector0x79 constructs `PrivateDialog` and reads DWORD +0x28, QWORD +0x30, and DWORD +0x38; this ends at +0x3C despite a +0x40 request, while the same parsed pointer reaches event-229 handling that reads through +0x48. The actual allocator block extent remains unresolved.
   Selector0x7A constructs `PublicDialog` and reads DWORDs +0x28/+0x2C; field meanings and allocation-failure consequence remain unknown.
   The nested selector table 0x53..0x7A is fully traced, and all 17 case-bearing
   primary-route subcases have native layouts. Route3 entries2,3,4,5,7,8 are
