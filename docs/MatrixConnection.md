@@ -3333,6 +3333,25 @@ when the mask is `0x30`. Finally, `control & 0xC0` selects three WORDs at
 uses the same reader setup. These are observed branch masks and field widths;
 their meanings and message semantics remain unknown.
 
+#### Selector 0x6E post-parse receiver
+
+The outer handler switch maps selector `0x6E` through VA `0xC1D48A` / raw
+`0x81C88A`, then calls slot `+0x13C` at raw `0x81C8A9`. The protocol-handler
+vtable entry at raw `0x1870BFC` contains VA `0xECE2A0`, mapped to receiver raw
+`0xACD6A0`.
+
+The receiver creates an event payload, formats message fields `+0x28/+0x2C/
++0x30` as three floats using distinct label strings, and optionally looks up
+the DWORD at `+0x34` in registry `0x1E5A4F0`. A usable entry is converted to
+text through `0x13122D0` and appended. It dispatches event `239` through the
+object at global `0x1E002B8`, vtable slot `+0xAC`, then cleans up the payload.
+The relationship between this receiver's float/key view and the parser's
+control-byte and conditional-field layout is unresolved.
+
+The parser requests `0x58` bytes; all receiver field accesses described above
+are within that requested extent. The event's meaning and the fields' semantic
+roles remain unknown.
+
 ### Selector 0x6F: `ConfirmedPoseUpdate`
 
 Entry28 maps selector `0x6F` to VA `0xC1E0A6` / raw case `0x81D4A6`. It

@@ -3641,6 +3641,25 @@ Check("WarnLockTargeted selector 0x6D records its gated manager update",
     && CharacterWarnLockTargetedConsumerNativeLayout.MessageTargetPastAllocationByteCount == 4
     && CharacterWarnLockTargetedConsumerNativeLayout.MessageBooleanPastAllocationByteCount == 17
     && CharacterWarnLockTargetedConsumerNativeLayout.StateUpdateHelperFileOffset == 0x465D40);
+Check("CurrentPoseUpdate selector 0x6E records its position and optional-text event receiver",
+    CharacterCurrentPoseUpdateConsumerNativeLayout.MessageDiscriminator
+        == CharacterCurrentPoseUpdateNativeLayout.InnerSelector
+    && CharacterCurrentPoseUpdateConsumerNativeLayout.ProtocolHandlerVtableSlotOffset == 0x13C
+    && CharacterCurrentPoseUpdateConsumerNativeLayout.ProtocolHandlerVtableTargetVirtualAddress == 0xECE2A0
+    && CharacterCurrentPoseUpdateConsumerNativeLayout.ProtocolHandlerVtableTargetFileOffset == 0xACD6A0
+    && CharacterCurrentPoseUpdateConsumerNativeLayout.ConsumerSwitchTargetVirtualAddress == 0xC1D48A
+    && CharacterCurrentPoseUpdateConsumerNativeLayout.ConsumerSwitchTargetFileOffset == 0x81C88A
+    && CharacterCurrentPoseUpdateConsumerNativeLayout.ConsumerVtableCallFileOffset == 0x81C8A9
+    && CharacterCurrentPoseUpdateConsumerNativeLayout.FirstFloatFieldOffset == 0x28
+    && CharacterCurrentPoseUpdateConsumerNativeLayout.SecondFloatFieldOffset == 0x2C
+    && CharacterCurrentPoseUpdateConsumerNativeLayout.ThirdFloatFieldOffset == 0x30
+    && CharacterCurrentPoseUpdateConsumerNativeLayout.OptionalTextKeyFieldOffset == 0x34
+    && CharacterCurrentPoseUpdateConsumerNativeLayout.OptionalTextRegistryVirtualAddress == 0x1E5A4F0
+    && CharacterCurrentPoseUpdateConsumerNativeLayout.OptionalTextLookupRoutineFileOffset == 0x327890
+    && CharacterCurrentPoseUpdateConsumerNativeLayout.OptionalTextExtractionRoutineFileOffset == 0x13122D0
+    && CharacterCurrentPoseUpdateConsumerNativeLayout.DispatchedEventId == 239
+    && CharacterCurrentPoseUpdateConsumerNativeLayout.EventDispatcherGlobalAddress == 0x1E002B8
+    && CharacterCurrentPoseUpdateConsumerNativeLayout.EventDispatcherVtableSlotOffset == 0xAC);
 Check("JumpActioned selector 0x65 records its shared WORD reader continuation",
     CharacterJumpActionedNativeLayout.InnerSelector == 0x65
     && CharacterJumpActionedNativeLayout.CaseFileOffset == 0x81D1F3
@@ -5421,6 +5440,7 @@ Check("ReplayReader message dispatch receiver and discriminator vtable cases rem
         new MatrixMessageDispatchVtableCaseSnapshot(0x6B, 0xC1D409, 0x81C809, 0x81C828, 0x130),
         new MatrixMessageDispatchVtableCaseSnapshot(0x6C, 0xC1D434, 0x81C834, 0x81C853, 0x134),
         new MatrixMessageDispatchVtableCaseSnapshot(0x6D, 0xC1D45F, 0x81C85F, 0x81C87E, 0x138),
+        new MatrixMessageDispatchVtableCaseSnapshot(0x6E, 0xC1D48A, 0x81C88A, 0x81C8A9, 0x13C),
         new MatrixMessageDispatchVtableCaseSnapshot(0x71, 0xC1D50B, 0x81C90B, 0x81C92A, 0x148),
         new MatrixMessageDispatchVtableCaseSnapshot(0x74, 0xC1D58C, 0x81C98C, 0x81C9AB, 0x154),
         new MatrixMessageDispatchVtableCaseSnapshot(0x75, 0xC1D5B7, 0x81C9B7, 0x81C9D6, 0x158),

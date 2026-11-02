@@ -176,8 +176,14 @@ manager pointer, it passes DWORD `+0x28` and Boolean `+0x38` to helper
 allocates `0x28` bytes and reads both fields beyond that declared extent;
 meaning and runtime impact remain unknown.
 
-Next, trace route-0 nested `Character::CurrentPoseUpdate` selector `0x6E`'s
-receiver at slot `+0x13C`, verifying dispatch and target mapping before
+The route-0 nested `Character::CurrentPoseUpdate` selector `0x6E` receiver is
+traced at slot `+0x13C` (VA `0xECE2A0` / raw `0xACD6A0`). It formats three
+message fields as floats, optionally resolves a DWORD at `+0x34` to text, and
+dispatches event `239`. The parser's variable control/field layout and the
+receiver's float/key view overlap; their relationship remains unresolved.
+
+Next, trace route-0 nested `Character::ConfirmedPoseUpdate` selector `0x6F`'s
+receiver at slot `+0x140`, verifying dispatch and target mapping before
 interpreting the method. Keep this nested selector table distinct from route
 indices 2-6 and the secondary decoder table.
 
@@ -189,7 +195,7 @@ Character selectors `OpenMovieDialog`, `PrivateDialog`, and `PublicDialog`.
 Do not repeat the earlier decoder or keyed-receiver factory batches.
 The decoder batches through `0x7A` and route-2 through route-6 consumer traces
 were previously committed; recent updates trace route0 nested selectors `0x53`
-through `0x6D` consumers.
+through `0x6E` consumers.
 Use GPT-6 Luna with explicit High reasoning for implementation and review.
 Verify field-address setup, primitive widths, count-loop boundaries and
 helper calls against the original binary before committing and pushing.

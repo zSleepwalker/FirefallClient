@@ -40,3 +40,28 @@ public static class CharacterCurrentPoseUpdateNativeLayout
     public const int TailModeThreeByteBlockOffset = 0x4C;
     public const int TailModeThreeWordBlockOffset = 0x50;
 }
+
+public static class CharacterCurrentPoseUpdateConsumerNativeLayout
+{
+    public const int MessageDiscriminator = CharacterCurrentPoseUpdateNativeLayout.InnerSelector;
+    public const uint ProtocolHandlerDispatchTableVirtualAddress = 0xC1D6DC;
+    public const int ProtocolHandlerDispatchTableSelectorBias = 0x20;
+    public const int ProtocolHandlerVtableSlotOffset = 0x13C;
+    public const uint ProtocolHandlerVtableTargetVirtualAddress = 0xECE2A0;
+    public const uint ProtocolHandlerVtableTargetFileOffset = 0xACD6A0;
+    public const uint ConsumerFunctionFileOffset = 0xACD6A0;
+    public const uint ConsumerSwitchTargetVirtualAddress = 0xC1D48A;
+    public const uint ConsumerSwitchTargetFileOffset = 0x81C88A;
+    public const uint ConsumerVtableCallFileOffset = 0x81C8A9;
+
+    public const int FirstFloatFieldOffset = 0x28;
+    public const int SecondFloatFieldOffset = 0x2C;
+    public const int ThirdFloatFieldOffset = 0x30;
+    public const int OptionalTextKeyFieldOffset = 0x34;
+    public const uint OptionalTextRegistryVirtualAddress = 0x1E5A4F0;
+    public const uint OptionalTextLookupRoutineFileOffset = 0x327890;
+    public const uint OptionalTextExtractionRoutineFileOffset = 0x13122D0;
+    public const int DispatchedEventId = 239;
+    public const uint EventDispatcherGlobalAddress = 0x1E002B8;
+    public const int EventDispatcherVtableSlotOffset = 0xAC;
+}
