@@ -147,8 +147,15 @@ and conditionally copies the modified block to state `+0xC8` after setting
 flag `+0x108`. The parser's allocation is `0x60`; the copy reads eight bytes
 beyond that declared extent. Meaning and runtime impact remain unknown.
 
-Next, trace route-0 nested `Character::AlmostHit` selector `0x6A`'s receiver at
-slot `+0x12C`, verifying dispatch and target mapping before interpreting the
+The route-0 nested `Character::AlmostHit` selector `0x6A` receiver is traced at
+slot `+0x12C` (VA `0xECEAD0` / raw `0xACDED0`). It validates a QWORD key at
+message `+0x30`, performs a normalized lookup and conditionally calls a virtual
+method at `+0x70`, then forwards the QWORD at `+0x28` to a signed-value helper
+with constant `12`. The lookup key lies entirely beyond the parser's `0x30`
+byte allocation; meanings and runtime impact remain unknown.
+
+Next, trace route-0 nested `Character::DealtHit` selector `0x6B`'s receiver at
+slot `+0x130`, verifying dispatch and target mapping before interpreting the
 method. Keep this nested selector table distinct from route indices 2-6 and
 the secondary decoder table.
 
@@ -160,7 +167,7 @@ Character selectors `OpenMovieDialog`, `PrivateDialog`, and `PublicDialog`.
 Do not repeat the earlier decoder or keyed-receiver factory batches.
 The decoder batches through `0x7A` and route-2 through route-6 consumer traces
 were previously committed; recent updates trace route0 nested selectors `0x53`
-through `0x69` consumers.
+through `0x6A` consumers.
 Use GPT-6 Luna with explicit High reasoning for implementation and review.
 Verify field-address setup, primitive widths, count-loop boundaries and
 helper calls against the original binary before committing and pushing.

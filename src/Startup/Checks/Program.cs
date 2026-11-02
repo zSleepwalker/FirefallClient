@@ -3562,6 +3562,27 @@ Check("TookHit selector 0x69 records its state-copy receiver",
     && CharacterTookHitConsumerNativeLayout.StateUpdateFlagOffset == 0x108
     && CharacterTookHitConsumerNativeLayout.StateWriteGateByteOffset == 0x18C
     && CharacterTookHitConsumerNativeLayout.StateDestinationPointerOffset == 0x14C8);
+Check("AlmostHit selector 0x6A records its keyed callback and signed-value receiver",
+    CharacterAlmostHitConsumerNativeLayout.MessageDiscriminator
+        == CharacterAlmostHitNativeLayout.InnerSelector
+    && CharacterAlmostHitConsumerNativeLayout.ProtocolHandlerVtableSlotOffset == 0x12C
+    && CharacterAlmostHitConsumerNativeLayout.ProtocolHandlerVtableTargetVirtualAddress == 0xECEAD0
+    && CharacterAlmostHitConsumerNativeLayout.ProtocolHandlerVtableTargetFileOffset == 0xACDED0
+    && CharacterAlmostHitConsumerNativeLayout.MessageSignedValueFieldOffset == 0x28
+    && CharacterAlmostHitConsumerNativeLayout.MessageLookupKeyFieldOffset == 0x30
+    && CharacterAlmostHitConsumerNativeLayout.LookupKeyByteMask == unchecked((int)0xFFFFFF00)
+    && CharacterAlmostHitConsumerNativeLayout.InvalidLookupKeyUpperSentinel == 0xFFFFFFFFFFFFFF00
+    && CharacterAlmostHitConsumerNativeLayout.AllocationSize == 0x30
+    && CharacterAlmostHitConsumerNativeLayout.LookupKeyPastAllocationByteCount == 8
+    && CharacterAlmostHitConsumerNativeLayout.LookupTableAccessorFileOffset == 0x35E700
+    && CharacterAlmostHitConsumerNativeLayout.LookupTableBucketsFieldOffset == 0x54
+    && CharacterAlmostHitConsumerNativeLayout.LookupRoutineFileOffset == 0x4093E0
+    && CharacterAlmostHitConsumerNativeLayout.LookupEntryTargetPointerOffset == 0x10
+    && CharacterAlmostHitConsumerNativeLayout.LookupTargetVirtualMethodSlotOffset == 0x70
+    && CharacterAlmostHitConsumerNativeLayout.SignedValueHandlerFileOffset == 0x369080
+    && CharacterAlmostHitConsumerNativeLayout.SignedValueHandlerTypeArgument == 12
+    && CharacterAlmostHitConsumerNativeLayout.ManagerGlobalAddress == 0x1DFFFE8
+    && CharacterAlmostHitConsumerNativeLayout.ManagerAvailabilityFieldOffset == 0x28);
 Check("JumpActioned selector 0x65 records its shared WORD reader continuation",
     CharacterJumpActionedNativeLayout.InnerSelector == 0x65
     && CharacterJumpActionedNativeLayout.CaseFileOffset == 0x81D1F3
@@ -5338,6 +5359,7 @@ Check("ReplayReader message dispatch receiver and discriminator vtable cases rem
         new MatrixMessageDispatchVtableCaseSnapshot(0x67, 0xC1D35D, 0x81C75D, 0x81C77C, 0x120),
         new MatrixMessageDispatchVtableCaseSnapshot(0x68, 0xC1D388, 0x81C788, 0x81C7A7, 0x124),
         new MatrixMessageDispatchVtableCaseSnapshot(0x69, 0xC1D3B3, 0x81C7B3, 0x81C7D2, 0x128),
+        new MatrixMessageDispatchVtableCaseSnapshot(0x6A, 0xC1D3DE, 0x81C7DE, 0x81C7FD, 0x12C),
         new MatrixMessageDispatchVtableCaseSnapshot(0x71, 0xC1D50B, 0x81C90B, 0x81C92A, 0x148),
         new MatrixMessageDispatchVtableCaseSnapshot(0x74, 0xC1D58C, 0x81C98C, 0x81C9AB, 0x154),
         new MatrixMessageDispatchVtableCaseSnapshot(0x75, 0xC1D5B7, 0x81C9B7, 0x81C9D6, 0x158),

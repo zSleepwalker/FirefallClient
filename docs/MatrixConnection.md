@@ -3179,6 +3179,29 @@ body length eight bytes). Allocation failure branches at `0x81D35C` to
 `0x28`; the consequence of that abnormal path is unresolved. The field
 meaning remains unknown; the RTTI name does not prove message semantics.
 
+#### Selector 0x6A post-parse receiver
+
+The outer handler switch maps selector `0x6A` through VA `0xC1D3DE` / raw
+`0x81C7DE`, then calls slot `+0x12C` at raw `0x81C7FD`. The protocol-handler
+vtable entry at raw `0x1870BEC` contains VA `0xECEAD0`, mapped to receiver raw
+`0xACDED0`.
+
+The receiver first requires the global object at VA `0x1DFFFE8` to have a
+nonzero pointer at `+0x28`. It treats the QWORD at message `+0x30` as a lookup
+key, rejecting zero and values from `0xFFFFFFFFFFFFFF00` through
+`0xFFFFFFFFFFFFFFFF`. For other values, it clears the low byte of the key's
+low DWORD and searches the table obtained through `0x35E700` using `0x4093E0`.
+If the found entry has a nonzero pointer at `+0x10`, it calls that object's
+virtual slot `+0x70`; the return value is then passed to `0x369080` along with
+the QWORD at message `+0x28` and constant `12`. That helper branches on the
+signed QWORD and routes through distinct manager-side helpers; their meanings
+remain unknown.
+
+The parser requests `0x30` bytes and reads a QWORD at `+0x28`. The receiver's
+lookup key is a QWORD at `+0x30`, entirely beyond the requested extent. This
+is a static extent mismatch and does not establish actual runtime capacity or
+impact.
+
 ### Selector 0x6B: `DealtHit`
 
 Entry24 maps selector `0x6B` to VA `0xC1DF75` / raw case `0x81D375`. It

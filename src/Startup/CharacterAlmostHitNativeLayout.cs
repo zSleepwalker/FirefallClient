@@ -24,3 +24,31 @@ public static class CharacterAlmostHitNativeLayout
     public const int QwordFieldOffset = 0x28;
     public const int NominalInputByteCount = 8;
 }
+
+public static class CharacterAlmostHitConsumerNativeLayout
+{
+    public const int MessageDiscriminator = CharacterAlmostHitNativeLayout.InnerSelector;
+    public const uint ProtocolHandlerDispatchTableVirtualAddress = 0xC1D6DC;
+    public const int ProtocolHandlerDispatchTableSelectorBias = 0x20;
+    public const int ProtocolHandlerVtableSlotOffset = 0x12C;
+    public const uint ProtocolHandlerVtableTargetVirtualAddress = 0xECEAD0;
+    public const uint ProtocolHandlerVtableTargetFileOffset = 0xACDED0;
+    public const uint ConsumerFunctionFileOffset = 0xACDED0;
+
+    public const int MessageSignedValueFieldOffset = 0x28;
+    public const int MessageLookupKeyFieldOffset = 0x30;
+    public const int LookupKeyByteMask = unchecked((int)0xFFFFFF00);
+    public const ulong InvalidLookupKeyUpperSentinel = 0xFFFFFFFFFFFFFF00;
+    public const int AllocationSize = CharacterAlmostHitNativeLayout.AllocationSize;
+    public const int LookupKeyPastAllocationByteCount =
+        MessageLookupKeyFieldOffset + sizeof(ulong) - AllocationSize;
+    public const uint LookupTableAccessorFileOffset = 0x35E700;
+    public const int LookupTableBucketsFieldOffset = 0x54;
+    public const uint LookupRoutineFileOffset = 0x4093E0;
+    public const int LookupEntryTargetPointerOffset = 0x10;
+    public const int LookupTargetVirtualMethodSlotOffset = 0x70;
+    public const uint SignedValueHandlerFileOffset = 0x369080;
+    public const int SignedValueHandlerTypeArgument = 12;
+    public const uint ManagerGlobalAddress = 0x1DFFFE8;
+    public const int ManagerAvailabilityFieldOffset = 0x28;
+}
