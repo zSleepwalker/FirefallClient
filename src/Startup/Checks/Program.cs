@@ -970,7 +970,7 @@ Check("Secondary command dispatcher separates primary-byte, secondary-selector, 
     && MatrixSecondaryCommandDispatcherNativeLayout.GetSecondarySelectorIndex(0x20) == 0
     && MatrixSecondaryCommandDispatcherNativeLayout.GetSecondarySelectorIndex(0x7A) == 0x5A
     && MatrixSecondaryCommandDispatcherNativeLayout.GetSecondarySelectorIndex(0x7B) is null);
-Check("Secondary decoder table snapshot records the first 56 of 91 selectors",
+Check("Secondary decoder table snapshot records the first 64 of 91 selectors",
     MatrixSecondaryDecoderTableNativeLayout.ParserFileOffset == 0x81CC50
     && MatrixSecondaryDecoderTableNativeLayout.SelectorComparisonFileOffset == 0x81F3A8
     && MatrixSecondaryDecoderTableNativeLayout.SelectorJumpFileOffset == 0x81F3B4
@@ -995,13 +995,13 @@ Check("Secondary decoder table snapshot records the first 56 of 91 selectors",
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x7A) == 0x5A
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x1F) is null
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x7B) is null
-    && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries.Count == 56
+    && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries.Count == 64
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .Select(entry => entry.Selector)
-        .SequenceEqual(Enumerable.Range(0x20, 56).Select(selector => (byte)selector))
+        .SequenceEqual(Enumerable.Range(0x20, 64).Select(selector => (byte)selector))
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .Select(entry => entry.TableIndex)
-        .SequenceEqual(Enumerable.Range(0, 56))
+        .SequenceEqual(Enumerable.Range(0, 64))
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .Select(entry => entry.TargetVirtualAddress)
         .SequenceEqual(new uint[]
@@ -1019,7 +1019,9 @@ Check("Secondary decoder table snapshot records the first 56 of 91 selectors",
             0xC20FC8, 0xC21030, 0xC21098, 0xC21100,
             0xC21168, 0xC211D0, 0xC21238, 0xC212A0,
             0xC2130B, 0xC21375, 0xC213BD, 0xC21405,
-            0xC21479, 0xC214E1, 0xC21529, 0xC21593
+            0xC21479, 0xC214E1, 0xC21529, 0xC21593,
+            0xC215FD, 0xC21645, 0xC21699, 0xC216E1,
+            0xC21749, 0xC217B1, 0xC21819, 0xC21881
         })
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .All(entry => entry.TargetKind == MatrixSecondaryDecoderTargetKind.MessageCase)
@@ -1027,7 +1029,7 @@ Check("Secondary decoder table snapshot records the first 56 of 91 selectors",
         .All(entry => entry.TargetVirtualAddress == entry.TargetFileOffset + 0x400C00)
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .Select(entry => entry.TargetVirtualAddress)
-        .Distinct().Count() == 56
+        .Distinct().Count() == 64
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x27)?.TargetFileOffset == 0x81F683
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x28)?.TargetFileOffset == 0x81F6EB
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x2F)?.TargetFileOffset == 0x81F9BE
@@ -1040,7 +1042,53 @@ Check("Secondary decoder table snapshot records the first 56 of 91 selectors",
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x4F)?.TargetFileOffset == 0x8206A0
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x50)?.TargetFileOffset == 0x82070B
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x57)?.TargetFileOffset == 0x820993
-    && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x58) is null);
+    && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x58)?.TargetFileOffset == 0x8209FD
+    && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x5F)?.TargetFileOffset == 0x820C81);
+Check("Secondary selectors 0x58-0x5F retain positional wire layouts",
+    TrackRecipeNativeLayout.Selector == 0x58
+    && TrackRecipeNativeLayout.AllocationSize == 0x30
+    && TrackRecipeNativeLayout.ConstructorNativeTypeId == 0x58
+    && TrackRecipeNativeLayout.DwordFieldOffset == 0x28
+    && TrackRecipeNativeLayout.DwordWireWidth == 4
+    && ClearTrackedRecipeNativeLayout.Selector == 0x59
+    && ClearTrackedRecipeNativeLayout.AllocationSize == 0x28
+    && ClearTrackedRecipeNativeLayout.ConstructorNativeTypeId == 0x59
+    && ClearTrackedRecipeNativeLayout.SuccessfulConstructionReturnFileOffset
+        == ClearTrackedRecipeNativeLayout.CaseFileOffset + 0x35
+    && !ClearTrackedRecipeNativeLayout.HasBodyReader
+    && SlotTechNativeLayout.Selector == 0x5A
+    && SlotTechNativeLayout.AllocationSize == 0x30
+    && SlotTechNativeLayout.ConstructorNativeTypeId == 0x5A
+    && SlotTechNativeLayout.DwordFieldOffset == 0x28
+    && InteractableStatusChangedNativeLayout.AllocationSize == 0x40
+    && InteractableStatusChangedNativeLayout.ConstructorNativeTypeId == 0x5B
+    && InteractableStatusChangedNativeLayout.ByteFieldOffset == 0x28
+    && InteractableStatusChangedNativeLayout.DwordFieldOffset == 0x2C
+    && InteractableStatusChangedNativeLayout.QwordFieldOffset == 0x30
+    && InteractableStatusChangedNativeLayout.TrailingByteFieldOffset == 0x38
+    && InteractableStatusChangedNativeLayout.QwordWireWidth == 8
+    && SendTipMessageNativeLayout.AllocationSize == 0x38
+    && SendTipMessageNativeLayout.ConstructorNativeTypeId == 0x5C
+    && SendTipMessageNativeLayout.ByteFieldOffset == 0x28
+    && SendTipMessageNativeLayout.FirstDwordFieldOffset == 0x2C
+    && SendTipMessageNativeLayout.SecondDwordFieldOffset == 0x30
+    && SendTipMessageNativeLayout.WordFieldOffset == 0x34
+    && SendTipMessageNativeLayout.TrailingByteFieldOffset == 0x36
+    && DebugEventSampleNativeLayout.AllocationSize == 0x30
+    && DebugEventSampleNativeLayout.ConstructorNativeTypeId == 0x5D
+    && DebugEventSampleNativeLayout.FirstWordFieldOffset == 0x28
+    && DebugEventSampleNativeLayout.SecondWordFieldOffset == 0x2A
+    && DebugEventSampleNativeLayout.FirstByteFieldOffset == 0x2C
+    && DebugEventSampleNativeLayout.SecondByteFieldOffset == 0x2D
+    && DebugLagPlayerSampleNativeLayout.AllocationSize == 0x38
+    && DebugLagPlayerSampleNativeLayout.ConstructorNativeTypeId == 0x5E
+    && DebugLagPlayerSampleNativeLayout.WordFieldCount == 5
+    && DebugLagPlayerSampleNativeLayout.FifthWordFieldOffset == 0x30
+    && DebugLagSimulationSampleNativeLayout.AllocationSize == 0x48
+    && DebugLagSimulationSampleNativeLayout.ConstructorNativeTypeId == 0x5F
+    && DebugLagSimulationSampleNativeLayout.WordFieldCount == 13
+    && DebugLagSimulationSampleNativeLayout.LastWordFieldOffset == 0x40
+    && DebugLagSimulationSampleNativeLayout.WordFieldStride == 2);
 Check("Secondary decoder RTTI and native body layouts retain observed offsets and widths",
     MatrixSecondaryMessageHeaderNativeLayout.BaseMetadataFlagOffset == 0x08
     && MatrixSecondaryMessageHeaderNativeLayout.DescriptorAnchorPointerOffset == 0x0C

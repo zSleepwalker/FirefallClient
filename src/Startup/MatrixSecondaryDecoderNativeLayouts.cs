@@ -142,6 +142,22 @@ public static class MatrixSecondaryDecoderTableNativeLayout
             new MatrixSecondaryDecoderEntrySnapshot(0x56, 54, 0xC21529, 0x820929,
                 MatrixSecondaryDecoderTargetKind.MessageCase),
             new MatrixSecondaryDecoderEntrySnapshot(0x57, 55, 0xC21593, 0x820993,
+                MatrixSecondaryDecoderTargetKind.MessageCase),
+            new MatrixSecondaryDecoderEntrySnapshot(0x58, 56, 0xC215FD, 0x8209FD,
+                MatrixSecondaryDecoderTargetKind.MessageCase),
+            new MatrixSecondaryDecoderEntrySnapshot(0x59, 57, 0xC21645, 0x820A45,
+                MatrixSecondaryDecoderTargetKind.MessageCase),
+            new MatrixSecondaryDecoderEntrySnapshot(0x5A, 58, 0xC21699, 0x820A99,
+                MatrixSecondaryDecoderTargetKind.MessageCase),
+            new MatrixSecondaryDecoderEntrySnapshot(0x5B, 59, 0xC216E1, 0x820AE1,
+                MatrixSecondaryDecoderTargetKind.MessageCase),
+            new MatrixSecondaryDecoderEntrySnapshot(0x5C, 60, 0xC21749, 0x820B49,
+                MatrixSecondaryDecoderTargetKind.MessageCase),
+            new MatrixSecondaryDecoderEntrySnapshot(0x5D, 61, 0xC217B1, 0x820BB1,
+                MatrixSecondaryDecoderTargetKind.MessageCase),
+            new MatrixSecondaryDecoderEntrySnapshot(0x5E, 62, 0xC21819, 0x820C19,
+                MatrixSecondaryDecoderTargetKind.MessageCase),
+            new MatrixSecondaryDecoderEntrySnapshot(0x5F, 63, 0xC21881, 0x820C81,
                 MatrixSecondaryDecoderTargetKind.MessageCase)
         });
 
@@ -1587,6 +1603,199 @@ public static class JobLedgerEntriesUpdateNativeLayout
     public const int RecordNativeStride = 4;
     public const int CountWireWidth = 1;
     public const byte ChunkContinuationCount = 0xFF;
+}
+
+public static class TrackRecipeNativeLayout
+{
+    public const byte Selector = 0x58;
+    public const uint CaseVirtualAddress = 0xC215FD;
+    public const uint CaseFileOffset = 0x8209FD;
+    public const uint CaseLocalDwordValue = 0x38;
+    public const uint CaseSetupArgument2VirtualAddress = 0x1B8CC84;
+    public const int AllocationSize = 0x30;
+    public const uint ConstructorFileOffset = 0x818370;
+    public const uint BaseMetadataConstructorFileOffset = 0x825190;
+    public const uint ConstructorNativeTypeId = 0x58;
+    public const uint DescriptorAnchorVirtualAddress = 0x1B89B9C;
+    public const uint BodyReaderFileOffset = 0x3370A0;
+    public const uint BodyReaderCallSiteFileOffset = 0x8206F1;
+    public const uint SharedBodyContinuationFileOffset = 0x8206E3;
+    public const uint AllocationFailureZeroObjectFileOffset = 0x8206E1;
+    public const uint VtableVirtualAddress = 0x1C6DED8;
+    public const string RttiName = ".?AVTrackRecipe@firefall@@";
+    public const int DwordFieldOffset = 0x28;
+    public const int DwordWireWidth = 4;
+}
+
+public static class ClearTrackedRecipeNativeLayout
+{
+    public const byte Selector = 0x59;
+    public const uint CaseVirtualAddress = 0xC21645;
+    public const uint CaseFileOffset = 0x820A45;
+    public const uint CaseLocalDwordValue = 0x39;
+    public const uint CaseSetupArgument2VirtualAddress = 0x1B8CC9C;
+    public const int AllocationSize = 0x28;
+    public const uint ConstructorFileOffset = 0x818430;
+    public const uint BaseMetadataConstructorFileOffset = 0x825200;
+    public const uint ConstructorNativeTypeId = 0x59;
+    public const uint DescriptorAnchorVirtualAddress = 0x1B89BA4;
+    public const uint AllocationFailureZeroReturnFileOffset = 0x8217D9;
+    public const uint SuccessfulConstructionReturnFileOffset = 0x820A7A;
+    public const uint VtableVirtualAddress = 0x1C6DEF8;
+    public const string RttiName = ".?AVClearTrackedRecipe@firefall@@";
+    public const bool HasBodyReader = false;
+}
+
+public static class SlotTechNativeLayout
+{
+    public const byte Selector = 0x5A;
+    public const uint CaseVirtualAddress = 0xC21699;
+    public const uint CaseFileOffset = 0x820A99;
+    public const uint CaseLocalDwordValue = 0x3A;
+    public const uint CaseSetupArgument2VirtualAddress = 0x1B8CCB4;
+    public const int AllocationSize = 0x30;
+    public const uint ConstructorFileOffset = 0x8184A0;
+    public const uint BaseMetadataConstructorFileOffset = 0x825270;
+    public const uint ConstructorNativeTypeId = 0x5A;
+    public const uint DescriptorAnchorVirtualAddress = 0x1B89B8C;
+    public const uint BodyReaderFileOffset = 0x3370A0;
+    public const uint BodyReaderCallSiteFileOffset = 0x8206F1;
+    public const uint SharedBodyContinuationFileOffset = 0x8206E3;
+    public const uint AllocationFailureZeroObjectFileOffset = 0x8206E1;
+    public const uint VtableVirtualAddress = 0x1C6DEE8;
+    public const string RttiName = ".?AVSlotTech@firefall@@";
+    public const int DwordFieldOffset = 0x28;
+    public const int DwordWireWidth = 4;
+}
+
+public static class InteractableStatusChangedNativeLayout
+{
+    public const byte Selector = 0x5B;
+    public const uint CaseVirtualAddress = 0xC216E1;
+    public const uint CaseFileOffset = 0x820AE1;
+    public const uint CaseLocalDwordValue = 0x3B;
+    public const uint CaseSetupArgument2VirtualAddress = 0x1B8CCCC;
+    public const int AllocationSize = 0x40;
+    public const uint ConstructorFileOffset = 0x818560;
+    public const uint BaseMetadataConstructorFileOffset = 0x8252E0;
+    public const uint ConstructorNativeTypeId = 0x5B;
+    public const uint DescriptorAnchorVirtualAddress = 0x1B89B94;
+    public const uint BodyReaderFileOffset = 0x846A50;
+    public const uint BodyReaderCallSiteFileOffset = 0x820B2F;
+    public const uint AllocationFailureZeroObjectFileOffset = 0x820B22;
+    public const uint VtableVirtualAddress = 0x1C6DEB8;
+    public const string RttiName = ".?AVInteractableStatusChanged@firefall@@";
+    public const int ByteFieldOffset = 0x28;
+    public const int DwordFieldOffset = 0x2C;
+    public const int QwordFieldOffset = 0x30;
+    public const int TrailingByteFieldOffset = 0x38;
+    public const int ByteWireWidth = 1;
+    public const int DwordWireWidth = 4;
+    public const int QwordWireWidth = 8;
+    public const int TrailingByteWireWidth = 1;
+}
+
+public static class SendTipMessageNativeLayout
+{
+    public const byte Selector = 0x5C;
+    public const uint CaseVirtualAddress = 0xC21749;
+    public const uint CaseFileOffset = 0x820B49;
+    public const uint CaseLocalDwordValue = 0x3C;
+    public const uint CaseSetupArgument2VirtualAddress = 0x1B8CCE4;
+    public const int AllocationSize = 0x38;
+    public const uint ConstructorFileOffset = 0x818640;
+    public const uint BaseMetadataConstructorFileOffset = 0x825350;
+    public const uint ConstructorNativeTypeId = 0x5C;
+    public const uint DescriptorAnchorVirtualAddress = 0x1B89B7C;
+    public const uint BodyReaderFileOffset = 0x846960;
+    public const uint BodyReaderCallSiteFileOffset = 0x820B97;
+    public const uint AllocationFailureZeroObjectFileOffset = 0x820B8A;
+    public const uint VtableVirtualAddress = 0x1C6DEA8;
+    public const string RttiName = ".?AVSendTipMessage@firefall@@";
+    public const int ByteFieldOffset = 0x28;
+    public const int FirstDwordFieldOffset = 0x2C;
+    public const int SecondDwordFieldOffset = 0x30;
+    public const int WordFieldOffset = 0x34;
+    public const int TrailingByteFieldOffset = 0x36;
+    public const int ByteWireWidth = 1;
+    public const int DwordWireWidth = 4;
+    public const int WordWireWidth = 2;
+}
+
+public static class DebugEventSampleNativeLayout
+{
+    public const byte Selector = 0x5D;
+    public const uint CaseVirtualAddress = 0xC217B1;
+    public const uint CaseFileOffset = 0x820BB1;
+    public const uint CaseLocalDwordValue = 0x3D;
+    public const uint CaseSetupArgument2VirtualAddress = 0x1B8CB7C;
+    public const int AllocationSize = 0x30;
+    public const uint ConstructorFileOffset = 0x818730;
+    public const uint BaseMetadataConstructorFileOffset = 0x8253C0;
+    public const uint ConstructorNativeTypeId = 0x5D;
+    public const uint DescriptorAnchorVirtualAddress = 0x1B89B84;
+    public const uint BodyReaderFileOffset = 0x846850;
+    public const uint BodyReaderCallSiteFileOffset = 0x820BFF;
+    public const uint AllocationFailureZeroObjectFileOffset = 0x820BF2;
+    public const uint VtableVirtualAddress = 0x1C6DEC8;
+    public const string RttiName = ".?AVDebugEventSample@firefall@@";
+    public const int FirstWordFieldOffset = 0x28;
+    public const int SecondWordFieldOffset = 0x2A;
+    public const int FirstByteFieldOffset = 0x2C;
+    public const int SecondByteFieldOffset = 0x2D;
+    public const int WordWireWidth = 2;
+    public const int ByteWireWidth = 1;
+}
+
+public static class DebugLagPlayerSampleNativeLayout
+{
+    public const byte Selector = 0x5E;
+    public const uint CaseVirtualAddress = 0xC21819;
+    public const uint CaseFileOffset = 0x820C19;
+    public const uint CaseLocalDwordValue = 0x3E;
+    public const uint CaseSetupArgument2VirtualAddress = 0x1B8CB94;
+    public const int AllocationSize = 0x38;
+    public const uint ConstructorFileOffset = 0x818800;
+    public const uint BaseMetadataConstructorFileOffset = 0x825430;
+    public const uint ConstructorNativeTypeId = 0x5E;
+    public const uint DescriptorAnchorVirtualAddress = 0x1B89B6C;
+    public const uint BodyReaderFileOffset = 0x846760;
+    public const uint BodyReaderCallSiteFileOffset = 0x820C67;
+    public const uint AllocationFailureZeroObjectFileOffset = 0x820C5A;
+    public const uint VtableVirtualAddress = 0x1C6DE88;
+    public const string RttiName = ".?AVDebugLagPlayerSample@firefall@@";
+    public const int FirstWordFieldOffset = 0x28;
+    public const int SecondWordFieldOffset = 0x2A;
+    public const int ThirdWordFieldOffset = 0x2C;
+    public const int FourthWordFieldOffset = 0x2E;
+    public const int FifthWordFieldOffset = 0x30;
+    public const int WordFieldCount = 5;
+    public const int WordFieldStride = 2;
+    public const int WordWireWidth = 2;
+}
+
+public static class DebugLagSimulationSampleNativeLayout
+{
+    public const byte Selector = 0x5F;
+    public const uint CaseVirtualAddress = 0xC21881;
+    public const uint CaseFileOffset = 0x820C81;
+    public const uint CaseLocalDwordValue = 0x3F;
+    public const uint CaseSetupArgument2VirtualAddress = 0x1B8CBAC;
+    public const int AllocationSize = 0x48;
+    public const uint ConstructorFileOffset = 0x8188E0;
+    public const uint BaseMetadataConstructorFileOffset = 0x8254A0;
+    public const uint ConstructorNativeTypeId = 0x5F;
+    public const uint DescriptorAnchorVirtualAddress = 0x1B89B74;
+    public const uint BodyReaderFileOffset = 0x8465C0;
+    public const uint BodyReaderCallSiteFileOffset = 0x820CCF;
+    public const uint AllocationFailureZeroObjectFileOffset = 0x820CC2;
+    public const uint VtableVirtualAddress = 0x1C6DE78;
+    public const string RttiName = ".?AVDebugLagSimulationSample@firefall@@";
+    public const int FirstWordFieldOffset = 0x28;
+    public const int LastWordFieldOffset = 0x40;
+    public const int WordFieldCount = 13;
+    public const int WordFieldStride = 2;
+    public const int WordWireWidth = 2;
 }
 
 public static class MatrixSecondaryEmbeddedBlobNativeLayout

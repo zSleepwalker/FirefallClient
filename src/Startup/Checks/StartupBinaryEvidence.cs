@@ -2356,6 +2356,191 @@ internal static class StartupBinaryEvidence
             && RelativeConditionalBranchTargets(0x609765, 0x0F, 0x82, 0x609627)
             && Matches(0x60976B, "80FBFF")
             && RelativeConditionalBranchTargets(0x60976E, 0x0F, 0x84, 0x6095D2));
+        check("Binary secondary selectors 0x58-0x5F map to eight distinct RTTI-backed message cases",
+            MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
+                .Where(entry => entry.Selector >= 0x58 && entry.Selector <= 0x5F)
+                .Select((entry, index) =>
+                    entry.Selector == 0x58 + index
+                    && entry.TableIndex == 56 + index
+                    && ReadUInt32(MatrixSecondaryDecoderTableNativeLayout.TableFileOffset
+                        + (uint)(entry.TableIndex * 4)) == entry.TargetVirtualAddress
+                    && entry.TargetVirtualAddress == entry.TargetFileOffset + 0x400C00
+                    && entry.TargetKind == MatrixSecondaryDecoderTargetKind.MessageCase)
+                .All(matches => matches)
+            && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
+                .Where(entry => entry.Selector >= 0x58 && entry.Selector <= 0x5F)
+                .Select(entry => entry.TargetVirtualAddress)
+                .Distinct().Count() == 8
+            && new (uint Vtable, string RttiName)[]
+            {
+                (TrackRecipeNativeLayout.VtableVirtualAddress, TrackRecipeNativeLayout.RttiName),
+                (ClearTrackedRecipeNativeLayout.VtableVirtualAddress, ClearTrackedRecipeNativeLayout.RttiName),
+                (SlotTechNativeLayout.VtableVirtualAddress, SlotTechNativeLayout.RttiName),
+                (InteractableStatusChangedNativeLayout.VtableVirtualAddress, InteractableStatusChangedNativeLayout.RttiName),
+                (SendTipMessageNativeLayout.VtableVirtualAddress, SendTipMessageNativeLayout.RttiName),
+                (DebugEventSampleNativeLayout.VtableVirtualAddress, DebugEventSampleNativeLayout.RttiName),
+                (DebugLagPlayerSampleNativeLayout.VtableVirtualAddress, DebugLagPlayerSampleNativeLayout.RttiName),
+                (DebugLagSimulationSampleNativeLayout.VtableVirtualAddress, DebugLagSimulationSampleNativeLayout.RttiName)
+            }.All(item =>
+                VtableRttiName(item.Vtable, 80) == item.RttiName
+                && VtableCompleteObjectOffset(item.Vtable) == 0));
+        check("Binary secondary 0x58-0x5F cases preserve setup, allocation, constructor, metadata, and failure paths",
+            new (uint Case, uint SetupArgument2, uint Anchor, uint Allocation, uint LocalValue,
+                uint ConstructorCall, uint Constructor, uint TypeId, uint Helper, uint Vtable,
+                uint VtableStoreOffset, string Initializers, uint InitializerOffset,
+                uint AllocationFailure, bool SharedZeroContinuation, bool ZeroReturn,
+                uint ReaderCall, uint Reader)[]
+            {
+                (0x8209FD, 0x1B8CC84, 0x1B89B9C, 0x30, 0x38,
+                    0x820A39, 0x818370, 0x58, 0x825190, 0x1C6DED8,
+                    0x1D, "C7462800000000", 0x25, 0x8206E1, true, false,
+                    0, 0),
+                (0x820A45, 0x1B8CC9C, 0x1B89BA4, 0x28, 0x39,
+                    0x820A81, 0x818430, 0x59, 0x825200, 0x1C6DEF8,
+                    0x1D, "", 0, 0x8217D9, false, true,
+                    0, 0),
+                (0x820A99, 0x1B8CCB4, 0x1B89B8C, 0x30, 0x3A,
+                    0x820AD5, 0x8184A0, 0x5A, 0x825270, 0x1C6DEE8,
+                    0x1D, "C7462800000000", 0x25, 0x8206E1, true, false,
+                    0, 0),
+                (0x820AE1, 0x1B8CCCC, 0x1B89B94, 0x40, 0x3B,
+                    0x820B19, 0x818560, 0x5B, 0x8252E0, 0x1C6DEB8,
+                    0x1D, "C6462800C7462C00000000C7463000000000C7463400000000C6463800",
+                    0x25, 0x820B22, false, false, 0x820B2F, 0x846A50),
+                (0x820B49, 0x1B8CCE4, 0x1B89B7C, 0x38, 0x3C,
+                    0x820B81, 0x818640, 0x5C, 0x825350, 0x1C6DEA8,
+                    0x1D, "C6462800C7462C00000000C7463000000000C6463600",
+                    0x25, 0x820B8A, false, false, 0x820B97, 0x846960),
+                (0x820BB1, 0x1B8CB7C, 0x1B89B84, 0x30, 0x3D,
+                    0x820BE9, 0x818730, 0x5D, 0x8253C0, 0x1C6DEC8,
+                    0x1F, "8946286689462C", 0x25, 0x820BF2, false, false,
+                    0x820BFF, 0x846850),
+                (0x820C19, 0x1B8CB94, 0x1B89B6C, 0x38, 0x3E,
+                    0x820C51, 0x818800, 0x5E, 0x825430, 0x1C6DE88,
+                    0x1F, "89462889462C66894630", 0x25, 0x820C5A, false, false,
+                    0x820C67, 0x846760),
+                (0x820C81, 0x1B8CBAC, 0x1B89B74, 0x48, 0x3F,
+                    0x820CB9, 0x8188E0, 0x5F, 0x8254A0, 0x1C6DE78,
+                    0x1F, "89462889462C89463089463489463889463C66894640",
+                    0x25, 0x820CC2, false, false, 0x820CCF, 0x8465C0)
+            }.All(item =>
+                Matches(item.Case, "68" + UInt32LittleEndianHex(item.Anchor)
+                    + "68" + UInt32LittleEndianHex(item.SetupArgument2)
+                    + "68" + UInt32LittleEndianHex(
+                        MatrixSecondaryDecoderTableNativeLayout.SharedCaseSetupArgument3VirtualAddress))
+                && RelativeBranchTargets(item.Case + 0x0F, 0xE8, 0x3571B0)
+                && Matches(0x3571B0, "C3")
+                && Matches(item.Case + 0x17, "6A" + ((byte)item.Allocation).ToString("X2"))
+                && RelativeBranchTargets(item.Case + 0x19, 0xE8, 0x12B7FB0)
+                && Matches(item.Case + 0x25, "C7442420" + UInt32LittleEndianHex(item.LocalValue))
+                && (item.SharedZeroContinuation
+                    ? Matches(item.Case + 0x2D, "85C0")
+                        && RelativeConditionalBranchTargets(
+                            item.Case + 0x2F, 0x0F, 0x84, item.AllocationFailure)
+                        && Matches(item.AllocationFailure, "33F6")
+                        && RelativeBranchTargets(item.Case + 0x43, 0xE9, 0x8206E3)
+                    : item.ZeroReturn
+                        ? Matches(item.Case + 0x2D, "85C0")
+                            && RelativeConditionalBranchTargets(
+                                item.Case + 0x2F, 0x0F, 0x84, item.AllocationFailure)
+                            && Matches(item.AllocationFailure, "33C0")
+                        : Matches(item.Case + 0x2D, "85C07410")
+                            && item.AllocationFailure == item.Case + 0x41
+                            && Matches(item.AllocationFailure, "33F6")
+                            && Matches(item.Case + 0x3F, "EB02"))
+                && RelativeBranchTargets(item.ConstructorCall, 0xE8, item.Constructor)
+                && Matches(item.Constructor + 0x12, "C700" + UInt32LittleEndianHex(item.TypeId))
+                && RelativeBranchTargets(item.Constructor + 0x18, 0xE8, item.Helper)
+                && Matches(item.Constructor + item.VtableStoreOffset,
+                    "C706" + UInt32LittleEndianHex(item.Vtable))
+                && (item.Initializers.Length == 0
+                    || Matches(item.Constructor + item.InitializerOffset, item.Initializers))
+                && Matches(item.Helper + 0x13, "C7460C" + UInt32LittleEndianHex(item.Anchor))
+                && Matches(item.Helper + 0x1A, "C7460801000000")
+                && Matches(item.Helper + 0x21, "894610")
+                && Matches(item.Helper + 0x2B, "894618")
+                && Matches(item.Helper + 0x31, "89461C")
+                && Matches(item.Helper + 0x34, "C7462000000000C7462400000000")
+                && (item.ReaderCall == 0
+                    ? item.Reader == 0
+                    : RelativeBranchTargets(item.ReaderCall, 0xE8, item.Reader)))
+            && !ClearTrackedRecipeNativeLayout.HasBodyReader
+            && Matches(ClearTrackedRecipeNativeLayout.SuccessfulConstructionReturnFileOffset,
+                "FF76048BC8FF36")
+            && RelativeBranchTargets(ClearTrackedRecipeNativeLayout.SuccessfulConstructionReturnFileOffset + 7,
+                0xE8, ClearTrackedRecipeNativeLayout.ConstructorFileOffset)
+            && Matches(ClearTrackedRecipeNativeLayout.SuccessfulConstructionReturnFileOffset + 0x0C,
+                "8B4C241864890D00000000595F5E5B8BE55DC3"));
+        check("Binary secondary 0x58-0x5F readers preserve ordered field addresses and primitive widths",
+            Matches(0x8206E1, "33F6")
+            && Matches(0x8206E3, "8D4628")
+            && RelativeBranchTargets(TrackRecipeNativeLayout.BodyReaderCallSiteFileOffset,
+                0xE8, TrackRecipeNativeLayout.BodyReaderFileOffset)
+            && Matches(0x8206E6, "C7442420FFFFFFFF")
+            && RelativeBranchTargets(SlotTechNativeLayout.BodyReaderCallSiteFileOffset,
+                0xE8, SlotTechNativeLayout.BodyReaderFileOffset)
+            && new (uint Argument, string Bytes, uint CallSite, uint Target)[]
+            {
+                (0x846A5A, "8D5628", 0x846A5D, 0x337180),
+                (0x846A62, "8D462C8BCF50", 0x846A68, 0x3370A0),
+                (0x846A6D, "8D46308BCF50", 0x846A73, 0x356F80),
+                (0x846A78, "8D56388BCF", 0x846A7D, 0x337180),
+                (0x84696A, "8D5628", 0x84696D, 0x337180),
+                (0x846972, "8D462C8BCF50", 0x846978, 0x3370A0),
+                (0x84697D, "8D46308BCF50", 0x846983, 0x3370A0),
+                (0x846988, "8D46348BCF50", 0x84698E, 0x34B740),
+                (0x846993, "8D5636", 0x846998, 0x356CF0),
+                (0x84685A, "8D462850", 0x84685E, 0x336AC0),
+                (0x846863, "8D462A8BCF50", 0x846869, 0x336AC0),
+                (0x84686E, "8D562C8BCF", 0x846873, 0x337180),
+                (0x846878, "8D562D8BCF", 0x84687D, 0x356CF0),
+                (0x84676A, "8D462850", 0x84676E, 0x336AC0),
+                (0x846773, "8D462A8BCF50", 0x846779, 0x336AC0),
+                (0x84677E, "8D462C8BCF50", 0x846784, 0x336AC0),
+                (0x846789, "8D462E8BCF50", 0x84678F, 0x336AC0),
+                (0x846794, "8D46308BCF50", 0x84679A, 0x336AC0),
+                (0x8465CA, "8BCE8D472850", 0x8465D0, 0x336AC0),
+                (0x8465D5, "8D472A8BCE50", 0x8465DB, 0x336AC0),
+                (0x8465E0, "8D472C8BCE50", 0x8465E6, 0x336AC0),
+                (0x8465EB, "8D472E8BCE50", 0x8465F1, 0x336AC0),
+                (0x8465F6, "8D47308BCE50", 0x8465FC, 0x336AC0),
+                (0x846601, "8D47328BCE50", 0x846607, 0x336AC0),
+                (0x84660C, "8D47348BCE50", 0x846612, 0x336AC0),
+                (0x846617, "8D47368BCE50", 0x84661D, 0x336AC0),
+                (0x846622, "8D47388BCE50", 0x846628, 0x336AC0),
+                (0x84662D, "8D473A8BCE50", 0x846633, 0x336AC0),
+                (0x846638, "8D473C8BCE50", 0x84663E, 0x336AC0),
+                (0x846643, "8D473E8BCE50", 0x846649, 0x336AC0),
+                (0x84664E, "8D47408BCE50", 0x846654, 0x336AC0)
+            }.All(item =>
+                Matches(item.Argument, item.Bytes)
+                && RelativeBranchTargets(item.CallSite, 0xE8, item.Target))
+            && Matches(0x3371A2, "8A00")
+            && Matches(0x3371A4, "8803")
+            && Matches(0x3371A6, "FF4704")
+            && Matches(0x3371CC, "FF4F08")
+            && Matches(0x3370C0, "8B08")
+            && Matches(0x3370C5, "8908")
+            && Matches(0x3370C7, "83460404")
+            && Matches(0x3370EE, "834608FC")
+            && Matches(0x356FA3, "8B02")
+            && Matches(0x356FA5, "8901")
+            && Matches(0x356FA7, "8B4204")
+            && Matches(0x356FAA, "894104")
+            && Matches(0x356FAD, "83460408")
+            && Matches(0x356FD4, "834608F8")
+            && Matches(0x34B760, "668B08")
+            && Matches(0x34B766, "668908")
+            && Matches(0x34B769, "83460402")
+            && Matches(0x34B790, "834608FE")
+            && Matches(0x356D12, "8A00")
+            && Matches(0x356D14, "8803")
+            && Matches(0x356D16, "FF4704")
+            && Matches(0x356D3C, "FF4F08")
+            && Matches(0x336AE0, "668B08")
+            && Matches(0x336AE6, "668908")
+            && Matches(0x336AE9, "83460402")
+            && Matches(0x336B10, "834608FE"));
         check("Binary inner selector 0x53 constructs the RTTI MarketRequestComplete body layout",
             ReadUInt32(VirtualAddressToFileOffset(
                 CharacterMarketRequestCompleteNativeLayout.InnerSelectorTableVirtualAddress)) == 0xC1D8C3

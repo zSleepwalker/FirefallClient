@@ -1,12 +1,11 @@
 # Reverse-engineering handoff
 
-## Resume here (end of November 1 session)
+## Resume here (November 2)
 
-Work stopped after reviewing and saving the secondary decoder `0x50..0x57`
-batch. Start tomorrow at `0x58`; do not repeat the earlier decoder or
-keyed-receiver factory batches. All assigned agents have finished.
-The next batch should identify secondary selectors `0x58..0x5F`, using
-`MatrixSecondaryDecoderNativeLayouts.cs` and its binary checks as templates.
+Selectors `0x58..0x5F` are now reconstructed and checked against
+`FirefallClient.exe.original`. Do not repeat the earlier decoder or
+keyed-receiver factory batches. The next batch starts at selector `0x60`.
+This session did not commit or push; parent review/QA remains pending.
 Use GPT-6 Luna with explicit High reasoning for implementation and review.
 Verify field-address setup, primitive widths, count-loop boundaries and
 helper calls against the original binary before committing and pushing.
@@ -28,17 +27,21 @@ helper calls against the original binary before committing and pushing.
   (40,197,848 bytes);
   it differs from the analyzed image in 13 bytes across four ranges, none of
   which overlap this batch's code/vtable evidence.
+- The documented IDA MCP analysis used instance `13337` with the raw-to-VA
+  mappings below. The MCP endpoint could not be initialized during this
+  session; this batch was checked read-only against the original PE using local
+  disassembly and the repository's binary-evidence checks.
 - Secondary selectors in `0x81CC50` use the separate 91-entry table at VA
   `0xC22630` / raw `0x821A30`: `[ebp+8] - 0x20`, bounded through index
   `0x5A`, then indexed by DWORD. The original binary has 91 nonzero, distinct
-  destinations; selectors `0x20..0x57` now have 56 verified message
-  identities/layouts, leaving 35 identities unresolved. Continue at selector
-  `0x58`. The table index is distinct from the keyed-receiver factory's
+  destinations; selectors `0x20..0x5F` now have 64 verified message
+  identities/layouts, leaving 27 identities unresolved. Continue at selector
+  `0x60`. The table index is distinct from the keyed-receiver factory's
   `0x02..0x35` selectors and the route0 Character table's `0x53..0x7A`
   selectors. Secondary selectors `0x53..0x57` and route0 Character selectors
   with those same numbers are different tables and dispatch namespaces. See
   the C# snapshots and `docs/MatrixConnection.md`.
-- The 56 verified secondary cases are RTTI-backed:
+- The 64 verified secondary cases are RTTI-backed:
   `EncounterToUIMessage`, `VotekickInitiated`, `VotekickResponded`,
   `ScoreBoardEnable/Init/SetWinner/Clear/AddPlayer/RemovePlayer/
   UpdatePlayerStats/UpdatePlayerStatsFromStats/UpdatePlayerStatus`,
@@ -100,7 +103,15 @@ helper calls against the original binary before committing and pushing.
   evidence for two independent byte fields. Count bytes use `0xFF`
   continuation and zero termination where observed. Parser-local DWORD
   literals `0x30..0x37` are recorded separately from selectors and
-  constructor type IDs; their roles are unknown. All 56 table targets are
+  constructor type IDs; their roles are unknown. Selectors `0x58..0x5F` add
+  the RTTI-backed `TrackRecipe`, `ClearTrackedRecipe`, `SlotTech`,
+  `InteractableStatusChanged`, `SendTipMessage`, `DebugEventSample`,
+  `DebugLagPlayerSample`, and `DebugLagSimulationSample` cases. They carry a
+  DWORD at `+0x28`, no body reader, another DWORD at `+0x28`, then ordered
+  byte/DWORD/QWORD/byte; byte/two DWORDs/WORD/byte; two WORDs/two bytes; five
+  WORDs; and thirteen WORDs, respectively. Their field meanings remain
+  unresolved. Parser-local DWORD literals `0x38..0x3F` are recorded separately
+  from selectors and constructor type IDs. All 64 verified table targets are
   distinct and nonzero. Selectors `0x28/0x2D`
   and `0x32/0x34` share
   reader continuations despite distinct table destinations and types.
@@ -114,7 +125,10 @@ helper calls against the original binary before committing and pushing.
   `0x56`, and `0x57` likewise reach readers from local zero-object blocks;
   `0x51`, `0x52`, and `0x55` use zero-object continuations `0x81F72C`,
   `0x8206E1`, and `0x81FB25`. These are static paths only; no runtime
-  consequence is asserted.
+  consequence is asserted. Selectors `0x58` and `0x5A` share the
+  `0x8206E1/0x8206E3` zero-object/reader continuation; `0x59` returns to
+  `0x8217D9` on allocation failure, and `0x5B..0x5F` reach local zero-object
+  blocks before their scalar readers.
 - Keep this table distinct from the unrelated keyed-receiver factory
   `0x81B1B0`, route0's nested Character selectors `0x53..0x7A`, and primary
   routes 2-6. `.text` and `.rdata` section-aware vtable RTTI names were

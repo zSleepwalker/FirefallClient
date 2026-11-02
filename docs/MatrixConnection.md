@@ -1089,12 +1089,12 @@ subcases: three at route2, nine at route3, three at route4, and one each at
 routes5 and6. All 17 subcases now have native layouts.
 Route0's nested table has a separate, complete set of 40 documented selectors
 (`0x53..0x7A`); route1 is the zero-return route. The secondary selector table
-records 91 dispatch targets. Selectors `0x20..0x57` now have 56 RTTI-backed
-class and body-reader layouts; the remaining 35 identities are unresolved.
+records 91 dispatch targets. Selectors `0x20..0x5F` now have 64 RTTI-backed
+class and body-reader layouts; the remaining 27 identities are unresolved.
 All 91 table entries are nonzero and have distinct targets in the original
 binary, which establishes address uniqueness, not 91 completed identities.
 
-### Secondary-selector entries `0x20..0x57`
+### Secondary-selector entries `0x20..0x5F`
 
 This is the separate second table used by the leading-byte-zero and
 `0xF0..0xFF` path in `0x81CC50`. Its index is `selector - 0x20`, with accepted
@@ -1169,8 +1169,16 @@ Selectors outside `0x20..0x7A` reach the shared zero-return block at raw
 | `0x55` | 53 | `0xC214E1` / `0x8208E1` | `0x30` | `0x817F20` | `0x1C6DF08` / `ClientUIAction` | `0x12EE010` (shared continuation) |
 | `0x56` | 54 | `0xC21529` / `0x820929` | `0x30` | `0x8180B0` | `0x1C6DF28` / `ArcCompletionHistoryUpdate` | `0x847A70` |
 | `0x57` | 55 | `0xC21593` / `0x820993` | `0x38` | `0x818220` | `0x1C6DF18` / `JobLedgerEntriesUpdate` | `0x6095C0` |
+| `0x58` | 56 | `0xC215FD` / `0x8209FD` | `0x30` | `0x818370` | `0x1C6DED8` / `TrackRecipe` | `0x3370A0` (shared continuation) |
+| `0x59` | 57 | `0xC21645` / `0x820A45` | `0x28` | `0x818430` | `0x1C6DEF8` / `ClearTrackedRecipe` | none |
+| `0x5A` | 58 | `0xC21699` / `0x820A99` | `0x30` | `0x8184A0` | `0x1C6DEE8` / `SlotTech` | `0x3370A0` (shared continuation) |
+| `0x5B` | 59 | `0xC216E1` / `0x820AE1` | `0x40` | `0x818560` | `0x1C6DEB8` / `InteractableStatusChanged` | `0x846A50` |
+| `0x5C` | 60 | `0xC21749` / `0x820B49` | `0x38` | `0x818640` | `0x1C6DEA8` / `SendTipMessage` | `0x846960` |
+| `0x5D` | 61 | `0xC217B1` / `0x820BB1` | `0x30` | `0x818730` | `0x1C6DEC8` / `DebugEventSample` | `0x846850` |
+| `0x5E` | 62 | `0xC21819` / `0x820C19` | `0x38` | `0x818800` | `0x1C6DE88` / `DebugLagPlayerSample` | `0x846760` |
+| `0x5F` | 63 | `0xC21881` / `0x820C81` | `0x48` | `0x8188E0` | `0x1C6DE78` / `DebugLagSimulationSample` | `0x8465C0` |
 
-The first 56 entries have 56 distinct, nonzero table destinations. No shared
+The first 64 entries have 64 distinct, nonzero table destinations. No shared
 case or zero-valued table slot occurs in this verified prefix. Selector `0x26`
 does have a distinct allocation-failure branch to the common zero-return block;
 that is a case-path result, not a zero table entry. Selectors `0x28` and `0x2D`
@@ -1180,7 +1188,7 @@ destinations and RTTI-identified types remain distinct. Selectors `0x32` and
 sharing the NUL-terminated text reader at raw `0x12EE010` through continuation
 `0x81FB27`.
 
-All 56 constructors call a selector-specific base-metadata initializer
+All 64 constructors call a selector-specific base-metadata initializer
 before storing the derived vtable. For selectors `0x20..0x27` these helpers
 are `0x823020`, `0x823090`, `0x823100`, `0x823170`, `0x8231E0`, `0x823250`,
 `0x8232C0`, and `0x823330`; for `0x28..0x2F` they are `0x8233C0`, `0x823430`,
@@ -1195,7 +1203,8 @@ and `0x824830`; selectors `0x48..0x4F` use `0x8248A0`, `0x824910`,
 selectors `0x50..0x57` use `0x824C20`, `0x824D80`, `0x824DF0`, `0x824E60`,
 `0x824FD0`, `0x825040`, `0x8250B0`, and `0x825120`. The
 `0x8250B0` initializer also installs a base vtable before initializing the
-common metadata fields.
+common metadata fields. Selectors `0x58..0x5F` use `0x825190`, `0x825200`,
+`0x825270`, `0x8252E0`, `0x825350`, `0x8253C0`, `0x825430`, and `0x8254A0`.
 Each helper sets a base flag DWORD at `+0x08` to 1, stores its
 descriptor-anchor pointer at `+0x0C`, stores the constructor-supplied type
 DWORD at `+0x10`, copies the parser input's first two DWORDs to `+0x18/+0x1C`,
@@ -1211,6 +1220,9 @@ these are recorded separately from selector/table indexes and their roles are
 unknown. Selectors `0x40..0x4F` store parser-local DWORD literals `0x20..0x2F`
 in the same separate slot; their roles are also unresolved and they are not
 the constructor type IDs or table indexes.
+Selectors `0x58..0x5F` store parser-local DWORD literals `0x38..0x3F` in that
+separate slot. These remain distinct observations from the selector, native
+constructor type ID, and descriptor anchor; no role is assigned to the values.
 
 Body reads, with field labels deliberately limited to offsets and widths:
 
@@ -1433,6 +1445,30 @@ Body reads, with field labels deliberately limited to offsets and widths:
 - `0x57` `JobLedgerEntriesUpdate`: a byte-counted DWORD vector at
   `+0x28/+0x2C/+0x30`. Each item is four wire bytes and four-byte native
   stride. Count `0xFF` continues with another count byte; zero ends the vector.
+- `0x58` `TrackRecipe`: one DWORD at `+0x28`, via the same reader and
+  continuation as selector `0x52`.
+- `0x59` `ClearTrackedRecipe`: no body-reader call; its allocation is exactly
+  the `0x28`-byte base object.
+- `0x5A` `SlotTech`: one DWORD at `+0x28`, via the same reader and
+  continuation as selectors `0x52` and `0x58`.
+- `0x5B` `InteractableStatusChanged`: byte at `+0x28`, DWORD at `+0x2C`, raw
+  QWORD at `+0x30`, then byte at `+0x38`.
+- `0x5C` `SendTipMessage`: byte at `+0x28`, DWORDs at `+0x2C/+0x30`, WORD at
+  `+0x34`, then byte at `+0x36`.
+- `0x5D` `DebugEventSample`: WORDs at `+0x28/+0x2A`, then bytes at
+  `+0x2C/+0x2D`.
+- `0x5E` `DebugLagPlayerSample`: five WORDs at `+0x28`, `+0x2A`, `+0x2C`,
+  `+0x2E`, and `+0x30`.
+- `0x5F` `DebugLagSimulationSample`: thirteen WORDs at two-byte intervals
+  from `+0x28` through `+0x40`.
+
+These are positional wire layouts only; RTTI class names do not establish the
+meaning of any field. None of the `0x58..0x5F` body readers has a count/vector
+loop or a field gate. `TrackRecipe` and `SlotTech` reuse the DWORD reader
+continuation at `0x8206E3`; `ClearTrackedRecipe` has no body reader. The other
+five readers are straight-line scalar reads in the field orders above. Their
+primitive helper calls were checked against the one-byte, WORD, DWORD, and
+QWORD load/store widths and cursor increments in `FirefallClient.exe.original`.
 
 The shared NUL-terminated text reader used by `0x53..0x55` reads bytewise
 through the terminator in repeating 256-byte chunks; 256 is a chunk size, not
@@ -1494,6 +1530,21 @@ tree sentinel. The allocation-failure routes either enter a local zero-object
 block or a shared zero-object continuation before the reader calls; this is
 static control flow only and does not assert runtime consequences.
 
+Selectors `0x58..0x5F` use the same setup-call/allocation pattern. Their
+parser-local DWORD literals are `0x38..0x3F`; the constructors pass native
+type IDs `0x58..0x5F` to the selector-specific metadata helpers and install
+distinct RTTI-resolved vtables with zero complete-object offsets.
+`TrackRecipe` and `SlotTech` share the `0x8206E3` DWORD-reader continuation;
+`ClearTrackedRecipe` has no body reader. The remaining readers consume the
+ordered byte/DWORD/QWORD/WORD scalar fields recorded above. The checks verify
+each reader's destination address, helper call, primitive width, and cursor
+increment. No count loop or field gate occurs in these readers. Allocation
+failure for `TrackRecipe` and `SlotTech` joins the shared zero-object
+continuation at `0x8206E1`; `ClearTrackedRecipe` returns through the common
+zero-return block at `0x8217D9`. Selectors `0x5B..0x5F` use local
+zero-object blocks immediately before their readers. These are static paths
+only; no runtime consequence is asserted.
+
 Binary fingerprints include table indexes and targets, case setup arguments,
 allocation sizes and failure blocks, constructor type/metadata/vtable order,
 reader field arguments, primitive-reader calls, byte-count consumption,
@@ -1505,7 +1556,9 @@ argument order, byte/DWORD/WORD widths, zero-length blob gate, and shared-text
 NUL/chunk loop. The `0x50..0x57` checks pin the table targets and RTTI,
 allocation-failure branches, constructor/header stores, all reader field
 arguments, the five-/16-/four-byte counted record shapes, native strides, and
-the `0x56` tree-sentinel word initializer and count loop. These checks
+the `0x56` tree-sentinel word initializer and count loop. The `0x58..0x5F`
+checks pin the new targets/RTTI, allocation and failure paths, metadata
+initializers, scalar field order, and primitive load/store widths. These checks
 assert wire framing only; unresolved field, gate, count, predicate, and tag
 meanings remain unassigned.
 
@@ -1522,6 +1575,11 @@ enter local zero-object blocks; `0x51`, `0x52`, and `0x55` reuse the zero-object
 continuations at `0x81F72C`, `0x8206E1`, and `0x81FB25`, respectively, before
 their readers. These are static control-flow observations only; their
 runtime consequence is not asserted.
+Selectors `0x58` and `0x5A` also branch to the shared zero-object continuation
+at `0x8206E1` before the DWORD reader; `0x59` branches to the common zero-return
+block at `0x8217D9`. Selectors `0x5B..0x5F` each branch to a local
+zero-object block before their scalar-reader call. These are static
+control-flow observations only; their runtime consequence is not asserted.
 Selectors `0x32` and `0x34` share the zero-object continuation at raw
 `0x81FB25` and the text-reader continuation at `0x81FB27`. These are static
 control-flow observations only; their runtime consequence is not asserted.
