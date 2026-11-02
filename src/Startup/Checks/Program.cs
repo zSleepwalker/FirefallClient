@@ -970,7 +970,7 @@ Check("Secondary command dispatcher separates primary-byte, secondary-selector, 
     && MatrixSecondaryCommandDispatcherNativeLayout.GetSecondarySelectorIndex(0x20) == 0
     && MatrixSecondaryCommandDispatcherNativeLayout.GetSecondarySelectorIndex(0x7A) == 0x5A
     && MatrixSecondaryCommandDispatcherNativeLayout.GetSecondarySelectorIndex(0x7B) is null);
-Check("Secondary decoder table snapshot records 80 of 91 selectors",
+Check("Secondary decoder table snapshot records 88 of 91 selectors",
     MatrixSecondaryDecoderTableNativeLayout.ParserFileOffset == 0x81CC50
     && MatrixSecondaryDecoderTableNativeLayout.SelectorComparisonFileOffset == 0x81F3A8
     && MatrixSecondaryDecoderTableNativeLayout.SelectorJumpFileOffset == 0x81F3B4
@@ -980,6 +980,11 @@ Check("Secondary decoder table snapshot records 80 of 91 selectors",
     && MatrixSecondaryDecoderTableNativeLayout.EntryCount == 0x5B
     && MatrixSecondaryDecoderTableNativeLayout.DefaultZeroReturnFileOffset == 0x8217D9
     && MatrixSecondaryDecoderTableNativeLayout.SharedCaseSetupArgument3VirtualAddress == 0x1E60904
+    && MatrixSecondaryDecoderTableNativeLayout.RemainingInputBlobVtableVirtualAddress == 0x1C80CC4
+    && MatrixSecondaryDecoderTableNativeLayout.RemainingInputBlobReaderMethodVirtualAddress == 0x16CC5D0
+    && MatrixSecondaryDecoderTableNativeLayout.RemainingInputBlobReaderMethodFileOffset == 0x12CB9D0
+    && MatrixSecondaryDecoderTableNativeLayout.RemainingInputBlobResizeHelperFileOffset == 0x12CBCB0
+    && MatrixSecondaryDecoderTableNativeLayout.RemainingInputBlobCopyRoutineFileOffset == 0x159D8F4
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x20) == 0
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x27) == 7
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x28) == 8
@@ -997,16 +1002,18 @@ Check("Secondary decoder table snapshot records 80 of 91 selectors",
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x67) == 71
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x68) == 72
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x6F) == 79
+    && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x70) == 80
+    && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x77) == 87
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x7A) == 0x5A
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x1F) is null
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x7B) is null
-    && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries.Count == 80
+    && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries.Count == 88
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .Select(entry => entry.Selector)
-        .SequenceEqual(Enumerable.Range(0x20, 80).Select(selector => (byte)selector))
+        .SequenceEqual(Enumerable.Range(0x20, 88).Select(selector => (byte)selector))
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .Select(entry => entry.TableIndex)
-        .SequenceEqual(Enumerable.Range(0, 80))
+        .SequenceEqual(Enumerable.Range(0, 88))
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .Select(entry => entry.TargetVirtualAddress)
         .SequenceEqual(new uint[]
@@ -1030,7 +1037,9 @@ Check("Secondary decoder table snapshot records 80 of 91 selectors",
             0xC218E9, 0xC21951, 0xC219B9, 0xC21A21,
             0xC21A89, 0xC21AF1, 0xC21B59, 0xC21BA1,
             0xC21C0C, 0xC21C74, 0xC21CDE, 0xC21D46,
-            0xC21DAE, 0xC21E16, 0xC21E7E, 0xC21EE6
+            0xC21DAE, 0xC21E16, 0xC21E7E, 0xC21EE6,
+            0xC21F4E, 0xC21FB6, 0xC2201E, 0xC22088,
+            0xC220F0, 0xC22158, 0xC221CC, 0xC22236
         })
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .All(entry => entry.TargetKind == MatrixSecondaryDecoderTargetKind.MessageCase)
@@ -1038,7 +1047,7 @@ Check("Secondary decoder table snapshot records 80 of 91 selectors",
         .All(entry => entry.TargetVirtualAddress == entry.TargetFileOffset + 0x400C00)
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .Select(entry => entry.TargetVirtualAddress)
-        .Distinct().Count() == 80
+        .Distinct().Count() == 88
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x27)?.TargetFileOffset == 0x81F683
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x28)?.TargetFileOffset == 0x81F6EB
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x2F)?.TargetFileOffset == 0x81F9BE
@@ -1056,7 +1065,76 @@ Check("Secondary decoder table snapshot records 80 of 91 selectors",
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x60)?.TargetFileOffset == 0x820CE9
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x67)?.TargetFileOffset == 0x820FA1
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x68)?.TargetFileOffset == 0x82100C
-    && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x6F)?.TargetFileOffset == 0x8212E6);
+    && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x6F)?.TargetFileOffset == 0x8212E6
+    && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x70)?.TargetFileOffset == 0x82134E
+    && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x77)?.TargetFileOffset == 0x821636);
+Check("Secondary selectors 0x70-0x77 retain native identities and wire layouts",
+    EncounterPublicInfoNativeLayout.AllocationSize == 0x40
+    && EncounterPublicInfoNativeLayout.ConstructorNativeTypeId == 0x70
+    && EncounterPublicInfoNativeLayout.DescriptorAnchorVirtualAddress == 0x1B89A84
+    && EncounterPublicInfoNativeLayout.QwordFieldOffset == 0x28
+    && EncounterPublicInfoNativeLayout.RemainingInputBlobFieldOffset == 0x30
+    && EncounterPublicInfoNativeLayout.QwordWireWidth == 8
+    && RequestActiveEncountersResponseNativeLayout.AllocationSize == 0x38
+    && RequestActiveEncountersResponseNativeLayout.ConstructorNativeTypeId == 0x71
+    && RequestActiveEncountersResponseNativeLayout.DescriptorAnchorVirtualAddress == 0x1B89A8C
+    && RequestActiveEncountersResponseNativeLayout.RemainingInputBlobFieldOffset == 0x28
+    && ShoppingListInitNativeLayout.AllocationSize == 0x30
+    && ShoppingListInitNativeLayout.ConstructorNativeTypeId == 0x72
+    && ShoppingListInitNativeLayout.DescriptorAnchorVirtualAddress == 0x1B89A74
+    && ShoppingListInitNativeLayout.TreeFieldOffset == 0x28
+    && ShoppingListInitNativeLayout.RecordFirstDwordWireWidth == 4
+    && ShoppingListInitNativeLayout.RecordSecondDwordWireWidth == 4
+    && SetClientDailyInfoNativeLayout.AllocationSize == 0x50
+    && SetClientDailyInfoNativeLayout.ConstructorNativeTypeId == 0x73
+    && SetClientDailyInfoNativeLayout.DescriptorAnchorVirtualAddress == 0x1B89A7C
+    && SetClientDailyInfoNativeLayout.FirstDwordFieldOffset == 0x28
+    && SetClientDailyInfoNativeLayout.CountedSequenceFieldOffset == 0x2C
+    && SetClientDailyInfoNativeLayout.RecordHelperFileOffset == 0x38EC20
+    && GlobalCounterUpdateNativeLayout.AllocationSize == 0x38
+    && GlobalCounterUpdateNativeLayout.ConstructorNativeTypeId == 0x74
+    && GlobalCounterUpdateNativeLayout.DescriptorAnchorVirtualAddress == 0x1B89A64
+    && GlobalCounterUpdateNativeLayout.SharedTextFieldOffset == 0x28
+    && GlobalCounterUpdateNativeLayout.QwordFieldOffset == 0x30
+    && GlobalCounterMilestoneInfoNativeLayout.AllocationSize == 0x38
+    && GlobalCounterMilestoneInfoNativeLayout.ConstructorNativeTypeId == 0x75
+    && GlobalCounterMilestoneInfoNativeLayout.DescriptorAnchorVirtualAddress == 0x1B89A6C
+    && GlobalCounterMilestoneInfoNativeLayout.FirstCollectionFieldOffset == 0x28
+    && GlobalCounterMilestoneInfoNativeLayout.SecondCollectionFieldOffset == 0x30
+    && GlobalCounterMilestoneInfoNativeLayout.NestedRecordFirstDwordWireWidth == 4
+    && GlobalCounterMilestoneInfoNativeLayout.NestedRecordSecondDwordWireWidth == 4
+    && GlobalCounterMilestoneInfoNativeLayout.NestedRecordTrailingDwordWireWidth == 4
+    && ChatMessageListNativeLayout.AllocationSize == 0x38
+    && ChatMessageListNativeLayout.ConstructorNativeTypeId == 0x76
+    && ChatMessageListNativeLayout.DescriptorAnchorVirtualAddress == 0x1B89A54
+    && ChatMessageListNativeLayout.RecordVectorFieldOffset == 0x28
+    && ChatMessageListNativeLayout.RecordNativeStride == 0x40
+    && ChatMessageListNativeLayout.RecordOptionalBlobOffset == 0x14
+    && ChatMessageListNativeLayout.OptionalBlobLengthReaderFileOffset == 0x12EE170
+    && ChatMessageListNativeLayout.OptionalBlobUpdateFileOffset == 0x5F1920
+    && ChatMessageListNativeLayout.OptionalBlobClearFileOffset == 0x49AC30
+    && ChatMessageListNativeLayout.RecordOptionalQwordOffset == 0x28
+    && ChatMessageListNativeLayout.OptionalQwordPrimitiveReaderFileOffset == 0x356F80
+    && ChatMessageListNativeLayout.RecordNestedReaderOffset == 0x38
+    && CurrentLoadoutResponseNativeLayout.AllocationSize == 0x50
+    && CurrentLoadoutResponseNativeLayout.ConstructorNativeTypeId == 0x77
+    && CurrentLoadoutResponseNativeLayout.DescriptorAnchorVirtualAddress == 0x1B89A5C
+    && CurrentLoadoutResponseNativeLayout.QwordFieldOffset == 0x28
+    && CurrentLoadoutResponseNativeLayout.RecordVectorFieldOffset == 0x44
+    && CurrentLoadoutResponseNativeLayout.RecordNativeStride == 0x2E0
+    && CurrentLoadoutResponseNativeLayout.RecordOptionalBlockGateOffset == 0x34
+    && CurrentLoadoutResponseNativeLayout.RecordOptionalBlockByteOffset == 0x2D8
+    && new uint[]
+    {
+        EncounterPublicInfoNativeLayout.BodyReaderFileOffset,
+        RequestActiveEncountersResponseNativeLayout.BodyReaderFileOffset,
+        ShoppingListInitNativeLayout.BodyReaderFileOffset,
+        SetClientDailyInfoNativeLayout.BodyReaderFileOffset,
+        GlobalCounterUpdateNativeLayout.BodyReaderFileOffset,
+        GlobalCounterMilestoneInfoNativeLayout.BodyReaderFileOffset,
+        ChatMessageListNativeLayout.BodyReaderFileOffset,
+        CurrentLoadoutResponseNativeLayout.BodyReaderFileOffset
+    }.All(reader => reader != 0));
 Check("Secondary selectors 0x58-0x5F retain positional wire layouts",
     TrackRecipeNativeLayout.Selector == 0x58
     && TrackRecipeNativeLayout.AllocationSize == 0x30

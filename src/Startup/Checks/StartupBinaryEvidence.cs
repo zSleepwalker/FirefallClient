@@ -25,6 +25,12 @@ internal static class StartupBinaryEvidence
             return ReadAt(offset, expected.Length).SequenceEqual(expected);
         }
 
+        bool ContainsBytes(long offset, int length, string hex)
+        {
+            var expected = Convert.FromHexString(hex);
+            return ReadAt(offset, length).AsSpan().IndexOf(expected) >= 0;
+        }
+
         string UInt32LittleEndianHex(uint value)
         {
             var bytes = new byte[4];
@@ -3044,6 +3050,477 @@ internal static class StartupBinaryEvidence
             && Matches(0x12EE05D, "8B4F048A01888435F8FEFFFF8D4101894704")
             && Matches(0x12EE091, "80BC35F8FEFFFF00")
             && Matches(0x12EE09C, "81FE000100007C9E"));
+        check("Binary secondary 0x70-0x77 table targets map to distinct section-aware RTTI types",
+            new (byte Selector, uint CaseFileOffset, uint CaseVirtualAddress,
+                uint VtableVirtualAddress, uint VtableFileOffset, string RttiName)[] {
+                (EncounterPublicInfoNativeLayout.Selector,
+                    EncounterPublicInfoNativeLayout.CaseFileOffset,
+                    EncounterPublicInfoNativeLayout.CaseVirtualAddress,
+                    EncounterPublicInfoNativeLayout.VtableVirtualAddress,
+                    EncounterPublicInfoNativeLayout.VtableFileOffset,
+                    EncounterPublicInfoNativeLayout.RttiName),
+                (RequestActiveEncountersResponseNativeLayout.Selector,
+                    RequestActiveEncountersResponseNativeLayout.CaseFileOffset,
+                    RequestActiveEncountersResponseNativeLayout.CaseVirtualAddress,
+                    RequestActiveEncountersResponseNativeLayout.VtableVirtualAddress,
+                    RequestActiveEncountersResponseNativeLayout.VtableFileOffset,
+                    RequestActiveEncountersResponseNativeLayout.RttiName),
+                (ShoppingListInitNativeLayout.Selector,
+                    ShoppingListInitNativeLayout.CaseFileOffset,
+                    ShoppingListInitNativeLayout.CaseVirtualAddress,
+                    ShoppingListInitNativeLayout.VtableVirtualAddress,
+                    ShoppingListInitNativeLayout.VtableFileOffset,
+                    ShoppingListInitNativeLayout.RttiName),
+                (SetClientDailyInfoNativeLayout.Selector,
+                    SetClientDailyInfoNativeLayout.CaseFileOffset,
+                    SetClientDailyInfoNativeLayout.CaseVirtualAddress,
+                    SetClientDailyInfoNativeLayout.VtableVirtualAddress,
+                    SetClientDailyInfoNativeLayout.VtableFileOffset,
+                    SetClientDailyInfoNativeLayout.RttiName),
+                (GlobalCounterUpdateNativeLayout.Selector,
+                    GlobalCounterUpdateNativeLayout.CaseFileOffset,
+                    GlobalCounterUpdateNativeLayout.CaseVirtualAddress,
+                    GlobalCounterUpdateNativeLayout.VtableVirtualAddress,
+                    GlobalCounterUpdateNativeLayout.VtableFileOffset,
+                    GlobalCounterUpdateNativeLayout.RttiName),
+                (GlobalCounterMilestoneInfoNativeLayout.Selector,
+                    GlobalCounterMilestoneInfoNativeLayout.CaseFileOffset,
+                    GlobalCounterMilestoneInfoNativeLayout.CaseVirtualAddress,
+                    GlobalCounterMilestoneInfoNativeLayout.VtableVirtualAddress,
+                    GlobalCounterMilestoneInfoNativeLayout.VtableFileOffset,
+                    GlobalCounterMilestoneInfoNativeLayout.RttiName),
+                (ChatMessageListNativeLayout.Selector,
+                    ChatMessageListNativeLayout.CaseFileOffset,
+                    ChatMessageListNativeLayout.CaseVirtualAddress,
+                    ChatMessageListNativeLayout.VtableVirtualAddress,
+                    ChatMessageListNativeLayout.VtableFileOffset,
+                    ChatMessageListNativeLayout.RttiName),
+                (CurrentLoadoutResponseNativeLayout.Selector,
+                    CurrentLoadoutResponseNativeLayout.CaseFileOffset,
+                    CurrentLoadoutResponseNativeLayout.CaseVirtualAddress,
+                    CurrentLoadoutResponseNativeLayout.VtableVirtualAddress,
+                    CurrentLoadoutResponseNativeLayout.VtableFileOffset,
+                    CurrentLoadoutResponseNativeLayout.RttiName)
+            }.Select((item, index) =>
+                item.Selector == 0x70 + index
+                && ReadUInt32(VirtualAddressToFileOffset(
+                    MatrixSecondaryDecoderTableNativeLayout.TableVirtualAddress)
+                    + (uint)((item.Selector - 0x20) * 4)) == item.CaseVirtualAddress
+                && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(item.Selector)
+                    ?.TargetVirtualAddress == item.CaseVirtualAddress
+                && item.CaseVirtualAddress == item.CaseFileOffset + 0x400C00
+                && VirtualAddressToFileOffset(item.VtableVirtualAddress) == item.VtableFileOffset
+                && VtableRttiName(item.VtableVirtualAddress, 80) == item.RttiName
+                && VtableCompleteObjectOffset(item.VtableVirtualAddress) == 0)
+                .All(matches => matches)
+            && new uint[] {
+                EncounterPublicInfoNativeLayout.CaseVirtualAddress,
+                RequestActiveEncountersResponseNativeLayout.CaseVirtualAddress,
+                ShoppingListInitNativeLayout.CaseVirtualAddress,
+                SetClientDailyInfoNativeLayout.CaseVirtualAddress,
+                GlobalCounterUpdateNativeLayout.CaseVirtualAddress,
+                GlobalCounterMilestoneInfoNativeLayout.CaseVirtualAddress,
+                ChatMessageListNativeLayout.CaseVirtualAddress,
+                CurrentLoadoutResponseNativeLayout.CaseVirtualAddress
+            }.Distinct().Count() == 8);
+        check("Binary secondary 0x70-0x77 cases preserve setup, allocation failure, constructors, and reader input setup",
+            new (byte Selector, uint Case, uint SetupArgument2, uint Anchor, int Allocation,
+                uint LocalValue, uint Constructor, uint Reader, uint ReaderCall,
+                uint FailureBranch, uint FailureZero, uint SuccessBranch, string ReaderSetup)[] {
+                (EncounterPublicInfoNativeLayout.Selector,
+                    EncounterPublicInfoNativeLayout.CaseFileOffset,
+                    EncounterPublicInfoNativeLayout.CaseSetupArgument2VirtualAddress,
+                    EncounterPublicInfoNativeLayout.DescriptorAnchorVirtualAddress,
+                    EncounterPublicInfoNativeLayout.AllocationSize,
+                    EncounterPublicInfoNativeLayout.CaseLocalDwordValue,
+                    EncounterPublicInfoNativeLayout.ConstructorFileOffset,
+                    EncounterPublicInfoNativeLayout.BodyReaderFileOffset,
+                    EncounterPublicInfoNativeLayout.BodyReaderCallSiteFileOffset,
+                    EncounterPublicInfoNativeLayout.AllocationFailureBranchFileOffset,
+                    EncounterPublicInfoNativeLayout.AllocationFailureZeroObjectFileOffset,
+                    EncounterPublicInfoNativeLayout.SuccessfulConstructionBranchFileOffset,
+                    "568BCFC7442424FFFFFFFF"),
+                (RequestActiveEncountersResponseNativeLayout.Selector,
+                    RequestActiveEncountersResponseNativeLayout.CaseFileOffset,
+                    RequestActiveEncountersResponseNativeLayout.CaseSetupArgument2VirtualAddress,
+                    RequestActiveEncountersResponseNativeLayout.DescriptorAnchorVirtualAddress,
+                    RequestActiveEncountersResponseNativeLayout.AllocationSize,
+                    RequestActiveEncountersResponseNativeLayout.CaseLocalDwordValue,
+                    RequestActiveEncountersResponseNativeLayout.ConstructorFileOffset,
+                    RequestActiveEncountersResponseNativeLayout.BodyReaderFileOffset,
+                    RequestActiveEncountersResponseNativeLayout.BodyReaderCallSiteFileOffset,
+                    RequestActiveEncountersResponseNativeLayout.AllocationFailureBranchFileOffset,
+                    RequestActiveEncountersResponseNativeLayout.AllocationFailureZeroObjectFileOffset,
+                    RequestActiveEncountersResponseNativeLayout.SuccessfulConstructionBranchFileOffset,
+                    "568BCFC7442424FFFFFFFF"),
+                (ShoppingListInitNativeLayout.Selector,
+                    ShoppingListInitNativeLayout.CaseFileOffset,
+                    ShoppingListInitNativeLayout.CaseSetupArgument2VirtualAddress,
+                    ShoppingListInitNativeLayout.DescriptorAnchorVirtualAddress,
+                    ShoppingListInitNativeLayout.AllocationSize,
+                    ShoppingListInitNativeLayout.CaseLocalDwordValue,
+                    ShoppingListInitNativeLayout.ConstructorFileOffset,
+                    ShoppingListInitNativeLayout.BodyReaderFileOffset,
+                    ShoppingListInitNativeLayout.BodyReaderCallSiteFileOffset,
+                    ShoppingListInitNativeLayout.AllocationFailureBranchFileOffset,
+                    ShoppingListInitNativeLayout.AllocationFailureZeroObjectFileOffset,
+                    ShoppingListInitNativeLayout.SuccessfulConstructionBranchFileOffset,
+                    "8D5628C7442420FFFFFFFF8BCF"),
+                (SetClientDailyInfoNativeLayout.Selector,
+                    SetClientDailyInfoNativeLayout.CaseFileOffset,
+                    SetClientDailyInfoNativeLayout.CaseSetupArgument2VirtualAddress,
+                    SetClientDailyInfoNativeLayout.DescriptorAnchorVirtualAddress,
+                    SetClientDailyInfoNativeLayout.AllocationSize,
+                    SetClientDailyInfoNativeLayout.CaseLocalDwordValue,
+                    SetClientDailyInfoNativeLayout.ConstructorFileOffset,
+                    SetClientDailyInfoNativeLayout.BodyReaderFileOffset,
+                    SetClientDailyInfoNativeLayout.BodyReaderCallSiteFileOffset,
+                    SetClientDailyInfoNativeLayout.AllocationFailureBranchFileOffset,
+                    SetClientDailyInfoNativeLayout.AllocationFailureZeroObjectFileOffset,
+                    SetClientDailyInfoNativeLayout.SuccessfulConstructionBranchFileOffset,
+                    "568BCFC7442424FFFFFFFF"),
+                (GlobalCounterUpdateNativeLayout.Selector,
+                    GlobalCounterUpdateNativeLayout.CaseFileOffset,
+                    GlobalCounterUpdateNativeLayout.CaseSetupArgument2VirtualAddress,
+                    GlobalCounterUpdateNativeLayout.DescriptorAnchorVirtualAddress,
+                    GlobalCounterUpdateNativeLayout.AllocationSize,
+                    GlobalCounterUpdateNativeLayout.CaseLocalDwordValue,
+                    GlobalCounterUpdateNativeLayout.ConstructorFileOffset,
+                    GlobalCounterUpdateNativeLayout.BodyReaderFileOffset,
+                    GlobalCounterUpdateNativeLayout.BodyReaderCallSiteFileOffset,
+                    GlobalCounterUpdateNativeLayout.AllocationFailureBranchFileOffset,
+                    GlobalCounterUpdateNativeLayout.AllocationFailureZeroObjectFileOffset,
+                    GlobalCounterUpdateNativeLayout.SuccessfulConstructionBranchFileOffset,
+                    "568BCFC7442424FFFFFFFF"),
+                (GlobalCounterMilestoneInfoNativeLayout.Selector,
+                    GlobalCounterMilestoneInfoNativeLayout.CaseFileOffset,
+                    GlobalCounterMilestoneInfoNativeLayout.CaseSetupArgument2VirtualAddress,
+                    GlobalCounterMilestoneInfoNativeLayout.DescriptorAnchorVirtualAddress,
+                    GlobalCounterMilestoneInfoNativeLayout.AllocationSize,
+                    GlobalCounterMilestoneInfoNativeLayout.CaseLocalDwordValue,
+                    GlobalCounterMilestoneInfoNativeLayout.ConstructorFileOffset,
+                    GlobalCounterMilestoneInfoNativeLayout.BodyReaderFileOffset,
+                    GlobalCounterMilestoneInfoNativeLayout.BodyReaderCallSiteFileOffset,
+                    GlobalCounterMilestoneInfoNativeLayout.AllocationFailureBranchFileOffset,
+                    GlobalCounterMilestoneInfoNativeLayout.AllocationFailureZeroObjectFileOffset,
+                    GlobalCounterMilestoneInfoNativeLayout.SuccessfulConstructionBranchFileOffset,
+                    "8D5628C7442420FFFFFFFF8BCF"),
+                (ChatMessageListNativeLayout.Selector,
+                    ChatMessageListNativeLayout.CaseFileOffset,
+                    ChatMessageListNativeLayout.CaseSetupArgument2VirtualAddress,
+                    ChatMessageListNativeLayout.DescriptorAnchorVirtualAddress,
+                    ChatMessageListNativeLayout.AllocationSize,
+                    ChatMessageListNativeLayout.CaseLocalDwordValue,
+                    ChatMessageListNativeLayout.ConstructorFileOffset,
+                    ChatMessageListNativeLayout.BodyReaderFileOffset,
+                    ChatMessageListNativeLayout.BodyReaderCallSiteFileOffset,
+                    ChatMessageListNativeLayout.AllocationFailureBranchFileOffset,
+                    ChatMessageListNativeLayout.AllocationFailureZeroObjectFileOffset,
+                    ChatMessageListNativeLayout.SuccessfulConstructionBranchFileOffset,
+                    "8D5628C7442420FFFFFFFF8BCF"),
+                (CurrentLoadoutResponseNativeLayout.Selector,
+                    CurrentLoadoutResponseNativeLayout.CaseFileOffset,
+                    CurrentLoadoutResponseNativeLayout.CaseSetupArgument2VirtualAddress,
+                    CurrentLoadoutResponseNativeLayout.DescriptorAnchorVirtualAddress,
+                    CurrentLoadoutResponseNativeLayout.AllocationSize,
+                    CurrentLoadoutResponseNativeLayout.CaseLocalDwordValue,
+                    CurrentLoadoutResponseNativeLayout.ConstructorFileOffset,
+                    CurrentLoadoutResponseNativeLayout.BodyReaderFileOffset,
+                    CurrentLoadoutResponseNativeLayout.BodyReaderCallSiteFileOffset,
+                    CurrentLoadoutResponseNativeLayout.AllocationFailureBranchFileOffset,
+                    CurrentLoadoutResponseNativeLayout.AllocationFailureZeroObjectFileOffset,
+                    CurrentLoadoutResponseNativeLayout.SuccessfulConstructionBranchFileOffset,
+                    "578BCEC7442424FFFFFFFF")
+            }.All(item =>
+                Matches(item.Case, "68" + UInt32LittleEndianHex(item.Anchor)
+                    + "68" + UInt32LittleEndianHex(item.SetupArgument2)
+                    + "68" + UInt32LittleEndianHex(
+                        MatrixSecondaryDecoderTableNativeLayout.SharedCaseSetupArgument3VirtualAddress))
+                && RelativeBranchTargets(item.Case + 0x0F, 0xE8,
+                    MatrixSecondaryDecoderTableNativeLayout.CaseSetupHelperFileOffset)
+                && Matches(MatrixSecondaryDecoderTableNativeLayout.CaseSetupHelperFileOffset, "C3")
+                && Matches(item.Case + 0x17, "6A" + item.Allocation.ToString("X2"))
+                && RelativeBranchTargets(item.Case + 0x19, 0xE8, 0x12B7FB0)
+                && Matches(item.Case + 0x25,
+                    "C7442420" + UInt32LittleEndianHex(item.LocalValue))
+                && item.FailureBranch == item.Case + 0x2F
+                && Matches(item.Case + 0x2D, "85C07410")
+                && item.FailureZero == item.Case + 0x41
+                && Matches(item.FailureZero, "33F6")
+                && item.SuccessBranch == item.Case + 0x3F
+                && Matches(item.Case + 0x3D, "8BF0EB02")
+                && Matches(item.SuccessBranch, "EB02")
+                && RelativeBranchTargets(item.Case + 0x38, 0xE8, item.Constructor)
+                && Matches(item.Case + 0x43, item.ReaderSetup)
+                && RelativeBranchTargets(item.ReaderCall, 0xE8, item.Reader))
+            && new uint[] {
+                EncounterPublicInfoNativeLayout.BodyReaderFileOffset,
+                RequestActiveEncountersResponseNativeLayout.BodyReaderFileOffset,
+                ShoppingListInitNativeLayout.BodyReaderFileOffset,
+                SetClientDailyInfoNativeLayout.BodyReaderFileOffset,
+                GlobalCounterUpdateNativeLayout.BodyReaderFileOffset,
+                GlobalCounterMilestoneInfoNativeLayout.BodyReaderFileOffset,
+                ChatMessageListNativeLayout.BodyReaderFileOffset,
+                CurrentLoadoutResponseNativeLayout.BodyReaderFileOffset
+            }.All(reader => reader != 0));
+        check("Binary secondary 0x70-0x77 constructors and metadata helpers preserve type IDs, anchors, and base fields",
+            new (uint Constructor, uint TypeId, uint Helper, uint Anchor,
+                uint Vtable, uint VtableFileOffset, string RttiName)[] {
+                (EncounterPublicInfoNativeLayout.ConstructorFileOffset,
+                    EncounterPublicInfoNativeLayout.ConstructorNativeTypeId,
+                    EncounterPublicInfoNativeLayout.BaseMetadataConstructorFileOffset,
+                    EncounterPublicInfoNativeLayout.DescriptorAnchorVirtualAddress,
+                    EncounterPublicInfoNativeLayout.VtableVirtualAddress,
+                    EncounterPublicInfoNativeLayout.VtableFileOffset,
+                    EncounterPublicInfoNativeLayout.RttiName),
+                (RequestActiveEncountersResponseNativeLayout.ConstructorFileOffset,
+                    RequestActiveEncountersResponseNativeLayout.ConstructorNativeTypeId,
+                    RequestActiveEncountersResponseNativeLayout.BaseMetadataConstructorFileOffset,
+                    RequestActiveEncountersResponseNativeLayout.DescriptorAnchorVirtualAddress,
+                    RequestActiveEncountersResponseNativeLayout.VtableVirtualAddress,
+                    RequestActiveEncountersResponseNativeLayout.VtableFileOffset,
+                    RequestActiveEncountersResponseNativeLayout.RttiName),
+                (ShoppingListInitNativeLayout.ConstructorFileOffset,
+                    ShoppingListInitNativeLayout.ConstructorNativeTypeId,
+                    ShoppingListInitNativeLayout.BaseMetadataConstructorFileOffset,
+                    ShoppingListInitNativeLayout.DescriptorAnchorVirtualAddress,
+                    ShoppingListInitNativeLayout.VtableVirtualAddress,
+                    ShoppingListInitNativeLayout.VtableFileOffset,
+                    ShoppingListInitNativeLayout.RttiName),
+                (SetClientDailyInfoNativeLayout.ConstructorFileOffset,
+                    SetClientDailyInfoNativeLayout.ConstructorNativeTypeId,
+                    SetClientDailyInfoNativeLayout.BaseMetadataConstructorFileOffset,
+                    SetClientDailyInfoNativeLayout.DescriptorAnchorVirtualAddress,
+                    SetClientDailyInfoNativeLayout.VtableVirtualAddress,
+                    SetClientDailyInfoNativeLayout.VtableFileOffset,
+                    SetClientDailyInfoNativeLayout.RttiName),
+                (GlobalCounterUpdateNativeLayout.ConstructorFileOffset,
+                    GlobalCounterUpdateNativeLayout.ConstructorNativeTypeId,
+                    GlobalCounterUpdateNativeLayout.BaseMetadataConstructorFileOffset,
+                    GlobalCounterUpdateNativeLayout.DescriptorAnchorVirtualAddress,
+                    GlobalCounterUpdateNativeLayout.VtableVirtualAddress,
+                    GlobalCounterUpdateNativeLayout.VtableFileOffset,
+                    GlobalCounterUpdateNativeLayout.RttiName),
+                (GlobalCounterMilestoneInfoNativeLayout.ConstructorFileOffset,
+                    GlobalCounterMilestoneInfoNativeLayout.ConstructorNativeTypeId,
+                    GlobalCounterMilestoneInfoNativeLayout.BaseMetadataConstructorFileOffset,
+                    GlobalCounterMilestoneInfoNativeLayout.DescriptorAnchorVirtualAddress,
+                    GlobalCounterMilestoneInfoNativeLayout.VtableVirtualAddress,
+                    GlobalCounterMilestoneInfoNativeLayout.VtableFileOffset,
+                    GlobalCounterMilestoneInfoNativeLayout.RttiName),
+                (ChatMessageListNativeLayout.ConstructorFileOffset,
+                    ChatMessageListNativeLayout.ConstructorNativeTypeId,
+                    ChatMessageListNativeLayout.BaseMetadataConstructorFileOffset,
+                    ChatMessageListNativeLayout.DescriptorAnchorVirtualAddress,
+                    ChatMessageListNativeLayout.VtableVirtualAddress,
+                    ChatMessageListNativeLayout.VtableFileOffset,
+                    ChatMessageListNativeLayout.RttiName),
+                (CurrentLoadoutResponseNativeLayout.ConstructorFileOffset,
+                    CurrentLoadoutResponseNativeLayout.ConstructorNativeTypeId,
+                    CurrentLoadoutResponseNativeLayout.BaseMetadataConstructorFileOffset,
+                    CurrentLoadoutResponseNativeLayout.DescriptorAnchorVirtualAddress,
+                    CurrentLoadoutResponseNativeLayout.VtableVirtualAddress,
+                    CurrentLoadoutResponseNativeLayout.VtableFileOffset,
+                    CurrentLoadoutResponseNativeLayout.RttiName)
+            }.All(item =>
+                ContainsBytes(item.Constructor, 0x80,
+                    "C700" + UInt32LittleEndianHex(item.TypeId))
+                && ContainsBytes(item.Constructor, 0x80,
+                    "C706" + UInt32LittleEndianHex(item.Vtable))
+                && ContainsConstructorCall(item.Constructor, item.Helper)
+                && Matches(item.Helper + 0x13,
+                    "C7460C" + UInt32LittleEndianHex(item.Anchor))
+                && Matches(item.Helper + 0x1A, "C7460801000000")
+                && Matches(item.Helper + 0x21, "894610")
+                && Matches(item.Helper + 0x2B, "894618")
+                && Matches(item.Helper + 0x31, "89461C")
+                && Matches(item.Helper + 0x34,
+                    "C7462000000000C7462400000000")
+                && VirtualAddressToFileOffset(item.Vtable) == item.VtableFileOffset
+                && VtableRttiName(item.Vtable, 80) == item.RttiName
+                && VtableCompleteObjectOffset(item.Vtable) == 0));
+        check("Binary secondary 0x70-0x77 readers preserve destination order, raw widths, gates, and count boundaries",
+            Matches(0x841AAA, "8D462850")
+            && RelativeBranchTargets(0x841AAE, 0xE8,
+                EncounterPublicInfoNativeLayout.QwordReaderFileOffset)
+            && Matches(0x841AB3, "8D4E30")
+            && Matches(0x841AB6, "8B770885F67431")
+            && Matches(0x841ABD, "8B0156FF7704FF5010")
+            && Matches(0x841AC6, "017704397708")
+            && Matches(0x841AEB, "297708")
+            && Matches(0x841959, "5783C128")
+            && Matches(0x84195D, "8B7E0885FF7431")
+            && Matches(0x841964, "8B0157FF7604FF5010")
+            && Matches(0x84196D, "017E04397E08")
+            && Matches(0x841992, "297E08")
+            && RelativeBranchTargets(0x82146E, 0xE8,
+                ShoppingListInitNativeLayout.BodyReaderFileOffset)
+            && RelativeBranchTargets(0x5B968D, 0xE8,
+                ShoppingListInitNativeLayout.TreeClearFileOffset)
+            && Matches(0x5B96A9, "8B46048A3840837E0801894604")
+            && Matches(0x5B9700, "8B018944240C8D4104894604")
+            && Matches(0x5B974D, "8B01894424108D4104894604")
+            && RelativeBranchTargets(0x5B9791, 0xE8,
+                ShoppingListInitNativeLayout.TreeInsertFileOffset)
+            && Matches(0x5B97A7, "80FFFF")
+            && RelativeConditionalBranchTargets(0x5B97AA, 0x0F, 0x84, 0x5B9692)
+            && Matches(0x8417DB, "8D462850")
+            && RelativeBranchTargets(0x8417DF, 0xE8,
+                SetClientDailyInfoNativeLayout.DwordReaderFileOffset)
+            && Matches(0x8417E4, "8D562C")
+            && RelativeBranchTargets(0x8417E9, 0xE8,
+                SetClientDailyInfoNativeLayout.CountedRecordReaderFileOffset)
+            && Matches(0x70A37C, "8A3840837E0801894604")
+            && Matches(0x70A3A8, "32DB84FF7475")
+            && Matches(0x70A3CE, "8B0189442410")
+            && RelativeBranchTargets(0x70A411, 0xE8,
+                SetClientDailyInfoNativeLayout.RecordHelperFileOffset)
+            && Matches(0x70A416, "807C241800")
+            && Matches(0x70A41D, "FEC33ADF728D")
+            && Matches(0x70A423, "80FFFF")
+            && RelativeConditionalBranchTargets(0x70A426, 0x0F, 0x84, 0x70A362)
+            && Matches(0x84173B, "8D5628")
+            && RelativeBranchTargets(0x84173E, 0xE8,
+                GlobalCounterUpdateNativeLayout.SharedTextReaderFileOffset)
+            && Matches(0x841743, "8D4630")
+            && RelativeBranchTargets(0x841749, 0xE8,
+                GlobalCounterUpdateNativeLayout.QwordReaderFileOffset)
+            && Matches(0x353330, "8B088B4508890883460404")
+            && Matches(0x35335E, "834608FC")
+            && Matches(0x356FA3, "8B0289018B420489410483460408")
+            && Matches(0x356FD4, "834608F8")
+            && Matches(0x3371A2, "8A008803FF4704")
+            && RelativeBranchTargets(0x84150C, 0xE8, 0x12EE010)
+            && RelativeBranchTargets(0x841516, 0xE8,
+                GlobalCounterMilestoneInfoNativeLayout.NestedCollectionReaderFileOffset)
+            && RelativeBranchTargets(0x841526, 0xE8, 0x841390)
+            && RelativeBranchTargets(0x841530, 0xE8, 0x83FF20)
+            && Matches(0x8414C9, "84DB0F8403010000")
+            && Matches(0x8415D4, "80FBFF0F84A3FEFFFF")
+            && RelativeBranchTargets(0x83F8F0, 0xE8, 0x12EE010)
+            && Matches(0x83F8BA, "8B4104894424208D4108894604")
+            && Matches(0x83F913, "8B01894424288D4104894604")
+            && RelativeBranchTargets(0x83F949, 0xE8, 0x83F6F0)
+            && Matches(0x83F9B7, "80FBFF0F8460FEFFFF")
+            && RelativeBranchTargets(0x355F07, 0xE8, 0x12EE010)
+            && RelativeBranchTargets(0x355F5C, 0xE8, 0x355DB0)
+            && Matches(0x355FC7, "80FBFF0F84D0FEFFFF")
+            && Matches(0x83EE0A,
+                "8B018944241C8B4104894424208D4108894604")
+            && RelativeBranchTargets(0x83EE46, 0xE8,
+                ChatMessageListNativeLayout.SharedTextReaderFileOffset)
+            && RelativeBranchTargets(0x83EE51, 0xE8,
+                ChatMessageListNativeLayout.SharedTextReaderFileOffset)
+            && Matches(0x83EE71, "8B4E048A018844242C")
+            && Matches(0x83EEBD, "8B4E048A018844242D")
+            && Matches(0x83EF09, "8B4E048A018844242E")
+            && RelativeBranchTargets(0x83EF40, 0xE8,
+                ChatMessageListNativeLayout.OptionalBlobReaderFileOffset)
+            && RelativeBranchTargets(0x83EF4B, 0xE8,
+                ChatMessageListNativeLayout.OptionalQwordReaderFileOffset)
+            && RelativeBranchTargets(0x83EF56, 0xE8,
+                ChatMessageListNativeLayout.NestedRecordReaderFileOffset)
+            && Matches(0x83F075, "83470440")
+            && Matches(0x83EDA6, "84DB0F84EE020000")
+            && Matches(0x83F09C, "80FBFF0F84B2FCFFFF")
+            && Matches(0x83E00D, "8D462850")
+            && RelativeBranchTargets(0x83E011, 0xE8, 0x356F80)
+            && Matches(0x83E016, "83C6308BCF56")
+            && RelativeBranchTargets(0x83E01C, 0xE8, 0x353310)
+            && Matches(0x83E021, "8D46048BCF50")
+            && RelativeBranchTargets(0x83E027, 0xE8, 0x353310)
+            && Matches(0x83E02C, "8D56088BCF")
+            && RelativeBranchTargets(0x83E031, 0xE8, 0x12EE010)
+            && Matches(0x83E036, "8D560C8BCF")
+            && RelativeBranchTargets(0x83E03B, 0xE8, 0x12EE010)
+            && Matches(0x83E040, "8D46108BCF50")
+            && RelativeBranchTargets(0x83E046, 0xE8, 0x3370A0)
+            && Matches(0x83E04B, "8D56148BCF")
+            && RelativeBranchTargets(0x83E050, 0xE8,
+                CurrentLoadoutResponseNativeLayout.VectorReaderFileOffset)
+            && Matches(0x5EA477, "8B46048A1840837E0801894604")
+            && Matches(0x5EA4A6, "84DB7449")
+            && RelativeBranchTargets(0x5EA4C9, 0xE8,
+                CurrentLoadoutResponseNativeLayout.VectorItemReaderFileOffset)
+            && RelativeBranchTargets(0x5EA4D7, 0xE8,
+                CurrentLoadoutResponseNativeLayout.VectorInsertFileOffset)
+            && Matches(0x5EA4F0, "4F75BD")
+            && Matches(0x5EA4F3, "80FBFF0F8464FFFFFF")
+            && RelativeConditionalBranchTargets(0x5EA4F6, 0x0F, 0x84, 0x5EA460)
+            && Matches(0x5EA225, "807B34007476")
+            && RelativeBranchTargets(0x5EA1BE, 0xE8, 0x353310)
+            && RelativeBranchTargets(0x5EA1C8, 0xE8, 0x12EE010)
+            && RelativeBranchTargets(0x5EA1D2, 0xE8, 0x5E8170)
+            && RelativeBranchTargets(0x5EA1DC, 0xE8, 0x5E8AD0)
+            && RelativeBranchTargets(0x5EA1E6, 0xE8, 0x6095C0)
+            && RelativeBranchTargets(0x5EA1F1, 0xE8, 0x3370A0)
+            && RelativeBranchTargets(0x5EA1FC, 0xE8, 0x3370A0)
+            && Matches(0x5EA201, "8D83D40200008BCF50")
+            && RelativeBranchTargets(0x5EA20A, 0xE8, 0x3370A0)
+            && Matches(0x5EA22B, "578D4B38")
+            && Matches(0x5EA234, "8D83F80000008BCF50")
+            && RelativeBranchTargets(0x5EA220, 0xE8, 0x356CF0)
+            && Matches(0x5EA242, "8D93D80100008BCF")
+            && RelativeBranchTargets(0x5EA22F, 0xE8, 0x5E93A0)
+            && Matches(0x5EA24F, "8D93E40100008BCF")
+            && RelativeBranchTargets(0x5EA23D, 0xE8, 0x601350)
+            && Matches(0x5EA25C, "8D83F00100008BCF50")
+            && RelativeBranchTargets(0x5EA24A, 0xE8, 0x5E9A80)
+            && Matches(0x5EA26A, "8D83D00200008BCF50")
+            && RelativeBranchTargets(0x5EA257, 0xE8, 0x60A530)
+            && Matches(0x5EA278, "8D83D40200008BCF50")
+            && RelativeBranchTargets(0x5EA265, 0xE8, 0x601350)
+            && Matches(0x5EA286, "8D93D80200008BCF")
+            && RelativeBranchTargets(0x5EA273, 0xE8, 0x3370A0)
+            && Matches(0x5EA293, "8D83F40000008BCF50")
+            && RelativeBranchTargets(0x5EA281, 0xE8, 0x3370A0)
+            && RelativeBranchTargets(0x5EA28E, 0xE8, 0x337180)
+            && RelativeBranchTargets(0x5EA29C, 0xE8, 0x3370A0)
+            && Matches(0x5EA330 + 0x5D, "69C7E0020000")
+            && Matches(0x5EA3D1, "814604E0020000")
+            && Matches(0x12EE09C, "81FE000100007C9E"));
+        check("Binary secondary 0x70-0x71 remaining-input blobs resize and raw-copy bytes through slBlob +0x10",
+            Matches(0x819FF3, "C74630C40CC801")
+            && Matches(0x81A145, "C74628C40CC801")
+            && VtableRttiName(
+                MatrixSecondaryDecoderTableNativeLayout.RemainingInputBlobVtableVirtualAddress, 80)
+                == ".?AVslBlob@@"
+            && ReadUInt32(VirtualAddressToFileOffset(
+                MatrixSecondaryDecoderTableNativeLayout.RemainingInputBlobVtableVirtualAddress) + 0x10)
+                == MatrixSecondaryDecoderTableNativeLayout.RemainingInputBlobReaderMethodVirtualAddress
+            && VirtualAddressToFileOffset(
+                MatrixSecondaryDecoderTableNativeLayout.RemainingInputBlobReaderMethodVirtualAddress)
+                == MatrixSecondaryDecoderTableNativeLayout.RemainingInputBlobReaderMethodFileOffset
+            && Matches(MatrixSecondaryDecoderTableNativeLayout.RemainingInputBlobReaderMethodFileOffset,
+                "558BEC566A00FF750C8BF1E8D00200008B460485C07411FF750CFF7508FF7004"
+                + "E8FF1E2D0083C40C5E5DC20800")
+            && RelativeBranchTargets(
+                MatrixSecondaryDecoderTableNativeLayout.RemainingInputBlobReaderMethodFileOffset + 0x0B,
+                0xE8,
+                MatrixSecondaryDecoderTableNativeLayout.RemainingInputBlobResizeHelperFileOffset)
+            && RelativeBranchTargets(
+                MatrixSecondaryDecoderTableNativeLayout.RemainingInputBlobReaderMethodFileOffset + 0x20,
+                0xE8,
+                MatrixSecondaryDecoderTableNativeLayout.RemainingInputBlobCopyRoutineFileOffset)
+            && Matches(MatrixSecondaryDecoderTableNativeLayout.RemainingInputBlobCopyRoutineFileOffset,
+                "FF25D04AAC01")
+            && ImportSlotNames(0x1AC4AD0, "memcpy"));
+        check("Binary ChatMessageList nested blob and QWORD readers consume independent gates and store raw values",
+            Matches(0x5F19E7, "8B47048A0840837F0801")
+            && Matches(0x5F1A1E, "84C90F8487000000")
+            && RelativeBranchTargets(0x5F1A54, 0xE8,
+                ChatMessageListNativeLayout.OptionalBlobLengthReaderFileOffset)
+            && RelativeBranchTargets(0x5F1A60, 0xE8,
+                ChatMessageListNativeLayout.OptionalBlobUpdateFileOffset)
+            && Matches(0x5F1AAD, "803B007410")
+            && RelativeBranchTargets(0x5F1ABD, 0xE8,
+                ChatMessageListNativeLayout.OptionalBlobClearFileOffset)
+            && Matches(0x5FDA10, "8B4B0883F901730F")
+            && Matches(0x5FDA5E, "84C9744D")
+            && RelativeBranchTargets(0x5FDA72, 0xE8,
+                ChatMessageListNativeLayout.OptionalQwordPrimitiveReaderFileOffset)
+            && Matches(0x5FDA7C, "8B4424108947088B44241489470C")
+            && Matches(0x5FDAAF, "803F007403C60700"));
         check("Binary selector 0x64 tagged entries retain their dispatch and payload branches",
             new uint[] {
                 EncounterUIScopeInNativeLayout.TagZeroHandlerFileOffset,

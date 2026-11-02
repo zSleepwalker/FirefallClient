@@ -1,11 +1,11 @@
 # Reverse-engineering handoff
 
-## Resume here (November 2)
+## Resume here (secondary selectors 0x70..0x77 complete)
 
-Selectors `0x68..0x6F` are now reconstructed and checked against
-`FirefallClient.exe.original`; selectors `0x60..0x67` remain complete.
-Do not repeat the earlier decoder or keyed-receiver factory batches. The next
-batch starts at selector `0x70`.
+Selectors `0x70..0x77` are now reconstructed and checked against
+`FirefallClient.exe.original`; the next unresolved secondary selectors are
+`0x78..0x7A`. Do not repeat the earlier decoder or keyed-receiver factory
+batches.
 This session did not commit or push; parent review/QA remains pending.
 Use GPT-6 Luna with explicit High reasoning for implementation and review.
 Verify field-address setup, primitive widths, count-loop boundaries and
@@ -30,20 +30,22 @@ helper calls against the original binary before committing and pushing.
   it differs from the analyzed image in 13 bytes across four ranges, none of
   which overlap this batch's code/vtable evidence.
 - IDA MCP could not be initialized during this session, so no new IDA evidence
-  was collected for selectors `0x68..0x6F`. This batch was checked read-only
+  was collected for selectors `0x70..0x77`. This batch was checked read-only
   against the original PE using local disassembly and the repository's
   binary-evidence checks.
 - Secondary selectors in `0x81CC50` use the separate 91-entry table at VA
   `0xC22630` / raw `0x821A30`: `[ebp+8] - 0x20`, bounded through index
   `0x5A`, then indexed by DWORD. The original binary has 91 nonzero, distinct
-  destinations; selectors `0x20..0x6F` now have 80 verified message
-  identities/layouts, leaving 11 identities unresolved. Continue at selector
-  `0x70`. The table index is distinct from the keyed-receiver factory's
+  destinations; selectors `0x20..0x77` now have 88 verified message
+  identities/layouts, leaving three identities unresolved. Continue at
+  selector `0x78`. The table index is distinct from the keyed-receiver factory's
   `0x02..0x35` selectors and the route0 Character table's `0x53..0x7A`
   selectors. Secondary selectors `0x53..0x57` and route0 Character selectors
-  with those same numbers are different tables and dispatch namespaces. See
-  the C# snapshots and `docs/MatrixConnection.md`.
-- The 80 verified secondary cases are RTTI-backed:
+  with those same numbers are different tables and dispatch namespaces.
+  Secondary selectors `0x70..0x77` are likewise distinct from route0's
+  same-numbered Character selectors. See the C# snapshots and
+  `docs/MatrixConnection.md`.
+- The 88 verified secondary cases are RTTI-backed:
   `EncounterToUIMessage`, `VotekickInitiated`, `VotekickResponded`,
   `ScoreBoardEnable/Init/SetWinner/Clear/AddPlayer/RemovePlayer/
   UpdatePlayerStats/UpdatePlayerStatsFromStats/UpdatePlayerStatus`,
@@ -66,6 +68,11 @@ helper calls against the original binary before committing and pushing.
   Selectors `0x68..0x6F` add `DisplayMoneyBombBanner`, `SetPreloadPosition`,
   `PlaySoundId`, `PlaySoundIdAtLocation`, `PlayDialogScriptMessage`,
   `StopDialogScriptMessage`, `PingMap`, and `PingMapMarker`.
+  Selectors `0x70..0x77` add `EncounterPublicInfo`,
+  `RequestActiveEncounters_Response`, `ShoppingListInit`,
+  `SetClientDailyInfo`, `GlobalCounterUpdate`,
+  `GlobalCounterMilestoneInfo`, `ChatMessageList`, and
+  `CurrentLoadoutResponse`.
   Their common base initializer writes marker
   `+0x08`, descriptor anchor `+0x0C`, constructor type DWORD `+0x10`,
   parser-context copies `+0x18/+0x1C`, and zeros `+0x20/+0x24`; body begins
@@ -141,9 +148,27 @@ helper calls against the original binary before committing and pushing.
   chunks: `0xFF` continues, zero terminates. The text reader is NUL-terminated
   and uses `0x100`-byte chunks, not a total-string bound. Parser-local DWORD
   literals `0x48..0x4F` remain distinct from selector/type ID and unresolved.
+  Selectors `0x70..0x77` add `EncounterPublicInfo`,
+  `RequestActiveEncounters_Response`, `ShoppingListInit`,
+  `SetClientDailyInfo`, `GlobalCounterUpdate`,
+  `GlobalCounterMilestoneInfo`, `ChatMessageList`, and
+  `CurrentLoadoutResponse`. `0x70` reads a QWORD then passes remaining input
+  to a blob at `+0x30`; `0x71` passes all remaining input to a blob at `+0x28`.
+  Both embedded members are `slBlob`; slot `+0x10` resizes then raw-copies the
+  incoming bytes when its data pointer is non-null.
+  `0x72` reads a byte-counted tree of two-DWORD items; `0x73` reads a DWORD and
+  a byte-counted DWORD/helper sequence; `0x74` reads text then QWORD. `0x75`
+  has two counted lists, including a nested two-DWORD/text/DWORD record.
+  `0x76` has `0x40`-stride records with QWORD/text/text/three bytes and
+  optional blob, optional QWORD, and opaque nested readers. `0x77` reads
+  QWORD/DWORD/DWORD/text/text/DWORD and a byte-counted `0x2E0`-stride vector
+  with an inner byte gate. Count bytes use `0xFF` continuation and zero
+  termination where observed; fields are offset/width observations only.
+  Parser-local DWORD literals `0x50..0x57` remain distinct from selectors,
+  native type IDs, and anchors.
   The setup call at raw `0x3571B0` is a `ret` stub; no semantics are assigned
   to its arguments. The route0 Character selector namespace overlaps these
-  numeric values but uses a separate dispatch table. All 80 verified targets are
+  numeric values but uses a separate dispatch table. All 88 verified targets are
   distinct and nonzero. Selectors `0x28/0x2D`
   and `0x32/0x34` share
   reader continuations despite distinct table destinations and types.
@@ -164,12 +189,10 @@ helper calls against the original binary before committing and pushing.
   reach local zero-object blocks before their readers; selector `0x66` branches
   to the shared zero-object block at `0x81F72C` and QWORD-reader continuation
   at `0x81F72E`. These are static paths only; no runtime consequence is
-  asserted. Selectors `0x68..0x6F` likewise test the allocation result and
-  join their body readers from the zero-object path. Selector `0x69` passes
-  `ESI+0x28` after zeroing ESI; the other seven pass the zero object pointer
-  to readers that derive their destination from it. All eight have reader
-  calls; none has a no-reader success epilog. These are static paths only,
-  with no runtime consequence asserted.
+  asserted. Selectors `0x68..0x77` likewise test the allocation result and
+  join their body readers from the zero-object path. Every case in this range
+  has a body-reader call; none has a no-reader success epilog. These are static
+  paths only, with no runtime consequence asserted.
 - Keep this table distinct from the unrelated keyed-receiver factory
   `0x81B1B0`, route0's nested Character selectors `0x53..0x7A`, and primary
   routes 2-6. `.text` and `.rdata` section-aware vtable RTTI names were
