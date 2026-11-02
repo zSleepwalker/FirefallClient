@@ -780,8 +780,10 @@ helper calls against the original binary before committing and pushing.
   available. The conditional `0xBD7060` serialization and recipient iteration
   are now documented, including the eight-byte recipient header. No code/data
   xrefs to wrapper `0x821DE0` (VA `0xC229E0`) exist in the current IDA database;
-  its caller remains unresolved. Continue with the remaining selector
-  `0x75`/`0x76` wire-state questions or selector `0x77` extent mismatch.
+  its caller remains unresolved. Continue with the `0x75` source/destination
+  tree meaning or selector `0x77` extent mismatch. Selector `0x76`'s
+  `+0x28/+0x2C` conflict is now tied to the shared `slBlob` vtable/storage-
+  object layout, with no conversion found on the traced callback route.
   Continue read-only; do not modify the sample/IDB.
 - Open items: field semantics, allocation-failure consequences, selector
   `0x55` copied but unwritten stack DWORD at object `+0x70` (source proven,
@@ -789,7 +791,8 @@ helper calls against the original binary before committing and pushing.
   consumption beyond the shared QWORD/compact-selector preamble (the case
   stores QWORD halves at `+0x18/+0x1C` without a selector-specific reader), selector
   `0x75`'s `+0x28` source tree and `+0x30` tree-vs-`slBlob` mismatch and
-  selector `0x76`'s parser/receiver range-vs-`slBlob` mismatch, selector
+  selector `0x76`'s parser/receiver range-vs-`slBlob` mismatch (receiver uses
+  the blob vtable/storage-object positions as range endpoints), selector
   `0x77` trailing-state extent. Whether an intervening conversion or distinct
   object path explains either mismatch remains open.
 - Workflow per batch: preserve native evidence in the existing layout,

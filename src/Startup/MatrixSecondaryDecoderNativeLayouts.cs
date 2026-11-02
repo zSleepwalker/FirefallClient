@@ -30,6 +30,7 @@ public static class MatrixSecondaryDecoderTableNativeLayout
     public const uint SharedCaseSetupArgument3VirtualAddress = 0x1E60904;
     public const uint RemainingInputBlobVtableVirtualAddress = 0x1C80CC4;
     public const int RemainingInputBlobReaderVtableSlotOffset = 0x10;
+    public const int RemainingInputBlobStorageObjectFieldOffset = 4;
     public const uint RemainingInputBlobReaderMethodVirtualAddress = 0x16CC5D0;
     public const uint RemainingInputBlobReaderMethodFileOffset = 0x12CB9D0;
     public const uint RemainingInputBlobResizeHelperFileOffset = 0x12CBCB0;

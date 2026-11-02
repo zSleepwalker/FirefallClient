@@ -982,6 +982,7 @@ Check("Secondary decoder table snapshot records all 91 selectors",
     && MatrixSecondaryDecoderTableNativeLayout.SharedCaseSetupArgument3VirtualAddress == 0x1E60904
     && MatrixSecondaryDecoderTableNativeLayout.RemainingInputBlobVtableVirtualAddress == 0x1C80CC4
     && MatrixSecondaryDecoderTableNativeLayout.RemainingInputBlobReaderVtableSlotOffset == 0x10
+    && MatrixSecondaryDecoderTableNativeLayout.RemainingInputBlobStorageObjectFieldOffset == 4
     && MatrixSecondaryDecoderTableNativeLayout.RemainingInputBlobReaderMethodVirtualAddress == 0x16CC5D0
     && MatrixSecondaryDecoderTableNativeLayout.RemainingInputBlobReaderMethodFileOffset == 0x12CB9D0
     && MatrixSecondaryDecoderTableNativeLayout.RemainingInputBlobResizeHelperFileOffset == 0x12CBCB0
@@ -4184,6 +4185,8 @@ Check("Character receiver behavior model preserves selector slots and observed a
     && CharacterAbilityApplicationNativeLayout.AbilityFailedSourceTreeEntryCloneFileOffset == 0x82C2E0
     && CharacterAbilityApplicationNativeLayout.AbilityFailedOwnerTreeInsertFileOffset == 0x8410B0
     && CharacterAbilityApplicationNativeLayout.AbilityCooldownsObservedRecordStride == 0x40
+    && CharacterAbilityApplicationNativeLayout.AbilityCooldownsBeginOffset == 0x28
+    && CharacterAbilityApplicationNativeLayout.AbilityCooldownsEndOffset == 0x2C
     && CharacterAbilityApplicationNativeLayout.AbilityCooldownsChatProcessorFileOffset == 0x6E2590
     && CharacterAbilityApplicationNativeLayout.AbilityCooldownsObservedOptionalBranchOffset == 0x14
     && CharacterAbilityApplicationNativeLayout.AbilityCooldownsObservedOptionalDataOffset == 0x18

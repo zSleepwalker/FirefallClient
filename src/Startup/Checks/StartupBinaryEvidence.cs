@@ -3504,6 +3504,8 @@ internal static class StartupBinaryEvidence
             && Matches(MatrixSecondaryDecoderTableNativeLayout.RemainingInputBlobReaderMethodFileOffset,
                 "558BEC566A00FF750C8BF1E8D00200008B460485C07411FF750CFF7508FF7004"
                 + "E8FF1E2D0083C40C5E5DC20800")
+            && Matches(MatrixSecondaryDecoderTableNativeLayout.RemainingInputBlobReaderMethodFileOffset + 0x10,
+                "8B460485C07411")
             && RelativeBranchTargets(
                 MatrixSecondaryDecoderTableNativeLayout.RemainingInputBlobReaderMethodFileOffset + 0x0B,
                 0xE8,

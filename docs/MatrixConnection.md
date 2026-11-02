@@ -3608,12 +3608,17 @@ object `+0x28` with DWORD `0x1C80CC4` followed by three zero DWORDs.
 Reader `0x5EEE60` passes the `slBlob` state at `+0x28` to its virtual slot
 `+0x10` with the remaining stream length and input pointer. The slot resizes
 and copies the remaining bytes verbatim, after which the reader advances past
-those bytes. The receiver separately interprets `+0x28/+0x2C` as begin/end
-range endpoints with `0x40`-byte records, while the parser initializes `+0x28`
-as an `slBlob` vtable and the reader uses `+0x2C` as its backing handle. This
-is a static layout/consumer mismatch; intervening mutations and runtime
-consequences are not established. The blob contents' semantics and allocation
-failure consequences remain unresolved.
+those bytes. In the shared `slBlob` reader at raw `0x12CB9D0`, the first DWORD
+of the blob object is used as its vtable and the second DWORD (`+4`) is loaded
+as a storage-object pointer before copying from the storage object's `+4`
+data field. The `AbilityCooldowns` receiver instead computes
+`(message[+0x2C] - message[+0x28]) >> 6` and walks records beginning at
+`message+0x28`; those positions are respectively the initialized `slBlob`
+vtable and its storage-object pointer in the parser's layout. The parsed
+pointer reaches the receiver unchanged on the traced callback route, and no
+intervening conversion is established. This is a static layout/consumer
+mismatch; runtime consequences are not established. The blob contents'
+semantics and allocation failure consequences remain unresolved.
 
 ### Selector 0x77: `NPCInteraction`
 
