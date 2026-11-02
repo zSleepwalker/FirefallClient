@@ -60,6 +60,7 @@ public readonly record struct MatrixMessageDiscriminatorProvenanceSnapshot(
     uint BaseHelperFinalVtableVirtualAddress,
     uint BaseHelperFinalVtableStoreFileOffset,
     uint BaseHelperDiscriminatorFieldStoreFileOffset,
+    uint BaseHelperEnvelopeKeyStoresInstructionOffset,
     uint MessageVtableVirtualAddress,
     uint ConstructorPrimaryVtableStoreFileOffset,
     int MessageVtableCompleteObjectLocatorObjectOffset,
@@ -217,6 +218,11 @@ public static class MatrixMessageParserFlowNativeLayout
     public const int MessageEnvelopeKeyLowDwordFieldOffset = 0x18;
     public const int MessageEnvelopeKeyHighDwordFieldOffset = 0x1C;
     public const int ParserStackLocalDwordOffset = 0x20;
+    public const uint Route2MessagePointerEaxRestoreFileOffset = 0x81EF58;
+    public const uint StreamParserCallerPostCallFileOffset = 0x821D8C;
+    public const uint ParserWrapperPostCallFileOffset = 0x821E23;
+    public const uint RegisteredParserResultEaxMoveFileOffset = 0xBD6D41;
+    public const uint RegisteredParserResultRecordStoreFileOffset = 0xBD6D63;
     public const int ForcedMovementInlineStateOffset = 0x28;
     public const uint ForcedMovementInlineStateInitializerFileOffset = 0x92B8A0;
     public const uint ConstructorDiscriminatorStackStoreInstructionOffset = 0x12;
@@ -321,25 +327,31 @@ public static class MatrixMessageParserFlowNativeLayout
             new MatrixMessageDiscriminatorProvenanceSnapshot(
                 0x71, 0x71, ".?AVForcedMovement@Character@firefall@@",
                 0x81D54F, 0x81D560, 0x79, 0x81D573, 0x81D578,
-                0x526230, 0x526242, 0x526248, 0x5A1170, 0x1B5BDBC, 0x1C65AF0, 0x5A11CD, 0x5A1191,
+                0x526230, 0x526242, 0x526248, 0x5A1170, 0x1B5BDBC, 0x1C65AF0, 0x5A11CD, 0x5A1191, 0x28,
                 0x1C67098, 0x526252, 0,
                 0xC1D50B, 0x81C90B, 0x81C92A, 0x148, 0xECED30, 0xACE130),
             new MatrixMessageDiscriminatorProvenanceSnapshot(
                 0x77, 0x77, ".?AVNPCInteraction@Character@firefall@@",
                 0x81D73C, 0x81D74A, 0x7F, 0x81D761, 0x81D766,
-                0x5266A0, 0x5266B2, 0x5266B8, 0x5A1430, 0x1B5BD84, 0x1C65AD0, 0x5A148D, 0x5A1451,
+                0x5266A0, 0x5266B2, 0x5266B8, 0x5A1430, 0x1B5BD84, 0x1C65AD0, 0x5A148D, 0x5A1451, 0x28,
                 0x1C67048, 0x5266BD, 0,
                 0xC1D60D, 0x81CA0D, 0x81CA2C, 0x160, 0xECEEA0, 0xACE2A0),
             new MatrixMessageDiscriminatorProvenanceSnapshot(
                 0x79, 0x79, ".?AVPrivateDialog@Character@firefall@@",
                 0x81D79E, 0x81D7AC, 0x81, 0x81D7BF, 0x81D7C4,
-                0x526840, 0x526852, 0x526858, 0x5A1510, 0x1B5BD7C, 0x1C65A70, 0x5A156D, 0x5A1531,
+                0x526840, 0x526852, 0x526858, 0x5A1510, 0x1B5BD7C, 0x1C65A70, 0x5A156D, 0x5A1531, 0x28,
                 0x1C67018, 0x52685D, 0,
                 0xC1D663, 0x81CA63, 0x81CA82, 0x168, 0xECEF00, 0xACE300),
             new MatrixMessageDiscriminatorProvenanceSnapshot(
+                0x53, 0x53, ".?AVLootObjectCollected@AreaVisualData@firefall@@",
+                0x81EF1C, 0x81EF2A, 0xCD, 0x81EF3D, 0x81EF42,
+                0xADBAA0, 0xADBAB2, 0xADBAB8, 0xB07660, 0x1BB0224, 0x1C72204, 0xB076BD, 0xB07681, 0x28,
+                0x1C723C0, 0xADBABD, 0,
+                0xC1D001, 0x81C401, 0x81C420, 0xD0, 0xECB180, 0xACA580),
+            new MatrixMessageDiscriminatorProvenanceSnapshot(
                 0x53, 0x53, ".?AVAbilityActivated@Vehicle@firefall@@",
                 0x81EF83, 0x81EF91, 0xD0, 0x81EFA4, 0x81EFA9,
-                0xB093C0, 0xB093D2, 0xB093D8, 0xB474B0, 0x1BB04E0, 0x1C72554, 0xB4750D, 0xB474D1,
+                0xB093C0, 0xB093D2, 0xB093D8, 0xB474B0, 0x1BB04E0, 0x1C72554, 0xB4750D, 0xB474D1, 0x28,
                 0x1C72998, 0xB093DD, 0,
                 0xC1D001, 0x81C401, 0x81C420, 0xD0, 0xECB180, 0xACA580)
         });

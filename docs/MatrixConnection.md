@@ -1824,6 +1824,65 @@ The body reader writes a DWORD at object+`0x28`, followed by raw QWORDs at
 `+0x30` and `+0x38`, using readers `0x3370A0` and `0x356F80`. Field meanings
 remain unknown.
 
+#### Conditional post-parse consumer for route 2
+
+The route selector in `0x81CC50` maps leading bytes `0x13..0x19` to route index
+2 and parser block `0x81EE63`; its `0x53` comparison selects the case at
+`0x81EF1C`. This is a parser-family choice, not the later receiver selector.
+The constructor's base helper writes the metadata pointer at object+`0x0C`
+(`0x1BB0224`, whose string is `msg-83`), discriminator `0x53` at `+0x10`, and
+the two envelope-key DWORDs at `+0x18/+0x1C`. The parser's local `0xCD` is at
+`[esp+0x20]`, not the object discriminator. After the body reader, `0x81EF58`
+restores EAX from ESI, preserving the constructed object pointer (or null on
+the allocation-failure path).
+
+That result is preserved by both direct parser callers: `0x821BA0` calls
+`0x81CC50` at `0x821D87`, and its epilog does not overwrite EAX; wrapper
+`0x821DE0` similarly calls at `0x821E1E` and returns EAX unchanged. In the
+registered ReplayReader path, the indirect parser call at `0xBD6D3C` moves its
+EAX result into EDI at `0xBD6D41`, stores that same value in the queued
+12-byte result record at `0xBD6D63`, then calls the queue helper at `0xBD6D66`.
+The queue-consumer and callback-context gates described in “Parser result path
+and dialog-message primary vftables” remain conditional; this trace does not
+assert that every parsed route-2 object reaches application dispatch.
+
+On the callback-context `+8` branch, `0x7FDC60` first requires the low byte of
+message `+0x18` to be zero. It then diverts a message whose `+0x10` equals the
+nested-message sentinel; otherwise it requires a non-null context `+8` and
+calls `0x81BB90` with the original message pointer. `0x81BB90` reads only
+message `+0x10`, subtracts `0x20`, and selects the table entry at VA `0xC1D6DC`
+(raw `0x81CADC`). Discriminator `0x53` reaches VA `0xC1D001` (raw `0x81C401`),
+which makes the virtual call at `0x81C420` through receiver slot `+0xD0`,
+passing the same message pointer. The concrete receiver was established from
+its constructor/vtable bytes and RTTI chain, not inferred from message RTTI:
+the `tfGameProtocolHandler` vtable at VA `0x1C71EC0` has VA `0xECB180`
+(`0xACA580` raw `.text`) in slot `+0xD0`. The receiver method therefore is
+`0xACA580`; the `0x81BB90` table does not branch on vptr or `+0x0C`.
+
+The handler uses message `+0x34` as a candidate C-string pointer, falling back
+to the empty string at VA `0x1C5EA68` when null, and compares it bytewise with
+`"missions"` at VA `0x1BAE9E0`. On the equal branch it gets owner state through
+VA `0x89E8C0` (raw `0x49DCC0`), resets the end pointer of the vector at
+`[owner+0x43B8]+0x18` to its begin pointer, and calls VA `0xCF0D80` (raw
+`0x8F0180`) with message `+0x28/+0x2C` as the source range. That helper's copy
+routine VA `0xCF26D0` (raw `0x8F1AD0`) copies 24-byte records and stores the
+new end pointer at vector `+4`. This is an observed conditional state update;
+the record semantics and runtime range validity are not established. The
+non-equal comparison branch instead calls VA `0xD38A40` (raw `0x937E40`) with
+the address of message `+0x28`.
+
+Boundary remains unresolved: the route-2 reader writes the DWORD at `+0x28`
+and QWORDs at `+0x30/+0x38`; the derived constructor zeros `+0x30..+0x3C`,
+but neither writes `+0x2C`. The receiver uses `+0x2C` as a range endpoint.
+Also, `+0x34` is part of the parsed QWORD at `+0x30`, but the handler treats
+that DWORD as a possible C-string pointer. No semantic names are assigned to
+these fields. Distinct parser families with discriminator `0x53` retain
+different `+0x0C` metadata pointers and vptrs, while this callback selector
+collapses them onto the same `+0xD0` receiver method. Read-only IDA
+disassembly/byte reads and the recorded binary-evidence checks agree with the
+requested original executable at the relevant code sites; the IDB and sample
+were not modified or executed.
+
 Value `0x54` selects case `0x81EECB` (`AreaVisualData::AudioEmitterSpawned`).
 It allocates `0x40` bytes, stores local DWORD `0xCE`, calls constructor
 `0xADBB40`, then reader `0x83ACA0`. The constructor passes `0x54` to base

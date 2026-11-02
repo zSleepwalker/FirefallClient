@@ -1,6 +1,29 @@
 # Reverse-engineering handoff
 
-## Resume here (secondary selector table complete)
+## Resume here (route-2 parsed-object consumer traced)
+
+The bounded primary-route continuation traced route index 2's
+`AreaVisualData::LootObjectCollected` from parser construction/body reading
+through its conditional receiver and one state update. Leading bytes
+`0x13..0x19` select parser route 2; dispatcher discriminator `0x53` selects
+raw `0x81EF1C`. The parser's result survives its direct callers and the
+registered callback's queue record. Application dispatch is conditional:
+the callback requires message `+0x18` low byte zero, diverts the nested
+sentinel in `+0x10`, then requires non-null context `+8` before calling
+`0x81BB90` with the original object. Its discriminator table sends `0x53`
+through receiver slot `+0xD0` to raw `0xACA580`, the `tfGameProtocolHandler`
+method established by constructor/vtable evidence. The `"missions"` branch
+clears and repopulates a vector at owner `+0x43B8` using message `+0x28/+0x2C`;
+the record semantics and runtime range validity remain unproven.
+
+Boundary: route 2 writes `+0x28`, `+0x30`, and `+0x38`, but not `+0x2C`;
+the handler consumes `+0x2C` as an endpoint and `+0x34` as a candidate
+C-string pointer. Preserve these as unresolved fields. Read-only IDA checks
+and original-file evidence agreed on the relevant parser, callback, selector,
+and receiver instructions; IDA was not modified and the sample was not run.
+Next, trace one route-3 consumer (start with
+`Vehicle::AbilityActivated`, parser case raw `0x81EF83`); do not broaden this
+into an all-17 consumer sweep.
 
 All secondary selectors `0x20..0x7A` are now reconstructed and checked against
 `FirefallClient.exe.original`. The final entries `0x78..0x7A` resolve to
@@ -8,7 +31,8 @@ All secondary selectors `0x20..0x7A` are now reconstructed and checked against
 `ConductorGlobalAnnouncement`; do not confuse them with route0's nested
 Character selectors `OpenMovieDialog`, `PrivateDialog`, and `PublicDialog`.
 Do not repeat the earlier decoder or keyed-receiver factory batches.
-This session did not commit or push; parent review/QA remains pending.
+The decoder batches through `0x7A` were previously committed; this update
+records the current primary-route consumer trace.
 Use GPT-6 Luna with explicit High reasoning for implementation and review.
 Verify field-address setup, primitive widths, count-loop boundaries and
 helper calls against the original binary before committing and pushing.
@@ -31,9 +55,12 @@ helper calls against the original binary before committing and pushing.
   (40,197,848 bytes);
   it differs from the analyzed image in 13 bytes across four ranges, none of
   which overlap this batch's code/vtable evidence.
-- IDA MCP was unavailable for this final batch; no new IDA claims were made.
-  Selectors `0x78..0x7A` were checked read-only against the original PE using
-  local byte reads/disassembly and the repository's binary-evidence checks.
+- IDA MCP was unavailable during the earlier secondary-selector final batch;
+  selectors `0x78..0x7A` were checked against the original PE with local
+  read-only byte reads/disassembly and repository binary-evidence checks. For
+  the route-2 consumer continuation above, IDA instance `13337` was reachable
+  and read-only disassembly/byte reads matched the requested original file at
+  the relevant code sites.
 - Secondary selectors in `0x81CC50` use the separate 91-entry table at VA
   `0xC22630` / raw `0x821A30`: `[ebp+8] - 0x20`, bounded through index
   `0x5A`, then indexed by DWORD. The original binary has 91 nonzero, distinct
@@ -67,7 +94,7 @@ helper calls against the original binary before committing and pushing.
   paths branch on null and still call the body reader after the constructor or
   zero-object path; none has a no-reader success epilog. This is static flow
   evidence only and does not establish allocation-failure runtime behavior.
-- Next recorded work, not new scope: continue the existing “trace
+- Previously recorded next work was to continue the existing “trace
   parsed-object consumers” task for the 17 case-bearing primary-route
   subcases; route3 entries `2,3,4,5,7,8` are now mapped. Existing unresolved
   decoder observations also remain:

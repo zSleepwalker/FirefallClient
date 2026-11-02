@@ -2471,7 +2471,13 @@ Check("AreaVisualData LootObjectCollected route-index-2 subcase layout is record
     && AreaVisualDataLootObjectCollectedNativeLayout.ConstructorFileOffset == 0xADBAA0
     && AreaVisualDataLootObjectCollectedNativeLayout.BaseConstructorHelperFileOffset == 0xB07660
     && AreaVisualDataLootObjectCollectedNativeLayout.BaseConstructorArgument == 0x53
+    && AreaVisualDataLootObjectCollectedNativeLayout.BaseMetadataStringVirtualAddress == 0x1BB0224
+    && AreaVisualDataLootObjectCollectedNativeLayout.MessageDiscriminatorFieldOffset == 0x10
+    && AreaVisualDataLootObjectCollectedNativeLayout.MessageDiscriminator == 0x53
+    && AreaVisualDataLootObjectCollectedNativeLayout.EnvelopeKeyLowDwordFieldOffset == 0x18
+    && AreaVisualDataLootObjectCollectedNativeLayout.EnvelopeKeyHighDwordFieldOffset == 0x1C
     && AreaVisualDataLootObjectCollectedNativeLayout.BodyReaderFileOffset == 0x83AD90
+    && AreaVisualDataLootObjectCollectedNativeLayout.MessagePointerEaxRestoreFileOffset == 0x81EF58
     && AreaVisualDataLootObjectCollectedNativeLayout.VtableVirtualAddress == 0x1C723C0
     && AreaVisualDataLootObjectCollectedNativeLayout.RttiName == ".?AVLootObjectCollected@AreaVisualData@firefall@@"
     && AreaVisualDataLootObjectCollectedNativeLayout.DwordFieldOffset == 0x28
@@ -4847,6 +4853,11 @@ Check("Matrix parser callsites, callback invocation, and result consumption rema
     && MatrixMessageParserFlowNativeLayout.ReplayReaderCallbackRecordParserFieldOffset == 4
     && MatrixMessageParserFlowNativeLayout.ReplayReaderRegisteredParserFieldOffset == 0x1C
     && MatrixMessageParserFlowNativeLayout.ReplayReaderRegisteredContextFieldOffset == 0x20
+    && MatrixMessageParserFlowNativeLayout.Route2MessagePointerEaxRestoreFileOffset == 0x81EF58
+    && MatrixMessageParserFlowNativeLayout.StreamParserCallerPostCallFileOffset == 0x821D8C
+    && MatrixMessageParserFlowNativeLayout.ParserWrapperPostCallFileOffset == 0x821E23
+    && MatrixMessageParserFlowNativeLayout.RegisteredParserResultEaxMoveFileOffset == 0xBD6D41
+    && MatrixMessageParserFlowNativeLayout.RegisteredParserResultRecordStoreFileOffset == 0xBD6D63
     && MatrixMessageParserFlowNativeLayout.CallbackObjectParserPointerFieldOffset == 0x10);
 Check("ReplayReader callback context resolves its constructor-returned primary vtable and dispatch slots",
     callbackContextVtable.RttiName == ".?AVtfGameSocketHandler@@"
@@ -4906,7 +4917,7 @@ Check("Matrix message discriminator provenance distinguishes parser stack locals
     && MatrixMessageParserFlowNativeLayout.BaseHelperInitialVtableVirtualAddress == 0x1C61B84
     && MatrixMessageParserFlowNativeLayout.BaseHelperFinalVtableStoreInstructionOffset == 0x5D
     && MatrixMessageParserFlowNativeLayout.BaseHelperDiscriminatorFieldStoreInstructionOffset == 0x21
-    && messageDiscriminatorProvenance.Count == 4
+    && messageDiscriminatorProvenance.Count == 5
     && messageDiscriminatorProvenance.All(provenance =>
         provenance.ConstructionSelector == provenance.MessageDiscriminator
         && provenance.ReceiverVtableSlotOffset
@@ -4923,6 +4934,10 @@ Check("Matrix message discriminator provenance distinguishes parser stack locals
         && provenance.ConstructorBaseHelperCallFileOffset
             == provenance.ConstructorFileOffset
                 + MatrixMessageParserFlowNativeLayout.ConstructorBaseHelperCallInstructionOffset
+        && provenance.BaseHelperEnvelopeKeyStoresInstructionOffset
+            == (provenance.MessageRttiName == AreaVisualDataLootObjectCollectedNativeLayout.RttiName
+                ? 0x28u
+                : MatrixMessageParserFlowNativeLayout.BaseHelperConstructorArgumentStoresInstructionOffset)
         && provenance.ReceiverVtableCallFileOffset == provenance.ReceiverSwitchTargetFileOffset + 0x1F
         && provenance.MessageVtableCompleteObjectLocatorObjectOffset == 0)
     && messageDiscriminatorProvenance.Select(provenance =>
@@ -4933,8 +4948,18 @@ Check("Matrix message discriminator provenance distinguishes parser stack locals
             (0x71, 0x79u, 0x148, 0xECED30u),
             (0x77, 0x7Fu, 0x160, 0xECEEA0u),
             (0x79, 0x81u, 0x168, 0xECEF00u),
+            (0x53, 0xCDu, 0xD0, 0xECB180u),
             (0x53, 0xD0u, 0xD0, 0xECB180u)
-        ]));
+        ])
+    && messageDiscriminatorProvenance.Any(provenance =>
+        provenance.MessageRttiName == AreaVisualDataLootObjectCollectedNativeLayout.RttiName
+        && provenance.ParserCaseFileOffset == AreaVisualDataLootObjectCollectedNativeLayout.CaseFileOffset
+        && provenance.ParserConstructorCallFileOffset
+            == AreaVisualDataLootObjectCollectedNativeLayout.ConstructorCallSiteFileOffset
+        && provenance.MessageVtableVirtualAddress == AreaVisualDataLootObjectCollectedNativeLayout.VtableVirtualAddress
+        && provenance.BaseHelperEnvelopeKeyStoresInstructionOffset == 0x28
+        && provenance.BaseHelperAuxiliaryPointerVirtualAddress
+            == AreaVisualDataLootObjectCollectedNativeLayout.BaseMetadataStringVirtualAddress));
 var selector53Namespaces = MatrixMessageNamespaceRoutingNativeLayout.Selector53Namespaces;
 Check("Matrix parser routes preserve distinct namespaces for duplicate selector 0x53",
     selector53Namespaces.Count == 6
@@ -4945,6 +4970,12 @@ Check("Matrix parser routes preserve distinct namespaces for duplicate selector 
     && selector53Namespaces.Select(snapshot => snapshot.MessageRttiName).Distinct().Count() == 6
     && selector53Namespaces.Select(snapshot => snapshot.MessageVtableVirtualAddress).Distinct().Count() == 6
     && selector53Namespaces.Select(snapshot => snapshot.BaseMetadataStringVirtualAddress).Distinct().Count() == 6
+    && selector53Namespaces.Any(snapshot =>
+        snapshot.ParserRouteIndex == 2
+        && snapshot.ParserCaseFileOffset == AreaVisualDataLootObjectCollectedNativeLayout.CaseFileOffset
+        && snapshot.BaseMetadataStringVirtualAddress
+            == AreaVisualDataLootObjectCollectedNativeLayout.BaseMetadataStringVirtualAddress
+        && snapshot.MessageRttiName == AreaVisualDataLootObjectCollectedNativeLayout.RttiName)
     && MatrixMessageNamespaceRoutingNativeLayout.MessagePrimaryVtableFieldOffset == 0
     && MatrixMessageNamespaceRoutingNativeLayout.MessageReferenceCountFieldOffset == 0x08
     && MatrixMessageNamespaceRoutingNativeLayout.MessageMetadataPointerFieldOffset == 0x0C
@@ -5781,7 +5812,24 @@ Check("Direct context+8 selector 0x53 representative remains the RTTI-backed pro
     MatrixMessageNamespaceRoutingNativeLayout.ProtocolHandlerRttiName == ".?AVtfGameProtocolHandler@@"
     && MatrixMessageNamespaceRoutingNativeLayout.Selector53ProtocolHandlerVtableSlotOffset == 0xD0
     && MatrixMessageNamespaceRoutingNativeLayout.Selector53ProtocolHandlerMethodFileOffset == 0xACA580
-    && MatrixMessageNamespaceRoutingNativeLayout.Selector53ProtocolHandlerObservedMessageReadOffset == 0x34);
+    && MatrixMessageNamespaceRoutingNativeLayout.Selector53ProtocolHandlerObservedMessageReadOffset == 0x34
+    && MatrixMessageNamespaceRoutingNativeLayout.Selector53HandlerFilterStringVirtualAddress == 0x1BAE9E0
+    && MatrixMessageNamespaceRoutingNativeLayout.Selector53HandlerNullFilterFallbackVirtualAddress == 0x1C5EA68
+    && MatrixMessageNamespaceRoutingNativeLayout.Selector53HandlerFilterMessageFieldOffset == 0x34
+    && MatrixMessageNamespaceRoutingNativeLayout.Selector53HandlerStateAccessorCallFileOffset == 0xACA5C9
+    && MatrixMessageNamespaceRoutingNativeLayout.Selector53HandlerStateAccessorFileOffset == 0x49DCC0
+    && MatrixMessageNamespaceRoutingNativeLayout.Selector53HandlerEqualFilterVectorCallFileOffset == 0xACA60C
+    && MatrixMessageNamespaceRoutingNativeLayout.Selector53HandlerEqualFilterVectorHelperFileOffset == 0x8F0180
+    && MatrixMessageNamespaceRoutingNativeLayout.Selector53HandlerVectorOwnerPointerFieldOffset == 0x43B8
+    && MatrixMessageNamespaceRoutingNativeLayout.Selector53HandlerVectorFieldOffset == 0x18
+    && MatrixMessageNamespaceRoutingNativeLayout.Selector53HandlerMessageRangeBeginFieldOffset == 0x28
+    && MatrixMessageNamespaceRoutingNativeLayout.Selector53HandlerMessageRangeEndFieldOffset == 0x2C
+    && MatrixMessageNamespaceRoutingNativeLayout.Selector53HandlerVectorRecordSize == 0x18
+    && MatrixMessageNamespaceRoutingNativeLayout.Selector53HandlerVectorCopyCallFileOffset == 0x8F021B
+    && MatrixMessageNamespaceRoutingNativeLayout.Selector53HandlerVectorCopyHelperFileOffset == 0x8F1AD0
+    && MatrixMessageNamespaceRoutingNativeLayout.Selector53HandlerUnequalFilterMapCallFileOffset == 0xACA64B
+    && MatrixMessageNamespaceRoutingNativeLayout.Selector53HandlerUnequalFilterMapHelperFileOffset == 0x937E40
+    && MatrixMessageNamespaceRoutingNativeLayout.Selector53HandlerMapOwnerPointerFieldOffset == 0x43C4);
 Check("ReplayReader getter and owner construction resolve the concrete message receiver field",
     MatrixMessageParserFlowNativeLayout.ReplayReaderMessageRecipientGetterOwnerRttiName
         == ".?AVtfLookingGlass@@"

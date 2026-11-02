@@ -6285,6 +6285,14 @@ internal static class StartupBinaryEvidence
                 "8D46388BCF50")
             && RelativeBranchTargets(AreaVisualDataLootObjectCollectedNativeLayout.BodyReaderFileOffset + 0x24,
                 0xE8, AreaVisualDataLootObjectCollectedNativeLayout.QwordReaderFileOffset)
+            && Matches(AreaVisualDataLootObjectCollectedNativeLayout.MessagePointerEaxRestoreFileOffset,
+                "8BC6")
+            && Matches(AreaVisualDataLootObjectCollectedNativeLayout.BaseConstructorHelperFileOffset + 0x13,
+                "C7460C2402BB01")
+            && Matches(AreaVisualDataLootObjectCollectedNativeLayout.BaseConstructorHelperFileOffset + 0x21,
+                "894610")
+            && ReadCStringAscii(
+                AreaVisualDataLootObjectCollectedNativeLayout.BaseMetadataStringVirtualAddress, 16) == "msg-83"
             && VtableRttiName(AreaVisualDataLootObjectCollectedNativeLayout.VtableVirtualAddress, 80)
                 == AreaVisualDataLootObjectCollectedNativeLayout.RttiName);
         check("Binary route-index-3 switch entry 0 constructs Vehicle AbilityActivated",
@@ -8257,7 +8265,7 @@ internal static class StartupBinaryEvidence
             uint messageCol = ReadUInt32(VirtualAddressToFileOffset(provenance.MessageVtableVirtualAddress) - 4);
             var dispatchCase = MatrixMessageParserFlowNativeLayout.MessageDispatchVtableCases
                 .Single(messageCase => messageCase.MessageDiscriminator == provenance.MessageDiscriminator);
-            messageDiscriminatorProvenanceMatches &=
+            bool parserEntryMatches =
                 provenance.ConstructionSelector == provenance.MessageDiscriminator
                 && provenance.ParserStackLocalDwordStoreFileOffset
                     == provenance.ParserCaseFileOffset + (provenance.MessageDiscriminator == 0x71 ? 0x11u : 0x0Eu)
@@ -8268,8 +8276,9 @@ internal static class StartupBinaryEvidence
                 && RelativeBranchTargets(
                     provenance.ParserConstructorCallFileOffset,
                     0xE8,
-                    provenance.ConstructorFileOffset)
-                && Matches(provenance.ParserConstructorResultObjectMoveFileOffset, "8BF0")
+                    provenance.ConstructorFileOffset);
+            bool constructorBaseMatches =
+                Matches(provenance.ParserConstructorResultObjectMoveFileOffset, "8BF0")
                 && Matches(provenance.ConstructorFileOffset + 5,
                     "FF750C8BF1FF750883EC088BC4")
                 && Matches(provenance.ConstructorDiscriminatorStackStoreFileOffset,
@@ -8277,8 +8286,9 @@ internal static class StartupBinaryEvidence
                 && RelativeBranchTargets(
                     provenance.ConstructorBaseHelperCallFileOffset,
                     0xE8,
-                    provenance.BaseHelperFileOffset)
-                && Matches(provenance.BaseHelperFileOffset + 4,
+                    provenance.BaseHelperFileOffset);
+            bool baseMetadataMatches =
+                Matches(provenance.BaseHelperFileOffset + 4,
                     "8B4508568BF18945FC")
                 && Matches(provenance.BaseHelperFileOffset + 0x0D,
                     "C706" + UInt32LittleEndianHex(
@@ -8290,15 +8300,20 @@ internal static class StartupBinaryEvidence
                 && Matches(provenance.BaseHelperDiscriminatorFieldStoreFileOffset,
                     "894610")
                 && Matches(
-                    provenance.BaseHelperFileOffset
-                        + MatrixMessageParserFlowNativeLayout.BaseHelperConstructorArgumentStoresInstructionOffset,
-                    "8B45108946188B451489461CC7462000000000C7462400000000")
-                && Matches(provenance.ConstructorPrimaryVtableStoreFileOffset,
+                    provenance.BaseHelperFileOffset + provenance.BaseHelperEnvelopeKeyStoresInstructionOffset,
+                    "8B45108946188B451489461CC7462000000000C7462400000000");
+            bool derivedVtableMatches =
+                Matches(provenance.ConstructorPrimaryVtableStoreFileOffset,
                     "C706" + UInt32LittleEndianHex(provenance.MessageVtableVirtualAddress))
-                && VtableRttiName(provenance.MessageVtableVirtualAddress) == provenance.MessageRttiName
+                && VtableRttiName(provenance.MessageVtableVirtualAddress, 80) == provenance.MessageRttiName
                 && ReadUInt32(VirtualAddressToFileOffset(messageCol) + 4)
-                    == (uint)provenance.MessageVtableCompleteObjectLocatorObjectOffset
-                && tableTarget == provenance.ReceiverSwitchTargetVirtualAddress
+                    == (uint)provenance.MessageVtableCompleteObjectLocatorObjectOffset;
+            bool parserConstructionMatches = parserEntryMatches
+                && constructorBaseMatches
+                && baseMetadataMatches
+                && derivedVtableMatches;
+            bool receiverDispatchMatches =
+                tableTarget == provenance.ReceiverSwitchTargetVirtualAddress
                 && tableTarget == dispatchCase.SwitchTargetVirtualAddress
                 && provenance.ReceiverSwitchTargetFileOffset == dispatchCase.SwitchTargetFileOffset
                 && provenance.ReceiverVtableCallFileOffset == dispatchCase.VtableCallFileOffset
@@ -8310,12 +8325,43 @@ internal static class StartupBinaryEvidence
                     == provenance.ReceiverMethodVirtualAddress
                 && VirtualAddressToFileOffset(provenance.ReceiverMethodVirtualAddress)
                     == provenance.ReceiverMethodFileOffset;
+            bool provenanceMatches = parserConstructionMatches && receiverDispatchMatches;
+            messageDiscriminatorProvenanceMatches &= provenanceMatches;
+            check($"Binary {provenance.MessageRttiName} parser case and constructor calls", parserEntryMatches);
+            check($"Binary {provenance.MessageRttiName} constructor discriminator and base call", constructorBaseMatches);
+            check($"Binary {provenance.MessageRttiName} base metadata and envelope fields", baseMetadataMatches);
+            check($"Binary {provenance.MessageRttiName} derived vtable and RTTI", derivedVtableMatches);
+            check($"Binary {provenance.MessageRttiName} constructor fields and RTTI",
+                parserConstructionMatches);
+            check($"Binary {provenance.MessageRttiName} discriminator-to-receiver dispatch",
+                receiverDispatchMatches);
+            check($"Binary {provenance.MessageRttiName} discriminator provenance resolves to its receiver slot",
+                provenanceMatches);
         }
         check("Binary 0x81BB90 conditional path reads +0x10 and preserves the message pointer",
             messageDiscriminatorProvenanceMatches
             && messageReceiverVtable.ObjectVtableFieldOffset
                 == MatrixMessageParserFlowNativeLayout.MessagePrimaryVtableFieldOffset
             && messageReceiverVtable.CompleteObjectLocatorObjectOffset == 0);
+        var route2MessageProvenance = MatrixMessageParserFlowNativeLayout.MessageDiscriminatorProvenance
+            .Single(provenance =>
+                provenance.MessageRttiName == AreaVisualDataLootObjectCollectedNativeLayout.RttiName);
+        check("Binary route-index-2 parser result passes through callers and into the registered result queue",
+            route2MessageProvenance.MessageDiscriminator
+                == AreaVisualDataLootObjectCollectedNativeLayout.MessageDiscriminator
+            && route2MessageProvenance.ReceiverMethodFileOffset
+                == MatrixMessageNamespaceRoutingNativeLayout.Selector53ProtocolHandlerMethodFileOffset
+            && Matches(MatrixMessageParserFlowNativeLayout.Route2MessagePointerEaxRestoreFileOffset, "8BC6")
+            && Matches(MatrixMessageParserFlowNativeLayout.StreamParserCallerPostCallFileOffset,
+                "83C4048B4DF464890D00000000595F5E5B8BE55DC3")
+            && Matches(MatrixMessageParserFlowNativeLayout.ParserWrapperPostCallFileOffset,
+                "83C4048B4DF464890D00000000595F5E5B8BE55DC3")
+            && Matches(MatrixMessageParserFlowNativeLayout.RegisteredParserResultEaxMoveFileOffset, "8BF8")
+            && Matches(MatrixMessageParserFlowNativeLayout.RegisteredParserResultRecordStoreFileOffset, "897DC8")
+            && RelativeBranchTargets(
+                MatrixMessageParserFlowNativeLayout.CallbackResultQueueInsertionCallFileOffset,
+                0xE8,
+                MatrixMessageParserFlowNativeLayout.CallbackResultQueueHelperFileOffset));
         var namespaceRouting = MatrixMessageNamespaceRoutingNativeLayout.Selector53Namespaces;
         bool callbackRoutingMatches =
             RelativeBranchTargets(
@@ -8499,6 +8545,65 @@ internal static class StartupBinaryEvidence
                 "8B4734");
         check("Binary tfGameProtocolHandler RTTI and selector 0x53 primary slot are verified",
             protocolHandlerGroupMatches);
+        var route2DispatchCase = MatrixMessageParserFlowNativeLayout.MessageDispatchVtableCases
+            .Single(messageCase => messageCase.MessageDiscriminator
+                == AreaVisualDataLootObjectCollectedNativeLayout.MessageDiscriminator);
+        check("Binary route-index-2 selector 0x53 reaches the concrete handler and conditional state paths",
+            route2DispatchCase.SwitchTargetFileOffset == 0x81C401
+            && route2DispatchCase.VtableSlotOffset
+                == MatrixMessageNamespaceRoutingNativeLayout.Selector53ProtocolHandlerVtableSlotOffset
+            && Matches(route2DispatchCase.SwitchTargetFileOffset + 0x1A, "8B068BCE57FF90D0000000")
+            && ReadUInt32(VirtualAddressToFileOffset(
+                MatrixMessageNamespaceRoutingNativeLayout.ProtocolHandlerVtableVirtualAddress)
+                + MatrixMessageNamespaceRoutingNativeLayout.Selector53ProtocolHandlerVtableSlotOffset)
+                == MatrixMessageNamespaceRoutingNativeLayout.Selector53ProtocolHandlerMethodVirtualAddress
+            && VirtualAddressToFileOffset(
+                MatrixMessageNamespaceRoutingNativeLayout.Selector53ProtocolHandlerMethodVirtualAddress)
+                == MatrixMessageNamespaceRoutingNativeLayout.Selector53ProtocolHandlerMethodFileOffset
+            && Matches(MatrixMessageNamespaceRoutingNativeLayout.Selector53ProtocolHandlerMethodFileOffset,
+                "558BEC56578B7D08B968EAC5018B473485C00F45C8B8E0E9BA01")
+            && ReadCStringAscii(
+                MatrixMessageNamespaceRoutingNativeLayout.Selector53HandlerFilterStringVirtualAddress, 16)
+                == "missions"
+            && ReadCStringAscii(
+                MatrixMessageNamespaceRoutingNativeLayout.Selector53HandlerNullFilterFallbackVirtualAddress, 16)
+                == string.Empty
+            && Matches(
+                MatrixMessageNamespaceRoutingNativeLayout.Selector53ProtocolHandlerMethodFileOffset + 0x45,
+                "85C0754E")
+            && RelativeBranchTargets(
+                MatrixMessageNamespaceRoutingNativeLayout.Selector53HandlerStateAccessorCallFileOffset,
+                0xE8,
+                MatrixMessageNamespaceRoutingNativeLayout.Selector53HandlerStateAccessorFileOffset)
+            && Matches(
+                MatrixMessageNamespaceRoutingNativeLayout.Selector53ProtocolHandlerMethodFileOffset + 0x73,
+                "8B8EB8430000FF75088B472C83C1188B572850528B31897104")
+            && RelativeBranchTargets(
+                MatrixMessageNamespaceRoutingNativeLayout.Selector53HandlerEqualFilterVectorCallFileOffset,
+                0xE8,
+                MatrixMessageNamespaceRoutingNativeLayout.Selector53HandlerEqualFilterVectorHelperFileOffset)
+            && Matches(MatrixMessageNamespaceRoutingNativeLayout.Selector53HandlerVectorCopyCallFileOffset - 8,
+                "FF750C8BD651FF33")
+            && RelativeBranchTargets(
+                MatrixMessageNamespaceRoutingNativeLayout.Selector53HandlerVectorCopyCallFileOffset,
+                0xE8,
+                MatrixMessageNamespaceRoutingNativeLayout.Selector53HandlerVectorCopyHelperFileOffset)
+            && Matches(
+                MatrixMessageNamespaceRoutingNativeLayout.Selector53HandlerVectorCopyCallFileOffset + 5,
+                "83C40C894304")
+            && Matches(
+                MatrixMessageNamespaceRoutingNativeLayout.Selector53HandlerVectorCopyHelperFileOffset + 0x14,
+                "F30F6F01F30F7F00F30F7E4110660FD64010")
+            && Matches(
+                MatrixMessageNamespaceRoutingNativeLayout.Selector53HandlerVectorCopyHelperFileOffset + 0x26,
+                "83C11883C0183BCA75E0")
+            && RelativeBranchTargets(
+                MatrixMessageNamespaceRoutingNativeLayout.Selector53HandlerUnequalFilterMapCallFileOffset,
+                0xE8,
+                MatrixMessageNamespaceRoutingNativeLayout.Selector53HandlerUnequalFilterMapHelperFileOffset)
+            && Matches(
+                MatrixMessageNamespaceRoutingNativeLayout.Selector53HandlerUnequalFilterMapHelperFileOffset + 0x77,
+                "8B46088947188B460C89471C8B4610894728"));
         var npcInteractionDispatchCase = MatrixMessageParserFlowNativeLayout.MessageDispatchVtableCases
             .Single(messageCase => messageCase.MessageDiscriminator == 0x77);
         check("Binary selector 0x77 forwards the same parsed object pointer through the virtual receiver",
