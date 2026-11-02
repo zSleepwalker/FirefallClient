@@ -2226,6 +2226,26 @@ remain unknown; this case's RTTI name does not identify the remaining table case
 `CharacterMarketRequestCompleteNativeLayout` preserve the route bounds and
 this bounded object layout without implementing a parser.
 
+#### Conditional post-parse consumer for nested selector 0x53
+
+The route0 constructor calls base helper `0x5A0400` with `0x53`, which stores
+that discriminator at message+`0x10`. It therefore shares the same conditional
+callback gates and receiver selection as the other `0x53` message families:
+when message+`0x18` has a zero low byte, `+0x10` is not the nested sentinel,
+and callback context `+8` is non-null, `0x81BB90` dispatches to receiver slot
+`+0xD0` / method `0xACA580`. This table is selected by the stored discriminator,
+not the route0 nested selector or the message RTTI.
+
+The shared method treats message+`0x34` as a candidate C-string pointer. For
+this type, it is the high DWORD of the raw QWORD parsed at `+0x30/+0x34`; the
+reader does not parse that DWORD as text. The method also uses `+0x28/+0x2C`
+as source-range endpoints, whereas the route0 reader writes a single byte at
+`+0x28` and does not initialize `+0x2C` in the traced constructor/reader.
+The discriminator match alone does not establish that this message reaches
+the handler or that either candidate pointer/range is valid. These are
+conditional static field overlaps; do not infer runtime behavior or assign
+semantic names to the raw fields.
+
 The same table's entry1 maps selector `0x54` to VA `0xC1D914` / raw case
 `0x81CD14`. It allocates `0x40` bytes, calls constructor `0x524DF0`, then
 body reader `0x5F68D0`. The constructor installs vtable VA `0x1C67268`

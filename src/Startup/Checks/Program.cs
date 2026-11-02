@@ -2875,10 +2875,18 @@ Check("Deployable PublicCombatLog route-index-4 value0x55 records versioned word
     && DeployablePublicCombatLogNativeLayout.BlobFieldOffset == 0x2C);
 Check("MarketRequestComplete selector 0x53 preserves its RTTI and native body field offsets",
     CharacterMarketRequestCompleteNativeLayout.InnerSelector == 0x53
+    && CharacterMarketRequestCompleteNativeLayout.MessageDiscriminator == 0x53
+    && CharacterMarketRequestCompleteNativeLayout.MessageDiscriminatorFieldOffset == 0x10
     && CharacterMarketRequestCompleteNativeLayout.CaseFileOffset == 0x81CCC3
     && CharacterMarketRequestCompleteNativeLayout.AllocationSize == 0x48
     && CharacterMarketRequestCompleteNativeLayout.ConstructorFileOffset == 0x524C30
+    && CharacterMarketRequestCompleteNativeLayout.ConstructorBaseConstructorCallFileOffset == 0x524C48
+    && CharacterMarketRequestCompleteNativeLayout.BaseConstructorHelperFileOffset == 0x5A0400
+    && CharacterMarketRequestCompleteNativeLayout.BaseConstructorArgument == 0x53
+    && CharacterMarketRequestCompleteNativeLayout.BaseMetadataStringVirtualAddress == 0x1B5BEAC
     && CharacterMarketRequestCompleteNativeLayout.BodyReaderFileOffset == 0x5F6B10
+    && CharacterMarketRequestCompleteNativeLayout.QwordReaderFileOffset == 0x356F80
+    && CharacterMarketRequestCompleteNativeLayout.MessagePointerEaxRestoreFileOffset == 0x81CCFF
     && CharacterMarketRequestCompleteNativeLayout.VtableVirtualAddress == 0x1C67278
     && CharacterMarketRequestCompleteNativeLayout.FirstByteFieldOffset == 0x28
     && CharacterMarketRequestCompleteNativeLayout.RawQwordFieldOffset == 0x30
@@ -2886,6 +2894,13 @@ Check("MarketRequestComplete selector 0x53 preserves its RTTI and native body fi
     && CharacterMarketRequestCompleteNativeLayout.FirstSharedTextFieldOffset == 0x3C
     && CharacterMarketRequestCompleteNativeLayout.SecondSharedTextFieldOffset == 0x40
     && CharacterMarketRequestCompleteNativeLayout.ThirdSharedTextFieldOffset == 0x44);
+Check("Character MarketRequestComplete's selector-0x53 consumer aliases its raw QWORD high dword",
+    CharacterMarketRequestCompleteNativeLayout.MessageDiscriminator == 0x53
+    && CharacterMarketRequestCompleteNativeLayout.RawQwordFieldOffset + sizeof(uint)
+        == MatrixMessageNamespaceRoutingNativeLayout.Selector53HandlerFilterMessageFieldOffset
+    && CharacterMarketRequestCompleteNativeLayout.RawQwordFieldOffset + sizeof(uint)
+        < CharacterMarketRequestCompleteNativeLayout.AllocationSize
+    && CharacterMarketRequestCompleteNativeLayout.FirstByteFieldOffset == 0x28);
 Check("ReceiveWeaponTweaks selector 0x54 preserves its RTTI and raw body field offsets",
     CharacterReceiveWeaponTweaksNativeLayout.InnerSelector == 0x54
     && CharacterReceiveWeaponTweaksNativeLayout.CaseFileOffset == 0x81CD14

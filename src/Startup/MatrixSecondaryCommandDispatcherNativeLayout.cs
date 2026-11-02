@@ -101,12 +101,20 @@ public static class MatrixSecondaryCommandDispatcherNativeLayout
 public static class CharacterMarketRequestCompleteNativeLayout
 {
     public const int InnerSelector = 0x53;
+    public const int MessageDiscriminator = 0x53;
+    public const int MessageDiscriminatorFieldOffset = 0x10;
     public const uint InnerSelectorTableVirtualAddress = 0xC22444;
     public const uint InnerSelectorTableFileOffset = 0x821844;
     public const uint CaseFileOffset = 0x81CCC3;
     public const int AllocationSize = 0x48;
     public const uint ConstructorFileOffset = 0x524C30;
+    public const uint ConstructorBaseConstructorCallFileOffset = 0x524C48;
+    public const uint BaseConstructorHelperFileOffset = 0x5A0400;
+    public const int BaseConstructorArgument = 0x53;
+    public const uint BaseMetadataStringVirtualAddress = 0x1B5BEAC;
     public const uint BodyReaderFileOffset = 0x5F6B10;
+    public const uint QwordReaderFileOffset = 0x356F80;
+    public const uint MessagePointerEaxRestoreFileOffset = 0x81CCFF;
     public const uint VtableVirtualAddress = 0x1C67278;
     public const string RttiName = ".?AVMarketRequestComplete@Character@firefall@@";
     public const int FirstByteFieldOffset = 0x28;

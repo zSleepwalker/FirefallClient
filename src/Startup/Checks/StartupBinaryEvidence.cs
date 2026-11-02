@@ -3810,14 +3810,39 @@ internal static class StartupBinaryEvidence
                 CharacterMarketRequestCompleteNativeLayout.ConstructorFileOffset)
             && RelativeBranchTargets(0x81CCFA, 0xE8,
                 CharacterMarketRequestCompleteNativeLayout.BodyReaderFileOffset)
+            && Matches(CharacterMarketRequestCompleteNativeLayout.ConstructorFileOffset + 0x12,
+                "C70053000000")
+            && RelativeBranchTargets(CharacterMarketRequestCompleteNativeLayout.ConstructorBaseConstructorCallFileOffset,
+                0xE8, CharacterMarketRequestCompleteNativeLayout.BaseConstructorHelperFileOffset)
+            && Matches(CharacterMarketRequestCompleteNativeLayout.BaseConstructorHelperFileOffset + 0x13,
+                "C7460CACBEB501")
+            && Matches(CharacterMarketRequestCompleteNativeLayout.BaseConstructorHelperFileOffset + 0x21,
+                "894610")
             && VtableRttiName(CharacterMarketRequestCompleteNativeLayout.VtableVirtualAddress, 80)
                 == CharacterMarketRequestCompleteNativeLayout.RttiName
             && Matches(0x5F6B1B, "8D5628")
             && Matches(0x5F6B23, "8D46308BCF50")
+            && RelativeBranchTargets(
+                CharacterMarketRequestCompleteNativeLayout.BodyReaderFileOffset + 0x19,
+                0xE8, CharacterMarketRequestCompleteNativeLayout.QwordReaderFileOffset)
             && Matches(0x5F6B2E, "8D56388BCF")
             && Matches(0x5F6B38, "8D563C8BCF")
             && Matches(0x5F6B42, "8D56408BCF")
-            && Matches(0x5F6B4C, "8D56448BCF"));
+            && Matches(0x5F6B4C, "8D56448BCF")
+            && Matches(CharacterMarketRequestCompleteNativeLayout.MessagePointerEaxRestoreFileOffset,
+                "8BC6"));
+        check("Binary route0 MarketRequestComplete shares selector-0x53 consumer field interpretations",
+            CharacterMarketRequestCompleteNativeLayout.MessageDiscriminator == 0x53
+            && CharacterMarketRequestCompleteNativeLayout.RawQwordFieldOffset + sizeof(uint)
+                == MatrixMessageNamespaceRoutingNativeLayout.Selector53HandlerFilterMessageFieldOffset
+            && Matches(
+                MatrixMessageNamespaceRoutingNativeLayout.Selector53ProtocolHandlerMethodFileOffset + 0x0D,
+                "8B4734")
+            && CharacterMarketRequestCompleteNativeLayout.FirstByteFieldOffset
+                == MatrixMessageNamespaceRoutingNativeLayout.Selector53HandlerMessageRangeBeginFieldOffset
+            && Matches(
+                MatrixMessageNamespaceRoutingNativeLayout.Selector53ProtocolHandlerMethodFileOffset + 0x73,
+                "8B8EB8430000FF75088B472C83C1188B572850528B31897104"));
         check("Binary inner selector 0x54 constructs ReceiveWeaponTweaks and consumes its remaining body as blob data",
             ReadUInt32(VirtualAddressToFileOffset(
                 CharacterReceiveWeaponTweaksNativeLayout.InnerSelectorTableVirtualAddress) + 4) == 0xC1D914
