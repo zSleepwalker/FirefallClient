@@ -1,20 +1,28 @@
 # Reverse-engineering handoff
 
-## Resume here (route-2 parsed-object consumer traced)
+## Resume here (route-3 parsed-object consumer traced)
 
-The bounded primary-route continuation traced route index 2's
-`AreaVisualData::LootObjectCollected` from parser construction/body reading
-through its conditional receiver and one state update. Leading bytes
-`0x13..0x19` select parser route 2; dispatcher discriminator `0x53` selects
-raw `0x81EF1C`. The parser's result survives its direct callers and the
-registered callback's queue record. Application dispatch is conditional:
-the callback requires message `+0x18` low byte zero, diverts the nested
-sentinel in `+0x10`, then requires non-null context `+8` before calling
-`0x81BB90` with the original object. Its discriminator table sends `0x53`
-through receiver slot `+0xD0` to raw `0xACA580`, the `tfGameProtocolHandler`
-method established by constructor/vtable evidence. The `"missions"` branch
-clears and repopulates a vector at owner `+0x43B8` using message `+0x28/+0x2C`;
-the record semantics and runtime range validity remain unproven.
+The bounded primary-route continuation traced route index 3's
+`Vehicle::AbilityActivated` from parser construction/body reading through its
+conditional receiver path. Parser case raw `0x81EF83` requests `0x30` bytes and
+reads DWORDs at `+0x28/+0x2C`. Its base constructor stores discriminator
+`0x53`, which aliases route 2's receiver selector. Under the callback gates
+(message `+0x18` low byte zero, non-sentinel `+0x10`, non-null context `+8`),
+the shared dispatcher calls receiver slot `+0xD0` at raw `0xACA580` without
+checking message RTTI or vptr. That method reads `+0x34` as a candidate string
+and uses `+0x28/+0x2C` as a range for either a vector or map update. Since
+`+0x34` exceeds this message's recorded `0x30`-byte extent, preserve it as a
+conditional static extent mismatch; do not infer runtime reachability or
+pointer validity. Route-2 consumer details remain below in the historical
+handoff.
+
+Boundary: route 2 writes `+0x28`, `+0x30`, and `+0x38`, but not `+0x2C`;
+the handler consumes `+0x2C` as a range endpoint and `+0x34` as a candidate
+C-string pointer. Preserve these as unresolved fields. Read-only IDA checks
+and original-file evidence agreed on the relevant parser, callback, selector,
+and receiver instructions; IDA was not modified and the sample was not run.
+Next, trace one route-4 consumer (start with `Deployable::TookHit`, parser
+case raw `0x81F29E`); do not broaden this into an all-17 consumer sweep.
 
 Boundary: route 2 writes `+0x28`, `+0x30`, and `+0x38`, but not `+0x2C`;
 the handler consumes `+0x2C` as an endpoint and `+0x34` as a candidate
@@ -31,8 +39,8 @@ All secondary selectors `0x20..0x7A` are now reconstructed and checked against
 `ConductorGlobalAnnouncement`; do not confuse them with route0's nested
 Character selectors `OpenMovieDialog`, `PrivateDialog`, and `PublicDialog`.
 Do not repeat the earlier decoder or keyed-receiver factory batches.
-The decoder batches through `0x7A` were previously committed; this update
-records the current primary-route consumer trace.
+The decoder batches through `0x7A` and route-2 consumer trace were previously
+committed; this update records the route-3 consumer trace.
 Use GPT-6 Luna with explicit High reasoning for implementation and review.
 Verify field-address setup, primitive widths, count-loop boundaries and
 helper calls against the original binary before committing and pushing.

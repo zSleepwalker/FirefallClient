@@ -8362,6 +8362,24 @@ internal static class StartupBinaryEvidence
                 MatrixMessageParserFlowNativeLayout.CallbackResultQueueInsertionCallFileOffset,
                 0xE8,
                 MatrixMessageParserFlowNativeLayout.CallbackResultQueueHelperFileOffset));
+        var route3MessageProvenance = MatrixMessageParserFlowNativeLayout.MessageDiscriminatorProvenance
+            .Single(provenance =>
+                provenance.MessageRttiName == VehicleAbilityActivatedNativeLayout.RttiName);
+        check("Binary route-index-3 message 0x53 reaches a handler that reads beyond its recorded extent",
+            route3MessageProvenance.MessageDiscriminator == 0x53
+            && route3MessageProvenance.ReceiverVtableSlotOffset
+                == MatrixMessageNamespaceRoutingNativeLayout.Selector53ProtocolHandlerVtableSlotOffset
+            && route3MessageProvenance.ReceiverMethodFileOffset
+                == MatrixMessageNamespaceRoutingNativeLayout.Selector53ProtocolHandlerMethodFileOffset
+            && VehicleAbilityActivatedNativeLayout.AllocationSize == 0x30
+            && MatrixMessageNamespaceRoutingNativeLayout.Selector53HandlerFilterMessageFieldOffset
+                >= VehicleAbilityActivatedNativeLayout.AllocationSize
+            && Matches(
+                MatrixMessageNamespaceRoutingNativeLayout.Selector53ProtocolHandlerMethodFileOffset + 0x0D,
+                "8B4734")
+            && Matches(
+                MatrixMessageNamespaceRoutingNativeLayout.Selector53ProtocolHandlerMethodFileOffset + 0x73,
+                "8B8EB8430000FF75088B472C83C1188B572850528B31897104"));
         var namespaceRouting = MatrixMessageNamespaceRoutingNativeLayout.Selector53Namespaces;
         bool callbackRoutingMatches =
             RelativeBranchTargets(

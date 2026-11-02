@@ -1921,6 +1921,35 @@ installs vtable VA `0x1C72998` (RTTI `firefall::Vehicle::AbilityActivated`).
 The reader writes DWORDs at object+`0x28` and `+0x2C` through `0x3370A0`.
 Their meanings remain unknown.
 
+#### Conditional post-parse consumer for route 3
+
+The base constructor stores discriminator `0x53` at message+`0x10`, just as
+route 2 does. The callback path is conditional: message+`0x18` must have a
+zero low byte, message+`0x10` must not be the nested-message sentinel, and the
+callback context's `+8` receiver must be non-null before `0x7FDC60` calls
+`0x81BB90` with this object. The receiver dispatcher selects solely on
+message+`0x10`; it does not check the message vptr or metadata pointer.
+Consequently, discriminator `0x53` reaches the same receiver slot `+0xD0` and
+method `0xACA580` described for route 2.
+
+That method reads message+`0x34` as a candidate C-string pointer and compares
+it to `"missions"`. On equality, it uses message+`0x28/+0x2C` as a source
+range for the vector at owner+`0x43B8`. On inequality, it passes the address
+of message+`0x28` to the map helper at `0x937E40`, which walks records in
+24-byte steps until the supplied end pointer. The two DWORDs parsed by
+`Vehicle::AbilityActivated` therefore serve as that helper's range endpoints
+on this path, but their semantics are not otherwise named.
+
+There is a static extent mismatch: this parser requests `0x30` bytes and reads
+only through `+0x2C`, while the shared method loads a pointer from `+0x34`.
+That address lies beyond the recorded allocation extent. This establishes a
+potential out-of-extent read only if a route-3 object reaches this conditional
+handler path; the IDA evidence does not establish that it happens at runtime,
+the validity of the loaded pointer, or the meaning/range validity of
+`+0x28/+0x2C`. Read-only disassembly and original-file fingerprints support
+the parser, callback gate, discriminator dispatch, and handler offsets; no
+runtime behavior is inferred.
+
 Switch entry1 (dispatcher value `0x54`) selects case `0x81EFD4`,
 `Vehicle::AbilityFailed`. It allocates `0x30` bytes, stores local DWORD
 `0xD1`, calls constructor `0xB09440`, then reader `0x83A7A0`. The constructor

@@ -2500,6 +2500,19 @@ Check("Vehicle AbilityActivated route-index-3 switch-entry layout is recorded",
     && VehicleAbilityActivatedNativeLayout.RttiName == ".?AVAbilityActivated@Vehicle@firefall@@"
     && VehicleAbilityActivatedNativeLayout.FirstDwordFieldOffset == 0x28
     && VehicleAbilityActivatedNativeLayout.SecondDwordFieldOffset == 0x2C);
+var vehicleAbilityMessageProvenance = MatrixMessageParserFlowNativeLayout.MessageDiscriminatorProvenance
+    .Single(provenance =>
+        provenance.MessageRttiName == VehicleAbilityActivatedNativeLayout.RttiName);
+Check("Vehicle AbilityActivated's shared selector-0x53 consumer reads beyond its recorded object extent",
+    vehicleAbilityMessageProvenance.MessageDiscriminator == 0x53
+    && vehicleAbilityMessageProvenance.ReceiverVtableSlotOffset
+        == MatrixMessageNamespaceRoutingNativeLayout.Selector53ProtocolHandlerVtableSlotOffset
+    && vehicleAbilityMessageProvenance.ReceiverMethodFileOffset
+        == MatrixMessageNamespaceRoutingNativeLayout.Selector53ProtocolHandlerMethodFileOffset
+    && MatrixMessageNamespaceRoutingNativeLayout.Selector53HandlerFilterMessageFieldOffset
+        >= VehicleAbilityActivatedNativeLayout.AllocationSize
+    && VehicleAbilityActivatedNativeLayout.FirstDwordFieldOffset == 0x28
+    && VehicleAbilityActivatedNativeLayout.SecondDwordFieldOffset == 0x2C);
 Check("Deployable TookHit route-index-4 subcase layout is recorded",
     DeployableTookHitNativeLayout.DispatcherFileOffset == 0x81F206
     && DeployableTookHitNativeLayout.DispatcherValue == 0x53
