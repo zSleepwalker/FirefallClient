@@ -2587,6 +2587,13 @@ Check("LootStoreExtension LootObjectCollected route-index-6 subcase layout is re
     && LootStoreExtensionLootObjectCollectedNativeLayout.DwordFieldOffset == 0x28
     && LootStoreExtensionLootObjectCollectedNativeLayout.FirstQwordFieldOffset == 0x30
     && LootStoreExtensionLootObjectCollectedNativeLayout.SecondQwordFieldOffset == 0x38);
+Check("LootStoreExtension LootObjectCollected's selector-0x53 filter candidate aliases its first QWORD",
+    LootStoreExtensionLootObjectCollectedNativeLayout.BaseConstructorArgument == 0x53
+    && LootStoreExtensionLootObjectCollectedNativeLayout.FirstQwordFieldOffset + sizeof(uint)
+        == MatrixMessageNamespaceRoutingNativeLayout.Selector53HandlerFilterMessageFieldOffset
+    && LootStoreExtensionLootObjectCollectedNativeLayout.FirstQwordFieldOffset + sizeof(uint)
+        < LootStoreExtensionLootObjectCollectedNativeLayout.AllocationSize
+    && LootStoreExtensionLootObjectCollectedNativeLayout.DwordFieldOffset == 0x28);
 Check("AreaVisualData AudioEmitterSpawned value0x54 layout is recorded",
     AreaVisualDataAudioEmitterSpawnedNativeLayout.DispatcherFileOffset == 0x81EE63
     && AreaVisualDataAudioEmitterSpawnedNativeLayout.DispatcherValue == 0x54

@@ -1,30 +1,30 @@
 # Reverse-engineering handoff
 
-## Resume here (route-5 parsed-object consumer traced)
+## Resume here (route-6 parsed-object consumer traced)
 
-The bounded primary-route continuation traced route index 5's
-`Turret::WeaponProjectileFired` through its conditional consumer. Parser case
-raw `0x81F2F9` allocates `0x48` bytes, stores discriminator `0x53`, and reads
-DWORDs at `+0x28/+0x2C/+0x30/+0x34`. The same callback gates can route it to
-slot `+0xD0` / raw method `0xACA580`, which treats `+0x34` as a candidate
-C-string pointer and `+0x28/+0x2C` as a range. Those are conflicting
-interpretations of parsed DWORDs, not established pointer or range semantics
-or runtime delivery.
+The bounded primary-route continuation traced route index 6's
+`LootStoreExtension::LootObjectCollected` through its conditional consumer.
+Parser case raw `0x81F354` allocates `0x40` bytes, stores discriminator `0x53`,
+reads a DWORD at `+0x28`, and QWORDs at `+0x30/+0x38`. Under the same callback
+gates, it can reach slot `+0xD0` / raw method `0xACA580`, which treats `+0x34`
+as a candidate C-string pointer and `+0x28/+0x2C` as a range. Here `+0x34` is
+the high DWORD of the first QWORD, and `+0x2C` is not initialized by the
+traced constructor/reader. Preserve the consumer/parser overlap without
+inferring pointer validity, range meaning, or runtime delivery.
 
-The prior route-4 trace (`Deployable::TookHit`, raw `0x81F29E`) found the same
-handler's `+0x34` candidate pointer aliases the high DWORD of a conditional
-QWORD, while `+0x28/+0x2C` overlap a presence byte and an uninitialized field.
-Route 3 (`Vehicle::AbilityActivated`, raw `0x81EF83`) has the same `+0x34`
-read beyond its requested `0x30`-byte extent. Route-2 details remain below.
+Routes 3-5 show similar `0x53` receiver collisions: route 3's `+0x34` read is
+outside its `0x30` allocation; route 4 overlays the high DWORD of a conditional
+QWORD and a presence byte/range start; route 5 reads a DWORD at `+0x34`.
+Route-2 details remain below.
 
 Boundary: route 2 writes `+0x28`, `+0x30`, and `+0x38`, but not `+0x2C`;
 the handler consumes `+0x2C` as a range endpoint and `+0x34` as a candidate
 C-string pointer. Preserve these as unresolved fields. Read-only IDA checks
 and original-file evidence agreed on the relevant parser, callback, selector,
 and receiver instructions; IDA was not modified and the sample was not run.
-Next, trace one route-6 consumer (start with
-`LootStoreExtension::LootObjectCollected`, parser case raw `0x81F354`); do not
-broaden this into an all-17 consumer sweep.
+Next, trace the route-0 nested `Character::MarketRequestComplete` selector
+`0x53` consumer at parser case raw `0x81CCC3`. Keep that nested selector table
+distinct from route indices 2-6 and the secondary decoder table.
 
 All secondary selectors `0x20..0x7A` are now reconstructed and checked against
 `FirefallClient.exe.original`. The final entries `0x78..0x7A` resolve to
@@ -32,8 +32,8 @@ All secondary selectors `0x20..0x7A` are now reconstructed and checked against
 `ConductorGlobalAnnouncement`; do not confuse them with route0's nested
 Character selectors `OpenMovieDialog`, `PrivateDialog`, and `PublicDialog`.
 Do not repeat the earlier decoder or keyed-receiver factory batches.
-The decoder batches through `0x7A` and route-2/route-3/route-4 consumer traces
-were previously committed; this update records the route-5 consumer trace.
+The decoder batches through `0x7A` and route-2 through route-5 consumer traces
+were previously committed; this update records the route-6 consumer trace.
 Use GPT-6 Luna with explicit High reasoning for implementation and review.
 Verify field-address setup, primitive widths, count-loop boundaries and
 helper calls against the original binary before committing and pushing.

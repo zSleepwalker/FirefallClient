@@ -2198,6 +2198,22 @@ DWORDs at `+0x30`, `+0x34`, `+0x38`, and `+0x3C` to zero.
 The body reader writes a DWORD at object+`0x28`, then raw QWORDs at `+0x30` and
 `+0x38`, through `0x3370A0` and `0x356F80`. Field meanings remain unknown.
 
+#### Conditional post-parse consumer for route 6
+
+The constructor stores discriminator `0x53` at message+`0x10`, so the same
+callback gates and receiver dispatch can route this message through slot
+`+0xD0` to `0xACA580`. That method treats message+`0x34` as a candidate
+C-string pointer; here it is the high DWORD of the first QWORD read at
+`+0x30/+0x34`. The constructor initially zeros that QWORD, but the body reader
+overwrites it from the stream.
+
+The handler also consumes message `+0x28/+0x2C` as source-range endpoints.
+Route 6 reads a DWORD at `+0x28` and leaves `+0x2C` untouched in the traced
+constructor and body reader; these are not established as valid range
+endpoints. Both the candidate field and range operands are within the
+`0x40`-byte allocation. The consumer path remains conditional, and neither
+runtime reachability nor field semantics are established.
+
 Nested-table entry0 maps selector `0x53`: route0 block `0x81CCAD` dispatches it
 through the table at VA `0xC22444` (raw `0x821844`) to raw case
 `0x81CCC3`. That case allocates `0x48` bytes, calls constructor `0x524C30`,

@@ -6483,6 +6483,17 @@ internal static class StartupBinaryEvidence
                 0xE8, LootStoreExtensionLootObjectCollectedNativeLayout.QwordReaderFileOffset)
             && VtableRttiName(LootStoreExtensionLootObjectCollectedNativeLayout.VtableVirtualAddress, 80)
                 == LootStoreExtensionLootObjectCollectedNativeLayout.RttiName);
+        check("Binary route-index-6 QWORD at +0x30 aliases selector-0x53 handler filter input",
+            Matches(LootStoreExtensionLootObjectCollectedNativeLayout.BodyReaderFileOffset + 0x13,
+                "8D46308BCF50")
+            && RelativeBranchTargets(LootStoreExtensionLootObjectCollectedNativeLayout.BodyReaderFileOffset + 0x19,
+                0xE8, LootStoreExtensionLootObjectCollectedNativeLayout.QwordReaderFileOffset)
+            && LootStoreExtensionLootObjectCollectedNativeLayout.BaseConstructorArgument == 0x53
+            && LootStoreExtensionLootObjectCollectedNativeLayout.FirstQwordFieldOffset + sizeof(uint)
+                == MatrixMessageNamespaceRoutingNativeLayout.Selector53HandlerFilterMessageFieldOffset
+            && Matches(
+                MatrixMessageNamespaceRoutingNativeLayout.Selector53ProtocolHandlerMethodFileOffset + 0x0D,
+                "8B4734"));
         check("Binary route-index-2 value0x54 constructs AreaVisualData AudioEmitterSpawned",
             ReadUInt32(VirtualAddressToFileOffset(
                 MatrixSecondaryCommandDispatcherNativeLayout.PrimaryJumpTableVirtualAddress) + 2 * 4)
