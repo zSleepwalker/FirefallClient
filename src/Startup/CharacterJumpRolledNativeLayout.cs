@@ -23,3 +23,24 @@ public static class CharacterJumpRolledNativeLayout
     public const int WordFieldOffset = 0x28;
     public const int NominalInputByteCount = 2;
 }
+
+public static class CharacterJumpRolledConsumerNativeLayout
+{
+    public const int MessageDiscriminator = CharacterJumpRolledNativeLayout.InnerSelector;
+    public const uint ProtocolHandlerDispatchTableVirtualAddress = 0xC1D6DC;
+    public const int ProtocolHandlerDispatchTableSelectorBias = 0x20;
+    public const int ProtocolHandlerVtableSlotOffset = 0x11C;
+    public const uint ProtocolHandlerVtableTargetVirtualAddress = 0xECD9B0;
+    public const uint ProtocolHandlerVtableTargetFileOffset = 0xACCDB0;
+    public const uint ConsumerFunctionFileOffset = 0xACCDB0;
+
+    public const int TransportContextFieldOffset = 0x10;
+    public const int MessageKeyFieldOffset = CharacterJumpRolledNativeLayout.WordFieldOffset;
+    public const int MessageKeyFieldByteCount = 8;
+    public const uint KeyedDrainRoutineFileOffset = 0x977F20;
+    public const uint KeyLookupRoutineFileOffset = 0x979C80;
+    public const uint DrainItemRoutineFileOffset = 0x977630;
+    public const uint DrainFinalizeRoutineFileOffset = 0x975020;
+    public const uint DrainReleaseRoutineFileOffset = 0x12C8D60;
+    public const int MissingTransportDiagnosticCode = 91;
+}

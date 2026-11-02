@@ -38,3 +38,29 @@ public static class CharacterProximityTextChatNativeLayout
     public const int EmptyTextInputByteCountWithoutOptionalBlob = 5;
     public const int EmptyTextInputByteCountWithEmptyOptionalBlob = 7;
 }
+
+public static class CharacterProximityTextChatConsumerNativeLayout
+{
+    public const int MessageDiscriminator = CharacterProximityTextChatNativeLayout.InnerSelector;
+    public const uint ProtocolHandlerDispatchTableVirtualAddress = 0xC1D6DC;
+    public const int ProtocolHandlerDispatchTableSelectorBias = 0x20;
+    public const int ProtocolHandlerVtableSlotOffset = 0x114;
+    public const uint ProtocolHandlerVtableTargetVirtualAddress = 0xECD900;
+    public const uint ProtocolHandlerVtableTargetFileOffset = 0xACCD00;
+    public const uint ConsumerFunctionFileOffset = 0xACCD00;
+
+    public const int MessagePayloadTypeWordOffset = 0x40;
+    public const int AcceptedPayloadTypeWordValue = 2;
+    public const int TransportContextFieldOffset = 0x10;
+    public const int TextParameterFieldOffset = 0x28;
+    public const int OptionalBlobParameterFieldOffset = 0x30;
+    public const int ReferenceTreeParameterFieldOffset = 0x44;
+    public const int AuxiliaryParameterPointerOffset = 0x4C;
+    public const int AllocationSize = CharacterProximityTextChatNativeLayout.AllocationSize;
+    public const int AuxiliaryPointerPastAllocationByteCount =
+        AuxiliaryParameterPointerOffset - AllocationSize;
+
+    public const int MissingTransportDiagnosticCode = 91;
+    public const uint NetworkSendRoutineFileOffset = 0x977150;
+    public const uint UnhandledPayloadLoggerFileOffset = 0x2FC4F0;
+}

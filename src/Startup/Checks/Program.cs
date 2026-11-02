@@ -3463,6 +3463,72 @@ Check("ProximityTextChat selector 0x64 records shared text and optional blob fra
     && CharacterProximityTextChatNativeLayout.MaximumOptionalBlobPayloadByteCount == 0xFFFF
     && CharacterProximityTextChatNativeLayout.EmptyTextInputByteCountWithoutOptionalBlob == 5
     && CharacterProximityTextChatNativeLayout.EmptyTextInputByteCountWithEmptyOptionalBlob == 7);
+Check("ProximityTextChat selector 0x64 records its gated transport handoff",
+    CharacterProximityTextChatConsumerNativeLayout.MessageDiscriminator
+        == CharacterProximityTextChatNativeLayout.InnerSelector
+    && CharacterProximityTextChatConsumerNativeLayout.ProtocolHandlerVtableSlotOffset == 0x114
+    && CharacterProximityTextChatConsumerNativeLayout.ProtocolHandlerVtableTargetVirtualAddress == 0xECD900
+    && CharacterProximityTextChatConsumerNativeLayout.ProtocolHandlerVtableTargetFileOffset == 0xACCD00
+    && CharacterProximityTextChatConsumerNativeLayout.MessagePayloadTypeWordOffset == 0x40
+    && CharacterProximityTextChatConsumerNativeLayout.AcceptedPayloadTypeWordValue == 2
+    && CharacterProximityTextChatConsumerNativeLayout.TransportContextFieldOffset == 0x10
+    && CharacterProximityTextChatConsumerNativeLayout.TextParameterFieldOffset == 0x28
+    && CharacterProximityTextChatConsumerNativeLayout.OptionalBlobParameterFieldOffset == 0x30
+    && CharacterProximityTextChatConsumerNativeLayout.ReferenceTreeParameterFieldOffset == 0x44
+    && CharacterProximityTextChatConsumerNativeLayout.AuxiliaryParameterPointerOffset == 0x4C
+    && CharacterProximityTextChatConsumerNativeLayout.AuxiliaryPointerPastAllocationByteCount == 4
+    && CharacterProximityTextChatConsumerNativeLayout.MissingTransportDiagnosticCode == 91
+    && CharacterProximityTextChatConsumerNativeLayout.NetworkSendRoutineFileOffset == 0x977150
+    && CharacterProximityTextChatConsumerNativeLayout.UnhandledPayloadLoggerFileOffset == 0x2FC4F0);
+Check("JumpActioned selector 0x65 records its opaque subobject handoff",
+    CharacterJumpActionedConsumerNativeLayout.MessageDiscriminator
+        == CharacterJumpActionedNativeLayout.InnerSelector
+    && CharacterJumpActionedConsumerNativeLayout.ProtocolHandlerVtableSlotOffset == 0x118
+    && CharacterJumpActionedConsumerNativeLayout.ProtocolHandlerVtableTargetVirtualAddress == 0xECD970
+    && CharacterJumpActionedConsumerNativeLayout.ProtocolHandlerVtableTargetFileOffset == 0xACCD70
+    && CharacterJumpActionedConsumerNativeLayout.TransportContextFieldOffset == 0x10
+    && CharacterJumpActionedConsumerNativeLayout.MessageWordFieldOffset == 0x28
+    && CharacterJumpActionedConsumerNativeLayout.FirstSubobjectAddressOffset == 0x30
+    && CharacterJumpActionedConsumerNativeLayout.SecondSubobjectAddressOffset == 0x40
+    && CharacterJumpActionedConsumerNativeLayout.AllocationSize == 0x30
+    && CharacterJumpActionedConsumerNativeLayout.SecondSubobjectAddressPastAllocationByteCount == 0x10
+    && CharacterJumpActionedConsumerNativeLayout.SubobjectVtableMethodSlotOffset == 0x0C
+    && CharacterJumpActionedConsumerNativeLayout.MissingTransportDiagnosticCode == 91
+    && CharacterJumpActionedConsumerNativeLayout.HandoffRoutineFileOffset == 0x977750
+    && CharacterJumpActionedConsumerNativeLayout.HandoffEventIdForRepeatedItems == 360
+    && CharacterJumpActionedConsumerNativeLayout.HandoffEventIdForNonemptyTail == 359);
+Check("JumpRolled selector 0x66 records its keyed drain receiver",
+    CharacterJumpRolledConsumerNativeLayout.MessageDiscriminator
+        == CharacterJumpRolledNativeLayout.InnerSelector
+    && CharacterJumpRolledConsumerNativeLayout.ProtocolHandlerVtableSlotOffset == 0x11C
+    && CharacterJumpRolledConsumerNativeLayout.ProtocolHandlerVtableTargetVirtualAddress == 0xECD9B0
+    && CharacterJumpRolledConsumerNativeLayout.ProtocolHandlerVtableTargetFileOffset == 0xACCDB0
+    && CharacterJumpRolledConsumerNativeLayout.TransportContextFieldOffset == 0x10
+    && CharacterJumpRolledConsumerNativeLayout.MessageKeyFieldOffset == 0x28
+    && CharacterJumpRolledConsumerNativeLayout.MessageKeyFieldByteCount == 8
+    && CharacterJumpRolledConsumerNativeLayout.KeyedDrainRoutineFileOffset == 0x977F20
+    && CharacterJumpRolledConsumerNativeLayout.KeyLookupRoutineFileOffset == 0x979C80
+    && CharacterJumpRolledConsumerNativeLayout.DrainItemRoutineFileOffset == 0x977630
+    && CharacterJumpRolledConsumerNativeLayout.DrainFinalizeRoutineFileOffset == 0x975020
+    && CharacterJumpRolledConsumerNativeLayout.DrainReleaseRoutineFileOffset == 0x12C8D60
+    && CharacterJumpRolledConsumerNativeLayout.MissingTransportDiagnosticCode == 91);
+Check("Respawned selector 0x67 records its typed vector receiver",
+    CharacterRespawnedConsumerNativeLayout.MessageDiscriminator
+        == CharacterRespawnedNativeLayout.InnerSelector
+    && CharacterRespawnedConsumerNativeLayout.ProtocolHandlerVtableSlotOffset == 0x120
+    && CharacterRespawnedConsumerNativeLayout.ProtocolHandlerVtableTargetVirtualAddress == 0xECD9F0
+    && CharacterRespawnedConsumerNativeLayout.ProtocolHandlerVtableTargetFileOffset == 0xACCDF0
+    && CharacterRespawnedConsumerNativeLayout.TransportContextFieldOffset == 0x10
+    && CharacterRespawnedConsumerNativeLayout.VectorBeginPointerOffset == 0x30
+    && CharacterRespawnedConsumerNativeLayout.VectorEndPointerOffset == 0x34
+    && CharacterRespawnedConsumerNativeLayout.VectorEntryStride == 0x10
+    && CharacterRespawnedConsumerNativeLayout.VectorEntryKindOffset == 0
+    && CharacterRespawnedConsumerNativeLayout.VectorEntryTextPointerOffset == 4
+    && CharacterRespawnedConsumerNativeLayout.VectorEntryIntegerOffset == 8
+    && CharacterRespawnedConsumerNativeLayout.VectorEntryFloatOffset == 0x0C
+    && CharacterRespawnedConsumerNativeLayout.OptionalSharedTextPointerOffset == 0x2C
+    && CharacterRespawnedConsumerNativeLayout.OptionalByteFieldOffset == 0x8C
+    && CharacterRespawnedConsumerNativeLayout.DispatchedEventId == 167);
 Check("JumpActioned selector 0x65 records its shared WORD reader continuation",
     CharacterJumpActionedNativeLayout.InnerSelector == 0x65
     && CharacterJumpActionedNativeLayout.CaseFileOffset == 0x81D1F3
@@ -5233,6 +5299,10 @@ Check("ReplayReader message dispatch receiver and discriminator vtable cases rem
         new MatrixMessageDispatchVtableCaseSnapshot(0x61, 0xC1D25B, 0x81C65B, 0x81C67A, 0x108),
         new MatrixMessageDispatchVtableCaseSnapshot(0x62, 0xC1D286, 0x81C686, 0x81C6A5, 0x10C),
         new MatrixMessageDispatchVtableCaseSnapshot(0x63, 0xC1D2B1, 0x81C6B1, 0x81C6D0, 0x110),
+        new MatrixMessageDispatchVtableCaseSnapshot(0x64, 0xC1D2DC, 0x81C6DC, 0x81C6FB, 0x114),
+        new MatrixMessageDispatchVtableCaseSnapshot(0x65, 0xC1D307, 0x81C707, 0x81C726, 0x118),
+        new MatrixMessageDispatchVtableCaseSnapshot(0x66, 0xC1D332, 0x81C732, 0x81C751, 0x11C),
+        new MatrixMessageDispatchVtableCaseSnapshot(0x67, 0xC1D35D, 0x81C75D, 0x81C77C, 0x120),
         new MatrixMessageDispatchVtableCaseSnapshot(0x71, 0xC1D50B, 0x81C90B, 0x81C92A, 0x148),
         new MatrixMessageDispatchVtableCaseSnapshot(0x74, 0xC1D58C, 0x81C98C, 0x81C9AB, 0x154),
         new MatrixMessageDispatchVtableCaseSnapshot(0x75, 0xC1D5B7, 0x81C9B7, 0x81C9D6, 0x158),

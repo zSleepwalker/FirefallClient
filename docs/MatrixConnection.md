@@ -2943,6 +2943,26 @@ through `0x12EE170`, then updates the reference-backed blob field using
 `0x5F1920`. A zero gate clears an existing blob through `0x49AC30` when its
 presence marker is set.
 
+#### Selector 0x64 post-parse receiver
+
+The outer handler switch maps selector `0x64` through VA `0xC1D2DC` / raw
+`0x81C6DC`, then calls slot `+0x114` at raw `0x81C6FB`. The protocol-handler
+vtable entry at raw `0x1870BD4` contains VA `0xECD900`, mapped to the receiver
+at raw `0xACCD00`. It reads a WORD at message `+0x40`; values other than `2`
+are sent to the unhandled-message logger `0x2FC4F0`. For value `2`, it checks
+the transport-context pointer at handler `+0x10`. A null context logs diagnostic
+code `91`, but execution then continues to `0x977150` either way, passing
+addresses of message fields `+0x28`, `+0x30`, `+0x4C`, and `+0x44`.
+
+The `0x977150` sender consumes the `+0x28` and `+0x30` arguments through
+collection helpers and traverses the structure rooted at `+0x44`. The
+`+0x4C` address is first passed to `0x975660`, whose decompilation remains
+unresolved; its exact meaning and whether that helper dereferences it are
+unknown. The parser's allocation is `0x48` bytes, so `message+0x4C` is four
+bytes beyond the declared extent. The receiver forms and forwards that address,
+but does not directly load from it. This static extent mismatch does not by
+itself establish runtime validity or impact.
+
 The nominal input length is the number of text bytes through and including
 the terminating NUL, plus three bytes and the gate byte, plus
 `2 + blobLength` when the gate is nonzero. Thus an empty text with no blob
@@ -2969,6 +2989,32 @@ continues into the same field reader, which forms destination address
 Field meaning remains unknown; RTTI alone does not establish jump-action
 semantics.
 
+#### Selector 0x65 post-parse receiver
+
+The outer handler switch maps selector `0x65` through VA `0xC1D307` / raw
+`0x81C707`, then calls slot `+0x118` at raw `0x81C726`. The protocol-handler
+vtable entry at raw `0x1870BD8` contains VA `0xECD970`, mapped to the receiver
+at raw `0xACCD70`. It checks the handler context at `+0x10`; a null value logs
+diagnostic `91`, then execution still calls `0x977750`. The call passes the
+address of message `+0x28`, then addresses `+0x30` and `+0x40`.
+
+The `0x977750` helper performs a keyed lookup using the DWORD pair at
+message `+0x28/+0x2C`. It treats the addresses at message `+0x30` and `+0x40`
+as polymorphic objects: it reads each address's first DWORD as a vtable and
+calls virtual slot `+0x0C`. The `+0x40` object's returned range is iterated to
+build event `360` records. When the keyed entry has a nonzero-length
+associated field, a separate branch can dispatch event `359` using the key.
+The `+0x30` object's returned byte sequence is also traversed, including
+eight-byte reads and special `0xFF` handling; the exact record meaning remains
+unresolved.
+
+The parser requests `0x30` bytes and writes only the WORD at `+0x28`. The
+receiver's `+0x30` object starts at the end of that declared allocation, while
+its `+0x40` object starts `0x10` bytes beyond it; the helper's virtual calls
+read vtable pointers there. These are static parser/receiver extent conflicts.
+The requested allocation size does not establish actual runtime capacity or
+the cause or effect of the observed accesses.
+
 ### Selector 0x66: `JumpRolled`
 
 Entry19 maps selector `0x66` to VA `0xC1DE47` / raw case `0x81D247`. It
@@ -2986,6 +3032,23 @@ failure branch at `0x81D25F` enters `0x81D21D`, zeroes ESI, and continues
 into the same reader, which forms destination address `0x28`; the runtime
 consequence remains unresolved. Field meaning is unknown.
 
+#### Selector 0x66 post-parse receiver
+
+The outer handler switch maps selector `0x66` through VA `0xC1D332` / raw
+`0x81C732`, then calls slot `+0x11C` at raw `0x81C751`. The protocol-handler
+vtable entry at raw `0x1870BDC` contains VA `0xECD9B0`, mapped to the receiver
+at raw `0xACCDB0`. It checks handler context `+0x10`; a null value logs
+diagnostic `91`, but execution continues and calls `0x977F20` with the address
+of message `+0x28`.
+
+The helper looks up the eight-byte key at message `+0x28/+0x2C`. On a hit, it
+removes the associated entry, then synchronously drains its `+4` count by
+calling `0x977630` for each linked item before finalizing with `0x975020` and
+releasing through `0x12C8D60`. The key's interpretation, entry type, and
+per-item effects remain unknown. Both key DWORDs are within the parser's
+requested `0x30`-byte allocation; the parser itself reads only the WORD at
+`+0x28`.
+
 ### Selector 0x67: `Respawned`
 
 Entry20 maps selector `0x67` to VA `0xC1DE71` / raw case `0x81D271`. It
@@ -3001,6 +3064,29 @@ length is four bytes. Allocation failure branches at `0x81D289` to
 `0x81D29B`, zeroes ESI, then joins the body-reader setup at `0x81D29D`;
 the consequence of that abnormal path remains unresolved. The field meanings
 are unknown, and the RTTI name does not establish respawn semantics.
+
+#### Selector 0x67 post-parse receiver
+
+The outer handler switch maps selector `0x67` through VA `0xC1D35D` / raw
+`0x81C75D`, then calls slot `+0x120` at raw `0x81C77C`. The protocol-handler
+vtable entry at raw `0x1870BE0` contains VA `0xECD9F0`, mapped to receiver raw
+`0xACCDF0`.
+
+The receiver compares message `+0x30` and `+0x34` as begin/end pointers and,
+when nonempty, computes a count using a `0x10`-byte stride. It processes each
+record by the byte at entry `+0`: kind `0` uses the pointer at `+4` as shared
+text, kind `1` formats the DWORD at `+8`, and kind `2` formats the float at
+`+0xC`; other kinds are skipped. The exact format strings and meanings are
+unknown. For an empty range it instead builds shared text from message
+`+0x28`. After aggregating, it conditionally appends shared text from `+0x2C`
+and a nonzero byte at `+0x8C`, then dispatches event `167`; event semantics are
+unresolved.
+
+The parser requests only `0x30` bytes and writes the WORD at `+0x28` and bytes
+at `+0x2A/+0x2B`. Thus the receiver's vector begin/end header starts at and
+extends beyond the declared allocation, and its optional byte at `+0x8C` is
+also beyond it. These are static extent mismatches, not proof of actual runtime
+capacity or impact.
 
 ### Selector 0x68: `CalledForHelp`
 

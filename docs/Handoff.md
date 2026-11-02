@@ -102,8 +102,40 @@ recognized type byte sequences. Those pointers lie beyond the parser's
 `0x30`-byte allocation. Details and uncertainty are in
 `docs/MatrixConnection.md`.
 
-Next, trace route-0 nested `Character::ProximityTextChat` selector `0x64`'s
-receiver at slot `+0x114`. Keep this nested selector table distinct from route
+The route-0 nested `Character::ProximityTextChat` selector `0x64` receiver is
+traced at slot `+0x114` (VA `0xECD900` / raw `0xACCD00`). It gates a call to
+`0x977150` on a WORD at message `+0x40` equaling `2`. A null handler context
+logs diagnostic `91` but does not suppress the sender call, which receives
+addresses of fields `+0x28`, `+0x30`, `+0x4C`, and `+0x44`. The `+0x4C` address
+lies four bytes beyond the parser's `0x48` allocation; the receiver only forms
+and forwards the address, while downstream use remains unresolved.
+
+The route-0 nested `Character::JumpActioned` selector `0x65` receiver is traced
+at slot `+0x118` (VA `0xECD970` / raw `0xACCD70`). It passes message field
+addresses `+0x28`, `+0x30`, and `+0x40` to `0x977750`; that helper treats the
+latter two as polymorphic objects and calls virtual slot `+0x0C`. The parser
+requests only `0x30` bytes, so the `+0x30` and `+0x40` object regions start at
+and beyond the declared allocation boundary. Field meanings and actual runtime
+capacity remain unknown.
+
+The route-0 nested `Character::JumpRolled` selector `0x66` receiver is traced
+at slot `+0x11C` (VA `0xECD9B0` / raw `0xACCDB0`). It sends the address of
+message `+0x28` to `0x977F20`, which performs an eight-byte keyed lookup and,
+on a hit, synchronously drains the associated `+4` count. The parser requests
+`0x30` bytes and reads only a WORD at `+0x28`; key meaning and entry effects
+remain unknown.
+
+The route-0 nested `Character::Respawned` selector `0x67` receiver is traced at
+slot `+0x120` (VA `0xECD9F0` / raw `0xACCDF0`). It reads a begin/end vector at
+message `+0x30/+0x34`, processes 16-byte entries tagged `0/1/2` as text,
+integer, or float values, then can append fields `+0x2C` and `+0x8C` before
+dispatching event `167`. The parser requests only `0x30` bytes, so the vector
+header and `+0x8C` read exceed its declared extent; runtime capacity and
+semantics remain unknown.
+
+Next, trace route-0 nested `Character::CalledForHelp` selector `0x68`'s
+receiver at slot `+0x124`, verifying the dispatch and target mapping before
+interpreting the method. Keep this nested selector table distinct from route
 indices 2-6 and the secondary decoder table.
 
 All secondary selectors `0x20..0x7A` are now reconstructed and checked against
@@ -114,7 +146,7 @@ Character selectors `OpenMovieDialog`, `PrivateDialog`, and `PublicDialog`.
 Do not repeat the earlier decoder or keyed-receiver factory batches.
 The decoder batches through `0x7A` and route-2 through route-6 consumer traces
 were previously committed; recent updates trace route0 nested selectors `0x53`
-through `0x63` consumers.
+through `0x67` consumers.
 Use GPT-6 Luna with explicit High reasoning for implementation and review.
 Verify field-address setup, primitive widths, count-loop boundaries and
 helper calls against the original binary before committing and pushing.

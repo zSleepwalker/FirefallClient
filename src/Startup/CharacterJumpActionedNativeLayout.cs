@@ -23,3 +23,28 @@ public static class CharacterJumpActionedNativeLayout
     public const int WordFieldOffset = 0x28;
     public const int NominalInputByteCount = 2;
 }
+
+public static class CharacterJumpActionedConsumerNativeLayout
+{
+    public const int MessageDiscriminator = CharacterJumpActionedNativeLayout.InnerSelector;
+    public const uint ProtocolHandlerDispatchTableVirtualAddress = 0xC1D6DC;
+    public const int ProtocolHandlerDispatchTableSelectorBias = 0x20;
+    public const int ProtocolHandlerVtableSlotOffset = 0x118;
+    public const uint ProtocolHandlerVtableTargetVirtualAddress = 0xECD970;
+    public const uint ProtocolHandlerVtableTargetFileOffset = 0xACCD70;
+    public const uint ConsumerFunctionFileOffset = 0xACCD70;
+
+    public const int TransportContextFieldOffset = 0x10;
+    public const int MessageWordFieldOffset = CharacterJumpActionedNativeLayout.WordFieldOffset;
+    public const int FirstSubobjectAddressOffset = 0x30;
+    public const int SecondSubobjectAddressOffset = 0x40;
+    public const int AllocationSize = CharacterJumpActionedNativeLayout.AllocationSize;
+    public const int SecondSubobjectAddressPastAllocationByteCount =
+        SecondSubobjectAddressOffset - AllocationSize;
+    public const int SubobjectVtableMethodSlotOffset = 0x0C;
+
+    public const int MissingTransportDiagnosticCode = 91;
+    public const uint HandoffRoutineFileOffset = 0x977750;
+    public const int HandoffEventIdForRepeatedItems = 360;
+    public const int HandoffEventIdForNonemptyTail = 359;
+}

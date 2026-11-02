@@ -29,3 +29,26 @@ public static class CharacterRespawnedNativeLayout
     public const int SecondByteFieldOffset = 0x2B;
     public const int NominalInputByteCount = 4;
 }
+
+public static class CharacterRespawnedConsumerNativeLayout
+{
+    public const int MessageDiscriminator = CharacterRespawnedNativeLayout.InnerSelector;
+    public const uint ProtocolHandlerDispatchTableVirtualAddress = 0xC1D6DC;
+    public const int ProtocolHandlerDispatchTableSelectorBias = 0x20;
+    public const int ProtocolHandlerVtableSlotOffset = 0x120;
+    public const uint ProtocolHandlerVtableTargetVirtualAddress = 0xECD9F0;
+    public const uint ProtocolHandlerVtableTargetFileOffset = 0xACCDF0;
+    public const uint ConsumerFunctionFileOffset = 0xACCDF0;
+
+    public const int TransportContextFieldOffset = 0x10;
+    public const int VectorBeginPointerOffset = 0x30;
+    public const int VectorEndPointerOffset = 0x34;
+    public const int VectorEntryStride = 0x10;
+    public const int VectorEntryKindOffset = 0;
+    public const int VectorEntryTextPointerOffset = 4;
+    public const int VectorEntryIntegerOffset = 8;
+    public const int VectorEntryFloatOffset = 0x0C;
+    public const int OptionalSharedTextPointerOffset = 0x2C;
+    public const int OptionalByteFieldOffset = 0x8C;
+    public const int DispatchedEventId = 167;
+}
