@@ -3142,6 +3142,28 @@ helpers remains unresolved. The body reader then reads bytes at `+0x50` and
 With the outer gate clear the body consumes six bytes; when set, its length
 depends on the nested gate. Field meanings remain unknown.
 
+#### Selector 0x69 post-parse receiver
+
+The outer handler switch maps selector `0x69` through VA `0xC1D3B3` / raw
+`0x81C7B3`, then calls slot `+0x128` at raw `0x81C7D2`. The protocol-handler
+vtable entry at raw `0x1870BE8` contains VA `0xECE210`, mapped to receiver raw
+`0xACD610`. The receiver copies `0x40` bytes from message `+0x28` using
+`0x37F810`; that helper performs four 16-byte reads and writes, including the
+block at source `+0x30`.
+
+The receiver then adds the global float at VA `0x1C81CA8` to the copied float
+whose message source is `+0x60`. It obtains an owner through `0x49DDD0`; when
+the owner's byte at `+0x18C` is set and its pointer at `+0x14C8` is nonzero,
+the receiver sets byte `+0x108` on that pointed-to object and copies the
+modified `0x40`-byte block to its `+0xC8` field. The meanings of this copied
+record, the global adjustment, and the state fields are unknown.
+
+The parser requests `0x60` bytes. The receiver's copy from `+0x28` spans
+through `+0x67`, so its final eight source bytes lie beyond the declared
+allocation; the adjusted float at `+0x60` is itself wholly outside it. This
+is a static extent mismatch and does not establish actual runtime capacity or
+impact.
+
 ### Selector 0x6A: `AlmostHit`
 
 Entry23 maps selector `0x6A` to VA `0xC1DF44` / raw case `0x81D344`. It

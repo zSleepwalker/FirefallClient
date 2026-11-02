@@ -3544,6 +3544,24 @@ Check("CalledForHelp selector 0x68 records its keyed event receiver",
     && CharacterCalledForHelpConsumerNativeLayout.MessageAuxiliaryDwordPastAllocationByteCount == 4
     && CharacterCalledForHelpConsumerNativeLayout.UnhandledMessageLoggerFileOffset == 0x2FC4F0
     && CharacterCalledForHelpConsumerNativeLayout.DispatchedEventId == 176);
+Check("TookHit selector 0x69 records its state-copy receiver",
+    CharacterTookHitConsumerNativeLayout.MessageDiscriminator
+        == CharacterTookHitNativeLayout.InnerSelector
+    && CharacterTookHitConsumerNativeLayout.ProtocolHandlerVtableSlotOffset == 0x128
+    && CharacterTookHitConsumerNativeLayout.ProtocolHandlerVtableTargetVirtualAddress == 0xECE210
+    && CharacterTookHitConsumerNativeLayout.ProtocolHandlerVtableTargetFileOffset == 0xACD610
+    && CharacterTookHitConsumerNativeLayout.MessageCopySourceOffset == 0x28
+    && CharacterTookHitConsumerNativeLayout.CopiedPayloadByteCount == 0x40
+    && CharacterTookHitConsumerNativeLayout.AllocationSize == 0x60
+    && CharacterTookHitConsumerNativeLayout.CopiedPayloadPastAllocationByteCount == 8
+    && CharacterTookHitConsumerNativeLayout.AdjustedFloatMessageOffset == 0x60
+    && CharacterTookHitConsumerNativeLayout.FloatAdjustmentVirtualAddress == 0x1C81CA8
+    && CharacterTookHitConsumerNativeLayout.CopyRoutineFileOffset == 0x37F810
+    && CharacterTookHitConsumerNativeLayout.StateAccessorFileOffset == 0x49DDD0
+    && CharacterTookHitConsumerNativeLayout.StateDestinationOffset == 0xC8
+    && CharacterTookHitConsumerNativeLayout.StateUpdateFlagOffset == 0x108
+    && CharacterTookHitConsumerNativeLayout.StateWriteGateByteOffset == 0x18C
+    && CharacterTookHitConsumerNativeLayout.StateDestinationPointerOffset == 0x14C8);
 Check("JumpActioned selector 0x65 records its shared WORD reader continuation",
     CharacterJumpActionedNativeLayout.InnerSelector == 0x65
     && CharacterJumpActionedNativeLayout.CaseFileOffset == 0x81D1F3
@@ -5319,6 +5337,7 @@ Check("ReplayReader message dispatch receiver and discriminator vtable cases rem
         new MatrixMessageDispatchVtableCaseSnapshot(0x66, 0xC1D332, 0x81C732, 0x81C751, 0x11C),
         new MatrixMessageDispatchVtableCaseSnapshot(0x67, 0xC1D35D, 0x81C75D, 0x81C77C, 0x120),
         new MatrixMessageDispatchVtableCaseSnapshot(0x68, 0xC1D388, 0x81C788, 0x81C7A7, 0x124),
+        new MatrixMessageDispatchVtableCaseSnapshot(0x69, 0xC1D3B3, 0x81C7B3, 0x81C7D2, 0x128),
         new MatrixMessageDispatchVtableCaseSnapshot(0x71, 0xC1D50B, 0x81C90B, 0x81C92A, 0x148),
         new MatrixMessageDispatchVtableCaseSnapshot(0x74, 0xC1D58C, 0x81C98C, 0x81C9AB, 0x154),
         new MatrixMessageDispatchVtableCaseSnapshot(0x75, 0xC1D5B7, 0x81C9B7, 0x81C9D6, 0x158),

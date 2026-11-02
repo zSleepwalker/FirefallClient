@@ -39,3 +39,28 @@ public static class CharacterTookHitNativeLayout
     public const int FinalByteFieldOffset = 0x5A;
     public const int MinimumInputByteCount = 6;
 }
+
+public static class CharacterTookHitConsumerNativeLayout
+{
+    public const int MessageDiscriminator = CharacterTookHitNativeLayout.InnerSelector;
+    public const uint ProtocolHandlerDispatchTableVirtualAddress = 0xC1D6DC;
+    public const int ProtocolHandlerDispatchTableSelectorBias = 0x20;
+    public const int ProtocolHandlerVtableSlotOffset = 0x128;
+    public const uint ProtocolHandlerVtableTargetVirtualAddress = 0xECE210;
+    public const uint ProtocolHandlerVtableTargetFileOffset = 0xACD610;
+    public const uint ConsumerFunctionFileOffset = 0xACD610;
+
+    public const int MessageCopySourceOffset = 0x28;
+    public const int CopiedPayloadByteCount = 0x40;
+    public const int AllocationSize = CharacterTookHitNativeLayout.AllocationSize;
+    public const int CopiedPayloadPastAllocationByteCount =
+        MessageCopySourceOffset + CopiedPayloadByteCount - AllocationSize;
+    public const int AdjustedFloatMessageOffset = 0x60;
+    public const uint FloatAdjustmentVirtualAddress = 0x1C81CA8;
+    public const uint CopyRoutineFileOffset = 0x37F810;
+    public const uint StateAccessorFileOffset = 0x49DDD0;
+    public const int StateDestinationOffset = 0xC8;
+    public const int StateUpdateFlagOffset = 0x108;
+    public const int StateWriteGateByteOffset = 0x18C;
+    public const int StateDestinationPointerOffset = 0x14C8;
+}
