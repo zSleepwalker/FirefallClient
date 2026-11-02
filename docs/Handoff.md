@@ -786,8 +786,9 @@ helper calls against the original binary before committing and pushing.
 - Open items: field semantics, allocation-failure consequences, selector
   `0x55` copied but unwritten stack DWORD at object `+0x70` (source proven,
   runtime consequence unresolved), selector `0x6D` outer framing/body
-  consumption (the case itself reaches its epilogue without a reader), selector
-  `0x75`'s `+0x30` parser/receiver tree-vs-`slBlob` mismatch and
+  consumption beyond the shared QWORD/compact-selector preamble (the case
+  constructs from the QWORD halves without a selector-specific reader), selector
+  `0x75`'s `+0x28` source tree and `+0x30` tree-vs-`slBlob` mismatch and
   selector `0x76`'s parser/receiver range-vs-`slBlob` mismatch, selector
   `0x77` trailing-state extent. Whether an intervening conversion or distinct
   object path explains either mismatch remains open.

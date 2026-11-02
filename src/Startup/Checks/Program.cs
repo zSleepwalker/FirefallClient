@@ -4176,6 +4176,9 @@ Check("Character receiver behavior model preserves selector slots and observed a
     && CharacterAbilityApplicationNativeLayout.AbilityActivatedEventPayloadTag == 1
     && CharacterAbilityApplicationNativeLayout.AbilityActivatedNumericApplicationEventCode == 230
     && CharacterAbilityApplicationNativeLayout.AbilityFailedApplicationHelperFileOffset == 0x909C60
+    && CharacterAbilityApplicationNativeLayout.AbilityFailedSourceTreeRangeCopyFileOffset == 0x90C580
+    && CharacterAbilityApplicationNativeLayout.AbilityFailedSourceTreeEntryCloneFileOffset == 0x82C2E0
+    && CharacterAbilityApplicationNativeLayout.AbilityFailedOwnerTreeInsertFileOffset == 0x8410B0
     && CharacterAbilityApplicationNativeLayout.AbilityCooldownsObservedRecordStride == 0x40
     && CharacterAbilityApplicationNativeLayout.AbilityCooldownsChatProcessorFileOffset == 0x6E2590
     && CharacterAbilityApplicationNativeLayout.AbilityCooldownsObservedOptionalBranchOffset == 0x14

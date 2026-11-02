@@ -3299,9 +3299,14 @@ body-reader call. At raw `0x81D435` it loads the two DWORDs at `[esi+4]` and
 `[esi]`, passes them to constructor `0x525FB0` at `0x81D43C`, then reaches the
 common return epilogue at `0x81D441` without another parser/read call.
 Allocation failure branches to `0x8217D9`, the switch's zero-return epilogue.
-Thus no body consumption is visible in this selector case; whether an outer
-framing layer consumes or accounts for additional bytes is unresolved, as are
-all field meanings.
+The common decoder `0x821BA0` has already read a raw QWORD and compact
+positive-UInt16 selector before calling `0x81CC50`. When the QWORD's first byte
+selects the secondary table, the compact selector is passed as the parser's
+selector argument; the `0x6D` case uses the two DWORDs at the QWORD address as
+constructor arguments. It invokes no additional selector-specific body
+reader. This narrows the no-reader observation to bytes beyond the shared
+QWORD/selector preamble; whether such trailing bytes are valid or accounted
+for elsewhere remains unresolved, as do all field meanings.
 
 #### Selector 0x6D post-parse receiver
 
@@ -3669,15 +3674,17 @@ dialog slots already verified at `0x78`–`0x7A`.
 * **`0x75 AbilityFailed` → `0xACDDE0`.** It uses the same accessor and asserted
   owner field `+0x43C8`, then passes the *addresses* of message fields `+0x28`
   and `+0x30` to `0x909C60`. That helper resets/initializes a per-owner tree,
-  passes two dereferenced values from `+0x28` to range walker `0x90C580`, then
-  treats the first DWORD at `+0x30` as a tree-header pointer: it loads the
-  header's first pointer and compares it with the header sentinel before
-  traversing nodes. Its node lookup uses a string pointer at node `+0x10` and
-  copies node `+0x14` into result-node `+0x10`. This conflicts with the parser,
-  which initializes message `+0x30` as an embedded `slBlob` whose first DWORD
-  is vtable VA `0x1C80CC4`; no intervening conversion is established. The
-  wire-field meaning and runtime consequence remain unknown. No `uiManager`
-  event dispatch was observed in this helper.
+  passes `**(+0x28)` and `*(+0x28)` as begin/end to `0x90C580`. The latter
+  pointer is also used as the tree-header sentinel; each source node's pair at
+  `+0x10/+0x14` is copied by `0x82C2E0` and inserted into the fresh owner tree
+  through `0x8410B0`. Separately, the helper dereferences message `+0x30` and
+  treats that value as a tree-header pointer: it loads the header's first
+  pointer and compares it with the header sentinel before traversing nodes.
+  This conflicts with the parser, which initializes message `+0x30` as an
+  embedded `slBlob` whose first DWORD is vtable VA `0x1C80CC4`; no intervening
+  conversion is established. Source/destination field meanings and runtime
+  consequence remain unknown. No `uiManager` event dispatch was observed in
+  this helper.
 * **`0x76 AbilityCooldowns` → `0xACE210`.** The receiver treats state
   `+0x28/+0x2C` as range endpoints, computes `(end-begin)/0x40`, and walks
   `0x40`-byte records. It forwards each record's QWORD `+0`, nullable strings

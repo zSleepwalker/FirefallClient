@@ -9361,6 +9361,12 @@ internal static class StartupBinaryEvidence
             && Matches(0xACDE11, "8D4130508D41288B8EC843000050")
             && RelativeBranchTargets(0xACDE1F, 0xE8,
                 CharacterAbilityApplicationNativeLayout.AbilityFailedApplicationHelperFileOffset)
+            && RelativeBranchTargets(0x909CA3, 0xE8,
+               CharacterAbilityApplicationNativeLayout.AbilityFailedSourceTreeRangeCopyFileOffset)
+            && RelativeBranchTargets(0x90C59A, 0xE8,
+               CharacterAbilityApplicationNativeLayout.AbilityFailedSourceTreeEntryCloneFileOffset)
+            && RelativeBranchTargets(0x90C5AB, 0xE8,
+               CharacterAbilityApplicationNativeLayout.AbilityFailedOwnerTreeInsertFileOffset)
             && Matches(0x909CA8, "8B7D0C8B3F8B373BF7")
             && Matches(CharacterAbilityFailedNativeLayout.ConstructorFileOffset + 0x25,
                 "C74630C40CC801"));

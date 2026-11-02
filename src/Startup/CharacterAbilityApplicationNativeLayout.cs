@@ -36,6 +36,9 @@ public static class CharacterAbilityApplicationNativeLayout
     public const int AbilityFailedFirstArgumentAddressOffset = 0x28;
     public const int AbilityFailedSecondArgumentAddressOffset = 0x30;
     public const uint AbilityFailedApplicationHelperFileOffset = 0x909C60;
+    public const uint AbilityFailedSourceTreeRangeCopyFileOffset = 0x90C580;
+    public const uint AbilityFailedSourceTreeEntryCloneFileOffset = 0x82C2E0;
+    public const uint AbilityFailedOwnerTreeInsertFileOffset = 0x8410B0;
 
     public const uint AbilityCooldownsHandlerFileOffset = 0xACE210;
     public const int AbilityCooldownsBeginOffset = 0x28;
