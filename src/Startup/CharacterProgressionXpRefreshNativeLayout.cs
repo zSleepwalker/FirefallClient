@@ -26,3 +26,20 @@ public static class CharacterProgressionXpRefreshNativeLayout
     public const int CountFieldByteCount = 1;
     public const int CountBlockRepeatMarker = 0xFF;
 }
+
+public static class CharacterProgressionXpRefreshConsumerNativeLayout
+{
+    public const int MessageDiscriminator = 0x59;
+    public const uint ProtocolHandlerDispatchTableVirtualAddress = 0xC1D6DC;
+    public const int ProtocolHandlerDispatchTableSelectorBias = 0x20;
+    public const int ProtocolHandlerVtableSlotOffset = 0xE8;
+    public const uint ProtocolHandlerVtableTargetVirtualAddress = 0xECB5D0;
+    public const uint ProtocolHandlerVtableTargetFileOffset = 0xACA9D0;
+    public const uint ConsumerFunctionFileOffset = 0xACA9D0;
+    public const uint OwnerStatePointerOffset = 0x43C8;
+    public const uint OwnerTreeSentinelPointerOffset = 0;
+    public const uint OwnerTreeSentinelSizeOffset = 4;
+    public const uint OwnerStateFlagOffset = 8;
+    public const uint TreeClearHelperFileOffset = 0x90A7B0;
+    public const int MissingOwnerDiagnosticCode = 1651;
+}

@@ -24,3 +24,26 @@ public static class CharacterRaiaNpcDebuggingNativeLayout
     public const int SharedTextTemporaryBufferByteCount = 0x104;
     public const int SharedTextTerminatorByte = 0;
 }
+
+public static class CharacterRaiaNpcDebuggingConsumerNativeLayout
+{
+    public const int MessageDiscriminator = CharacterRaiaNpcDebuggingNativeLayout.InnerSelector;
+    public const uint ProtocolHandlerDispatchTableVirtualAddress = 0xC1D6DC;
+    public const int ProtocolHandlerDispatchTableSelectorBias = 0x20;
+    public const int ProtocolHandlerVtableSlotOffset = 0xFC;
+    public const uint ProtocolHandlerVtableTargetVirtualAddress = 0xECCBE0;
+    public const uint ProtocolHandlerVtableTargetFileOffset = 0xACBFE0;
+    public const uint ConsumerFunctionFileOffset = 0xACBFE0;
+
+    public const int ContextPointerOffset = 8;
+    public const int ContextCounterPointerOffset = 8;
+    public const int ContextCounterValueOffset = 8;
+    public const int FirstMessageWordOffset = 0x28;
+    public const int MessageWordWidth = 2;
+    public const int MessageWordReadCount = 5;
+    public const int LastMessageWordOffset = 0x30;
+    public const int ReceiverReadEndOffsetExclusive = 0x32;
+    public const uint MetricStateGlobalVirtualAddress = 0x1E0004C;
+    public const uint MetricAppenderFileOffset = 0x481430;
+    public const int MetricAppenderCount = 5;
+}

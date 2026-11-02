@@ -2914,6 +2914,22 @@ Check("ReceiveWeaponTweaks selector 0x54 preserves its RTTI and raw body field o
     && CharacterReceiveWeaponTweaksNativeLayout.TrailingBlobVtableVirtualAddress == 0x1C80CC4
     && CharacterReceiveWeaponTweaksNativeLayout.TrailingBlobCopyMethodFileOffset == 0x12CB9D0
     && CharacterReceiveWeaponTweaksNativeLayout.TrailingBlobResizeMethodFileOffset == 0x12CBCB0);
+Check("ReceiveWeaponTweaks selector 0x54 records the conditional event consumer field overlaps",
+    CharacterReceiveWeaponTweaksConsumerNativeLayout.MessageDiscriminator
+        == CharacterReceiveWeaponTweaksNativeLayout.InnerSelector
+    && CharacterReceiveWeaponTweaksConsumerNativeLayout.ProtocolHandlerVtableSlotOffset == 0xD4
+    && CharacterReceiveWeaponTweaksConsumerNativeLayout.ProtocolHandlerMethodVirtualAddress == 0xECB3E0
+    && CharacterReceiveWeaponTweaksConsumerNativeLayout.ProtocolHandlerMethodFileOffset == 0xACA7E0
+    && CharacterReceiveWeaponTweaksConsumerNativeLayout.ContentTypeMessageFieldOffset
+        == CharacterReceiveWeaponTweaksNativeLayout.FirstByteFieldOffset
+    && CharacterReceiveWeaponTweaksConsumerNativeLayout.ContentIdMessageFieldOffset
+        == CharacterReceiveWeaponTweaksNativeLayout.TrailingBlobFieldOffset
+    && CharacterReceiveWeaponTweaksConsumerNativeLayout.DurationMessageFieldOffset
+        == CharacterReceiveWeaponTweaksConsumerNativeLayout.ContentIdMessageFieldOffset + sizeof(uint)
+    && CharacterReceiveWeaponTweaksConsumerNativeLayout.PayloadEntrySize == 8
+    && CharacterReceiveWeaponTweaksConsumerNativeLayout.PayloadReservedEntryCount == 8
+    && CharacterReceiveWeaponTweaksConsumerNativeLayout.EventSinkVtableSlotOffset == 0xAC
+    && CharacterReceiveWeaponTweaksConsumerNativeLayout.ApplicationEventCode == 130);
 Check("TookDebugWeaponHitPublic selector 0x55 records its scalar prefix and conditional-tail boundaries",
     CharacterTookDebugWeaponHitPublicNativeLayout.InnerSelector == 0x55
     && CharacterTookDebugWeaponHitPublicNativeLayout.CaseFileOffset == 0x81CD65
@@ -2940,6 +2956,16 @@ Check("TookDebugWeaponHitPublic selector 0x55 records its scalar prefix and cond
     && CharacterTookDebugWeaponHitPublicNativeLayout.SecondConditionalTailRecordDwordCount == 16
     && CharacterTookDebugWeaponHitPublicNativeLayout.SecondConditionalTailCountRepeatMarker == 0xFF
     && CharacterTookDebugWeaponHitPublicNativeLayout.SecondConditionalTailReaderByteCount == 0x121);
+Check("TookDebugWeaponHitPublic selector 0x55 records its conditional SharedText consumer",
+    CharacterTookDebugWeaponHitPublicConsumerNativeLayout.MessageDiscriminator
+        == CharacterTookDebugWeaponHitPublicNativeLayout.InnerSelector
+    && CharacterTookDebugWeaponHitPublicConsumerNativeLayout.ProtocolHandlerVtableSlotOffset == 0xD8
+    && CharacterTookDebugWeaponHitPublicConsumerNativeLayout.ProtocolHandlerMethodVirtualAddress == 0xECB4E0
+    && CharacterTookDebugWeaponHitPublicConsumerNativeLayout.ProtocolHandlerMethodFileOffset == 0xACA8E0
+    && CharacterTookDebugWeaponHitPublicConsumerNativeLayout.SharedTextMessageFieldOffset == 0x28
+    && CharacterTookDebugWeaponHitPublicConsumerNativeLayout.SharedTextEventHelperFileOffset == 0x8EDBD0
+    && CharacterTookDebugWeaponHitPublicConsumerNativeLayout.EventSinkVtableSlotOffset == 0xAC
+    && CharacterTookDebugWeaponHitPublicConsumerNativeLayout.ApplicationEventCode == 197);
 Check("TookDebugWeaponHit selector 0x56 has a distinct RTTI type and shares selector 0x55's body reader",
     CharacterTookDebugWeaponHitNativeLayout.InnerSelector == 0x56
     && CharacterTookDebugWeaponHitNativeLayout.CaseFileOffset == 0x81CDBA
@@ -2953,6 +2979,20 @@ Check("TookDebugWeaponHit selector 0x56 has a distinct RTTI type and shares sele
     && CharacterTookDebugWeaponHitNativeLayout.SharedBodyReaderSetupFileOffset == 0x81CD94
     && CharacterTookDebugWeaponHitNativeLayout.ConstructorZeroedByteField1Offset == 0x58
     && CharacterTookDebugWeaponHitNativeLayout.ConstructorZeroedByteField2Offset == 0x88);
+Check("TookDebugWeaponHit selector 0x56 records its mapped consumer and collection/event offsets",
+    CharacterTookDebugWeaponHitConsumerNativeLayout.MessageDiscriminator
+        == CharacterTookDebugWeaponHitNativeLayout.InnerSelector
+    && CharacterTookDebugWeaponHitConsumerNativeLayout.ProtocolHandlerVtableSlotOffset == 0xDC
+    && CharacterTookDebugWeaponHitConsumerNativeLayout.ProtocolHandlerVtableTargetVirtualAddress == 0xECEA30
+    && CharacterTookDebugWeaponHitConsumerNativeLayout.ProtocolHandlerVtableTargetFileOffset == 0xACDE30
+    && CharacterTookDebugWeaponHitConsumerNativeLayout.ConsumerFunctionFileOffset == 0xACDE30
+    && CharacterTookDebugWeaponHitConsumerNativeLayout.OwnerStatePointerOffset == 0x43D0
+    && CharacterTookDebugWeaponHitConsumerNativeLayout.OwnerTreeOffset == 0x30
+    && CharacterTookDebugWeaponHitConsumerNativeLayout.InputCollectionPointerOffset == 0x28
+    && CharacterTookDebugWeaponHitConsumerNativeLayout.InputCollectionCountOffset == 0x2C
+    && CharacterTookDebugWeaponHitConsumerNativeLayout.CollectionMergeHelperFileOffset == 0x927F60
+    && CharacterTookDebugWeaponHitConsumerNativeLayout.EventSinkVtableSlotOffset == 0xAC
+    && CharacterTookDebugWeaponHitConsumerNativeLayout.ApplicationEventCode == 222);
 Check("DebugWeaponStats selector 0x57 records eight raw WORD fields",
     CharacterDebugWeaponStatsNativeLayout.InnerSelector == 0x57
     && CharacterDebugWeaponStatsNativeLayout.CaseFileOffset == 0x81CDE7
@@ -2965,6 +3005,22 @@ Check("DebugWeaponStats selector 0x57 records eight raw WORD fields",
     && CharacterDebugWeaponStatsNativeLayout.WordFieldCount == 8
     && CharacterDebugWeaponStatsNativeLayout.WordFieldOffsets.SequenceEqual(
         new[] { 0x28, 0x2A, 0x2C, 0x2E, 0x30, 0x32, 0x34, 0x36 }));
+Check("DebugWeaponStats selector 0x57 records its consumer, vector range, and event",
+    CharacterDebugWeaponStatsConsumerNativeLayout.MessageDiscriminator
+        == CharacterDebugWeaponStatsNativeLayout.InnerSelector
+    && CharacterDebugWeaponStatsConsumerNativeLayout.ProtocolHandlerDispatchTableVirtualAddress == 0xC1D6DC
+    && CharacterDebugWeaponStatsConsumerNativeLayout.ProtocolHandlerDispatchTableSelectorBias == 0x20
+    && CharacterDebugWeaponStatsConsumerNativeLayout.ProtocolHandlerVtableSlotOffset == 0xE0
+    && CharacterDebugWeaponStatsConsumerNativeLayout.ProtocolHandlerVtableTargetVirtualAddress == 0xECEF10
+    && CharacterDebugWeaponStatsConsumerNativeLayout.ProtocolHandlerVtableTargetFileOffset == 0xACE310
+    && CharacterDebugWeaponStatsConsumerNativeLayout.ConsumerFunctionFileOffset == 0xACE310
+    && CharacterDebugWeaponStatsConsumerNativeLayout.OwnerStatePointerOffset == 0x43D0
+    && CharacterDebugWeaponStatsConsumerNativeLayout.OwnerVectorOffset == 0x90
+    && CharacterDebugWeaponStatsConsumerNativeLayout.InputRangeBeginOffset == 0x28
+    && CharacterDebugWeaponStatsConsumerNativeLayout.InputRangeEndOffset == 0x2C
+    && CharacterDebugWeaponStatsConsumerNativeLayout.VectorAssignHelperFileOffset == 0x929920
+    && CharacterDebugWeaponStatsConsumerNativeLayout.EventSinkVtableSlotOffset == 0xAC
+    && CharacterDebugWeaponStatsConsumerNativeLayout.ApplicationEventCode == 227);
 Check("RewardInfo selector 0x58 records its byte, QWORD, and DWORD fields",
     CharacterRewardInfoNativeLayout.InnerSelector == 0x58
     && CharacterRewardInfoNativeLayout.CaseFileOffset == 0x81CE38
@@ -2981,6 +3037,23 @@ Check("RewardInfo selector 0x58 records its byte, QWORD, and DWORD fields",
     && CharacterRewardInfoNativeLayout.ReaderLastWrittenFieldEndOffset == 0x44
     && CharacterRewardInfoNativeLayout.ConstructorZeroedDwordField1Offset == 0x30
     && CharacterRewardInfoNativeLayout.ConstructorZeroedDwordField2Offset == 0x34);
+Check("RewardInfo selector 0x58 records its state update and conditional follow-up",
+    CharacterRewardInfoConsumerNativeLayout.MessageDiscriminator
+        == CharacterRewardInfoNativeLayout.InnerSelector
+    && CharacterRewardInfoConsumerNativeLayout.ProtocolHandlerDispatchTableVirtualAddress == 0xC1D6DC
+    && CharacterRewardInfoConsumerNativeLayout.ProtocolHandlerDispatchTableSelectorBias == 0x20
+    && CharacterRewardInfoConsumerNativeLayout.ProtocolHandlerVtableSlotOffset == 0xE4
+    && CharacterRewardInfoConsumerNativeLayout.ProtocolHandlerVtableTargetVirtualAddress == 0xECB580
+    && CharacterRewardInfoConsumerNativeLayout.ProtocolHandlerVtableTargetFileOffset == 0xACA980
+    && CharacterRewardInfoConsumerNativeLayout.ConsumerFunctionFileOffset == 0xACA980
+    && CharacterRewardInfoConsumerNativeLayout.OwnerStatePointerOffset == 0x43C8
+    && CharacterRewardInfoConsumerNativeLayout.InputValueFieldOffset == 0x28
+    && CharacterRewardInfoConsumerNativeLayout.StateUpdateHelperFileOffset == 0x909120
+    && CharacterRewardInfoConsumerNativeLayout.ConditionalFollowupFileOffset == 0x9092A0
+    && CharacterRewardInfoConsumerNativeLayout.ConditionalRequestMethodFileOffset == 0x909980
+    && CharacterRewardInfoConsumerNativeLayout.EventSinkVtableSlotOffset == 0xAC
+    && CharacterRewardInfoConsumerNativeLayout.ConditionalApplicationEventCode == 219
+    && CharacterRewardInfoConsumerNativeLayout.MissingOwnerDiagnosticCode == 1651);
 Check("ProgressionXpRefresh selector 0x59 records its count-blocked 20-byte vector",
     CharacterProgressionXpRefreshNativeLayout.InnerSelector == 0x59
     && CharacterProgressionXpRefreshNativeLayout.CaseFileOffset == 0x81CE89
@@ -2997,6 +3070,21 @@ Check("ProgressionXpRefresh selector 0x59 records its count-blocked 20-byte vect
     && CharacterProgressionXpRefreshNativeLayout.RecordByteCount == 0x14
     && CharacterProgressionXpRefreshNativeLayout.CountFieldByteCount == 1
     && CharacterProgressionXpRefreshNativeLayout.CountBlockRepeatMarker == 0xFF);
+Check("ProgressionXpRefresh selector 0x59 records its state-tree clearing consumer",
+    CharacterProgressionXpRefreshConsumerNativeLayout.MessageDiscriminator
+        == CharacterProgressionXpRefreshNativeLayout.InnerSelector
+    && CharacterProgressionXpRefreshConsumerNativeLayout.ProtocolHandlerDispatchTableVirtualAddress == 0xC1D6DC
+    && CharacterProgressionXpRefreshConsumerNativeLayout.ProtocolHandlerDispatchTableSelectorBias == 0x20
+    && CharacterProgressionXpRefreshConsumerNativeLayout.ProtocolHandlerVtableSlotOffset == 0xE8
+    && CharacterProgressionXpRefreshConsumerNativeLayout.ProtocolHandlerVtableTargetVirtualAddress == 0xECB5D0
+    && CharacterProgressionXpRefreshConsumerNativeLayout.ProtocolHandlerVtableTargetFileOffset == 0xACA9D0
+    && CharacterProgressionXpRefreshConsumerNativeLayout.ConsumerFunctionFileOffset == 0xACA9D0
+    && CharacterProgressionXpRefreshConsumerNativeLayout.OwnerStatePointerOffset == 0x43C8
+    && CharacterProgressionXpRefreshConsumerNativeLayout.OwnerTreeSentinelPointerOffset == 0
+    && CharacterProgressionXpRefreshConsumerNativeLayout.OwnerTreeSentinelSizeOffset == 4
+    && CharacterProgressionXpRefreshConsumerNativeLayout.OwnerStateFlagOffset == 8
+    && CharacterProgressionXpRefreshConsumerNativeLayout.TreeClearHelperFileOffset == 0x90A7B0
+    && CharacterProgressionXpRefreshConsumerNativeLayout.MissingOwnerDiagnosticCode == 1651);
 Check("ReceivedDeferredXP selector 0x5A records its count-blocked 16-byte vector",
     CharacterReceivedDeferredXPNativeLayout.InnerSelector == 0x5A
     && CharacterReceivedDeferredXPNativeLayout.CaseFileOffset == 0x81CEDC
@@ -3013,6 +3101,21 @@ Check("ReceivedDeferredXP selector 0x5A records its count-blocked 16-byte vector
     && CharacterReceivedDeferredXPNativeLayout.RecordByteCount == 0x10
     && CharacterReceivedDeferredXPNativeLayout.CountFieldByteCount == 1
     && CharacterReceivedDeferredXPNativeLayout.CountBlockRepeatMarker == 0xFF);
+Check("ReceivedDeferredXP selector 0x5A records its conditional control consumer",
+    CharacterReceivedDeferredXPConsumerNativeLayout.MessageDiscriminator
+        == CharacterReceivedDeferredXPNativeLayout.InnerSelector
+    && CharacterReceivedDeferredXPConsumerNativeLayout.ProtocolHandlerDispatchTableVirtualAddress == 0xC1D6DC
+    && CharacterReceivedDeferredXPConsumerNativeLayout.ProtocolHandlerDispatchTableSelectorBias == 0x20
+    && CharacterReceivedDeferredXPConsumerNativeLayout.ProtocolHandlerVtableSlotOffset == 0xEC
+    && CharacterReceivedDeferredXPConsumerNativeLayout.ProtocolHandlerVtableTargetVirtualAddress == 0xECB630
+    && CharacterReceivedDeferredXPConsumerNativeLayout.ProtocolHandlerVtableTargetFileOffset == 0xACAA30
+    && CharacterReceivedDeferredXPConsumerNativeLayout.ConsumerFunctionFileOffset == 0xACAA30
+    && CharacterReceivedDeferredXPConsumerNativeLayout.InputMessageFieldOffset == 0x28
+    && CharacterReceivedDeferredXPConsumerNativeLayout.ContextAccessorFileOffset == 0x49DCC0
+    && CharacterReceivedDeferredXPConsumerNativeLayout.ControlRoutineFileOffset == 0x4BCBD0
+    && CharacterReceivedDeferredXPConsumerNativeLayout.ControlRoutineSelector == 9
+    && CharacterReceivedDeferredXPConsumerNativeLayout.EventSinkVtableSlotOffset == 0xAC
+    && CharacterReceivedDeferredXPConsumerNativeLayout.ConditionalApplicationEventCode == 50);
 Check("PublicCombatLog selector 0x5B records its gated blob body without naming its fields",
     CharacterPublicCombatLogNativeLayout.InnerSelector == 0x5B
     && CharacterPublicCombatLogNativeLayout.CaseFileOffset == 0x81CF2F
@@ -3031,6 +3134,29 @@ Check("PublicCombatLog selector 0x5B records its gated blob body without naming 
     && CharacterPublicCombatLogNativeLayout.RawDwordWidth == 4
     && CharacterPublicCombatLogNativeLayout.BlobLengthPrefixByteCount == 2
     && CharacterPublicCombatLogNativeLayout.MinimumSuccessBodyPrefixByteCount == 6);
+Check("PublicCombatLog selector 0x5B records its conditional receiver branches",
+    CharacterPublicCombatLogConsumerNativeLayout.MessageDiscriminator
+        == CharacterPublicCombatLogNativeLayout.InnerSelector
+    && CharacterPublicCombatLogConsumerNativeLayout.ProtocolHandlerDispatchTableVirtualAddress == 0xC1D6DC
+    && CharacterPublicCombatLogConsumerNativeLayout.ProtocolHandlerDispatchTableSelectorBias == 0x20
+    && CharacterPublicCombatLogConsumerNativeLayout.ProtocolHandlerVtableSlotOffset == 0xF0
+    && CharacterPublicCombatLogConsumerNativeLayout.ProtocolHandlerVtableTargetVirtualAddress == 0xECB260
+    && CharacterPublicCombatLogConsumerNativeLayout.ProtocolHandlerVtableTargetFileOffset == 0xACA660
+    && CharacterPublicCombatLogConsumerNativeLayout.ConsumerFunctionFileOffset == 0xACA660
+    && CharacterPublicCombatLogConsumerNativeLayout.MessageEmbeddedQwordOffset == 0x30
+    && CharacterPublicCombatLogConsumerNativeLayout.MessageModeByteOffset == 0x38
+    && CharacterPublicCombatLogConsumerNativeLayout.OwnerStatePointerOffset == 0x43BC
+    && CharacterPublicCombatLogConsumerNativeLayout.OwnerMapSubobjectOffset == 8
+    && CharacterPublicCombatLogConsumerNativeLayout.ContextAccessorFileOffset == 0x49DCC0
+    && CharacterPublicCombatLogConsumerNativeLayout.EmptyOrSentinelFlaggedHelperFileOffset == 0xB901F0
+    && CharacterPublicCombatLogConsumerNativeLayout.EmptyOrSentinelUnflaggedHelperFileOffset == 0xB903B0
+    && CharacterPublicCombatLogConsumerNativeLayout.QwordFlaggedHelperFileOffset == 0xB90A30
+    && CharacterPublicCombatLogConsumerNativeLayout.QwordUnflaggedSearchHelperFileOffset == 0xB90810
+    && CharacterPublicCombatLogConsumerNativeLayout.QwordUnflaggedRangeUpdateHelperFileOffset == 0x36F480
+    && CharacterPublicCombatLogConsumerNativeLayout.SentinelLowDwordMask == 0xFFFFFF00
+    && CharacterPublicCombatLogConsumerNativeLayout.SentinelLowDwordMaskedValue == 0xFFFFFF00
+    && CharacterPublicCombatLogConsumerNativeLayout.SentinelHighDwordValue == 0xFFFFFFFF
+    && CharacterPublicCombatLogConsumerNativeLayout.MissingOwnerDiagnosticCode == 1647);
 Check("PrivateCombatLog selector 0x5C has distinct RTTI and shares the public-log body reader",
     CharacterPrivateCombatLogNativeLayout.InnerSelector == 0x5C
     && CharacterPrivateCombatLogNativeLayout.CaseFileOffset == 0x81CF81
@@ -3047,6 +3173,26 @@ Check("PrivateCombatLog selector 0x5C has distinct RTTI and shares the public-lo
     && CharacterPrivateCombatLogNativeLayout.EmbeddedBlobVtableVirtualAddress == 0x1C80CC4
     && CharacterPrivateCombatLogNativeLayout.BodyReaderThisObjectOffset == 0x28
     && CharacterPrivateCombatLogNativeLayout.BlobDestinationOffsetFromReaderThis == 4);
+Check("PrivateCombatLog selector 0x5C receiver records its fields and event route",
+    CharacterPrivateCombatLogConsumerNativeLayout.MessageDiscriminator == 0x5C
+    && CharacterPrivateCombatLogConsumerNativeLayout.ProtocolHandlerVtableSlotOffset == 0xF4
+    && CharacterPrivateCombatLogConsumerNativeLayout.ProtocolHandlerVtableTargetVirtualAddress == 0xECC460
+    && CharacterPrivateCombatLogConsumerNativeLayout.ProtocolHandlerVtableTargetFileOffset == 0xACB860
+    && CharacterPrivateCombatLogConsumerNativeLayout.MessageByteFieldOffset == 0x28
+    && CharacterPrivateCombatLogConsumerNativeLayout.MessageEmbeddedBlobFieldOffset == 0x2C
+    && CharacterPrivateCombatLogConsumerNativeLayout.MessageBlobDataPointerFieldOffset == 0x30
+    && CharacterPrivateCombatLogConsumerNativeLayout.MessageWordFieldOffset == 0x34
+    && CharacterPrivateCombatLogConsumerNativeLayout.MessageTrailingByteFieldOffset == 0x36
+    && CharacterPrivateCombatLogConsumerNativeLayout.EmbeddedBlobLookupHelperFileOffset == 0x391470
+    && CharacterPrivateCombatLogConsumerNativeLayout.EmbeddedBlobFallbackHelperFileOffset == 0xC24210
+    && CharacterPrivateCombatLogConsumerNativeLayout.SharedTextAppendHelperFileOffset == 0xC23FE0
+    && CharacterPrivateCombatLogConsumerNativeLayout.BlobDataVtableCallFileOffset == 0xACB93A
+    && CharacterPrivateCombatLogConsumerNativeLayout.ByteFieldLookupCallFileOffset == 0xACB9C3
+    && CharacterPrivateCombatLogConsumerNativeLayout.WordFieldConversionHelperFileOffset == 0xC242F0
+    && CharacterPrivateCombatLogConsumerNativeLayout.TrailingByteConversionHelperFileOffset == 0xC243E0
+    && CharacterPrivateCombatLogConsumerNativeLayout.ApplicationEventSinkVtableSlotOffset == 0xAC
+    && CharacterPrivateCombatLogConsumerNativeLayout.ApplicationEventDispatchCallFileOffset == 0xACBA78
+    && CharacterPrivateCombatLogConsumerNativeLayout.ApplicationEventCode == 122);
 Check("AnimationUpdated selector 0x5D records its WORD and byte fields",
     CharacterAnimationUpdatedNativeLayout.InnerSelector == 0x5D
     && CharacterAnimationUpdatedNativeLayout.CaseFileOffset == 0x81CFAB
@@ -3059,6 +3205,30 @@ Check("AnimationUpdated selector 0x5D records its WORD and byte fields",
     && CharacterAnimationUpdatedNativeLayout.RawWordFieldOffset == 0x28
     && CharacterAnimationUpdatedNativeLayout.RawByteFieldOffset == 0x2A
     && CharacterAnimationUpdatedNativeLayout.NominalInputByteCount == 3);
+Check("AnimationUpdated selector 0x5D records counter extension and queued relay layout",
+    CharacterAnimationUpdatedConsumerNativeLayout.MessageDiscriminator == 0x5D
+    && CharacterAnimationUpdatedConsumerNativeLayout.ProtocolHandlerVtableSlotOffset == 0xF8
+    && CharacterAnimationUpdatedConsumerNativeLayout.ProtocolHandlerVtableTargetVirtualAddress == 0xECCB40
+    && CharacterAnimationUpdatedConsumerNativeLayout.ProtocolHandlerVtableTargetFileOffset == 0xACBF40
+    && CharacterAnimationUpdatedConsumerNativeLayout.HandlerContextPointerOffset == 8
+    && CharacterAnimationUpdatedConsumerNativeLayout.ContextCounterPointerOffset == 8
+    && CharacterAnimationUpdatedConsumerNativeLayout.ContextCounterValueOffset == 8
+    && CharacterAnimationUpdatedConsumerNativeLayout.MessageFirstWordOffset == 0x28
+    && CharacterAnimationUpdatedConsumerNativeLayout.MessageSecondWordOffset == 0x2A
+    && CharacterAnimationUpdatedConsumerNativeLayout.MessageQueueIndexByteOffset == 0x2C
+    && CharacterAnimationUpdatedConsumerNativeLayout.MessageModeByteOffset == 0x2D
+    && CharacterAnimationUpdatedConsumerNativeLayout.CounterWrapModulus == 0x10000
+    && CharacterAnimationUpdatedConsumerNativeLayout.CounterWrapHalfRange == 0x8000
+    && CharacterAnimationUpdatedConsumerNativeLayout.RelayHelperFileOffset == 0x3343B0
+    && CharacterAnimationUpdatedConsumerNativeLayout.RelayRecordQueueFileOffset == 0x334460
+    && CharacterAnimationUpdatedConsumerNativeLayout.RelayMaximumQueueIndex == 10
+    && CharacterAnimationUpdatedConsumerNativeLayout.RelayMaximumMode == 3
+    && CharacterAnimationUpdatedConsumerNativeLayout.RelayQueueFlagsOffset == 5
+    && CharacterAnimationUpdatedConsumerNativeLayout.RelayQueueAcceptFlagOffset == 6
+    && CharacterAnimationUpdatedConsumerNativeLayout.RelayRecordSize == 0x10
+    && CharacterAnimationUpdatedConsumerNativeLayout.RelayRecordArrayBaseOffset == 0x50
+    && CharacterAnimationUpdatedConsumerNativeLayout.RelayRecordIndexBias == 5
+    && CharacterAnimationUpdatedConsumerNativeLayout.RelayQueueCapacity == 0xBB8);
 Check("RaiaNPCDebugging selector 0x5E records its NUL-terminated shared-text field",
     CharacterRaiaNpcDebuggingNativeLayout.InnerSelector == 0x5E
     && CharacterRaiaNpcDebuggingNativeLayout.CaseFileOffset == 0x81CFFC
@@ -3073,6 +3243,22 @@ Check("RaiaNPCDebugging selector 0x5E records its NUL-terminated shared-text fie
     && CharacterRaiaNpcDebuggingNativeLayout.SharedTextChunkByteLimit == 0x100
     && CharacterRaiaNpcDebuggingNativeLayout.SharedTextTemporaryBufferByteCount == 0x104
     && CharacterRaiaNpcDebuggingNativeLayout.SharedTextTerminatorByte == 0);
+Check("RaiaNPCDebugging selector 0x5E records its receiver's wider WORD reads",
+    CharacterRaiaNpcDebuggingConsumerNativeLayout.MessageDiscriminator == 0x5E
+    && CharacterRaiaNpcDebuggingConsumerNativeLayout.ProtocolHandlerVtableSlotOffset == 0xFC
+    && CharacterRaiaNpcDebuggingConsumerNativeLayout.ProtocolHandlerVtableTargetVirtualAddress == 0xECCBE0
+    && CharacterRaiaNpcDebuggingConsumerNativeLayout.ProtocolHandlerVtableTargetFileOffset == 0xACBFE0
+    && CharacterRaiaNpcDebuggingConsumerNativeLayout.ContextPointerOffset == 8
+    && CharacterRaiaNpcDebuggingConsumerNativeLayout.ContextCounterPointerOffset == 8
+    && CharacterRaiaNpcDebuggingConsumerNativeLayout.ContextCounterValueOffset == 8
+    && CharacterRaiaNpcDebuggingConsumerNativeLayout.FirstMessageWordOffset == 0x28
+    && CharacterRaiaNpcDebuggingConsumerNativeLayout.MessageWordWidth == 2
+    && CharacterRaiaNpcDebuggingConsumerNativeLayout.MessageWordReadCount == 5
+    && CharacterRaiaNpcDebuggingConsumerNativeLayout.LastMessageWordOffset == 0x30
+    && CharacterRaiaNpcDebuggingConsumerNativeLayout.ReceiverReadEndOffsetExclusive == 0x32
+    && CharacterRaiaNpcDebuggingConsumerNativeLayout.MetricStateGlobalVirtualAddress == 0x1E0004C
+    && CharacterRaiaNpcDebuggingConsumerNativeLayout.MetricAppenderFileOffset == 0x481430
+    && CharacterRaiaNpcDebuggingConsumerNativeLayout.MetricAppenderCount == 5);
 Check("WeaponProjectileFired selector 0x5F records its prefix and optional tail",
     CharacterWeaponProjectileFiredNativeLayout.InnerSelector == 0x5F
     && CharacterWeaponProjectileFiredNativeLayout.CaseFileOffset == 0x81D02D
@@ -3092,6 +3278,40 @@ Check("WeaponProjectileFired selector 0x5F records its prefix and optional tail"
     && CharacterWeaponProjectileFiredNativeLayout.OptionalTailPayloadWordCount == 3
     && CharacterWeaponProjectileFiredNativeLayout.InputByteCountWithoutOptionalTail == 9
     && CharacterWeaponProjectileFiredNativeLayout.InputByteCountWithOptionalTail == 15);
+Check("WeaponProjectileFired selector 0x5F records its gated metrics consumer and allocation overread",
+    CharacterWeaponProjectileFiredConsumerNativeLayout.MessageDiscriminator == 0x5F
+    && CharacterWeaponProjectileFiredConsumerNativeLayout.ProtocolHandlerVtableSlotOffset == 0x100
+    && CharacterWeaponProjectileFiredConsumerNativeLayout.ProtocolHandlerVtableTargetVirtualAddress == 0xECCF30
+    && CharacterWeaponProjectileFiredConsumerNativeLayout.ProtocolHandlerVtableTargetFileOffset == 0xACC330
+    && CharacterWeaponProjectileFiredConsumerNativeLayout.MetricStateGlobalVirtualAddress == 0x1E0004C
+    && CharacterWeaponProjectileFiredConsumerNativeLayout.MetricStateEnabledByteOffset == 4
+    && CharacterWeaponProjectileFiredConsumerNativeLayout.MetricStateSuppressedByteOffset == 5
+    && CharacterWeaponProjectileFiredConsumerNativeLayout.MetricAppenderFileOffset == 0x481430
+    && CharacterWeaponProjectileFiredConsumerNativeLayout.MessageFirstWordOffset == 0x28
+    && CharacterWeaponProjectileFiredConsumerNativeLayout.MessageWordWidth == 2
+    && CharacterWeaponProjectileFiredConsumerNativeLayout.MessageWordReadCount == 13
+    && CharacterWeaponProjectileFiredConsumerNativeLayout.MessageLastWordOffset == 0x40
+    && CharacterWeaponProjectileFiredConsumerNativeLayout.ReceiverReadEndOffsetExclusive == 0x42
+    && CharacterWeaponProjectileFiredConsumerNativeLayout.DeclaredAllocationReadPastEndByteCount == 10
+    && CharacterWeaponProjectileFiredConsumerNativeLayout.MessageWordReadOffsets.SequenceEqual(
+        new[] { 0x28, 0x2A, 0x2C, 0x2E, 0x32, 0x30, 0x36, 0x34, 0x38, 0x3A, 0x3C, 0x3E, 0x40 }));
+Check("AbilityProjectileFired selector 0x60 records its four gated metric reads",
+    CharacterAbilityProjectileFiredConsumerNativeLayout.MessageDiscriminator
+        == CharacterAbilityProjectileFiredNativeLayout.InnerSelector
+    && CharacterAbilityProjectileFiredConsumerNativeLayout.ProtocolHandlerVtableSlotOffset == 0x104
+    && CharacterAbilityProjectileFiredConsumerNativeLayout.ProtocolHandlerVtableTargetVirtualAddress == 0xECD580
+    && CharacterAbilityProjectileFiredConsumerNativeLayout.ProtocolHandlerVtableTargetFileOffset == 0xACC980
+    && CharacterAbilityProjectileFiredConsumerNativeLayout.MetricStateGlobalVirtualAddress == 0x1E0004C
+    && CharacterAbilityProjectileFiredConsumerNativeLayout.MetricStateEnabledByteOffset == 4
+    && CharacterAbilityProjectileFiredConsumerNativeLayout.MetricStateSuppressedByteOffset == 5
+    && CharacterAbilityProjectileFiredConsumerNativeLayout.MetricAppenderFileOffset == 0x481430
+    && CharacterAbilityProjectileFiredConsumerNativeLayout.Metrics.SequenceEqual(
+    [
+        new CharacterAbilityProjectileFiredMetricSnapshot(0x28, 0x1DFABF0, 908),
+        new CharacterAbilityProjectileFiredMetricSnapshot(0x2A, 0x1DFAC10, 924),
+        new CharacterAbilityProjectileFiredMetricSnapshot(0x2C, 0x1DFAC30, 940),
+        new CharacterAbilityProjectileFiredMetricSnapshot(0x2E, 0x1DFAC50, 956)
+    ]));
 Check("AbilityProjectileFired selector 0x60 records its fixed fields and optional QWORD",
     CharacterAbilityProjectileFiredNativeLayout.InnerSelector == 0x60
     && CharacterAbilityProjectileFiredNativeLayout.CaseFileOffset == 0x81D07E
@@ -3140,6 +3360,19 @@ Check("ProjectileHitReported selector 0x61 records two WORDs and two bytes",
     && CharacterProjectileHitReportedNativeLayout.ByteField0Offset == 0x2C
     && CharacterProjectileHitReportedNativeLayout.ByteField1Offset == 0x2D
     && CharacterProjectileHitReportedNativeLayout.NominalInputByteCount == 6);
+Check("ProjectileHitReported selector 0x61 records its 22-DWORD receiver read extent",
+    CharacterProjectileHitReportedConsumerNativeLayout.MessageDiscriminator
+        == CharacterProjectileHitReportedNativeLayout.InnerSelector
+    && CharacterProjectileHitReportedConsumerNativeLayout.ProtocolHandlerVtableSlotOffset == 0x108
+    && CharacterProjectileHitReportedConsumerNativeLayout.ProtocolHandlerVtableTargetVirtualAddress == 0xECA340
+    && CharacterProjectileHitReportedConsumerNativeLayout.ProtocolHandlerVtableTargetFileOffset == 0xAC9740
+    && CharacterProjectileHitReportedConsumerNativeLayout.BulkLoadInstructionFileOffset == 0xAC974C
+    && CharacterProjectileHitReportedConsumerNativeLayout.MessageReadStartOffset == 0
+    && CharacterProjectileHitReportedConsumerNativeLayout.MessageDwordReadCount == 22
+    && CharacterProjectileHitReportedConsumerNativeLayout.MessageDwordWidth == 4
+    && CharacterProjectileHitReportedConsumerNativeLayout.MessageReadEndOffsetExclusive == 0x58
+    && CharacterProjectileHitReportedConsumerNativeLayout.LastLoadedDwordOffset == 0x54
+    && CharacterProjectileHitReportedConsumerNativeLayout.DeclaredAllocationReadPastEndByteCount == 0x28);
 Check("Stumble selector 0x62 records two WORDs and a byte",
     CharacterStumbleNativeLayout.InnerSelector == 0x62
     && CharacterStumbleNativeLayout.CaseFileOffset == 0x81D120
@@ -4951,6 +5184,20 @@ Check("ReplayReader message dispatch receiver and discriminator vtable cases rem
         new MatrixMessageDispatchVtableCaseSnapshot(0x21, 0xC1C7F5, 0x81BBF5, 0x81BC14, 8),
         new MatrixMessageDispatchVtableCaseSnapshot(0x40, 0xC1CCD0, 0x81C0D0, 0x81C0EF, 0x84),
         new MatrixMessageDispatchVtableCaseSnapshot(0x53, 0xC1D001, 0x81C401, 0x81C420, 0xD0),
+        new MatrixMessageDispatchVtableCaseSnapshot(0x54, 0xC1D02C, 0x81C42C, 0x81C44B, 0xD4),
+        new MatrixMessageDispatchVtableCaseSnapshot(0x55, 0xC1D057, 0x81C457, 0x81C476, 0xD8),
+        new MatrixMessageDispatchVtableCaseSnapshot(0x56, 0xC1D082, 0x81C482, 0x81C4A1, 0xDC),
+        new MatrixMessageDispatchVtableCaseSnapshot(0x57, 0xC1D0AD, 0x81C4AD, 0x81C4CC, 0xE0),
+        new MatrixMessageDispatchVtableCaseSnapshot(0x58, 0xC1D0D8, 0x81C4D8, 0x81C4F7, 0xE4),
+        new MatrixMessageDispatchVtableCaseSnapshot(0x59, 0xC1D103, 0x81C503, 0x81C522, 0xE8),
+        new MatrixMessageDispatchVtableCaseSnapshot(0x5A, 0xC1D12E, 0x81C52E, 0x81C54D, 0xEC),
+        new MatrixMessageDispatchVtableCaseSnapshot(0x5B, 0xC1D159, 0x81C559, 0x81C578, 0xF0),
+        new MatrixMessageDispatchVtableCaseSnapshot(0x5C, 0xC1D184, 0x81C584, 0x81C5A3, 0xF4),
+        new MatrixMessageDispatchVtableCaseSnapshot(0x5D, 0xC1D1AF, 0x81C5AF, 0x81C5CE, 0xF8),
+        new MatrixMessageDispatchVtableCaseSnapshot(0x5E, 0xC1D1DA, 0x81C5DA, 0x81C5F9, 0xFC),
+        new MatrixMessageDispatchVtableCaseSnapshot(0x5F, 0xC1D205, 0x81C605, 0x81C624, 0x100),
+        new MatrixMessageDispatchVtableCaseSnapshot(0x60, 0xC1D230, 0x81C630, 0x81C64F, 0x104),
+        new MatrixMessageDispatchVtableCaseSnapshot(0x61, 0xC1D25B, 0x81C65B, 0x81C67A, 0x108),
         new MatrixMessageDispatchVtableCaseSnapshot(0x71, 0xC1D50B, 0x81C90B, 0x81C92A, 0x148),
         new MatrixMessageDispatchVtableCaseSnapshot(0x74, 0xC1D58C, 0x81C98C, 0x81C9AB, 0x154),
         new MatrixMessageDispatchVtableCaseSnapshot(0x75, 0xC1D5B7, 0x81C9B7, 0x81C9D6, 0x158),

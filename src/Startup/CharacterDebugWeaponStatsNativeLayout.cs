@@ -22,3 +22,21 @@ public static class CharacterDebugWeaponStatsNativeLayout
     public static IReadOnlyList<int> WordFieldOffsets { get; } =
         Array.AsReadOnly(new[] { 0x28, 0x2A, 0x2C, 0x2E, 0x30, 0x32, 0x34, 0x36 });
 }
+
+public static class CharacterDebugWeaponStatsConsumerNativeLayout
+{
+    public const int MessageDiscriminator = 0x57;
+    public const uint ProtocolHandlerDispatchTableVirtualAddress = 0xC1D6DC;
+    public const int ProtocolHandlerDispatchTableSelectorBias = 0x20;
+    public const int ProtocolHandlerVtableSlotOffset = 0xE0;
+    public const uint ProtocolHandlerVtableTargetVirtualAddress = 0xECEF10;
+    public const uint ProtocolHandlerVtableTargetFileOffset = 0xACE310;
+    public const uint ConsumerFunctionFileOffset = 0xACE310;
+    public const uint OwnerStatePointerOffset = 0x43D0;
+    public const uint OwnerVectorOffset = 0x90;
+    public const int InputRangeBeginOffset = 0x28;
+    public const int InputRangeEndOffset = 0x2C;
+    public const uint VectorAssignHelperFileOffset = 0x929920;
+    public const int EventSinkVtableSlotOffset = 0xAC;
+    public const int ApplicationEventCode = 227;
+}

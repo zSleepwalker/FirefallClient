@@ -28,3 +28,32 @@ public static class CharacterWeaponProjectileFiredNativeLayout
     public const int InputByteCountWithoutOptionalTail = 9;
     public const int InputByteCountWithOptionalTail = 15;
 }
+
+public static class CharacterWeaponProjectileFiredConsumerNativeLayout
+{
+    public const int MessageDiscriminator = CharacterWeaponProjectileFiredNativeLayout.InnerSelector;
+    public const uint ProtocolHandlerDispatchTableVirtualAddress = 0xC1D6DC;
+    public const int ProtocolHandlerDispatchTableSelectorBias = 0x20;
+    public const int ProtocolHandlerVtableSlotOffset = 0x100;
+    public const uint ProtocolHandlerVtableTargetVirtualAddress = 0xECCF30;
+    public const uint ProtocolHandlerVtableTargetFileOffset = 0xACC330;
+    public const uint ConsumerFunctionFileOffset = 0xACC330;
+
+    public const uint MetricStateGlobalVirtualAddress = 0x1E0004C;
+    public const int MetricStateEnabledByteOffset = 4;
+    public const int MetricStateSuppressedByteOffset = 5;
+    public const uint MetricAppenderFileOffset = 0x481430;
+    public const int MessageFirstWordOffset = 0x28;
+    public const int MessageWordWidth = 2;
+    public const int MessageWordReadCount = 13;
+    public const int MessageLastWordOffset = 0x40;
+    public const int ReceiverReadEndOffsetExclusive = 0x42;
+    public const int DeclaredAllocationReadPastEndByteCount =
+        ReceiverReadEndOffsetExclusive - CharacterWeaponProjectileFiredNativeLayout.AllocationSize;
+
+    public static IReadOnlyList<int> MessageWordReadOffsets { get; } =
+        Array.AsReadOnly(new[]
+        {
+            0x28, 0x2A, 0x2C, 0x2E, 0x32, 0x30, 0x36, 0x34, 0x38, 0x3A, 0x3C, 0x3E, 0x40
+        });
+}

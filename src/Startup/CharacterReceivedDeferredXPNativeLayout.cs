@@ -27,3 +27,20 @@ public static class CharacterReceivedDeferredXPNativeLayout
     public const int CountFieldByteCount = 1;
     public const int CountBlockRepeatMarker = 0xFF;
 }
+
+public static class CharacterReceivedDeferredXPConsumerNativeLayout
+{
+    public const int MessageDiscriminator = 0x5A;
+    public const uint ProtocolHandlerDispatchTableVirtualAddress = 0xC1D6DC;
+    public const int ProtocolHandlerDispatchTableSelectorBias = 0x20;
+    public const int ProtocolHandlerVtableSlotOffset = 0xEC;
+    public const uint ProtocolHandlerVtableTargetVirtualAddress = 0xECB630;
+    public const uint ProtocolHandlerVtableTargetFileOffset = 0xACAA30;
+    public const uint ConsumerFunctionFileOffset = 0xACAA30;
+    public const int InputMessageFieldOffset = 0x28;
+    public const uint ContextAccessorFileOffset = 0x49DCC0;
+    public const uint ControlRoutineFileOffset = 0x4BCBD0;
+    public const int ControlRoutineSelector = 9;
+    public const int EventSinkVtableSlotOffset = 0xAC;
+    public const int ConditionalApplicationEventCode = 50;
+}

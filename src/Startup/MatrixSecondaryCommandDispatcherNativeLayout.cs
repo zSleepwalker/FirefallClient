@@ -143,3 +143,25 @@ public static class CharacterReceiveWeaponTweaksNativeLayout
     public const uint TrailingBlobCopyMethodFileOffset = 0x12CB9D0;
     public const uint TrailingBlobResizeMethodFileOffset = 0x12CBCB0;
 }
+
+public static class CharacterReceiveWeaponTweaksConsumerNativeLayout
+{
+    public const int MessageDiscriminator = 0x54;
+    public const int ProtocolHandlerVtableSlotOffset = 0xD4;
+    public const uint ProtocolHandlerMethodVirtualAddress = 0xECB3E0;
+    public const uint ProtocolHandlerMethodFileOffset = 0xACA7E0;
+    public const int ContentTypeMessageFieldOffset = 0x28;
+    public const int ContentIdMessageFieldOffset = 0x2C;
+    public const int DurationMessageFieldOffset = 0x30;
+    public const uint ContentTypeLabelVirtualAddress = 0x1BAE9D4;
+    public const uint ContentIdLabelVirtualAddress = 0x1BAE9C8;
+    public const uint DurationLabelVirtualAddress = 0x1BAE9BC;
+    public const uint PayloadCapacityHelperFileOffset = 0xC26BA0;
+    public const uint SharedTextPayloadHelperFileOffset = 0xC23FE0;
+    public const uint DwordPayloadHelperFileOffset = 0xC24210;
+    public const int PayloadEntrySize = 8;
+    public const int PayloadReservedEntryCount = 8;
+    public const uint EventSinkGlobalVirtualAddress = 0x1E002B8;
+    public const int EventSinkVtableSlotOffset = 0xAC;
+    public const int ApplicationEventCode = 130;
+}

@@ -28,3 +28,22 @@ public static class CharacterRewardInfoNativeLayout
     public const int ConstructorZeroedDwordField1Offset = 0x30;
     public const int ConstructorZeroedDwordField2Offset = 0x34;
 }
+
+public static class CharacterRewardInfoConsumerNativeLayout
+{
+    public const int MessageDiscriminator = 0x58;
+    public const uint ProtocolHandlerDispatchTableVirtualAddress = 0xC1D6DC;
+    public const int ProtocolHandlerDispatchTableSelectorBias = 0x20;
+    public const int ProtocolHandlerVtableSlotOffset = 0xE4;
+    public const uint ProtocolHandlerVtableTargetVirtualAddress = 0xECB580;
+    public const uint ProtocolHandlerVtableTargetFileOffset = 0xACA980;
+    public const uint ConsumerFunctionFileOffset = 0xACA980;
+    public const uint OwnerStatePointerOffset = 0x43C8;
+    public const int InputValueFieldOffset = 0x28;
+    public const uint StateUpdateHelperFileOffset = 0x909120;
+    public const uint ConditionalFollowupFileOffset = 0x9092A0;
+    public const uint ConditionalRequestMethodFileOffset = 0x909980;
+    public const int EventSinkVtableSlotOffset = 0xAC;
+    public const int ConditionalApplicationEventCode = 219;
+    public const int MissingOwnerDiagnosticCode = 1651;
+}

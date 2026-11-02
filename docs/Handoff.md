@@ -1,16 +1,41 @@
 # Reverse-engineering handoff
 
-## Resume here (route0 nested selector-0x53 consumer traced)
+## Resume here (route0 nested selector-0x5E consumer traced)
 
-The bounded continuation traced route0's nested
-`Character::MarketRequestComplete` selector `0x53`, parser case raw
-`0x81CCC3`. Its constructor stores message discriminator `0x53` at `+0x10`,
-so the conditional shared receiver path can send it through slot `+0xD0` to
-raw method `0xACA580`. That method treats `+0x34` as a candidate C-string
-pointer and `+0x28/+0x2C` as a source range; here `+0x34` is the high DWORD of
-the raw QWORD at `+0x30`, while `+0x28` is a byte and `+0x2C` is not initialized
-by the traced constructor/reader. Preserve this as a conditional static
-overlap; pointer/range validity and runtime delivery are unknown.
+The bounded continuation traced route0's nested `Character::PublicCombatLog`
+selector `0x5B`, parser case raw `0x81CF2F`. The outer switch table at VA
+`0xC1D6DC` maps it to receiver slot `+0xF0` / raw case `0x81C559`; the vtable
+target VA `0xECB260` maps to raw `0xACA660`. That receiver branches on a QWORD
+at message `+0x30/+0x34` (zero or a high sentinel range) and byte `+0x38`,
+then performs ordered-tree helper calls through state pointer `+0x43BC`.
+Missing state triggers diagnostic `1647`, then the method continues. Its field
+meanings and higher-level schema remain unknown.
+
+Selector `0x5A` is also documented: slot `+0xEC` targets raw `0xACAA30`, which
+passes the DWORD at message `+0x28` and arguments `(9, 0, 0)` to `0x4BCBD0`.
+The receiver does not iterate the 16-byte vector records; because `+0x28` is
+the vector begin pointer, the control routine receives that pointer value as a
+DWORD. Its conditional path may emit event `50` through slot `+0xAC`; intended
+semantics remain unknown.
+
+Selector `0x59` is also documented: slot `+0xE8` targets raw `0xACA9D0`, which
+uses context state pointer `+0x43C8` to clear/reset its tree container and set
+state byte `+8` to 1. The method does not load the dispatched message or its
+parsed five-DWORD vector records. The reason for the unused payload and the
+meaning of the tree reset remain unknown.
+
+Selector `0x58` is also documented: slot `+0xE4` targets raw `0xACA980`, which
+passes message DWORD `+0x28` and literal `1` to `0x909120`. On an absent,
+nonzero key, the helper clears/resets its state tree and calls `0x9092A0`;
+conditional branches can send `SendFindServiceProviderRequest(1)` and emit
+event `219`. The parser writes only bytes `+0x28/+0x29` at that input location,
+so `+0x2A/+0x2B` remain unwritten. This is a static representation conflict,
+not a proven runtime failure.
+
+Selector `0x56` is also documented: its slot `+0xDC` target VA `0xECEA30`
+maps to raw `0xACDE30`; that method merges a source tree into owner-state
+`+0x30` and emits event `222` when the input count is nonzero. The earlier
+`0xACEA30`/`0xACE430` interpretations were mapping arithmetic errors.
 
 Routes 2-6 also use discriminator `0x53` across different message layouts.
 Route 3's `+0x34` read is outside its `0x30` allocation; route 4 overlays the
@@ -23,9 +48,50 @@ the handler consumes `+0x2C` as a range endpoint and `+0x34` as a candidate
 C-string pointer. Preserve these as unresolved fields. Read-only IDA checks
 and original-file evidence agreed on the relevant parser, callback, selector,
 and receiver instructions; IDA was not modified and the sample was not run.
-Next, trace the route-0 nested `Character::ReceiveWeaponTweaks` selector
-`0x54` at parser case raw `0x81CD14`. Keep this nested selector table distinct
-from route indices 2-6 and the secondary decoder table.
+The route-0 nested `Character::PrivateCombatLog` selector `0x5C` consumer is
+traced in `docs/MatrixConnection.md` and
+`CharacterPrivateCombatLogConsumerNativeLayout`. Its slot `+0xF4` maps to
+receiver VA `0xECC460` / raw `0xACB860`; it reads fields `+0x28`, `+0x2C`,
+`+0x30`, `+0x34`, and `+0x36`, then dispatches application event `122`.
+The earlier tentative receiver VA `0x859010` was an address-mapping error;
+use the verified target above.
+
+The route-0 nested `Character::AnimationUpdated` selector `0x5D` consumer is
+also traced. Slot `+0xF8` resolves to receiver VA `0xECCB40` / raw `0xACBF40`;
+it unwraps two 16-bit values around a context counter and sends gated
+16-byte records through a 3000-slot circular queue. Their application-level
+meaning is not established.
+
+The route-0 nested `Character::RaiaNPCDebugging` selector `0x5E` consumer is
+also traced. Slot `+0xFC` resolves to receiver VA `0xECCBE0` / raw `0xACBFE0`.
+It reads five WORDs through `message+0x30`, including two bytes beyond the
+declared `0x30` allocation; the parser writes one NUL-terminated text field at
+`+0x28`. This static layout conflict and its unresolved runtime implications
+are documented in `docs/MatrixConnection.md`.
+
+The route-0 nested `Character::WeaponProjectileFired` selector `0x5F`
+consumer is also traced. Slot `+0x100` resolves to receiver VA `0xECCF30` /
+raw `0xACC330`; it reads 13 WORDs while the parser allocates `0x38` bytes and
+provides at most 15 body bytes. The receiver reads through `message+0x41`,
+ten bytes past the declared allocation. Details and uncertainty are recorded
+in `docs/MatrixConnection.md`.
+
+The route-0 nested `Character::AbilityProjectileFired` selector `0x60`
+consumer is also traced. Slot `+0x104` resolves to receiver VA `0xECD580` /
+raw `0xACC980`; it reads four WORDs from `+0x28..+0x2E` and conditionally
+submits each as a metric. The remaining parser fields are not consumed by
+this metric path; see `docs/MatrixConnection.md`.
+
+The route-0 nested `Character::ProjectileHitReported` selector `0x61` receiver
+is also traced. Slot `+0x108` resolves to receiver VA `0xECA340` / raw
+`0xAC9740`; with the normal x86 direction-flag-clear entry state it executes
+`REP LODSD` for 22 DWORDs from the message pointer, reading through `+0x57`
+despite the parser's `0x30`-byte allocation. The mismatch and uncertainties
+are recorded in `docs/MatrixConnection.md`.
+
+Next, trace route-0 nested `Character::Stumble` selector `0x62`'s receiver at
+slot `+0x10C`. Keep this nested selector table distinct from route indices
+2-6 and the secondary decoder table.
 
 All secondary selectors `0x20..0x7A` are now reconstructed and checked against
 `FirefallClient.exe.original`. The final entries `0x78..0x7A` resolve to
@@ -34,8 +100,8 @@ All secondary selectors `0x20..0x7A` are now reconstructed and checked against
 Character selectors `OpenMovieDialog`, `PrivateDialog`, and `PublicDialog`.
 Do not repeat the earlier decoder or keyed-receiver factory batches.
 The decoder batches through `0x7A` and route-2 through route-6 consumer traces
-were previously committed; this update records the route0 nested selector
-`0x53` consumer trace.
+were previously committed; recent updates trace route0 nested selectors `0x53`
+through `0x61` consumers.
 Use GPT-6 Luna with explicit High reasoning for implementation and review.
 Verify field-address setup, primitive widths, count-loop boundaries and
 helper calls against the original binary before committing and pushing.

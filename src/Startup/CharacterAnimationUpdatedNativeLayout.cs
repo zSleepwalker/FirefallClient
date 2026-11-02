@@ -21,3 +21,34 @@ public static class CharacterAnimationUpdatedNativeLayout
     public const int RawByteFieldOffset = 0x2A;
     public const int NominalInputByteCount = 3;
 }
+
+public static class CharacterAnimationUpdatedConsumerNativeLayout
+{
+    public const int MessageDiscriminator = CharacterAnimationUpdatedNativeLayout.InnerSelector;
+    public const uint ProtocolHandlerDispatchTableVirtualAddress = 0xC1D6DC;
+    public const int ProtocolHandlerDispatchTableSelectorBias = 0x20;
+    public const int ProtocolHandlerVtableSlotOffset = 0xF8;
+    public const uint ProtocolHandlerVtableTargetVirtualAddress = 0xECCB40;
+    public const uint ProtocolHandlerVtableTargetFileOffset = 0xACBF40;
+    public const uint ConsumerFunctionFileOffset = 0xACBF40;
+
+    public const int HandlerContextPointerOffset = 8;
+    public const int ContextCounterPointerOffset = 8;
+    public const int ContextCounterValueOffset = 8;
+    public const int MessageFirstWordOffset = 0x28;
+    public const int MessageSecondWordOffset = 0x2A;
+    public const int MessageQueueIndexByteOffset = 0x2C;
+    public const int MessageModeByteOffset = 0x2D;
+    public const uint CounterWrapModulus = 0x10000;
+    public const uint CounterWrapHalfRange = 0x8000;
+    public const uint RelayHelperFileOffset = 0x3343B0;
+    public const uint RelayRecordQueueFileOffset = 0x334460;
+    public const int RelayMaximumQueueIndex = 10;
+    public const int RelayMaximumMode = 3;
+    public const int RelayQueueFlagsOffset = 5;
+    public const int RelayQueueAcceptFlagOffset = 6;
+    public const int RelayRecordSize = 0x10;
+    public const int RelayRecordArrayBaseOffset = 0x50;
+    public const int RelayRecordIndexBias = 5;
+    public const uint RelayQueueCapacity = 0xBB8;
+}

@@ -49,3 +49,18 @@ public static class CharacterTookDebugWeaponHitPublicNativeLayout
     public const int ConstructorZeroedByteField1Offset = 0x58;
     public const int ConstructorZeroedByteField2Offset = 0x88;
 }
+
+public static class CharacterTookDebugWeaponHitPublicConsumerNativeLayout
+{
+    public const int MessageDiscriminator = 0x55;
+    public const int ProtocolHandlerVtableSlotOffset = 0xD8;
+    public const uint ProtocolHandlerMethodVirtualAddress = 0xECB4E0;
+    public const uint ProtocolHandlerMethodFileOffset = 0xACA8E0;
+    public const int SharedTextMessageFieldOffset = 0x28;
+    public const uint SharedTextEventHelperFileOffset = 0x8EDBD0;
+    public const uint EventPayloadBuilderFileOffset = 0xC240F0;
+    public const uint EventPayloadStringKeyVirtualAddress = 0x1B94064;
+    public const uint EventSinkGlobalVirtualAddress = 0x1E002B8;
+    public const int EventSinkVtableSlotOffset = 0xAC;
+    public const int ApplicationEventCode = 197;
+}

@@ -24,3 +24,23 @@ public static class CharacterProjectileHitReportedNativeLayout
     public const int ByteField1Offset = 0x2D;
     public const int NominalInputByteCount = 6;
 }
+
+public static class CharacterProjectileHitReportedConsumerNativeLayout
+{
+    public const int MessageDiscriminator = CharacterProjectileHitReportedNativeLayout.InnerSelector;
+    public const uint ProtocolHandlerDispatchTableVirtualAddress = 0xC1D6DC;
+    public const int ProtocolHandlerDispatchTableSelectorBias = 0x20;
+    public const int ProtocolHandlerVtableSlotOffset = 0x108;
+    public const uint ProtocolHandlerVtableTargetVirtualAddress = 0xECA340;
+    public const uint ProtocolHandlerVtableTargetFileOffset = 0xAC9740;
+    public const uint ConsumerFunctionFileOffset = 0xAC9740;
+    public const uint BulkLoadInstructionFileOffset = 0xAC974C;
+
+    public const int MessageReadStartOffset = 0;
+    public const int MessageDwordReadCount = 22;
+    public const int MessageDwordWidth = 4;
+    public const int MessageReadEndOffsetExclusive = MessageDwordReadCount * MessageDwordWidth;
+    public const int LastLoadedDwordOffset = MessageReadEndOffsetExclusive - MessageDwordWidth;
+    public const int DeclaredAllocationReadPastEndByteCount =
+        MessageReadEndOffsetExclusive - CharacterProjectileHitReportedNativeLayout.AllocationSize;
+}

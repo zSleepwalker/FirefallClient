@@ -42,3 +42,33 @@ public static class CharacterAbilityProjectileFiredNativeLayout
     public const int InputByteCountWithoutOptionalQword = 0x27;
     public const int InputByteCountWithOptionalQword = 0x2F;
 }
+
+public readonly record struct CharacterAbilityProjectileFiredMetricSnapshot(
+    int MessageWordOffset,
+    uint MetricDescriptorVirtualAddress,
+    int MetricOutputStateOffset);
+
+public static class CharacterAbilityProjectileFiredConsumerNativeLayout
+{
+    public const int MessageDiscriminator = CharacterAbilityProjectileFiredNativeLayout.InnerSelector;
+    public const uint ProtocolHandlerDispatchTableVirtualAddress = 0xC1D6DC;
+    public const int ProtocolHandlerDispatchTableSelectorBias = 0x20;
+    public const int ProtocolHandlerVtableSlotOffset = 0x104;
+    public const uint ProtocolHandlerVtableTargetVirtualAddress = 0xECD580;
+    public const uint ProtocolHandlerVtableTargetFileOffset = 0xACC980;
+    public const uint ConsumerFunctionFileOffset = 0xACC980;
+
+    public const uint MetricStateGlobalVirtualAddress = 0x1E0004C;
+    public const int MetricStateEnabledByteOffset = 4;
+    public const int MetricStateSuppressedByteOffset = 5;
+    public const uint MetricAppenderFileOffset = 0x481430;
+
+    public static IReadOnlyList<CharacterAbilityProjectileFiredMetricSnapshot> Metrics { get; } =
+        Array.AsReadOnly(new[]
+        {
+            new CharacterAbilityProjectileFiredMetricSnapshot(0x28, 0x1DFABF0, 908),
+            new CharacterAbilityProjectileFiredMetricSnapshot(0x2A, 0x1DFAC10, 924),
+            new CharacterAbilityProjectileFiredMetricSnapshot(0x2C, 0x1DFAC30, 940),
+            new CharacterAbilityProjectileFiredMetricSnapshot(0x2E, 0x1DFAC50, 956)
+        });
+}

@@ -304,6 +304,34 @@ public static class MatrixMessageParserFlowNativeLayout
             new MatrixMessageDispatchVtableCaseSnapshot(
                 0x53, 0xC1D001, 0x81C401, 0x81C420, 0xD0),
             new MatrixMessageDispatchVtableCaseSnapshot(
+                0x54, 0xC1D02C, 0x81C42C, 0x81C44B, 0xD4),
+            new MatrixMessageDispatchVtableCaseSnapshot(
+                0x55, 0xC1D057, 0x81C457, 0x81C476, 0xD8),
+            new MatrixMessageDispatchVtableCaseSnapshot(
+                0x56, 0xC1D082, 0x81C482, 0x81C4A1, 0xDC),
+            new MatrixMessageDispatchVtableCaseSnapshot(
+                0x57, 0xC1D0AD, 0x81C4AD, 0x81C4CC, 0xE0),
+            new MatrixMessageDispatchVtableCaseSnapshot(
+                0x58, 0xC1D0D8, 0x81C4D8, 0x81C4F7, 0xE4),
+            new MatrixMessageDispatchVtableCaseSnapshot(
+                0x59, 0xC1D103, 0x81C503, 0x81C522, 0xE8),
+            new MatrixMessageDispatchVtableCaseSnapshot(
+                0x5A, 0xC1D12E, 0x81C52E, 0x81C54D, 0xEC),
+            new MatrixMessageDispatchVtableCaseSnapshot(
+                0x5B, 0xC1D159, 0x81C559, 0x81C578, 0xF0),
+            new MatrixMessageDispatchVtableCaseSnapshot(
+                0x5C, 0xC1D184, 0x81C584, 0x81C5A3, 0xF4),
+            new MatrixMessageDispatchVtableCaseSnapshot(
+                0x5D, 0xC1D1AF, 0x81C5AF, 0x81C5CE, 0xF8),
+            new MatrixMessageDispatchVtableCaseSnapshot(
+                0x5E, 0xC1D1DA, 0x81C5DA, 0x81C5F9, 0xFC),
+            new MatrixMessageDispatchVtableCaseSnapshot(
+                0x5F, 0xC1D205, 0x81C605, 0x81C624, 0x100),
+            new MatrixMessageDispatchVtableCaseSnapshot(
+                0x60, 0xC1D230, 0x81C630, 0x81C64F, 0x104),
+            new MatrixMessageDispatchVtableCaseSnapshot(
+                0x61, 0xC1D25B, 0x81C65B, 0x81C67A, 0x108),
+            new MatrixMessageDispatchVtableCaseSnapshot(
                 0x71, 0xC1D50B, 0x81C90B, 0x81C92A, 0x148),
             new MatrixMessageDispatchVtableCaseSnapshot(
                 0x74, 0xC1D58C, 0x81C98C, 0x81C9AB, 0x154),

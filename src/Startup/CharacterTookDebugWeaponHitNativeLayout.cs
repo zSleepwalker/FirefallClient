@@ -22,3 +22,19 @@ public static class CharacterTookDebugWeaponHitNativeLayout
     public const int ConstructorZeroedByteField1Offset = 0x58;
     public const int ConstructorZeroedByteField2Offset = 0x88;
 }
+
+public static class CharacterTookDebugWeaponHitConsumerNativeLayout
+{
+    public const int MessageDiscriminator = 0x56;
+    public const int ProtocolHandlerVtableSlotOffset = 0xDC;
+    public const uint ProtocolHandlerVtableTargetVirtualAddress = 0xECEA30;
+    public const uint ProtocolHandlerVtableTargetFileOffset = 0xACDE30;
+    public const uint ConsumerFunctionFileOffset = 0xACDE30;
+    public const uint OwnerStatePointerOffset = 0x43D0;
+    public const uint OwnerTreeOffset = 0x30;
+    public const int InputCollectionPointerOffset = 0x28;
+    public const int InputCollectionCountOffset = 0x2C;
+    public const uint CollectionMergeHelperFileOffset = 0x927F60;
+    public const int EventSinkVtableSlotOffset = 0xAC;
+    public const int ApplicationEventCode = 222;
+}
