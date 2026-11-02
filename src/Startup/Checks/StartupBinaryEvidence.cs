@@ -3949,6 +3949,16 @@ internal static class StartupBinaryEvidence
             && Matches(0x6087F2, "BB04000000")
             && RelativeBranchTargets(0x5F5EFC, 0xE8, 0x5F5880)
             && RelativeBranchTargets(0x5F5F3E, 0xE8, 0x5F5D70));
+        check("Binary selector 0x55 copies the unwritten third DWORD of its QWORD temporary",
+            Matches(0x5F6032, "C744242000000000C744242400000000C7442428000000008D442414")
+            && RelativeBranchTargets(0x5F6059, 0xE8,
+                CharacterTookDebugWeaponHitPublicNativeLayout.SecondConditionalTailQwordReaderFileOffset)
+            && RelativeBranchTargets(0x5F6064, 0xE8,
+                CharacterTookDebugWeaponHitPublicNativeLayout.SecondConditionalTailVectorReaderFileOffset)
+            && Matches(0x5F6069, "8D4424148BCF50")
+            && RelativeBranchTargets(0x5F6070, 0xE8,
+                CharacterTookDebugWeaponHitPublicNativeLayout.SecondConditionalTailStateTransferFileOffset)
+            && Matches(0x5F5EF2, "8B4208894610"));
         check("Binary inner selector 0x56 constructs TookDebugWeaponHit and joins the shared body reader",
             ReadUInt32(VirtualAddressToFileOffset(
                 CharacterTookDebugWeaponHitNativeLayout.InnerSelectorTableVirtualAddress) + 12) == 0xC1D9BA

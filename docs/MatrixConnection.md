@@ -2328,20 +2328,24 @@ no records. The temporary vector is copied into the object beginning at
 at `+0x60`. A zero gate releases the current vector when the marker is
 nonzero, clears those three DWORDs, and clears the marker.
 
-One data-flow discrepancy remains in the nonzero `+0x60` path. The QWORD
-reader writes eight bytes to a 12-byte local prefix at `0x5F6059`, while
-`0x5F5EB0` copies three DWORDs from that local prefix to object
-`+0x68/+0x6C/+0x70` at `0x5F5EE9/0x5F5EEF/0x5F5EF5`. The disassembled caller
-sequence `0x5F6032..0x5F6070` initializes the separate vector temporary and
-passes the QWORD temporary first to `0x356F80`, then to `0x5F5EB0`; it shows
-no write to the QWORD temporary's third DWORD. The `0x356F80` fingerprint
-confirms two DWORD stores and an eight-byte cursor advance, and the
-`0x5F5EB0` fingerprint confirms the three destination offsets. Accordingly,
-object `+0x70` is recorded as unresolved rather than assigned a wire-field
-meaning. Refill and short-input behavior of the scalar helpers is also not
-established. `CharacterTookDebugWeaponHitPublicNativeLayout` preserves the
-observed offsets, widths, branch boundaries, and record size without
-implementing a parser or naming semantic fields.
+The nonzero `+0x60` path supplies a 12-byte local prefix to `0x5F5EB0`, but its
+QWORD reader writes only the first eight bytes. At raw `0x5F6032..0x5F6042`,
+the caller zeroes a separate three-DWORD vector temporary at `[esp+0x20]`;
+the QWORD scratch begins at `[esp+0x14]` (`0x5F604A`) and is not included in
+those stores. `0x356F80` writes two DWORDs and advances the stream by eight
+bytes (`0x356FA5..0x356FB5`). The same scratch address is passed to
+`0x5F5EB0` at `0x5F6069..0x5F6070`. That helper copies source DWORDs at
+`+0/+4/+8` to object `+0x68/+0x6C/+0x70` (`0x5F5EE9/0x5F5EEF/0x5F5EF5`);
+therefore its third input DWORD, the local at `[esp+0x1C]`, is not explicitly
+initialized or populated by the QWORD read before being copied to object
+`+0x70`. It is not a third wire DWORD. The reader's constructor only zeros
+object `+0x58` and `+0x88`; it does not initialize `+0x70`. This establishes
+the local data-flow discrepancy, not its runtime consequence. The receiver
+uses only message `+0x28`, so no traced consumer explains the copied value.
+Refill and short-input behavior of the scalar helpers is also not established.
+`CharacterTookDebugWeaponHitPublicNativeLayout` preserves the observed
+offsets, widths, branch boundaries, and record size without implementing a
+parser or naming semantic fields.
 
 #### Conditional post-parse consumer for nested selector 0x55
 

@@ -2955,6 +2955,13 @@ Check("TookDebugWeaponHitPublic selector 0x55 records its scalar prefix and cond
     && CharacterTookDebugWeaponHitPublicNativeLayout.SecondConditionalTailRecordByteCount == 0x40
     && CharacterTookDebugWeaponHitPublicNativeLayout.SecondConditionalTailRecordDwordCount == 16
     && CharacterTookDebugWeaponHitPublicNativeLayout.SecondConditionalTailCountRepeatMarker == 0xFF
+    && CharacterTookDebugWeaponHitPublicNativeLayout.SecondConditionalTailTemporaryPrefixSize == 0x0C
+    && CharacterTookDebugWeaponHitPublicNativeLayout.SecondConditionalTailQwordReadByteCount == 8
+    && CharacterTookDebugWeaponHitPublicNativeLayout.SecondConditionalTailTemporaryThirdDwordOffset == 8
+    && CharacterTookDebugWeaponHitPublicNativeLayout.SecondConditionalTailQwordReaderFileOffset == 0x356F80
+    && CharacterTookDebugWeaponHitPublicNativeLayout.SecondConditionalTailStateTransferFileOffset == 0x5F5EB0
+    && CharacterTookDebugWeaponHitPublicNativeLayout.SecondConditionalTailVectorReaderFileOffset == 0x5F5420
+    && CharacterTookDebugWeaponHitPublicNativeLayout.SecondConditionalTailCopiedPrefixThirdDwordObjectOffset == 0x70
     && CharacterTookDebugWeaponHitPublicNativeLayout.SecondConditionalTailReaderByteCount == 0x121);
 Check("TookDebugWeaponHitPublic selector 0x55 records its conditional SharedText consumer",
     CharacterTookDebugWeaponHitPublicConsumerNativeLayout.MessageDiscriminator

@@ -39,12 +39,19 @@ public static class CharacterTookDebugWeaponHitPublicNativeLayout
     public const int SecondConditionalTailVectorBeginOffset = 0x74;
     public const int SecondConditionalTailVectorEndOffset = 0x78;
     public const int SecondConditionalTailVectorCapacityOffset = 0x7C;
+    public const int SecondConditionalTailTemporaryPrefixSize = 0x0C;
+    public const int SecondConditionalTailQwordReadByteCount = 8;
+    public const int SecondConditionalTailTemporaryThirdDwordOffset = 8;
+    public const uint SecondConditionalTailQwordReaderFileOffset = 0x356F80;
+    public const uint SecondConditionalTailStateTransferFileOffset = 0x5F5EB0;
+    public const uint SecondConditionalTailVectorReaderFileOffset = 0x5F5420;
     public const int SecondConditionalTailRecordByteCount = 0x40;
     public const int SecondConditionalTailRecordDwordCount = 16;
     public const int SecondConditionalTailCountRepeatMarker = 0xFF;
     public const uint SecondConditionalTailReaderFileOffset = 0x5F5FB0;
     public const int SecondConditionalTailReaderByteCount = 0x121;
     public const uint SecondConditionalTailRecordReaderFileOffset = 0x6087E0;
+    public const int SecondConditionalTailCopiedPrefixThirdDwordObjectOffset = 0x70;
 
     public const int ConstructorZeroedByteField1Offset = 0x58;
     public const int ConstructorZeroedByteField2Offset = 0x88;
