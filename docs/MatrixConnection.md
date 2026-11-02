@@ -1090,11 +1090,12 @@ routes5 and6. All 17 subcases now have native layouts.
 Route0's nested table has a separate, complete set of 40 documented selectors
 (`0x53..0x7A`); route1 is the zero-return route. The secondary selector table
 records 91 dispatch targets. Selectors `0x20..0x5F` now have 64 RTTI-backed
-class and body-reader layouts; the remaining 27 identities are unresolved.
+class and body-reader layouts; selectors `0x60..0x67` add eight more verified
+layouts, leaving 19 identities unresolved.
 All 91 table entries are nonzero and have distinct targets in the original
 binary, which establishes address uniqueness, not 91 completed identities.
 
-### Secondary-selector entries `0x20..0x5F`
+### Secondary-selector entries `0x20..0x67`
 
 This is the separate second table used by the leading-byte-zero and
 `0xF0..0xFF` path in `0x81CC50`. Its index is `selector - 0x20`, with accepted
@@ -1177,8 +1178,16 @@ Selectors outside `0x20..0x7A` reach the shared zero-return block at raw
 | `0x5D` | 61 | `0xC217B1` / `0x820BB1` | `0x30` | `0x818730` | `0x1C6DEC8` / `DebugEventSample` | `0x846850` |
 | `0x5E` | 62 | `0xC21819` / `0x820C19` | `0x38` | `0x818800` | `0x1C6DE88` / `DebugLagPlayerSample` | `0x846760` |
 | `0x5F` | 63 | `0xC21881` / `0x820C81` | `0x48` | `0x8188E0` | `0x1C6DE78` / `DebugLagSimulationSample` | `0x8465C0` |
+| `0x60` | 64 | `0xC218E9` / `0x820CE9` | `0x30` | `0x818A10` | `0x1C6DE98` / `DebugLagRaiaSample` | `0x846580` |
+| `0x61` | 65 | `0xC21951` / `0x820D51` | `0x58` | `0x818AE0` | `0x1C6DE48` / `DebugEncounterVolumes` | `0x846480` |
+| `0x62` | 66 | `0xC219B9` / `0x820DB9` | `0x40` | `0x818CE0` | `0x1C6DE38` / `Trail` | `0x844AD0` |
+| `0x63` | 67 | `0xC21A21` / `0x820E21` | `0x38` | `0x818E40` | `0x1C6DE68` / `EncounterDebugNotification` | `0x844A10` |
+| `0x64` | 68 | `0xC21A89` / `0x820E89` | `0x60` | `0x819070` | `0x1C6DE58` / `EncounterUIScopeIn` | `0x8448B0` |
+| `0x65` | 69 | `0xC21AF1` / `0x820EF1` | `0x50` | `0x819310` | `0x1C6DE08` / `EncounterUIUpdate` | `0x842940` |
+| `0x66` | 70 | `0xC21B59` / `0x820F59` | `0x30` | `0x8194D0` | `0x1C6DE28` / `EncounterUIScopeOut` | `0x356F80` (shared continuation) |
+| `0x67` | 71 | `0xC21BA1` / `0x820FA1` | `0x90` | `0x819590` | `0x1C6DE18` / `DisplayUiNotification` | `0x8428B0` |
 
-The first 64 entries have 64 distinct, nonzero table destinations. No shared
+The first 72 entries have 72 distinct, nonzero table destinations. No shared
 case or zero-valued table slot occurs in this verified prefix. Selector `0x26`
 does have a distinct allocation-failure branch to the common zero-return block;
 that is a case-path result, not a zero table entry. Selectors `0x28` and `0x2D`
@@ -1188,7 +1197,7 @@ destinations and RTTI-identified types remain distinct. Selectors `0x32` and
 sharing the NUL-terminated text reader at raw `0x12EE010` through continuation
 `0x81FB27`.
 
-All 64 constructors call a selector-specific base-metadata initializer
+All 72 constructors call a selector-specific base-metadata initializer
 before storing the derived vtable. For selectors `0x20..0x27` these helpers
 are `0x823020`, `0x823090`, `0x823100`, `0x823170`, `0x8231E0`, `0x823250`,
 `0x8232C0`, and `0x823330`; for `0x28..0x2F` they are `0x8233C0`, `0x823430`,
@@ -1204,7 +1213,9 @@ selectors `0x50..0x57` use `0x824C20`, `0x824D80`, `0x824DF0`, `0x824E60`,
 `0x824FD0`, `0x825040`, `0x8250B0`, and `0x825120`. The
 `0x8250B0` initializer also installs a base vtable before initializing the
 common metadata fields. Selectors `0x58..0x5F` use `0x825190`, `0x825200`,
-`0x825270`, `0x8252E0`, `0x825350`, `0x8253C0`, `0x825430`, and `0x8254A0`.
+`0x825270`, `0x8252E0`, `0x825350`, `0x8253C0`, `0x825430`, and `0x8254A0`;
+selectors `0x60..0x67` use `0x825510`, `0x825580`, `0x825700`, `0x825770`,
+`0x8257E0`, `0x8258C0`, `0x825930`, and `0x8259A0`.
 Each helper sets a base flag DWORD at `+0x08` to 1, stores its
 descriptor-anchor pointer at `+0x0C`, stores the constructor-supplied type
 DWORD at `+0x10`, copies the parser input's first two DWORDs to `+0x18/+0x1C`,
@@ -1223,6 +1234,9 @@ the constructor type IDs or table indexes.
 Selectors `0x58..0x5F` store parser-local DWORD literals `0x38..0x3F` in that
 separate slot. These remain distinct observations from the selector, native
 constructor type ID, and descriptor anchor; no role is assigned to the values.
+Selectors `0x60..0x67` similarly store parser-local DWORD literals `0x40..0x47`
+in that separate slot; their roles are unknown and distinct from selector,
+constructor type ID, and descriptor anchor.
 
 Body reads, with field labels deliberately limited to offsets and widths:
 
@@ -1461,6 +1475,47 @@ Body reads, with field labels deliberately limited to offsets and widths:
   `+0x2E`, and `+0x30`.
 - `0x5F` `DebugLagSimulationSample`: thirteen WORDs at two-byte intervals
   from `+0x28` through `+0x40`.
+- `0x60` `DebugLagRaiaSample`: four WORDs at `+0x28`, `+0x2A`, `+0x2C`,
+  and `+0x2E`.
+- `0x61` `DebugEncounterVolumes`: four byte-counted vectors. The first
+  contains four-float (`0x10`-wire-byte) records at `+0x28`; the next two
+  contain `0x40`-wire-byte records at `+0x34` and `+0x40`; the last starts at
+  `+0x4C` and contains NUL-terminated shared text followed by `0x40` bytes.
+  Their native strides are respectively `0x10`, `0x40`, `0x40`, and `0x44`.
+  Each count is a byte; `0xFF` continues with another count and zero ends that
+  vector. The record payloads remain offset-only.
+- `0x62` `Trail`: DWORD at `+0x28`, byte at `+0x2C`, then a byte-counted
+  vector at `+0x30` of three-float records (12 wire bytes and 12-byte native
+  stride). Count `0xFF` continues; zero ends the vector.
+- `0x63` `EncounterDebugNotification`: raw QWORD at `+0x28`, then
+  NUL-terminated shared-text reads at `+0x30` and `+0x34`.
+- `0x64` `EncounterUIScopeIn`: raw QWORD at `+0x28`; a WORD-length-prefixed
+  byte blob at `+0x30`; WORD at `+0x40`; a tree at `+0x44` with its root
+  pointer and count at `+0x44/+0x48`; then the embedded blob at `+0x4C`
+  receives all remaining bytes in the current input slice, if any. Tree
+  entries read a QWORD key, QWORD, DWORD, then a byte-counted vector of tagged
+  entries. Both count levels use `0xFF` continuation and zero termination.
+  Tagged entries have `0x18`-byte native stride. Tag `0` reads a DWORD to
+  `+8` and clears DWORD `+0x0C`; tag `1` reads a DWORD to `+0x10`; tags `2`/`3`
+  read a QWORD to `+8`; tag `4` reads one byte to
+  WORD `+0x14`; tag `6` reads a WORD to `+0x14`; tag `7` reads a byte to WORD
+  `+0x14`, then reads a DWORD to `+0x10` when bit `0x02` is set, otherwise a
+  QWORD to `+8`; tag `8` writes WORD 1 without a payload. Special tag `0xFE`
+  writes WORD 0, and `0xFF` takes a no-payload path. Tag `5` and values
+  `0x09..0xFD` reach the same invalid/unsupported path. These tag values and
+  fields have no assigned application semantics.
+- `0x65` `EncounterUIUpdate`: raw QWORD at `+0x28`; a WORD-length-prefixed
+  byte blob at `+0x30`; then all remaining bytes in the current input slice
+  are copied into the embedded blob at `+0x40`, if any remain.
+- `0x66` `EncounterUIScopeOut`: raw QWORD at `+0x28` through the shared
+  `0x356F80` reader continuation at raw `0x81F72E`. The allocation-failure
+  branch targets the shared zero-object block at raw `0x81F72C`; this is
+  static control flow only and does not assert runtime consequences.
+- `0x67` `DisplayUiNotification`: DWORDs at `+0x28/+0x2C`; a byte-counted
+  vector at `+0x30`; then byte at `+0x8C`. Each vector record reads a byte,
+  NUL-terminated shared text, DWORD, and float. Records have `0x10`-byte
+  native stride; count `0xFF` continues with another count and zero ends the
+  vector.
 
 These are positional wire layouts only; RTTI class names do not establish the
 meaning of any field. None of the `0x58..0x5F` body readers has a count/vector
@@ -1469,6 +1524,9 @@ continuation at `0x8206E3`; `ClearTrackedRecipe` has no body reader. The other
 five readers are straight-line scalar reads in the field orders above. Their
 primitive helper calls were checked against the one-byte, WORD, DWORD, and
 QWORD load/store widths and cursor increments in `FirefallClient.exe.original`.
+The `0x60..0x67` records above likewise remain offset/width observations;
+their count framing and tag dispatch are described separately from field
+semantics.
 
 The shared NUL-terminated text reader used by `0x53..0x55` reads bytewise
 through the terminator in repeating 256-byte chunks; 256 is a chunk size, not
@@ -1545,6 +1603,19 @@ zero-return block at `0x8217D9`. Selectors `0x5B..0x5F` use local
 zero-object blocks immediately before their readers. These are static paths
 only; no runtime consequence is asserted.
 
+Selectors `0x60..0x67` use the same setup-call/allocation pattern. Their
+parser-local DWORD literals are `0x40..0x47`; the constructors pass native
+type IDs `0x60..0x67` to the selector-specific metadata helpers and install
+distinct RTTI-resolved vtables with zero complete-object offsets. Checks pin
+the case setup arguments, allocator sizes, constructor/helper calls, metadata
+anchors, derived-vtable stores, and reader argument order. Selectors
+`0x60..0x65` and `0x67` continue through their readers after a local
+zero-object block if allocation fails. Selector `0x66` instead branches to
+the shared zero-object block at `0x81F72C` on failure and jumps to the shared
+QWORD-reader continuation at `0x81F72E` after successful construction. These
+are static control-flow observations only; no runtime consequence is
+asserted.
+
 Binary fingerprints include table indexes and targets, case setup arguments,
 allocation sizes and failure blocks, constructor type/metadata/vtable order,
 reader field arguments, primitive-reader calls, byte-count consumption,
@@ -1560,7 +1631,10 @@ the `0x56` tree-sentinel word initializer and count loop. The `0x58..0x5F`
 checks pin the new targets/RTTI, allocation and failure paths, metadata
 initializers, scalar field order, and primitive load/store widths. These checks
 assert wire framing only; unresolved field, gate, count, predicate, and tag
-meanings remain unassigned.
+meanings remain unassigned. The `0x60..0x67` fingerprints additionally cover
+the four-vector and variable-record readers, the `0xFF` count continuations,
+the shared `0x66` reader path, embedded-blob remainder copies, and the `0x64`
+tag-dispatch table and conditional payload paths.
 
 On allocation failure, selectors `0x20..0x25`, `0x27..0x2C`, and `0x2E..0x2F`
 set the object register to zero but still fall through to their body-reader
@@ -1580,6 +1654,10 @@ at `0x8206E1` before the DWORD reader; `0x59` branches to the common zero-return
 block at `0x8217D9`. Selectors `0x5B..0x5F` each branch to a local
 zero-object block before their scalar-reader call. These are static
 control-flow observations only; their runtime consequence is not asserted.
+Selectors `0x60..0x65` and `0x67` likewise branch to local zero-object blocks
+before their readers; selector `0x66` branches to `0x81F72C`, then reaches the
+shared reader at `0x81F72E`. These are static control-flow observations only;
+their runtime consequence is not asserted.
 Selectors `0x32` and `0x34` share the zero-object continuation at raw
 `0x81FB25` and the text-reader continuation at `0x81FB27`. These are static
 control-flow observations only; their runtime consequence is not asserted.

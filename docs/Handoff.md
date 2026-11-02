@@ -2,9 +2,9 @@
 
 ## Resume here (November 2)
 
-Selectors `0x58..0x5F` are now reconstructed and checked against
+Selectors `0x60..0x67` are now reconstructed and checked against
 `FirefallClient.exe.original`. Do not repeat the earlier decoder or
-keyed-receiver factory batches. The next batch starts at selector `0x60`.
+keyed-receiver factory batches. The next batch starts at selector `0x68`.
 This session did not commit or push; parent review/QA remains pending.
 Use GPT-6 Luna with explicit High reasoning for implementation and review.
 Verify field-address setup, primitive widths, count-loop boundaries and
@@ -34,14 +34,14 @@ helper calls against the original binary before committing and pushing.
 - Secondary selectors in `0x81CC50` use the separate 91-entry table at VA
   `0xC22630` / raw `0x821A30`: `[ebp+8] - 0x20`, bounded through index
   `0x5A`, then indexed by DWORD. The original binary has 91 nonzero, distinct
-  destinations; selectors `0x20..0x5F` now have 64 verified message
-  identities/layouts, leaving 27 identities unresolved. Continue at selector
+  destinations; selectors `0x20..0x67` now have 72 verified message
+  identities/layouts, leaving 19 identities unresolved. Continue at selector
   `0x60`. The table index is distinct from the keyed-receiver factory's
   `0x02..0x35` selectors and the route0 Character table's `0x53..0x7A`
   selectors. Secondary selectors `0x53..0x57` and route0 Character selectors
   with those same numbers are different tables and dispatch namespaces. See
   the C# snapshots and `docs/MatrixConnection.md`.
-- The 64 verified secondary cases are RTTI-backed:
+- The 72 verified secondary cases are RTTI-backed:
   `EncounterToUIMessage`, `VotekickInitiated`, `VotekickResponded`,
   `ScoreBoardEnable/Init/SetWinner/Clear/AddPlayer/RemovePlayer/
   UpdatePlayerStats/UpdatePlayerStatsFromStats/UpdatePlayerStatus`,
@@ -111,7 +111,21 @@ helper calls against the original binary before committing and pushing.
   byte/DWORD/QWORD/byte; byte/two DWORDs/WORD/byte; two WORDs/two bytes; five
   WORDs; and thirteen WORDs, respectively. Their field meanings remain
   unresolved. Parser-local DWORD literals `0x38..0x3F` are recorded separately
-  from selectors and constructor type IDs. All 64 verified table targets are
+  from selectors and constructor type IDs. Selectors `0x60..0x67` add the
+  RTTI-backed `DebugLagRaiaSample`, `DebugEncounterVolumes`, `Trail`,
+  `EncounterDebugNotification`, `EncounterUIScopeIn`, `EncounterUIUpdate`,
+  `EncounterUIScopeOut`, and `DisplayUiNotification` cases. Their layouts
+  include four WORDs; four independently counted record vectors; a three-float
+  vector; ordered QWORD/text fields; length-prefixed and remaining-input
+  blobs; a tree with nested tagged records; and a text-bearing vector with
+  `0x10` native stride and a trailing byte. The `0x64` tagged-vector parser
+  uses a byte count with `0xFF` continuation at both levels; tag 7 selects a
+  DWORD or QWORD payload using bit `0x02`, tag 5 is unsupported, and tags
+  `0xFE/0xFF` use special zero/no-payload paths. Tag and field meanings remain
+  unresolved. Parser-local DWORD literals `0x40..0x47` are separate from
+  selectors and constructor type IDs. Tag `5` and values `0x09..0xFD` reach
+  the same invalid/unsupported path; application meanings remain unknown.
+  All 72 verified table targets are
   distinct and nonzero. Selectors `0x28/0x2D`
   and `0x32/0x34` share
   reader continuations despite distinct table destinations and types.
@@ -128,7 +142,11 @@ helper calls against the original binary before committing and pushing.
   consequence is asserted. Selectors `0x58` and `0x5A` share the
   `0x8206E1/0x8206E3` zero-object/reader continuation; `0x59` returns to
   `0x8217D9` on allocation failure, and `0x5B..0x5F` reach local zero-object
-  blocks before their scalar readers.
+  blocks before their scalar readers. Selectors `0x60..0x65` and `0x67` also
+  reach local zero-object blocks before their readers; selector `0x66` branches
+  to the shared zero-object block at `0x81F72C` and QWORD-reader continuation
+  at `0x81F72E`. These are static paths only; no runtime consequence is
+  asserted.
 - Keep this table distinct from the unrelated keyed-receiver factory
   `0x81B1B0`, route0's nested Character selectors `0x53..0x7A`, and primary
   routes 2-6. `.text` and `.rdata` section-aware vtable RTTI names were

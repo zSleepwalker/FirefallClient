@@ -970,7 +970,7 @@ Check("Secondary command dispatcher separates primary-byte, secondary-selector, 
     && MatrixSecondaryCommandDispatcherNativeLayout.GetSecondarySelectorIndex(0x20) == 0
     && MatrixSecondaryCommandDispatcherNativeLayout.GetSecondarySelectorIndex(0x7A) == 0x5A
     && MatrixSecondaryCommandDispatcherNativeLayout.GetSecondarySelectorIndex(0x7B) is null);
-Check("Secondary decoder table snapshot records the first 64 of 91 selectors",
+Check("Secondary decoder table snapshot records 72 of 91 selectors",
     MatrixSecondaryDecoderTableNativeLayout.ParserFileOffset == 0x81CC50
     && MatrixSecondaryDecoderTableNativeLayout.SelectorComparisonFileOffset == 0x81F3A8
     && MatrixSecondaryDecoderTableNativeLayout.SelectorJumpFileOffset == 0x81F3B4
@@ -992,16 +992,18 @@ Check("Secondary decoder table snapshot records the first 64 of 91 selectors",
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x50) == 48
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x57) == 55
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x58) == 56
+    && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x60) == 64
+    && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x67) == 71
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x7A) == 0x5A
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x1F) is null
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x7B) is null
-    && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries.Count == 64
+    && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries.Count == 72
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .Select(entry => entry.Selector)
-        .SequenceEqual(Enumerable.Range(0x20, 64).Select(selector => (byte)selector))
+        .SequenceEqual(Enumerable.Range(0x20, 72).Select(selector => (byte)selector))
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .Select(entry => entry.TableIndex)
-        .SequenceEqual(Enumerable.Range(0, 64))
+        .SequenceEqual(Enumerable.Range(0, 72))
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .Select(entry => entry.TargetVirtualAddress)
         .SequenceEqual(new uint[]
@@ -1021,7 +1023,9 @@ Check("Secondary decoder table snapshot records the first 64 of 91 selectors",
             0xC2130B, 0xC21375, 0xC213BD, 0xC21405,
             0xC21479, 0xC214E1, 0xC21529, 0xC21593,
             0xC215FD, 0xC21645, 0xC21699, 0xC216E1,
-            0xC21749, 0xC217B1, 0xC21819, 0xC21881
+            0xC21749, 0xC217B1, 0xC21819, 0xC21881,
+            0xC218E9, 0xC21951, 0xC219B9, 0xC21A21,
+            0xC21A89, 0xC21AF1, 0xC21B59, 0xC21BA1
         })
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .All(entry => entry.TargetKind == MatrixSecondaryDecoderTargetKind.MessageCase)
@@ -1029,7 +1033,7 @@ Check("Secondary decoder table snapshot records the first 64 of 91 selectors",
         .All(entry => entry.TargetVirtualAddress == entry.TargetFileOffset + 0x400C00)
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .Select(entry => entry.TargetVirtualAddress)
-        .Distinct().Count() == 64
+        .Distinct().Count() == 72
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x27)?.TargetFileOffset == 0x81F683
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x28)?.TargetFileOffset == 0x81F6EB
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x2F)?.TargetFileOffset == 0x81F9BE
@@ -1043,7 +1047,9 @@ Check("Secondary decoder table snapshot records the first 64 of 91 selectors",
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x50)?.TargetFileOffset == 0x82070B
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x57)?.TargetFileOffset == 0x820993
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x58)?.TargetFileOffset == 0x8209FD
-    && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x5F)?.TargetFileOffset == 0x820C81);
+    && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x5F)?.TargetFileOffset == 0x820C81
+    && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x60)?.TargetFileOffset == 0x820CE9
+    && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x67)?.TargetFileOffset == 0x820FA1);
 Check("Secondary selectors 0x58-0x5F retain positional wire layouts",
     TrackRecipeNativeLayout.Selector == 0x58
     && TrackRecipeNativeLayout.AllocationSize == 0x30
@@ -1089,6 +1095,200 @@ Check("Secondary selectors 0x58-0x5F retain positional wire layouts",
     && DebugLagSimulationSampleNativeLayout.WordFieldCount == 13
     && DebugLagSimulationSampleNativeLayout.LastWordFieldOffset == 0x40
     && DebugLagSimulationSampleNativeLayout.WordFieldStride == 2);
+Check("Secondary selectors 0x60-0x67 preserve their positional table and RTTI identities",
+    new (byte Selector, uint CaseFileOffset, uint CaseVirtualAddress, uint TypeId,
+        uint Anchor, uint Vtable, string RttiName)[] {
+        (DebugLagRaiaSampleNativeLayout.Selector,
+            DebugLagRaiaSampleNativeLayout.CaseFileOffset,
+            DebugLagRaiaSampleNativeLayout.CaseVirtualAddress,
+            DebugLagRaiaSampleNativeLayout.ConstructorNativeTypeId,
+            DebugLagRaiaSampleNativeLayout.DescriptorAnchorVirtualAddress,
+            DebugLagRaiaSampleNativeLayout.VtableVirtualAddress,
+            DebugLagRaiaSampleNativeLayout.RttiName),
+        (DebugEncounterVolumesNativeLayout.Selector,
+            DebugEncounterVolumesNativeLayout.CaseFileOffset,
+            DebugEncounterVolumesNativeLayout.CaseVirtualAddress,
+            DebugEncounterVolumesNativeLayout.ConstructorNativeTypeId,
+            DebugEncounterVolumesNativeLayout.DescriptorAnchorVirtualAddress,
+            DebugEncounterVolumesNativeLayout.VtableVirtualAddress,
+            DebugEncounterVolumesNativeLayout.RttiName),
+        (TrailNativeLayout.Selector, TrailNativeLayout.CaseFileOffset,
+            TrailNativeLayout.CaseVirtualAddress, TrailNativeLayout.ConstructorNativeTypeId,
+            TrailNativeLayout.DescriptorAnchorVirtualAddress,
+            TrailNativeLayout.VtableVirtualAddress, TrailNativeLayout.RttiName),
+        (EncounterDebugNotificationNativeLayout.Selector,
+            EncounterDebugNotificationNativeLayout.CaseFileOffset,
+            EncounterDebugNotificationNativeLayout.CaseVirtualAddress,
+            EncounterDebugNotificationNativeLayout.ConstructorNativeTypeId,
+            EncounterDebugNotificationNativeLayout.DescriptorAnchorVirtualAddress,
+            EncounterDebugNotificationNativeLayout.VtableVirtualAddress,
+            EncounterDebugNotificationNativeLayout.RttiName),
+        (EncounterUIScopeInNativeLayout.Selector,
+            EncounterUIScopeInNativeLayout.CaseFileOffset,
+            EncounterUIScopeInNativeLayout.CaseVirtualAddress,
+            EncounterUIScopeInNativeLayout.ConstructorNativeTypeId,
+            EncounterUIScopeInNativeLayout.DescriptorAnchorVirtualAddress,
+            EncounterUIScopeInNativeLayout.VtableVirtualAddress,
+            EncounterUIScopeInNativeLayout.RttiName),
+        (EncounterUIUpdateNativeLayout.Selector,
+            EncounterUIUpdateNativeLayout.CaseFileOffset,
+            EncounterUIUpdateNativeLayout.CaseVirtualAddress,
+            EncounterUIUpdateNativeLayout.ConstructorNativeTypeId,
+            EncounterUIUpdateNativeLayout.DescriptorAnchorVirtualAddress,
+            EncounterUIUpdateNativeLayout.VtableVirtualAddress,
+            EncounterUIUpdateNativeLayout.RttiName),
+        (EncounterUIScopeOutNativeLayout.Selector,
+            EncounterUIScopeOutNativeLayout.CaseFileOffset,
+            EncounterUIScopeOutNativeLayout.CaseVirtualAddress,
+            EncounterUIScopeOutNativeLayout.ConstructorNativeTypeId,
+            EncounterUIScopeOutNativeLayout.DescriptorAnchorVirtualAddress,
+            EncounterUIScopeOutNativeLayout.VtableVirtualAddress,
+            EncounterUIScopeOutNativeLayout.RttiName),
+        (DisplayUiNotificationNativeLayout.Selector,
+            DisplayUiNotificationNativeLayout.CaseFileOffset,
+            DisplayUiNotificationNativeLayout.CaseVirtualAddress,
+            DisplayUiNotificationNativeLayout.ConstructorNativeTypeId,
+            DisplayUiNotificationNativeLayout.DescriptorAnchorVirtualAddress,
+            DisplayUiNotificationNativeLayout.VtableVirtualAddress,
+            DisplayUiNotificationNativeLayout.RttiName)
+    }.Select((item, index) =>
+        item.Selector == 0x60 + index
+        && item.CaseVirtualAddress == item.CaseFileOffset + 0x400C00
+        && item.TypeId == item.Selector
+        && item.Anchor != 0
+        && item.Vtable != 0
+        && !string.IsNullOrWhiteSpace(item.RttiName)
+        && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(item.Selector)
+            ?.TargetFileOffset == item.CaseFileOffset
+        && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(item.Selector)
+            ?.TargetVirtualAddress == item.CaseVirtualAddress)
+        .All(matches => matches)
+    && new (uint Helper, uint Constructor, uint Reader, uint ReaderCall,
+        uint SetupArgument2, int Allocation, uint Failure)[] {
+        (DebugLagRaiaSampleNativeLayout.BaseMetadataConstructorFileOffset,
+            DebugLagRaiaSampleNativeLayout.ConstructorFileOffset,
+            DebugLagRaiaSampleNativeLayout.BodyReaderFileOffset,
+            DebugLagRaiaSampleNativeLayout.BodyReaderCallSiteFileOffset,
+            DebugLagRaiaSampleNativeLayout.CaseSetupArgument2VirtualAddress,
+            DebugLagRaiaSampleNativeLayout.AllocationSize,
+            DebugLagRaiaSampleNativeLayout.AllocationFailureZeroObjectFileOffset),
+        (DebugEncounterVolumesNativeLayout.BaseMetadataConstructorFileOffset,
+            DebugEncounterVolumesNativeLayout.ConstructorFileOffset,
+            DebugEncounterVolumesNativeLayout.BodyReaderFileOffset,
+            DebugEncounterVolumesNativeLayout.BodyReaderCallSiteFileOffset,
+            DebugEncounterVolumesNativeLayout.CaseSetupArgument2VirtualAddress,
+            DebugEncounterVolumesNativeLayout.AllocationSize,
+            DebugEncounterVolumesNativeLayout.AllocationFailureZeroObjectFileOffset),
+        (TrailNativeLayout.BaseMetadataConstructorFileOffset,
+            TrailNativeLayout.ConstructorFileOffset, TrailNativeLayout.BodyReaderFileOffset,
+            TrailNativeLayout.BodyReaderCallSiteFileOffset,
+            TrailNativeLayout.CaseSetupArgument2VirtualAddress,
+            TrailNativeLayout.AllocationSize,
+            TrailNativeLayout.AllocationFailureZeroObjectFileOffset),
+        (EncounterDebugNotificationNativeLayout.BaseMetadataConstructorFileOffset,
+            EncounterDebugNotificationNativeLayout.ConstructorFileOffset,
+            EncounterDebugNotificationNativeLayout.BodyReaderFileOffset,
+            EncounterDebugNotificationNativeLayout.BodyReaderCallSiteFileOffset,
+            EncounterDebugNotificationNativeLayout.CaseSetupArgument2VirtualAddress,
+            EncounterDebugNotificationNativeLayout.AllocationSize,
+            EncounterDebugNotificationNativeLayout.AllocationFailureZeroObjectFileOffset),
+        (EncounterUIScopeInNativeLayout.BaseMetadataConstructorFileOffset,
+            EncounterUIScopeInNativeLayout.ConstructorFileOffset,
+            EncounterUIScopeInNativeLayout.BodyReaderFileOffset,
+            EncounterUIScopeInNativeLayout.BodyReaderCallSiteFileOffset,
+            EncounterUIScopeInNativeLayout.CaseSetupArgument2VirtualAddress,
+            EncounterUIScopeInNativeLayout.AllocationSize,
+            EncounterUIScopeInNativeLayout.AllocationFailureZeroObjectFileOffset),
+        (EncounterUIUpdateNativeLayout.BaseMetadataConstructorFileOffset,
+            EncounterUIUpdateNativeLayout.ConstructorFileOffset,
+            EncounterUIUpdateNativeLayout.BodyReaderFileOffset,
+            EncounterUIUpdateNativeLayout.BodyReaderCallSiteFileOffset,
+            EncounterUIUpdateNativeLayout.CaseSetupArgument2VirtualAddress,
+            EncounterUIUpdateNativeLayout.AllocationSize,
+            EncounterUIUpdateNativeLayout.AllocationFailureZeroObjectFileOffset),
+        (EncounterUIScopeOutNativeLayout.BaseMetadataConstructorFileOffset,
+            EncounterUIScopeOutNativeLayout.ConstructorFileOffset,
+            EncounterUIScopeOutNativeLayout.BodyReaderFileOffset,
+            EncounterUIScopeOutNativeLayout.SharedBodyContinuationFileOffset,
+            EncounterUIScopeOutNativeLayout.CaseSetupArgument2VirtualAddress,
+            EncounterUIScopeOutNativeLayout.AllocationSize,
+            EncounterUIScopeOutNativeLayout.AllocationFailureZeroObjectFileOffset),
+        (DisplayUiNotificationNativeLayout.BaseMetadataConstructorFileOffset,
+            DisplayUiNotificationNativeLayout.ConstructorFileOffset,
+            DisplayUiNotificationNativeLayout.BodyReaderFileOffset,
+            DisplayUiNotificationNativeLayout.BodyReaderCallSiteFileOffset,
+            DisplayUiNotificationNativeLayout.CaseSetupArgument2VirtualAddress,
+            DisplayUiNotificationNativeLayout.AllocationSize,
+            DisplayUiNotificationNativeLayout.AllocationFailureZeroObjectFileOffset)
+    }.All(item => item.Helper != 0 && item.Constructor != 0 && item.Reader != 0
+        && item.ReaderCall != 0 && item.SetupArgument2 != 0
+        && item.Allocation >= MatrixSecondaryMessageHeaderNativeLayout.BodyOffset
+        && item.Failure != 0));
+Check("Secondary selectors 0x60-0x67 retain observed wire and native body layouts",
+    DebugLagRaiaSampleNativeLayout.FirstWordFieldOffset == 0x28
+    && DebugLagRaiaSampleNativeLayout.WordFieldCount == 4
+    && DebugLagRaiaSampleNativeLayout.WordFieldStride == 2
+    && DebugLagRaiaSampleNativeLayout.WordWireWidth == 2
+    && DebugEncounterVolumesNativeLayout.FirstVectorBeginOffset == 0x28
+    && DebugEncounterVolumesNativeLayout.FirstRecordFloatCount == 4
+    && DebugEncounterVolumesNativeLayout.FirstRecordWireWidth == 0x10
+    && DebugEncounterVolumesNativeLayout.FirstRecordNativeStride == 0x10
+    && DebugEncounterVolumesNativeLayout.SecondRecordWireWidth == 0x40
+    && DebugEncounterVolumesNativeLayout.SecondRecordNativeStride == 0x40
+    && DebugEncounterVolumesNativeLayout.ThirdRecordWireWidth == 0x40
+    && DebugEncounterVolumesNativeLayout.FourthRecordFixedWireWidth == 0x40
+    && DebugEncounterVolumesNativeLayout.FourthRecordNativeStride == 0x44
+    && DebugEncounterVolumesNativeLayout.CountWireWidth == 1
+    && DebugEncounterVolumesNativeLayout.ChunkContinuationCount == 0xFF
+    && TrailNativeLayout.DwordFieldOffset == 0x28
+    && TrailNativeLayout.ByteFieldOffset == 0x2C
+    && TrailNativeLayout.RecordVectorBeginOffset == 0x30
+    && TrailNativeLayout.RecordFloatCount == 3
+    && TrailNativeLayout.RecordWireWidth == 0x0C
+    && TrailNativeLayout.RecordNativeStride == 0x0C
+    && EncounterDebugNotificationNativeLayout.QwordFieldOffset == 0x28
+    && EncounterDebugNotificationNativeLayout.FirstTextFieldOffset == 0x30
+    && EncounterDebugNotificationNativeLayout.SecondTextFieldOffset == 0x34
+    && EncounterUIScopeInNativeLayout.LeadingBlobOffset == 0x30
+    && EncounterUIScopeInNativeLayout.LeadingBlobLengthPrefixWireWidth == 2
+    && EncounterUIScopeInNativeLayout.WordFieldOffset == 0x40
+    && EncounterUIScopeInNativeLayout.TreeRootPointerOffset == 0x44
+    && EncounterUIScopeInNativeLayout.TreeCountOffset == 0x48
+    && EncounterUIScopeInNativeLayout.TrailingBlobOffset == 0x4C
+    && EncounterUIScopeInNativeLayout.TaggedEntryNativeStride == 0x18
+    && EncounterUIScopeInNativeLayout.TaggedEntryTagOffset == 0
+    && EncounterUIScopeInNativeLayout.TagDwordAtEight == 0
+    && EncounterUIScopeInNativeLayout.TaggedEntryDwordAtEightOffset == 8
+    && EncounterUIScopeInNativeLayout.TaggedEntryTagZeroClearedDwordOffset == 0x0C
+    && EncounterUIScopeInNativeLayout.TagDwordAtSixteen == 1
+    && EncounterUIScopeInNativeLayout.TagQwordAtEightA == 2
+    && EncounterUIScopeInNativeLayout.TagQwordAtEightB == 3
+    && EncounterUIScopeInNativeLayout.TagByteAtTwenty == 4
+    && EncounterUIScopeInNativeLayout.UnsupportedTag == 5
+    && EncounterUIScopeInNativeLayout.TagWordAtTwenty == 6
+    && EncounterUIScopeInNativeLayout.TagFlagAndConditionalPayload == 7
+    && EncounterUIScopeInNativeLayout.TagSevenDwordPayloadOffset == 0x10
+    && EncounterUIScopeInNativeLayout.TagSevenQwordPayloadOffset == 8
+    && EncounterUIScopeInNativeLayout.ConditionalDwordFlagMask == 2
+    && EncounterUIScopeInNativeLayout.TagSetWordOne == 8
+    && EncounterUIScopeInNativeLayout.SpecialZeroTag == 0xFE
+    && EncounterUIScopeInNativeLayout.SpecialNoPayloadTag == 0xFF
+    && EncounterUIScopeInNativeLayout.SpecialNoPayloadTagHandlerFileOffset == 0x609912
+    && EncounterUIUpdateNativeLayout.QwordFieldOffset == 0x28
+    && EncounterUIUpdateNativeLayout.LeadingBlobOffset == 0x30
+    && EncounterUIUpdateNativeLayout.TrailingBlobOffset == 0x40
+    && EncounterUIScopeOutNativeLayout.HasBodyReader
+    && EncounterUIScopeOutNativeLayout.SharedBodyContinuationFileOffset == 0x81F72E
+    && DisplayUiNotificationNativeLayout.FirstDwordFieldOffset == 0x28
+    && DisplayUiNotificationNativeLayout.SecondDwordFieldOffset == 0x2C
+    && DisplayUiNotificationNativeLayout.RecordVectorBeginOffset == 0x30
+    && DisplayUiNotificationNativeLayout.RecordNativeStride == 0x10
+    && DisplayUiNotificationNativeLayout.RecordTextOffset == 4
+    && DisplayUiNotificationNativeLayout.RecordDwordOffset == 8
+    && DisplayUiNotificationNativeLayout.RecordFloatOffset == 0x0C
+    && DisplayUiNotificationNativeLayout.RecordTextTerminatorWireWidth == 1
+    && DisplayUiNotificationNativeLayout.TrailingByteFieldOffset == 0x8C
+    && DisplayUiNotificationNativeLayout.ChunkContinuationCount == 0xFF);
 Check("Secondary decoder RTTI and native body layouts retain observed offsets and widths",
     MatrixSecondaryMessageHeaderNativeLayout.BaseMetadataFlagOffset == 0x08
     && MatrixSecondaryMessageHeaderNativeLayout.DescriptorAnchorPointerOffset == 0x0C
