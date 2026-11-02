@@ -3260,6 +3260,26 @@ failure branches to `0x81D3F0`, zeroes ESI, and reaches the same reader setup;
 the abnormal-path consequence is unresolved. The RTTI label does not prove
 message semantics, and all field meanings remain unknown.
 
+#### Selector 0x6C post-parse receiver
+
+The outer handler switch maps selector `0x6C` through VA `0xC1D434` / raw
+`0x81C834`, then calls slot `+0x134` at raw `0x81C853`. The protocol-handler
+vtable entry at raw `0x1870BF4` contains VA `0xECEBA0`, mapped to receiver raw
+`0xACDFA0`. This wrapper passes global `0x1DFFFFC`, the DWORD at message
+`+0x28`, constant `12`, zero, and the address of message `+0x2C` to helper
+`0x466790`.
+
+The helper looks up an object using the DWORD through `0x421640`; depending on
+the returned object's fields and a pair of DWORDs beginning at message
+`+0x2C`, it either updates or searches manager-owned contexts. Several paths
+allocate a `0xB0`-byte context and call update routine `0x465A10`; other paths
+log or return without that update. The object's role, message fields, and
+context semantics are unresolved.
+
+The parser requests `0x40` bytes. The receiver's `+0x28` DWORD and the
+helper's access to the pair at `+0x2C/+0x30` remain within that extent; no
+allocation-boundary mismatch is apparent in this path.
+
 ### Selector 0x6D: `WarnLockTargeted`
 
 Entry26 maps selector `0x6D` to VA `0xC1E017` / raw case `0x81D417`. It

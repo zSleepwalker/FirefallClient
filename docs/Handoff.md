@@ -162,10 +162,17 @@ a distance callback, forwards the QWORD through `0x369080`, and registers a
 `60000` ms follow-up timer. Parser byte `+0x38` is also a nested-record gate;
 the overlap between those views remains unresolved.
 
-Next, trace route-0 nested `Character::Killed` selector `0x6C`'s receiver at
-slot `+0x134`, verifying dispatch and target mapping before interpreting the
-method. Keep this nested selector table distinct from route indices 2-6 and
-the secondary decoder table.
+The route-0 nested `Character::Killed` selector `0x6C` receiver is traced at
+slot `+0x134` (VA `0xECEBA0` / raw `0xACDFA0`). It forwards the DWORD at
+message `+0x28` and a pointer to `+0x2C` into helper `0x466790`, which looks up
+an object and can allocate/update `0xB0`-byte contexts through `0x465A10`.
+Field and context meanings remain unknown; its observed accesses are inside
+the parser's `0x40`-byte allocation.
+
+Next, trace route-0 nested `Character::WarnLockTargeted` selector `0x6D`'s
+receiver at slot `+0x138`, verifying dispatch and target mapping before
+interpreting the method. Keep this nested selector table distinct from route
+indices 2-6 and the secondary decoder table.
 
 All secondary selectors `0x20..0x7A` are now reconstructed and checked against
 `FirefallClient.exe.original`. The final entries `0x78..0x7A` resolve to
@@ -175,7 +182,7 @@ Character selectors `OpenMovieDialog`, `PrivateDialog`, and `PublicDialog`.
 Do not repeat the earlier decoder or keyed-receiver factory batches.
 The decoder batches through `0x7A` and route-2 through route-6 consumer traces
 were previously committed; recent updates trace route0 nested selectors `0x53`
-through `0x6B` consumers.
+through `0x6C` consumers.
 Use GPT-6 Luna with explicit High reasoning for implementation and review.
 Verify field-address setup, primitive widths, count-loop boundaries and
 helper calls against the original binary before committing and pushing.

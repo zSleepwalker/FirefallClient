@@ -31,3 +31,27 @@ public static class CharacterKilledNativeLayout
     public const int ThirdByteFieldOffset = 0x3A;
     public const int NominalInputByteCount = 13;
 }
+
+public static class CharacterKilledConsumerNativeLayout
+{
+    public const int MessageDiscriminator = CharacterKilledNativeLayout.InnerSelector;
+    public const uint ProtocolHandlerDispatchTableVirtualAddress = 0xC1D6DC;
+    public const int ProtocolHandlerDispatchTableSelectorBias = 0x20;
+    public const int ProtocolHandlerVtableSlotOffset = 0x134;
+    public const uint ProtocolHandlerVtableTargetVirtualAddress = 0xECEBA0;
+    public const uint ProtocolHandlerVtableTargetFileOffset = 0xACDFA0;
+    public const uint ConsumerFunctionFileOffset = 0xACDFA0;
+    public const uint ConsumerSwitchTargetVirtualAddress = 0xC1D434;
+    public const uint ConsumerSwitchTargetFileOffset = 0x81C834;
+    public const uint ConsumerVtableCallFileOffset = 0x81C853;
+
+    public const uint ManagerGlobalAddress = 0x1DFFFFC;
+    public const int MessageValueFieldOffset = 0x28;
+    public const int MessageAuxiliaryFieldOffset = 0x2C;
+    public const int MessageAuxiliarySecondDwordOffset = 0x30;
+    public const int AllocationSize = CharacterKilledNativeLayout.AllocationSize;
+    public const uint DispatchHelperFileOffset = 0x466790;
+    public const uint KeyedObjectLookupFileOffset = 0x421640;
+    public const uint ContextUpdateRoutineFileOffset = 0x465A10;
+    public const int ConditionalContextAllocationSize = 0xB0;
+}

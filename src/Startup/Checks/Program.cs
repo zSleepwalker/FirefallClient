@@ -3607,6 +3607,24 @@ Check("DealtHit selector 0x6B records its position and follow-up receiver",
     && CharacterDealtHitConsumerNativeLayout.FollowupDurationMillisecondsMultiplier == 1000
     && CharacterDealtHitConsumerNativeLayout.FollowupTimerRegistrationFileOffset == 0x100C5D0
     && CharacterDealtHitConsumerNativeLayout.SharedDispatchHelperFileOffset == 0x368EA0);
+Check("Killed selector 0x6C records its manager/context receiver",
+    CharacterKilledConsumerNativeLayout.MessageDiscriminator
+        == CharacterKilledNativeLayout.InnerSelector
+    && CharacterKilledConsumerNativeLayout.ProtocolHandlerVtableSlotOffset == 0x134
+    && CharacterKilledConsumerNativeLayout.ProtocolHandlerVtableTargetVirtualAddress == 0xECEBA0
+    && CharacterKilledConsumerNativeLayout.ProtocolHandlerVtableTargetFileOffset == 0xACDFA0
+    && CharacterKilledConsumerNativeLayout.ConsumerSwitchTargetVirtualAddress == 0xC1D434
+    && CharacterKilledConsumerNativeLayout.ConsumerSwitchTargetFileOffset == 0x81C834
+    && CharacterKilledConsumerNativeLayout.ConsumerVtableCallFileOffset == 0x81C853
+    && CharacterKilledConsumerNativeLayout.ManagerGlobalAddress == 0x1DFFFFC
+    && CharacterKilledConsumerNativeLayout.MessageValueFieldOffset == 0x28
+    && CharacterKilledConsumerNativeLayout.MessageAuxiliaryFieldOffset == 0x2C
+    && CharacterKilledConsumerNativeLayout.MessageAuxiliarySecondDwordOffset == 0x30
+    && CharacterKilledConsumerNativeLayout.AllocationSize == 0x40
+    && CharacterKilledConsumerNativeLayout.DispatchHelperFileOffset == 0x466790
+    && CharacterKilledConsumerNativeLayout.KeyedObjectLookupFileOffset == 0x421640
+    && CharacterKilledConsumerNativeLayout.ContextUpdateRoutineFileOffset == 0x465A10
+    && CharacterKilledConsumerNativeLayout.ConditionalContextAllocationSize == 0xB0);
 Check("JumpActioned selector 0x65 records its shared WORD reader continuation",
     CharacterJumpActionedNativeLayout.InnerSelector == 0x65
     && CharacterJumpActionedNativeLayout.CaseFileOffset == 0x81D1F3
@@ -5385,6 +5403,7 @@ Check("ReplayReader message dispatch receiver and discriminator vtable cases rem
         new MatrixMessageDispatchVtableCaseSnapshot(0x69, 0xC1D3B3, 0x81C7B3, 0x81C7D2, 0x128),
         new MatrixMessageDispatchVtableCaseSnapshot(0x6A, 0xC1D3DE, 0x81C7DE, 0x81C7FD, 0x12C),
         new MatrixMessageDispatchVtableCaseSnapshot(0x6B, 0xC1D409, 0x81C809, 0x81C828, 0x130),
+        new MatrixMessageDispatchVtableCaseSnapshot(0x6C, 0xC1D434, 0x81C834, 0x81C853, 0x134),
         new MatrixMessageDispatchVtableCaseSnapshot(0x71, 0xC1D50B, 0x81C90B, 0x81C92A, 0x148),
         new MatrixMessageDispatchVtableCaseSnapshot(0x74, 0xC1D58C, 0x81C98C, 0x81C9AB, 0x154),
         new MatrixMessageDispatchVtableCaseSnapshot(0x75, 0xC1D5B7, 0x81C9B7, 0x81C9D6, 0x158),
