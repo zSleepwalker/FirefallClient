@@ -6359,6 +6359,8 @@ internal static class StartupBinaryEvidence
                 "8D5728E8")
             && RelativeBranchTargets(DeployableTookHitNativeLayout.BodyReaderFileOffset + 0x0E,
                 0xE8, DeployableTookHitNativeLayout.ConditionalRecordReaderFileOffset)
+            && RelativeBranchTargets(DeployableTookHitNativeLayout.ConditionalRecordReaderFileOffset + 0xAF,
+                0xE8, DeployableTookHitNativeLayout.ConditionalRecordQwordReaderFileOffset)
             && Matches(DeployableTookHitNativeLayout.BodyReaderFileOffset + 0x13,
                 "8D57508BCB")
             && RelativeBranchTargets(DeployableTookHitNativeLayout.BodyReaderFileOffset + 0x18,
@@ -6377,6 +6379,19 @@ internal static class StartupBinaryEvidence
                 0xE8, DeployableTookHitNativeLayout.ByteReaderFileOffset)
             && VtableRttiName(DeployableTookHitNativeLayout.VtableVirtualAddress, 80)
                 == DeployableTookHitNativeLayout.RttiName);
+        check("Binary route-index-4 conditional QWORD overlaps the selector-0x53 filter field",
+            Matches(
+                DeployableTookHitNativeLayout.ConditionalRecordMergeHelperFileOffset + 0x0E,
+                "8B0689028B4604894204")
+            && Matches(
+                DeployableTookHitNativeLayout.ConditionalRecordReaderFileOffset + 0xF3,
+                "803F00740D807F10007404C6471000C60700")
+            && DeployableTookHitNativeLayout.BaseConstructorArgument == 0x53
+            && DeployableTookHitNativeLayout.ConditionalRecordQwordHighDwordFieldOffset
+                == MatrixMessageNamespaceRoutingNativeLayout.Selector53HandlerFilterMessageFieldOffset
+            && Matches(
+                MatrixMessageNamespaceRoutingNativeLayout.Selector53ProtocolHandlerMethodFileOffset + 0x0D,
+                "8B4734"));
         check("Binary route-index-5 subcase constructs Turret WeaponProjectileFired",
             ReadUInt32(VirtualAddressToFileOffset(
                 MatrixSecondaryCommandDispatcherNativeLayout.PrimaryJumpTableVirtualAddress) + 5 * 4)

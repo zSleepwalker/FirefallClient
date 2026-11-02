@@ -2107,6 +2107,31 @@ reads bytes at `+0x50` and `+0x51`, a WORD at `+0x58`, then a byte at `+0x5A`.
 The conditional record's internal field meanings and all outer field meanings
 remain unknown.
 
+#### Conditional post-parse consumer for route 4
+
+The constructor stores discriminator `0x53` at message+`0x10`, so this
+message shares route 2 and route 3's callback selector. Subject to the same
+callback gates described above, `0x81BB90` sends it through receiver slot
+`+0xD0` to `0xACA580`, without checking message RTTI or vptr. That method
+reads message+`0x34` as a candidate C-string pointer. For this message,
+`+0x34` is also the high DWORD of the QWORD read into the conditional record
+at `+0x30/+0x34` when the record's presence byte at `+0x28` is nonzero. The
+record helper also conditionally stores a nested QWORD at `+0x40/+0x44`,
+then a DWORD at `+0x48` and byte at `+0x4C`. If the outer record is absent,
+the parser clears its presence byte (and clears the nested-presence byte only
+when already set); it does not clear the QWORD at `+0x30/+0x34`. The
+constructor likewise initializes `+0x28` and `+0x50`, not the QWORD.
+
+The same handler uses message `+0x28/+0x2C` as source-range endpoints for
+either the `"missions"` vector branch or the map-update branch. Here `+0x28`
+is the conditional record's presence byte, and the parser does not initialize
+`+0x2C`; neither is identified as a range by the route-4 body reader. These
+are static field overlaps between different parser/consumer views, not proof
+that route 4 reaches the handler or that the candidate pointer/range is valid.
+Unlike route 3, the `+0x34` read is within this class's `0x60`-byte allocation,
+but its value is conditionally populated as part of a raw QWORD. Keep the
+field's semantic interpretation unresolved.
+
 Value `0x54` selects case `0x81F24D`, `Deployable::AbilityProjectileFired`.
 It allocates `0x68` bytes, stores local DWORD `0xDA`, calls constructor
 `0xB27F40`, then reader `0x839F50`. The constructor passes `0x54` to base

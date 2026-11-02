@@ -2527,10 +2527,26 @@ Check("Deployable TookHit route-index-4 subcase layout is recorded",
     && DeployableTookHitNativeLayout.VtableVirtualAddress == 0x1C727A8
     && DeployableTookHitNativeLayout.RttiName == ".?AVTookHit@Deployable@firefall@@"
     && DeployableTookHitNativeLayout.ConditionalRecordOffset == 0x28
+    && DeployableTookHitNativeLayout.ConditionalRecordQwordReaderFileOffset == 0x356F80
+    && DeployableTookHitNativeLayout.ConditionalRecordMergeHelperFileOffset == 0x5F0C30
+    && DeployableTookHitNativeLayout.ConditionalRecordQwordFieldOffset == 0x30
+    && DeployableTookHitNativeLayout.ConditionalRecordQwordHighDwordFieldOffset == 0x34
+    && DeployableTookHitNativeLayout.ConditionalRecordNestedQwordPresenceFieldOffset == 0x38
+    && DeployableTookHitNativeLayout.ConditionalRecordNestedQwordFieldOffset == 0x40
+    && DeployableTookHitNativeLayout.ConditionalRecordDwordFieldOffset == 0x48
+    && DeployableTookHitNativeLayout.ConditionalRecordByteFieldOffset == 0x4C
     && DeployableTookHitNativeLayout.FirstByteFieldOffset == 0x50
     && DeployableTookHitNativeLayout.SecondByteFieldOffset == 0x51
     && DeployableTookHitNativeLayout.WordFieldOffset == 0x58
     && DeployableTookHitNativeLayout.FinalByteFieldOffset == 0x5A);
+Check("Deployable TookHit selector-0x53 consumer's filter field aliases a conditional QWORD half",
+    DeployableTookHitNativeLayout.BaseConstructorArgument == 0x53
+    && DeployableTookHitNativeLayout.ConditionalRecordQwordHighDwordFieldOffset
+        == MatrixMessageNamespaceRoutingNativeLayout.Selector53HandlerFilterMessageFieldOffset
+    && DeployableTookHitNativeLayout.ConditionalRecordQwordHighDwordFieldOffset
+        < DeployableTookHitNativeLayout.AllocationSize
+    && DeployableTookHitNativeLayout.ConditionalRecordOffset
+        < DeployableTookHitNativeLayout.ConditionalRecordQwordFieldOffset);
 Check("Turret WeaponProjectileFired route-index-5 subcase layout is recorded",
     TurretWeaponProjectileFiredNativeLayout.DispatcherFileOffset == 0x81F2EF
     && TurretWeaponProjectileFiredNativeLayout.DispatcherValue == 0x53

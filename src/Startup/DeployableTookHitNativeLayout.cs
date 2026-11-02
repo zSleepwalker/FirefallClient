@@ -18,12 +18,20 @@ public static class DeployableTookHitNativeLayout
     public const uint BodyReaderCallSiteFileOffset = 0x81F2D5;
     public const uint BodyReaderFileOffset = 0x83A120;
     public const uint ConditionalRecordReaderFileOffset = 0x5F0CF0;
+    public const uint ConditionalRecordQwordReaderFileOffset = 0x356F80;
+    public const uint ConditionalRecordMergeHelperFileOffset = 0x5F0C30;
     public const uint ByteReaderFileOffset = 0x337180;
     public const uint WordReaderFileOffset = 0x336AC0;
     public const uint VtableVirtualAddress = 0x1C727A8;
     public const string RttiName = ".?AVTookHit@Deployable@firefall@@";
 
     public const int ConditionalRecordOffset = 0x28;
+    public const int ConditionalRecordQwordFieldOffset = 0x30;
+    public const int ConditionalRecordQwordHighDwordFieldOffset = 0x34;
+    public const int ConditionalRecordNestedQwordPresenceFieldOffset = 0x38;
+    public const int ConditionalRecordNestedQwordFieldOffset = 0x40;
+    public const int ConditionalRecordDwordFieldOffset = 0x48;
+    public const int ConditionalRecordByteFieldOffset = 0x4C;
     public const int FirstByteFieldOffset = 0x50;
     public const int SecondByteFieldOffset = 0x51;
     public const int WordFieldOffset = 0x58;

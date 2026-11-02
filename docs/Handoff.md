@@ -1,37 +1,31 @@
 # Reverse-engineering handoff
 
-## Resume here (route-3 parsed-object consumer traced)
+## Resume here (route-4 parsed-object consumer traced)
 
-The bounded primary-route continuation traced route index 3's
-`Vehicle::AbilityActivated` from parser construction/body reading through its
-conditional receiver path. Parser case raw `0x81EF83` requests `0x30` bytes and
-reads DWORDs at `+0x28/+0x2C`. Its base constructor stores discriminator
-`0x53`, which aliases route 2's receiver selector. Under the callback gates
-(message `+0x18` low byte zero, non-sentinel `+0x10`, non-null context `+8`),
-the shared dispatcher calls receiver slot `+0xD0` at raw `0xACA580` without
-checking message RTTI or vptr. That method reads `+0x34` as a candidate string
-and uses `+0x28/+0x2C` as a range for either a vector or map update. Since
-`+0x34` exceeds this message's recorded `0x30`-byte extent, preserve it as a
-conditional static extent mismatch; do not infer runtime reachability or
-pointer validity. Route-2 consumer details remain below in the historical
-handoff.
+The bounded primary-route continuation traced route index 4's
+`Deployable::TookHit` through its conditional consumer. Parser case raw
+`0x81F29E` allocates `0x60` bytes and reads a conditional record at `+0x28`;
+when present, the record includes a QWORD at `+0x30/+0x34`, nested optional
+QWORD at `+0x40/+0x44`, DWORD `+0x48`, and byte `+0x4C`. Its base constructor
+stores discriminator `0x53`, so under the callback gates this also reaches
+the shared receiver slot `+0xD0` / raw method `0xACA580`. That method treats
+`+0x34` as a candidate C-string pointer and `+0x28/+0x2C` as range endpoints.
+These overlap a QWORD half, presence byte, and a field not initialized by the
+route-4 constructor/reader. Preserve as unresolved interpretation and
+conditional path evidence; do not infer runtime reachability or pointer/range
+validity.
+
+The prior route-3 trace (`Vehicle::AbilityActivated`, raw `0x81EF83`) found
+the same shared consumer's `+0x34` read beyond its requested `0x30`-byte
+extent. Route-2 consumer details remain below in the historical handoff.
 
 Boundary: route 2 writes `+0x28`, `+0x30`, and `+0x38`, but not `+0x2C`;
 the handler consumes `+0x2C` as a range endpoint and `+0x34` as a candidate
 C-string pointer. Preserve these as unresolved fields. Read-only IDA checks
 and original-file evidence agreed on the relevant parser, callback, selector,
 and receiver instructions; IDA was not modified and the sample was not run.
-Next, trace one route-4 consumer (start with `Deployable::TookHit`, parser
-case raw `0x81F29E`); do not broaden this into an all-17 consumer sweep.
-
-Boundary: route 2 writes `+0x28`, `+0x30`, and `+0x38`, but not `+0x2C`;
-the handler consumes `+0x2C` as an endpoint and `+0x34` as a candidate
-C-string pointer. Preserve these as unresolved fields. Read-only IDA checks
-and original-file evidence agreed on the relevant parser, callback, selector,
-and receiver instructions; IDA was not modified and the sample was not run.
-Next, trace one route-3 consumer (start with
-`Vehicle::AbilityActivated`, parser case raw `0x81EF83`); do not broaden this
-into an all-17 consumer sweep.
+Next, trace one route-5 consumer (start with `Turret::WeaponProjectileFired`,
+parser case raw `0x81F2F9`); do not broaden this into an all-17 consumer sweep.
 
 All secondary selectors `0x20..0x7A` are now reconstructed and checked against
 `FirefallClient.exe.original`. The final entries `0x78..0x7A` resolve to
@@ -39,8 +33,8 @@ All secondary selectors `0x20..0x7A` are now reconstructed and checked against
 `ConductorGlobalAnnouncement`; do not confuse them with route0's nested
 Character selectors `OpenMovieDialog`, `PrivateDialog`, and `PublicDialog`.
 Do not repeat the earlier decoder or keyed-receiver factory batches.
-The decoder batches through `0x7A` and route-2 consumer trace were previously
-committed; this update records the route-3 consumer trace.
+The decoder batches through `0x7A` and route-2/route-3 consumer traces were
+previously committed; this update records the route-4 consumer trace.
 Use GPT-6 Luna with explicit High reasoning for implementation and review.
 Verify field-address setup, primitive widths, count-loop boundaries and
 helper calls against the original binary before committing and pushing.
