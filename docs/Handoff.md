@@ -154,8 +154,16 @@ method at `+0x70`, then forwards the QWORD at `+0x28` to a signed-value helper
 with constant `12`. The lookup key lies entirely beyond the parser's `0x30`
 byte allocation; meanings and runtime impact remain unknown.
 
-Next, trace route-0 nested `Character::DealtHit` selector `0x6B`'s receiver at
-slot `+0x130`, verifying dispatch and target mapping before interpreting the
+The route-0 nested `Character::DealtHit` selector `0x6B` receiver is traced at
+slot `+0x130` (VA `0xECEB70` / raw `0xACDF70`). It passes a three-float view
+starting at message `+0x30`, QWORD `+0x28`, and duration `0x3C` to shared helper
+`0x368EA0`. The helper updates position-related state, conditionally computes
+a distance callback, forwards the QWORD through `0x369080`, and registers a
+`60000` ms follow-up timer. Parser byte `+0x38` is also a nested-record gate;
+the overlap between those views remains unresolved.
+
+Next, trace route-0 nested `Character::Killed` selector `0x6C`'s receiver at
+slot `+0x134`, verifying dispatch and target mapping before interpreting the
 method. Keep this nested selector table distinct from route indices 2-6 and
 the secondary decoder table.
 
@@ -167,7 +175,7 @@ Character selectors `OpenMovieDialog`, `PrivateDialog`, and `PublicDialog`.
 Do not repeat the earlier decoder or keyed-receiver factory batches.
 The decoder batches through `0x7A` and route-2 through route-6 consumer traces
 were previously committed; recent updates trace route0 nested selectors `0x53`
-through `0x6A` consumers.
+through `0x6B` consumers.
 Use GPT-6 Luna with explicit High reasoning for implementation and review.
 Verify field-address setup, primitive widths, count-loop boundaries and
 helper calls against the original binary before committing and pushing.

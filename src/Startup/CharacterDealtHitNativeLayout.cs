@@ -36,3 +36,33 @@ public static class CharacterDealtHitNativeLayout
     public const int SecondTrailingByteFieldOffset = 0x51;
     public const int MinimumInputByteCount = 3;
 }
+
+public static class CharacterDealtHitConsumerNativeLayout
+{
+    public const int MessageDiscriminator = CharacterDealtHitNativeLayout.InnerSelector;
+    public const uint ProtocolHandlerDispatchTableVirtualAddress = 0xC1D6DC;
+    public const int ProtocolHandlerDispatchTableSelectorBias = 0x20;
+    public const int ProtocolHandlerVtableSlotOffset = 0x130;
+    public const uint ProtocolHandlerVtableTargetVirtualAddress = 0xECEB70;
+    public const uint ProtocolHandlerVtableTargetFileOffset = 0xACDF70;
+    public const uint ConsumerFunctionFileOffset = 0xACDF70;
+    public const uint ConsumerSwitchTargetVirtualAddress = 0xC1D409;
+    public const uint ConsumerSwitchTargetFileOffset = 0x81C809;
+    public const uint ConsumerVtableCallFileOffset = 0x81C828;
+
+    public const int MessageSignedValueFieldOffset = 0x28;
+    public const int MessagePositionArgumentOffset = 0x30;
+    public const int PositionComponentCount = 3;
+    public const uint PositionDistanceOriginXVirtualAddress = 0x1E62C44;
+    public const uint PositionDistanceOriginYVirtualAddress = 0x1E62C48;
+    public const uint PositionDistanceOriginZVirtualAddress = 0x1E62C4C;
+    public const int PositionUpdateGateByteOffset = 0xE1;
+    public const uint PositionUpdateHelperFileOffset = 0x100F7A0;
+    public const uint PositionDistanceCallbackFileOffset = 0x100AE90;
+    public const uint MessageValueHandlerFileOffset = 0x369080;
+    public const int MessageValueHandlerTypeArgument = 12;
+    public const int FollowupDurationSeconds = 0x3C;
+    public const int FollowupDurationMillisecondsMultiplier = 1000;
+    public const uint FollowupTimerRegistrationFileOffset = 0x100C5D0;
+    public const uint SharedDispatchHelperFileOffset = 0x368EA0;
+}

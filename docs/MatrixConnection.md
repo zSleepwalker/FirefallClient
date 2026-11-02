@@ -3223,6 +3223,28 @@ adds the record fields. Allocation failure branches at `0x81D38D` to
 runtime consequence is unresolved. Field meanings and message semantics
 remain unknown.
 
+#### Selector 0x6B post-parse receiver
+
+The outer handler switch maps selector `0x6B` through VA `0xC1D409` / raw
+`0x81C809`, then calls slot `+0x130` at raw `0x81C828`. The protocol-handler
+vtable entry at raw `0x1870BF0` contains VA `0xECEB70`, mapped to receiver raw
+`0xACDF70`. That wrapper calls `0x368EA0` with the address of message `+0x30`,
+the QWORD at `+0x28`, constant `12`, and duration value `0x3C`.
+
+The shared helper treats the bytes at `+0x30/+0x34/+0x38` as three floats,
+updates position-related state when manager byte `+0xE1` is set, and can
+compute their Euclidean distance from the global vector at VAs
+`0x1E62C44/0x1E62C48/0x1E62C4C` before a conditional callback through
+`0x100AE90`. It also sends the QWORD at `+0x28` through `0x369080` and
+registers a follow-up timer for `0x3C * 1000` milliseconds. The meanings of
+the QWORD, callback, and timer action remain unresolved.
+
+The parser's conditional record uses byte `+0x38` as a nested gate, while the
+receiver's helper reads `+0x38..+0x3B` as its third float. This is an observed
+overlay between parser and consumer views; the relationship between those
+representations is unresolved. All these reads remain within the parser's
+requested `0x58`-byte allocation.
+
 ### Selector 0x6C: `Killed`
 
 Entry25 maps selector `0x6C` to VA `0xC1DFC6` / raw case `0x81D3C6`. It

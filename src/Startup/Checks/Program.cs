@@ -3583,6 +3583,30 @@ Check("AlmostHit selector 0x6A records its keyed callback and signed-value recei
     && CharacterAlmostHitConsumerNativeLayout.SignedValueHandlerTypeArgument == 12
     && CharacterAlmostHitConsumerNativeLayout.ManagerGlobalAddress == 0x1DFFFE8
     && CharacterAlmostHitConsumerNativeLayout.ManagerAvailabilityFieldOffset == 0x28);
+Check("DealtHit selector 0x6B records its position and follow-up receiver",
+    CharacterDealtHitConsumerNativeLayout.MessageDiscriminator
+        == CharacterDealtHitNativeLayout.InnerSelector
+    && CharacterDealtHitConsumerNativeLayout.ProtocolHandlerVtableSlotOffset == 0x130
+    && CharacterDealtHitConsumerNativeLayout.ProtocolHandlerVtableTargetVirtualAddress == 0xECEB70
+    && CharacterDealtHitConsumerNativeLayout.ProtocolHandlerVtableTargetFileOffset == 0xACDF70
+    && CharacterDealtHitConsumerNativeLayout.ConsumerSwitchTargetVirtualAddress == 0xC1D409
+    && CharacterDealtHitConsumerNativeLayout.ConsumerSwitchTargetFileOffset == 0x81C809
+    && CharacterDealtHitConsumerNativeLayout.ConsumerVtableCallFileOffset == 0x81C828
+    && CharacterDealtHitConsumerNativeLayout.MessageSignedValueFieldOffset == 0x28
+    && CharacterDealtHitConsumerNativeLayout.MessagePositionArgumentOffset == 0x30
+    && CharacterDealtHitConsumerNativeLayout.PositionComponentCount == 3
+    && CharacterDealtHitConsumerNativeLayout.PositionDistanceOriginXVirtualAddress == 0x1E62C44
+    && CharacterDealtHitConsumerNativeLayout.PositionDistanceOriginYVirtualAddress == 0x1E62C48
+    && CharacterDealtHitConsumerNativeLayout.PositionDistanceOriginZVirtualAddress == 0x1E62C4C
+    && CharacterDealtHitConsumerNativeLayout.PositionUpdateGateByteOffset == 0xE1
+    && CharacterDealtHitConsumerNativeLayout.PositionUpdateHelperFileOffset == 0x100F7A0
+    && CharacterDealtHitConsumerNativeLayout.PositionDistanceCallbackFileOffset == 0x100AE90
+    && CharacterDealtHitConsumerNativeLayout.MessageValueHandlerFileOffset == 0x369080
+    && CharacterDealtHitConsumerNativeLayout.MessageValueHandlerTypeArgument == 12
+    && CharacterDealtHitConsumerNativeLayout.FollowupDurationSeconds == 0x3C
+    && CharacterDealtHitConsumerNativeLayout.FollowupDurationMillisecondsMultiplier == 1000
+    && CharacterDealtHitConsumerNativeLayout.FollowupTimerRegistrationFileOffset == 0x100C5D0
+    && CharacterDealtHitConsumerNativeLayout.SharedDispatchHelperFileOffset == 0x368EA0);
 Check("JumpActioned selector 0x65 records its shared WORD reader continuation",
     CharacterJumpActionedNativeLayout.InnerSelector == 0x65
     && CharacterJumpActionedNativeLayout.CaseFileOffset == 0x81D1F3
@@ -5360,6 +5384,7 @@ Check("ReplayReader message dispatch receiver and discriminator vtable cases rem
         new MatrixMessageDispatchVtableCaseSnapshot(0x68, 0xC1D388, 0x81C788, 0x81C7A7, 0x124),
         new MatrixMessageDispatchVtableCaseSnapshot(0x69, 0xC1D3B3, 0x81C7B3, 0x81C7D2, 0x128),
         new MatrixMessageDispatchVtableCaseSnapshot(0x6A, 0xC1D3DE, 0x81C7DE, 0x81C7FD, 0x12C),
+        new MatrixMessageDispatchVtableCaseSnapshot(0x6B, 0xC1D409, 0x81C809, 0x81C828, 0x130),
         new MatrixMessageDispatchVtableCaseSnapshot(0x71, 0xC1D50B, 0x81C90B, 0x81C92A, 0x148),
         new MatrixMessageDispatchVtableCaseSnapshot(0x74, 0xC1D58C, 0x81C98C, 0x81C9AB, 0x154),
         new MatrixMessageDispatchVtableCaseSnapshot(0x75, 0xC1D5B7, 0x81C9B7, 0x81C9D6, 0x158),
