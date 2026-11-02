@@ -4829,6 +4829,47 @@ internal static class StartupBinaryEvidence
             && RelativeBranchTargets(0x5F1EE9, 0xE8, 0x336AC0)
             && Matches(0x5F1EEE, "8D562C")
             && RelativeBranchTargets(0x5F1EF3, 0xE8, 0x337180));
+        var stumbleDispatchCase = MatrixMessageParserFlowNativeLayout.MessageDispatchVtableCases
+            .Single(entry => entry.MessageDiscriminator
+                == CharacterStumbleConsumerNativeLayout.MessageDiscriminator);
+        check("Binary selector 0x62 dispatches through slot +0x10C to its receiver",
+            ReadUInt32(VirtualAddressToFileOffset(
+                CharacterStumbleConsumerNativeLayout.ProtocolHandlerDispatchTableVirtualAddress)
+                + (CharacterStumbleConsumerNativeLayout.MessageDiscriminator
+                    - CharacterStumbleConsumerNativeLayout.ProtocolHandlerDispatchTableSelectorBias) * 4)
+                == stumbleDispatchCase.SwitchTargetVirtualAddress
+            && stumbleDispatchCase.SwitchTargetVirtualAddress == 0xC1D286
+            && stumbleDispatchCase.SwitchTargetFileOffset == 0x81C686
+            && stumbleDispatchCase.VtableCallFileOffset == 0x81C6A5
+            && stumbleDispatchCase.VtableSlotOffset
+                == CharacterStumbleConsumerNativeLayout.ProtocolHandlerVtableSlotOffset
+            && Matches(stumbleDispatchCase.VtableCallFileOffset, "FF900C010000")
+            && ReadUInt32(VirtualAddressToFileOffset(
+                MatrixMessageNamespaceRoutingNativeLayout.ProtocolHandlerVtableVirtualAddress)
+                + CharacterStumbleConsumerNativeLayout.ProtocolHandlerVtableSlotOffset)
+                == CharacterStumbleConsumerNativeLayout.ProtocolHandlerVtableTargetVirtualAddress
+            && VirtualAddressToFileOffset(
+                CharacterStumbleConsumerNativeLayout.ProtocolHandlerVtableTargetVirtualAddress)
+                == CharacterStumbleConsumerNativeLayout.ProtocolHandlerVtableTargetFileOffset
+            && Matches(CharacterStumbleConsumerNativeLayout.ConsumerFunctionFileOffset,
+                "558BEC83E4F86AFF684895A301"));
+        check("Binary selector 0x62 receiver reads key, byte status, and an external 12-byte-record vector",
+            Matches(0xACB67C, "A15483E601")
+            && Matches(0xACB684, "8A404084C0")
+            && Matches(0xACB68F, "8B4728")
+            && Matches(0xACB6C6, "8B4F34")
+            && Matches(0xACB6C9, "8D5F30")
+            && Matches(0xACB6CC, "2B0B")
+            && Matches(0xACB6CE, "B8ABAAAA2A")
+            && RelativeBranchTargets(0xACB6E5, 0xE8,
+                CharacterStumbleConsumerNativeLayout.VectorCopyHelperFileOffset)
+            && Matches(0xACB75C, "0FB64F2C")
+            && Matches(0xACB760, "BA0200000083E90074084975078D5101EB0233D2")
+            && Matches(0xACB775, "FF77288D47308BCE50")
+            && RelativeBranchTargets(0xACB751, 0xE8,
+                CharacterStumbleConsumerNativeLayout.SubsystemAccessorFileOffset)
+            && RelativeBranchTargets(0xACB77E, 0xE8,
+                CharacterStumbleConsumerNativeLayout.SubsystemMessageHandlerFileOffset));
         check("Binary inner selector 0x63 routes QuickChat to a shared DWORD reader",
             ReadUInt32(VirtualAddressToFileOffset(
                 CharacterQuickChatNativeLayout.InnerSelectorTableVirtualAddress) + 64) == 0xC1DD71
@@ -4848,6 +4889,45 @@ internal static class StartupBinaryEvidence
             && Matches(CharacterQuickChatNativeLayout.BodyReaderContinuationFileOffset, "8D4628")
             && RelativeBranchTargets(0x8206F1, 0xE8,
                 CharacterQuickChatNativeLayout.DwordReaderFileOffset));
+        var quickChatDispatchCase = MatrixMessageParserFlowNativeLayout.MessageDispatchVtableCases
+            .Single(entry => entry.MessageDiscriminator
+                == CharacterQuickChatConsumerNativeLayout.MessageDiscriminator);
+        check("Binary selector 0x63 dispatches through slot +0x110 to its notification receiver",
+            ReadUInt32(VirtualAddressToFileOffset(
+                CharacterQuickChatConsumerNativeLayout.ProtocolHandlerDispatchTableVirtualAddress)
+                + (CharacterQuickChatConsumerNativeLayout.MessageDiscriminator
+                    - CharacterQuickChatConsumerNativeLayout.ProtocolHandlerDispatchTableSelectorBias) * 4)
+                == quickChatDispatchCase.SwitchTargetVirtualAddress
+            && quickChatDispatchCase.SwitchTargetVirtualAddress == 0xC1D2B1
+            && quickChatDispatchCase.SwitchTargetFileOffset == 0x81C6B1
+            && quickChatDispatchCase.VtableCallFileOffset == 0x81C6D0
+            && quickChatDispatchCase.VtableSlotOffset
+                == CharacterQuickChatConsumerNativeLayout.ProtocolHandlerVtableSlotOffset
+            && Matches(quickChatDispatchCase.VtableCallFileOffset, "FF9010010000")
+            && ReadUInt32(VirtualAddressToFileOffset(
+                MatrixMessageNamespaceRoutingNativeLayout.ProtocolHandlerVtableVirtualAddress)
+                + CharacterQuickChatConsumerNativeLayout.ProtocolHandlerVtableSlotOffset)
+                == CharacterQuickChatConsumerNativeLayout.ProtocolHandlerVtableTargetVirtualAddress
+            && VirtualAddressToFileOffset(
+                CharacterQuickChatConsumerNativeLayout.ProtocolHandlerVtableTargetVirtualAddress)
+                == CharacterQuickChatConsumerNativeLayout.ProtocolHandlerVtableTargetFileOffset
+            && Matches(CharacterQuickChatConsumerNativeLayout.ConsumerFunctionFileOffset,
+                "558BEC83E4F856578B7D08"));
+        check("Binary selector 0x63 receiver reads text pointers outside the parsed object and posts chat notifications",
+            Matches(0xACCBF2, "8B4734")
+            && Matches(0xACCC29, "8B4730")
+            && Matches(0xACCC5E, "8B4734")
+            && Matches(0xACCCDB, "FF772CFF7728")
+            && RelativeBranchTargets(0xACCC31, 0xE8,
+                CharacterQuickChatConsumerNativeLayout.ChatGetterFileOffset)
+            && RelativeBranchTargets(0xACCCA1, 0xE8,
+                CharacterQuickChatConsumerNativeLayout.ChatGetterFileOffset)
+            && RelativeBranchTargets(0xACCC51, 0xE8,
+                CharacterQuickChatConsumerNativeLayout.NotificationMethodFileOffset)
+            && RelativeBranchTargets(0xACCCBD, 0xE8,
+                CharacterQuickChatConsumerNativeLayout.NotificationMethodFileOffset)
+            && RelativeBranchTargets(0xACCCEB, 0xE8,
+                CharacterQuickChatConsumerNativeLayout.LoggerFileOffset));
         check("Binary inner selector 0x64 constructs ProximityTextChat and routes its body fields",
             ReadUInt32(VirtualAddressToFileOffset(
                 CharacterProximityTextChatNativeLayout.InnerSelectorTableVirtualAddress) + 68) == 0xC1DDA2

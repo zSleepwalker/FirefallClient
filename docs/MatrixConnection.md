@@ -2871,6 +2871,26 @@ then reads a byte into `+0x2C`. The observed nominal body length is five
 bytes. Field meanings remain unknown; the RTTI name does not establish
 stumble-event semantics.
 
+#### Selector 0x62 post-parse consumer
+
+The outer handler switch maps selector `0x62` through VA `0xC1D286` / raw case
+`0x81C686`, then invokes slot `+0x10C` at raw `0x81C6A5`. The vtable entry at
+raw `0x1870BCC` contains VA `0xECC250`, mapped to receiver raw `0xACB650`.
+When global pointer `0x1E68354` refers to state with byte `+0x40` set, the
+receiver combines the two parser WORDs at message `+0x28` into a DWORD key
+and uses it with context map state at `this+0x4C`. It then reads a begin/end
+pointer pair at message `+0x30/+0x34`, computes `(end - begin) / 12`, and
+copies/processes the resulting 12-byte entries when the count is nonzero.
+
+The parser allocates `0x30` bytes and writes only through `+0x2C`; the
+receiver's pointer pair at `+0x30/+0x34` lies eight bytes beyond the declared
+object extent. A second path calls `0x60FB60`; when it returns a nonzero
+context, the receiver passes the key, the address of the same pointer pair,
+and the status byte at `+0x2C` to `0x60FBD0`. That byte is mapped as `0 -> 0`,
+`1 -> 1`, and any other value to `2`. The pointer pair's provenance and
+runtime validity are unresolved; the static extent discrepancy alone does
+not establish runtime impact or the meaning of the event.
+
 ### Selector 0x63: `QuickChat`
 
 Entry16 maps selector `0x63` to VA `0xC1DD71` / raw case `0x81D171`. It
@@ -2886,6 +2906,25 @@ failure branch at `0x81D189` instead enters `0x8206E1`, zeroes ESI, and
 continues into the same field reader, which forms destination address
 `0x28`. The runtime consequence of that abnormal path is unresolved.
 Field meaning remains unknown; RTTI alone does not establish chat semantics.
+
+#### Selector 0x63 post-parse receiver
+
+The outer handler switch maps selector `0x63` through VA `0xC1D2B1` / raw case
+`0x81C6B1`, then invokes slot `+0x110` at raw `0x81C6D0`. The vtable entry at
+raw `0x1870BD0` contains VA `0xECD7E0`, mapped to receiver raw `0xACCBE0`.
+The receiver reads a type-string pointer from message `+0x34` and a text
+pointer from `+0x30`; it compares the type string against two static byte
+sequences. For either match, it obtains the current chat through `0x6F4540`
+and posts a notification through `0x6E3460`, using the text pointer or an
+empty-string fallback. If neither comparison matches, it logs values that
+include the DWORD at `+0x28`. The comparison bytes and field semantics remain
+unresolved.
+
+The parser allocates `0x30` bytes and writes only the DWORD at `+0x28`. The
+receiver's pointer fields at `+0x30` and `+0x34` therefore extend eight bytes
+past the declared allocation (`+0x34..+0x37` is the furthest pointer read).
+This static parser/receiver mismatch does not establish whether the pointers
+are valid or what runtime effect follows.
 
 ### Selector 0x64: `ProximityTextChat`
 

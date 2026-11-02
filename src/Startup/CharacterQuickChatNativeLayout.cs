@@ -23,3 +23,25 @@ public static class CharacterQuickChatNativeLayout
     public const int DwordFieldOffset = 0x28;
     public const int NominalInputByteCount = 4;
 }
+
+public static class CharacterQuickChatConsumerNativeLayout
+{
+    public const int MessageDiscriminator = CharacterQuickChatNativeLayout.InnerSelector;
+    public const uint ProtocolHandlerDispatchTableVirtualAddress = 0xC1D6DC;
+    public const int ProtocolHandlerDispatchTableSelectorBias = 0x20;
+    public const int ProtocolHandlerVtableSlotOffset = 0x110;
+    public const uint ProtocolHandlerVtableTargetVirtualAddress = 0xECD7E0;
+    public const uint ProtocolHandlerVtableTargetFileOffset = 0xACCBE0;
+    public const uint ConsumerFunctionFileOffset = 0xACCBE0;
+
+    public const int MessageLogDwordOffset = 0x28;
+    public const int MessageTextPointerOffset = 0x30;
+    public const int MessageTypePointerOffset = 0x34;
+    public const int ReceiverPointerReadEndOffsetExclusive = 0x38;
+    public const int DeclaredAllocationReadPastEndByteCount =
+        ReceiverPointerReadEndOffsetExclusive - CharacterQuickChatNativeLayout.AllocationSize;
+
+    public const uint ChatGetterFileOffset = 0x6F4540;
+    public const uint NotificationMethodFileOffset = 0x6E3460;
+    public const uint LoggerFileOffset = 0x325A90;
+}

@@ -3387,6 +3387,26 @@ Check("Stumble selector 0x62 records two WORDs and a byte",
     && CharacterStumbleNativeLayout.WordField1Offset == 0x2A
     && CharacterStumbleNativeLayout.ByteFieldOffset == 0x2C
     && CharacterStumbleNativeLayout.NominalInputByteCount == 5);
+Check("Stumble selector 0x62 records its key, status, and bounded vector mismatch",
+    CharacterStumbleConsumerNativeLayout.MessageDiscriminator == CharacterStumbleNativeLayout.InnerSelector
+    && CharacterStumbleConsumerNativeLayout.ProtocolHandlerVtableSlotOffset == 0x10C
+    && CharacterStumbleConsumerNativeLayout.ProtocolHandlerVtableTargetVirtualAddress == 0xECC250
+    && CharacterStumbleConsumerNativeLayout.ProtocolHandlerVtableTargetFileOffset == 0xACB650
+    && CharacterStumbleConsumerNativeLayout.MessageStateGateGlobalVirtualAddress == 0x1E68354
+    && CharacterStumbleConsumerNativeLayout.MessageStateGateByteOffset == 0x40
+    && CharacterStumbleConsumerNativeLayout.MessageKeyDwordOffset == 0x28
+    && CharacterStumbleConsumerNativeLayout.MessageStatusByteOffset == 0x2C
+    && CharacterStumbleConsumerNativeLayout.MessageVectorBeginPointerOffset == 0x30
+    && CharacterStumbleConsumerNativeLayout.MessageVectorEndPointerOffset == 0x34
+    && CharacterStumbleConsumerNativeLayout.VectorEntrySizeBytes == 12
+    && CharacterStumbleConsumerNativeLayout.VectorHeaderReadEndOffsetExclusive == 0x38
+    && CharacterStumbleConsumerNativeLayout.VectorHeaderReadPastAllocationByteCount == 8
+    && CharacterStumbleConsumerNativeLayout.StatusValueZero == 0
+    && CharacterStumbleConsumerNativeLayout.StatusValueOne == 1
+    && CharacterStumbleConsumerNativeLayout.StatusValueOther == 2
+    && CharacterStumbleConsumerNativeLayout.VectorCopyHelperFileOffset == 0x611A30
+    && CharacterStumbleConsumerNativeLayout.SubsystemAccessorFileOffset == 0x60FB60
+    && CharacterStumbleConsumerNativeLayout.SubsystemMessageHandlerFileOffset == 0x60FBD0);
 Check("QuickChat selector 0x63 records its DWORD field and shared reader continuation",
     CharacterQuickChatNativeLayout.InnerSelector == 0x63
     && CharacterQuickChatNativeLayout.CaseFileOffset == 0x81D171
@@ -3401,6 +3421,19 @@ Check("QuickChat selector 0x63 records its DWORD field and shared reader continu
     && CharacterQuickChatNativeLayout.VtableVirtualAddress == 0x1C67178
     && CharacterQuickChatNativeLayout.DwordFieldOffset == 0x28
     && CharacterQuickChatNativeLayout.NominalInputByteCount == 4);
+Check("QuickChat selector 0x63 records its notification fields and pointer overread",
+    CharacterQuickChatConsumerNativeLayout.MessageDiscriminator == CharacterQuickChatNativeLayout.InnerSelector
+    && CharacterQuickChatConsumerNativeLayout.ProtocolHandlerVtableSlotOffset == 0x110
+    && CharacterQuickChatConsumerNativeLayout.ProtocolHandlerVtableTargetVirtualAddress == 0xECD7E0
+    && CharacterQuickChatConsumerNativeLayout.ProtocolHandlerVtableTargetFileOffset == 0xACCBE0
+    && CharacterQuickChatConsumerNativeLayout.MessageLogDwordOffset == 0x28
+    && CharacterQuickChatConsumerNativeLayout.MessageTextPointerOffset == 0x30
+    && CharacterQuickChatConsumerNativeLayout.MessageTypePointerOffset == 0x34
+    && CharacterQuickChatConsumerNativeLayout.ReceiverPointerReadEndOffsetExclusive == 0x38
+    && CharacterQuickChatConsumerNativeLayout.DeclaredAllocationReadPastEndByteCount == 8
+    && CharacterQuickChatConsumerNativeLayout.ChatGetterFileOffset == 0x6F4540
+    && CharacterQuickChatConsumerNativeLayout.NotificationMethodFileOffset == 0x6E3460
+    && CharacterQuickChatConsumerNativeLayout.LoggerFileOffset == 0x325A90);
 Check("ProximityTextChat selector 0x64 records shared text and optional blob framing",
     CharacterProximityTextChatNativeLayout.InnerSelector == 0x64
     && CharacterProximityTextChatNativeLayout.CaseFileOffset == 0x81D1A2
@@ -5198,6 +5231,8 @@ Check("ReplayReader message dispatch receiver and discriminator vtable cases rem
         new MatrixMessageDispatchVtableCaseSnapshot(0x5F, 0xC1D205, 0x81C605, 0x81C624, 0x100),
         new MatrixMessageDispatchVtableCaseSnapshot(0x60, 0xC1D230, 0x81C630, 0x81C64F, 0x104),
         new MatrixMessageDispatchVtableCaseSnapshot(0x61, 0xC1D25B, 0x81C65B, 0x81C67A, 0x108),
+        new MatrixMessageDispatchVtableCaseSnapshot(0x62, 0xC1D286, 0x81C686, 0x81C6A5, 0x10C),
+        new MatrixMessageDispatchVtableCaseSnapshot(0x63, 0xC1D2B1, 0x81C6B1, 0x81C6D0, 0x110),
         new MatrixMessageDispatchVtableCaseSnapshot(0x71, 0xC1D50B, 0x81C90B, 0x81C92A, 0x148),
         new MatrixMessageDispatchVtableCaseSnapshot(0x74, 0xC1D58C, 0x81C98C, 0x81C9AB, 0x154),
         new MatrixMessageDispatchVtableCaseSnapshot(0x75, 0xC1D5B7, 0x81C9B7, 0x81C9D6, 0x158),

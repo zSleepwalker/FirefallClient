@@ -89,9 +89,22 @@ is also traced. Slot `+0x108` resolves to receiver VA `0xECA340` / raw
 despite the parser's `0x30`-byte allocation. The mismatch and uncertainties
 are recorded in `docs/MatrixConnection.md`.
 
-Next, trace route-0 nested `Character::Stumble` selector `0x62`'s receiver at
-slot `+0x10C`. Keep this nested selector table distinct from route indices
-2-6 and the secondary decoder table.
+The route-0 nested `Character::Stumble` selector `0x62` receiver is also
+traced. Slot `+0x10C` resolves to VA `0xECC250` / raw `0xACB650`. It treats
+the message's `+0x28` DWORD as a key and reads a 12-byte-entry vector header
+at `+0x30/+0x34`, eight bytes past the declared `0x30`-byte allocation. See
+`docs/MatrixConnection.md` for the gated processing paths and caveats.
+
+The route-0 nested `Character::QuickChat` selector `0x63` receiver is also
+traced. Slot `+0x110` resolves to VA `0xECD7E0` / raw `0xACCBE0`; it interprets
+`+0x30/+0x34` as text/type pointers and posts chat notifications for two
+recognized type byte sequences. Those pointers lie beyond the parser's
+`0x30`-byte allocation. Details and uncertainty are in
+`docs/MatrixConnection.md`.
+
+Next, trace route-0 nested `Character::ProximityTextChat` selector `0x64`'s
+receiver at slot `+0x114`. Keep this nested selector table distinct from route
+indices 2-6 and the secondary decoder table.
 
 All secondary selectors `0x20..0x7A` are now reconstructed and checked against
 `FirefallClient.exe.original`. The final entries `0x78..0x7A` resolve to
@@ -101,7 +114,7 @@ Character selectors `OpenMovieDialog`, `PrivateDialog`, and `PublicDialog`.
 Do not repeat the earlier decoder or keyed-receiver factory batches.
 The decoder batches through `0x7A` and route-2 through route-6 consumer traces
 were previously committed; recent updates trace route0 nested selectors `0x53`
-through `0x61` consumers.
+through `0x63` consumers.
 Use GPT-6 Luna with explicit High reasoning for implementation and review.
 Verify field-address setup, primitive widths, count-loop boundaries and
 helper calls against the original binary before committing and pushing.
