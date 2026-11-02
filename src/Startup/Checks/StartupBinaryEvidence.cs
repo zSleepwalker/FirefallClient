@@ -9378,10 +9378,16 @@ internal static class StartupBinaryEvidence
             Matches(0xACE225, "8B472C2B4728C1F806")
             && Matches(0xACE243, "8B410C85C00F45F0")
             && Matches(0xACE24B, "8B410885C00F45D0")
+            && Matches(0xACE253, "8D411450")
             && RelativeBranchTargets(0xACE267, 0xE8,
                 CharacterAbilityApplicationNativeLayout.AbilityCooldownsChatProcessorFileOffset)
             && Matches(0xACE276, "83C340")
-            && Matches(0x6E2590, "558BEC83E4F883EC34"));
+            && Matches(0x6E2590, "558BEC83E4F883EC34")
+            && RelativeBranchTargets(0x6E25FD, 0xE8,
+                CharacterAbilityApplicationNativeLayout.AbilityCooldownsFormattedMessageHelperFileOffset)
+            && RelativeBranchTargets(0x6E2678, 0xE8,
+                CharacterAbilityApplicationNativeLayout.AbilityCooldownsDisplayNotificationFileOffset)
+            && Matches(0x6E35FE, "684F010000"));
         check("Binary NPCInteraction gates on its singleton, swaps state, and dispatches numeric uiManager code 356",
             RelativeBranchTargets(0xACE2A6, 0xE8,
                 CharacterAbilityApplicationNativeLayout.NpcInteractionRootAccessorFileOffset)

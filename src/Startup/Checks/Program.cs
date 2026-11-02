@@ -4187,7 +4187,16 @@ Check("Character receiver behavior model preserves selector slots and observed a
     && CharacterAbilityApplicationNativeLayout.AbilityCooldownsObservedRecordStride == 0x40
     && CharacterAbilityApplicationNativeLayout.AbilityCooldownsBeginOffset == 0x28
     && CharacterAbilityApplicationNativeLayout.AbilityCooldownsEndOffset == 0x2C
+    && CharacterAbilityApplicationNativeLayout.AbilityCooldownsObservedAuthorIdOffset == 0
+    && CharacterAbilityApplicationNativeLayout.AbilityCooldownsObservedAuthorTextOffset == 0x08
+    && CharacterAbilityApplicationNativeLayout.AbilityCooldownsObservedMessageTextOffset == 0x0C
+    && CharacterAbilityApplicationNativeLayout.AbilityCooldownsObservedNativeChannelOffset == 0x10
+    && CharacterAbilityApplicationNativeLayout.AbilityCooldownsObservedDisplayFlagsOffset == 0x11
+    && CharacterAbilityApplicationNativeLayout.AbilityCooldownsObservedTemplateSelectorOffset == 0x12
     && CharacterAbilityApplicationNativeLayout.AbilityCooldownsChatProcessorFileOffset == 0x6E2590
+    && CharacterAbilityApplicationNativeLayout.AbilityCooldownsFormattedMessageHelperFileOffset == 0x6E3670
+    && CharacterAbilityApplicationNativeLayout.AbilityCooldownsDisplayNotificationFileOffset == 0x6E3460
+    && CharacterAbilityApplicationNativeLayout.AbilityCooldownsDisplayNotificationMessageId == 335
     && CharacterAbilityApplicationNativeLayout.AbilityCooldownsObservedOptionalBranchOffset == 0x14
     && CharacterAbilityApplicationNativeLayout.AbilityCooldownsObservedOptionalDataOffset == 0x18
     && CharacterAbilityApplicationNativeLayout.NpcInteractionMessagePointerLoadFileOffset == 0xACE2B8

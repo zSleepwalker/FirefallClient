@@ -52,7 +52,16 @@ public static class CharacterAbilityApplicationNativeLayout
     public const int AbilityCooldownsObservedFlagsOffset = 0x14;
     public const int AbilityCooldownsObservedOptionalBranchOffset = 0x14;
     public const int AbilityCooldownsObservedOptionalDataOffset = 0x18;
+    public const int AbilityCooldownsObservedAuthorIdOffset = 0x00;
+    public const int AbilityCooldownsObservedAuthorTextOffset = 0x08;
+    public const int AbilityCooldownsObservedMessageTextOffset = 0x0C;
+    public const int AbilityCooldownsObservedNativeChannelOffset = 0x10;
+    public const int AbilityCooldownsObservedDisplayFlagsOffset = 0x11;
+    public const int AbilityCooldownsObservedTemplateSelectorOffset = 0x12;
     public const uint AbilityCooldownsChatProcessorFileOffset = 0x6E2590;
+    public const uint AbilityCooldownsFormattedMessageHelperFileOffset = 0x6E3670;
+    public const uint AbilityCooldownsDisplayNotificationFileOffset = 0x6E3460;
+    public const int AbilityCooldownsDisplayNotificationMessageId = 335;
 
     public const uint NpcInteractionHandlerFileOffset = 0xACE2A0;
     public const uint NpcInteractionRootAccessorFileOffset = 0x49DDD0;

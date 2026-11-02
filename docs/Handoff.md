@@ -783,7 +783,9 @@ helper calls against the original binary before committing and pushing.
   its caller remains unresolved. Continue with the `0x75` source/destination
   tree meaning or selector `0x77` extent mismatch. Selector `0x76`'s
   `+0x28/+0x2C` conflict is now tied to the shared `slBlob` vtable/storage-
-  object layout, with no conversion found on the traced callback route.
+  object layout, with no conversion found on the traced callback route. The
+  zero-control consumer path is mapped to event335's text/author/author-ID/
+  channel/display-flag fields; the nonzero template switch remains unresolved.
   Continue read-only; do not modify the sample/IDB.
 - Open items: field semantics, allocation-failure consequences, selector
   `0x55` copied but unwritten stack DWORD at object `+0x70` (source proven,
@@ -792,9 +794,10 @@ helper calls against the original binary before committing and pushing.
   stores QWORD halves at `+0x18/+0x1C` without a selector-specific reader), selector
   `0x75`'s `+0x28` source tree and `+0x30` tree-vs-`slBlob` mismatch and
   selector `0x76`'s parser/receiver range-vs-`slBlob` mismatch (receiver uses
-  the blob vtable/storage-object positions as range endpoints), selector
-  `0x77` trailing-state extent. Whether an intervening conversion or distinct
-  object path explains either mismatch remains open.
+  the blob vtable/storage-object positions as range endpoints), its nonzero
+  `+0x14` template switch, selector `0x77` trailing-state extent. Whether an
+  intervening conversion or distinct object path explains either mismatch
+  remains open.
 - Workflow per batch: preserve native evidence in the existing layout,
   binary checks, and documentation; validate the focused build and binary
   checks, without committing or pushing unless the user requests it.
@@ -2678,3 +2681,22 @@ Ctor is raw `0xE4DFA0` (sole caller `0xE4E660` = slot 1 of factory vtable `0x1C7
 - Static pass: the factory lists (0x1E4B0A4 classes, 0x1E4B0A8 instances) have only a create walker (0x12C3A80, slot +4) and a teardown walker (0x12C3AF0, slot +8); no init loop calls oEngineSystem slot 0 (0xE54BF0). The list is a generic singleton registry (Network, SoundThread, fsAssetDB, uiManager, oParticleInterface, ...). Next: find the real caller of 0xE54BF0 (see docs\MatrixConnection.md 'Factory list consumers').
 
 Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller unresolved) and crash hook setter 0x12C38D0 / RedHanded trigger 0x2EAEBF; see MatrixConnection.md and CrashHandler.md.
+
+## Session handoff — selector 0x76 consumer
+
+- `0xACE210` sends each `0x40`-byte record through `0x6E2590`. With record
+  `+0x14 == 0`, `+0x0C` is notification text, `+0x08` author, `+0` author ID,
+  `+0x10` selects the native channel label, and `+0x11` supplies event335
+  display flags. The shared display path applies the existing channel gates,
+  dispatches `335`, and writes the chat file log.
+- With `+0x14 != 0`, the consumer requires a current chat and calls
+  `0x6E3670` with `+0x08`, `+0x10`, `+0x12`, and the object at `+0x18`.
+  That helper reads storage-object data and size and switches on `+0x12`;
+  individual templates remain unresolved.
+- The parser/receiver `slBlob` versus range-endpoint mismatch is unchanged and
+  remains static evidence only; no runtime outcome is claimed. The build and
+  all 1,427 startup/binary checks passed against the original executable.
+- Next: resolve the nonzero `+0x12` switch if static evidence is available;
+  otherwise continue with selector `0x75` tree semantics or selector `0x77`
+  state extent. See `docs\MatrixConnection.md` and the matching
+  `CharacterAbilityApplicationNativeLayout` constants/checks.

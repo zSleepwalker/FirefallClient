@@ -3696,12 +3696,24 @@ dialog slots already verified at `0x78`–`0x7A`.
   `+0x28/+0x2C` as range endpoints, computes `(end-begin)/0x40`, and walks
   `0x40`-byte records. It forwards each record's QWORD `+0`, nullable strings
   `+0x8/+0xC` (empty-string fallback), bytes `+0x10/+0x11/+0x12`, and address
-  `+0x14` to `0x6E2590`. That routine branches on the byte at `+0x14`: the
-  nonzero path requires a current chat and calls `0x6E3670` with data at
-  `+0x18`; the zero path obtains a category label from byte `+0x10`, lowercases
-  it, and posts a display notification through `0x6E3460` when a current chat
-  exists. This proves how the handler consumes the embedded state, but not the
-  meaning of individual records or cooldown timing.
+  `+0x14` to `0x6E2590`. For a zero byte at `+0x14`, `0x6E2590` selects a
+  native channel label from byte `+0x10`, lowercases it, and passes the
+  `+0x0C` string as notification text, `+0x08` as author, the QWORD at `+0`
+  as author ID, and byte `+0x11` as display flags to `0x6E3460`. That helper
+  applies the channel gates documented in the chat-display section, emits
+  runtime event `335` through `uiManager`, and writes the chat file log. Its
+  byte-keyed payload properties are independently identified there; byte
+  `+0x11` contributes the five documented low-byte flags. The `+0x12` byte is
+  not used by this zero-byte branch.
+
+  A nonzero byte at `+0x14` instead requires a current chat and calls
+  `0x6E3670` with the record, `+0x08` string, byte `+0x10`, byte `+0x12`, and
+  the object at `+0x18`. The helper obtains a data pointer and length through
+  that object's storage object and virtual `+0x0C` method, then switches on
+  byte `+0x12`; the switch's individual output templates remain unresolved.
+  These traces establish consumer behavior, not record semantics or cooldown
+  timing. Separately, the parser/receiver state mismatch above remains
+  unresolved.
 * **`0x77 NPCInteraction` → `0xACE2A0`.** It returns without dispatch if the
   `0x49DDD0` root accessor is null or root `+0x4D20` is null; otherwise
   `0x49DCC0` supplies the owner state. The QWORD at message `+0x28` is passed
