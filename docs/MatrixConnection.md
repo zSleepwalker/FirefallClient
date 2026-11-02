@@ -3446,6 +3446,15 @@ and dispatches 14 discriminator cases. The case-specific tail layouts and
 field meanings remain unresolved. Allocation failure zeroes ESI before the
 reader setup.
 
+The route-0 receiver dispatches through slot `+0x148` (table VA `0xC1D6DC`,
+raw table `0x81CADC`) to VA `0xECED30` / raw function `0xACE130`. Its switch
+case is VA `0xC1D50B` / raw `0x81C90B`, with the indirect call through slot
+`+0x148` at raw `0x81C92A`. The receiver passes a pointer to the nested state
+at message `+0x28` to helper `0xC24780` with label `byte_1BAEDDC` and value 1,
+then dispatches event 365 through `uiManager` global VA `0x1E002B8`, slot
+`+0xAC`. The receiver does not directly inspect individual state fields;
+interpretation of the state and event remains unresolved.
+
 ### Selector 0x72: `ForcedMovementCancelled`
 
 Entry31 maps selector `0x72` to VA `0xC1E1A3` / raw case `0x81D5A3`. It

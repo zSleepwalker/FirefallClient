@@ -5416,6 +5416,41 @@ internal static class StartupBinaryEvidence
                 CharacterPublicDebugMovementUpdateConsumerNativeLayout.NestedObjectValueAppenderFileOffset)
             && Matches(0xACE0D8, "686B010000")
             && Matches(0xACE0DD, "8B01FF90AC000000"));
+        var forcedMovementDispatchCase = MatrixMessageParserFlowNativeLayout.MessageDispatchVtableCases
+            .Single(entry => entry.MessageDiscriminator
+                == CharacterForcedMovementConsumerNativeLayout.MessageDiscriminator);
+        check("Binary selector 0x71 dispatches through slot +0x148 to its nested-state receiver",
+            ReadUInt32(VirtualAddressToFileOffset(
+                CharacterForcedMovementConsumerNativeLayout.ProtocolHandlerDispatchTableVirtualAddress)
+                + (CharacterForcedMovementConsumerNativeLayout.MessageDiscriminator
+                    - CharacterForcedMovementConsumerNativeLayout.ProtocolHandlerDispatchTableSelectorBias) * 4)
+                == forcedMovementDispatchCase.SwitchTargetVirtualAddress
+            && forcedMovementDispatchCase.SwitchTargetVirtualAddress
+                == CharacterForcedMovementConsumerNativeLayout.ConsumerSwitchTargetVirtualAddress
+            && forcedMovementDispatchCase.SwitchTargetFileOffset
+                == CharacterForcedMovementConsumerNativeLayout.ConsumerSwitchTargetFileOffset
+            && forcedMovementDispatchCase.VtableCallFileOffset
+                == CharacterForcedMovementConsumerNativeLayout.ConsumerVtableCallFileOffset
+            && forcedMovementDispatchCase.VtableSlotOffset
+                == CharacterForcedMovementConsumerNativeLayout.ProtocolHandlerVtableSlotOffset
+            && Matches(forcedMovementDispatchCase.VtableCallFileOffset, "FF9048010000")
+            && ReadUInt32(VirtualAddressToFileOffset(
+                MatrixMessageNamespaceRoutingNativeLayout.ProtocolHandlerVtableVirtualAddress)
+                + CharacterForcedMovementConsumerNativeLayout.ProtocolHandlerVtableSlotOffset)
+                == CharacterForcedMovementConsumerNativeLayout.ProtocolHandlerVtableTargetVirtualAddress
+            && VirtualAddressToFileOffset(
+                CharacterForcedMovementConsumerNativeLayout.ProtocolHandlerVtableTargetVirtualAddress)
+                == CharacterForcedMovementConsumerNativeLayout.ProtocolHandlerVtableTargetFileOffset
+            && Matches(CharacterForcedMovementConsumerNativeLayout.ConsumerFunctionFileOffset,
+                "558BEC6AFF68"));
+        check("Binary selector 0x71 packages the nested state before event 365",
+            Matches(0xACE1A4, "8D4628")
+            && Matches(0xACE1AF, "68DCEDBA01")
+            && RelativeBranchTargets(0xACE1B7, 0xE8,
+                CharacterForcedMovementConsumerNativeLayout.NestedStateValueAppenderFileOffset)
+            && Matches(0xACE1C5, "6A0052")
+            && Matches(0xACE1C8, "686D010000")
+            && Matches(0xACE1CD, "8B01FF90AC000000"));
         check("Binary inner selector 0x64 constructs ProximityTextChat and routes its body fields",
             ReadUInt32(VirtualAddressToFileOffset(
                 CharacterProximityTextChatNativeLayout.InnerSelectorTableVirtualAddress) + 68) == 0xC1DDA2

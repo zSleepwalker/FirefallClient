@@ -195,10 +195,15 @@ queries the object at `+0x30`, and dispatches event `363`. The `+0x30` object
 view falls inside the first parser record, but their relationship and
 semantics remain unresolved.
 
-Next, trace route-0 nested `Character::ForcedMovement` selector `0x71`'s
-receiver at slot `+0x148`, verifying dispatch and target mapping before
-interpreting the method. Keep this nested selector table distinct from route
-indices 2-6 and the secondary decoder table.
+The route-0 nested `Character::ForcedMovement` selector `0x71` receiver is
+traced at slot `+0x148` (VA `0xECED30` / raw `0xACE130`). It passes a pointer
+to the nested message state at `+0x28` to helper `0xC24780` and dispatches
+event `365`; individual field and event semantics remain unknown.
+
+Next, trace route-0 nested `Character::ForcedMovementCancelled` selector
+`0x72`'s receiver at slot `+0x14C`, verifying dispatch and target mapping
+before interpreting the method. Keep this nested selector table distinct
+from route indices 2-6 and the secondary decoder table.
 
 All secondary selectors `0x20..0x7A` are now reconstructed and checked against
 `FirefallClient.exe.original`. The final entries `0x78..0x7A` resolve to

@@ -50,3 +50,23 @@ public static class CharacterForcedMovementNativeLayout
         (0x110, 0), (0x19C, 0x0101), (0x1CC, 0)
     ];
 }
+
+public static class CharacterForcedMovementConsumerNativeLayout
+{
+    public const int MessageDiscriminator = CharacterForcedMovementNativeLayout.InnerSelector;
+    public const uint ProtocolHandlerDispatchTableVirtualAddress = 0xC1D6DC;
+    public const int ProtocolHandlerDispatchTableSelectorBias = 0x20;
+    public const int ProtocolHandlerVtableSlotOffset = 0x148;
+    public const uint ProtocolHandlerVtableTargetVirtualAddress = 0xECED30;
+    public const uint ProtocolHandlerVtableTargetFileOffset = 0xACE130;
+    public const uint ConsumerFunctionFileOffset = 0xACE130;
+    public const uint ConsumerSwitchTargetVirtualAddress = 0xC1D50B;
+    public const uint ConsumerSwitchTargetFileOffset = 0x81C90B;
+    public const uint ConsumerVtableCallFileOffset = 0x81C92A;
+
+    public const int NestedStateOffset = 0x28;
+    public const uint NestedStateValueAppenderFileOffset = 0xC24780;
+    public const int DispatchedEventId = 365;
+    public const uint EventDispatcherGlobalAddress = 0x1E002B8;
+    public const int EventDispatcherVtableSlotOffset = 0xAC;
+}

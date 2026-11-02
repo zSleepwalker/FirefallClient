@@ -3700,6 +3700,23 @@ Check("PublicDebugMovementUpdate selector 0x70 records its nested-object event r
     && CharacterPublicDebugMovementUpdateConsumerNativeLayout.DispatchedEventId == 363
     && CharacterPublicDebugMovementUpdateConsumerNativeLayout.EventDispatcherGlobalAddress == 0x1E002B8
     && CharacterPublicDebugMovementUpdateConsumerNativeLayout.EventDispatcherVtableSlotOffset == 0xAC);
+Check("ForcedMovement selector 0x71 records its nested-state event receiver",
+    CharacterForcedMovementConsumerNativeLayout.MessageDiscriminator
+        == CharacterForcedMovementNativeLayout.InnerSelector
+    && CharacterForcedMovementConsumerNativeLayout.ProtocolHandlerDispatchTableVirtualAddress == 0xC1D6DC
+    && CharacterForcedMovementConsumerNativeLayout.ProtocolHandlerDispatchTableSelectorBias == 0x20
+    && CharacterForcedMovementConsumerNativeLayout.ProtocolHandlerVtableSlotOffset == 0x148
+    && CharacterForcedMovementConsumerNativeLayout.ProtocolHandlerVtableTargetVirtualAddress == 0xECED30
+    && CharacterForcedMovementConsumerNativeLayout.ProtocolHandlerVtableTargetFileOffset == 0xACE130
+    && CharacterForcedMovementConsumerNativeLayout.ConsumerFunctionFileOffset == 0xACE130
+    && CharacterForcedMovementConsumerNativeLayout.ConsumerSwitchTargetVirtualAddress == 0xC1D50B
+    && CharacterForcedMovementConsumerNativeLayout.ConsumerSwitchTargetFileOffset == 0x81C90B
+    && CharacterForcedMovementConsumerNativeLayout.ConsumerVtableCallFileOffset == 0x81C92A
+    && CharacterForcedMovementConsumerNativeLayout.NestedStateOffset == 0x28
+    && CharacterForcedMovementConsumerNativeLayout.NestedStateValueAppenderFileOffset == 0xC24780
+    && CharacterForcedMovementConsumerNativeLayout.DispatchedEventId == 365
+    && CharacterForcedMovementConsumerNativeLayout.EventDispatcherGlobalAddress == 0x1E002B8
+    && CharacterForcedMovementConsumerNativeLayout.EventDispatcherVtableSlotOffset == 0xAC);
 Check("JumpActioned selector 0x65 records its shared WORD reader continuation",
     CharacterJumpActionedNativeLayout.InnerSelector == 0x65
     && CharacterJumpActionedNativeLayout.CaseFileOffset == 0x81D1F3
