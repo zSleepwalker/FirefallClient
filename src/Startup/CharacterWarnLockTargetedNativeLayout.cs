@@ -21,3 +21,27 @@ public static class CharacterWarnLockTargetedNativeLayout
     public const uint VtableVirtualAddress = 0x1C670C8;
     public const string RttiName = ".?AVWarnLockTargeted@Character@firefall@@";
 }
+
+public static class CharacterWarnLockTargetedConsumerNativeLayout
+{
+    public const int MessageDiscriminator = CharacterWarnLockTargetedNativeLayout.InnerSelector;
+    public const uint ProtocolHandlerDispatchTableVirtualAddress = 0xC1D6DC;
+    public const int ProtocolHandlerDispatchTableSelectorBias = 0x20;
+    public const int ProtocolHandlerVtableSlotOffset = 0x138;
+    public const uint ProtocolHandlerVtableTargetVirtualAddress = 0xECEBC0;
+    public const uint ProtocolHandlerVtableTargetFileOffset = 0xACDFC0;
+    public const uint ConsumerFunctionFileOffset = 0xACDFC0;
+    public const uint ConsumerSwitchTargetVirtualAddress = 0xC1D45F;
+    public const uint ConsumerSwitchTargetFileOffset = 0x81C85F;
+    public const uint ConsumerVtableCallFileOffset = 0x81C87E;
+
+    public const uint ManagerGlobalAddress = 0x1DFFFFC;
+    public const int MessageTargetFieldOffset = 0x28;
+    public const int MessageBooleanFieldOffset = 0x38;
+    public const int AllocationSize = CharacterWarnLockTargetedNativeLayout.AllocationSize;
+    public const int MessageTargetPastAllocationByteCount =
+        MessageTargetFieldOffset + sizeof(uint) - AllocationSize;
+    public const int MessageBooleanPastAllocationByteCount =
+        MessageBooleanFieldOffset + sizeof(byte) - AllocationSize;
+    public const uint StateUpdateHelperFileOffset = 0x465D40;
+}

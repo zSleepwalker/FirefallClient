@@ -3291,6 +3291,27 @@ body-reader call and returns after construction. Allocation failure branches
 to `0x8217D9`, the switch's zero-return epilogue. Body consumption outside
 this case and all field meanings remain unresolved.
 
+#### Selector 0x6D post-parse receiver
+
+The outer handler switch maps selector `0x6D` through VA `0xC1D45F` / raw
+`0x81C85F`, then calls slot `+0x138` at raw `0x81C87E`. The protocol-handler
+vtable entry at raw `0x1870BF8` contains VA `0xECEBC0`, mapped to receiver raw
+`0xACDFC0`.
+
+The receiver calls `0x465D40` only if the global object at VA `0x1DFFFFC`
+contains a nonzero manager pointer. It forwards the DWORD at message `+0x28`,
+constant `12`, the manager pointer, and a normalized Boolean from byte
+`+0x38`. The helper maintains manager-owned entries keyed by the DWORD,
+removes matching entries, and can update manager state; when its Boolean and
+stored-key conditions hold it may also query a selected object and dispatch
+additional state. The behavior of that state and the message's semantics
+remain unknown.
+
+The parser allocates `0x28` bytes and has no explicit body-reader call in this
+case. The receiver nevertheless reads a DWORD at `+0x28` (four bytes beyond
+the allocation) and a Boolean byte at `+0x38` (17 bytes beyond its end). These
+are static extent mismatches, not proof of actual runtime capacity or impact.
+
 ### Selector 0x6E: `CurrentPoseUpdate`
 
 Entry27 maps selector `0x6E` to VA `0xC1E054` / raw case `0x81D454`. It

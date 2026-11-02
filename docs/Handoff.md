@@ -169,8 +169,15 @@ an object and can allocate/update `0xB0`-byte contexts through `0x465A10`.
 Field and context meanings remain unknown; its observed accesses are inside
 the parser's `0x40`-byte allocation.
 
-Next, trace route-0 nested `Character::WarnLockTargeted` selector `0x6D`'s
-receiver at slot `+0x138`, verifying dispatch and target mapping before
+The route-0 nested `Character::WarnLockTargeted` selector `0x6D` receiver is
+traced at slot `+0x138` (VA `0xECEBC0` / raw `0xACDFC0`). With a nonzero global
+manager pointer, it passes DWORD `+0x28` and Boolean `+0x38` to helper
+`0x465D40`, which manages keyed manager entries and can update state. The case
+allocates `0x28` bytes and reads both fields beyond that declared extent;
+meaning and runtime impact remain unknown.
+
+Next, trace route-0 nested `Character::CurrentPoseUpdate` selector `0x6E`'s
+receiver at slot `+0x13C`, verifying dispatch and target mapping before
 interpreting the method. Keep this nested selector table distinct from route
 indices 2-6 and the secondary decoder table.
 
@@ -182,7 +189,7 @@ Character selectors `OpenMovieDialog`, `PrivateDialog`, and `PublicDialog`.
 Do not repeat the earlier decoder or keyed-receiver factory batches.
 The decoder batches through `0x7A` and route-2 through route-6 consumer traces
 were previously committed; recent updates trace route0 nested selectors `0x53`
-through `0x6C` consumers.
+through `0x6D` consumers.
 Use GPT-6 Luna with explicit High reasoning for implementation and review.
 Verify field-address setup, primitive widths, count-loop boundaries and
 helper calls against the original binary before committing and pushing.

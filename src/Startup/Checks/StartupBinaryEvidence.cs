@@ -5267,6 +5267,38 @@ internal static class StartupBinaryEvidence
                 CharacterKilledConsumerNativeLayout.KeyedObjectLookupFileOffset)
             && RelativeBranchTargets(0x46684D, 0xE8,
                 CharacterKilledConsumerNativeLayout.ContextUpdateRoutineFileOffset));
+        var warnLockTargetedDispatchCase = MatrixMessageParserFlowNativeLayout.MessageDispatchVtableCases
+            .Single(entry => entry.MessageDiscriminator
+                == CharacterWarnLockTargetedConsumerNativeLayout.MessageDiscriminator);
+        check("Binary selector 0x6D dispatches through slot +0x138 to its gated manager update",
+            ReadUInt32(VirtualAddressToFileOffset(
+                CharacterWarnLockTargetedConsumerNativeLayout.ProtocolHandlerDispatchTableVirtualAddress)
+                + (CharacterWarnLockTargetedConsumerNativeLayout.MessageDiscriminator
+                    - CharacterWarnLockTargetedConsumerNativeLayout.ProtocolHandlerDispatchTableSelectorBias) * 4)
+                == warnLockTargetedDispatchCase.SwitchTargetVirtualAddress
+            && warnLockTargetedDispatchCase.SwitchTargetVirtualAddress
+                == CharacterWarnLockTargetedConsumerNativeLayout.ConsumerSwitchTargetVirtualAddress
+            && warnLockTargetedDispatchCase.SwitchTargetFileOffset
+                == CharacterWarnLockTargetedConsumerNativeLayout.ConsumerSwitchTargetFileOffset
+            && warnLockTargetedDispatchCase.VtableCallFileOffset
+                == CharacterWarnLockTargetedConsumerNativeLayout.ConsumerVtableCallFileOffset
+            && warnLockTargetedDispatchCase.VtableSlotOffset
+                == CharacterWarnLockTargetedConsumerNativeLayout.ProtocolHandlerVtableSlotOffset
+            && Matches(warnLockTargetedDispatchCase.VtableCallFileOffset, "FF9038010000")
+            && ReadUInt32(VirtualAddressToFileOffset(
+                MatrixMessageNamespaceRoutingNativeLayout.ProtocolHandlerVtableVirtualAddress)
+                + CharacterWarnLockTargetedConsumerNativeLayout.ProtocolHandlerVtableSlotOffset)
+                == CharacterWarnLockTargetedConsumerNativeLayout.ProtocolHandlerVtableTargetVirtualAddress
+            && VirtualAddressToFileOffset(
+                CharacterWarnLockTargetedConsumerNativeLayout.ProtocolHandlerVtableTargetVirtualAddress)
+                == CharacterWarnLockTargetedConsumerNativeLayout.ProtocolHandlerVtableTargetFileOffset
+            && Matches(CharacterWarnLockTargetedConsumerNativeLayout.ConsumerFunctionFileOffset,
+                "558BECA1FCFFDF018B0885C97419"));
+        check("Binary selector 0x6D gates on message +0x38 and forwards DWORD +0x28",
+            Matches(0xACDFD1, "807A38000F95C00FB6C0")
+            && Matches(0xACDFDD, "6A0CFF7228")
+            && RelativeBranchTargets(0xACDFE2, 0xE8,
+                CharacterWarnLockTargetedConsumerNativeLayout.StateUpdateHelperFileOffset));
         check("Binary inner selector 0x64 constructs ProximityTextChat and routes its body fields",
             ReadUInt32(VirtualAddressToFileOffset(
                 CharacterProximityTextChatNativeLayout.InnerSelectorTableVirtualAddress) + 68) == 0xC1DDA2
