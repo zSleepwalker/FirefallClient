@@ -3372,6 +3372,24 @@ processes the field at `+0xB0` through byte-gated nested reader `0x5FFB00`.
 Allocation failure zeroes ESI before the same reader setup. Nested contents, field
 meanings, and message semantics remain unresolved.
 
+#### Selector 0x6F post-parse receiver
+
+The outer handler switch maps selector `0x6F` through VA `0xC1D4B5` / raw
+`0x81C8B5`, then calls slot `+0x140` at raw `0x81C8D4`. The protocol-handler
+vtable entry at raw `0x1870C00` contains VA `0xECE400`, mapped to receiver raw
+`0xACD800`.
+
+The receiver creates an event payload and appends a typed value of kind `5`
+using message DWORDs at `+0x28/+0x2C`. If the DWORD at `+0x30` is nonzero, it
+looks it up in registry `0x1E5A4F0`; a usable entry is converted to text by
+`0x13122D0` and appended. It dispatches event `239` through the object at
+global `0x1E002B8`, vtable slot `+0xAC`, then releases the payload.
+
+The parser requests `0xC0` bytes; all receiver reads described here are within
+that allocation. The relationship between the receiver's three DWORD view
+and the parser's conditional record layout, plus the event's meaning, remains
+unresolved.
+
 ### Selector 0x70: `PublicDebugMovementUpdate`
 
 Entry29 maps selector `0x70` to VA `0xC1E0FA` / raw case `0x81D4FA`. The case

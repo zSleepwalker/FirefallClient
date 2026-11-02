@@ -182,10 +182,16 @@ message fields as floats, optionally resolves a DWORD at `+0x34` to text, and
 dispatches event `239`. The parser's variable control/field layout and the
 receiver's float/key view overlap; their relationship remains unresolved.
 
-Next, trace route-0 nested `Character::ConfirmedPoseUpdate` selector `0x6F`'s
-receiver at slot `+0x140`, verifying dispatch and target mapping before
-interpreting the method. Keep this nested selector table distinct from route
-indices 2-6 and the secondary decoder table.
+The route-0 nested `Character::ConfirmedPoseUpdate` selector `0x6F` receiver
+is traced at slot `+0x140` (VA `0xECE400` / raw `0xACD800`). It appends a kind-5
+typed value from message DWORDs `+0x28/+0x2C`, optionally resolves `+0x30` to
+text, and dispatches event `239`. All observed fields fit the parser's `0xC0`
+allocation; field and event semantics remain unknown.
+
+Next, trace route-0 nested `Character::PublicDebugMovementUpdate` selector
+`0x70`'s receiver at slot `+0x144`, verifying dispatch and target mapping
+before interpreting the method. Keep this nested selector table distinct from
+route indices 2-6 and the secondary decoder table.
 
 All secondary selectors `0x20..0x7A` are now reconstructed and checked against
 `FirefallClient.exe.original`. The final entries `0x78..0x7A` resolve to
@@ -195,7 +201,7 @@ Character selectors `OpenMovieDialog`, `PrivateDialog`, and `PublicDialog`.
 Do not repeat the earlier decoder or keyed-receiver factory batches.
 The decoder batches through `0x7A` and route-2 through route-6 consumer traces
 were previously committed; recent updates trace route0 nested selectors `0x53`
-through `0x6E` consumers.
+through `0x6F` consumers.
 Use GPT-6 Luna with explicit High reasoning for implementation and review.
 Verify field-address setup, primitive widths, count-loop boundaries and
 helper calls against the original binary before committing and pushing.

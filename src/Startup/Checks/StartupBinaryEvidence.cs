@@ -5338,6 +5338,44 @@ internal static class StartupBinaryEvidence
                 CharacterCurrentPoseUpdateConsumerNativeLayout.OptionalTextExtractionRoutineFileOffset)
             && Matches(0xACD7AD, "68EF000000")
             && Matches(0xACD7B2, "8B01FF90AC000000"));
+        var confirmedPoseUpdateDispatchCase = MatrixMessageParserFlowNativeLayout.MessageDispatchVtableCases
+            .Single(entry => entry.MessageDiscriminator
+                == CharacterConfirmedPoseUpdateConsumerNativeLayout.MessageDiscriminator);
+        check("Binary selector 0x6F dispatches through slot +0x140 to its event receiver",
+            ReadUInt32(VirtualAddressToFileOffset(
+                CharacterConfirmedPoseUpdateConsumerNativeLayout.ProtocolHandlerDispatchTableVirtualAddress)
+                + (CharacterConfirmedPoseUpdateConsumerNativeLayout.MessageDiscriminator
+                    - CharacterConfirmedPoseUpdateConsumerNativeLayout.ProtocolHandlerDispatchTableSelectorBias) * 4)
+                == confirmedPoseUpdateDispatchCase.SwitchTargetVirtualAddress
+            && confirmedPoseUpdateDispatchCase.SwitchTargetVirtualAddress
+                == CharacterConfirmedPoseUpdateConsumerNativeLayout.ConsumerSwitchTargetVirtualAddress
+            && confirmedPoseUpdateDispatchCase.SwitchTargetFileOffset
+                == CharacterConfirmedPoseUpdateConsumerNativeLayout.ConsumerSwitchTargetFileOffset
+            && confirmedPoseUpdateDispatchCase.VtableCallFileOffset
+                == CharacterConfirmedPoseUpdateConsumerNativeLayout.ConsumerVtableCallFileOffset
+            && confirmedPoseUpdateDispatchCase.VtableSlotOffset
+                == CharacterConfirmedPoseUpdateConsumerNativeLayout.ProtocolHandlerVtableSlotOffset
+            && Matches(confirmedPoseUpdateDispatchCase.VtableCallFileOffset, "FF9040010000")
+            && ReadUInt32(VirtualAddressToFileOffset(
+                MatrixMessageNamespaceRoutingNativeLayout.ProtocolHandlerVtableVirtualAddress)
+                + CharacterConfirmedPoseUpdateConsumerNativeLayout.ProtocolHandlerVtableSlotOffset)
+                == CharacterConfirmedPoseUpdateConsumerNativeLayout.ProtocolHandlerVtableTargetVirtualAddress
+            && VirtualAddressToFileOffset(
+                CharacterConfirmedPoseUpdateConsumerNativeLayout.ProtocolHandlerVtableTargetVirtualAddress)
+                == CharacterConfirmedPoseUpdateConsumerNativeLayout.ProtocolHandlerVtableTargetFileOffset
+            && Matches(CharacterConfirmedPoseUpdateConsumerNativeLayout.ConsumerFunctionFileOffset,
+                "558BEC83E4F86AFF68"));
+        check("Binary selector 0x6F appends typed values and optional text before event 239",
+            Matches(0xACD899, "8D4C240CFF762CFF762868F0ECBA01")
+            && RelativeBranchTargets(0xACD8A8, 0xE8,
+                CharacterConfirmedPoseUpdateConsumerNativeLayout.TypedMessageValueAppenderFileOffset)
+            && Matches(0xACD8AD, "8B463085C0")
+            && RelativeBranchTargets(0xACD8C2, 0xE8,
+                CharacterConfirmedPoseUpdateConsumerNativeLayout.OptionalTextLookupRoutineFileOffset)
+            && RelativeBranchTargets(0xACD8D5, 0xE8,
+                CharacterConfirmedPoseUpdateConsumerNativeLayout.OptionalTextExtractionRoutineFileOffset)
+            && Matches(0xACD90F, "68EF000000")
+            && Matches(0xACD914, "8B01FF90AC000000"));
         check("Binary inner selector 0x64 constructs ProximityTextChat and routes its body fields",
             ReadUInt32(VirtualAddressToFileOffset(
                 CharacterProximityTextChatNativeLayout.InnerSelectorTableVirtualAddress) + 68) == 0xC1DDA2
