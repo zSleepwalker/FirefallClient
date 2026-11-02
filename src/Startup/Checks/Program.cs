@@ -6397,6 +6397,12 @@ Check("Optional nested Character receiver is a separate +0x10 field with forward
     && CharacterKeyedDialogDispatchNativeLayout.ReceiverOptionalCallbackObjectPointerFieldOffset == 0x2C);
 Check("Conditional message fan-out records its constructed keyed state and recipient-vector call",
     MatrixMessageParserFlowNativeLayout.ConditionalFanoutStateLazyConstructionMethodFileOffset == 0x7FE1C0
+    && MatrixMessageParserFlowNativeLayout.ConditionalFanoutMessageQwordWriterFileOffset == 0x325BE0
+    && MatrixMessageParserFlowNativeLayout.ConditionalFanoutCompactSelectorWriterFileOffset == 0x320900
+    && MatrixMessageParserFlowNativeLayout.ConditionalFanoutMessageSelectorLoadFileOffset == 0xBD712B
+    && MatrixMessageParserFlowNativeLayout.ConditionalFanoutWireSelectorWriterCallFileOffset == 0xBD7138
+    && MatrixMessageParserFlowNativeLayout.ConditionalFanoutMessageSerializerCallFileOffset == 0xBD7145
+    && MatrixMessageParserFlowNativeLayout.ConditionalFanoutOutputBufferPointerCallFileOffset == 0xBD71F3
     && MatrixMessageParserFlowNativeLayout.ConditionalFanoutStateConstructorFileOffset == 0xBD6E10
     && MatrixMessageParserFlowNativeLayout.ConditionalFanoutStateAllocationSize == 0x48
     && MatrixMessageParserFlowNativeLayout.ConditionalFanoutStateQwordArgumentLowFieldOffset == 8
@@ -6413,7 +6419,11 @@ Check("Conditional message fan-out records its constructed keyed state and recip
     && MatrixMessageParserFlowNativeLayout.ConditionalFanoutStateRecipientRegistrationVtableSlotOffset == 4
     && MatrixMessageParserFlowNativeLayout.ConditionalFanoutStateRecipientDispatchVtableSlotOffset == 0x0C
     && MatrixMessageParserFlowNativeLayout.ConditionalFanoutStateRecipientPointerSize == 4
-    && MatrixMessageParserFlowNativeLayout.ConditionalFanoutStateRecipientDispatchRecordSize == 0x0C);
+    && MatrixMessageParserFlowNativeLayout.ConditionalFanoutStateRecipientDispatchRecordSize == 8
+    && MatrixMessageParserFlowNativeLayout.ConditionalFanoutStateRecipientDispatchContextOffset == 0
+    && MatrixMessageParserFlowNativeLayout.ConditionalFanoutStateRecipientDispatchDataLengthOffset == 4
+    && MatrixMessageParserFlowNativeLayout.ConditionalFanoutStateRecipientDispatchSelectorOffset == 6
+    && MatrixMessageParserFlowNativeLayout.ConditionalFanoutStateRecipientDispatchReservedOffset == 7);
 Check("Observed DefaultReplayWriter recipient RTTI resolves the fan-out slot implementation",
     MatrixMessageParserFlowNativeLayout.DefaultReplayWriterObjectAllocationSize == 0x64
     && MatrixMessageParserFlowNativeLayout.DefaultReplayWriterConstructorFileOffset == 0xBD7EA0

@@ -662,12 +662,15 @@ helper calls against the original binary before committing and pushing.
   `tfGameProtocolHandler`. See `docs/MatrixConnection.md` for precise
   factory/constructor bytes, vtable targets, and unresolved NPC/nested edges.
 - The gated `0xBD7060` path serializes the message QWORD and message data into
-  its output stream, then passes the selector separately to `0xBD7460`,
+  its output stream (raw QWORD from message `+0x18`, compact positive UInt16
+  from `+0x10`, then message-vtable slot `+0` output), then passes the
+  separate selector to `0xBD7460`,
   which stores it in the recipient callback's local record, not the stream.
-  That function traverses 32-bit
-  recipient pointers in `[+0x2C,+0x30)` (capacity `+0x34`) and calls each
-  recipient's vtable slot `+0x0C` with a local 12-byte record and another
-  argument. A candidate registration path at `0x7FE1C0` allocates `0x48`
+  That function traverses 32-bit recipient pointers in `[+0x2C,+0x30)`
+  (capacity `+0x34`) and calls each recipient's vtable slot `+0x0C` with an
+  eight-byte local header (`owner[+0x20]`, WORD output length, selector byte,
+  zero byte) and a separate output-buffer pointer. A candidate registration
+  path at `0x7FE1C0` allocates `0x48`
   bytes, constructs it with `0xBD6E10`, appends via `0xBD8C90`, then invokes
   recipient slot `+4`. `0x7FE360` constructs one RTTI-backed
   `nl::DefaultReplayWriter` at `0xBD7EA0`; its slot `+0x0C` is VA `0xFD9010`
@@ -774,15 +777,20 @@ helper calls against the original binary before committing and pushing.
   fingerprints are in `docs/MatrixConnection.md` and the separate
   `src/Startup/DialogApplicationDispatchNativeLayout.cs`. Do not repeat the
   registration-order trace unless new static registration-order evidence is
-  available; the next distinct boundary is the recipient iteration behind
-  `0xBD7060` and wrapper `0x821DE0`'s application caller. Continue read-only;
-  do not modify the sample/IDB or commit/push unless explicitly requested.
+  available. The conditional `0xBD7060` serialization and recipient iteration
+  are now documented, including the eight-byte recipient header. No code/data
+  xrefs to wrapper `0x821DE0` (VA `0xC229E0`) exist in the current IDA database;
+  its caller remains unresolved. Continue with the remaining selector
+  `0x75`/`0x76` wire-state questions or selector `0x77` extent mismatch.
+  Continue read-only; do not modify the sample/IDB.
 - Open items: field semantics, allocation-failure consequences, selector
   `0x55` copied but unwritten stack DWORD at object `+0x70` (source proven,
   runtime consequence unresolved), selector `0x6D` outer framing/body
   consumption (the case itself reaches its epilogue without a reader), selector
-  `0x75`/`0x76` blob-content semantics and selector `0x76`'s parser/receiver
-  representation mismatch, selector `0x77` trailing-state extent.
+  `0x75`'s `+0x30` parser/receiver tree-vs-`slBlob` mismatch and
+  selector `0x76`'s parser/receiver range-vs-`slBlob` mismatch, selector
+  `0x77` trailing-state extent. Whether an intervening conversion or distinct
+  object path explains either mismatch remains open.
 - Workflow per batch: preserve native evidence in the existing layout,
   binary checks, and documentation; validate the focused build and binary
   checks, without committing or pushing unless the user requests it.
@@ -1893,8 +1901,9 @@ These updates supersede older next-step suggestions below where they overlap.
   Selector0x74 constructs `AbilityActivated`, reads DWORDs +0x28/+0x2C, and
   copies remaining input into an `slBlob` at +0x30 through virtual +0x10.
   Selector0x75 has the same parser shape; its receiver passes addresses
-  +0x28/+0x30 into an owner-state updater. Blob-content meaning remains
-  unknown; no UI event dispatch was observed.
+  +0x28/+0x30 to a helper that treats the latter field as a tree-header
+  pointer, conflicting with its initialized slBlob vtable. No intervening
+  conversion is known; runtime consequences and field meanings remain unknown.
   Selector0x76 copies remaining input into an `slBlob` at +0x28, but its
   receiver interprets +0x28/+0x2C as begin/end pointers to 0x40-byte records.
   This parser/consumer representation mismatch is confirmed statically; any

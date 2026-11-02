@@ -172,6 +172,12 @@ public static class MatrixMessageParserFlowNativeLayout
     public const uint CallbackContextNestedMessageParserFileOffset = 0xBCA850;
     public const uint CallbackContextMessageConsumerFileOffset = 0x81BB90;
     public const uint CallbackContextConditionalDispatchFileOffset = 0xBD7060;
+    public const uint ConditionalFanoutMessageQwordWriterFileOffset = 0x325BE0;
+    public const uint ConditionalFanoutCompactSelectorWriterFileOffset = 0x320900;
+    public const uint ConditionalFanoutMessageSelectorLoadFileOffset = 0xBD712B;
+    public const uint ConditionalFanoutWireSelectorWriterCallFileOffset = 0xBD7138;
+    public const uint ConditionalFanoutMessageSerializerCallFileOffset = 0xBD7145;
+    public const uint ConditionalFanoutOutputBufferPointerCallFileOffset = 0xBD71F3;
     public const int CallbackContextMessageDispatchReceiverFieldOffset = 8;
     public const uint ConditionalFanoutStateLazyConstructionMethodFileOffset = 0x7FE1C0;
     public const uint ConditionalFanoutStateConstructorFileOffset = 0xBD6E10;
@@ -190,7 +196,11 @@ public static class MatrixMessageParserFlowNativeLayout
     public const int ConditionalFanoutStateRecipientRegistrationVtableSlotOffset = 4;
     public const int ConditionalFanoutStateRecipientDispatchVtableSlotOffset = 0x0C;
     public const int ConditionalFanoutStateRecipientPointerSize = 4;
-    public const int ConditionalFanoutStateRecipientDispatchRecordSize = 0x0C;
+    public const int ConditionalFanoutStateRecipientDispatchRecordSize = 8;
+    public const int ConditionalFanoutStateRecipientDispatchContextOffset = 0;
+    public const int ConditionalFanoutStateRecipientDispatchDataLengthOffset = 4;
+    public const int ConditionalFanoutStateRecipientDispatchSelectorOffset = 6;
+    public const int ConditionalFanoutStateRecipientDispatchReservedOffset = 7;
     public const int DefaultReplayWriterObjectAllocationSize = 0x64;
     public const uint DefaultReplayWriterConstructorFileOffset = 0xBD7EA0;
     public const uint DefaultReplayWriterVtableStoreFileOffset = 0xBD7EE6;

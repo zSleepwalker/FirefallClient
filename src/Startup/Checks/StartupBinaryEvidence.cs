@@ -9050,15 +9050,25 @@ internal static class StartupBinaryEvidence
             && RelativeBranchTargets(0x7FDD81, 0xE8,
                 MatrixMessageParserFlowNativeLayout.CallbackContextConditionalDispatchFileOffset)
             && Matches(0xBD7116, "8B46188945E08B461C8945E4")
+            && RelativeBranchTargets(0xBD7126, 0xE8,
+                MatrixMessageParserFlowNativeLayout.ConditionalFanoutMessageQwordWriterFileOffset)
+            && Matches(MatrixMessageParserFlowNativeLayout.ConditionalFanoutMessageSelectorLoadFileOffset,
+                "8B4610")
+            && RelativeBranchTargets(0xBD7138, 0xE8,
+                MatrixMessageParserFlowNativeLayout.ConditionalFanoutCompactSelectorWriterFileOffset)
+            && Matches(MatrixMessageParserFlowNativeLayout.ConditionalFanoutMessageSerializerCallFileOffset,
+                "FF10")
+            && Matches(MatrixMessageParserFlowNativeLayout.ConditionalFanoutOutputBufferPointerCallFileOffset,
+                "8B038BCBFF500C5056FF75088BCF")
             && RelativeBranchTargets(0xBD7201, 0xE8,
                 MatrixMessageParserFlowNativeLayout.ConditionalFanoutStateRecipientFanoutMethodFileOffset)
             && Matches(0xBD747C, "8945F48B4508")
             && Matches(0xBD7482, "8845FA")
             && Matches(0xBD748A, "668975F8")
             && Matches(0xBD7496, "C645FB00")
+            && Matches(0xBD74A8, "8B0E528D55F4528B01FF500C")
             && Matches(0xBD7485, "8B41308B")
             && Matches(0xBD748E, "8B712C")
-            && Matches(0xBD74A8, "8B0E528D55F4528B01FF500C")
             && Matches(0xBD74B4, "8B550C8D7604")
             && Matches(0x7FE1F7, "6A48E8")
             && RelativeBranchTargets(0x7FE1F9, 0xE8, 0x12B7FB0)
@@ -9106,6 +9116,8 @@ internal static class StartupBinaryEvidence
                 == MatrixMessageParserFlowNativeLayout.DefaultReplayWriterFanoutMethodFileOffset
             && Matches(MatrixMessageParserFlowNativeLayout.DefaultReplayWriterFanoutMethodFileOffset,
                 "558BEC578BF98B4F0C85C97507")
+            && Matches(MatrixMessageParserFlowNativeLayout.DefaultReplayWriterFanoutMethodFileOffset + 0x14,
+                "568B75088BD66A08")
             && RelativeBranchTargets(
                 MatrixMessageParserFlowNativeLayout.DefaultReplayWriterFanoutMethodFileOffset + 0x1C,
                 0xE8,
@@ -9348,7 +9360,10 @@ internal static class StartupBinaryEvidence
             && Matches(0xACDDEB, "83BEC843000000751A")
             && Matches(0xACDE11, "8D4130508D41288B8EC843000050")
             && RelativeBranchTargets(0xACDE1F, 0xE8,
-                CharacterAbilityApplicationNativeLayout.AbilityFailedApplicationHelperFileOffset));
+                CharacterAbilityApplicationNativeLayout.AbilityFailedApplicationHelperFileOffset)
+            && Matches(0x909CA8, "8B7D0C8B3F8B373BF7")
+            && Matches(CharacterAbilityFailedNativeLayout.ConstructorFileOffset + 0x25,
+                "C74630C40CC801"));
         check("Binary AbilityCooldowns iterates 0x40-byte records and calls the chat processor",
             Matches(0xACE225, "8B472C2B4728C1F806")
             && Matches(0xACE243, "8B410C85C00F45F0")

@@ -3669,11 +3669,15 @@ dialog slots already verified at `0x78`–`0x7A`.
 * **`0x75 AbilityFailed` → `0xACDDE0`.** It uses the same accessor and asserted
   owner field `+0x43C8`, then passes the *addresses* of message fields `+0x28`
   and `+0x30` to `0x909C60`. That helper resets/initializes a per-owner tree,
-  follows the state reached through those pointers, resolves keys through
-  owner-state `+0x2C`, and stores a source record value at result-node `+0x10`.
-  This is the observed state-update path; the wire fields and embedded-state
-  type remain unknown. No `uiManager` event dispatch was observed in this
-  helper.
+  passes two dereferenced values from `+0x28` to range walker `0x90C580`, then
+  treats the first DWORD at `+0x30` as a tree-header pointer: it loads the
+  header's first pointer and compares it with the header sentinel before
+  traversing nodes. Its node lookup uses a string pointer at node `+0x10` and
+  copies node `+0x14` into result-node `+0x10`. This conflicts with the parser,
+  which initializes message `+0x30` as an embedded `slBlob` whose first DWORD
+  is vtable VA `0x1C80CC4`; no intervening conversion is established. The
+  wire-field meaning and runtime consequence remain unknown. No `uiManager`
+  event dispatch was observed in this helper.
 * **`0x76 AbilityCooldowns` → `0xACE210`.** The receiver treats state
   `+0x28/+0x2C` as range endpoints, computes `(end-begin)/0x40`, and walks
   `0x40`-byte records. It forwards each record's QWORD `+0`, nullable strings
@@ -4236,14 +4240,18 @@ The `0xBD7060` fan-out is a separate conditional side path: `0x7FDC60` reaches
 it when the message predicate at `message+0x18` returns zero and context
 `+0xB0` is non-null; its selector is `3` for a zero callback argument and `2`
 otherwise. `0xBD7060` serializes the message QWORD and message data into an
-output stream, then passes the selector separately to `0xBD7460`. The latter
-stores the selector in the recipient callback's local record at `0xBD7482`;
-it is not serialized into that stream. That function iterates 32-bit recipient
-pointers in its owner's vector `[+0x2C,+0x30)` (capacity at `+0x34`), stepping
-four bytes at a time. For each item it performs an indirect `__thiscall`
-through vtable slot `+0x0C`, passing a pointer to a local 12-byte record and
-the other fan-out argument. The exact concrete type of every vector entry is
-not established.
+output stream in this order: raw eight bytes from message `+0x18/+0x1C`, a
+compact positive UInt16 encoding of message `+0x10`, then the message vtable's
+slot-`+0` serialization. It then passes the selector separately to
+`0xBD7460`. The latter stores that selector in the recipient callback's local
+header at `0xBD7482`; it is not serialized into the stream. That function
+iterates 32-bit recipient pointers in its owner's vector `[+0x2C,+0x30)`
+(capacity at `+0x34`), stepping four bytes at a time. For each item it
+performs an indirect `__thiscall` through vtable slot `+0x0C`, passing the
+output-buffer pointer separately from an eight-byte local header: DWORD
+`owner[+0x20]` at header `+0`, WORD output length at `+4`, selector byte at
+`+6`, and zero byte at `+7`. The length is narrowed to WORD when the header
+is populated. The exact concrete type of every vector entry is not established.
 
 A representative registration path is visible at raw `0x7FE1C0`: it lazily
 allocates a `0x48`-byte state object, calls `0xBD6E10`, appends a recipient
@@ -4723,20 +4731,24 @@ numeric cases.
 The other direct call, `0xBD7060`, is separately gated by a zero return from
 `0x80A030(message[+0x18])` and non-null context field `+0xB0`. Its selector
 argument is `3` when the callback-supplied argument is zero, otherwise `2`.
-The recipient iteration behind this route is not assigned a concrete type in
-this pass. The analyzed PE's `.text` header maps raw offsets to VAs with
-`+0x400C00` (`ImageBase=0x400000`, section RVA `0x1000`, raw pointer
-`0x400`), so raw `0x7FDC60` maps to VA `0xBFE860`; the binary check validates
-this mapping and the selector-table entries against the requested executable.
-Message-field meanings and producer-side reference policy/ownership transfer
-remain unproven.
+`0xBD7460` passes an eight-byte local header to each recipient's vtable slot
+`+0x0C`, separately from the output-buffer pointer. The header contains
+`owner[+0x20]` as a DWORD, output length as a WORD, the selector byte, and a
+zero byte; the length is narrowed to WORD. The analyzed PE's `.text` header
+maps raw offsets to VAs with `+0x400C00` (`ImageBase=0x400000`, section RVA
+`0x1000`, raw pointer `0x400`), so raw `0x7FDC60` maps to VA `0xBFE860`; the
+binary check validates this mapping and the selector-table entries against the
+requested executable. Message-field meanings and producer-side reference
+policy/ownership transfer remain unproven.
 
 The parser's returned pointer is still passed through EAX by both `0x821BA0`
 and the wrapper `0x821DE0`. The registration field is therefore distinct
 from the readiness probe at `0xBD68F4`, which calls a vtable slot through an
 object at `this+0x24`; its AL result sets or clears `this+0xB1`. The separate
 store of `0xC227A0` into `qword_1EDD1EC` at `0x7FE9F0` remains an independent
-state update. `0x821DE0` still has no proven application caller in this pass.
+state update. No code or data xrefs to raw `0x821DE0` or mapped VA `0xC229E0`
+were found in the current IDA database; the wrapper's application caller and
+role therefore remain unresolved.
 
 The three dialog-message RTTI vtables have a primary three-slot prefix. VAs
 are runtime addresses; the mapped `.rdata` file offsets below follow the PE
