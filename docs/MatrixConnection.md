@@ -1675,12 +1675,16 @@ observed; their per-entry widths and nested layouts are listed above. Selectors
 Selectors `0x76` and `0x77` include the explicit conditional gates described
 above.
 The `0x70` and `0x71` constructors initialize their embedded members at
-`+0x30` and `+0x28` with `slBlob` vtable VA `0x1C80CC4`. Its virtual `+0x10`
-target is VA `0x16CC5D0` / raw `0x12CB9D0`: the method calls resize helper
-`0x12CBCB0`, then, when the blob data pointer is non-null, calls the `memcpy`
-import with the internal destination, incoming source pointer, and remaining
-byte count. This confirms a raw-byte copy without assigning higher-level blob
-semantics.
+`+0x30` and `+0x28` with `slBlob` vtable VA `0x1C80CC4`. The same vtable
+initializes the embedded members for selectors `0x74`–`0x76` at `+0x30`,
+`+0x30`, and `+0x28`, respectively. Its virtual `+0x10` target is VA
+`0x16CC5D0` / raw `0x12CB9D0`: the method calls resize helper `0x12CBCB0`
+with the remaining-byte count and a false preserve flag, then, when the blob
+backing handle is non-null, copies that many bytes from the input pointer into
+the blob's storage via the `memcpy` thunk. Readers `0x5EF1F0`, `0x5EF090`, and
+`0x5EEE60` advance the input pointer and decrement remaining length by that
+same count after the virtual call. This establishes raw-byte storage, not the
+higher-level meaning or schema of those bytes.
 
 The `0x48..0x4E` body-reader functions are called with the stream in ECX and
 the message-object pointer on the stack. Selector `0x4F` instead calls the
@@ -3562,9 +3566,11 @@ object `+0x30`: DWORD `0x1C80CC4` followed by three zero DWORDs.
 
 Reader `0x5EF1F0` reads DWORDs at `+0x28` and `+0x2C` through `0x3370A0`.
 It then invokes virtual slot `+0x10` on the state at `+0x30`, passing the
-remaining stream length and input pointer. The exact interpretation of this
-state and its trailing bytes remains unknown. On allocation failure, ESI is
-zeroed before the reader setup; runtime consequences are not inferred.
+remaining stream length and input pointer. The shared `slBlob` method resizes
+the blob to that length without preserving prior contents and copies the
+remaining bytes verbatim. Their semantic interpretation remains unknown. On
+allocation failure, ESI is zeroed before the reader setup; runtime consequences
+are not inferred.
 
 ### Selector 0x75: `AbilityFailed`
 
@@ -3578,9 +3584,10 @@ DWORDs.
 
 Reader `0x5EF090` has the same observed field-access pattern as `0x5EF1F0`:
 DWORDs at `+0x28` and `+0x2C` through `0x3370A0`, then a virtual slot `+0x10`
-call on `+0x30` using the remaining stream length. Shared layout and reader
-shape do not establish matching event semantics. The state meaning, trailing
-bytes, and allocation-failure consequences remain unresolved.
+call on `+0x30` using the remaining stream length. That slot resolves to the
+shared `slBlob` reader, which resizes and copies the remaining bytes verbatim.
+Shared layout and reader shape do not establish matching event semantics. The
+blob's semantic meaning and allocation-failure consequences remain unresolved.
 
 ### Selector 0x76: `AbilityCooldowns`
 
@@ -3591,9 +3598,14 @@ constructor `0x5265B0`. The constructor passes selector `0x76` to helper
 `firefall::Character::AbilityCooldowns`), and initializes a 16-byte state at
 object `+0x28` with DWORD `0x1C80CC4` followed by three zero DWORDs.
 
-Reader `0x5EEE60` passes the state at `+0x28` to its virtual slot `+0x10`
-with the remaining stream length and input pointer. Thus the observed reader
-consumes the remaining bytes into that state; its exact meaning and allocation
+Reader `0x5EEE60` passes the `slBlob` state at `+0x28` to its virtual slot
+`+0x10` with the remaining stream length and input pointer. The slot resizes
+and copies the remaining bytes verbatim, after which the reader advances past
+those bytes. The receiver separately interprets `+0x28/+0x2C` as begin/end
+range endpoints with `0x40`-byte records, while the parser initializes `+0x28`
+as an `slBlob` vtable and the reader uses `+0x2C` as its backing handle. This
+is a static layout/consumer mismatch; intervening mutations and runtime
+consequences are not established. The blob contents' semantics and allocation
 failure consequences remain unresolved.
 
 ### Selector 0x77: `NPCInteraction`

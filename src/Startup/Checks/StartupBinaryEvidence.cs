@@ -3479,14 +3479,24 @@ internal static class StartupBinaryEvidence
             && Matches(0x5EA330 + 0x5D, "69C7E0020000")
             && Matches(0x5EA3D1, "814604E0020000")
             && Matches(0x12EE09C, "81FE000100007C9E"));
-        check("Binary secondary 0x70-0x71 remaining-input blobs resize and raw-copy bytes through slBlob +0x10",
+        check("Binary secondary and Character embedded slBlob readers resize and raw-copy remaining bytes",
             Matches(0x819FF3, "C74630C40CC801")
             && Matches(0x81A145, "C74628C40CC801")
+            && Matches(CharacterAbilityActivatedNativeLayout.BodyReaderFileOffset + 0x2A,
+                "8B0156FF7704FF5010017704397708")
+            && Matches(CharacterAbilityActivatedNativeLayout.BodyReaderFileOffset + 0x58, "297708")
+            && Matches(CharacterAbilityFailedNativeLayout.BodyReaderFileOffset + 0x2A,
+                "8B0156FF7704FF5010017704397708")
+            && Matches(CharacterAbilityFailedNativeLayout.BodyReaderFileOffset + 0x58, "297708")
+            && Matches(CharacterAbilityCooldownsNativeLayout.BodyReaderFileOffset + 0x14,
+                "8B0157FF7604FF5010017E04397E08")
+            && Matches(CharacterAbilityCooldownsNativeLayout.BodyReaderFileOffset + 0x42, "297E08")
             && VtableRttiName(
                 MatrixSecondaryDecoderTableNativeLayout.RemainingInputBlobVtableVirtualAddress, 80)
                 == ".?AVslBlob@@"
             && ReadUInt32(VirtualAddressToFileOffset(
-                MatrixSecondaryDecoderTableNativeLayout.RemainingInputBlobVtableVirtualAddress) + 0x10)
+                MatrixSecondaryDecoderTableNativeLayout.RemainingInputBlobVtableVirtualAddress)
+                + MatrixSecondaryDecoderTableNativeLayout.RemainingInputBlobReaderVtableSlotOffset)
                 == MatrixSecondaryDecoderTableNativeLayout.RemainingInputBlobReaderMethodVirtualAddress
             && VirtualAddressToFileOffset(
                 MatrixSecondaryDecoderTableNativeLayout.RemainingInputBlobReaderMethodVirtualAddress)
@@ -5977,7 +5987,7 @@ internal static class StartupBinaryEvidence
                 0xE8, CharacterGrappleClimbPermissionNativeLayout.ConditionalPairReaderFileOffset)
             && VtableRttiName(CharacterGrappleClimbPermissionNativeLayout.VtableVirtualAddress, 80)
                 == CharacterGrappleClimbPermissionNativeLayout.RttiName);
-        check("Binary inner selector 0x74 routes AbilityActivated through two DWORDs and its trailing opaque embedded state",
+        check("Binary inner selector 0x74 routes AbilityActivated through two DWORDs and its trailing slBlob",
             ReadUInt32(VirtualAddressToFileOffset(
                 CharacterAbilityActivatedNativeLayout.InnerSelectorTableVirtualAddress)
                 + CharacterAbilityActivatedNativeLayout.InnerSelectorTableEntryOffset)
@@ -6009,7 +6019,7 @@ internal static class StartupBinaryEvidence
                 "8D4E308B770885F67431")
             && VtableRttiName(CharacterAbilityActivatedNativeLayout.VtableVirtualAddress, 80)
                 == CharacterAbilityActivatedNativeLayout.RttiName);
-        check("Binary inner selector 0x75 routes AbilityFailed through two DWORDs and its trailing opaque embedded state",
+        check("Binary inner selector 0x75 routes AbilityFailed through two DWORDs and its trailing slBlob",
             ReadUInt32(VirtualAddressToFileOffset(
                 CharacterAbilityFailedNativeLayout.InnerSelectorTableVirtualAddress)
                 + CharacterAbilityFailedNativeLayout.InnerSelectorTableEntryOffset)
@@ -6041,7 +6051,7 @@ internal static class StartupBinaryEvidence
                 "8D4E308B770885F67431")
             && VtableRttiName(CharacterAbilityFailedNativeLayout.VtableVirtualAddress, 80)
                 == CharacterAbilityFailedNativeLayout.RttiName);
-        check("Binary inner selector 0x76 routes AbilityCooldowns through its opaque embedded state",
+        check("Binary inner selector 0x76 routes AbilityCooldowns through its slBlob state",
             ReadUInt32(VirtualAddressToFileOffset(
                 CharacterAbilityCooldownsNativeLayout.InnerSelectorTableVirtualAddress)
                 + CharacterAbilityCooldownsNativeLayout.InnerSelectorTableEntryOffset)

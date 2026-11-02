@@ -203,11 +203,14 @@ event `365`; individual field and event semantics remain unknown.
 The existing movement receiver overview also records selectors `0x72`
 (`ForcedMovementCancelled`) and `0x73` (`GrappleClimbPermission`) with their
 verified dispatch slots and helper paths; avoid repeating those traces.
-Selectors `0x74`–`0x77` likewise have receiver routing documented. Continue
-with the unresolved nested embedded-state details for selector `0x75`
-(`AbilityFailed`) and selector `0x76` (`AbilityCooldowns`), or selector `0x77`
-(`NPCInteraction`) extent mismatch, while keeping this selector table distinct
-from route indices 2-6 and the secondary decoder table.
+Selectors `0x74`–`0x77` likewise have receiver routing documented. The
+`0x74`–`0x76` embedded objects are `slBlob` instances whose virtual `+0x10`
+reader copies the remaining bytes verbatim; selector `0x76`'s parser-created
+blob representation conflicts with the receiver's range interpretation.
+Continue by tracing whether any intervening transformation explains that
+mismatch, or investigate selector `0x77`'s extent mismatch, while keeping this
+selector table distinct from route indices 2-6 and the secondary decoder
+table.
 
 All secondary selectors `0x20..0x7A` are now reconstructed and checked against
 `FirefallClient.exe.original`. The final entries `0x78..0x7A` resolve to
@@ -778,7 +781,8 @@ helper calls against the original binary before committing and pushing.
   `0x55` copied but unwritten stack DWORD at object `+0x70` (source proven,
   runtime consequence unresolved), selector `0x6D` outer framing/body
   consumption (the case itself reaches its epilogue without a reader), selector
-  `0x75`/`0x76` wire-state semantics, selector `0x77` trailing-state extent.
+  `0x75`/`0x76` blob-content semantics and selector `0x76`'s parser/receiver
+  representation mismatch, selector `0x77` trailing-state extent.
 - Workflow per batch: preserve native evidence in the existing layout,
   binary checks, and documentation; validate the focused build and binary
   checks, without committing or pushing unless the user requests it.
@@ -1887,17 +1891,15 @@ These updates supersede older next-step suggestions below where they overlap.
   Selector0x72 reads DWORD +0x28/WORD +0x2C; receiver slot +0x14C treats +0x28 as a list pointer and updates owner state at +0x43C8; no event dispatch observed.
   Selector0x73 parses the same 14-case nested state; receiver slot +0x150 treats +0x2C as a list pointer, uses zero +0x28 as state, and dispatches numeric code213. Mismatches and unknown consequences are documented.
   Selector0x74 constructs `AbilityActivated`, reads DWORDs +0x28/+0x2C, and
-  passes remaining input to the opaque embedded state at +0x30 (virtual
-  +0x10 reader). Its receiver updates a keyed state record and dispatches
-  numeric UI code 230; no event name is assigned.
-  Selector0x75 constructs `AbilityFailed` with the same observed
-  DWORD/opaque-state reader shape as selector0x74; its receiver passes
-  addresses +0x28/+0x30 into an owner-state updater. Wire-field meaning
-  remains unknown; no UI event dispatch was observed.
-  Selector0x76 constructs `AbilityCooldowns` and passes remaining input to
-  the opaque embedded state at +0x28 (virtual +0x10 reader); its receiver
-  iterates 0x40-byte records into chat processing, but their semantics and
-  cooldown timing remain unknown.
+  copies remaining input into an `slBlob` at +0x30 through virtual +0x10.
+  Selector0x75 has the same parser shape; its receiver passes addresses
+  +0x28/+0x30 into an owner-state updater. Blob-content meaning remains
+  unknown; no UI event dispatch was observed.
+  Selector0x76 copies remaining input into an `slBlob` at +0x28, but its
+  receiver interprets +0x28/+0x2C as begin/end pointers to 0x40-byte records.
+  This parser/consumer representation mismatch is confirmed statically; any
+  intervening mutation and runtime consequence remain unknown. The records'
+  semantics and cooldown timing are also unresolved.
   In the parser-message path, selector `0x77` constructs `NPCInteraction` and
   reads one raw QWORD at +0x28;
   its receiver uses it as a two-DWORD map key and dispatches numeric UI code

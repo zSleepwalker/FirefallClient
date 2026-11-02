@@ -981,6 +981,7 @@ Check("Secondary decoder table snapshot records all 91 selectors",
     && MatrixSecondaryDecoderTableNativeLayout.DefaultZeroReturnFileOffset == 0x8217D9
     && MatrixSecondaryDecoderTableNativeLayout.SharedCaseSetupArgument3VirtualAddress == 0x1E60904
     && MatrixSecondaryDecoderTableNativeLayout.RemainingInputBlobVtableVirtualAddress == 0x1C80CC4
+    && MatrixSecondaryDecoderTableNativeLayout.RemainingInputBlobReaderVtableSlotOffset == 0x10
     && MatrixSecondaryDecoderTableNativeLayout.RemainingInputBlobReaderMethodVirtualAddress == 0x16CC5D0
     && MatrixSecondaryDecoderTableNativeLayout.RemainingInputBlobReaderMethodFileOffset == 0x12CB9D0
     && MatrixSecondaryDecoderTableNativeLayout.RemainingInputBlobResizeHelperFileOffset == 0x12CBCB0
@@ -4085,7 +4086,7 @@ Check("GrappleClimbPermission selector 0x73 records its initialized nested state
         .SequenceEqual(CharacterForcedMovementNativeLayout.ConstructorInitializedDwords)
     && CharacterGrappleClimbPermissionNativeLayout.ConstructorInitializedWords
         .SequenceEqual(CharacterForcedMovementNativeLayout.ConstructorInitializedWords));
-Check("AbilityActivated selector 0x74 records its two DWORDs and trailing opaque embedded state",
+Check("AbilityActivated selector 0x74 records its two DWORDs and trailing slBlob",
     CharacterAbilityActivatedNativeLayout.InnerSelector == 0x74
     && CharacterAbilityActivatedNativeLayout.InnerSelectorTableEntryOffset == 0x84
     && CharacterAbilityActivatedNativeLayout.CaseVirtualAddress == 0xC1E249
@@ -4102,7 +4103,7 @@ Check("AbilityActivated selector 0x74 records its two DWORDs and trailing opaque
     && CharacterAbilityActivatedNativeLayout.PayloadOffset == 0x30
     && CharacterAbilityActivatedNativeLayout.PayloadStateSize == 0x10
     && CharacterAbilityActivatedNativeLayout.PayloadStateInitializer == 0x1C80CC4);
-Check("AbilityFailed selector 0x75 records its two DWORDs and trailing opaque embedded state",
+Check("AbilityFailed selector 0x75 records its two DWORDs and trailing slBlob",
     CharacterAbilityFailedNativeLayout.InnerSelector == 0x75
     && CharacterAbilityFailedNativeLayout.InnerSelectorTableEntryOffset == 0x88
     && CharacterAbilityFailedNativeLayout.CaseVirtualAddress == 0xC1E29A
@@ -4119,7 +4120,7 @@ Check("AbilityFailed selector 0x75 records its two DWORDs and trailing opaque em
     && CharacterAbilityFailedNativeLayout.PayloadOffset == 0x30
     && CharacterAbilityFailedNativeLayout.PayloadStateSize == 0x10
     && CharacterAbilityFailedNativeLayout.PayloadStateInitializer == 0x1C80CC4);
-Check("AbilityCooldowns selector 0x76 records an opaque embedded state",
+Check("AbilityCooldowns selector 0x76 records an slBlob state",
     CharacterAbilityCooldownsNativeLayout.InnerSelector == 0x76
     && CharacterAbilityCooldownsNativeLayout.InnerSelectorTableEntryOffset == 0x8C
     && CharacterAbilityCooldownsNativeLayout.CaseVirtualAddress == 0xC1E2EB
