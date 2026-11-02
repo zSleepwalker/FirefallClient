@@ -2788,6 +2788,262 @@ internal static class StartupBinaryEvidence
             && Matches(0x8446CB, "84DB0F848F010000")
             && Matches(0x84485B, "4F0F857EFEFFFF")
             && Matches(0x844862, "80FBFF0F841AFEFFFF"));
+        check("Binary secondary 0x68-0x6F table targets are distinct and resolve section-aware RTTI",
+            new (byte Selector, uint CaseFileOffset, uint CaseVirtualAddress,
+                uint VtableVirtualAddress, string RttiName)[] {
+                (DisplayMoneyBombBannerNativeLayout.Selector,
+                    DisplayMoneyBombBannerNativeLayout.CaseFileOffset,
+                    DisplayMoneyBombBannerNativeLayout.CaseVirtualAddress,
+                    DisplayMoneyBombBannerNativeLayout.VtableVirtualAddress,
+                    DisplayMoneyBombBannerNativeLayout.RttiName),
+                (SetPreloadPositionNativeLayout.Selector,
+                    SetPreloadPositionNativeLayout.CaseFileOffset,
+                    SetPreloadPositionNativeLayout.CaseVirtualAddress,
+                    SetPreloadPositionNativeLayout.VtableVirtualAddress,
+                    SetPreloadPositionNativeLayout.RttiName),
+                (PlaySoundIdNativeLayout.Selector, PlaySoundIdNativeLayout.CaseFileOffset,
+                    PlaySoundIdNativeLayout.CaseVirtualAddress,
+                    PlaySoundIdNativeLayout.VtableVirtualAddress,
+                    PlaySoundIdNativeLayout.RttiName),
+                (PlaySoundIdAtLocationNativeLayout.Selector,
+                    PlaySoundIdAtLocationNativeLayout.CaseFileOffset,
+                    PlaySoundIdAtLocationNativeLayout.CaseVirtualAddress,
+                    PlaySoundIdAtLocationNativeLayout.VtableVirtualAddress,
+                    PlaySoundIdAtLocationNativeLayout.RttiName),
+                (PlayDialogScriptMessageNativeLayout.Selector,
+                    PlayDialogScriptMessageNativeLayout.CaseFileOffset,
+                    PlayDialogScriptMessageNativeLayout.CaseVirtualAddress,
+                    PlayDialogScriptMessageNativeLayout.VtableVirtualAddress,
+                    PlayDialogScriptMessageNativeLayout.RttiName),
+                (StopDialogScriptMessageNativeLayout.Selector,
+                    StopDialogScriptMessageNativeLayout.CaseFileOffset,
+                    StopDialogScriptMessageNativeLayout.CaseVirtualAddress,
+                    StopDialogScriptMessageNativeLayout.VtableVirtualAddress,
+                    StopDialogScriptMessageNativeLayout.RttiName),
+                (PingMapNativeLayout.Selector, PingMapNativeLayout.CaseFileOffset,
+                    PingMapNativeLayout.CaseVirtualAddress,
+                    PingMapNativeLayout.VtableVirtualAddress,
+                    PingMapNativeLayout.RttiName),
+                (PingMapMarkerNativeLayout.Selector, PingMapMarkerNativeLayout.CaseFileOffset,
+                    PingMapMarkerNativeLayout.CaseVirtualAddress,
+                    PingMapMarkerNativeLayout.VtableVirtualAddress,
+                    PingMapMarkerNativeLayout.RttiName)
+            }.Select((item, index) =>
+                item.Selector == 0x68 + index
+                && ReadUInt32(VirtualAddressToFileOffset(
+                    MatrixSecondaryDecoderTableNativeLayout.TableVirtualAddress)
+                    + (uint)(MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(item.Selector)!.Value * 4))
+                    == item.CaseVirtualAddress
+                && item.CaseVirtualAddress == item.CaseFileOffset + 0x400C00
+                && VtableRttiName(item.VtableVirtualAddress, 80) == item.RttiName
+                && VtableCompleteObjectOffset(item.VtableVirtualAddress) == 0)
+                .All(matches => matches)
+            && new uint[] {
+                DisplayMoneyBombBannerNativeLayout.CaseVirtualAddress,
+                SetPreloadPositionNativeLayout.CaseVirtualAddress,
+                PlaySoundIdNativeLayout.CaseVirtualAddress,
+                PlaySoundIdAtLocationNativeLayout.CaseVirtualAddress,
+                PlayDialogScriptMessageNativeLayout.CaseVirtualAddress,
+                StopDialogScriptMessageNativeLayout.CaseVirtualAddress,
+                PingMapNativeLayout.CaseVirtualAddress,
+                PingMapMarkerNativeLayout.CaseVirtualAddress
+            }.Distinct().Count() == 8);
+        check("Binary secondary 0x68-0x6F cases preserve setup, allocation gates, constructors, and readers",
+            new (uint Case, uint SetupArgument2, uint Anchor, int Allocation,
+                uint Constructor, uint Reader, uint ReaderCall, uint Failure)[] {
+                (DisplayMoneyBombBannerNativeLayout.CaseFileOffset,
+                    DisplayMoneyBombBannerNativeLayout.CaseSetupArgument2VirtualAddress,
+                    DisplayMoneyBombBannerNativeLayout.DescriptorAnchorVirtualAddress,
+                    DisplayMoneyBombBannerNativeLayout.AllocationSize,
+                    DisplayMoneyBombBannerNativeLayout.ConstructorFileOffset,
+                    DisplayMoneyBombBannerNativeLayout.BodyReaderFileOffset,
+                    DisplayMoneyBombBannerNativeLayout.BodyReaderCallSiteFileOffset,
+                    DisplayMoneyBombBannerNativeLayout.AllocationFailureZeroObjectFileOffset),
+                (SetPreloadPositionNativeLayout.CaseFileOffset,
+                    SetPreloadPositionNativeLayout.CaseSetupArgument2VirtualAddress,
+                    SetPreloadPositionNativeLayout.DescriptorAnchorVirtualAddress,
+                    SetPreloadPositionNativeLayout.AllocationSize,
+                    SetPreloadPositionNativeLayout.ConstructorFileOffset,
+                    SetPreloadPositionNativeLayout.BodyReaderFileOffset,
+                    SetPreloadPositionNativeLayout.BodyReaderCallSiteFileOffset,
+                    SetPreloadPositionNativeLayout.AllocationFailureZeroObjectFileOffset),
+                (PlaySoundIdNativeLayout.CaseFileOffset,
+                    PlaySoundIdNativeLayout.CaseSetupArgument2VirtualAddress,
+                    PlaySoundIdNativeLayout.DescriptorAnchorVirtualAddress,
+                    PlaySoundIdNativeLayout.AllocationSize,
+                    PlaySoundIdNativeLayout.ConstructorFileOffset,
+                    PlaySoundIdNativeLayout.BodyReaderFileOffset,
+                    PlaySoundIdNativeLayout.BodyReaderCallSiteFileOffset,
+                    PlaySoundIdNativeLayout.AllocationFailureZeroObjectFileOffset),
+                (PlaySoundIdAtLocationNativeLayout.CaseFileOffset,
+                    PlaySoundIdAtLocationNativeLayout.CaseSetupArgument2VirtualAddress,
+                    PlaySoundIdAtLocationNativeLayout.DescriptorAnchorVirtualAddress,
+                    PlaySoundIdAtLocationNativeLayout.AllocationSize,
+                    PlaySoundIdAtLocationNativeLayout.ConstructorFileOffset,
+                    PlaySoundIdAtLocationNativeLayout.BodyReaderFileOffset,
+                    PlaySoundIdAtLocationNativeLayout.BodyReaderCallSiteFileOffset,
+                    PlaySoundIdAtLocationNativeLayout.AllocationFailureZeroObjectFileOffset),
+                (PlayDialogScriptMessageNativeLayout.CaseFileOffset,
+                    PlayDialogScriptMessageNativeLayout.CaseSetupArgument2VirtualAddress,
+                    PlayDialogScriptMessageNativeLayout.DescriptorAnchorVirtualAddress,
+                    PlayDialogScriptMessageNativeLayout.AllocationSize,
+                    PlayDialogScriptMessageNativeLayout.ConstructorFileOffset,
+                    PlayDialogScriptMessageNativeLayout.BodyReaderFileOffset,
+                    PlayDialogScriptMessageNativeLayout.BodyReaderCallSiteFileOffset,
+                    PlayDialogScriptMessageNativeLayout.AllocationFailureZeroObjectFileOffset),
+                (StopDialogScriptMessageNativeLayout.CaseFileOffset,
+                    StopDialogScriptMessageNativeLayout.CaseSetupArgument2VirtualAddress,
+                    StopDialogScriptMessageNativeLayout.DescriptorAnchorVirtualAddress,
+                    StopDialogScriptMessageNativeLayout.AllocationSize,
+                    StopDialogScriptMessageNativeLayout.ConstructorFileOffset,
+                    StopDialogScriptMessageNativeLayout.BodyReaderFileOffset,
+                    StopDialogScriptMessageNativeLayout.BodyReaderCallSiteFileOffset,
+                    StopDialogScriptMessageNativeLayout.AllocationFailureZeroObjectFileOffset),
+                (PingMapNativeLayout.CaseFileOffset,
+                    PingMapNativeLayout.CaseSetupArgument2VirtualAddress,
+                    PingMapNativeLayout.DescriptorAnchorVirtualAddress,
+                    PingMapNativeLayout.AllocationSize,
+                    PingMapNativeLayout.ConstructorFileOffset,
+                    PingMapNativeLayout.BodyReaderFileOffset,
+                    PingMapNativeLayout.BodyReaderCallSiteFileOffset,
+                    PingMapNativeLayout.AllocationFailureZeroObjectFileOffset),
+                (PingMapMarkerNativeLayout.CaseFileOffset,
+                    PingMapMarkerNativeLayout.CaseSetupArgument2VirtualAddress,
+                    PingMapMarkerNativeLayout.DescriptorAnchorVirtualAddress,
+                    PingMapMarkerNativeLayout.AllocationSize,
+                    PingMapMarkerNativeLayout.ConstructorFileOffset,
+                    PingMapMarkerNativeLayout.BodyReaderFileOffset,
+                    PingMapMarkerNativeLayout.BodyReaderCallSiteFileOffset,
+                    PingMapMarkerNativeLayout.AllocationFailureZeroObjectFileOffset)
+            }.Select((item, index) =>
+                Matches(item.Case,
+                    "68" + UInt32LittleEndianHex(item.Anchor)
+                    + "68" + UInt32LittleEndianHex(item.SetupArgument2)
+                    + "68" + UInt32LittleEndianHex(
+                        MatrixSecondaryDecoderTableNativeLayout.SharedCaseSetupArgument3VirtualAddress))
+                && RelativeBranchTargets(item.Case + 0x0F, 0xE8,
+                    MatrixSecondaryDecoderTableNativeLayout.CaseSetupHelperFileOffset)
+                && Matches(MatrixSecondaryDecoderTableNativeLayout.CaseSetupHelperFileOffset, "C3")
+                && Matches(item.Case + 0x17, "6A" + item.Allocation.ToString("X2"))
+                && RelativeBranchTargets(item.Case + 0x19, 0xE8, 0x12B7FB0)
+                && Matches(item.Case + 0x25,
+                    "C7442420" + UInt32LittleEndianHex((uint)(0x48 + index)))
+                && Matches(item.Case + 0x2D, "85C0")
+                && Matches(item.Case + 0x2F, "7410")
+                && item.Failure == item.Case + 0x41
+                && Matches(item.Failure, "33F6")
+                && RelativeBranchTargets(item.Case + 0x38, 0xE8, item.Constructor)
+                && Matches(item.Case + 0x3D, "8BF0EB02")
+                && Matches(item.Case + 0x3F, "EB02")
+                && (index == 1
+                    ? Matches(item.Case + 0x43, "8D5628C7442420FFFFFFFF8BCF")
+                    : Matches(item.Case + 0x43, "568BCFC7442424FFFFFFFF"))
+                && RelativeBranchTargets(item.ReaderCall, 0xE8, item.Reader))
+                .All(matches => matches));
+        check("Binary secondary 0x68-0x6F constructors set native type, metadata, anchors, and derived RTTI",
+            new (uint Constructor, uint TypeId, uint Helper, uint Anchor,
+                uint Vtable, string RttiName)[] {
+                (DisplayMoneyBombBannerNativeLayout.ConstructorFileOffset, 0x68,
+                    DisplayMoneyBombBannerNativeLayout.BaseMetadataConstructorFileOffset,
+                    DisplayMoneyBombBannerNativeLayout.DescriptorAnchorVirtualAddress,
+                    DisplayMoneyBombBannerNativeLayout.VtableVirtualAddress,
+                    DisplayMoneyBombBannerNativeLayout.RttiName),
+                (SetPreloadPositionNativeLayout.ConstructorFileOffset, 0x69,
+                    SetPreloadPositionNativeLayout.BaseMetadataConstructorFileOffset,
+                    SetPreloadPositionNativeLayout.DescriptorAnchorVirtualAddress,
+                    SetPreloadPositionNativeLayout.VtableVirtualAddress,
+                    SetPreloadPositionNativeLayout.RttiName),
+                (PlaySoundIdNativeLayout.ConstructorFileOffset, 0x6A,
+                    PlaySoundIdNativeLayout.BaseMetadataConstructorFileOffset,
+                    PlaySoundIdNativeLayout.DescriptorAnchorVirtualAddress,
+                    PlaySoundIdNativeLayout.VtableVirtualAddress,
+                    PlaySoundIdNativeLayout.RttiName),
+                (PlaySoundIdAtLocationNativeLayout.ConstructorFileOffset, 0x6B,
+                    PlaySoundIdAtLocationNativeLayout.BaseMetadataConstructorFileOffset,
+                    PlaySoundIdAtLocationNativeLayout.DescriptorAnchorVirtualAddress,
+                    PlaySoundIdAtLocationNativeLayout.VtableVirtualAddress,
+                    PlaySoundIdAtLocationNativeLayout.RttiName),
+                (PlayDialogScriptMessageNativeLayout.ConstructorFileOffset, 0x6C,
+                    PlayDialogScriptMessageNativeLayout.BaseMetadataConstructorFileOffset,
+                    PlayDialogScriptMessageNativeLayout.DescriptorAnchorVirtualAddress,
+                    PlayDialogScriptMessageNativeLayout.VtableVirtualAddress,
+                    PlayDialogScriptMessageNativeLayout.RttiName),
+                (StopDialogScriptMessageNativeLayout.ConstructorFileOffset, 0x6D,
+                    StopDialogScriptMessageNativeLayout.BaseMetadataConstructorFileOffset,
+                    StopDialogScriptMessageNativeLayout.DescriptorAnchorVirtualAddress,
+                    StopDialogScriptMessageNativeLayout.VtableVirtualAddress,
+                    StopDialogScriptMessageNativeLayout.RttiName),
+                (PingMapNativeLayout.ConstructorFileOffset, 0x6E,
+                    PingMapNativeLayout.BaseMetadataConstructorFileOffset,
+                    PingMapNativeLayout.DescriptorAnchorVirtualAddress,
+                    PingMapNativeLayout.VtableVirtualAddress,
+                    PingMapNativeLayout.RttiName),
+                (PingMapMarkerNativeLayout.ConstructorFileOffset, 0x6F,
+                    PingMapMarkerNativeLayout.BaseMetadataConstructorFileOffset,
+                    PingMapMarkerNativeLayout.DescriptorAnchorVirtualAddress,
+                    PingMapMarkerNativeLayout.VtableVirtualAddress,
+                    PingMapMarkerNativeLayout.RttiName)
+            }.All(item =>
+                Matches(item.Constructor + 0x12,
+                    "C700" + UInt32LittleEndianHex(item.TypeId))
+                && RelativeBranchTargets(item.Constructor + 0x18, 0xE8, item.Helper)
+                && Matches(item.Constructor + 0x1D,
+                    "C706" + UInt32LittleEndianHex(item.Vtable))
+                && Matches(item.Helper + 0x13,
+                    "C7460C" + UInt32LittleEndianHex(item.Anchor))
+                && Matches(item.Helper + 0x1A, "C7460801000000")
+                && Matches(item.Helper + 0x21, "894610")
+                && Matches(item.Helper + 0x2B, "894618")
+                && Matches(item.Helper + 0x31, "89461C")
+                && Matches(item.Helper + 0x34,
+                    "C7462000000000C7462400000000")
+                && VtableRttiName(item.Vtable, 80) == item.RttiName
+                && VtableCompleteObjectOffset(item.Vtable) == 0));
+        check("Binary secondary 0x68-0x6F readers preserve ordered destinations and primitive wire widths",
+            new (uint Address, string Bytes, uint CallSite, uint Target)[] {
+                (0x8420BB, "8D4628", 0x8420BF, 0x3370A0),
+                (0x8420C4, "8D562C8BCF", 0x8420C9, 0x12EE010),
+                (0x8420CE, "8D46308BCF50", 0x8420D4, 0x3370A0),
+                (0x8210B7, "8D5628", 0x8210C4, 0x6087E0),
+                (0x841F8A, "8D4628", 0x841F8E, 0x356850),
+                (0x841F93, "8D4630", 0x841F99, 0x356F80),
+                (0x841EDA, "8D4628", 0x841EDE, 0x356850),
+                (0x841EE3, "83C6308BCF56", 0x841EE9, 0x3568E0),
+                (0x841EEE, "8D46048BCF50", 0x841EF4, 0x3568E0),
+                (0x841EF9, "8D46088BCF50", 0x841EFF, 0x3568E0),
+                (0x841DEB, "8D4628", 0x841DEF, 0x3370A0),
+                (0x841DF4, "8D562C8BCF", 0x841DF9, 0x34F7D0),
+                (0x841D4B, "8D4628", 0x841D4F, 0x3370A0),
+                (0x841D54, "8D562C8BCF", 0x841D59, 0x34F7D0),
+                (0x841D5E, "8D56388BCF", 0x841D63, 0x337180),
+                (0x841C6B, "8D7728", 0x841C6F, 0x3568E0),
+                (0x841C74, "8D46048BCB50", 0x841C7A, 0x3568E0),
+                (0x841C7F, "8D46088BCB50", 0x841C85, 0x3568E0),
+                (0x841C8A, "8D47348BCB50", 0x841C90, 0x3370A0),
+                (0x841B7A, "8D4628", 0x841B7E, 0x356F80),
+                (0x841B83, "8D46308BCF50", 0x841B89, 0x3370A0)
+            }.All(item => Matches(item.Address, item.Bytes)
+                && RelativeBranchTargets(item.CallSite, 0xE8, item.Target))
+            && Matches(0x3370BD, "8B46048B088B4508890883460404837E0804")
+            && Matches(0x3568FD, "8B46048B088B4508890883460404837E0804")
+            && Matches(0x35686D,
+                "8B56048B4D088B0289018B420489410483460408")
+            && Matches(0x356F9D,
+                "8B56048B4D088B0289018B420489410483460408")
+            && Matches(0x33719F, "8B47048A008803FF4704837F0801")
+            && Matches(0x6087E9, "C745FC04000000")
+            && Matches(0x6087F2, "BB04000000")
+            && Matches(0x608840, "83C7044B75B1")
+            && Matches(0x608846, "FF4DFC75A7")
+            && Matches(0x34F7FC, "8B47048A1840837F0801885C2413894704731D")
+            && Matches(0x34F82C, "FF4F08C64424120084DB0F8473010000")
+            && Matches(0x34F857,
+                "8B47048B188B480483C008837F0808895C2418895C2420894C241C894C2424894704731D")
+            && Matches(0x34F9A7, "3AC30F8291FEFFFF")
+            && Matches(0x34F9AF, "80FBFF0F842DFEFFFF")
+            && Matches(0x12EE05D, "8B4F048A01888435F8FEFFFF8D4101894704")
+            && Matches(0x12EE091, "80BC35F8FEFFFF00")
+            && Matches(0x12EE09C, "81FE000100007C9E"));
         check("Binary selector 0x64 tagged entries retain their dispatch and payload branches",
             new uint[] {
                 EncounterUIScopeInNativeLayout.TagZeroHandlerFileOffset,

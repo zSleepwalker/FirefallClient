@@ -970,12 +970,13 @@ Check("Secondary command dispatcher separates primary-byte, secondary-selector, 
     && MatrixSecondaryCommandDispatcherNativeLayout.GetSecondarySelectorIndex(0x20) == 0
     && MatrixSecondaryCommandDispatcherNativeLayout.GetSecondarySelectorIndex(0x7A) == 0x5A
     && MatrixSecondaryCommandDispatcherNativeLayout.GetSecondarySelectorIndex(0x7B) is null);
-Check("Secondary decoder table snapshot records 72 of 91 selectors",
+Check("Secondary decoder table snapshot records 80 of 91 selectors",
     MatrixSecondaryDecoderTableNativeLayout.ParserFileOffset == 0x81CC50
     && MatrixSecondaryDecoderTableNativeLayout.SelectorComparisonFileOffset == 0x81F3A8
     && MatrixSecondaryDecoderTableNativeLayout.SelectorJumpFileOffset == 0x81F3B4
     && MatrixSecondaryDecoderTableNativeLayout.TableVirtualAddress == 0xC22630
     && MatrixSecondaryDecoderTableNativeLayout.TableFileOffset == 0x821A30
+    && MatrixSecondaryDecoderTableNativeLayout.CaseSetupHelperFileOffset == 0x3571B0
     && MatrixSecondaryDecoderTableNativeLayout.EntryCount == 0x5B
     && MatrixSecondaryDecoderTableNativeLayout.DefaultZeroReturnFileOffset == 0x8217D9
     && MatrixSecondaryDecoderTableNativeLayout.SharedCaseSetupArgument3VirtualAddress == 0x1E60904
@@ -994,16 +995,18 @@ Check("Secondary decoder table snapshot records 72 of 91 selectors",
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x58) == 56
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x60) == 64
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x67) == 71
+    && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x68) == 72
+    && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x6F) == 79
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x7A) == 0x5A
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x1F) is null
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x7B) is null
-    && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries.Count == 72
+    && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries.Count == 80
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .Select(entry => entry.Selector)
-        .SequenceEqual(Enumerable.Range(0x20, 72).Select(selector => (byte)selector))
+        .SequenceEqual(Enumerable.Range(0x20, 80).Select(selector => (byte)selector))
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .Select(entry => entry.TableIndex)
-        .SequenceEqual(Enumerable.Range(0, 72))
+        .SequenceEqual(Enumerable.Range(0, 80))
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .Select(entry => entry.TargetVirtualAddress)
         .SequenceEqual(new uint[]
@@ -1025,7 +1028,9 @@ Check("Secondary decoder table snapshot records 72 of 91 selectors",
             0xC215FD, 0xC21645, 0xC21699, 0xC216E1,
             0xC21749, 0xC217B1, 0xC21819, 0xC21881,
             0xC218E9, 0xC21951, 0xC219B9, 0xC21A21,
-            0xC21A89, 0xC21AF1, 0xC21B59, 0xC21BA1
+            0xC21A89, 0xC21AF1, 0xC21B59, 0xC21BA1,
+            0xC21C0C, 0xC21C74, 0xC21CDE, 0xC21D46,
+            0xC21DAE, 0xC21E16, 0xC21E7E, 0xC21EE6
         })
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .All(entry => entry.TargetKind == MatrixSecondaryDecoderTargetKind.MessageCase)
@@ -1033,7 +1038,7 @@ Check("Secondary decoder table snapshot records 72 of 91 selectors",
         .All(entry => entry.TargetVirtualAddress == entry.TargetFileOffset + 0x400C00)
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .Select(entry => entry.TargetVirtualAddress)
-        .Distinct().Count() == 72
+        .Distinct().Count() == 80
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x27)?.TargetFileOffset == 0x81F683
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x28)?.TargetFileOffset == 0x81F6EB
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x2F)?.TargetFileOffset == 0x81F9BE
@@ -1049,7 +1054,9 @@ Check("Secondary decoder table snapshot records 72 of 91 selectors",
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x58)?.TargetFileOffset == 0x8209FD
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x5F)?.TargetFileOffset == 0x820C81
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x60)?.TargetFileOffset == 0x820CE9
-    && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x67)?.TargetFileOffset == 0x820FA1);
+    && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x67)?.TargetFileOffset == 0x820FA1
+    && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x68)?.TargetFileOffset == 0x82100C
+    && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x6F)?.TargetFileOffset == 0x8212E6);
 Check("Secondary selectors 0x58-0x5F retain positional wire layouts",
     TrackRecipeNativeLayout.Selector == 0x58
     && TrackRecipeNativeLayout.AllocationSize == 0x30
@@ -1289,6 +1296,146 @@ Check("Secondary selectors 0x60-0x67 retain observed wire and native body layout
     && DisplayUiNotificationNativeLayout.RecordTextTerminatorWireWidth == 1
     && DisplayUiNotificationNativeLayout.TrailingByteFieldOffset == 0x8C
     && DisplayUiNotificationNativeLayout.ChunkContinuationCount == 0xFF);
+Check("Secondary selectors 0x68-0x6F record their independent RTTI-backed cases",
+    new (byte Selector, uint CaseOffset, uint CaseVa, uint TypeId,
+        uint Anchor, uint Vtable, string RttiName)[] {
+        (DisplayMoneyBombBannerNativeLayout.Selector,
+            DisplayMoneyBombBannerNativeLayout.CaseFileOffset,
+            DisplayMoneyBombBannerNativeLayout.CaseVirtualAddress,
+            DisplayMoneyBombBannerNativeLayout.ConstructorNativeTypeId,
+            DisplayMoneyBombBannerNativeLayout.DescriptorAnchorVirtualAddress,
+            DisplayMoneyBombBannerNativeLayout.VtableVirtualAddress,
+            DisplayMoneyBombBannerNativeLayout.RttiName),
+        (SetPreloadPositionNativeLayout.Selector,
+            SetPreloadPositionNativeLayout.CaseFileOffset,
+            SetPreloadPositionNativeLayout.CaseVirtualAddress,
+            SetPreloadPositionNativeLayout.ConstructorNativeTypeId,
+            SetPreloadPositionNativeLayout.DescriptorAnchorVirtualAddress,
+            SetPreloadPositionNativeLayout.VtableVirtualAddress,
+            SetPreloadPositionNativeLayout.RttiName),
+        (PlaySoundIdNativeLayout.Selector, PlaySoundIdNativeLayout.CaseFileOffset,
+            PlaySoundIdNativeLayout.CaseVirtualAddress,
+            PlaySoundIdNativeLayout.ConstructorNativeTypeId,
+            PlaySoundIdNativeLayout.DescriptorAnchorVirtualAddress,
+            PlaySoundIdNativeLayout.VtableVirtualAddress,
+            PlaySoundIdNativeLayout.RttiName),
+        (PlaySoundIdAtLocationNativeLayout.Selector,
+            PlaySoundIdAtLocationNativeLayout.CaseFileOffset,
+            PlaySoundIdAtLocationNativeLayout.CaseVirtualAddress,
+            PlaySoundIdAtLocationNativeLayout.ConstructorNativeTypeId,
+            PlaySoundIdAtLocationNativeLayout.DescriptorAnchorVirtualAddress,
+            PlaySoundIdAtLocationNativeLayout.VtableVirtualAddress,
+            PlaySoundIdAtLocationNativeLayout.RttiName),
+        (PlayDialogScriptMessageNativeLayout.Selector,
+            PlayDialogScriptMessageNativeLayout.CaseFileOffset,
+            PlayDialogScriptMessageNativeLayout.CaseVirtualAddress,
+            PlayDialogScriptMessageNativeLayout.ConstructorNativeTypeId,
+            PlayDialogScriptMessageNativeLayout.DescriptorAnchorVirtualAddress,
+            PlayDialogScriptMessageNativeLayout.VtableVirtualAddress,
+            PlayDialogScriptMessageNativeLayout.RttiName),
+        (StopDialogScriptMessageNativeLayout.Selector,
+            StopDialogScriptMessageNativeLayout.CaseFileOffset,
+            StopDialogScriptMessageNativeLayout.CaseVirtualAddress,
+            StopDialogScriptMessageNativeLayout.ConstructorNativeTypeId,
+            StopDialogScriptMessageNativeLayout.DescriptorAnchorVirtualAddress,
+            StopDialogScriptMessageNativeLayout.VtableVirtualAddress,
+            StopDialogScriptMessageNativeLayout.RttiName),
+        (PingMapNativeLayout.Selector, PingMapNativeLayout.CaseFileOffset,
+            PingMapNativeLayout.CaseVirtualAddress,
+            PingMapNativeLayout.ConstructorNativeTypeId,
+            PingMapNativeLayout.DescriptorAnchorVirtualAddress,
+            PingMapNativeLayout.VtableVirtualAddress,
+            PingMapNativeLayout.RttiName),
+        (PingMapMarkerNativeLayout.Selector, PingMapMarkerNativeLayout.CaseFileOffset,
+            PingMapMarkerNativeLayout.CaseVirtualAddress,
+            PingMapMarkerNativeLayout.ConstructorNativeTypeId,
+            PingMapMarkerNativeLayout.DescriptorAnchorVirtualAddress,
+            PingMapMarkerNativeLayout.VtableVirtualAddress,
+            PingMapMarkerNativeLayout.RttiName)
+    }.Select((item, index) =>
+        item.Selector == 0x68 + index
+        && item.CaseVa == item.CaseOffset + 0x400C00
+        && item.TypeId == item.Selector
+        && item.Anchor != 0 && item.Vtable != 0
+        && !string.IsNullOrWhiteSpace(item.RttiName)
+        && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(item.Selector)
+            ?.TargetFileOffset == item.CaseOffset
+        && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(item.Selector)
+            ?.TargetVirtualAddress == item.CaseVa)
+        .All(matches => matches)
+    && new uint[] {
+        DisplayMoneyBombBannerNativeLayout.BaseMetadataConstructorFileOffset,
+        SetPreloadPositionNativeLayout.BaseMetadataConstructorFileOffset,
+        PlaySoundIdNativeLayout.BaseMetadataConstructorFileOffset,
+        PlaySoundIdAtLocationNativeLayout.BaseMetadataConstructorFileOffset,
+        PlayDialogScriptMessageNativeLayout.BaseMetadataConstructorFileOffset,
+        StopDialogScriptMessageNativeLayout.BaseMetadataConstructorFileOffset,
+        PingMapNativeLayout.BaseMetadataConstructorFileOffset,
+        PingMapMarkerNativeLayout.BaseMetadataConstructorFileOffset
+    }.SequenceEqual(new uint[] { 0x825AA0, 0x825B10, 0x825B80, 0x825BF0,
+        0x825C60, 0x825CD0, 0x825D40, 0x825DB0 }));
+Check("Secondary selectors 0x68-0x6F preserve exact positional wire layouts",
+    DisplayMoneyBombBannerNativeLayout.AllocationSize == 0x38
+    && DisplayMoneyBombBannerNativeLayout.FirstDwordFieldOffset == 0x28
+    && DisplayMoneyBombBannerNativeLayout.SharedTextFieldOffset == 0x2C
+    && DisplayMoneyBombBannerNativeLayout.SecondDwordFieldOffset == 0x30
+    && DisplayMoneyBombBannerNativeLayout.DwordWireWidth == 4
+    && DisplayMoneyBombBannerNativeLayout.SharedTextReaderFileOffset == 0x12EE010
+    && DisplayMoneyBombBannerNativeLayout.TextTerminatorWireWidth == 1
+    && DisplayMoneyBombBannerNativeLayout.TextChunkSize == 0x100
+    && SetPreloadPositionNativeLayout.AllocationSize == 0x68
+    && SetPreloadPositionNativeLayout.FirstDwordFieldOffset == 0x28
+    && SetPreloadPositionNativeLayout.DwordFieldCount == 16
+    && SetPreloadPositionNativeLayout.DwordFieldStride == 4
+    && SetPreloadPositionNativeLayout.DwordRows == 4
+    && SetPreloadPositionNativeLayout.DwordColumns == 4
+    && SetPreloadPositionNativeLayout.LastDwordFieldOffset == 0x64
+    && SetPreloadPositionNativeLayout.NominalInputByteCount == 0x40
+    && PlaySoundIdNativeLayout.FirstQwordFieldOffset == 0x28
+    && PlaySoundIdNativeLayout.SecondQwordFieldOffset == 0x30
+    && PlaySoundIdNativeLayout.QwordWireWidth == 8
+    && PlaySoundIdNativeLayout.NominalInputByteCount == 0x10
+    && PlaySoundIdAtLocationNativeLayout.QwordFieldOffset == 0x28
+    && PlaySoundIdAtLocationNativeLayout.FirstDwordFieldOffset == 0x30
+    && PlaySoundIdAtLocationNativeLayout.SecondDwordFieldOffset == 0x34
+    && PlaySoundIdAtLocationNativeLayout.ThirdDwordFieldOffset == 0x38
+    && PlaySoundIdAtLocationNativeLayout.QwordWireWidth == 8
+    && PlaySoundIdAtLocationNativeLayout.DwordWireWidth == 4
+    && PlaySoundIdAtLocationNativeLayout.NominalInputByteCount == 0x14
+    && PlayDialogScriptMessageNativeLayout.DwordFieldOffset == 0x28
+    && PlayDialogScriptMessageNativeLayout.VectorBeginOffset == 0x2C
+    && PlayDialogScriptMessageNativeLayout.VectorEndOffset == 0x30
+    && PlayDialogScriptMessageNativeLayout.VectorCapacityOffset == 0x34
+    && PlayDialogScriptMessageNativeLayout.RecordWireWidth == 8
+    && PlayDialogScriptMessageNativeLayout.RecordNativeStride == 8
+    && PlayDialogScriptMessageNativeLayout.CountWireWidth == 1
+    && PlayDialogScriptMessageNativeLayout.ChunkContinuationCount == 0xFF
+    && PlayDialogScriptMessageNativeLayout.TerminalCount == 0
+    && PlayDialogScriptMessageNativeLayout.MinimumInputByteCount == 5
+    && StopDialogScriptMessageNativeLayout.DwordFieldOffset == 0x28
+    && StopDialogScriptMessageNativeLayout.VectorBeginOffset == 0x2C
+    && StopDialogScriptMessageNativeLayout.VectorEndOffset == 0x30
+    && StopDialogScriptMessageNativeLayout.VectorCapacityOffset == 0x34
+    && StopDialogScriptMessageNativeLayout.RecordWireWidth == 8
+    && StopDialogScriptMessageNativeLayout.RecordNativeStride == 8
+    && StopDialogScriptMessageNativeLayout.CountWireWidth == 1
+    && StopDialogScriptMessageNativeLayout.ChunkContinuationCount == 0xFF
+    && StopDialogScriptMessageNativeLayout.TerminalCount == 0
+    && StopDialogScriptMessageNativeLayout.TrailingByteFieldOffset == 0x38
+    && StopDialogScriptMessageNativeLayout.TrailingByteWireWidth == 1
+    && StopDialogScriptMessageNativeLayout.MinimumInputByteCount == 6
+    && PingMapNativeLayout.FirstDwordFieldOffset == 0x28
+    && PingMapNativeLayout.SecondDwordFieldOffset == 0x2C
+    && PingMapNativeLayout.ThirdDwordFieldOffset == 0x30
+    && PingMapNativeLayout.FourthDwordFieldOffset == 0x34
+    && PingMapNativeLayout.DwordFieldCount == 4
+    && PingMapNativeLayout.DwordWireWidth == 4
+    && PingMapNativeLayout.NominalInputByteCount == 0x10
+    && PingMapMarkerNativeLayout.QwordFieldOffset == 0x28
+    && PingMapMarkerNativeLayout.DwordFieldOffset == 0x30
+    && PingMapMarkerNativeLayout.QwordWireWidth == 8
+    && PingMapMarkerNativeLayout.DwordWireWidth == 4
+    && PingMapMarkerNativeLayout.NominalInputByteCount == 0x0C);
 Check("Secondary decoder RTTI and native body layouts retain observed offsets and widths",
     MatrixSecondaryMessageHeaderNativeLayout.BaseMetadataFlagOffset == 0x08
     && MatrixSecondaryMessageHeaderNativeLayout.DescriptorAnchorPointerOffset == 0x0C

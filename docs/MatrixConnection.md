@@ -1090,21 +1090,21 @@ routes5 and6. All 17 subcases now have native layouts.
 Route0's nested table has a separate, complete set of 40 documented selectors
 (`0x53..0x7A`); route1 is the zero-return route. The secondary selector table
 records 91 dispatch targets. Selectors `0x20..0x5F` now have 64 RTTI-backed
-class and body-reader layouts; selectors `0x60..0x67` add eight more verified
-layouts, leaving 19 identities unresolved.
+class and body-reader layouts; selectors `0x60..0x67` and `0x68..0x6F` each
+add eight more verified layouts, leaving 11 identities unresolved.
 All 91 table entries are nonzero and have distinct targets in the original
 binary, which establishes address uniqueness, not 91 completed identities.
 
-### Secondary-selector entries `0x20..0x67`
+### Secondary-selector entries `0x20..0x6F`
 
 This is the separate second table used by the leading-byte-zero and
 `0xF0..0xFF` path in `0x81CC50`. Its index is `selector - 0x20`, with accepted
 selectors `0x20..0x7A`, and the DWORD table is at VA `0xC22630` (raw file
 offset `0x821A30`). It is distinct from the keyed-receiver factory's selector
 range `0x02..0x35` and route0's nested Character selectors `0x53..0x7A`.
-In particular, secondary selectors `0x53..0x57` below and route0 Character
-selectors with the same numeric values belong to different tables and dispatch
-namespaces.
+Secondary selectors `0x53..0x7A` overlap route0's Character selector values
+numerically, but belong to separate tables and dispatch paths; in particular,
+secondary selectors `0x68..0x6F` are not route0 Character cases.
 The original PE confirms `.text` raw offsets map to VA with `+0x400C00`;
 `.rdata` vtable/COL locations map with `+0x401400`, while `.data` TypeDescriptor
 locations map with `+0x401C00`. Vtable names below were resolved through their
@@ -1186,8 +1186,16 @@ Selectors outside `0x20..0x7A` reach the shared zero-return block at raw
 | `0x65` | 69 | `0xC21AF1` / `0x820EF1` | `0x50` | `0x819310` | `0x1C6DE08` / `EncounterUIUpdate` | `0x842940` |
 | `0x66` | 70 | `0xC21B59` / `0x820F59` | `0x30` | `0x8194D0` | `0x1C6DE28` / `EncounterUIScopeOut` | `0x356F80` (shared continuation) |
 | `0x67` | 71 | `0xC21BA1` / `0x820FA1` | `0x90` | `0x819590` | `0x1C6DE18` / `DisplayUiNotification` | `0x8428B0` |
+| `0x68` | 72 | `0xC21C0C` / `0x82100C` | `0x38` | `0x819750` | `0x1C6DDF8` / `DisplayMoneyBombBanner` | `0x8420B0` |
+| `0x69` | 73 | `0xC21C74` / `0x821074` | `0x68` | `0x819900` | `0x1C6DDC8` / `SetPreloadPosition` | `0x6087E0` |
+| `0x6A` | 74 | `0xC21CDE` / `0x8210DE` | `0x38` | `0x8199B0` | `0x1C6DDE8` / `PlaySoundId` | `0x841F80` |
+| `0x6B` | 75 | `0xC21D46` / `0x821146` | `0x40` | `0x819A90` | `0x1C6DDD8` / `PlaySoundIdAtLocation` | `0x841ED0` |
+| `0x6C` | 76 | `0xC21DAE` / `0x8211AE` | `0x38` | `0x819B60` | `0x1C6DD98` / `PlayDialogScriptMessage` | `0x841DE0` |
+| `0x6D` | 77 | `0xC21E16` / `0x821216` | `0x40` | `0x819CC0` | `0x1C6DDB8` / `StopDialogScriptMessage` | `0x841D40` |
+| `0x6E` | 78 | `0xC21E7E` / `0x82127E` | `0x38` | `0x819E20` | `0x1C6DDA8` / `PingMap` | `0x841C60` |
+| `0x6F` | 79 | `0xC21EE6` / `0x8212E6` | `0x38` | `0x819EF0` | `0x1C6DD78` / `PingMapMarker` | `0x841B70` |
 
-The first 72 entries have 72 distinct, nonzero table destinations. No shared
+The first 80 entries have 80 distinct, nonzero table destinations. No shared
 case or zero-valued table slot occurs in this verified prefix. Selector `0x26`
 does have a distinct allocation-failure branch to the common zero-return block;
 that is a case-path result, not a zero table entry. Selectors `0x28` and `0x2D`
@@ -1197,7 +1205,7 @@ destinations and RTTI-identified types remain distinct. Selectors `0x32` and
 sharing the NUL-terminated text reader at raw `0x12EE010` through continuation
 `0x81FB27`.
 
-All 72 constructors call a selector-specific base-metadata initializer
+All 80 constructors call a selector-specific base-metadata initializer
 before storing the derived vtable. For selectors `0x20..0x27` these helpers
 are `0x823020`, `0x823090`, `0x823100`, `0x823170`, `0x8231E0`, `0x823250`,
 `0x8232C0`, and `0x823330`; for `0x28..0x2F` they are `0x8233C0`, `0x823430`,
@@ -1215,7 +1223,9 @@ selectors `0x50..0x57` use `0x824C20`, `0x824D80`, `0x824DF0`, `0x824E60`,
 common metadata fields. Selectors `0x58..0x5F` use `0x825190`, `0x825200`,
 `0x825270`, `0x8252E0`, `0x825350`, `0x8253C0`, `0x825430`, and `0x8254A0`;
 selectors `0x60..0x67` use `0x825510`, `0x825580`, `0x825700`, `0x825770`,
-`0x8257E0`, `0x8258C0`, `0x825930`, and `0x8259A0`.
+`0x8257E0`, `0x8258C0`, `0x825930`, and `0x8259A0`; selectors `0x68..0x6F`
+use `0x825AA0`, `0x825B10`, `0x825B80`, `0x825BF0`, `0x825C60`, `0x825CD0`,
+`0x825D40`, and `0x825DB0`.
 Each helper sets a base flag DWORD at `+0x08` to 1, stores its
 descriptor-anchor pointer at `+0x0C`, stores the constructor-supplied type
 DWORD at `+0x10`, copies the parser input's first two DWORDs to `+0x18/+0x1C`,
@@ -1237,6 +1247,9 @@ constructor type ID, and descriptor anchor; no role is assigned to the values.
 Selectors `0x60..0x67` similarly store parser-local DWORD literals `0x40..0x47`
 in that separate slot; their roles are unknown and distinct from selector,
 constructor type ID, and descriptor anchor.
+Selectors `0x68..0x6F` similarly store parser-local DWORD literals `0x48..0x4F`;
+their roles remain unknown and distinct from selector, type ID, and descriptor
+anchor.
 
 Body reads, with field labels deliberately limited to offsets and widths:
 
@@ -1516,6 +1529,20 @@ Body reads, with field labels deliberately limited to offsets and widths:
   NUL-terminated shared text, DWORD, and float. Records have `0x10`-byte
   native stride; count `0xFF` continues with another count and zero ends the
   vector.
+- `0x68` `DisplayMoneyBombBanner`: DWORD at `+0x28`, NUL-terminated shared
+  text at `+0x2C`, then DWORD at `+0x30`.
+- `0x69` `SetPreloadPosition`: sixteen DWORDs at four-byte intervals from
+  `+0x28` through `+0x64` (four groups of four in the reader loops).
+- `0x6A` `PlaySoundId`: raw QWORDs at `+0x28` and `+0x30`.
+- `0x6B` `PlaySoundIdAtLocation`: raw QWORD at `+0x28`, then DWORDs at
+  `+0x30`, `+0x34`, and `+0x38`.
+- `0x6C` `PlayDialogScriptMessage`: DWORD at `+0x28`, then a vector at
+  `+0x2C/+0x30/+0x34` of opaque eight-byte wire records stored at eight-byte
+  native stride.
+- `0x6D` `StopDialogScriptMessage`: DWORD at `+0x28`, the same eight-byte
+  record vector at `+0x2C/+0x30/+0x34`, then one byte at `+0x38`.
+- `0x6E` `PingMap`: DWORDs at `+0x28`, `+0x2C`, `+0x30`, and `+0x34`.
+- `0x6F` `PingMapMarker`: raw QWORD at `+0x28`, then DWORD at `+0x30`.
 
 These are positional wire layouts only; RTTI class names do not establish the
 meaning of any field. None of the `0x58..0x5F` body readers has a count/vector
@@ -1524,14 +1551,42 @@ continuation at `0x8206E3`; `ClearTrackedRecipe` has no body reader. The other
 five readers are straight-line scalar reads in the field orders above. Their
 primitive helper calls were checked against the one-byte, WORD, DWORD, and
 QWORD load/store widths and cursor increments in `FirefallClient.exe.original`.
-The `0x60..0x67` records above likewise remain offset/width observations;
+The `0x60..0x6F` records above likewise remain offset/width observations;
 their count framing and tag dispatch are described separately from field
-semantics.
+semantics. All eight `0x68..0x6F` cases have body-reader calls; none has a
+no-reader success epilog.
 
-The shared NUL-terminated text reader used by `0x53..0x55` reads bytewise
-through the terminator in repeating 256-byte chunks; 256 is a chunk size, not
-a total-string limit. These three text fields have no assigned application
-semantics or encoding.
+The shared NUL-terminated text reader used by `0x53..0x55` and `0x68` reads
+bytewise through the terminator in repeating 256-byte chunks; 256 is a chunk
+size, not a total-string limit. These text fields have no assigned
+application semantics or encoding.
+
+Each case in `0x68..0x6F` pushes a descriptor-anchor immediate, a
+selector-specific pointer VA, and `0x1E60904` before calling raw `0x3571B0`;
+the target bytes are a single `ret`, so no effect for those pushed values is
+established. Each derived constructor instead calls its type-specific
+base-metadata helper, which stores the descriptor anchor at `+0x0C`, type ID
+at `+0x10`, common flag at `+0x08`, parser-context DWORDs at `+0x18/+0x1C`,
+and zeroes `+0x20/+0x24` before the derived constructor installs its vtable.
+The anchors are opaque metadata pointers, not wire fields.
+
+All eight cases test the allocation result, branch on null, and still reach
+their body reader after either the constructor path or the zero-object path;
+static flow alone does not establish the runtime consequence of the
+allocation-failure path. Selector `0x69` forms its reader argument as
+`ESI+0x28` after zeroing ESI, while the other seven pass the zero object
+pointer to a reader that derives its destinations from the object base.
+Selectors `0x68`, `0x69`, `0x6A`, `0x6B`, `0x6C`, `0x6D`, `0x6E`, and `0x6F`
+all have direct reader calls, so no no-reader epilog is inferred for this
+range.
+
+The vectors in selectors `0x6C` and `0x6D` use one-byte chunk counts. Each
+count gives the number of eight-byte records in that chunk; `0xFF` means read
+another count, and zero terminates the vector. The parser grows the native
+eight-byte-stride vector and no overall record limit is established. Selector
+`0x68`'s text reader consumes a NUL terminator and uses a `0x100`-byte
+temporary chunk; this is not a total-text-length bound. No length-prefixed blob
+or application-level gate was observed in selectors `0x68..0x6F`.
 
 The `0x48..0x4E` body-reader functions are called with the stream in ECX and
 the message-object pointer on the stack. Selector `0x4F` instead calls the
