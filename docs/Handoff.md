@@ -776,7 +776,8 @@ helper calls against the original binary before committing and pushing.
   do not modify the sample/IDB or commit/push unless explicitly requested.
 - Open items: field semantics, allocation-failure consequences, selector
   `0x55` copied but unwritten stack DWORD at object `+0x70` (source proven,
-  runtime consequence unresolved), selector `0x6D` body consumption, selector
+  runtime consequence unresolved), selector `0x6D` outer framing/body
+  consumption (the case itself reaches its epilogue without a reader), selector
   `0x75`/`0x76` wire-state semantics, selector `0x77` trailing-state extent.
 - Workflow per batch: preserve native evidence in the existing layout,
   binary checks, and documentation; validate the focused build and binary

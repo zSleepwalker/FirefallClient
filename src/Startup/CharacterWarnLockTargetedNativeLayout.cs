@@ -10,6 +10,8 @@ public static class CharacterWarnLockTargetedNativeLayout
     public const uint InnerSelectorTableFileOffset = 0x821844;
     public const uint CaseFileOffset = 0x81D417;
     public const uint CaseLocalDwordValue = 0x75;
+    public const uint ConstructorCallSiteFileOffset = 0x81D43C;
+    public const uint SuccessPathReturnEpilogueFileOffset = 0x81D441;
     public const int AllocationSize = 0x28;
     public const uint AllocationFunctionFileOffset = 0x12B7FB0;
     public const uint ConstructorFileOffset = 0x525FB0;

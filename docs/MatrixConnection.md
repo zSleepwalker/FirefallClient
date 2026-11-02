@@ -3291,9 +3291,13 @@ allocates `0x28` bytes, stores local DWORD `0x75` (role unknown), then calls
 constructor `0x525FB0`. The constructor passes `0x6D` to helper `0x5A0FA0`
 and installs vtable VA `0x1C670C8` (RTTI
 `firefall::Character::WarnLockTargeted`). This case path has no explicit
-body-reader call and returns after construction. Allocation failure branches
-to `0x8217D9`, the switch's zero-return epilogue. Body consumption outside
-this case and all field meanings remain unresolved.
+body-reader call. At raw `0x81D435` it loads the two DWORDs at `[esi+4]` and
+`[esi]`, passes them to constructor `0x525FB0` at `0x81D43C`, then reaches the
+common return epilogue at `0x81D441` without another parser/read call.
+Allocation failure branches to `0x8217D9`, the switch's zero-return epilogue.
+Thus no body consumption is visible in this selector case; whether an outer
+framing layer consumes or accounts for additional bytes is unresolved, as are
+all field meanings.
 
 #### Selector 0x6D post-parse receiver
 

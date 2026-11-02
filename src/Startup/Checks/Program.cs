@@ -3901,6 +3901,8 @@ Check("WarnLockTargeted selector 0x6D records its constructor-only case",
     && CharacterWarnLockTargetedNativeLayout.InnerSelectorTableFileOffset == 0x821844
     && CharacterWarnLockTargetedNativeLayout.CaseFileOffset == 0x81D417
     && CharacterWarnLockTargetedNativeLayout.CaseLocalDwordValue == 0x75
+    && CharacterWarnLockTargetedNativeLayout.ConstructorCallSiteFileOffset == 0x81D43C
+    && CharacterWarnLockTargetedNativeLayout.SuccessPathReturnEpilogueFileOffset == 0x81D441
     && CharacterWarnLockTargetedNativeLayout.AllocationSize == 0x28
     && CharacterWarnLockTargetedNativeLayout.AllocationFunctionFileOffset == 0x12B7FB0
     && CharacterWarnLockTargetedNativeLayout.ConstructorFileOffset == 0x525FB0

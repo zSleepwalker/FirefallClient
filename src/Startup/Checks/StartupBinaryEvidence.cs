@@ -5729,8 +5729,11 @@ internal static class StartupBinaryEvidence
                 CharacterWarnLockTargetedNativeLayout.AllocationFunctionFileOffset)
             && Matches(CharacterWarnLockTargetedNativeLayout.CaseFileOffset + 0x0E, "C744242075000000")
             && Matches(CharacterWarnLockTargetedNativeLayout.CaseFileOffset + 0x18, "0F84A4430000")
-            && RelativeBranchTargets(CharacterWarnLockTargetedNativeLayout.CaseFileOffset + 0x25, 0xE8,
+            && Matches(CharacterWarnLockTargetedNativeLayout.CaseFileOffset + 0x1E, "FF76048BC8FF36")
+            && RelativeBranchTargets(CharacterWarnLockTargetedNativeLayout.ConstructorCallSiteFileOffset, 0xE8,
                 CharacterWarnLockTargetedNativeLayout.ConstructorFileOffset)
+            && Matches(CharacterWarnLockTargetedNativeLayout.SuccessPathReturnEpilogueFileOffset,
+                "8B4C241864890D00000000595F5E5B8BE55DC3")
             && Matches(CharacterWarnLockTargetedNativeLayout.AllocationFailureContinuationFileOffset,
                 "33C08B4C241864890D00000000595F5E5B8BE55DC3")
             && Matches(CharacterWarnLockTargetedNativeLayout.ConstructorFileOffset + 0x12, "C7006D000000")
