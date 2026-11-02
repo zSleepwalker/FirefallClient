@@ -15,8 +15,14 @@ public static class AreaVisualDataLootObjectCollectedNativeLayout
     public const uint ConstructorCallSiteFileOffset = 0x81EF3D;
     public const uint BaseConstructorHelperFileOffset = 0xB07660;
     public const int BaseConstructorArgument = 0x53;
+    public const uint BaseMetadataStringVirtualAddress = 0x1BB0224;
+    public const int MessageDiscriminatorFieldOffset = 0x10;
+    public const int MessageDiscriminator = 0x53;
+    public const int EnvelopeKeyLowDwordFieldOffset = 0x18;
+    public const int EnvelopeKeyHighDwordFieldOffset = 0x1C;
     public const uint BodyReaderCallSiteFileOffset = 0x81EF53;
     public const uint BodyReaderFileOffset = 0x83AD90;
+    public const uint MessagePointerEaxRestoreFileOffset = 0x81EF58;
     public const uint DwordReaderFileOffset = 0x3370A0;
     public const uint QwordReaderFileOffset = 0x356F80;
     public const uint VtableVirtualAddress = 0x1C723C0;

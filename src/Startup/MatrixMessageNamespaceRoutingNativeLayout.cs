@@ -124,6 +124,23 @@ public static class MatrixMessageNamespaceRoutingNativeLayout
     public const uint Selector53ProtocolHandlerMethodVirtualAddress = 0xECB180;
     public const uint Selector53ProtocolHandlerMethodFileOffset = 0xACA580;
     public const int Selector53ProtocolHandlerObservedMessageReadOffset = 0x34;
+    public const uint Selector53HandlerStateAccessorCallFileOffset = 0xACA5C9;
+    public const uint Selector53HandlerStateAccessorFileOffset = 0x49DCC0;
+    public const uint Selector53HandlerFilterStringVirtualAddress = 0x1BAE9E0;
+    public const uint Selector53HandlerNullFilterFallbackVirtualAddress = 0x1C5EA68;
+    public const int Selector53HandlerFilterMessageFieldOffset = 0x34;
+    public const uint Selector53HandlerEqualFilterVectorCallFileOffset = 0xACA60C;
+    public const uint Selector53HandlerEqualFilterVectorHelperFileOffset = 0x8F0180;
+    public const int Selector53HandlerVectorOwnerPointerFieldOffset = 0x43B8;
+    public const int Selector53HandlerVectorFieldOffset = 0x18;
+    public const int Selector53HandlerMessageRangeBeginFieldOffset = 0x28;
+    public const int Selector53HandlerMessageRangeEndFieldOffset = 0x2C;
+    public const int Selector53HandlerVectorRecordSize = 0x18;
+    public const uint Selector53HandlerVectorCopyCallFileOffset = 0x8F021B;
+    public const uint Selector53HandlerVectorCopyHelperFileOffset = 0x8F1AD0;
+    public const uint Selector53HandlerUnequalFilterMapCallFileOffset = 0xACA64B;
+    public const uint Selector53HandlerUnequalFilterMapHelperFileOffset = 0x937E40;
+    public const int Selector53HandlerMapOwnerPointerFieldOffset = 0x43C4;
 
     public static MatrixMessageEnvelopeRegistrySnapshot EnvelopeKeyRegistry { get; } = new(
         CallbackDispatcherFileOffset,
