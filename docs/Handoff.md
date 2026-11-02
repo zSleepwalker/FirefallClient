@@ -200,9 +200,13 @@ traced at slot `+0x148` (VA `0xECED30` / raw `0xACE130`). It passes a pointer
 to the nested message state at `+0x28` to helper `0xC24780` and dispatches
 event `365`; individual field and event semantics remain unknown.
 
-Next, trace route-0 nested `Character::ForcedMovementCancelled` selector
-`0x72`'s receiver at slot `+0x14C`, verifying dispatch and target mapping
-before interpreting the method. Keep this nested selector table distinct
+The existing movement receiver overview also records selectors `0x72`
+(`ForcedMovementCancelled`) and `0x73` (`GrappleClimbPermission`) with their
+verified dispatch slots and helper paths; avoid repeating those traces.
+Selectors `0x74`–`0x77` likewise have receiver routing documented. Continue
+with the unresolved nested embedded-state details for selector `0x75`
+(`AbilityFailed`) and selector `0x76` (`AbilityCooldowns`), or selector `0x77`
+(`NPCInteraction`) extent mismatch, while keeping this selector table distinct
 from route indices 2-6 and the secondary decoder table.
 
 All secondary selectors `0x20..0x7A` are now reconstructed and checked against
@@ -212,8 +216,8 @@ All secondary selectors `0x20..0x7A` are now reconstructed and checked against
 Character selectors `OpenMovieDialog`, `PrivateDialog`, and `PublicDialog`.
 Do not repeat the earlier decoder or keyed-receiver factory batches.
 The decoder batches through `0x7A` and route-2 through route-6 consumer traces
-were previously committed; recent updates trace route0 nested selectors `0x53`
-through `0x6F` consumers.
+were previously committed; recent updates add route0 nested receiver traces
+for selectors `0x6F`, `0x70`, and `0x71`.
 Use GPT-6 Luna with explicit High reasoning for implementation and review.
 Verify field-address setup, primitive widths, count-loop boundaries and
 helper calls against the original binary before committing and pushing.
