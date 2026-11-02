@@ -360,6 +360,8 @@ public static class MatrixMessageParserFlowNativeLayout
             new MatrixMessageDispatchVtableCaseSnapshot(
                 0x6F, 0xC1D4B5, 0x81C8B5, 0x81C8D4, 0x140),
             new MatrixMessageDispatchVtableCaseSnapshot(
+                0x70, 0xC1D4E0, 0x81C8E0, 0x81C8FF, 0x144),
+            new MatrixMessageDispatchVtableCaseSnapshot(
                 0x71, 0xC1D50B, 0x81C90B, 0x81C92A, 0x148),
             new MatrixMessageDispatchVtableCaseSnapshot(
                 0x74, 0xC1D58C, 0x81C98C, 0x81C9AB, 0x154),

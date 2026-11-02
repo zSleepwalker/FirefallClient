@@ -57,3 +57,29 @@ public static class CharacterPublicDebugMovementUpdateNativeLayout
     public const uint FirstTaggedFieldReaderCallSiteFileOffset = 0x5FF9A1;
     public const int ReaderCallSiteStride = 0x2D;
 }
+
+public static class CharacterPublicDebugMovementUpdateConsumerNativeLayout
+{
+    public const int MessageDiscriminator = CharacterPublicDebugMovementUpdateNativeLayout.InnerSelector;
+    public const uint ProtocolHandlerDispatchTableVirtualAddress = 0xC1D6DC;
+    public const int ProtocolHandlerDispatchTableSelectorBias = 0x20;
+    public const int ProtocolHandlerVtableSlotOffset = 0x144;
+    public const uint ProtocolHandlerVtableTargetVirtualAddress = 0xECEBF0;
+    public const uint ProtocolHandlerVtableTargetFileOffset = 0xACDFF0;
+    public const uint ConsumerFunctionFileOffset = 0xACDFF0;
+    public const uint ConsumerSwitchTargetVirtualAddress = 0xC1D4E0;
+    public const uint ConsumerSwitchTargetFileOffset = 0x81C8E0;
+    public const uint ConsumerVtableCallFileOffset = 0x81C8FF;
+
+    public const int FirstMessageDwordOffset = 0x28;
+    public const int SecondMessageDwordOffset = 0x2C;
+    public const int NestedMessageObjectOffset = 0x30;
+    public const int NestedObjectQueryVtableSlotOffset = 0x0C;
+    public const int NestedObjectUpdateVtableSlotOffset = 0x18;
+    public const uint TypedMessageValueAppenderFileOffset = 0xC245A0;
+    public const uint NestedObjectValueAppenderFileOffset = 0xC24780;
+    public const int AppendedValueKind = 5;
+    public const int DispatchedEventId = 363;
+    public const uint EventDispatcherGlobalAddress = 0x1E002B8;
+    public const int EventDispatcherVtableSlotOffset = 0xAC;
+}

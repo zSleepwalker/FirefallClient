@@ -188,10 +188,17 @@ typed value from message DWORDs `+0x28/+0x2C`, optionally resolves `+0x30` to
 text, and dispatches event `239`. All observed fields fit the parser's `0xC0`
 allocation; field and event semantics remain unknown.
 
-Next, trace route-0 nested `Character::PublicDebugMovementUpdate` selector
-`0x70`'s receiver at slot `+0x144`, verifying dispatch and target mapping
-before interpreting the method. Keep this nested selector table distinct from
-route indices 2-6 and the secondary decoder table.
+The route-0 nested `Character::PublicDebugMovementUpdate` selector `0x70`
+receiver is traced at slot `+0x144` (VA `0xECEBF0` / raw `0xACDFF0`). It
+appends a kind-5 typed value from message DWORDs `+0x28/+0x2C`, conditionally
+queries the object at `+0x30`, and dispatches event `363`. The `+0x30` object
+view falls inside the first parser record, but their relationship and
+semantics remain unresolved.
+
+Next, trace route-0 nested `Character::ForcedMovement` selector `0x71`'s
+receiver at slot `+0x148`, verifying dispatch and target mapping before
+interpreting the method. Keep this nested selector table distinct from route
+indices 2-6 and the secondary decoder table.
 
 All secondary selectors `0x20..0x7A` are now reconstructed and checked against
 `FirefallClient.exe.original`. The final entries `0x78..0x7A` resolve to

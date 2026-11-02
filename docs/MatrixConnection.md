@@ -3411,6 +3411,20 @@ the reader overwrites the WORD with 1. Record starts are object offsets
 remain unresolved. Allocation failure zeroes ESI before entering the shared
 reader setup; the consequences of that path are not inferred.
 
+The route-0 receiver dispatches through slot `+0x144` (table VA
+`0xC1D6DC`, raw table `0x81CADC`) to VA `0xECEBF0` / raw function
+`0xACDFF0`. Its switch case is VA `0xC1D4E0` / raw `0x81C8E0`, with the
+indirect call through slot `+0x144` at raw `0x81C8FF`. The receiver appends a
+kind-5 typed value from the DWORDs at message `+0x28/+0x2C` through helper
+`0xC245A0`. It then treats the DWORD at message `+0x30` as a nested object's
+vtable pointer, calls slot `+0x0C`, and, for a nonzero result, calls slot
+`+0x18` with a pointer to `unk_1B53F77` and value 1 before passing that object
+to helper `0xC24780`. Finally it dispatches event 363 through
+`uiManager` global VA `0x1E002B8`, slot `+0xAC`. The message `+0x30` location
+falls inside the parser's first record; the relationship between that record
+and the receiver's object view is not established, nor are the nested object's
+semantics or event payload meaning.
+
 ### Selector 0x71: `ForcedMovement`
 
 Entry30 maps selector `0x71` to VA `0xC1E14F` / raw case `0x81D54F`. It

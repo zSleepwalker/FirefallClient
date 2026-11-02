@@ -3680,6 +3680,26 @@ Check("ConfirmedPoseUpdate selector 0x6F records its typed values and optional-t
     && CharacterConfirmedPoseUpdateConsumerNativeLayout.EventDispatcherVtableSlotOffset == 0xAC
     && CharacterConfirmedPoseUpdateConsumerNativeLayout.TypedMessageValueAppenderFileOffset == 0xC245A0
     && CharacterConfirmedPoseUpdateConsumerNativeLayout.AppendedValueKind == 5);
+Check("PublicDebugMovementUpdate selector 0x70 records its nested-object event receiver",
+    CharacterPublicDebugMovementUpdateConsumerNativeLayout.MessageDiscriminator
+        == CharacterPublicDebugMovementUpdateNativeLayout.InnerSelector
+    && CharacterPublicDebugMovementUpdateConsumerNativeLayout.ProtocolHandlerVtableSlotOffset == 0x144
+    && CharacterPublicDebugMovementUpdateConsumerNativeLayout.ProtocolHandlerVtableTargetVirtualAddress == 0xECEBF0
+    && CharacterPublicDebugMovementUpdateConsumerNativeLayout.ProtocolHandlerVtableTargetFileOffset == 0xACDFF0
+    && CharacterPublicDebugMovementUpdateConsumerNativeLayout.ConsumerSwitchTargetVirtualAddress == 0xC1D4E0
+    && CharacterPublicDebugMovementUpdateConsumerNativeLayout.ConsumerSwitchTargetFileOffset == 0x81C8E0
+    && CharacterPublicDebugMovementUpdateConsumerNativeLayout.ConsumerVtableCallFileOffset == 0x81C8FF
+    && CharacterPublicDebugMovementUpdateConsumerNativeLayout.FirstMessageDwordOffset == 0x28
+    && CharacterPublicDebugMovementUpdateConsumerNativeLayout.SecondMessageDwordOffset == 0x2C
+    && CharacterPublicDebugMovementUpdateConsumerNativeLayout.NestedMessageObjectOffset == 0x30
+    && CharacterPublicDebugMovementUpdateConsumerNativeLayout.NestedObjectQueryVtableSlotOffset == 0x0C
+    && CharacterPublicDebugMovementUpdateConsumerNativeLayout.NestedObjectUpdateVtableSlotOffset == 0x18
+    && CharacterPublicDebugMovementUpdateConsumerNativeLayout.TypedMessageValueAppenderFileOffset == 0xC245A0
+    && CharacterPublicDebugMovementUpdateConsumerNativeLayout.NestedObjectValueAppenderFileOffset == 0xC24780
+    && CharacterPublicDebugMovementUpdateConsumerNativeLayout.AppendedValueKind == 5
+    && CharacterPublicDebugMovementUpdateConsumerNativeLayout.DispatchedEventId == 363
+    && CharacterPublicDebugMovementUpdateConsumerNativeLayout.EventDispatcherGlobalAddress == 0x1E002B8
+    && CharacterPublicDebugMovementUpdateConsumerNativeLayout.EventDispatcherVtableSlotOffset == 0xAC);
 Check("JumpActioned selector 0x65 records its shared WORD reader continuation",
     CharacterJumpActionedNativeLayout.InnerSelector == 0x65
     && CharacterJumpActionedNativeLayout.CaseFileOffset == 0x81D1F3
@@ -5462,6 +5482,7 @@ Check("ReplayReader message dispatch receiver and discriminator vtable cases rem
         new MatrixMessageDispatchVtableCaseSnapshot(0x6D, 0xC1D45F, 0x81C85F, 0x81C87E, 0x138),
         new MatrixMessageDispatchVtableCaseSnapshot(0x6E, 0xC1D48A, 0x81C88A, 0x81C8A9, 0x13C),
         new MatrixMessageDispatchVtableCaseSnapshot(0x6F, 0xC1D4B5, 0x81C8B5, 0x81C8D4, 0x140),
+        new MatrixMessageDispatchVtableCaseSnapshot(0x70, 0xC1D4E0, 0x81C8E0, 0x81C8FF, 0x144),
         new MatrixMessageDispatchVtableCaseSnapshot(0x71, 0xC1D50B, 0x81C90B, 0x81C92A, 0x148),
         new MatrixMessageDispatchVtableCaseSnapshot(0x74, 0xC1D58C, 0x81C98C, 0x81C9AB, 0x154),
         new MatrixMessageDispatchVtableCaseSnapshot(0x75, 0xC1D5B7, 0x81C9B7, 0x81C9D6, 0x158),
