@@ -2170,6 +2170,22 @@ The body reader uses `0x3370A0` at `+0x28`, `0x3568E0` at `+0x2C`, `+0x30`,
 and `+0x34`, then helper `0x5C0270` at `+0x38`. Field meanings and the role of
 the final helper remain unresolved.
 
+#### Conditional post-parse consumer for route 5
+
+The constructor stores discriminator `0x53` at message+`0x10`, so under the
+same callback gates route 5 also reaches the shared slot `+0xD0` method
+`0xACA580`. It loads message+`0x34` as a candidate C-string pointer. In this
+message layout that field is populated by the third `0x3568E0` DWORD reader,
+not by a text reader; the constructor only zeroes the byte at `+0x38`.
+
+The shared method then interprets message `+0x28/+0x2C` as a source range for
+its vector or map update. Route 5 parses a DWORD at `+0x28` and another DWORD
+at `+0x2C`; the parser does not establish that these values are valid range
+endpoints or that the DWORD at `+0x34` is a valid C-string pointer. All three
+fields are within the `0x48`-byte allocation. This is a static collision
+between parser and consumer interpretations, conditional on the callback
+gates; it does not establish route-5 runtime delivery or field semantics.
+
 ### Route index 6, dispatcher value `0x53`: `LootStoreExtension::LootObjectCollected`
 
 The route6 block `0x81F34A` accepts dispatcher value `0x53` and enters case

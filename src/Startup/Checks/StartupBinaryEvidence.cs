@@ -6436,6 +6436,17 @@ internal static class StartupBinaryEvidence
                 0xE8, TurretWeaponProjectileFiredNativeLayout.OpaqueFieldReaderFileOffset)
             && VtableRttiName(TurretWeaponProjectileFiredNativeLayout.VtableVirtualAddress, 80)
                 == TurretWeaponProjectileFiredNativeLayout.RttiName);
+        check("Binary route-index-5 DWORD at +0x34 aliases selector-0x53 handler filter input",
+            Matches(TurretWeaponProjectileFiredNativeLayout.BodyReaderFileOffset + 0x2A,
+                "8D46088BCB50")
+            && RelativeBranchTargets(TurretWeaponProjectileFiredNativeLayout.BodyReaderFileOffset + 0x30,
+                0xE8, TurretWeaponProjectileFiredNativeLayout.ScalarReaderFileOffset)
+            && TurretWeaponProjectileFiredNativeLayout.BaseConstructorArgument == 0x53
+            && TurretWeaponProjectileFiredNativeLayout.ThirdRepeatedReaderFieldOffset
+                == MatrixMessageNamespaceRoutingNativeLayout.Selector53HandlerFilterMessageFieldOffset
+            && Matches(
+                MatrixMessageNamespaceRoutingNativeLayout.Selector53ProtocolHandlerMethodFileOffset + 0x0D,
+                "8B4734"));
         check("Binary route-index-6 subcase constructs LootStoreExtension LootObjectCollected",
             ReadUInt32(VirtualAddressToFileOffset(
                 MatrixSecondaryCommandDispatcherNativeLayout.PrimaryJumpTableVirtualAddress) + 6 * 4)

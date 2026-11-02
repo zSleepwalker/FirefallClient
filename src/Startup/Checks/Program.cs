@@ -2565,6 +2565,13 @@ Check("Turret WeaponProjectileFired route-index-5 subcase layout is recorded",
     && TurretWeaponProjectileFiredNativeLayout.SecondRepeatedReaderFieldOffset == 0x30
     && TurretWeaponProjectileFiredNativeLayout.ThirdRepeatedReaderFieldOffset == 0x34
     && TurretWeaponProjectileFiredNativeLayout.OpaqueFieldOffset == 0x38);
+Check("Turret WeaponProjectileFired's selector-0x53 consumer reads its third DWORD as a filter candidate",
+    TurretWeaponProjectileFiredNativeLayout.BaseConstructorArgument == 0x53
+    && TurretWeaponProjectileFiredNativeLayout.ThirdRepeatedReaderFieldOffset
+        == MatrixMessageNamespaceRoutingNativeLayout.Selector53HandlerFilterMessageFieldOffset
+    && TurretWeaponProjectileFiredNativeLayout.ThirdRepeatedReaderFieldOffset
+        < TurretWeaponProjectileFiredNativeLayout.AllocationSize
+    && MatrixMessageNamespaceRoutingNativeLayout.Selector53ProtocolHandlerMethodFileOffset == 0xACA580);
 Check("LootStoreExtension LootObjectCollected route-index-6 subcase layout is recorded",
     LootStoreExtensionLootObjectCollectedNativeLayout.DispatcherFileOffset == 0x81F34A
     && LootStoreExtensionLootObjectCollectedNativeLayout.DispatcherValue == 0x53
