@@ -3909,6 +3909,10 @@ Check("WarnLockTargeted selector 0x6D records its constructor-only case",
     && CharacterWarnLockTargetedNativeLayout.ConstructorFileOffset == 0x525FB0
     && CharacterWarnLockTargetedNativeLayout.BaseConstructorHelperFileOffset == 0x5A0FA0
     && CharacterWarnLockTargetedNativeLayout.BaseConstructorArgument == 0x6D
+    && CharacterWarnLockTargetedNativeLayout.CommonQwordFirstDwordFieldOffset == 0x18
+    && CharacterWarnLockTargetedNativeLayout.CommonQwordSecondDwordFieldOffset == 0x1C
+    && CharacterWarnLockTargetedNativeLayout.ConstructorInitializedEndOffsetExclusive
+        == CharacterWarnLockTargetedNativeLayout.AllocationSize
     && CharacterWarnLockTargetedNativeLayout.AllocationFailureContinuationFileOffset == 0x8217D9
     && CharacterWarnLockTargetedNativeLayout.BodyReaderContinuationFileOffset == 0
     && CharacterWarnLockTargetedNativeLayout.BodyReaderFileOffset == 0

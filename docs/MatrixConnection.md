@@ -3303,10 +3303,12 @@ The common decoder `0x821BA0` has already read a raw QWORD and compact
 positive-UInt16 selector before calling `0x81CC50`. When the QWORD's first byte
 selects the secondary table, the compact selector is passed as the parser's
 selector argument; the `0x6D` case uses the two DWORDs at the QWORD address as
-constructor arguments. It invokes no additional selector-specific body
-reader. This narrows the no-reader observation to bytes beyond the shared
-QWORD/selector preamble; whether such trailing bytes are valid or accounted
-for elsewhere remains unresolved, as do all field meanings.
+constructor arguments. The base initializer stores those words at object
+`+0x18/+0x1C`, zeros `+0x20/+0x24`, and finishes at the requested allocation
+end `+0x28`. It invokes no additional selector-specific body reader. This
+narrows the no-reader observation to bytes beyond the shared QWORD/selector
+preamble; whether such trailing bytes are valid or accounted for elsewhere
+remains unresolved, as do all field meanings.
 
 #### Selector 0x6D post-parse receiver
 

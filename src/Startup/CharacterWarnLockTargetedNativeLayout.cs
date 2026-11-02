@@ -17,6 +17,9 @@ public static class CharacterWarnLockTargetedNativeLayout
     public const uint ConstructorFileOffset = 0x525FB0;
     public const uint BaseConstructorHelperFileOffset = 0x5A0FA0;
     public const int BaseConstructorArgument = 0x6D;
+    public const int CommonQwordFirstDwordFieldOffset = 0x18;
+    public const int CommonQwordSecondDwordFieldOffset = 0x1C;
+    public const int ConstructorInitializedEndOffsetExclusive = 0x28;
     public const uint AllocationFailureContinuationFileOffset = 0x8217D9;
     public const uint BodyReaderContinuationFileOffset = 0;
     public const uint BodyReaderFileOffset = 0;

@@ -5750,6 +5750,8 @@ internal static class StartupBinaryEvidence
             && RelativeBranchTargets(CharacterWarnLockTargetedNativeLayout.ConstructorFileOffset + 0x18, 0xE8,
                 CharacterWarnLockTargetedNativeLayout.BaseConstructorHelperFileOffset)
             && Matches(CharacterWarnLockTargetedNativeLayout.ConstructorFileOffset + 0x1D, "C706C870C601")
+            && Matches(CharacterWarnLockTargetedNativeLayout.BaseConstructorHelperFileOffset + 0x28,
+               "8B45108946188B451489461CC7462000000000C7462400000000")
             && VtableRttiName(CharacterWarnLockTargetedNativeLayout.VtableVirtualAddress, 80)
                 == CharacterWarnLockTargetedNativeLayout.RttiName);
         check("Binary inner selector 0x6E routes CurrentPoseUpdate through the flag-controlled scalar reader",
