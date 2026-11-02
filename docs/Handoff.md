@@ -1,11 +1,13 @@
 # Reverse-engineering handoff
 
-## Resume here (secondary selectors 0x70..0x77 complete)
+## Resume here (secondary selector table complete)
 
-Selectors `0x70..0x77` are now reconstructed and checked against
-`FirefallClient.exe.original`; the next unresolved secondary selectors are
-`0x78..0x7A`. Do not repeat the earlier decoder or keyed-receiver factory
-batches.
+All secondary selectors `0x20..0x7A` are now reconstructed and checked against
+`FirefallClient.exe.original`. The final entries `0x78..0x7A` resolve to
+`VendorProductsResponse`, `VendorPurchaseResponse`, and
+`ConductorGlobalAnnouncement`; do not confuse them with route0's nested
+Character selectors `OpenMovieDialog`, `PrivateDialog`, and `PublicDialog`.
+Do not repeat the earlier decoder or keyed-receiver factory batches.
 This session did not commit or push; parent review/QA remains pending.
 Use GPT-6 Luna with explicit High reasoning for implementation and review.
 Verify field-address setup, primitive widths, count-loop boundaries and
@@ -29,23 +31,50 @@ helper calls against the original binary before committing and pushing.
   (40,197,848 bytes);
   it differs from the analyzed image in 13 bytes across four ranges, none of
   which overlap this batch's code/vtable evidence.
-- IDA MCP could not be initialized during this session, so no new IDA evidence
-  was collected for selectors `0x70..0x77`. This batch was checked read-only
-  against the original PE using local disassembly and the repository's
-  binary-evidence checks.
+- IDA MCP was unavailable for this final batch; no new IDA claims were made.
+  Selectors `0x78..0x7A` were checked read-only against the original PE using
+  local byte reads/disassembly and the repository's binary-evidence checks.
 - Secondary selectors in `0x81CC50` use the separate 91-entry table at VA
   `0xC22630` / raw `0x821A30`: `[ebp+8] - 0x20`, bounded through index
   `0x5A`, then indexed by DWORD. The original binary has 91 nonzero, distinct
-  destinations; selectors `0x20..0x77` now have 88 verified message
-  identities/layouts, leaving three identities unresolved. Continue at
-  selector `0x78`. The table index is distinct from the keyed-receiver factory's
+  destinations; all 91 selectors now have verified message identities/layouts.
+  The table index is distinct from the keyed-receiver factory's
   `0x02..0x35` selectors and the route0 Character table's `0x53..0x7A`
   selectors. Secondary selectors `0x53..0x57` and route0 Character selectors
   with those same numbers are different tables and dispatch namespaces.
   Secondary selectors `0x70..0x77` are likewise distinct from route0's
-  same-numbered Character selectors. See the C# snapshots and
+  same-numbered Character selectors; secondary `0x78..0x7A` are distinct from
+  route0's dialog cases. See the C# snapshots and
   `docs/MatrixConnection.md`.
-- The 88 verified secondary cases are RTTI-backed:
+- Final secondary-table entries (indexes are `selector - 0x20`):
+
+  | Selector / index | Target VA / raw | Allocation | Constructor / base helper | Type / descriptor anchor | Vtable / RTTI | Reader |
+  | --- | --- | ---: | --- | --- | --- | --- |
+  | `0x78` / 88 | `0xC2229E` / `0x82169E` | `0x60` | `0x81AC60` / `0x826310` | `0x78` / `0x1B89A9C` | `0x1C6DD18` / `VendorProductsResponse` | `0x83DF60` |
+  | `0x79` / 89 | `0xC22306` / `0x821706` | `0x48` | `0x81AE20` / `0x826380` | `0x79` / `0x1B89AA4` | `0x1C6DCE8` / `VendorPurchaseResponse` | `0x83B9F0` |
+  | `0x7A` / 90 | `0xC2236E` / `0x82176E` | `0x88` | `0x81B000` / `0x826400` | `0x7A` / `0x1B89A94` | `0x1C6DCD8` / `ConductorGlobalAnnouncement` | `0x83B8F0` |
+
+- These final readers were traced in wire order. `0x78` reads scalar fields at
+  `+0x28..+0x40` and byte-counted vectors at `+0x44/+0x50`; the latter has
+  `0x30`-byte records, nested vectors at `+0x14/+0x20`, and a booleanized tail
+  byte. Nested item strides are `0x18` and 8 bytes. `0x79` reads byte,
+  QWORD/QWORD, DWORD, and text at `+0x28/+0x30/+0x38/+0x40/+0x44`.
+  `0x7A` reads DWORDs at `+0x28/+0x2C/+0x30`, text at `+0x34/+0x38`, gated
+  values at `+0x3C/+0x4C`, text at `+0x80`, gated text/optional-DWORD at
+  `+0x5C`, gated DWORD/DWORD/text at `+0x70`, and a final byte at `+0x84`.
+  `0x78`'s vector counts use `0xFF` continuation and zero termination;
+  `0x7A`'s gates are byte-presence gates, not count loops. All three allocation
+  paths branch on null and still call the body reader after the constructor or
+  zero-object path; none has a no-reader success epilog. This is static flow
+  evidence only and does not establish allocation-failure runtime behavior.
+- Next recorded work, not new scope: continue the existing “trace
+  parsed-object consumers” task for the 17 case-bearing primary-route
+  subcases; route3 entries `2,3,4,5,7,8` are now mapped. Existing unresolved
+  decoder observations also remain:
+  selector `0x2A` tagged variants, selector `0x36`'s float-derived predicate,
+  and selector `0x3B`'s opaque payload. Keep these separate from the completed
+  secondary-selector identities.
+- The 91 verified secondary cases are RTTI-backed:
   `EncounterToUIMessage`, `VotekickInitiated`, `VotekickResponded`,
   `ScoreBoardEnable/Init/SetWinner/Clear/AddPlayer/RemovePlayer/
   UpdatePlayerStats/UpdatePlayerStatsFromStats/UpdatePlayerStatus`,
@@ -73,6 +102,8 @@ helper calls against the original binary before committing and pushing.
   `SetClientDailyInfo`, `GlobalCounterUpdate`,
   `GlobalCounterMilestoneInfo`, `ChatMessageList`, and
   `CurrentLoadoutResponse`.
+  Selectors `0x78..0x7A` add `VendorProductsResponse`,
+  `VendorPurchaseResponse`, and `ConductorGlobalAnnouncement`.
   Their common base initializer writes marker
   `+0x08`, descriptor anchor `+0x0C`, constructor type DWORD `+0x10`,
   parser-context copies `+0x18/+0x1C`, and zeros `+0x20/+0x24`; body begins
@@ -168,7 +199,7 @@ helper calls against the original binary before committing and pushing.
   native type IDs, and anchors.
   The setup call at raw `0x3571B0` is a `ret` stub; no semantics are assigned
   to its arguments. The route0 Character selector namespace overlaps these
-  numeric values but uses a separate dispatch table. All 88 verified targets are
+  numeric values but uses a separate dispatch table. All 91 verified targets are
   distinct and nonzero. Selectors `0x28/0x2D`
   and `0x32/0x34` share
   reader continuations despite distinct table destinations and types.
@@ -1664,11 +1695,19 @@ These updates supersede older next-step suggestions below where they overlap.
   evidence that the keyed selector-0x02/0x03 Character dispatchers reuse that
   method. An untraced indirect entry is not excluded. Actual block extent and
   runtime consequences remain unknown.
-  Selector0x78 constructs `OpenMovieDialog` and passes input through the shared NUL-terminated text reader at +0x28; field meaning and allocation-failure consequence remain unknown.
-  Selector0x79 constructs `PrivateDialog` and reads DWORD +0x28, QWORD +0x30, and DWORD +0x38; this ends at +0x3C despite a +0x40 request, while the same parsed pointer reaches event-229 handling that reads through +0x48. The actual allocator block extent remains unresolved.
-  Selector0x7A constructs `PublicDialog` and reads DWORDs +0x28/+0x2C; field meanings and allocation-failure consequence remain unknown.
-  The nested selector table 0x53..0x7A is fully traced, and all 17 case-bearing
-  primary-route subcases have native layouts. Route3 entries2,3,4,5,7,8 are
+  Route0 Character selector0x78 constructs `OpenMovieDialog` and passes input
+  through the shared NUL-terminated text reader at +0x28; field meaning and
+  allocation-failure consequence remain unknown.
+  Route0 Character selector0x79 constructs `PrivateDialog` and reads DWORD
+  +0x28, QWORD +0x30, and DWORD +0x38; this ends at +0x3C despite a +0x40
+  request, while the same parsed pointer reaches event-229 handling that reads
+  through +0x48. The actual allocator block extent remains unresolved.
+  Route0 Character selector0x7A constructs `PublicDialog` and reads DWORDs
+  +0x28/+0x2C; field meanings and allocation-failure consequence remain
+  unknown.
+  The Route0 Character nested selector table 0x53..0x7A is fully traced, and
+  all 17 case-bearing primary-route subcases have native layouts. Route3
+  entries2,3,4,5,7,8 are
   mapped in `docs/MatrixConnection.md`; next trace parsed-object consumers.
   Field semantics remain open.
   RTTI names the results `nl::RoutedMessage` and

@@ -970,7 +970,7 @@ Check("Secondary command dispatcher separates primary-byte, secondary-selector, 
     && MatrixSecondaryCommandDispatcherNativeLayout.GetSecondarySelectorIndex(0x20) == 0
     && MatrixSecondaryCommandDispatcherNativeLayout.GetSecondarySelectorIndex(0x7A) == 0x5A
     && MatrixSecondaryCommandDispatcherNativeLayout.GetSecondarySelectorIndex(0x7B) is null);
-Check("Secondary decoder table snapshot records 88 of 91 selectors",
+Check("Secondary decoder table snapshot records all 91 selectors",
     MatrixSecondaryDecoderTableNativeLayout.ParserFileOffset == 0x81CC50
     && MatrixSecondaryDecoderTableNativeLayout.SelectorComparisonFileOffset == 0x81F3A8
     && MatrixSecondaryDecoderTableNativeLayout.SelectorJumpFileOffset == 0x81F3B4
@@ -1004,16 +1004,18 @@ Check("Secondary decoder table snapshot records 88 of 91 selectors",
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x6F) == 79
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x70) == 80
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x77) == 87
+    && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x78) == 88
+    && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x79) == 89
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x7A) == 0x5A
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x1F) is null
     && MatrixSecondaryDecoderTableNativeLayout.GetTableIndex(0x7B) is null
-    && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries.Count == 88
+    && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries.Count == 91
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .Select(entry => entry.Selector)
-        .SequenceEqual(Enumerable.Range(0x20, 88).Select(selector => (byte)selector))
+        .SequenceEqual(Enumerable.Range(0x20, 91).Select(selector => (byte)selector))
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .Select(entry => entry.TableIndex)
-        .SequenceEqual(Enumerable.Range(0, 88))
+        .SequenceEqual(Enumerable.Range(0, 91))
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .Select(entry => entry.TargetVirtualAddress)
         .SequenceEqual(new uint[]
@@ -1039,7 +1041,8 @@ Check("Secondary decoder table snapshot records 88 of 91 selectors",
             0xC21C0C, 0xC21C74, 0xC21CDE, 0xC21D46,
             0xC21DAE, 0xC21E16, 0xC21E7E, 0xC21EE6,
             0xC21F4E, 0xC21FB6, 0xC2201E, 0xC22088,
-            0xC220F0, 0xC22158, 0xC221CC, 0xC22236
+            0xC220F0, 0xC22158, 0xC221CC, 0xC22236,
+            0xC2229E, 0xC22306, 0xC2236E
         })
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .All(entry => entry.TargetKind == MatrixSecondaryDecoderTargetKind.MessageCase)
@@ -1047,7 +1050,7 @@ Check("Secondary decoder table snapshot records 88 of 91 selectors",
         .All(entry => entry.TargetVirtualAddress == entry.TargetFileOffset + 0x400C00)
     && MatrixSecondaryDecoderTableNativeLayout.VerifiedEntries
         .Select(entry => entry.TargetVirtualAddress)
-        .Distinct().Count() == 88
+        .Distinct().Count() == 91
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x27)?.TargetFileOffset == 0x81F683
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x28)?.TargetFileOffset == 0x81F6EB
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x2F)?.TargetFileOffset == 0x81F9BE
@@ -1067,7 +1070,10 @@ Check("Secondary decoder table snapshot records 88 of 91 selectors",
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x68)?.TargetFileOffset == 0x82100C
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x6F)?.TargetFileOffset == 0x8212E6
     && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x70)?.TargetFileOffset == 0x82134E
-    && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x77)?.TargetFileOffset == 0x821636);
+    && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x77)?.TargetFileOffset == 0x821636
+    && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x78)?.TargetFileOffset == 0x82169E
+    && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x79)?.TargetFileOffset == 0x821706
+    && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(0x7A)?.TargetFileOffset == 0x82176E);
 Check("Secondary selectors 0x70-0x77 retain native identities and wire layouts",
     EncounterPublicInfoNativeLayout.AllocationSize == 0x40
     && EncounterPublicInfoNativeLayout.ConstructorNativeTypeId == 0x70
@@ -1135,6 +1141,42 @@ Check("Secondary selectors 0x70-0x77 retain native identities and wire layouts",
         ChatMessageListNativeLayout.BodyReaderFileOffset,
         CurrentLoadoutResponseNativeLayout.BodyReaderFileOffset
     }.All(reader => reader != 0));
+Check("Secondary selectors 0x78-0x7A preserve RTTI-backed identities and reader layouts",
+    VendorProductsResponseNativeLayout.AllocationSize == 0x60
+    && VendorProductsResponseNativeLayout.ConstructorNativeTypeId == 0x78
+    && VendorProductsResponseNativeLayout.DescriptorAnchorVirtualAddress == 0x1B89A9C
+    && VendorProductsResponseNativeLayout.VtableVirtualAddress == 0x1C6DD18
+    && VendorProductsResponseNativeLayout.RttiName == ".?AVVendorProductsResponse@firefall@@"
+    && VendorProductsResponseNativeLayout.FirstVectorFieldOffset == 0x44
+    && VendorProductsResponseNativeLayout.FirstVectorNativeStride == 8
+    && VendorProductsResponseNativeLayout.OuterVectorFieldOffset == 0x50
+    && VendorProductsResponseNativeLayout.OuterRecordNativeStride == 0x30
+    && VendorProductsResponseNativeLayout.FirstNestedVectorNativeStride == 0x18
+    && VendorProductsResponseNativeLayout.SecondNestedVectorNativeStride == 8
+    && VendorProductsResponseNativeLayout.CountWireWidth == 1
+    && VendorProductsResponseNativeLayout.ChunkContinuationCount == 0xFF
+    && VendorPurchaseResponseNativeLayout.AllocationSize == 0x48
+    && VendorPurchaseResponseNativeLayout.ConstructorNativeTypeId == 0x79
+    && VendorPurchaseResponseNativeLayout.DescriptorAnchorVirtualAddress == 0x1B89AA4
+    && VendorPurchaseResponseNativeLayout.VtableVirtualAddress == 0x1C6DCE8
+    && VendorPurchaseResponseNativeLayout.RttiName == ".?AVVendorPurchaseResponse@firefall@@"
+    && VendorPurchaseResponseNativeLayout.ByteFieldOffset == 0x28
+    && VendorPurchaseResponseNativeLayout.FirstQwordFieldOffset == 0x30
+    && VendorPurchaseResponseNativeLayout.SecondQwordFieldOffset == 0x38
+    && VendorPurchaseResponseNativeLayout.DwordFieldOffset == 0x40
+    && VendorPurchaseResponseNativeLayout.TextFieldOffset == 0x44
+    && ConductorGlobalAnnouncementNativeLayout.AllocationSize == 0x88
+    && ConductorGlobalAnnouncementNativeLayout.ConstructorNativeTypeId == 0x7A
+    && ConductorGlobalAnnouncementNativeLayout.DescriptorAnchorVirtualAddress == 0x1B89A94
+    && ConductorGlobalAnnouncementNativeLayout.VtableVirtualAddress == 0x1C6DCD8
+    && ConductorGlobalAnnouncementNativeLayout.RttiName == ".?AVConductorGlobalAnnouncement@firefall@@"
+    && ConductorGlobalAnnouncementNativeLayout.NestedBlockReaderFileOffset == 0x83B7A0
+    && ConductorGlobalAnnouncementNativeLayout.FirstGatedObjectFieldOffset == 0x3C
+    && ConductorGlobalAnnouncementNativeLayout.SecondGatedObjectFieldOffset == 0x4C
+    && ConductorGlobalAnnouncementNativeLayout.ThirdTextFieldOffset == 0x80
+    && ConductorGlobalAnnouncementNativeLayout.FourthGatedObjectFieldOffset == 0x5C
+    && ConductorGlobalAnnouncementNativeLayout.FifthGatedObjectFieldOffset == 0x70
+    && ConductorGlobalAnnouncementNativeLayout.TrailingByteFieldOffset == 0x84);
 Check("Secondary selectors 0x58-0x5F retain positional wire layouts",
     TrackRecipeNativeLayout.Selector == 0x58
     && TrackRecipeNativeLayout.AllocationSize == 0x30

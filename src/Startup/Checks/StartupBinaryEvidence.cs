@@ -3521,6 +3521,243 @@ internal static class StartupBinaryEvidence
                 ChatMessageListNativeLayout.OptionalQwordPrimitiveReaderFileOffset)
             && Matches(0x5FDA7C, "8B4424108947088B44241489470C")
             && Matches(0x5FDAAF, "803F007403C60700"));
+        check("Binary secondary selectors 0x78-0x7A map to distinct RTTI-backed types in the separate table",
+            new (byte Selector, uint CaseFileOffset, uint CaseVirtualAddress,
+                uint VtableVirtualAddress, uint VtableFileOffset, string RttiName)[] {
+                (VendorProductsResponseNativeLayout.Selector,
+                    VendorProductsResponseNativeLayout.CaseFileOffset,
+                    VendorProductsResponseNativeLayout.CaseVirtualAddress,
+                    VendorProductsResponseNativeLayout.VtableVirtualAddress,
+                    VendorProductsResponseNativeLayout.VtableFileOffset,
+                    VendorProductsResponseNativeLayout.RttiName),
+                (VendorPurchaseResponseNativeLayout.Selector,
+                    VendorPurchaseResponseNativeLayout.CaseFileOffset,
+                    VendorPurchaseResponseNativeLayout.CaseVirtualAddress,
+                    VendorPurchaseResponseNativeLayout.VtableVirtualAddress,
+                    VendorPurchaseResponseNativeLayout.VtableFileOffset,
+                    VendorPurchaseResponseNativeLayout.RttiName),
+                (ConductorGlobalAnnouncementNativeLayout.Selector,
+                    ConductorGlobalAnnouncementNativeLayout.CaseFileOffset,
+                    ConductorGlobalAnnouncementNativeLayout.CaseVirtualAddress,
+                    ConductorGlobalAnnouncementNativeLayout.VtableVirtualAddress,
+                    ConductorGlobalAnnouncementNativeLayout.VtableFileOffset,
+                    ConductorGlobalAnnouncementNativeLayout.RttiName)
+            }.Select((item, index) =>
+                item.Selector == 0x78 + index
+                && ReadUInt32(VirtualAddressToFileOffset(
+                    MatrixSecondaryDecoderTableNativeLayout.TableVirtualAddress)
+                    + (uint)((item.Selector - 0x20) * 4)) == item.CaseVirtualAddress
+                && MatrixSecondaryDecoderTableNativeLayout.GetVerifiedEntry(item.Selector)
+                    ?.TargetVirtualAddress == item.CaseVirtualAddress
+                && item.CaseVirtualAddress == item.CaseFileOffset + 0x400C00
+                && VirtualAddressToFileOffset(item.VtableVirtualAddress) == item.VtableFileOffset
+                && VtableRttiName(item.VtableVirtualAddress, 80) == item.RttiName
+                && VtableCompleteObjectOffset(item.VtableVirtualAddress) == 0)
+                .All(matches => matches)
+            && new uint[] {
+                VendorProductsResponseNativeLayout.CaseVirtualAddress,
+                VendorPurchaseResponseNativeLayout.CaseVirtualAddress,
+                ConductorGlobalAnnouncementNativeLayout.CaseVirtualAddress
+            }.Distinct().Count() == 3);
+        check("Binary secondary 0x78-0x7A cases preserve setup, allocation failure, constructors, and readers",
+            Matches(0x82169E, "689C9AB8016824D0B801680409E601")
+            && RelativeBranchTargets(0x8216AD, 0xE8,
+                MatrixSecondaryDecoderTableNativeLayout.CaseSetupHelperFileOffset)
+            && Matches(MatrixSecondaryDecoderTableNativeLayout.CaseSetupHelperFileOffset, "C3")
+            && Matches(0x8216B5, "6A60")
+            && RelativeBranchTargets(0x8216B7, 0xE8,
+                VendorProductsResponseNativeLayout.AllocationFunctionFileOffset)
+            && Matches(0x8216C3, "C744242058000000")
+            && Matches(0x8216CB, "85C07410")
+            && Matches(0x8216DF, "33F6")
+            && Matches(0x8216DD, "EB02")
+            && RelativeBranchTargets(0x8216D6, 0xE8,
+                VendorProductsResponseNativeLayout.ConstructorFileOffset)
+            && Matches(0x8216E1, "578BCEC7442424FFFFFFFF")
+            && RelativeBranchTargets(VendorProductsResponseNativeLayout.BodyReaderCallSiteFileOffset,
+                0xE8, VendorProductsResponseNativeLayout.BodyReaderFileOffset)
+            && Matches(0x821706, "68A49AB801683CD0B801680409E601")
+            && RelativeBranchTargets(0x821715, 0xE8,
+                MatrixSecondaryDecoderTableNativeLayout.CaseSetupHelperFileOffset)
+            && Matches(0x82171D, "6A48")
+            && RelativeBranchTargets(0x82171F, 0xE8,
+                VendorPurchaseResponseNativeLayout.AllocationFunctionFileOffset)
+            && Matches(0x82172B, "C744242059000000")
+            && Matches(0x821733, "85C07410")
+            && Matches(0x821747, "33F6")
+            && Matches(0x821745, "EB02")
+            && RelativeBranchTargets(0x82173E, 0xE8,
+                VendorPurchaseResponseNativeLayout.ConstructorFileOffset)
+            && Matches(0x821749, "56")
+            && Matches(0x82174A, "8BCF")
+            && Matches(0x82174C, "C7442424FFFFFFFF")
+            && RelativeBranchTargets(VendorPurchaseResponseNativeLayout.BodyReaderCallSiteFileOffset,
+                0xE8, VendorPurchaseResponseNativeLayout.BodyReaderFileOffset)
+            && Matches(0x82176E, "68949AB8016854D0B801680409E601")
+            && RelativeBranchTargets(0x82177D, 0xE8,
+                MatrixSecondaryDecoderTableNativeLayout.CaseSetupHelperFileOffset)
+            && Matches(0x821785, "6888000000")
+            && RelativeBranchTargets(0x82178A, 0xE8,
+                ConductorGlobalAnnouncementNativeLayout.AllocationFunctionFileOffset)
+            && Matches(0x821796, "C74424205A000000")
+            && Matches(0x82179E, "85C07410")
+            && Matches(0x8217B2, "33F6")
+            && Matches(0x8217B0, "EB02")
+            && RelativeBranchTargets(0x8217A9, 0xE8,
+                ConductorGlobalAnnouncementNativeLayout.ConstructorFileOffset)
+            && Matches(0x8217B4, "568BCFC7442424FFFFFFFF")
+            && RelativeBranchTargets(ConductorGlobalAnnouncementNativeLayout.BodyReaderCallSiteFileOffset,
+                0xE8, ConductorGlobalAnnouncementNativeLayout.BodyReaderFileOffset));
+        check("Binary secondary 0x78-0x7A constructors retain native type IDs, anchors, metadata helpers, and derived vtables",
+            new (uint Constructor, uint TypeId, uint Helper, uint Anchor,
+                uint Vtable)[] {
+                (VendorProductsResponseNativeLayout.ConstructorFileOffset,
+                    VendorProductsResponseNativeLayout.ConstructorNativeTypeId,
+                    VendorProductsResponseNativeLayout.BaseMetadataConstructorFileOffset,
+                    VendorProductsResponseNativeLayout.DescriptorAnchorVirtualAddress,
+                    VendorProductsResponseNativeLayout.VtableVirtualAddress),
+                (VendorPurchaseResponseNativeLayout.ConstructorFileOffset,
+                    VendorPurchaseResponseNativeLayout.ConstructorNativeTypeId,
+                    VendorPurchaseResponseNativeLayout.BaseMetadataConstructorFileOffset,
+                    VendorPurchaseResponseNativeLayout.DescriptorAnchorVirtualAddress,
+                    VendorPurchaseResponseNativeLayout.VtableVirtualAddress),
+                (ConductorGlobalAnnouncementNativeLayout.ConstructorFileOffset,
+                    ConductorGlobalAnnouncementNativeLayout.ConstructorNativeTypeId,
+                    ConductorGlobalAnnouncementNativeLayout.BaseMetadataConstructorFileOffset,
+                    ConductorGlobalAnnouncementNativeLayout.DescriptorAnchorVirtualAddress,
+                    ConductorGlobalAnnouncementNativeLayout.VtableVirtualAddress)
+            }.All(item =>
+                ContainsBytes(item.Constructor, 0x80,
+                    "C700" + UInt32LittleEndianHex(item.TypeId))
+                && ContainsBytes(item.Constructor, 0x80,
+                    "C706" + UInt32LittleEndianHex(item.Vtable))
+                && ContainsConstructorCall(item.Constructor, item.Helper)
+                && Matches(item.Helper + 0x13,
+                    "C7460C" + UInt32LittleEndianHex(item.Anchor))
+                && Matches(item.Helper + 0x1A, "C7460801000000")
+                && Matches(item.Helper + 0x21, "894610")
+                && Matches(item.Helper + 0x2B, "894618")
+                && Matches(item.Helper + 0x31, "89461C")
+                && Matches(item.Helper + 0x34,
+                    "C7462000000000C7462400000000")));
+        check("Binary VendorProductsResponse readers preserve scalar order, vector strides, and nested count framing",
+            Matches(0x83DF6D, "8D462850")
+            && RelativeBranchTargets(0x83DF71, 0xE8,
+                VendorProductsResponseNativeLayout.DwordReaderFileOffset)
+            && Matches(0x83DF76, "83C6308BCF56")
+            && RelativeBranchTargets(0x83DF7C, 0xE8,
+                VendorProductsResponseNativeLayout.QwordReaderFileOffset)
+            && RelativeBranchTargets(0x83DF87, 0xE8,
+                VendorProductsResponseNativeLayout.DwordReaderFileOffset)
+            && RelativeBranchTargets(0x83DF91, 0xE8,
+                VendorProductsResponseNativeLayout.SharedTextReaderFileOffset)
+            && RelativeBranchTargets(0x83DF9C, 0xE8,
+                VendorProductsResponseNativeLayout.DwordReaderFileOffset)
+            && RelativeBranchTargets(0x83DFA6, 0xE8,
+                VendorProductsResponseNativeLayout.FirstVectorReaderFileOffset)
+            && RelativeBranchTargets(0x83DFB0, 0xE8,
+                VendorProductsResponseNativeLayout.OuterVectorReaderFileOffset)
+            && Matches(0x83C0E5, "80FBFF0F84E7FDFFFF")
+            && RelativeBranchTargets(0x83C9FB, 0xE8,
+                VendorProductsResponseNativeLayout.SharedTextReaderFileOffset)
+            && Matches(0x83CB60, "83470418")
+            && Matches(0x83CBC0, "80FBFF0F8459FDFFFF")
+            && RelativeBranchTargets(0x83D35A, 0xE8,
+                VendorProductsResponseNativeLayout.SharedTextReaderFileOffset)
+            && RelativeBranchTargets(0x83D364, 0xE8,
+                VendorProductsResponseNativeLayout.SharedTextReaderFileOffset)
+            && Matches(0x83D4C2, "83460408")
+            && Matches(0x83D4EB, "80F9FF0F84ECFDFFFF")
+            && RelativeBranchTargets(0x83D55E, 0xE8,
+                VendorProductsResponseNativeLayout.QwordReaderFileOffset)
+            && RelativeBranchTargets(0x83D569, 0xE8,
+                VendorProductsResponseNativeLayout.DwordReaderFileOffset)
+            && RelativeBranchTargets(0x83D574, 0xE8,
+                VendorProductsResponseNativeLayout.DwordReaderFileOffset)
+            && RelativeBranchTargets(0x83D57F, 0xE8,
+                VendorProductsResponseNativeLayout.DwordReaderFileOffset)
+            && RelativeBranchTargets(0x83D589, 0xE8,
+                VendorProductsResponseNativeLayout.FirstNestedVectorReaderFileOffset)
+            && RelativeBranchTargets(0x83D593, 0xE8,
+                VendorProductsResponseNativeLayout.SecondNestedVectorReaderFileOffset)
+            && Matches(0x83D5E0, "0F95C088472C")
+            && Matches(0x83DD07, "83C730")
+            && RelativeBranchTargets(0x83DDAD, 0xE8,
+                VendorProductsResponseNativeLayout.OuterRecordReaderFileOffset)
+            && RelativeBranchTargets(0x83DDBB, 0xE8,
+                VendorProductsResponseNativeLayout.OuterVectorAppendFileOffset)
+            && Matches(0x83DDD4, "80FBFF0F843AFFFFFF"));
+        check("Binary VendorPurchaseResponse and ConductorGlobalAnnouncement readers preserve exact field order and gates",
+            Matches(0x83B9FB, "8D5628")
+            && RelativeBranchTargets(0x83B9FE, 0xE8,
+                VendorPurchaseResponseNativeLayout.ByteReaderFileOffset)
+            && Matches(0x83BA03, "8D4630")
+            && RelativeBranchTargets(0x83BA09, 0xE8,
+                VendorPurchaseResponseNativeLayout.QwordReaderFileOffset)
+            && Matches(0x83BA0E, "8D4638")
+            && RelativeBranchTargets(0x83BA14, 0xE8,
+                VendorPurchaseResponseNativeLayout.QwordReaderFileOffset)
+            && Matches(0x83BA19, "8D4640")
+            && RelativeBranchTargets(0x83BA1F, 0xE8,
+                VendorPurchaseResponseNativeLayout.DwordReaderFileOffset)
+            && Matches(0x83BA24, "8D5644")
+            && RelativeBranchTargets(0x83BA29, 0xE8,
+                VendorPurchaseResponseNativeLayout.SharedTextReaderFileOffset)
+            && Matches(0x83B8FC, "8D4E28")
+            && RelativeBranchTargets(0x83B8FF, 0xE8,
+                ConductorGlobalAnnouncementNativeLayout.NestedBlockReaderFileOffset)
+            && Matches(0x83B904, "8D9684000000")
+            && RelativeBranchTargets(0x83B90C, 0xE8,
+                ConductorGlobalAnnouncementNativeLayout.ByteReaderFileOffset)
+            && RelativeBranchTargets(0x83B7AE, 0xE8,
+                ConductorGlobalAnnouncementNativeLayout.DwordReaderFileOffset)
+            && RelativeBranchTargets(0x83B7B9, 0xE8,
+                ConductorGlobalAnnouncementNativeLayout.DwordReaderFileOffset)
+            && RelativeBranchTargets(0x83B7C4, 0xE8,
+                ConductorGlobalAnnouncementNativeLayout.DwordReaderFileOffset)
+            && RelativeBranchTargets(0x83B7CE, 0xE8,
+                ConductorGlobalAnnouncementNativeLayout.SharedTextReaderFileOffset)
+            && RelativeBranchTargets(0x83B7D8, 0xE8,
+                ConductorGlobalAnnouncementNativeLayout.SharedTextReaderFileOffset)
+            && RelativeBranchTargets(0x83B7E2, 0xE8,
+                ConductorGlobalAnnouncementNativeLayout.FirstGatedObjectReaderFileOffset)
+            && RelativeBranchTargets(0x83B7EC, 0xE8,
+                ConductorGlobalAnnouncementNativeLayout.SecondGatedObjectReaderFileOffset)
+            && RelativeBranchTargets(0x83B7F6, 0xE8,
+                ConductorGlobalAnnouncementNativeLayout.SharedTextReaderFileOffset)
+            && RelativeBranchTargets(0x83B800, 0xE8,
+                ConductorGlobalAnnouncementNativeLayout.TextAndOptionalDwordReaderFileOffset)
+            && RelativeBranchTargets(0x83B80A, 0xE8,
+                ConductorGlobalAnnouncementNativeLayout.DwordDwordTextReaderFileOffset)
+            && Matches(0x83AF85, "84DB742D")
+            && RelativeBranchTargets(0x83AF9A, 0xE8,
+                ConductorGlobalAnnouncementNativeLayout.DwordReaderFileOffset)
+            && RelativeBranchTargets(0x83AFA4, 0xE8,
+                ConductorGlobalAnnouncementNativeLayout.OptionalDwordReaderFileOffset)
+            && RelativeBranchTargets(0x83AFAF, 0xE8,
+                ConductorGlobalAnnouncementNativeLayout.FirstGatedObjectUpdateFileOffset)
+            && Matches(0x83B1C5, "84DB742D")
+            && RelativeBranchTargets(0x83B1DA, 0xE8,
+                ConductorGlobalAnnouncementNativeLayout.DwordReaderFileOffset)
+            && RelativeBranchTargets(0x83B1E4, 0xE8,
+                ConductorGlobalAnnouncementNativeLayout.OptionalDwordReaderFileOffset)
+            && RelativeBranchTargets(0x83B1EF, 0xE8,
+                ConductorGlobalAnnouncementNativeLayout.SecondGatedObjectUpdateFileOffset)
+            && Matches(0x83B43E, "84C97457")
+            && RelativeBranchTargets(0x83B459, 0xE8,
+                ConductorGlobalAnnouncementNativeLayout.SharedTextReaderFileOffset)
+            && RelativeBranchTargets(0x83B464, 0xE8, 0x6095C0)
+            && RelativeBranchTargets(0x83B470, 0xE8,
+                ConductorGlobalAnnouncementNativeLayout.TextAndOptionalDwordUpdateFileOffset)
+            && Matches(0x83B6F8, "84C9745A")
+            && RelativeBranchTargets(0x83B710, 0xE8,
+                ConductorGlobalAnnouncementNativeLayout.DwordReaderFileOffset)
+            && RelativeBranchTargets(0x83B71B, 0xE8,
+                ConductorGlobalAnnouncementNativeLayout.DwordReaderFileOffset)
+            && RelativeBranchTargets(0x83B725, 0xE8,
+                ConductorGlobalAnnouncementNativeLayout.SharedTextReaderFileOffset)
+            && RelativeBranchTargets(0x83B730, 0xE8,
+                ConductorGlobalAnnouncementNativeLayout.DwordDwordTextUpdateFileOffset));
         check("Binary selector 0x64 tagged entries retain their dispatch and payload branches",
             new uint[] {
                 EncounterUIScopeInNativeLayout.TagZeroHandlerFileOffset,
