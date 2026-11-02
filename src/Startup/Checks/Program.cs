@@ -3529,6 +3529,21 @@ Check("Respawned selector 0x67 records its typed vector receiver",
     && CharacterRespawnedConsumerNativeLayout.OptionalSharedTextPointerOffset == 0x2C
     && CharacterRespawnedConsumerNativeLayout.OptionalByteFieldOffset == 0x8C
     && CharacterRespawnedConsumerNativeLayout.DispatchedEventId == 167);
+Check("CalledForHelp selector 0x68 records its keyed event receiver",
+    CharacterCalledForHelpConsumerNativeLayout.MessageDiscriminator
+        == CharacterCalledForHelpNativeLayout.InnerSelector
+    && CharacterCalledForHelpConsumerNativeLayout.ProtocolHandlerVtableSlotOffset == 0x124
+    && CharacterCalledForHelpConsumerNativeLayout.ProtocolHandlerVtableTargetVirtualAddress == 0xECE040
+    && CharacterCalledForHelpConsumerNativeLayout.ProtocolHandlerVtableTargetFileOffset == 0xACD440
+    && CharacterCalledForHelpConsumerNativeLayout.KeyedRegistryVirtualAddress == 0x1E5A830
+    && CharacterCalledForHelpConsumerNativeLayout.KeyedLookupRoutineFileOffset == 0x327890
+    && CharacterCalledForHelpConsumerNativeLayout.MessageKeyFieldOffset == 0x28
+    && CharacterCalledForHelpConsumerNativeLayout.MessageAuxiliaryByteFieldOffset == 0x2C
+    && CharacterCalledForHelpConsumerNativeLayout.MessageAuxiliaryDwordFieldOffset == 0x30
+    && CharacterCalledForHelpConsumerNativeLayout.AllocationSize == 0x30
+    && CharacterCalledForHelpConsumerNativeLayout.MessageAuxiliaryDwordPastAllocationByteCount == 4
+    && CharacterCalledForHelpConsumerNativeLayout.UnhandledMessageLoggerFileOffset == 0x2FC4F0
+    && CharacterCalledForHelpConsumerNativeLayout.DispatchedEventId == 176);
 Check("JumpActioned selector 0x65 records its shared WORD reader continuation",
     CharacterJumpActionedNativeLayout.InnerSelector == 0x65
     && CharacterJumpActionedNativeLayout.CaseFileOffset == 0x81D1F3
@@ -5303,6 +5318,7 @@ Check("ReplayReader message dispatch receiver and discriminator vtable cases rem
         new MatrixMessageDispatchVtableCaseSnapshot(0x65, 0xC1D307, 0x81C707, 0x81C726, 0x118),
         new MatrixMessageDispatchVtableCaseSnapshot(0x66, 0xC1D332, 0x81C732, 0x81C751, 0x11C),
         new MatrixMessageDispatchVtableCaseSnapshot(0x67, 0xC1D35D, 0x81C75D, 0x81C77C, 0x120),
+        new MatrixMessageDispatchVtableCaseSnapshot(0x68, 0xC1D388, 0x81C788, 0x81C7A7, 0x124),
         new MatrixMessageDispatchVtableCaseSnapshot(0x71, 0xC1D50B, 0x81C90B, 0x81C92A, 0x148),
         new MatrixMessageDispatchVtableCaseSnapshot(0x74, 0xC1D58C, 0x81C98C, 0x81C9AB, 0x154),
         new MatrixMessageDispatchVtableCaseSnapshot(0x75, 0xC1D5B7, 0x81C9B7, 0x81C9D6, 0x158),

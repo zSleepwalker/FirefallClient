@@ -3105,6 +3105,23 @@ The runtime consequence of that abnormal path is unresolved. Field meaning
 remains unknown; shared parsing does not establish semantic equivalence with
 the other selectors.
 
+#### Selector 0x68 post-parse receiver
+
+The outer handler switch maps selector `0x68` through VA `0xC1D388` / raw
+`0x81C788`, then calls slot `+0x124` at raw `0x81C7A7`. The protocol-handler
+vtable entry at raw `0x1870BE4` contains VA `0xECE040`, mapped to receiver raw
+`0xACD440`. It reads the DWORD at message `+0x28` and looks it up in registry
+`0x1E5A830` through `0x327890`. If the lookup has no usable entry, it logs the
+key through `0x2FC4F0`. On a hit, it builds event `176` from several converted
+registry-entry values and message fields `+0x2C` and `+0x30`; the associated
+labels and field meanings remain unknown.
+
+The parser requests `0x30` bytes and writes a WORD at `+0x28` plus bytes
+`+0x2A/+0x2B`. The receiver reads a DWORD key at `+0x28` and accesses a DWORD
+at `+0x30`; that latter field starts exactly at the declared allocation end,
+so its four-byte read is outside the requested object extent. This static
+extent mismatch does not establish actual runtime capacity or impact.
+
 ### Selector 0x69: `TookHit`
 
 Entry22 maps selector `0x69` to VA `0xC1DEF3` / raw case `0x81D2F3`. It

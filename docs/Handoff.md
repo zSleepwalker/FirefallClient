@@ -133,10 +133,17 @@ dispatching event `167`. The parser requests only `0x30` bytes, so the vector
 header and `+0x8C` read exceed its declared extent; runtime capacity and
 semantics remain unknown.
 
-Next, trace route-0 nested `Character::CalledForHelp` selector `0x68`'s
-receiver at slot `+0x124`, verifying the dispatch and target mapping before
-interpreting the method. Keep this nested selector table distinct from route
-indices 2-6 and the secondary decoder table.
+The route-0 nested `Character::CalledForHelp` selector `0x68` receiver is traced
+at slot `+0x124` (VA `0xECE040` / raw `0xACD440`). It looks up the DWORD at
+message `+0x28` in registry `0x1E5A830` and, on a hit, builds event `176` from
+registry values and message fields `+0x2C/+0x30`. The `+0x30` DWORD begins at
+the end of the parser's `0x30`-byte allocation; field meaning and runtime
+capacity remain unknown.
+
+Next, trace route-0 nested `Character::TookHit` selector `0x69`'s receiver at
+slot `+0x128`, verifying the dispatch and target mapping before interpreting
+the method. Keep this nested selector table distinct from route indices 2-6
+and the secondary decoder table.
 
 All secondary selectors `0x20..0x7A` are now reconstructed and checked against
 `FirefallClient.exe.original`. The final entries `0x78..0x7A` resolve to
@@ -146,7 +153,7 @@ Character selectors `OpenMovieDialog`, `PrivateDialog`, and `PublicDialog`.
 Do not repeat the earlier decoder or keyed-receiver factory batches.
 The decoder batches through `0x7A` and route-2 through route-6 consumer traces
 were previously committed; recent updates trace route0 nested selectors `0x53`
-through `0x67` consumers.
+through `0x68` consumers.
 Use GPT-6 Luna with explicit High reasoning for implementation and review.
 Verify field-address setup, primitive widths, count-loop boundaries and
 helper calls against the original binary before committing and pushing.
