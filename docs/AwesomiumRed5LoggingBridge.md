@@ -251,6 +251,13 @@ vtable slot `+0x10` with argument `1`, then clears that field. It also
 releases the values at `+0x9A8` and `+0x9A4` through the shared-text release
 path and clears both fields, supporting their identification as
 reference-counted text values but not their application-level purpose.
+Before building the first factory argument, setup copies its incoming path
+value into owner field `+0x5C8`. For nonempty input, it ensures a trailing
+slash or backslash and converts forward slashes to backslashes; for empty
+input, it uses `"./"` at VA `0x1BBA0FC`. If field `+0x9A4` is empty, the
+literal `"web"` is composed with this base path. This supports a root-path
+and web-subdirectory interpretation, while the precise API contract remains
+unidentified.
 When those fields are empty, setup uses fallback addresses `0x1BBA15C` and
 `0x1BBA160`, which contain `"web"` and `"./"` respectively. The first value
 is path-composed with owner field `+0x5C8` before it is passed to the factory.

@@ -3931,9 +3931,12 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   remain unresolved. Owner cleanup `0xBF8AC0` calls the `+0xA04` object's
   vtable slot `+0x10` with `1`, then clears that field; it also releases and
   clears the shared-text values at `+0x9A8/+0x9A4`. Their meanings remain
-  unknown. Empty fields use `"web"` (`0x1BBA15C`) and `"./"`
-  (`0x1BBA160`); the first is path-composed with owner field `+0x5C8` before
-  factory use. Their purpose is unresolved. Secondary slot `+0x00` is raw
+  unknown. Setup copies its incoming path into owner field `+0x5C8`, adds a
+  trailing separator as needed, and converts `/` to `\`; empty input uses
+  `"./"` (`0x1BBA0FC`). Empty `+0x9A4` uses `"web"` (`0x1BBA15C`) composed
+  with that base; empty `+0x9A8` uses `"./"` (`0x1BBA160`). These support a
+  root/web-subdirectory interpretation, but the API purpose remains unknown.
+  Secondary slot `+0x00` is raw
   `0xCBD2C0`; its normal
   return path sets `EAX=0` and consumes one stack argument after substantial
   object processing. Its contract remains unidentified. The primary table at
