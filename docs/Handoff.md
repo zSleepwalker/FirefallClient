@@ -3408,3 +3408,22 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   hardware/registry access. Agent has finished; no active agent assignment.
 - Follow-ons: DumpTruck submission-layer serialization boundaries and
   Awesomium switch-name normalization. RedHanded state2 writer unresolved.
+
+## Awesomium switch-name conversion and ASCII getter
+
+- Hardware capture/DirectX batch committed/pushed ascc8aa49.
+- Parsed name conversion1029A9C0 feeds builder1028D7F0. Its helper10007AB0
+  lowercases ASCII A-Z only over stored byte length, then recognized prefix
+  length is removed before map key insertion. Lookup folds narrow key too.
+- Original wide values are copied unchanged; no value lowercasing.
+- Generic conversion optionally diagnoses WORD>7F (global11596AF8==1
+  and helper10288E40<=3). Diagnostic destructor1029AA58 not traced; do not
+  guarantee continuation or non-ASCII aliases.
+- Returning conversion copies low byte per WORD using1000B350; no UTF-8.
+  Separate child-type getter1028C8A0 first rejects any non-ASCII WORD via
+  10299E00 and returns empty. ASCII values preserve case; empty fails the
+  existing nonempty child-entry gate.
+- Saved SwitchNameNativeLayout and native checks. Build succeeds;1741
+  sample-backed checks and1519 pure checks pass.
+- Follow-ons: diagnostic cleanup10289EC0 behavior, and DumpTruck report
+  layer serialization. No target execution, sample edits or remote calls.

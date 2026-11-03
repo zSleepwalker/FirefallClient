@@ -19,6 +19,39 @@ void Check(string name, bool condition)
     if (condition) passed++; else failed++;
 }
 
+for (int value = 0; value <= byte.MaxValue; value++)
+    Check($"Awesomium byte lowercase preserves non-ASCII and folds only A-Z, byte {value:X2}",
+        SwitchNameNativeLayout.CaptureAsciiLowercaseByte((byte)value)
+        == (value >= 0x41 && value <= 0x5A ? value + 0x20 : value));
+foreach (ushort unit in new ushort[] { 0, 0x41, 0x7F, 0x80, 0xFF, 0x100, 0x141, 0xD800, 0xFFFF })
+    Check($"Awesomium returning converter keeps only low byte of code unit {unit:X4}",
+        SwitchNameNativeLayout.CaptureNarrowedCodeUnit(unit) == (unit & 0xFF));
+foreach (var value in new (string Text, bool Ascii)[]
+{
+    ("", true), ("Renderer", true), ("\0A\0", true), ("\u007F", true),
+    ("\u0080", false), ("\u0141", false), ("render\u0100er", false),
+    ("\uD800", false), ("\uD83D\uDE00", false)
+})
+    Check($"Awesomium wide ASCII value admission for {Convert.ToHexString(System.Text.Encoding.Unicode.GetBytes(value.Text))}",
+        SwitchNameNativeLayout.CaptureWideAsciiAdmission(value.Text) == value.Ascii);
+foreach (var diagnostic in new (bool Mode, int Threshold, string Text, bool Expected)[]
+{
+    (false, 0, "\u0100", false), (true, 4, "\u0100", false),
+    (true, 3, "\u0100", true), (true, int.MinValue, "\u0100", true),
+    (true, 3, "TYPE", false), (true, 3, "", false)
+})
+    Check($"Awesomium converter diagnostic admission mode={diagnostic.Mode}, threshold={diagnostic.Threshold}, length={diagnostic.Text.Length}",
+        SwitchNameNativeLayout.CaptureConversionDiagnosticAdmission(diagnostic.Mode,
+            diagnostic.Threshold, diagnostic.Text) == diagnostic.Expected);
+Check("Awesomium uppercase name bytes fold to type and mixed-case value passes ASCII gate",
+    new byte[]
+    {
+        SwitchNameNativeLayout.CaptureAsciiLowercaseByte((byte)'T'),
+        SwitchNameNativeLayout.CaptureAsciiLowercaseByte((byte)'Y'),
+        SwitchNameNativeLayout.CaptureAsciiLowercaseByte((byte)'P'),
+        SwitchNameNativeLayout.CaptureAsciiLowercaseByte((byte)'E')
+    }.SequenceEqual("type"u8.ToArray())
+    && SwitchNameNativeLayout.CaptureWideAsciiAdmission("Renderer"));
 foreach (var value in new (bool Open, uint Count, DirectXVersionReadDecision Expected)[]
 {
     (false, 127, new(DirectXVersionReadAction.UseInitializedEmptyBuffer, null)),
@@ -667,6 +700,39 @@ if (args.Length == 2)
     var hardware = Load("HWStats.exe", HWStatsLayout.FileSize, HWStatsLayout.Sha256);
     var child = Load("FirefallProcess.exe", FirefallProcessLayout.FileSize, FirefallProcessLayout.Sha256);
     var browser = Load("awesomium.dll", 23470048, AwesomiumLayout.Sha256);
+    Check("Awesomium names lower only ASCII uppercase bytes through length-bounded loop",
+        browser.Matches(0x10007ACD, "8B561003D03BCA7415")
+        && browser.Matches(0x10007AD6, "8A018D50BF0FBEC080FA19770383C020880141EBD6")
+        && browser.Calls(0x1028D82F, SwitchNameNativeLayout.AsciiLowercaseVa)
+        && browser.Calls(0x1028C4C4, SwitchNameNativeLayout.AsciiLowercaseVa));
+    Check("Awesomium wide converter conditionally diagnoses code units above ASCII",
+        browser.Matches(0x1029A9D5, "833DF86A591101")
+        && browser.Matches(0x1029A9E4, "83F8037F66")
+        && browser.Matches(0x1029AA00, "66833C417F7707")
+        && browser.Matches(0x1029AA10, "68A7010000")
+        && browser.Calls(SwitchNameNativeLayout.DiagnosticDestructorCallVa, 0x10289EC0));
+    Check("Awesomium returning wide converter copies low bytes in two-byte source strides",
+        browser.Matches(0x1029AA6B, "8B56108D0450")
+        && browser.Calls(0x1029AA99, SwitchNameNativeLayout.LowByteCopyVa)
+        && browser.Matches(0x1000B3A0, "8A18")
+        && browser.Matches(0x1000B3F2, "881C08")
+        && browser.Matches(0x1000B40B, "83C002894424143B4424187588")
+        && browser.Calls(0x1028DDCF, SwitchNameNativeLayout.WideToNarrowVa));
+    Check("Awesomium ASCII value getter rejects non-ASCII code units before conversion",
+        browser.Calls(0x1028C8C5, 0x1028C480)
+        && browser.Calls(0x1028C8CF, SwitchNameNativeLayout.WideAsciiPredicateVa)
+        && browser.Matches(0x1028C8D7, "84C0751E")
+        && browser.Matches(0x1028C8DB, "C746140F000000C74610000000008806")
+        && browser.Calls(0x1028C8FF, SwitchNameNativeLayout.WideToNarrowVa)
+        && browser.Matches(0x10299E1D, "66833C417F770A403BC672E9")
+        && browser.Matches(0x10299E29, "5FB0015EC35F32C05EC3"));
+    Check("Awesomium map builder removes prefix from folded name but copies wide value directly",
+        browser.Calls(0x1028D86D, 0x1028BB70)
+        && browser.Matches(0x1028D877, "8BE855")
+        && browser.Calls(0x1028D893, 0x100038B0)
+        && browser.Calls(0x1028D8A0, 0x1028D310)
+        && browser.Matches(0x1028D8A5, "6AFF53578BC8")
+        && browser.Calls(0x1028D8AB, 0x10007FA0));
     Check("Awesomium parsed switches update the same map in admitted argument order",
         browser.Calls(0x1028DFA6, 0x1028DCD0)
         && browser.Calls(0x1028DDB4, 0x1028BC60)
