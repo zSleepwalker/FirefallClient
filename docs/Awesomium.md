@@ -72,6 +72,6 @@ live-threshold fallback without introducing a wildcard parser.
 layout and shows that pair/numeric failure does not automatically discard
 the produced rule.
 
-[Red5 logging-method setup](AwesomiumRed5LoggingBridge.md) records the
-one-shot creation of the `Red5` JavaScript object and conditional registration
-of its `errorlog` custom method; the native callback body remains unresolved.
+[Red5 logging bridge](AwesomiumRed5LoggingBridge.md) records one-shot object
+creation, the native `errorlog` callback's string-to-logger path, and the
+separate mapped-object branch that remains unresolved.

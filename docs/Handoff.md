@@ -3734,17 +3734,45 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   imported `JSObject::SetCustomMethod` with trailing argument0, then sets
   `this+0x73`. Failure selects a bounded string index 0..7, logs
   `Unable to create Red5 JS object: %s`, and sets `this+0x72`.
-- The SetCustomMethod IAT slot has three observed call sites: raw
-  `0xD64530`, `0xD668D0`, and `0xD651B0`. The first and third use caller-
-  supplied names/strings and require successful Red5 setup; their method
-  behavior is not assigned. The separate WebPreferences constructor has one
-  direct call at raw `0xCBC1B1`; its adjacent initialization is not evidence
-  of a logging preference.
+- `SetCustomMethod` has two observed sites: raw function `0xD64530` and
+  initializer `0xD668D0`. The other setup-gated call in raw function
+  `0xD651B0` is `JSObject::SetPropertyAsync` via IAT slot `0x1AC4EF0`, not a
+  third `SetCustomMethod` site. The separate WebPreferences constructor has
+  one direct call at raw `0xCBC1B1`; its adjacent initialization is not
+  evidence of a logging preference.
 - Checked the call sites, decorated imports, UTF-16 object/method names and
   ASCII failure format against `FirefallClient.exe.original`. Build succeeds;
   2256 pure and2543 sample-backed checks pass. No browser, script, logging
   API, or callback was run.
-- Follow-up: locate the native handler behind `errorlog` and determine
-  whether JS-facing messages reach client logging; behavior is not proven by
-  the method-registration call alone. The pending state2 snapshot-writer
-  question also remains open.
+- Follow-up: trace the callback's mapped-object branch and identify the
+  JavaScript-side call site. The pending state2 snapshot-writer question
+  also remains open.
+
+## FirefallClient Red5 callback routing
+
+- Corrected the Red5 call-site record: the call in raw function `0xD651B0`
+  uses `JSObject::SetPropertyAsync`; only the raw `0xD64530` and `0xD668D0`
+  sites observed here call `JSObject::SetCustomMethod`.
+- RTTI associates the `JSMethodHandler` subobject table at VA `0x1C7656C`
+  with raw callback function `0xD65A60` (VA `0x1166660`). The handler gets
+  the saved JSObject remote ID through IAT VA `0x1AC4F00` and compares it
+  against the incoming ID at raw `0xD65AF9`; mismatch enters the unknown
+  callback logger.
+- On the fallback path after the mapped-object lookup, raw `0xD65A60`
+  compares the incoming method name with UTF-16 `errorlog` at VA `0x1BD4994`
+  via `WebString::operator==` (IAT VA `0x1AC4EA4`). If no argument is
+  present, or argument zero is not a string, it returns without message
+  logging. Otherwise it reads argument zero, verifies `JSValue::IsString`,
+  converts with `JSValue::ToString`, and calls helper raw `0x2FC4F0` with
+  format `%s - %s` (VA `0x1BD498C`) and logger object VA `0x1E68688`.
+  The first format value is the frame label when non-null, otherwise the
+  empty-string pointer VA `0x1C5EA68`.
+- Unknown names use format VA `0x1BD48F0` and logger object VA `0x1E68668`
+  through helper raw `0x2FCC60`. The mapped-object handling path and actual
+  JavaScript caller of `Red5.errorlog` remain open; no target or callback
+  was executed.
+- Added the callback fallback decision model, sample instruction/string
+  checks, and corrected the earlier SetCustomMethod call-site assertion.
+- Validation: solution build succeeded with 0 warnings/errors; all 2552
+  CompanionTools checks passed, including original-sample checks; `git diff
+  --check` is clean.
