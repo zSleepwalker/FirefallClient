@@ -251,6 +251,11 @@ vtable slot `+0x10` with argument `1`, then clears that field. It also
 releases the values at `+0x9A8` and `+0x9A4` through the shared-text release
 path and clears both fields, supporting their identification as
 reference-counted text values but not their application-level purpose.
+When those fields are empty, setup uses fallback addresses `0x1BBA15C` and
+`0x1BBA160`, which contain `"web"` and `"./"` respectively. The first value
+is path-composed with owner field `+0x5C8` before it is passed to the factory.
+These strings suggest path components, but their application-level purpose
+is not established.
 The primary table is at file offset `0x18733CC`; its `+0x08` entry is VA
 `0x10BCD80` (raw `0xCBC180`). That method first calls raw `0xCBC270`, then
 uses the helper object at member `+0x08` twice to populate members `+0x0C`
