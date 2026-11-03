@@ -3317,3 +3317,19 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
 - Saved BiosRegistryNativeLayout and exact five-call/native checks.
 - Build succeeds;1237 sample-backed checks and1114 pure checks pass.
   Follow-ons: OS description403A20 and NETAPI MAC helper.
+
+## HWStats MAC source and first-success policy
+
+- BIOS registry batch committed/pushed as529fc73.
+- Traced4041D0: Netbios NCBENUM37 (256-byte stack buffer), then per LANA
+  NCBRESET32 and NCBASTAT33 with wildcard and600-byte shared buffer48EFC0.
+  Clears each64-byte NCB, but not the enumeration buffer.
+- Enumeration/reset returns ignored. Status AL==0 picks first successful
+  attempt; only then six shared bytes are copied into caller destination.
+- Failure returns0 without touching destination. Report caller ignores it,
+  does not preinitialize MAC bytes, and prints six zero-extended bytes with
+  literal `macaddr = %02x:%02x:%02x:%02x:%02x:%02x\n`.
+- No invented zero address, physical-adapter preference, real hardware
+  access, target execution, or Netbios requests in reconstruction.
+- Saved MacAddressNativeLayout and byte checks. Build succeeds;1255
+  sample-backed checks and1121 pure checks pass. Follow-on: OS description.

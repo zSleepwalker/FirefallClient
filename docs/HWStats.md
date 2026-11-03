@@ -5,7 +5,7 @@ Static IDA analysis only. SHA256 `0AE559DA740DE2C51A77A652906F021833A17E2A634757
 ## Observed
 - `main` (0x404480) takes optional argv[1] output path (opened `"w"`), else stdout; calls report function 0x404340.
 - Report: `CoInitialize`, prints `macaddr = xx:xx:...`, enumerates DirectSound playback (`soundplayback`) and capture (`soundrecording`) devices, then runs sections for registry `HARDWARE\DESCRIPTION\System\CentralProcessor`, `SYSTEM\CurrentControlSet\Enum\DISPLAY`, DriveSpace (`total = %.3f GB/MB`), D3D9 caps (`Direct3DCreate9`, `GetAvailableVidMem*`, `D3DVersion`, D3DFMT names), CPU features (MMX/SSE/SSE2/3DNow), and `%s = %s` key/value dumps.
-- Imports: KERNEL32, USER32, ADVAPI32 (registry), SHELL32, ole32, NETAPI32, DSOUND, WINMM. No network imports.
+- Imports: KERNEL32, USER32, ADVAPI32 (registry), SHELL32, ole32, NETAPI32, DSOUND, WINMM. NETAPI32's `Netbios` supplies the MAC survey; [MAC-address evidence](HWStatsMacAddress.md) records its enumeration/reset/status requests and unchecked failure-path output.
 - DumpTruck launches it with a stdout pipe and compresses the output into the crash report.
 
 ## Interpreted
@@ -21,7 +21,7 @@ Static IDA analysis only. SHA256 `0AE559DA740DE2C51A77A652906F021833A17E2A634757
 - The OS/DirectX line uses the unrecovered wstream text of `sub_403A20`; the decompiler lost the buffer link into `sub_404020`'s `%s`. [BIOS registry evidence](HWStatsBiosRegistry.md) now traces `sub_406F30`: HKLM `HARDWARE\DESCRIPTION\SYSTEM\`, KEY_ALL_ACCESS, ANSI queries and REG_SZ/REG_MULTI_SZ-only print admission.
 
 ## Unresolved
-- Exact OS string text and NETAPI usage (likely the `macaddr` code).
+- Exact OS string text.
 
 ## DriveSpace follow-up
 

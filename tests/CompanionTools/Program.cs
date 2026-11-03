@@ -53,6 +53,13 @@ foreach (uint type in new uint[] { 0, 1, 2, 3, 4, 7, 11, uint.MaxValue })
     Check($"BIOS helper failure suppresses type {type}",
         !BiosRegistryNativeLayout.CapturePrintAdmission(0x80004005, type));
 }
+foreach (var selection in new (byte[] Statuses, int? Expected)[]
+{
+    ([], null), ([1], null), ([0], 0), ([0, 1, 0], 0),
+    ([1, 0, 0], 1), ([0xFF, 0xFE, 0], 2), ([1, 2, 3], null)
+})
+    Check($"MAC first zero ASTAT return in {Convert.ToHexString(selection.Statuses)}",
+        MacAddressNativeLayout.CaptureFirstSuccessfulAttempt(selection.Statuses) == selection.Expected);
 foreach (var entry in new (ulong Bytes, DriveSpaceAmounts Amounts, DriveSpaceDisplayUnit Unit)[]
 {
     (0, new(0, 0), DriveSpaceDisplayUnit.None),
@@ -1021,6 +1028,43 @@ if (args.Length == 2)
         && hardware.Matches(0x403159, "85F6754B")
         && hardware.Ascii(0x443C7C) == BiosRegistryNativeLayout.NativeFormat
         && hardware.Matches(0x403198, "687C3C4400"));
+    Check("HWStats MAC enumerates with zeroed 64-byte NCB and 256-byte destination",
+        hardware.ImportSlotNames(0x440584, "Netbios")
+        && hardware.Matches(0x4041E6, "6A40")
+        && hardware.Matches(0x4041F8, "8B1D84054400")
+        && hardware.Matches(0x40420D, "B800010000C685B8FEFFFF37")
+        && hardware.Matches(0x404219, "668985C0FEFFFF")
+        && hardware.Matches(0x404227, "FFD333F680BDF8FEFFFF00"));
+    Check("HWStats MAC resets each enumerated LANA and ignores reset status",
+        hardware.Matches(0x404250, "8A8435F9FEFFFF")
+        && hardware.Matches(0x40425A, "8885E8FEFFFF")
+        && hardware.Matches(0x404266, "C685B8FEFFFF3250FFD36A40"));
+    Check("HWStats MAC ASTAT uses same LANA, wildcard name and shared 600-byte buffer",
+        hardware.Matches(0x404280, "8A8435F9FEFFFF")
+        && hardware.Ascii(0x443C6C) == MacAddressNativeLayout.AdapterStatusCallName
+        && hardware.Matches(0x404287, "686C3C4400")
+        && hardware.Matches(0x40429B, "C685B8FEFFFF33")
+        && hardware.Matches(0x4042AB, "C785BCFEFFFFC0EF4800")
+        && hardware.Matches(0x4042B5, "B858020000668985C0FEFFFF"));
+    Check("HWStats MAC stops on first zero AL, else advances against enumerated count",
+        hardware.Matches(0x4042C8, "FFD384C07423")
+        && hardware.Matches(0x4042CE, "0FB685F8FEFFFF463BF00F8C62FFFFFF")
+        && hardware.Matches(0x4042DE, "33C05F5E5B")
+        && hardware.Matches(0x404325, "B801000000"));
+    foreach (var copy in new (uint ReadVa, uint StoreVa, byte Offset)[]
+    {
+        (0x4042F1, 0x4042F9, 0), (0x4042FD, 0x404302, 1), (0x404305, 0x40430A, 2),
+        (0x40430D, 0x404312, 3), (0x404315, 0x40431A, 4), (0x40431D, 0x404322, 5)
+    })
+        Check($"HWStats MAC copies shared status byte {copy.Offset} into destination",
+            hardware.Matches(copy.ReadVa, "A0" + Convert.ToHexString(
+                BitConverter.GetBytes(MacAddressNativeLayout.AdapterStatusBufferVa + copy.Offset)))
+            && hardware.Matches(copy.StoreVa, copy.Offset == 0 ? "8807" : $"8847{copy.Offset:X2}"));
+    Check("HWStats MAC caller ignores helper return and promotes all six unsigned bytes to printf",
+        hardware.Calls(0x4043C2, MacAddressNativeLayout.HelperVa)
+        && hardware.Matches(0x4043C7, "0FB645F1500FB645F0500FB645EF500FB645EE500FB645ED500FB645EC50")
+        && hardware.Ascii(0x443BB4) == MacAddressNativeLayout.NativeFormat
+        && hardware.Calls(0x4043EE, 0x406A20));
     Check("DeploymentCommon is a managed deployment assembly, not an observed native import of these helpers",
         deployment.ImportsFrom("mscoree.dll").Contains("_CorDllMain")
         && new[] { red, dumper, truck, hardware, child, browser, client }
