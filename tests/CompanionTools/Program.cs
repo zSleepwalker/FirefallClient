@@ -2066,6 +2066,9 @@ if (args.Length == 2)
     Check("Original ClientApi request query format literal",
         client.Ascii(Red5LoggingBridgeNativeLayout.ClientApiRequestQueryFormatVa)
             == Red5LoggingBridgeNativeLayout.ClientApiRequestQueryNativeFormat);
+    Check("Original ClientApi stores its signed request under the signature header name",
+        client.Ascii(Red5LoggingBridgeNativeLayout.ClientApiRequestSignatureHeaderNameVa)
+            == Red5LoggingBridgeNativeLayout.ClientApiRequestSignatureHeaderName);
     Check("Original ClientApi uses rand and CryptoAPI SHA-1 for the request nonce and signatures",
         client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiRequestRandImportVa, "rand")
         && client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiRequestHashCreateImportVa,

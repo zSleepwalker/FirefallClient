@@ -4110,3 +4110,17 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
 - The AES mode, the encryption/decryption dispatch path, and the application
   data protected by these wrappers are not established. Do not model cipher
   output until the stream contract and dispatch caller are resolved.
+
+# Round 25: ClientApi signature header key
+
+## Observed
+- `0xBC1990` inserts the string produced by `0x12E4100` into the request map
+  at `this+0x20` using key VA `0x1BB5328`. The PE-mapped sample string is
+  `"X-Red5-Signature"`, now modeled as
+  `ClientApiRequestSignatureHeaderName`.
+- The header-shaped key supports interpreting the signed query as an HTTP
+  request header. A CompanionTools sample check verifies the literal.
+
+## Unresolved
+- The final path that enumerates the request map and emits this value through
+  the HTTP API has not been traced.

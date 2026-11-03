@@ -276,6 +276,8 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint ClientApiRequestQueryFormatVa = 0x1C57568;
     public const string ClientApiRequestQueryNativeFormat =
         "ver=%d&tc=%u&nonce=%04x%04x%04x%04x&uid=%s&host=%s&path=%s&hbody=%s&cid=%llu";
+    public const uint ClientApiRequestSignatureHeaderNameVa = 0x1BB5328;
+    public const string ClientApiRequestSignatureHeaderName = "X-Red5-Signature";
     public const uint ClientApiRequestUrlLookupFormatSharedTextRaw = 0x12B9230;
     public const uint LuaUrlFilterUrlMessageBuilderRaw = 0x12E4100;
     public const uint LuaUrlFilterUrlMessageFormatVa = 0x1C576D0;
