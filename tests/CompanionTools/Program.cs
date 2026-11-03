@@ -202,6 +202,9 @@ foreach (uint state in new uint[] { 0, 1, 2, 3, 4, uint.MaxValue })
         DebugExceptionHandoffNativeLayout.CaptureSnapshotTransition(state, 10, 20)
             == new DebugSnapshotTransition(admitted, admitted ? 1u : state,
                 admitted ? 20u : 10u, !admitted && state == 3));
+    Check($"RIP_EVENT state {state} preserves state/tick and always terminates",
+        DebugExceptionHandoffNativeLayout.CaptureRipTransition(state, uint.MaxValue)
+            == new DebugSnapshotTransition(state == 0 || state == 2, state, uint.MaxValue, true));
 }
 foreach (ushort unicode in new ushort[] { 0, 1, 2, ushort.MaxValue })
 foreach (ushort length in new ushort[] { 0, 1, 5, 6, 13, 14, ushort.MaxValue })
@@ -399,6 +402,13 @@ if (args.Length == 2)
         red.Matches(0x4099C1, "C7470403000000FF15E8485400890784DB7448")
         && red.Matches(0x409A1C, "837F0403")
         && red.ImportSlotNames(0x5440D4, "TerminateProcess"));
+    Check("RIP_EVENT captures only in state0/2 with null exception, then terminates regardless",
+        red.Matches(0x409A47, "8B470483C40C85C0740583F8027544")
+        && red.Ascii(0x546534) == "RIP error=%u type=%u"
+        && red.Matches(0x409A7B, "6A00")
+        && red.Calls(DebugExceptionHandoffNativeLayout.RipMetadataCallVa, 0x407630)
+        && red.Matches(0x409A9A, "8B473C6AFFFF30")
+        && red.Matches(DebugExceptionHandoffNativeLayout.RipTerminateCallVa, "FF15D4405400"));
     Check("Client LOGPATH producer gates on debugger presence and emits formatted console-log path",
         client.Ascii(0x1C155F4) == DebugStringHandoffNativeLayout.ClientLogPathFormat
         && client.Ascii(0x1C1556C) == "console.log"

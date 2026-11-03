@@ -43,6 +43,9 @@ public static class DebugExceptionHandoffNativeLayout
     public const uint MessageReadCallVa = 0x4089AA;
     public const uint DumpThrottleVa = 0x409850;
     public const uint DumpThrottleMilliseconds = 2000;
+    public const uint RipEventCode = 9;
+    public const uint RipMetadataCallVa = 0x409A86;
+    public const uint RipTerminateCallVa = 0x409AA1;
     public const string NoMessageMarker = "RED5_HALT <<NOMSG>>";
     public const string TooLongMessageMarker = "RED5_HALT <<MSGTOOLONG>>";
     public const string BadMemoryMessageMarker = "RED5_HALT <<BADMEM>>";
@@ -69,6 +72,9 @@ public static class DebugExceptionHandoffNativeLayout
         uint state = capture ? 1u : previousState;
         return new(capture, state, capture ? stateUpdateTick : previousTick, state == 3);
     }
+
+    public static DebugSnapshotTransition CaptureRipTransition(uint previousState, uint previousTick) =>
+        new(previousState == 0 || previousState == 2, previousState, previousTick, true);
 
     public static PrivateExceptionMessageDecision CaptureMessage(
         uint exceptionCode, uint parameterCount, uint messageByteCount, bool readSucceeded)

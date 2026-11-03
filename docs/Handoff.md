@@ -3123,3 +3123,18 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   server semantics remain unresolved.
 - Build succeeds;981 sample-backed checks and910 pure checks pass.
   Next native trace: who writes debugger owner state2 after a snapshot.
+
+## RIP_EVENT and bounded state2-writer search
+
+- Monitor0x406820 calls the debug loop and cleans up its process helper.
+  No state2 writer was identified in the launch monitor, debug loop, or
+  reviewed dump-capture helper. Do not equate state2 with completed/ready.
+  Further alias/data-flow work is still needed; the three generic
+  immediate2 stores are not linked to the debugger owner.
+- Adjacent concrete result: RIP_EVENT9 uses state0/2 admission but no
+  time throttle, passes a null exception pointer to0x407630 at0x409A86,
+  and terminates withFFFFFFFF at0x409AA1 regardless of admission.
+  Unlike fatal exceptions, this branch does not setstate3 or update tick.
+- Saved pure CaptureRipTransition and byte/branch checks. Pending work
+  remains state2 writer aliasing or managed native window/path helpers.
+- Build succeeds;988 sample-backed checks and916 pure checks pass.

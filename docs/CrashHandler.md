@@ -118,3 +118,25 @@ remain unresolved; its observed admission role is not enough to name it
 "completed" or "ready". Allocation, notification, and metadata-handler
 early-return failures can prevent later effects; captured decisions describe
 the normal-return control-flow path.
+
+### RIP_EVENT is a separate terminating branch
+
+RedHanded event9 (`RIP_EVENT`) at `0x409A35..0x409AA7` does not use
+the elapsed-time throttle. State0 or2 admits metadata capture
+(`0x409A47..0x409A54`), formatting `RIP error=%u type=%u` and calling
+`0x407630` at `0x409A86` with the debug event's thread ID and a **null**
+exception record. Consequently the private source reader's null-record
+behavior applies; this is not a fabricated private exception payload.
+
+The branch then calls TerminateProcess with exit code `0xFFFFFFFF`
+at `0x409AA1` regardless of that admission decision. It does not write
+state3 or refresh the previous tick, unlike the fatal exception path.
+`CaptureRipTransition` preserves those distinctions on normal return
+from the called routines.
+
+An additional bounded search of the launch monitor, event loop, and dump
+capture helper has not identified a writer of owner state2. Existing
+state0/2 comparisons establish admission behavior only; state2 is still
+not named as completed/ready. The generic direct immediate2 stores
+previously found at `0x422625`, `0x4226EB`, and `0x4227AC` have no verified
+alias to this debugger owner.
