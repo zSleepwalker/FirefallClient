@@ -3248,3 +3248,19 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
 - Saved pure read/default/key/write decisions and full IL/import checks.
   No target config read/write or INI parser implementation.
 - Build succeeds;1145 sample-backed checks and1043 pure checks pass.
+
+## Awesomium bare/empty parsed switch values
+
+- Independent type-extraction agent finished one new bounded policy:
+  recognized --type and --type= both store empty values; the parser does
+  not use a following standalone renderer token as the value.
+- Splitter1028BC60 initializes value length+10 to0 at1028BC98, skips
+  suffix copy when equals absent at1028BD26; map-copy sequence1028D8A5.
+  Windows wide command-line/argv calls1028E234/1028E19E.
+- Saved inert length/next-token decision, native byte/literal checks,
+  and evidence doc. No argv parser implementation. Prefix exclusivity,
+  duplicate-switch precedence, and name normalization remain unresolved.
+- Agent is finished/idle; no further agent task has been started here.
+- Build succeeds;1158 sample-backed checks and1053 pure checks pass.
+  Next independent file: HWStats output evidence beyond its saved pipe
+  and DumpTruck type3 compression handoff.

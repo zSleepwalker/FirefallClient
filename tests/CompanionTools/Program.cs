@@ -19,6 +19,15 @@ void Check(string name, bool condition)
     if (condition) passed++; else failed++;
 }
 
+foreach (uint suffixLength in new uint[] { 0, 1, 8, 1024, uint.MaxValue })
+{
+    Check($"Recognized bare browser switch does not infer a value from another argument ({suffixLength})",
+        CommandSwitchValueNativeLayout.CaptureValueLength(false, suffixLength)
+            == new SwitchValueLengthDecision(0, false));
+    Check($"Recognized browser switch with equals preserves suffix length {suffixLength}",
+        CommandSwitchValueNativeLayout.CaptureValueLength(true, suffixLength)
+            == new SwitchValueLengthDecision(suffixLength, false));
+}
 foreach (int capacity in new[] { 512, 1024, 2048, 4096, 8192, 16384, 32768 })
 {
     Check($"INI capacity {capacity}, zero count returns null",
@@ -841,6 +850,18 @@ if (args.Length == 2)
         && browser.Matches(0x100649D7, "FFD2")
         && browser.Matches(0x10064A07, "BE01000000")
         && browser.Matches(0x10064A70, "5F8BC65E5D5B81C4B8000000C3"));
+    Check("Browser switch splitting initializes value length and bypasses copying when no equals occurs",
+        browser.Matches(CommandSwitchValueNativeLayout.ParsedValueLengthInitializationVa, "897510")
+        && browser.Matches(CommandSwitchValueNativeLayout.NoSeparatorBranchVa, "83FEFF7444")
+        && browser.Matches(CommandSwitchValueNativeLayout.MapValueCopySequenceVa,
+            "6AFF53578BC8E8F0A6D7FF"));
+    Check("Browser type lookup and recognized wide double-dash/equals delimiters match literals",
+        browser.Ascii(CommandSwitchValueNativeLayout.TypeKeyVa) == "type"
+        && browser.Matches(CommandSwitchValueNativeLayout.WideDoubleDashVa, "2D002D000000")
+        && browser.Matches(CommandSwitchValueNativeLayout.WideEqualsVa, "3D000000"));
+    Check("Browser command initialization uses wide Windows command-line/argv entry calls",
+        browser.Matches(0x1028E234, "FF15EC042411")
+        && browser.Matches(0x1028E19E, "FF1598BC5711"));
     Check("DeploymentCommon is a managed deployment assembly, not an observed native import of these helpers",
         deployment.ImportsFrom("mscoree.dll").Contains("_CorDllMain")
         && new[] { red, dumper, truck, hardware, child, browser, client }

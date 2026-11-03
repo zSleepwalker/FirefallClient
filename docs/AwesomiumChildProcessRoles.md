@@ -36,6 +36,11 @@ wrapper. This does not imply that every nonempty value is a known role.
 Switch syntax/tokenization and other command-line preprocessing are
 outside the saved decision model.
 
+The [switch-value follow-up](AwesomiumSwitchValuePolicy.md) establishes
+that bare `--type` and explicit `--type=` both supply empty values and
+do not consume a following argv token as that value. It is not a full
+argv grammar or duplicate-switch policy.
+
 ## Content-main role table
 
 Dispatcher `0x10064940` uses the table at `0x1124D400`.
