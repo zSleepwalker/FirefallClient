@@ -34,6 +34,21 @@ public readonly record struct StructuredChatMapUpdateSnapshot(
     bool AssignDecodedMap,
     int? EventCode);
 
+public readonly record struct StructuredChatTextCacheSnapshot(
+    bool LookupTextKey,
+    bool RefreshExistingKeyPosition,
+    int? EventCodeBeforeStore,
+    bool StoreCallerQwordAndText,
+    bool ReturnValue);
+
+public readonly record struct StructuredChatInstanceTipSnapshot(
+    bool LocalizeAndDisplay,
+    bool ReturnValue);
+
+public readonly record struct StructuredChatCacheTrimSnapshot(
+    uint? TargetCountBeforeAppend,
+    uint OldestKeysToRemove);
+
 /// <summary>
 /// Observed structured-chat dispatch behind the nonzero optional-data branch
 /// of 0x6E2590. These are consumer cases, not a reconstruction of selector
@@ -85,6 +100,26 @@ public static class StructuredChatMessageNativeLayout
     public const int PrerequisiteRangeBeginOffset = 0x10C;
     public const int PrerequisiteRangeEndOffset = 0x110;
     public const int PrerequisiteEntryNativeByteCount = 104;
+    public const uint OwnerWordPairEqualityFileOffset = 0x6E9F40;
+    public const int OwnerCurrentWordPairOffset = 0x120;
+    public const int OwnerComparedWordPairOffset = 0x08;
+    public const uint WordPairEqualityFileOffset = 0x37C5F0;
+    public const int Case13TextCacheOffset = 0x170;
+    public const uint Case13TextLookupFileOffset = 0x6FD280;
+    public const uint Case13TextStoreFileOffset = 0x6FD0E0;
+    public const uint Case13RefreshKeyPositionFileOffset = 0x700680;
+    public const uint Case13TrimOldestKeysFileOffset = 0x700570;
+    public const int Case13CacheListSentinelOffset = 0x08;
+    public const int Case13CacheListCountOffset = 0x0C;
+    public const int Case13CacheCapacityOffset = 0x10;
+    public const int Case13CacheTrimEnabledOffset = 0x14;
+    public const int Case13MissingTextNotificationCode = 265;
+    public const string Case13PlayerField = "player";
+    public const uint Case13PlayerFieldVirtualAddress = 0x1B6E534;
+    public const string Case18TipTemplate = "TIP_JOIN_ANOTHER_INSTANCE";
+    public const uint Case18TipTemplateVirtualAddress = 0x1B6E53C;
+    public const string Case18DisplayCategory = "notification";
+    public const uint Case18DisplayCategoryVirtualAddress = 0x1B6E558;
 
     public static IReadOnlyList<(byte Selector, uint CallFileOffset, uint FailureTarget, bool FailureReturn)>
         MultiEntryPrerequisiteCalls { get; } = Array.AsReadOnly(new (byte, uint, uint, bool)[]
@@ -248,6 +283,40 @@ public static class StructuredChatMessageNativeLayout
         int byteLength = unchecked((int)(rangeEnd - rangeBegin));
         uint entryCount = unchecked((uint)(byteLength / PrerequisiteEntryNativeByteCount));
         return entryCount > 1;
+    }
+
+    public static bool OwnerWordPairsEqual(ulong currentWordsAt120, ulong comparedWordsAt08) =>
+        currentWordsAt120 == comparedWordsAt08;
+
+    /// <summary>Captures case13 without performing text lookup, list updates, dispatch, or storage.</summary>
+    public static StructuredChatTextCacheSnapshot CaptureCase13TextCache(
+        bool passesMultiEntryPrerequisite, bool ownerWordPairsEqual, bool textKeyPresent)
+    {
+        if (!passesMultiEntryPrerequisite || !ownerWordPairsEqual)
+            return new(false, false, null, false, true);
+
+        return textKeyPresent
+            ? new(true, true, null, false, true)
+            : new(true, false, Case13MissingTextNotificationCode, true, true);
+    }
+
+    /// <summary>Case18 returns false even after displaying its localized tip.</summary>
+    public static StructuredChatInstanceTipSnapshot CaptureCase18InstanceTip(
+        bool passesMultiEntryPrerequisite, bool ownerWordPairsEqual, bool callerWordsEqualCurrent) =>
+        new(passesMultiEntryPrerequisite && !ownerWordPairsEqual && callerWordsEqualCurrent, false);
+
+    /// <summary>
+    /// Miss-path trim arithmetic only; does not allocate or append the new entry.
+    /// Native capacity zero wraps the target to uint.MaxValue rather than rejecting insertion.
+    /// </summary>
+    public static StructuredChatCacheTrimSnapshot CaptureCase13CacheTrim(
+        bool trimmingEnabled, uint configuredCapacity, uint listCount)
+    {
+        if (!trimmingEnabled)
+            return new(null, 0);
+
+        uint target = unchecked(configuredCapacity - 1);
+        return new(target, listCount > target ? listCount - target : 0);
     }
 
     public static int Case5OptionalConsumedByteCount(byte presence) =>

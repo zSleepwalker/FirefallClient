@@ -9640,6 +9640,83 @@ internal static class StartupBinaryEvidence
             && Matches(0x6E4583, "B001")
             && RelativeBranchTargets(0x6E4585, 0xE9,
                 StructuredChatMessageNativeLayout.SharedReturnFileOffset));
+        check("Binary structured chat owner paired-word prerequisite compares +120/+124 with +8/+C",
+            Matches(StructuredChatMessageNativeLayout.OwnerWordPairEqualityFileOffset,
+                "8B81200100003B4108750E8B81240100003B410C7503B001C332C0C3")
+            && Matches(StructuredChatMessageNativeLayout.WordPairEqualityFileOffset,
+                "558BEC8B55088B013B02750E8B41043B42047506B0015DC2040032C05DC20400"));
+        check("Binary structured chat case13 gates text lookup and returns true for either failed gate",
+            RelativeBranchTargets(0x6E44B3, 0xE8,
+                StructuredChatMessageNativeLayout.OwnerWordPairEqualityFileOffset)
+            && Matches(0x6E44B8, "84C0")
+            && RelativeConditionalBranchTargets(0x6E44BA, 0x0F, 0x84, 0x6E4583)
+            && Matches(0x6E44D8, "8D8F70010000")
+            && RelativeBranchTargets(0x6E44DE, 0xE8,
+                StructuredChatMessageNativeLayout.Case13TextLookupFileOffset)
+            && Matches(0x6E44E3, "85C0")
+            && RelativeConditionalBranchTargets(0x6E44E5, 0x0F, 0x85, 0x6E4574));
+        check("Binary structured chat case13 lookup refreshes a hit's list position before returning its value",
+            RelativeBranchTargets(0x6FD28F, 0xE8, 0x6FFFC0)
+            && Matches(0x6FD294, "8B75083B377415")
+            && RelativeBranchTargets(0x6FD2A1, 0xE8,
+                StructuredChatMessageNativeLayout.Case13RefreshKeyPositionFileOffset)
+            && Matches(0x6FD2A6, "8D4618")
+            && Matches(0x6FD2B1, "33C0")
+            && Matches(0x7006C1, "8B77288B56048B0689028B168B4604894204")
+            && Matches(0x7006D6, "FF4B0C")
+            && RelativeBranchTargets(0x7006F1, 0xE8, 0x7048C0)
+            && Matches(0x700712, "4089430C8956048B420489108B4604894728"));
+        check("Binary structured chat case13 sends event265 with player before storing the caller QWORD and text",
+            Matches(0x6E44F6, "566834E5B601")
+            && ReadCStringAscii(StructuredChatMessageNativeLayout.Case13PlayerFieldVirtualAddress, 7)
+                == StructuredChatMessageNativeLayout.Case13PlayerField
+            && Matches(0x6E451A, "68090100008B01FF90AC000000")
+            && Matches(0x6E4535, "8B038945D48B4304568945D8")
+            && Matches(0x6E454E, "8D8F70010000")
+            && RelativeBranchTargets(0x6E4554, 0xE8,
+                StructuredChatMessageNativeLayout.Case13TextStoreFileOffset));
+        check("Binary structured chat case18 requires unequal owner pairs but equality with the caller pair",
+            RelativeBranchTargets(0x6E4434, 0xE8,
+                StructuredChatMessageNativeLayout.OwnerWordPairEqualityFileOffset)
+            && Matches(0x6E4439, "84C0")
+            && RelativeConditionalBranchTargets(0x6E443B, 0x0F, 0x85, 0x6E3AF2)
+            && Matches(0x6E4441, "538D8F20010000")
+            && RelativeBranchTargets(0x6E4448, 0xE8,
+                StructuredChatMessageNativeLayout.WordPairEqualityFileOffset)
+            && Matches(0x6E444D, "84C0")
+            && RelativeConditionalBranchTargets(0x6E444F, 0x0F, 0x84, 0x6E3AF2));
+        check("Binary structured chat case18 displays the instance tip but still follows the false return path",
+            Matches(0x6E4463, "683CE5B601")
+            && ReadCStringAscii(StructuredChatMessageNativeLayout.Case18TipTemplateVirtualAddress, 26)
+                == StructuredChatMessageNativeLayout.Case18TipTemplate
+            && ReadCStringAscii(StructuredChatMessageNativeLayout.Case18DisplayCategoryVirtualAddress, 14)
+                == StructuredChatMessageNativeLayout.Case18DisplayCategory
+            && Matches(0x6E4486, "6858E5B601")
+            && RelativeBranchTargets(0x6E448E, 0xE8,
+                StructuredChatMessageNativeLayout.DisplayHelperFileOffset)
+            && RelativeBranchTargets(0x6E449D, 0xE9, 0x6E3AED)
+            && RelativeBranchTargets(0x6E3AED, 0xE8, 0x2ED410)
+            && Matches(0x6E3AF2, "32C0"));
+        check("Binary structured chat text-cache miss trims to unsigned capacity-minus-one before append",
+            Matches(0x6FD172, "807F1400740C8B47108BCF4850")
+            && RelativeBranchTargets(0x6FD17F, 0xE8,
+                StructuredChatMessageNativeLayout.Case13TrimOldestKeysFileOffset)
+            && RelativeBranchTargets(0x6FD18C, 0xE8, 0x7048C0)
+            && Matches(0x6FD1AD, "408D4DD089470C8956048B42048910")
+            && RelativeBranchTargets(0x6FD124, 0xE8,
+                StructuredChatMessageNativeLayout.Case13RefreshKeyPositionFileOffset));
+        check("Binary structured chat text-cache trim erases oldest list keys until the target count",
+            Matches(0x700581, "8B5F0C3BD8")
+            && RelativeConditionalBranchTargets(0x700586, 0x0F, 0x86, 0x70063D)
+            && Matches(0x70058C, "8BF32BF08975088B47088BCF8B0083C008")
+            && RelativeBranchTargets(0x7005A2, 0xE8, 0x702F50)
+            && RelativeBranchTargets(0x7005B3, 0xE8, 0x6F9310)
+            && Matches(0x7005B8, "8B47088B388B4F048B0789018B0F8B4704894104")
+            && Matches(0x7005CF, "FF480C")
+            && Matches(0x700632, "4B4E897508")
+            && RelativeConditionalBranchTargets(0x700637, 0x0F, 0x85, 0x700593)
+            && Matches(0x70063D, "395F04")
+            && Matches(0x700659, "395F0C"));
         check("Binary structured chat case1 localizes CHAT_DUEL_RESULT and forwards it to chat display",
             ReadCStringAscii(StructuredChatMessageNativeLayout.DuelResultTemplateVirtualAddress, 17)
                 == StructuredChatMessageNativeLayout.DuelResultTemplate

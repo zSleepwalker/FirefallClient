@@ -2845,3 +2845,47 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
 - Current saved validation: the solution builds without warnings/errors;
   all1,519 startup/original-binary checks pass. Analysis remained read-only
   for both the executable and IDA database.
+
+## Structured-chat cases13/18 consumer follow-up
+
+- `0x6E9F40` compares owner `+0x120/+0x124` with `+0x08/+0x0C`, including
+  equality for zero pairs. Case13 requires equality; case18 requires
+  inequality. Neither field pair's semantic identity is established.
+- Case13's owner `+0x170` cache is keyed by NUL-terminated text bytes.
+  Hit lookup `0x6FD280` refreshes a separate key-list position through
+  `0x700680`, without notifying. Miss dispatches event265 with `player`
+  text before storing the caller QWORD plus text through `0x6FD0E0`.
+  Reentrant subscriber behavior remains open; capacity/eviction was
+  resolved in the follow-up below.
+- Case18 also requires caller QWORD equality with owner `+0x120`; the
+  helper `0x37C5F0` is two DWORD comparisons, not membership lookup.
+  Its success path displays localized `TIP_JOIN_ANOTHER_INSTANCE` in
+  category `notification`, then returns false. Case13 returns true even
+  when its gates skip all processing. Do not interpret the dispatcher
+  Boolean as notification delivery.
+- Saved C# captures preserve the gated lookup/refresh/notify-before-store
+  decisions and displayed-but-false return without implementing a parser
+  or reproducing native allocations. Binary evidence anchors the exact
+  comparisons, branch polarity, literals, list update, and call order.
+- Next bounded targets: owner `+0x120`/`+0x08` writers and the104-byte
+  entry type. The unresolved selector0x76 parser-side
+  representation still limits claims about actual consumer delivery.
+
+## Structured-chat text-cache capacity follow-up
+
+- Miss insertion `0x6FD0E0` trims only when cache byte `+0x14` is nonzero.
+  It passes unsigned `capacity+0x10 - 1` to `0x700570` before adding the
+  new entry. Capacity0 wraps the target to `0xFFFFFFFF` and requests no
+  eviction; this is not a native input-rejection branch.
+- Trim removes keys from the list head, erasing corresponding text-tree
+  entries through `0x702F50 -> 0x6F9310`. New entries and hits append to
+  the tail. This establishes least-recently-accessed eviction, not
+  lexical-key order. Tree/list count assertions guard the resulting
+  count. Default capacity/enablement and allocation-failure behavior
+  are not fabricated.
+- C# records only the pre-append trim target and removal count, preserving
+  disabled, positive-capacity, capacity1, and unsigned-wrap behavior.
+  It does not claim successful allocation or append for arbitrary counts.
+- Validation after these follow-ups: build has zero warnings/errors and
+  all1,569 startup/original-binary checks pass. The original executable and
+  IDA database were only read; all saved changes are C#, checks, and docs.

@@ -7434,6 +7434,121 @@ objects or observable runtime consequences. The `+0x118` word's meaning
 and the104-byte element type remain unnamed pending writer/consumer
 evidence.
 
+### Cases13/18 paired-word gates and text-cache side effects
+
+The second predicate at raw `0x6E9F40` compares owner DWORDs
+`+0x120/+0x124` with `+0x08/+0x0C`. Both must match; there is no nonzero
+test. Treat this as QWORD equality, without inferring the semantic identity
+of either field. All-zero pairs match too.
+
+Case13 calls the predicate at `0x6E44B3` and skips its body when false.
+It returns true on either prerequisite failure, on a cache hit, or after
+the normal miss path. Once both prerequisites pass:
+
+1. The caller text is materialized by `0x45DD50` at `0x6E44C8`. This helper
+   uses `strlen` and copies the resulting byte range; it is not an
+   additional structured wire reader.
+2. `0x6FD280` looks up the text in owner cache `+0x170` at `0x6E44DE`.
+   The lookup uses lexicographic NUL-terminated byte comparison through
+   `0x700350/0x6FFFC0`, not pointer identity or a demonstrated
+   case-insensitive normalization.
+3. On a hit, `0x6FD280` calls `0x700680` before returning node value
+   `+0x18`. The latter unlinks the associated key-list node
+   (`0x7006C1..0x7006D0`), decrements the list count, releases that node,
+   allocates a replacement through `0x7048C0`, and links it at the
+   sentinel's previous end (`0x700712..0x700721`). The tree node's
+   `+0x28` list pointer is updated. This is a key-position refresh, not a
+   read-only membership test. The eviction/capacity follow-up below
+   establishes the miss-path trimming policy.
+4. On a miss, numeric event265 is dispatched first
+   (`0x6E451A..0x6E4521`) with literal `player` (VA `0x1B6E534`) and the
+   caller text. Only after dispatch returns normally does the code build
+   a QWORD-plus-shared-text value from the caller QWORD and text
+   (`0x6E4535..0x6E4541`) and call `0x6FD0E0` at `0x6E4554` to store it
+   in the same cache.
+
+The event-before-store ordering is directly observed. Do not model the
+store as already completed when a subscriber runs, or collapse hit
+behavior into a side-effect-free lookup. Reentrant callback behavior and
+allocation failures are not simulated by the saved decision capture.
+
+Case18 calls the same predicate at `0x6E4434` but rejects when it is
+**true**. It then compares owner `+0x120/+0x124` with the caller QWORD
+through `0x37C5F0` at `0x6E4448`, rejecting when unequal. This latter
+helper is just two DWORD comparisons, not collection membership. Thus the
+display path requires all three conditions:
+
+- The shared `0x48C2B0` multi-entry prerequisite passes.
+- Owner pair `+0x120` differs from owner pair `+0x08`.
+- Caller QWORD equals owner pair `+0x120`.
+
+The path localizes `TIP_JOIN_ANOTHER_INSTANCE` (VA `0x1B6E53C`) through
+`0x390B00`, then calls shared display `0x6E3460` at `0x6E448E` with
+literal category `notification` (VA `0x1B6E558`). Cleanup jumps to
+`0x6E3AED`, whose destructor call falls through to `xor al,al` at
+`0x6E3AF2`. **Case18 returns false even when it displayed the tip.**
+Combined with case13's true-without-notification paths, this rules out
+interpreting the dispatcher's Boolean as an event-delivery indicator.
+Its enclosing caller already ignores that Boolean.
+
+The two pure C# captures record only these post-input decisions and
+ordering, not string encoding, cache ownership, actual dispatch, or
+native allocation behavior. Exhaustive Boolean combinations and
+original-binary checks cover the opposing predicates, hit refresh, miss
+notification-before-store, exact literals, and displayed-but-false return.
+
+### Case13 text-cache capacity and oldest-key eviction
+
+The insertion helper `0x6FD0E0` rechecks the text key. If already present,
+it refreshes the list position through `0x700680` at `0x6FD124`, then
+updates the value QWORD and shared text at node `+0x18/+0x20`. A miss
+reaches `0x6FD172`, where cache byte `+0x14` controls trimming. Relative
+to the cache base (owner `+0x170`), the observed members are:
+
+| Offset | Observed use |
+|---|---|
+| `+0x00` | Text-keyed tree sentinel |
+| `+0x04` | Tree entry count |
+| `+0x08` | Separate key-list sentinel |
+| `+0x0C` | Key-list count |
+| `+0x10` | Configured capacity DWORD |
+| `+0x14` | Trimming-enabled byte, any nonzero value enables |
+
+With trimming enabled, `0x6FD178..0x6FD17F` subtracts1 from capacity and
+calls `0x700570` **before** appending the new key. The trim helper uses
+an unsigned count comparison at `0x700584..0x700586`, then removes exactly
+`current-list-count - target` entries when the current count exceeds the
+target. It selects the list head's text at `0x700593..0x70059A`, finds that
+key's tree range through `0x702F50`, and erases the range through
+`0x6F9310`. It then unlinks/releases that list head and decrements the
+list count. After the loop, assertions at `0x70063D` and `0x700659`
+check both tree and list counts against the remaining count.
+
+Insertion appends the new key at the opposite (previous/tail) end at
+`0x6FD1B4..0x6FD1BA`. Hits also move their keys to that tail through the
+unlink/reappend sequence described above. This establishes least-recently
+accessed-key eviction on normal enabled-trim paths, rather than arbitrary
+tree-order eviction. A hit does not add another cache entry or invoke
+capacity trimming. The policy does not depend on elapsed time in these
+helpers; no expiration timer is inferred.
+
+For a positive configured capacity, a miss trims to at most
+`capacity - 1`, then appends one key. Capacity1 evicts all existing keys
+on a miss; capacity3 with three entries evicts one. With trimming disabled,
+no such capacity reduction occurs. Capacity0 is not rejected here:
+the decrement wraps to `0xFFFFFFFF`, so the unsigned trim comparison
+requests no eviction. This is native arithmetic, not a recommendation to
+configure a zero-sized cache. Default capacity, default enablement, and
+other writers of these fields remain unestablished.
+
+The saved `CaptureCase13CacheTrim` records only the trim target and
+number of oldest keys requested for removal; it does not allocate,
+append, mutate a collection, or assume successful completion at native
+allocation limits. In particular, the list append has its own length-error
+route and is not modeled as an unconditional successful increment for
+arbitrary DWORD counts. The boundary checks include disabled trimming,
+below/at/above capacity, capacity1, and unsigned zero-capacity wrap.
+
 ## Post-notification chat file log and folded hash
 
 `0x6F46F0` is a **chat file-log writer**, gated by the current object's

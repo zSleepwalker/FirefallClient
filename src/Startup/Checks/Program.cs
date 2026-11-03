@@ -154,6 +154,63 @@ foreach (var range in new (uint Begin, uint End, bool PassesWhenNonzero)[]
         StructuredChatMessageNativeLayout.PassesMultiEntryPrerequisite(nativeWord, range.Begin, range.End)
             == (nativeWord != 0 && range.PassesWhenNonzero));
 }
+Check("Structured chat paired-word helper compares both complete DWORDs without a nonzero prerequisite",
+    StructuredChatMessageNativeLayout.OwnerCurrentWordPairOffset == 0x120
+    && StructuredChatMessageNativeLayout.OwnerComparedWordPairOffset == 8
+    && StructuredChatMessageNativeLayout.OwnerWordPairsEqual(0, 0)
+    && StructuredChatMessageNativeLayout.OwnerWordPairsEqual(ulong.MaxValue, ulong.MaxValue)
+    && !StructuredChatMessageNativeLayout.OwnerWordPairsEqual(0x0000000100000000, 0)
+    && !StructuredChatMessageNativeLayout.OwnerWordPairsEqual(0x0000000000000001, 0)
+    && !StructuredChatMessageNativeLayout.OwnerWordPairsEqual(0x1234567887654321, 0x8765432112345678));
+foreach (bool prerequisite in new[] { false, true })
+foreach (bool ownerPairsEqual in new[] { false, true })
+foreach (bool keyPresent in new[] { false, true })
+{
+    var cache = StructuredChatMessageNativeLayout.CaptureCase13TextCache(
+        prerequisite, ownerPairsEqual, keyPresent);
+    bool lookup = prerequisite && ownerPairsEqual;
+    Check($"Structured chat case13 prerequisite={prerequisite}, ownerEqual={ownerPairsEqual}, keyPresent={keyPresent}",
+        cache.LookupTextKey == lookup
+        && cache.RefreshExistingKeyPosition == (lookup && keyPresent)
+        && cache.EventCodeBeforeStore == (lookup && !keyPresent ? 265 : (int?)null)
+        && cache.StoreCallerQwordAndText == (lookup && !keyPresent)
+        && cache.ReturnValue);
+
+    var tip = StructuredChatMessageNativeLayout.CaptureCase18InstanceTip(
+        prerequisite, ownerPairsEqual, keyPresent);
+    Check($"Structured chat case18 prerequisite={prerequisite}, ownerEqual={ownerPairsEqual}, callerEqual={keyPresent}",
+        tip.LocalizeAndDisplay == (prerequisite && !ownerPairsEqual && keyPresent)
+        && !tip.ReturnValue);
+}
+Check("Structured chat text-cache native capacity and recency-list fields are recorded",
+    StructuredChatMessageNativeLayout.Case13TextCacheOffset == 0x170
+    && StructuredChatMessageNativeLayout.Case13CacheListSentinelOffset == 8
+    && StructuredChatMessageNativeLayout.Case13CacheListCountOffset == 12
+    && StructuredChatMessageNativeLayout.Case13CacheCapacityOffset == 16
+    && StructuredChatMessageNativeLayout.Case13CacheTrimEnabledOffset == 20);
+foreach (bool enabled in new[] { false, true })
+foreach (var trimCase in new (uint Capacity, uint Count, uint Target, uint Remove)[]
+{
+    (0, 0, uint.MaxValue, 0),
+    (0, 100, uint.MaxValue, 0),
+    (0, uint.MaxValue, uint.MaxValue, 0),
+    (1, 0, 0, 0),
+    (1, 1, 0, 1),
+    (1, 8, 0, 8),
+    (3, 1, 2, 0),
+    (3, 2, 2, 0),
+    (3, 3, 2, 1),
+    (3, 8, 2, 6),
+    (uint.MaxValue, uint.MaxValue - 1, uint.MaxValue - 1, 0),
+    (uint.MaxValue, uint.MaxValue, uint.MaxValue - 1, 1)
+})
+{
+    var trim = StructuredChatMessageNativeLayout.CaptureCase13CacheTrim(
+        enabled, trimCase.Capacity, trimCase.Count);
+    Check($"Structured chat cache trim enabled={enabled}, capacity={trimCase.Capacity}, count={trimCase.Count}",
+        trim.TargetCountBeforeAppend == (enabled ? trimCase.Target : (uint?)null)
+        && trim.OldestKeysToRemove == (enabled ? trimCase.Remove : 0));
+}
 Check("All three observed app modes are cataloged", AppModeCatalog.KnownModes.SequenceEqual(expected));
 Check("Mode 1 maps to tfLogin", AppModeCatalog.Find(1) == expected[0]);
 Check("Mode 2 maps to tfWorld", AppModeCatalog.Find(2) == expected[1]);
