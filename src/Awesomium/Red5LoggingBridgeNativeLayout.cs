@@ -35,6 +35,27 @@ public enum Red5LuaCallbackRegistrationAction
     ReplaceExistingMethod
 }
 
+public enum Red5LuaWebBindingAction
+{
+    ReportUsage,
+    RejectUnsupportedNameType,
+    DispatchToWebObject
+}
+
+public enum Red5LuaWebFunctionInvocationAction
+{
+    ReturnWithoutInvocationForUnavailableCallbacksObject,
+    ReturnWithoutInvocationForMissingFunction,
+    InvokeSynchronously,
+    InvokeAsynchronously
+}
+
+public enum Red5LuaWebValueAction
+{
+    ReturnWithoutSettingForUnavailableObject,
+    SetPropertyAsynchronously
+}
+
 public enum Red5QueuedJavaScriptContinuationAction
 {
     SkipUndefinedContinuation,
@@ -60,6 +81,11 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint LuaCallbackRegistrationRaw = 0xCCC130;
     public const uint LuaCallbackReferenceCreateRaw = 0xC56170;
     public const uint LuaCallbackReferenceReleaseRaw = 0xC56250;
+    public const uint LuaAddWebValueRaw = 0xCCAF10;
+    public const uint LuaCallWebFuncRaw = 0xCCB060;
+    public const uint LuaWebValueSetterRaw = 0xD651B0;
+    public const uint LuaWebFunctionDispatcherRaw = 0xD65250;
+    public const uint LuaValueToJavaScriptRaw = 0xCBBDB0;
     public const uint LuaCallbackArgumentConversionRaw = 0xCBBE00;
     public const uint LuaCallbackInvocationWrapperRaw = 0xCD6C10;
     public const uint CallbackBridgeCleanupRaw = 0xD64710;
@@ -78,6 +104,7 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint CallbackIsUndefinedImportVa = 0x1AC4EE8;
     public const uint CallbackInvokeImportVa = 0x1AC4EDC;
     public const uint CallbackInvokeAsyncImportVa = 0x1AC4EEC;
+    public const uint LuaWebFunctionHasMethodImportVa = 0x1AC4EF4;
     public const uint Red5ObjectNameVa = 0x1BD4BAC;
     public const uint ErrorLogMethodNameVa = 0x1BD4B98;
     public const uint CallbackErrorLogMethodNameVa = 0x1BD4994;
@@ -90,6 +117,14 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint CallbackQueueArgumentLogFormatVa = 0x1BD47C0;
     public const uint CallbackQueueReturnLogFormatVa = 0x1BD4730;
     public const uint CallbackQueueAsyncStateVa = 0x1E686C4;
+    public const uint LuaCallWebFuncUsageVa = 0x1BC761C;
+    public const uint LuaAddWebValueUsageVa = 0x1BC7734;
+    public const uint LuaWebFunctionTargetExpressionVa = 0x1BD46B8;
+    public const uint LuaWebFunctionArgumentLogFormatVa = 0x1BD4754;
+    public const uint LuaWebFunctionCallLogFormatVa = 0x1BD4760;
+    public const uint LuaWebFunctionReturnLogFormatVa = 0x1BD49D4;
+    public const uint LuaWebFunctionMissingFormatVa = 0x1BD49A8;
+    public const uint LuaWebCallbacksUnavailableFormatVa = 0x1BD4A10;
     public const uint CallbackLogHelperRaw = 0x2FC4F0;
     public const uint CallbackUnknownLogHelperRaw = 0x2FCC60;
     public const uint CreationFailureFormatVa = 0x1BD4B2C;
@@ -166,6 +201,37 @@ public static class Red5LoggingBridgeNativeLayout
             ? Red5LuaCallbackRegistrationAction.ReplaceExistingMethod
             : Red5LuaCallbackRegistrationAction.RegisterNewMethod;
     }
+
+    public static Red5LuaWebBindingAction CaptureCallWebFuncBinding(
+        uint luaArgumentCount,
+        bool functionNameIsStringOrNumber) =>
+        luaArgumentCount < 2 ? Red5LuaWebBindingAction.ReportUsage
+        : functionNameIsStringOrNumber ? Red5LuaWebBindingAction.DispatchToWebObject
+        : Red5LuaWebBindingAction.RejectUnsupportedNameType;
+
+    public static Red5LuaWebBindingAction CaptureAddWebValueBinding(
+        uint luaArgumentCount,
+        bool propertyNameIsStringOrNumber) =>
+        luaArgumentCount < 3 ? Red5LuaWebBindingAction.ReportUsage
+        : propertyNameIsStringOrNumber ? Red5LuaWebBindingAction.DispatchToWebObject
+        : Red5LuaWebBindingAction.RejectUnsupportedNameType;
+
+    public static Red5LuaWebFunctionInvocationAction CaptureCallWebFuncInvocation(
+        bool callbacksObjectAvailable,
+        bool functionExists,
+        bool asynchronousInvokeEnabled) =>
+        !callbacksObjectAvailable
+            ? Red5LuaWebFunctionInvocationAction.ReturnWithoutInvocationForUnavailableCallbacksObject
+        : !functionExists
+            ? Red5LuaWebFunctionInvocationAction.ReturnWithoutInvocationForMissingFunction
+        : asynchronousInvokeEnabled
+            ? Red5LuaWebFunctionInvocationAction.InvokeAsynchronously
+            : Red5LuaWebFunctionInvocationAction.InvokeSynchronously;
+
+    public static Red5LuaWebValueAction CaptureAddWebValueDispatch(bool webObjectAvailable) =>
+        webObjectAvailable
+            ? Red5LuaWebValueAction.SetPropertyAsynchronously
+            : Red5LuaWebValueAction.ReturnWithoutSettingForUnavailableObject;
 
     public static Red5QueuedJavaScriptContinuationAction CaptureQueuedJavaScriptContinuation(
         bool continuationValueIsUndefined,

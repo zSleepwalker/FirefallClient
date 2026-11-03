@@ -180,6 +180,47 @@ foreach (var registration in new[]
         Red5LoggingBridgeNativeLayout.CaptureLuaCallbackRegistration(
             registration.Context, registration.Reference, registration.Name, registration.Existing)
         == registration.Expected);
+foreach (var call in new[]
+{
+    (Count: 0U, NameValid: true, Expected: Red5LuaWebBindingAction.ReportUsage),
+    (Count: 1U, NameValid: true, Expected: Red5LuaWebBindingAction.ReportUsage),
+    (Count: 2U, NameValid: false, Expected: Red5LuaWebBindingAction.RejectUnsupportedNameType),
+    (Count: 2U, NameValid: true, Expected: Red5LuaWebBindingAction.DispatchToWebObject)
+})
+    Check($"Awesomium CallWebFunc binding argument count={call.Count}, valid name={call.NameValid}",
+        Red5LoggingBridgeNativeLayout.CaptureCallWebFuncBinding(call.Count, call.NameValid)
+        == call.Expected);
+foreach (var value in new[]
+{
+    (Count: 0U, NameValid: true, Expected: Red5LuaWebBindingAction.ReportUsage),
+    (Count: 2U, NameValid: true, Expected: Red5LuaWebBindingAction.ReportUsage),
+    (Count: 3U, NameValid: false, Expected: Red5LuaWebBindingAction.RejectUnsupportedNameType),
+    (Count: 3U, NameValid: true, Expected: Red5LuaWebBindingAction.DispatchToWebObject)
+})
+    Check($"Awesomium AddWebValue binding argument count={value.Count}, valid name={value.NameValid}",
+        Red5LoggingBridgeNativeLayout.CaptureAddWebValueBinding(value.Count, value.NameValid)
+        == value.Expected);
+foreach (var invocation in new[]
+{
+    (ObjectAvailable: false, FunctionExists: true, Async: false,
+        Expected: Red5LuaWebFunctionInvocationAction.ReturnWithoutInvocationForUnavailableCallbacksObject),
+    (ObjectAvailable: true, FunctionExists: false, Async: true,
+        Expected: Red5LuaWebFunctionInvocationAction.ReturnWithoutInvocationForMissingFunction),
+    (ObjectAvailable: true, FunctionExists: true, Async: false,
+        Expected: Red5LuaWebFunctionInvocationAction.InvokeSynchronously),
+    (ObjectAvailable: true, FunctionExists: true, Async: true,
+        Expected: Red5LuaWebFunctionInvocationAction.InvokeAsynchronously)
+})
+    Check($"Awesomium CallWebFunc object available={invocation.ObjectAvailable}, function exists={invocation.FunctionExists}, async={invocation.Async}",
+        Red5LoggingBridgeNativeLayout.CaptureCallWebFuncInvocation(
+            invocation.ObjectAvailable, invocation.FunctionExists, invocation.Async)
+        == invocation.Expected);
+foreach (bool objectAvailable in new[] { false, true })
+    Check($"Awesomium AddWebValue object available={objectAvailable}",
+        Red5LoggingBridgeNativeLayout.CaptureAddWebValueDispatch(objectAvailable)
+        == (objectAvailable
+            ? Red5LuaWebValueAction.SetPropertyAsynchronously
+            : Red5LuaWebValueAction.ReturnWithoutSettingForUnavailableObject));
 foreach (var mappedArguments in new[]
 {
     (HasArguments: false, IsObject: false, CallableLike: false,
@@ -1577,6 +1618,52 @@ if (args.Length == 2)
         && client.Matches(Red5LoggingBridgeNativeLayout.CallbackRegistrationVtableSlotVa, "30511601"));
     Check("Original client routes the other guarded Red5 call through SetPropertyAsync, not SetCustomMethod",
         ClientMatches(0xD651B0 + 0x68, "FF15F04EAC01")
+        && client.ImportSlotNames(Red5LoggingBridgeNativeLayout.SetPropertyAsyncImportVa,
+            "?SetPropertyAsync@JSObject@Awesomium@@QAEXABVWebString@2@ABVJSValue@2@@Z"));
+    Check("Original client binds AddWebValue and CallWebFunc to the expected WebFrame virtual slots",
+        ClientMatches(Red5LoggingBridgeNativeLayout.LuaAddWebValueRaw + 0xCD, "FF5054")
+        && ClientMatches(Red5LoggingBridgeNativeLayout.LuaCallWebFuncRaw + 0xD8, "FF5058")
+        && client.Matches(0x1C76650, "B05D1601")
+        && client.Matches(0x1C76654, "505E1601")
+        && client.Ascii(Red5LoggingBridgeNativeLayout.LuaAddWebValueUsageVa)
+            == "Usage: FRAME:AddWebValue('name', value)"
+        && client.Ascii(Red5LoggingBridgeNativeLayout.LuaCallWebFuncUsageVa)
+            == "Usage: FRAME:CallWebFunc('name', ...)");
+    Check("Original client CallWebFunc target expression names Red5Callbacks",
+        client.Matches(Red5LoggingBridgeNativeLayout.LuaWebFunctionTargetExpressionVa + 14,
+            "5200650064003500430061006C006C006200610063006B0073"));
+    Check("Original client CallWebFunc initializes its target and checks method existence",
+        client.Calls(Red5LoggingBridgeNativeLayout.LuaWebFunctionDispatcherRaw + 0x400C00 + 0xA1,
+            0xD63E20 + 0x400C00)
+        && ClientMatches(Red5LoggingBridgeNativeLayout.LuaWebFunctionDispatcherRaw + 0x135,
+            "FF15F44EAC01"));
+    Check("Original client CallWebFunc selects asynchronous or synchronous JavaScript invocation",
+        ClientMatches(Red5LoggingBridgeNativeLayout.LuaWebFunctionDispatcherRaw + 0x2D9,
+            "FF15EC4EAC01")
+        && ClientMatches(Red5LoggingBridgeNativeLayout.LuaWebFunctionDispatcherRaw + 0x2FB,
+            "FF15DC4EAC01")
+        && client.ImportSlotNames(Red5LoggingBridgeNativeLayout.LuaWebFunctionHasMethodImportVa,
+            "?HasMethod@JSObject@Awesomium@@QBE_NABVWebString@2@@Z")
+        && client.ImportSlotNames(Red5LoggingBridgeNativeLayout.CallbackInvokeAsyncImportVa,
+            "?InvokeAsync@JSObject@Awesomium@@QAEXABVWebString@2@ABVJSArray@2@@Z")
+        && client.ImportSlotNames(Red5LoggingBridgeNativeLayout.CallbackInvokeImportVa,
+            "?Invoke@JSObject@Awesomium@@QAE?AVJSValue@2@ABVWebString@2@ABVJSArray@2@@Z"));
+    Check("Original client CallWebFunc diagnostics identify unavailable or missing functions",
+        client.Ascii(Red5LoggingBridgeNativeLayout.LuaWebFunctionMissingFormatVa)
+            == "'%s': JavaScript function '%s' not found"
+        && client.Ascii(Red5LoggingBridgeNativeLayout.LuaWebCallbacksUnavailableFormatVa)
+            == "'%s': JavaScript callback object is not available (attempting %s)"
+        && client.Ascii(Red5LoggingBridgeNativeLayout.LuaWebFunctionArgumentLogFormatVa) == "   #%d: %s"
+        && client.Ascii(Red5LoggingBridgeNativeLayout.LuaWebFunctionCallLogFormatVa)
+            == "'%s': Executing JavaScript function '%s'"
+        && client.Ascii(Red5LoggingBridgeNativeLayout.LuaWebFunctionReturnLogFormatVa)
+            == "Javascript function returned: %s");
+    Check("Original client converts Lua WebFrame values and sets properties asynchronously",
+        ClientMatches(Red5LoggingBridgeNativeLayout.LuaWebValueSetterRaw + 0x68, "FF15F04EAC01")
+        && client.Calls(Red5LoggingBridgeNativeLayout.LuaWebValueSetterRaw + 0x34 + 0x400C00,
+            Red5LoggingBridgeNativeLayout.LuaValueToJavaScriptRaw + 0x400C00)
+        && client.Calls(Red5LoggingBridgeNativeLayout.LuaWebFunctionDispatcherRaw + 0x172 + 0x400C00,
+            Red5LoggingBridgeNativeLayout.LuaValueToJavaScriptRaw + 0x400C00)
         && client.ImportSlotNames(Red5LoggingBridgeNativeLayout.SetPropertyAsyncImportVa,
             "?SetPropertyAsync@JSObject@Awesomium@@QAEXABVWebString@2@ABVJSValue@2@@Z"));
     Check("Original client errorlog callback validates its object ID, method name, and first string argument",

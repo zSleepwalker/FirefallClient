@@ -3881,3 +3881,13 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   JavaScript-to-Lua-to-JavaScript flow. The installed `WebTest.lua` and HTML
   corroborate the generic callback flow, but do not show a call to
   `Red5.errorlog`; its JavaScript caller remains unresolved.
+- Raw `0xCCAF10` is `AddWebValue`: it accepts string/numeric property names,
+  dispatches through frame virtual slot `+0x54` to `0xD651B0`, marshals the
+  value via `0xCBBDB0`, and uses `JSObject::SetPropertyAsync`.
+- Raw `0xCCB060` is `CallWebFunc`: it dispatches through virtual slot `+0x58`
+  to `0xD65250`, which resolves `Red5Callbacks`, checks the named function
+  with `JSObject::HasMethod`, marshals Lua arguments into a `JSArray`, then
+  selects `InvokeAsync` or `Invoke` using the shared `0x1E686C4+8` state.
+  The local WebTest pair corroborates the `Red5Callbacks` target. Both
+  bindings and their invocation decisions are recorded in the inert C# model
+  and sample-backed checks; no executable or script was run.

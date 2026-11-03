@@ -111,6 +111,39 @@ A state check at global VA `0x1E686C4` offset `+8` selects imported
 include `Executing callback '%s' from JavaScript`, `   #%d: %s`, and
 `Javascript callback returned: %s`.
 
+## Lua-to-JavaScript values and function calls
+
+The Lua binding at raw `0xCCAF10` implements `AddWebValue`, using the usage
+string at VA `0x1BC7734`. It requires the frame, property name, and value
+arguments. The property name may be a string or number; the numeric path goes
+through raw `0xCD6550`. It dispatches through virtual slot `+0x54` on the
+frame-associated object. The matching vtable entry at VA `0x1C76650` points to
+raw `0xD651B0`, which marshals the Lua value through `0xCBBDB0` and calls
+`JSObject::SetPropertyAsync` (IAT VA `0x1AC4EF0`) when its web object is
+available. The property is set asynchronously; this path is distinct from
+custom-method registration.
+
+The binding at raw `0xCCB060` implements `CallWebFunc`, with usage string at
+VA `0x1BC761C`. It requires a method name in addition to the frame argument,
+and accepts a string or numeric name. It dispatches through virtual slot
+`+0x58`; the matching entry at VA `0x1C76654` points to raw `0xD65250`.
+That routine resolves the JavaScript expression
+`typeof Red5Callbacks == "undefined" ? null : Red5Callbacks`, checks the
+requested name with `JSObject::HasMethod` (IAT VA `0x1AC4EF4`), and stops
+without invocation if the callbacks object or function is unavailable. For a
+found function, it marshals Lua stack arguments starting at index 3 through
+`0xCBBDB0` into a `JSArray`. The shared state at VA `0x1E686C4` offset `+8`
+selects `JSObject::InvokeAsync` (IAT VA `0x1AC4EEC`) when nonzero and
+`JSObject::Invoke` (IAT VA `0x1AC4EDC`) otherwise. The synchronous return
+value is used for the function-return diagnostic; it is not shown being
+returned to Lua. Diagnostics include the missing-function and unavailable-
+object formats at VAs `0x1BD49A8` and `0x1BD4A10`.
+
+The installed `WebTest.lua`/HTML pair defines
+`Red5Callbacks.test_from_lua` and calls it through `CallWebFunc`, corroborating
+the native target selection. The evidence establishes the generic
+`Red5Callbacks` dispatch, not any call to `Red5.errorlog`.
+
 ## Bridge teardown
 
 The bridge's deleting-destructor wrapper is raw `0xD64180`; it calls

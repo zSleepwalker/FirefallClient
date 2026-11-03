@@ -74,5 +74,6 @@ the produced rule.
 
 [Red5 logging bridge](AwesomiumRed5LoggingBridge.md) records one-shot object
 creation, the native `errorlog` callback's string-to-logger path, Lua
-`AddWebCallback` registration and dispatch, and its optional JavaScript
-continuation; the `errorlog` caller remains unresolved.
+`AddWebCallback` registration and dispatch, `AddWebValue` property setting,
+and `CallWebFunc` dispatch to `Red5Callbacks`; the `errorlog` caller remains
+unresolved.
