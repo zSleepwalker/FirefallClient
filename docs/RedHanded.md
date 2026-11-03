@@ -18,9 +18,14 @@ Static IDA analysis only. SHA256 `1FBD21966A9DA297AB46A061ECE94BE8F4822ACC103BF2
 - `rh::subsystem::DebuggerIntegrity` and IpcMessageHeader RTTI suggest a named-pipe link to the client and anti-tamper checks.
 
 ## Unresolved
-- `sub_406820` semantics, broader debugger IPC, use of WinVerifyTrust/Crypt*, remaining `--debug` effects, and initialization of some stream-owner fields.
+- Full `sub_406820` semantics, broader debugger IPC, use of WinVerifyTrust/Crypt*, remaining `--debug` effects, and decoded-source/process-memory metadata semantics.
 
 The [companion handoff ledger](CompanionBinaryConnections.md) verifies that
 r5dumper's three decimal arguments are PID, dump flags, and inherited read handle.
 The optional bigdump call passes flags2. It also distinguishes actual stream
 IDs from truncated decompiler arguments and identifies the blank-line terminator.
+The follow-up traces metadata owner fields to application name, source revision,
+build number, and environment mnemonic/name options. Stream `0x1000A` is the
+debug event's thread ID in both exception and RIP-event calls. Numeric option
+defaults replace only zero after `atoi`; negative nonzero values survive and
+are emitted with unsigned decimal formatting.

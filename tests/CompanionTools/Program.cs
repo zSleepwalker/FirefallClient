@@ -32,6 +32,27 @@ Check("Minidump descriptors are twelve native bytes with fixed-width integer buf
     && UserStreamNativeLayout.DescriptorBufferPointerOffset == 8
     && UserStreamNativeLayout.Int32BufferByteCount == 4
     && UserStreamNativeLayout.Int64BufferByteCount == 8);
+Check("Metadata owner names and thread stream preserve their independently traced offsets",
+    DumperHandoffNativeLayout.OwnerApplicationNameOffset == 0x20
+    && DumperHandoffNativeLayout.OwnerSourceRevisionOffset == 0x24
+    && DumperHandoffNativeLayout.OwnerBuildNumberOffset == 0x28
+    && DumperHandoffNativeLayout.OwnerEnvironmentMnemonicOffset == 0x2C
+    && DumperHandoffNativeLayout.OwnerEnvironmentNameOffset == 0x30
+    && DumperHandoffNativeLayout.ThreadIdStreamType == 0x1000A);
+foreach (var numbers in new (int Source, int Build, uint ExpectedSource, uint ExpectedBuild)[]
+{
+    (0, 0, 117123, 1962),
+    (1, 0, 1, 1962),
+    (0, 1, 117123, 1),
+    (117123, 1962, 117123, 1962),
+    (-1, -1, uint.MaxValue, uint.MaxValue),
+    (int.MinValue, int.MaxValue, 0x80000000, 0x7FFFFFFF)
+})
+{
+    Check($"Post-atoi build defaults source={numbers.Source}, build={numbers.Build}",
+        DumperHandoffNativeLayout.CaptureBuildNumbers(numbers.Source, numbers.Build)
+            == new DumperBuildNumbers(numbers.ExpectedSource, numbers.ExpectedBuild));
+}
 foreach (bool success in new[] { false, true })
 foreach (var counts in new (uint Requested, uint Written)[]
 {
@@ -108,6 +129,41 @@ if (args.Length == 2)
         red.Matches(0x408167, "6A02689C575400")
         && red.Ascii(0x54579C) == DumperHandoffNativeLayout.EndOfMetadata
         && red.Calls(0x408174, 0x40FF30));
+    Check("RedHanded parses signed option numbers and substitutes defaults only for zero",
+        red.ImportSlotNames(0x5447C4, "atoi")
+        && red.Matches(0x4048C2, "8B35C447540051FFD6")
+        && red.Matches(0x4048F1, "51FFD6")
+        && red.Matches(0x4049BF, "8B442428B983C9010085C00F44C1B9AA070000")
+        && red.Matches(0x4049D6, "8B44242C85C00F44C1"));
+    Check("RedHanded initializes stream-owner fields from app/build/environment option locals",
+        red.Matches(0x404A72, "89842480000000")
+        && red.Matches(0x404A82, "8B442428898424840000008B44242C89842488000000")
+        && red.Matches(0x404AAB, "8984248C000000")
+        && red.Matches(0x404ACE, "89842490000000")
+        && red.Matches(0x404B36, "8D4C246850")
+        && red.Calls(0x404B3B, 0x406820));
+    Check("Stream-owner initializer names the source revision, build number, and environment options",
+        red.Matches(0x40489E, "B9E4515400")
+        && red.Ascii(0x5451E4) == "sourcerev"
+        && red.Matches(0x4048D2, "B9F4515400")
+        && red.Ascii(0x5451F4) == "buildnumber"
+        && red.Matches(0x4048FB, "B900525400")
+        && red.Ascii(0x545200) == "envmnemonic"
+        && red.Matches(0x40495D, "B90C525400")
+        && red.Ascii(0x54520C) == "envname");
+    Check("Both exception and RIP-event handlers pass the DEBUG_EVENT thread ID to stream1000A",
+        red.Matches(0x4098B6, "8D4D90")
+        && red.Calls(0x4098B9, 0x458B20)
+        && red.Matches(0x4099FB, "8D459C5051FF75988BCF")
+        && red.Calls(DumperHandoffNativeLayout.ExceptionHandlerCallVa,
+            DumperHandoffNativeLayout.BuildMetadataVa)
+        && red.Matches(0x409A7B, "6A000F45C851FF75988BCF")
+        && red.Calls(DumperHandoffNativeLayout.RipHandlerCallVa,
+            DumperHandoffNativeLayout.BuildMetadataVa)
+        && red.Matches(0x407665, "8B4D08")
+        && red.Matches(0x407670, "898DC4FCFFFF")
+        && red.Matches(0x408031, "FFB5C4FCFFFF")
+        && red.Matches(0x40803D, "680A000100"));
     Check("r5dumper reads 512-byte chunks, appends as a C string, and extracts CRLF lines",
         dumper.Matches(0x401320, "6800020000")
         && dumper.ImportSlotNames(0x404008, "ReadFile")

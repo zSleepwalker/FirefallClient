@@ -2926,3 +2926,23 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
 - Validation: solution build has zero warnings/errors;46 companion checks
   pass with all nine samples,19 pure checks pass without samples, and the
   existing1,569 startup/original-client checks remain passing.
+
+## Companion metadata source names
+
+- Followed RedHanded wWinMain `0x404540` from option locals through object
+  initialization (`0x404A72..0x404ACE`) and monitor this-pointer setup at
+  `0x404B36`. Owner `+0x20/+0x24/+0x28/+0x2C/+0x30` are application
+  name/source revision/build number/environment mnemonic/environment name.
+- `atoi` feeds source revision and build number. CMOVE at
+  `0x4049CA/0x4049DC` replaces zero with117123/1962; negative nonzero
+  values keep their DWORD bit patterns and later use unsigned `%u`.
+  Added a pure post-atoi capture; it is not a native CRT parser.
+- Debug loop `0x409880` calls the metadata handler in exception and
+  RIP-event paths. Both forward `DEBUG_EVENT.dwThreadId`, proven by event
+  base `[ebp-0x70]` and argument `[ebp-0x68]`. The handler saves argument1
+  unchanged and formats it as stream `0x1000A`: thread ID, not exception
+  code. Updated ledger, source names, and hash-guarded instruction checks.
+- Next: resolve source-text `0x10006` and process-memory `0x10008`, or
+  follow DumpTruck's hardware-report sink into compression.
+- Validation: solution build has zero warnings/errors;57 companion checks
+  pass with the nine samples and26 pure checks pass without samples.

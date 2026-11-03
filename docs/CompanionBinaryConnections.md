@@ -125,19 +125,57 @@ the actual bytes, preserved in checks, are authoritative.
 | Stream | Kind | Observed value source | Producer VA / raw |
 |---|---|---|---|
 | `0x10000` | str | Owner `+0x1C`, command line | `0x407AAF / 0x6EAF` |
-| `0x10002` | str | Owner `+0x2C` | `0x407B54 / 0x6F54` |
-| `0x10003` | str | Owner `+0x30` | `0x407BFB / 0x6FFB` |
-| `0x10004` | i32 | Owner `+0x24` | `0x407C92 / 0x7092` |
-| `0x10005` | i32 | Owner `+0x28` | `0x407D30 / 0x7130` |
+| `0x10002` | str | Environment mnemonic, owner `+0x2C` | `0x407B54 / 0x6F54` |
+| `0x10003` | str | Environment name, owner `+0x30` | `0x407BFB / 0x6FFB` |
+| `0x10004` | i32 | Source revision, owner `+0x24` | `0x407C92 / 0x7092` |
+| `0x10005` | i32 | Build number, owner `+0x28` | `0x407D30 / 0x7130` |
 | `0x10006` | str | Decoded debug source | `0x407DCF / 0x71CF` |
 | `0x10007` | str | Handler message argument | `0x407E68 / 0x7268` |
 | `0x10008` | i64 | Process memory measurement, with fallback | `0x407F08 / 0x7308` |
 | `0x10009` | i64 | Minimum total-page-file/total-virtual memory, or0 on status failure | `0x407FA3 / 0x73A3` |
-| `0x1000A` | i32 | Handler first argument, exact semantic name unresolved | `0x40803D / 0x743D` |
-| `0x1000B` | str | Owner `+0x20` | `0x4080DF / 0x74DF` |
+| `0x1000A` | i32 | Debug event's thread ID | `0x40803D / 0x743D` |
+| `0x1000B` | str | Application name, owner `+0x20` | `0x4080DF / 0x74DF` |
 
-There is no `0x10001` record in this sequence. Owner fields are deliberately
-not all semantically renamed until their initialization chain is verified.
+There is no `0x10001` record in this sequence.
+
+### Owner initialization and thread identity
+
+The names above are traced through `RedHanded.exe!wWinMain` VA `0x404540`,
+not inferred from ID order. Its `app`, `sourcerev`, `buildnumber`,
+`envmnemonic`, and `envname` options populate locals at stack `+0x24`,
+`+0x28`, `+0x2C`, `+0x30`, and `+0x34`, respectively (offsets here are at
+the constructor's balanced stack). Instructions at `0x404A72`,
+`0x404A86`, `0x404A91`, `0x404AAB`, and `0x404ACE` copy those into object
+stack slots `+0x80..+0x90`. The object base is stack `+0x60`:
+`0x404B36` loads ECX with `[esp+0x68]` after two argument pushes and
+`0x404B3B` calls the monitor. Subtraction gives owner offsets `+0x20`,
+`+0x24`, `+0x28`, `+0x2C`, and `+0x30`.
+Default text is `Firefall`, `prod`, and `Firefall` for app, mnemonic, and
+environment name when those options are absent. An explicitly present
+empty/null text follows the empty-string path, not the absent-option default.
+
+Numeric options call imported `atoi` at `0x4048C9` and `0x4048F2`.
+VA `0x4049BF..0x4049E7` replaces **zero**, not all nonpositive values,
+with source revision117123 and build number1962. Nonzero negative values
+survive as DWORDs and later format with `%u`; for example a parsed `-1`
+becomes `4294967295` on the pipe. `CaptureBuildNumbers` models only this
+post-`atoi` transformation, not text parsing or CRT overflow behavior.
+
+The debug loop VA `0x409880` passes the event buffer at `[ebp-0x70]` to
+helper `0x458B20` (`0x4098B6..0x4098BD`). Its `DEBUG_EVENT.dwThreadId`
+is at `[ebp-0x68]`, offset8 in the Windows structure.
+Both EXCEPTION_DEBUG_EVENT (case1) and RIP_EVENT (case9) push that DWORD
+at `0x409A00` and `0x409A81` before calling `0x407630`
+(`0x409A05` and `0x409A86`). The handler saves its first stack argument
+from `[ebp+8]` to `[ebp-0x33C]` at `0x407665..0x407675`, then pushes
+that unchanged local at `0x408031` into stream `0x1000A`.
+Thus this stream is the **thread ID**, not a process ID, exception code,
+or chance flag. For case9 the exception-record argument is null; the
+thread ID still comes from the same debug event.
+
+These are static data-flow conclusions with instruction-byte checks.
+The exact meaning of decoded-source stream `0x10006` and the process-memory
+measurement/fallback stream `0x10008` still needs its own bounded trace.
 
 ### Receiver tokenization and native descriptors
 
@@ -212,8 +250,7 @@ exports. They do not execute any target or contact a service. Without
 `--samples`, only the pure managed decisions and metadata checks run,
 with an explicit notice that binary evidence was not checked.
 
-Next bounded traces: initialization of the remaining stream-owner fields;
-RedHanded's actual debug-event-to-handler argument mapping; the DumpTruck
-sink's compression boundary and interpretation of its return codes; and
+Next bounded traces: decoded-source and process-memory metadata semantics;
+the DumpTruck sink's compression boundary and interpretation of its return codes; and
 the managed loader/callers of DeploymentCommon. Static import absence is
 not used as a claim that all nine form one direct-load chain.
