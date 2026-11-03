@@ -4228,3 +4228,17 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   response's header collection based on its use in status/header processing;
   that association is not established by constructor code alone. The purpose
   of fields `+0xC`, `+0x14`, `+0x18`, and `+0x1C` is still unknown.
+
+# Round 30: ClientApi response ownership
+
+## Observed
+- The response vtable's first code pointer resolves to `0x3845B0`, which
+  forwards to destructor `0x3844B0`. That destructor releases shared-text
+  fields at `+0x18` and `+0x1C`, then destroys the tree rooted at `+0x10`
+  through `0x326EF0`.
+- `ClientApi_DispatchWinHttpStatus` inserts response header name/value pairs
+  into the container at response `+0x10`, supporting its identification as
+  the owned response-header tree. The field-specific meaning of `+0x14` and
+  the two shared-text values remains unresolved.
+- CompanionTools checks the destructor's text-field cleanup and tree
+  destructor call against the sample.

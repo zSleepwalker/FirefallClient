@@ -2144,6 +2144,12 @@ if (args.Length == 2)
             "6A20")
         && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiPumpRequestWorkerRaw + 0x147 + 0x400C00,
             "894E04C7460800000000")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiResponseDestroyRaw + 0x7D + 0x400C00,
+            "C7461C00000000")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiResponseDestroyRaw + 0x88 + 0x400C00,
+            "8B4E1885C9")
+        && client.Calls(Red5LoggingBridgeNativeLayout.ClientApiResponseDestroyRaw + 0xDE + 0x400C00,
+            Red5LoggingBridgeNativeLayout.ClientApiResponseTreeDestroyRaw + 0x400C00)
         && (uint)ClientApiResponseObservedKind.HandleClosing == 3
         && (uint)ClientApiResponseObservedKind.CloseAfterStatusDispatch == 4);
     Check("Original client URL message builder escapes host, path and configured identifier components",

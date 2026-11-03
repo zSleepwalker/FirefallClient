@@ -264,6 +264,8 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint ClientApiRequestResetRaw = 0xBC1280;
     public const uint ClientApiResponseResetRaw = 0xBC11D0;
     public const uint ClientApiResponseCtorRaw = 0x3845D0;
+    public const uint ClientApiResponseDestroyRaw = 0x3844B0;
+    public const uint ClientApiResponseTreeDestroyRaw = 0x326EF0;
     public const uint ClientApiResponseSize = 0x20;
     public const uint ClientApiResponseRequestOffset = 0x04;
     public const uint ClientApiResponseKindOffset = 0x08;
