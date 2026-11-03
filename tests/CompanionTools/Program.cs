@@ -2243,6 +2243,16 @@ if (args.Length == 2)
         && Red5LoggingBridgeNativeLayout.ClientApiRequestUrlPortOffset == 0x14
         && Red5LoggingBridgeNativeLayout.ClientApiRequestUrlPathOffset == 0x18
         && Red5LoggingBridgeNativeLayout.ClientApiRequestUrlQueryOffset == 0x1C);
+    Check("ClientApi worker applies the request's five-redirect automatic limit",
+        client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiWinHttpSetOptionImportVa,
+            "WinHttpSetOption")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiRequestResetRaw + 0x4D + 0x400C00,
+            "66C7473C0502C6473E00")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiPumpRequestWorkerRaw + 0x3FD + 0x400C00,
+            "6A040FB6463C898584FBFFFF8D8584FBFFFF506A59FF37FF15084DAC01")
+        && Red5LoggingBridgeNativeLayout.ClientApiRequestAutomaticRedirectLimitOffset == 0x3C
+        && Red5LoggingBridgeNativeLayout.ClientApiRequestAutomaticRedirectLimitDefault == 5
+        && Red5LoggingBridgeNativeLayout.ClientApiWinHttpSetAutomaticRedirectLimitRaw == 0xBC2F44);
     Check("Original client URL message builder escapes host, path and configured identifier components",
         client.Calls(Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlMessageBuilderRaw + 0xFD + 0x400C00,
             Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlComponentEscapeRaw + 0x400C00)

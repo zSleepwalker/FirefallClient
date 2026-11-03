@@ -286,6 +286,10 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint ClientApiRequestUrlLookupRaw = 0xBC1460;
     public const uint ClientApiRequestUrlLookupUpdateRaw = 0xBC1680;
     public const uint ClientApiRequestResetRaw = 0xBC1280;
+    public const uint ClientApiRequestAutomaticRedirectLimitOffset = 0x3C;
+    public const uint ClientApiRequestAutomaticRedirectLimitDefault = 5;
+    public const uint ClientApiWinHttpSetAutomaticRedirectLimitRaw = 0xBC2F44;
+    public const uint ClientApiWinHttpSetOptionImportVa = 0x1AC4D08;
     public const uint ClientApiRequestUrlSchemeOffset = 0x0C;
     public const uint ClientApiRequestUrlHostOffset = 0x10;
     public const uint ClientApiRequestUrlPortOffset = 0x14;

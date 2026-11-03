@@ -138,3 +138,14 @@
 
 ## Unresolved
 - I did not decompile `0xBD3140`/`0xBD3E50` this round, and did not produce a new id->handler name list; names beyond `docs\MatrixServerMessageBodies.md` / `MatrixServerMessageCatalog.cs` are unproven. Fragment reassembly/ack internals not re-traced (see MatrixConnection.md).
+
+# Round 22: ClientApi automatic redirect limit
+
+## Observed
+- `ClientApiRequest_Reset` (`0xBC1280`) writes the word `0x0205` at request `+0x3C` (`0xBC12CD`) and clears the following byte at `+0x3E`. `ClientApi_PumpRequestWorker` (`0xBC2B30`) reads only the low byte at request `+0x3C`, zero-extends it, and passes its address with a four-byte length to `WinHttpSetOption` at `0xBC2F44`, using option `0x59`. The sample's IAT slot `0x1AC4D08` resolves to `WinHttpSetOption`; Microsoft documents option `0x59` as `WINHTTP_OPTION_MAX_HTTP_AUTOMATIC_REDIRECTS`. Thus this request's WinHTTP automatic redirect ceiling is 5. The remaining `0x02` byte in the reset word is not interpreted here.
+
+## Interpreted
+- The five-redirect ceiling is copied from each request's initialized byte into a 32-bit WinHTTP option value when the worker configures the request handle.
+
+## Unresolved
+- The purpose of request byte `+0x3D` and whether any path changes the redirect limit after reset.

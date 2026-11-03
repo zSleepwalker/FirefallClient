@@ -4349,3 +4349,26 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   have been traversed and submitted, so subsequent redirect callbacks for
   this context skip replay. CompanionTools now includes the host-only policy
   cases and guards the URL-component offsets.
+
+# Round 37: ClientApi automatic redirect limit
+
+## Observed
+- `ClientApiRequest_Reset` (`0xBC1280`) writes word `0x0205` at request
+  `+0x3C` (`0xBC12CD`) and clears byte `+0x3E`. In
+  `ClientApi_PumpRequestWorker` (`0xBC2B30`), `0xBC2F2F` zero-extends only
+  request byte `+0x3C`; `0xBC2F2D` pushes a four-byte value length and
+  `0xBC2F44` calls `WinHttpSetOption(handle, 0x59, &value, 4)`. Original
+  sample IAT slot `0x1AC4D08` resolves to `WinHttpSetOption`. Microsoft's
+  WinHTTP option reference names `0x59` as
+  `WINHTTP_OPTION_MAX_HTTP_AUTOMATIC_REDIRECTS`; the value initialized and
+  passed by the client is 5. The upper `0x02` byte in the reset word is not
+  explained by this usage. CompanionTools checks the IAT, reset bytes,
+  complete option-setup instruction sequence, and modeled offset/default.
+
+## Interpreted
+- The WinHTTP request handle is configured with a five-redirect automatic
+  redirect ceiling per request.
+
+## Unresolved
+- The purpose of request byte `+0x3D` and whether another path changes the
+  limit after reset.
