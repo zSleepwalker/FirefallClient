@@ -93,6 +93,17 @@ public enum ClientApiResponseObservedKind : uint
     CloseAfterStatusDispatch = 4
 }
 
+public enum ClientApiWinHttpCallbackStatus : uint
+{
+    Redirect = 0x4000,
+    SecureFailure = 0x10000,
+    HeadersAvailable = 0x20000,
+    DataAvailable = 0x40000,
+    ReadComplete = 0x80000,
+    WriteComplete = 0x100000,
+    RequestError = 0x200000
+}
+
 public enum Red5LuaWebRequestLoggingAction
 {
     Disable,
@@ -270,8 +281,13 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint ClientApiResponseRequestOffset = 0x04;
     public const uint ClientApiResponseKindOffset = 0x08;
     public const uint ClientApiWinHttpStatusCallbackRaw = 0xBC26E0;
+    public const uint ClientApiWinHttpStatusDispatchRaw = 0xBC1DA0;
     public const uint ClientApiWinHttpHandleClosingStatus = 0x800;
     public const uint ClientApiWinHttpCloseHandleImportVa = 0x1AC4CF8;
+    public const uint ClientApiWinHttpReceiveResponseImportVa = 0x1AC4CE0;
+    public const uint ClientApiWinHttpQueryHeadersImportVa = 0x1AC4CE4;
+    public const uint ClientApiWinHttpQueryDataAvailableImportVa = 0x1AC4CE8;
+    public const uint ClientApiWinHttpReadDataImportVa = 0x1AC4CEC;
     public const uint ClientApiWinHttpSetStatusCallbackImportVa = 0x1AC4D0C;
     public const uint ClientApiWinHttpSendRequestImportVa = 0x1AC4D10;
     public const uint ClientApiWinHttpCallbackContextAllocRaw = 0xBC2D0E;

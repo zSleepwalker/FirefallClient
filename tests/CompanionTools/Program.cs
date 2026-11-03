@@ -2174,6 +2174,32 @@ if (args.Length == 2)
             "57")
         && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiPumpRequestWorkerRaw + 0x6E3 + 0x400C00,
             "FF15104DAC01"));
+    Check("Original ClientApi status dispatcher uses the verified response-stage WinHTTP imports",
+        client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiWinHttpReceiveResponseImportVa,
+            "WinHttpReceiveResponse")
+        && client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiWinHttpQueryHeadersImportVa,
+            "WinHttpQueryHeaders")
+        && client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiWinHttpQueryDataAvailableImportVa,
+            "WinHttpQueryDataAvailable")
+        && client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiWinHttpReadDataImportVa,
+            "WinHttpReadData")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpStatusDispatchRaw + 0x3B9 + 0x400C00,
+            "8B35E44CAC01")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpStatusDispatchRaw + 0x3E4 + 0x400C00,
+            "FFD6")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpStatusDispatchRaw + 0x5C3 + 0x400C00,
+            "FF15E84CAC01")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpStatusDispatchRaw + 0x659 + 0x400C00,
+            "FF15EC4CAC01")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpStatusDispatchRaw + 0x90E + 0x400C00,
+            "FF15E04CAC01")
+        && (uint)ClientApiWinHttpCallbackStatus.Redirect == 0x4000
+        && (uint)ClientApiWinHttpCallbackStatus.SecureFailure == 0x10000
+        && (uint)ClientApiWinHttpCallbackStatus.HeadersAvailable == 0x20000
+        && (uint)ClientApiWinHttpCallbackStatus.DataAvailable == 0x40000
+        && (uint)ClientApiWinHttpCallbackStatus.ReadComplete == 0x80000
+        && (uint)ClientApiWinHttpCallbackStatus.WriteComplete == 0x100000
+        && (uint)ClientApiWinHttpCallbackStatus.RequestError == 0x200000);
     Check("Original client URL message builder escapes host, path and configured identifier components",
         client.Calls(Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlMessageBuilderRaw + 0xFD + 0x400C00,
             Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlComponentEscapeRaw + 0x400C00)

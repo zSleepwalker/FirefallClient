@@ -4265,3 +4265,24 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
 - CompanionTools checks the sample allocation size, initial flag/result
   stores, subsequent handle/result/response stores, and the callback/send
   import slots and callsites.
+
+# Round 32: ClientApi WinHTTP response stages
+
+## Observed
+- `ClientApi_DispatchWinHttpStatus` (`0xBC1DA0`) handles callback status
+  `0x100000` by counting completed upload bytes, updating request progress,
+  and calling `WinHttpReceiveResponse` (`0x1AC4CE0`) after upload completion.
+- Status `0x20000` queries the numeric response status and raw response
+  headers through `WinHttpQueryHeaders` (`0x1AC4CE4`). The parsed header
+  pairs are inserted into the response tree at `+0x10`, then the dispatcher
+  calls `WinHttpQueryDataAvailable` (`0x1AC4CE8`).
+- Status `0x40000` reserves response-body capacity and starts
+  `WinHttpReadData` (`0x1AC4CEC`). Status `0x80000` appends read bytes to
+  response text at `+0x1C`, then requests more available data. A zero-byte
+  read assigns observed response kind 1 if unset and returns the terminal
+  result.
+- Statuses `0x10000`, `0x200000`, and `0x4000` have separate secure-failure,
+  request-error, and redirect handling paths. Redirect policy and the exact
+  response-kind meanings are not fully established.
+- CompanionTools checks the import-slot names, representative indirect call
+  sites, and the callback-status numeric values against the sample/model.
