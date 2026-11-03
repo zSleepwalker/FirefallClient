@@ -176,6 +176,16 @@ foreach (var mappedArguments in new[]
         Red5LoggingBridgeNativeLayout.CaptureMappedCallbackArguments(
             mappedArguments.HasArguments, mappedArguments.IsObject, mappedArguments.CallableLike)
         == mappedArguments.Expected);
+foreach (var invocation in new[]
+{
+    (Undefined: true, Async: false, Expected: Red5QueuedCallbackInvocationAction.SkipUndefinedCallback),
+    (Undefined: true, Async: true, Expected: Red5QueuedCallbackInvocationAction.SkipUndefinedCallback),
+    (Undefined: false, Async: false, Expected: Red5QueuedCallbackInvocationAction.InvokeSynchronously),
+    (Undefined: false, Async: true, Expected: Red5QueuedCallbackInvocationAction.InvokeAsynchronously)
+})
+    Check($"Awesomium Red5 queued callback invocation undefined={invocation.Undefined}, async={invocation.Async}",
+        Red5LoggingBridgeNativeLayout.CaptureQueuedCallbackInvocation(
+            invocation.Undefined, invocation.Async) == invocation.Expected);
 foreach (uint fileHandle in new uint[] { 0, 1, 0x80000000, uint.MaxValue })
     Check($"Awesomium configuration closes nonzero prior file handle {fileHandle:X8}",
         LogFileNativeLayout.CaptureClosesPriorFileHandle(fileHandle) == (fileHandle != 0));
@@ -1567,6 +1577,44 @@ if (args.Length == 2)
             "630061006C006C000000")
         && client.Ascii(Red5LoggingBridgeNativeLayout.CallbackCallablePredicateVa)
             == "(function (object) { return !!(object && object.constructor && object.call && object.apply); })");
+    Check("Original client queue consumer is uiWebFrameInternal_17 vtable slot 20",
+        client.Matches(Red5LoggingBridgeNativeLayout.CallbackQueueConsumerRttiLocatorPointerVa,
+            "E00FCD01")
+        && client.Matches(Red5LoggingBridgeNativeLayout.CallbackQueueConsumerVtableSlotVa, "E0561601")
+        && client.Ascii(Red5LoggingBridgeNativeLayout.CallbackQueueConsumerClassDescriptorVa)
+            == ".?AVuiWebFrameInternal_17@@");
+    Check("Original client drains queued callbacks and re-resolves each retained method-name key",
+        ClientMatches(Red5LoggingBridgeNativeLayout.CallbackQueueConsumerRaw + 0x46,
+            "83785C000F8453060000")
+        && ClientMatches(0xD64BA4,
+            "8D8B74040000E8C190F6FF")
+        && client.Calls(0xD64BAA + 0x400C00,
+            0xCCDC70 + 0x400C00));
+    Check("Original client invokes queued callback through call using synchronous or asynchronous import",
+        ClientMatches(0xD64EBE, "FF15E84EAC01")
+        && ClientMatches(0xD64EC4, "84C00F85DD010000")
+        && ClientMatches(0xD64F6C, "BAB447BD018D4C2430E8D667F5FF")
+        && ClientMatches(0xD64FB8, "FF15EC4EAC01")
+        && ClientMatches(0xD64FD0, "FF15DC4EAC01")
+        && ClientMatches(0xD64F82, "A1C486E601")
+        && ClientMatches(0xD64F9E, "83780800")
+        && ClientMatches(0xD64FAE, "7413")
+        && client.ImportSlotNames(Red5LoggingBridgeNativeLayout.CallbackIsUndefinedImportVa,
+            "?IsUndefined@JSValue@Awesomium@@QBE_NXZ")
+        && client.ImportSlotNames(0x1AC4EC8,
+            "?ToObject@JSValue@Awesomium@@QAEAAVJSObject@2@XZ")
+        && client.ImportSlotNames(Red5LoggingBridgeNativeLayout.CallbackInvokeAsyncImportVa,
+            "?InvokeAsync@JSObject@Awesomium@@QAEXABVWebString@2@ABVJSArray@2@@Z")
+        && client.ImportSlotNames(Red5LoggingBridgeNativeLayout.CallbackInvokeImportVa,
+            "?Invoke@JSObject@Awesomium@@QAE?AVJSValue@2@ABVWebString@2@ABVJSArray@2@@Z")
+        && client.Matches(Red5LoggingBridgeNativeLayout.CallbackQueueCallMethodNameVa,
+            "630061006C006C000000")
+        && client.Ascii(Red5LoggingBridgeNativeLayout.CallbackQueueLogFormatVa)
+            == "Executing callback '%s' from JavaScript"
+        && client.Ascii(Red5LoggingBridgeNativeLayout.CallbackQueueArgumentLogFormatVa)
+            == "   #%d: %s"
+        && client.Ascii(Red5LoggingBridgeNativeLayout.CallbackQueueReturnLogFormatVa)
+            == "Javascript callback returned: %s");
     Check("RedHanded message decoder admits500/501/502 with four parameters and length at most1024",
         red.Matches(0x40890B, "05002BD1FE83F8020F87CD040000")
         && red.Matches(0x408919, "837E10047324")

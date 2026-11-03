@@ -3773,7 +3773,8 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   of the enclosing object. Raw `0xCCD640`/`0xCCDC70` compare the method key
   with `strcmp`; a lookup miss or second sentinel check falls through to the
   `errorlog` special case. On a match, raw `0xD65A60` creates a 12-byte
-  record with the retained lookup result, a `JSValue`, and a `JSArray`.
+  record with retained method-name text, a `JSValue`, and a `JSArray`; the
+  lookup result itself is not retained in the record.
 - For nonempty arrays, the handler checks the final argument; if it is an
   object, raw `0xD64320` invokes a cached predicate from ASCII source VA
   `0x1BD4570`. The predicate requires truthy `object`, `constructor`, `call`,
@@ -3783,11 +3784,35 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   collection at `this+0x34`.
 - Added callback route and trailing-callable-like-argument decision models,
   plus sample guards for the lookup, predicate, array pop, and queue append.
-  The queue consumer and actual JavaScript caller of `Red5.errorlog` remain
-  unresolved.
+  At that point, the queue consumer and actual JavaScript caller of
+  `Red5.errorlog` remained unresolved.
 - Validation: solution build succeeded with 0 warnings/errors; all 2556
   CompanionTools checks passed, including original-sample checks; `git diff
   --check` is clean.
 - Validation: solution build succeeded with 0 warnings/errors; all 2552
   CompanionTools checks passed, including original-sample checks; `git diff
   --check` is clean.
+
+## FirefallClient Red5 callback queue dispatch
+
+- Corrected the queued record interpretation: its first field is retained
+  method-name text, not a retained tree lookup result. Consumer raw
+  `0xD64AE0` uses that key to perform a fresh lookup in the mapping tree.
+- RTTI identifies `0xD64AE0` as virtual slot20 of the primary
+  `uiWebFrameInternal_17` vtable (table VA `0x1C765FC`, slot VA
+  `0x1C7664C`; complete-object locator VA `0x1CD0FE0`, object offset0).
+- The consumer drains the queue at `this+0x4C` while the pending count at
+  `this+0x5C` is nonzero. A missing current mapping discards that queued
+  callback. Otherwise it prepares the stored callback and arguments, skips
+  an undefined callback value using imported `JSValue::IsUndefined` at IAT
+  VA `0x1AC4EE8`, then invokes its `call` method with a null receiver and
+  the prepared arguments.
+- Global VA `0x1E686C4` offset `+8` selects imported
+  `JSObject::InvokeAsync` at IAT VA `0x1AC4EEC` when nonzero, or synchronous
+  `JSObject::Invoke` at `0x1AC4EDC` otherwise. The synchronous path logs the
+  return value; conditional diagnostics include the callback name and
+  argument strings.
+- Added an inert decision model and original-sample guards for the vtable
+  slot, queue count, fresh method lookup, `call` method string, both invocation
+  imports, and diagnostic formats. The JavaScript caller of `Red5.errorlog`
+  remains unresolved.

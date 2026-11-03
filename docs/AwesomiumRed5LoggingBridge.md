@@ -45,8 +45,9 @@ lookup rooted at offset `+0x474` of the enclosing object, using the incoming
 method name. The lookup helper at raw `0xCCD640` uses `strcmp`; an exact
 match enters the mapped callback path, while a miss (or the helper's
 additional sentinel condition) falls through to the special-method check.
-The mapped path creates a
-12-byte record holding a retained lookup result, a `JSValue`, and a `JSArray`.
+The mapped path creates a 12-byte record holding retained method-name text,
+a `JSValue`, and a `JSArray`; the lookup result itself is not retained in the
+record.
 It examines the final array argument, not the first. When that value is an
 object, raw `0xD64320` applies a cached JavaScript predicate whose ASCII
 source is at VA `0x1BD4570`:
@@ -56,7 +57,30 @@ The helper invokes the predicate's `call` method (method-name literal
 is defined and truthy, the handler stores that trailing value separately and
 pops it from the copied argument array; otherwise it preserves the full
 array. Raw `0xD66B70` appends the record to the handler's collection at
-`this+0x34`. The later consumer of this queue remains unresolved.
+`this+0x34`.
+
+The queue consumer is raw function `0xD64AE0` (VA `0x11656E0`), virtual
+slot20 of the primary `uiWebFrameInternal_17` vtable at VA `0x1C765FC`.
+Its RTTI complete-object locator at VA `0x1CD0FE0` identifies that class at
+object offset0. The consumer checks the pending count at `this+0x5C`, takes a
+record from the collection at `this+0x4C`, and uses the record's first field
+as the method-name key for a fresh lookup in the ordered tree rooted at
+`this+0x474`. Thus the queued field is the retained method name, not a
+pre-resolved tree entry. If the mapping is no longer found, that queued
+callback is discarded rather than invoked.
+
+For a selected entry, the consumer obtains the separately stored callback
+value and assembled argument array. When the callback value is undefined,
+as tested through imported `JSValue::IsUndefined` (IAT VA `0x1AC4EE8`), it
+skips invocation. Otherwise it converts the value to a JSObject and invokes
+that object's `call` method
+(UTF-16 literal at VA `0x1BD47B4`) with a null receiver followed by the
+prepared callback arguments. A state check at global VA `0x1E686C4` offset
+`+8` selects imported `JSObject::InvokeAsync` (IAT VA `0x1AC4EEC`) when
+nonzero, and `JSObject::Invoke` (IAT VA `0x1AC4EDC`) otherwise. The
+synchronous path can log the return value. Conditional debug logs use
+`Executing callback '%s' from JavaScript` and `   #%d: %s`; this path's
+observed return format is `Javascript callback returned: %s`.
 
 If lookup falls through, the handler compares the callback method name
 against the UTF-16 literal `errorlog` at VA `0x1BD4994` using the imported
@@ -72,10 +96,10 @@ object is at VA `0x1E68688`.
 
 The unrelated/unknown callback message uses format VA `0x1BD48F0`
 (`uiWebFrame='%s', unknown callback was used by Javascript: %s`) and logger
-object VA `0x1E68668`, through the helper at raw `0x2FCC60`. The mapped
-callback's queue consumer and the JavaScript code that invokes `Red5.errorlog`
-remain untraced; the callback's routing, callable-like argument handling,
-and errorlog string-to-logger handoff are established by the native
+object VA `0x1E68668`, through the helper at raw `0x2FCC60`. The JavaScript
+code that invokes `Red5.errorlog` remains untraced; the callback's routing,
+callable-like argument handling, mapped callback queue dispatch, and
+errorlog string-to-logger handoff are established by the native
 instructions.
 
 The separate `WebPreferences::WebPreferences` import has one direct call

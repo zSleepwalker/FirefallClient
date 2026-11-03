@@ -74,5 +74,5 @@ the produced rule.
 
 [Red5 logging bridge](AwesomiumRed5LoggingBridge.md) records one-shot object
 creation, the native `errorlog` callback's string-to-logger path, and the
-mapped callback queue's record/argument handling; its consumer and JavaScript
-caller remain unresolved.
+mapped callback queue's record/argument handling and synchronous/asynchronous
+consumer; the JavaScript caller remains unresolved.
