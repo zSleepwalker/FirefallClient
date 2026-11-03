@@ -4456,3 +4456,14 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
 ## Unresolved
 - No behavior is inferred for the unsupported-platform path beyond the
   initializer's failure return.
+
+# Round 41: ClientApi callback-context teardown
+
+- Resolved the callback-context `+0x11` cleanup flag's nonzero source.
+  `ClientApi_WorkerDetachCompletionOnTeardown` (`0xBC2890`) tests worker
+  `+0x1C` and writes `1` to its context's `+0x11` at `0xBC28CB`; it separately
+  closes and clears worker handle `+0x20`. The registered WinHTTP callback
+  checks the same context byte on `HANDLE_CLOSING` and releases/clears response
+  pointer `+0x18` before releasing the context. Sample checks now cover both
+  sides of that flag and the separate handle-close operation. This does not
+  establish cancellation of the request handle at context `+0`.

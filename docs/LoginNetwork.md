@@ -186,3 +186,32 @@
 
 ## Unresolved
 - No runtime behavior is inferred for platforms on which the check returns false.
+
+# Round 26: ClientApi deferred callback-context cleanup
+
+## Observed
+- `ClientApi_WorkerDetachCompletionOnTeardown` (`0xBC2890`) reads the worker's
+  pointer at `+0x1C`; when non-null it sets byte `+0x11` on that context at
+  `0xBC28CB`. It separately closes the worker's handle at `+0x20` through
+  `WinHttpCloseHandle` and clears that field. The `0x1C`-byte callback context
+  is passed as `WinHttpSendRequest`'s `dwContext` (Round 14), and its `+0x11`
+  byte is initialized to zero by `ClientApi_PumpRequestWorker`.
+- On `WINHTTP_CALLBACK_STATUS_HANDLE_CLOSING` (`0x800`),
+  `ClientApi_WinHttpStatusCallback` tests context byte `+0x11`. When set, it
+  releases the response reference at `+0x18` when non-null, clears the pointer,
+  then releases the callback context. This connects the teardown flag store to
+  the callback's deferred cleanup path. Manager teardown calls the detach
+  helper before freeing workers; route-worker pruning also uses it.
+- CompanionTools now verifies the worker-context test and flag store, the
+  separate handle-close/clear sequence, the callback's matching flag test, and
+  the `WinHttpCloseHandle` import against the original sample.
+
+## Interpreted
+- Worker teardown transfers response/context cleanup to the asynchronous
+  `HANDLE_CLOSING` callback by setting the callback-context flag before closing
+  its separate worker handle.
+
+## Unresolved
+- The observed teardown code does not itself close or cancel the request
+  handle stored at callback-context `+0`; cancellation and completion
+  guarantees remain unestablished.

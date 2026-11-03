@@ -2163,6 +2163,18 @@ if (args.Length == 2)
             + 0x400C00, "894714")
         && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpCallbackContextResponseStoreRaw
             + 0x400C00, "894718"));
+    Check("ClientApi worker teardown marks its callback context for handle-close cleanup",
+        client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiWinHttpCloseHandleImportVa,
+            "WinHttpCloseHandle")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpWorkerDetachRaw + 0x34 + 0x400C00,
+            "8B431C85C07404C6401101")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpWorkerDetachContextCleanupFlagStoreRaw
+            + 0x400C00, "C6401101")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpWorkerDetachHandleCloseRaw
+            + 0x400C00, "FF15F84CAC01C7432000000000")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpCallbackContextCleanupFlagTestRaw
+            + 0x400C00, "807E1100C70600000000")
+        && Red5LoggingBridgeNativeLayout.ClientApiWinHttpCallbackContextCleanupFlagOffset == 0x11);
     Check("Original ClientApi registers the callback and sends its context as WinHttpSendRequest dwContext",
         client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiWinHttpSetStatusCallbackImportVa,
             "WinHttpSetStatusCallback")
