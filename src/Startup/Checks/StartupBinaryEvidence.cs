@@ -9470,6 +9470,49 @@ internal static class StartupBinaryEvidence
             && Matches(0x7096F1, "F30F6F45E8F30F7F4308")
             && Matches(0x709709, "F30F6F45E8F30F7F00")
             && Matches(0x709712, "C60301"));
+        check("Binary structured chat case5 and collection surrounding fields preserve every primitive call",
+            StructuredChatMessageNativeLayout.Case5FixedFields
+                .Concat(StructuredChatCollectionNativeLayout.SurroundingFields)
+                .All(field => RelativeBranchTargets(
+                    field.ReadCallFileOffset, 0xE8, field.ReadHelperFileOffset))
+            && Matches(0x709764, "8D4704")
+            && Matches(0x70976F, "8D5708")
+            && Matches(0x709779, "8D5709")
+            && Matches(0x709783, "8D470C")
+            && Matches(0x70978E, "8D4710")
+            && Matches(0x709799, "8D4718")
+            && Matches(0x7097A4, "8D571C")
+            && Matches(0x7097AE, "8D4720")
+            && Matches(0x7097B9, "8D5728")
+            && Matches(0x7097C3, "8D5740")
+            && Matches(0x7097CD, "8D5741")
+            && Matches(0x7097D7, "8D4744")
+            && Matches(0x7097E2, "8D4748"));
+        check("Binary structured chat cases9/14/17 reach count-byte collections at recorded native offsets",
+            RelativeBranchTargets(0x6E3EB2, 0xE8, 0x6FDE30)
+            && RelativeBranchTargets(0x6FDE66, 0xE8, 0x709560)
+            && RelativeBranchTargets(0x7095C0, 0xE8, 0x7093F0)
+            && Matches(0x7095BB, "8D570C")
+            && Matches(0x6FE0D7, "8D5718")
+            && RelativeBranchTargets(0x6FE0DC, 0xE8, 0x5DE550)
+            && Matches(0x6FE1F8, "8D5714")
+            && RelativeBranchTargets(0x6FE1FD, 0xE8, 0x6002C0)
+            && Matches(0x6FE202, "8D5748"));
+        check("Binary structured chat collections read8/10/4 wire bytes per entry, without native padding",
+            Matches(0x7094A0, "8D4108894604")
+            && Matches(0x7094C5, "834608F8")
+            && Matches(0x5DE5DF, "8B018945F08D4104")
+            && Matches(0x5DE62B, "668B01668945F48D4102")
+            && Matches(0x5DE675, "F30F100083C004")
+            && RelativeBranchTargets(0x5DE6B2, 0xE8, 0x5DE4C0)
+            && Matches(0x5DE513, "8346040C")
+            && Matches(0x5DE53F, "8346040C")
+            && Matches(0x600343, "83C004")
+            && Matches(0x600372, "834708FC"));
+        check("Binary structured chat collections continue only after count255",
+            Matches(0x70950A, "80FFFF7513")
+            && Matches(0x5DE6BE, "80FBFF0F84A9FEFFFF")
+            && Matches(0x60046B, "80FBFF0F845EFEFFFF"));
         check("Binary structured chat case1 localizes CHAT_DUEL_RESULT and forwards it to chat display",
             ReadCStringAscii(StructuredChatMessageNativeLayout.DuelResultTemplateVirtualAddress, 17)
                 == StructuredChatMessageNativeLayout.DuelResultTemplate

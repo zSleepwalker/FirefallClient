@@ -7201,8 +7201,70 @@ arithmetic; they neither decode a packet nor synthesize absent values.
 Checks cover every presence byte, all field calls/destinations, the wrapper
 chain, flag writes, and copy extents against the immutable original sample.
 
-Next: case5's remaining fields, case9 reader `0x709560`, case12 chunked map
-`0x705570`, and the case14/17 collection helpers.
+### Structured-chat case5 full read order
+
+Reader `0x709750` processes the following fields in order. Native offsets
+are relative to its decoded destination; `ztext` means raw NUL-terminated
+bytes. These are storage/width descriptions, not semantic field names.
+
+| Native destination | Wire field | Primitive call raw |
+| --- | --- | --- |
+| `+0` (DWORD) | one byte, zero-extended | `0x70975F` |
+| `+4` | DWORD | `0x70976A` |
+| `+8`, `+9` | two bytes | `0x709774`, `0x70977E` |
+| `+0xC` | DWORD | `0x709789` |
+| `+0x10` | QWORD | `0x709794` |
+| `+0x18` | DWORD | `0x70979F` |
+| `+0x1C` | ztext | `0x7097A9` |
+| `+0x20` | DWORD | `0x7097B4` |
+| `+0x28` | presence byte and conditional14-byte value, as above | `0x7097BE` |
+| `+0x40`, `+0x41` | two bytes | `0x7097C8`, `0x7097D2` |
+| `+0x44` | DWORD | `0x7097DD` |
+| `+0x48` | WORD | `0x7097E8` |
+
+With text length `L` excluding NUL, consumption is `L+37` for an absent
+optional value or `L+51` when present. In particular, native gaps at
+`+0xA/+0xB` or `+0x24..+0x27` are not serialized padding.
+`Case5FixedFields` preserves the 13 primitive calls separately from the
+optional member and records the last WORD's two-byte wire width.
+
+### Structured-chat count-byte collections (cases9,14,17)
+
+The three readers below reset their destination collection before decoding.
+Each group starts with an unsigned count byte and reads exactly that many
+entries. Count `255` requires another count group; every smaller count
+ends the collection. Zero therefore represents an empty collection, and a
+final nonzero count below255 does **not** require a trailing zero. Full
+255-entry final groups need an additional count (possibly zero).
+
+| Case / wrapper | Prefix | Collection destination / reader raw | Entry wire layout | Suffix |
+| --- | --- | --- | --- | --- |
+| 9 / `0x709560` | six bytes, WORD, byte (`9` bytes) | native `+0xC` / `0x7093F0` | QWORD, `8` bytes | none observed |
+| 14 / `0x6FE070` | QWORD, DWORD, three four-byte words (`24` bytes) | native `+0x18` / `0x5DE550` | DWORD, WORD, four-byte raw value (`10` bytes) | none observed |
+| 17 / `0x6FE190` | DWORD, ztext, three DWORDs | native `+0x14` / `0x6002C0` | DWORD, `4` bytes | byte at native `+0x48` |
+
+Case9's reader appends QWORD-valued linked nodes through `0x709FD0`.
+Case14 builds a temporary with DWORD at native `+0`, WORD at `+4`, and
+four-byte value at `+8`. Its last value uses `movss` at raw `0x5DE675`,
+but its semantic role is unknown. The append helper `0x5DE4C0` advances
+the native vector end by **12** (`0x5DE513` and `0x5DE53F`); only **10**
+bytes came from wire. Native padding at entry `+6/+7` is not a wire field.
+Case17's helper appends four-byte values; its trailing byte is read only
+after the complete chunk sequence.
+
+With `N` entries and `G` count groups, the case9 total is `9 + G + 8*N`,
+case14 is `24 + G + 10*N`, and case17 is `L + 18 + G + 4*N`.
+`G` is at least one, so empty-list minima are `10`, `25`, and `L+19`.
+These formulas count transmitted entries, not necessarily unique entries.
+They establish no meanings for the opaque words or byte fields.
+
+`StructuredChatCollectionNativeLayout.cs` records the collection offsets,
+entry wire/native value sizes, continuation comparison sites, and the 19
+surrounding primitive reads. Binary checks cover those calls, the parent
+collection calls, per-entry cursor changes, 12-byte native append stride,
+and count255 comparisons at raw `0x70950A`, `0x5DE6BE`, and `0x60046B`.
+No new wire parser is introduced. Remaining payload work is chiefly case12's
+`0x705570` chunked map and its nested vector/map decoders.
 
 ## Post-notification chat file log and folded hash
 

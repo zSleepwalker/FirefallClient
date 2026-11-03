@@ -69,6 +69,33 @@ Check("Structured chat optional values distinguish wire widths from native paddi
     && StructuredChatMessageNativeLayout.Case5OptionalCopyByteCount == 16
     && StructuredChatMessageNativeLayout.Case10OptionalValueNativeExtent == 32
     && StructuredChatMessageNativeLayout.OptionalValueNativeOffset == 8);
+Check("Structured chat case5 fixed fields plus absent optional consume37 bytes with empty text",
+    StructuredChatMessageNativeLayout.Case5FixedFields.Count == 13
+    && StructuredChatMessageNativeLayout.Case5FixedFields.Sum(field => field.FixedWireByteCount ?? 1)
+        + StructuredChatMessageNativeLayout.Case5OptionalConsumedByteCount(0) == 37
+    && StructuredChatMessageNativeLayout.Case5MinimumPayloadByteCount == 37
+    && StructuredChatMessageNativeLayout.Case5FixedFields.Select(field => field.NativeOffset)
+        .SequenceEqual([0, 4, 8, 9, 12, 16, 24, 28, 32, 64, 65, 68, 72]));
+Check("Structured chat collection entries distinguish ten wire bytes from twelve native bytes",
+    StructuredChatCollectionNativeLayout.ContinuationCount == 255
+    && StructuredChatCollectionNativeLayout.Collections.SequenceEqual(
+    [
+        new StructuredChatCollectionSnapshot(9, 0x7093F0, 0x0C, 8, 8, 0x70950A),
+        new StructuredChatCollectionSnapshot(14, 0x5DE550, 0x18, 10, 12, 0x5DE6BE),
+        new StructuredChatCollectionSnapshot(17, 0x6002C0, 0x14, 4, 4, 0x60046B)
+    ]));
+Check("Structured chat collection prefixes and suffixes preserve minimum consumption without native padding",
+    StructuredChatCollectionNativeLayout.SurroundingFields.Count == 19
+    && StructuredChatCollectionNativeLayout.SurroundingFields
+        .Where(field => field.ReaderFileOffset == 0x709560)
+        .Sum(field => field.FixedWireByteCount) == StructuredChatCollectionNativeLayout.Case9PrefixWireByteCount
+    && StructuredChatCollectionNativeLayout.SurroundingFields
+        .Where(field => field.ReaderFileOffset == 0x6FE070)
+        .Sum(field => field.FixedWireByteCount) == StructuredChatCollectionNativeLayout.Case14PrefixWireByteCount
+    && StructuredChatCollectionNativeLayout.SurroundingFields
+        .Where(field => field.ReaderFileOffset == 0x6FE190)
+        .Sum(field => field.FixedWireByteCount ?? 1) + 1
+            == StructuredChatCollectionNativeLayout.Case17MinimumPayloadByteCount);
 Check("All three observed app modes are cataloged", AppModeCatalog.KnownModes.SequenceEqual(expected));
 Check("Mode 1 maps to tfLogin", AppModeCatalog.Find(1) == expected[0]);
 Check("Mode 2 maps to tfWorld", AppModeCatalog.Find(2) == expected[1]);

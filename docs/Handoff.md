@@ -2758,3 +2758,21 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   presence checks, and source fingerprints in the existing structured-chat
   layout/checks. Next: remaining case5 prefix/suffix fields, case9's
   `0x709560`, case12's `0x705570`, and case14/17 collections.
+
+## Structured-chat collection and case5 follow-up
+
+- Case5 now has all13 fixed primitive fields, its optional member, and wire
+  consumption arithmetic recorded: text length+37 absent, +51 present.
+  Native gaps are not serialized padding. The final field is a WORD.
+- Cases9/14/17 collection readers are mapped in
+  `StructuredChatCollectionNativeLayout.cs`: QWORD entries, DWORD/WORD/raw
+  four-byte entries, and DWORD entries respectively. They use count-byte
+  groups and continue only after255; a shorter final group needs no extra
+  zero terminator.
+- Case14 consumes10 bytes per entry but appends12 native bytes; entry+6/+7
+  are native padding. Case17 consumes its trailing byte only after the
+  complete chunk sequence. All field semantics remain conservative.
+- Next: case12's `0x705570` chunked map, nested `0x7035C0` DWORD vector,
+  and `0x70A340` map. Its decompiler has a JUMPOUT and a path that needs
+  direct instruction tracing before a complete ledger can be claimed.
+  The selector0x76 parser/receiver representation conflict is still open.

@@ -10,6 +10,7 @@ public enum StructuredChatFieldEncoding
     NullTerminatedBytes,
     Byte,
     ByteZeroExtendedToDword,
+    RawUInt16LittleEndian,
     RawUInt32LittleEndian,
     RawUInt64LittleEndian
 }
@@ -60,6 +61,40 @@ public static class StructuredChatMessageNativeLayout
     public const int Case5OptionalCopyByteCount = 16;
     public const int Case10OptionalValueWireByteCount = 28;
     public const int Case10OptionalValueNativeExtent = 32;
+    public const uint Case5PayloadReaderFileOffset = 0x709750;
+    public const int Case5MinimumPayloadByteCount = 37;
+
+    /// <summary>Case5 fields in wire order, with the optional member between native +0x20 and +0x40.</summary>
+    public static IReadOnlyList<StructuredChatPayloadFieldSnapshot> Case5FixedFields { get; } =
+        Array.AsReadOnly(new[]
+        {
+            new StructuredChatPayloadFieldSnapshot(0x709750, 0x00, 4, 1,
+                StructuredChatFieldEncoding.ByteZeroExtendedToDword, 0x70975F, 0x3849C0),
+            new StructuredChatPayloadFieldSnapshot(0x709750, 0x04, 4, 4,
+                StructuredChatFieldEncoding.RawUInt32LittleEndian, 0x70976A, 0x3370A0),
+            new StructuredChatPayloadFieldSnapshot(0x709750, 0x08, 1, 1,
+                StructuredChatFieldEncoding.Byte, 0x709774, 0x337180),
+            new StructuredChatPayloadFieldSnapshot(0x709750, 0x09, 1, 1,
+                StructuredChatFieldEncoding.Byte, 0x70977E, 0x337180),
+            new StructuredChatPayloadFieldSnapshot(0x709750, 0x0C, 4, 4,
+                StructuredChatFieldEncoding.RawUInt32LittleEndian, 0x709789, 0x3370A0),
+            new StructuredChatPayloadFieldSnapshot(0x709750, 0x10, 8, 8,
+                StructuredChatFieldEncoding.RawUInt64LittleEndian, 0x709794, 0x356F80),
+            new StructuredChatPayloadFieldSnapshot(0x709750, 0x18, 4, 4,
+                StructuredChatFieldEncoding.RawUInt32LittleEndian, 0x70979F, 0x3370A0),
+            new StructuredChatPayloadFieldSnapshot(0x709750, 0x1C, 4, null,
+                StructuredChatFieldEncoding.NullTerminatedBytes, 0x7097A9, 0x12EE010),
+            new StructuredChatPayloadFieldSnapshot(0x709750, 0x20, 4, 4,
+                StructuredChatFieldEncoding.RawUInt32LittleEndian, 0x7097B4, 0x3370A0),
+            new StructuredChatPayloadFieldSnapshot(0x709750, 0x40, 1, 1,
+                StructuredChatFieldEncoding.Byte, 0x7097C8, 0x337180),
+            new StructuredChatPayloadFieldSnapshot(0x709750, 0x41, 1, 1,
+                StructuredChatFieldEncoding.Byte, 0x7097D2, 0x337180),
+            new StructuredChatPayloadFieldSnapshot(0x709750, 0x44, 4, 4,
+                StructuredChatFieldEncoding.RawUInt32LittleEndian, 0x7097DD, 0x3370A0),
+            new StructuredChatPayloadFieldSnapshot(0x709750, 0x48, 2, 2,
+                StructuredChatFieldEncoding.RawUInt16LittleEndian, 0x7097E8, 0x336AC0)
+        });
 
     /// <summary>Fields relative to the optional reader's temporary value, excluding its presence byte.</summary>
     public static IReadOnlyList<StructuredChatPayloadFieldSnapshot> OptionalValueFields { get; } =
