@@ -113,6 +113,16 @@ include `Executing callback '%s' from JavaScript`, `   #%d: %s`, and
 
 ## Lua-to-JavaScript values and function calls
 
+The Lua WebFrame registration builder at raw `0xCCB9A0` installs twelve
+named entries: `LoadUrl`, `GetUrl`, `AddWebCallback`, `AddWebValue`,
+`CallWebFunc`, `SetUrlFilters`, `LogWebRequests`, `SetNaturalDims`,
+`ClearCookies`, `GetNaturalDims`, `EnableTypeTarget`, and `IsTypeTarget`.
+Their closure-entry values map to raw offsets `0xCC38B0` through `0xCC3960`
+in `0x10` increments. Those entries fall inside two shared native code
+regions rather than resolving as twelve standalone functions, so the table
+alone does not establish their individual behavior. The three bridge methods
+whose paths are traced in this document are described below or above.
+
 The Lua binding at raw `0xCCAF10` implements `AddWebValue`, using the usage
 string at VA `0x1BC7734`. It requires the frame, property name, and value
 arguments. The property name may be a string or number; the numeric path goes

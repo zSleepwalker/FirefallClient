@@ -3891,3 +3891,7 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   The local WebTest pair corroborates the `Red5Callbacks` target. Both
   bindings and their invocation decisions are recorded in the inert C# model
   and sample-backed checks; no executable or script was run.
+- Raw `0xCCB9A0` registers twelve Lua WebFrame names from `LoadUrl` through
+  `IsTypeTarget`. Their closure-entry values fall in shared code ranges, so
+  the remaining methods require individual data-flow traces before assigning
+  behavior.

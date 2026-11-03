@@ -1620,6 +1620,22 @@ if (args.Length == 2)
         ClientMatches(0xD651B0 + 0x68, "FF15F04EAC01")
         && client.ImportSlotNames(Red5LoggingBridgeNativeLayout.SetPropertyAsyncImportVa,
             "?SetPropertyAsync@JSObject@Awesomium@@QAEXABVWebString@2@ABVJSValue@2@@Z"));
+    Check("Original client Lua WebFrame registration names all twelve observed methods",
+        new (uint Va, string Name)[]
+        {
+            (0x1BC7880, "LoadUrl"),
+            (0x1BC77DC, "GetUrl"),
+            (0x1BC77E4, "AddWebCallback"),
+            (0x1BC77F4, "AddWebValue"),
+            (0x1BC7800, "CallWebFunc"),
+            (0x1BC779C, "SetUrlFilters"),
+            (0x1BC77AC, "LogWebRequests"),
+            (0x1BC77BC, "SetNaturalDims"),
+            (0x1BC77CC, "ClearCookies"),
+            (0x1BC775C, "GetNaturalDims"),
+            (0x1BC776C, "EnableTypeTarget"),
+            (0x1BC7780, "IsTypeTarget")
+        }.All(method => client.Ascii(method.Va) == method.Name));
     Check("Original client binds AddWebValue and CallWebFunc to the expected WebFrame virtual slots",
         ClientMatches(Red5LoggingBridgeNativeLayout.LuaAddWebValueRaw + 0xCD, "FF5054")
         && ClientMatches(Red5LoggingBridgeNativeLayout.LuaCallWebFuncRaw + 0xD8, "FF5058")

@@ -83,6 +83,7 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint LuaCallbackReferenceReleaseRaw = 0xC56250;
     public const uint LuaAddWebValueRaw = 0xCCAF10;
     public const uint LuaCallWebFuncRaw = 0xCCB060;
+    public const uint LuaWebFrameBindingTableRaw = 0xCCB9A0;
     public const uint LuaWebValueSetterRaw = 0xD651B0;
     public const uint LuaWebFunctionDispatcherRaw = 0xD65250;
     public const uint LuaValueToJavaScriptRaw = 0xCBBDB0;
