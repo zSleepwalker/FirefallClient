@@ -3932,4 +3932,9 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   `+0x08` to VA `0x10BCD80` (raw `0xCBC180`). That method calls `0xCBC270`,
   invokes the helper at object `+0x08` twice using configuration at `+0x14`,
   stores results at `+0x0C/+0x10`, then conditionally calls primary slot
-  `+0x04`. Its public meaning is not known.
+  `+0x04`. Setup passes flag `2` only if both its stack-byte argument and
+  owner byte `+0x5C` are nonzero; else it passes `0`. Primary slots `+0x00`
+  and `+0x04` point to `0xCBC150` and `0xCBC160`, which call virtual slot
+  `+0x18` on the nonnull helper objects at `+0x08`, and `+0x0C/+0x10`,
+  respectively. They appear to release those helpers; interface semantics
+  remain unknown.

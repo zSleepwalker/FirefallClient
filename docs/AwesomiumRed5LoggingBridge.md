@@ -249,6 +249,13 @@ uses the helper object at member `+0x08` twice to populate members `+0x0C`
 and `+0x10` from the configuration at `+0x14`. When its flag is nonzero, it
 also calls primary-vtable slot `+0x04`. This identifies the immediate
 initialization work, but not the user-facing meaning of the helper fields.
+Setup computes that flag as `2` only when both its stack-byte argument and
+owner byte `+0x5C` are nonzero; otherwise it passes `0`. Primary slot `+0x00`
+at VA `0x1C747CC` points to raw `0xCBC150`, which calls the helper at object
+`+0x08`'s virtual slot `+0x18`. Primary slot `+0x04` points to raw `0xCBC160`,
+which similarly calls virtual slot `+0x18` on nonnull objects at `+0x0C` and
+`+0x10`. These methods appear to release helper objects, but their allocator
+or interface semantics are not established.
 
 `LogWebRequests` is registered to raw `0xCCB3D0` and takes a value after the
 frame. Although its usage string at VA `0x1BC7584` says `boolean`, the

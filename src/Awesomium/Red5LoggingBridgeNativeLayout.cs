@@ -232,8 +232,12 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint LuaUrlFilterCallbackPointerVa = 0x10BE9E0;
     public const uint LuaUrlFilterDispatchObjectConstructorRaw = 0xCBC410;
     public const uint LuaUrlFilterDispatchObjectPrimaryVtableVa = 0x1C747CC;
+    public const uint LuaUrlFilterDispatchObjectPrimaryCleanupSlotVa = 0x1C747D0;
     public const uint LuaUrlFilterDispatchObjectSetupSlotVa = 0x1C747D4;
+    public const uint LuaUrlFilterDispatchObjectPrimaryCleanupSlotPointerVa = 0x10BCD60;
     public const uint LuaUrlFilterDispatchObjectSetupSlotPointerVa = 0x10BCD80;
+    public const uint LuaUrlFilterDispatchObjectPrimaryCleanupSlotRaw = 0xCBC160;
+    public const uint LuaUrlFilterDispatchObjectPrimaryReleaseSlotRaw = 0xCBC150;
     public const uint LuaUrlFilterDispatchObjectSetupSlotRaw = 0xCBC180;
     public const uint LuaUrlFilterDispatchObjectSecondaryVtableOffset = 0x04;
     public const uint LuaUrlFilterDispatchObjectFactoryRaw = 0xCBB7A0;
