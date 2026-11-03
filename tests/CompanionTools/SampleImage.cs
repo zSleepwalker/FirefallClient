@@ -104,6 +104,18 @@ internal sealed class SampleImage
         return false;
     }
 
+    public bool ManagedFinallyMatches(int methodRow, int tryOffset, int tryLength,
+        int handlerOffset, int handlerLength)
+    {
+        using var pe = new PEReader(new MemoryStream(bytes, writable: false));
+        var metadata = pe.GetMetadataReader();
+        var method = metadata.GetMethodDefinition(MetadataTokens.MethodDefinitionHandle(methodRow));
+        return pe.GetMethodBody(method.RelativeVirtualAddress).ExceptionRegions.Any(region =>
+            region.Kind == ExceptionRegionKind.Finally
+            && region.TryOffset == tryOffset && region.TryLength == tryLength
+            && region.HandlerOffset == handlerOffset && region.HandlerLength == handlerLength);
+    }
+
     public bool Calls(uint va, uint target) =>
         bytes[Offset(va)] == 0xE8
         && (long)va + 5 + BinaryPrimitives.ReadInt32LittleEndian(bytes.AsSpan(Offset(va) + 1, 4)) == target;

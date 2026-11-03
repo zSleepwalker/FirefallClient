@@ -3662,3 +3662,25 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   that Thread.Abort means completed cancellation or disposed resources.
 - Next static follow-ons: verify verbose module levels relative to caller
   source-span construction1028A790; allocator/aliasing behavior if required.
+
+## DeploymentCommon cancellation and bounded cleanup
+
+- Verbose construction batch committed/pushed as f9c2dc8.
+- Agent bdfbfb74-e45b-490e-baa3-793c603663af completed cancellation trace.
+  Integrated DownloadCancellationNativeLayout and focused evidence document.
+- First fatal worker clears mIsRunning, requests Thread.Abort only for
+  other enumerated threads, drains queue and signals ManualResetEvent
+  values. ThreadAbortException skips ordinary diagnostic block, but CLR
+  automatic rethrow behavior is not suppressed or modeled as graceful exit.
+- Outer row7C waits individual events then live workers. Timer finally
+  try28D/69 handler2F6/C disposes nonnull timer local; no whole-method
+  timer cleanup and no individual wait-handle disposal in that method.
+  Dispose does not establish completion of an in-flight timer callback.
+- Added exact finally-region metadata matcher to SampleImage and checks.
+  Corrected agent-proposed queue-drain guard against immutable bytes:
+  actual span has one getter/type-test, not duplicated getter sequence.
+- Build succeeds;2150 pure and2428 sample-backed checks pass. No workers,
+  targets, timers, cancellation requests, network or filesystem APIs run.
+- No active agent assignment remains. Follow-ons: verbose source-span
+  caller1028A790 and negative threshold fallback arithmetic; cancellation
+  effects beyond immediate managed boundary remain unresolved.

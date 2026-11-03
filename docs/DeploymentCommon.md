@@ -71,3 +71,8 @@ outside that decision model.
 recoverable WebException requeueing from the first-fatal-exception slot.
 The custom range-retry exception is captured by the worker and thrown by
 the outer multi-part downloader after its waits, rather than silently lost.
+
+[Cancellation and cleanup](DeploymentCommonDownloadCancellation.md)
+separate abort requests, queued-event signals, live-worker waits and the
+bounded timer-disposal finally. Neither event signaling nor Thread.Abort
+is treated as proof of completed cancellation.

@@ -19,6 +19,18 @@ void Check(string name, bool condition)
     if (condition) passed++; else failed++;
 }
 
+Check("DeploymentCommon abort requests exclude current worker only",
+    DownloadCancellationNativeLayout.GetAbortDisposition(true) == DownloadWorkerAbortDisposition.SkipCurrentThread
+    && DownloadCancellationNativeLayout.GetAbortDisposition(false) == DownloadWorkerAbortDisposition.RequestAbortOtherThread);
+Check("DeploymentCommon queue drain signals only ManualResetEvent values",
+    DownloadCancellationNativeLayout.ShouldSignalDrainedQueueEvent(true)
+    && !DownloadCancellationNativeLayout.ShouldSignalDrainedQueueEvent(false));
+Check("DeploymentCommon outer wait continues while any worker is alive",
+    DownloadCancellationNativeLayout.ShouldContinueWaitingForWorkers(true)
+    && !DownloadCancellationNativeLayout.ShouldContinueWaitingForWorkers(false));
+Check("DeploymentCommon wait-region timer cleanup requires nonnull local",
+    DownloadCancellationNativeLayout.ShouldDisposeTimerOnWaitExit(true)
+    && !DownloadCancellationNativeLayout.ShouldDisposeTimerOnWaitExit(false));
 foreach (var entry in new (string Source, string Module)[]
 {
     (@"dir\widget-inl.cc", "widget"), ("dir/widget.test.cc", "widget.test"),
@@ -2015,6 +2027,41 @@ if (args.Length == 2)
         hardware.Matches(0x403EB7, "83BDBCFEFFFF067229")
         && hardware.Matches(0x403EC7, "6683F8097507")
         && hardware.Matches(0x403ED4, "6685C07510"));
+    Check("DeploymentCommon fatal worker clears running flag and excludes CurrentThread from abort requests",
+        deployment.Matches(0x00403640, "02177D28000004")
+        && deployment.Matches(0x00403FB7, "02167D280000040207287B000006")
+        && deployment.Matches(0x00403FDC, "288F00000A092E06096FAE00000A"));
+    Check("DeploymentCommon queue drain signals event and ThreadAbortException skips ordinary diagnostic block",
+        deployment.Matches(0x0040401E,
+            "120428A900000A75710000016FB000000A26")
+        && deployment.Matches(0x00404048, "07757B0000013AFA000000"));
+    Check("DeploymentCommon outer wait observes events then worker liveness",
+        deployment.Matches(0x00403B4B, "11056F9900000A")
+        && deployment.Matches(0x00403B8E, "FE0682000006739D00000A803A000004")
+        && deployment.ManagedIlMatches(DownloadCancellationNativeLayout.WorkerAlivePredicateMethodRow,
+            DownloadCancellationNativeLayout.WorkerAlivePredicateBodyRva, "026F7B00000A2A"));
+    Check("DeploymentCommon timer disposal belongs to wait-region finally, not a whole-method cleanup",
+        deployment.Matches(0x00403B20,
+            "0202FE067E000006739700000A1420D007000020D0070000739800000A2513117D2A000004")
+        && deployment.Matches(0x00403BB2, "11122C0711126F4000000ADC")
+        && deployment.ManagedFinallyMatches(DownloadWorkerNativeLayout.DoFileDownloadMethodRow,
+            0x28D, 0x69, 0x2F6, 0xC));
+    Check("DeploymentCommon worker cancellation finally regions release enumerator and lock",
+        deployment.ManagedFinallyMatches(DownloadWorkerNativeLayout.ThreadRunnerMethodRow,
+            0x1B6, 0x23, 0x1D9, 0xE)
+        && deployment.ManagedFinallyMatches(DownloadWorkerNativeLayout.ThreadRunnerMethodRow,
+            0x62, 0x1C2, 0x224, 8)
+        && deployment.ManagedFinallyMatches(DownloadWorkerNativeLayout.DoDownloadMethodRow,
+            0, 0x4B6, 0x4B6, 0x1C));
+    Check("DeploymentCommon outer enumerator and stream cleanup have bounded protected regions",
+        deployment.ManagedFinallyMatches(DownloadWorkerNativeLayout.DoFileDownloadMethodRow,
+            0x194, 0xC8, 0x25C, 8)
+        && deployment.ManagedFinallyMatches(DownloadWorkerNativeLayout.DoFileDownloadMethodRow,
+            0x298, 0x1E, 0x2B6, 0xE)
+        && deployment.ManagedFinallyMatches(DownloadWorkerNativeLayout.DoFileDownloadMethodRow,
+            0x405, 0xA8, 0x4AD, 0xE)
+        && deployment.ManagedFinallyMatches(DownloadWorkerNativeLayout.DoFileDownloadMethodRow,
+            0x3F8, 0xC5, 0x4BD, 0xC));
     Check("DeploymentCommon worker invokes DoDownload inside System.Exception catch",
         deployment.Matches(0x00403E57, "120028A800000A120028A900000A6F9E000006DDE0020000")
         && deployment.ManagedCatchMatches(DownloadWorkerNativeLayout.ThreadRunnerMethodRow,
