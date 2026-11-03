@@ -272,6 +272,16 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint ClientApiWinHttpStatusCallbackRaw = 0xBC26E0;
     public const uint ClientApiWinHttpHandleClosingStatus = 0x800;
     public const uint ClientApiWinHttpCloseHandleImportVa = 0x1AC4CF8;
+    public const uint ClientApiWinHttpCallbackContextAllocRaw = 0xBC2D0E;
+    public const uint ClientApiWinHttpCallbackContextInitRaw = 0xBC2D6B;
+    public const uint ClientApiWinHttpCallbackContextHandleStoreRaw = 0xBC2DEC;
+    public const uint ClientApiWinHttpCallbackContextResultStoreRaw = 0xBC3264;
+    public const uint ClientApiWinHttpCallbackContextResponseStoreRaw = 0xBC3270;
+    public const uint ClientApiWinHttpCallbackContextSize = 0x1C;
+    public const uint ClientApiWinHttpCallbackContextHandleOffset = 0x00;
+    public const uint ClientApiWinHttpCallbackContextCleanupFlagOffset = 0x11;
+    public const uint ClientApiWinHttpCallbackContextResultOffset = 0x14;
+    public const uint ClientApiWinHttpCallbackContextResponseOffset = 0x18;
     public const uint ClientApiRequestTrackRaw = 0xBC43C0;
     public const uint ClientApiRequestSubmitTickStoreRaw = 0xBC4512;
     public const uint ClientApiRequestOpenTickStoreRaw = 0xBC2DE1;

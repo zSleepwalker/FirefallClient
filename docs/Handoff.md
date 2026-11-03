@@ -4242,3 +4242,21 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   the two shared-text values remains unresolved.
 - CompanionTools checks the destructor's text-field cleanup and tree
   destructor call against the sample.
+
+# Round 31: ClientApi WinHTTP callback context
+
+## Observed
+- `ClientApi_PumpRequestWorker` allocates a 0x1C-byte context at `0xBC2D0E`.
+  It clears the context, explicitly zeroes byte `+0x11` and dword `+0x14`,
+  stores the `ClientApiResponse` pointer at `+0x18`, and later stores the
+  opened WinHTTP request handle at `+0`. At `0xBC31F8`, it pushes this context
+  as the final `dwContext` argument to `WinHttpSendRequest`.
+- `ClientApi_WinHttpStatusCallback` checks that the callback's handle equals
+  context `+0`, gates non-closing status dispatch on context `+0x14`, accesses
+  the response through `+0x18`, and tests byte `+0x11` on HANDLE_CLOSING.
+- No nonzero write to byte `+0x11` was found in `ClientApi_PumpRequestWorker`;
+  whether another path sets it and what ownership behavior it enables remain
+  unresolved. Other context fields at `+4`, `+8`, `+0xC`, and `+0x10` are kept
+  unnamed.
+- CompanionTools checks the sample allocation size, initial flag/result
+  stores, and subsequent handle/result/response stores.

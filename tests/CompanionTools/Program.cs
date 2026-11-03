@@ -2152,6 +2152,17 @@ if (args.Length == 2)
             Red5LoggingBridgeNativeLayout.ClientApiResponseTreeDestroyRaw + 0x400C00)
         && (uint)ClientApiResponseObservedKind.HandleClosing == 3
         && (uint)ClientApiResponseObservedKind.CloseAfterStatusDispatch == 4);
+    Check("Original ClientApi WinHTTP callback context is 0x1C bytes with verified field stores",
+        client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpCallbackContextAllocRaw + 0x400C00,
+            "6A1C")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpCallbackContextInitRaw + 0x400C00,
+            "C6471000C6471100C7471400000000")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpCallbackContextHandleStoreRaw + 0x400C00,
+            "8937")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpCallbackContextResultStoreRaw
+            + 0x400C00, "894714")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpCallbackContextResponseStoreRaw
+            + 0x400C00, "894718"));
     Check("Original client URL message builder escapes host, path and configured identifier components",
         client.Calls(Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlMessageBuilderRaw + 0xFD + 0x400C00,
             Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlComponentEscapeRaw + 0x400C00)
