@@ -127,6 +127,30 @@ site at raw `0xCBC1B1` in function `0xCBC180`. That routine then initializes
 several stack fields and delegates to `0xCBC270`; this observed call does
 not, by itself, establish any logging preference or connect it to `errorlog`.
 
+## Lua/web bridge corroboration
+
+The installed GUI test harness demonstrates the generic bidirectional bridge.
+`system\gui\components\Test\WebTest.lua` loads
+`local://awesomium_test.html`, exposes values with `AddWebValue`, and registers
+`myfunc` and `MoveMe` with `AddWebCallback` (lines 20, 43-50). Its
+`TestCallback` reads a string and nested array/object arguments, then returns
+a Lua table with nested values (lines 24-39). The paired
+`system\gui\web\awesomium_test.html` calls `Red5.myfunc(...)` with a trailing
+JavaScript callback and calls `Red5.MoveMe()` (lines 58 and 90); it also
+defines `Red5Callbacks.test_from_lua`, which the Lua side calls through
+`CallWebFunc` (Lua line 54; HTML line 65). This confirms a generic
+JavaScript-to-Lua callback and Lua-to-JavaScript function path, but it does
+not identify a call to `Red5.errorlog` or prove which native method implements
+`AddWebCallback`.
+
+The main UI Lua source gets `ingame_host` from an operator setting
+(`components\MainUI\Web\Mainframe\Mainframe.lua`, line 91) and loads
+`host .. "/panelmanager"` (line 716); panel URLs are also loaded by that
+frame. A case-insensitive search of the installed `system\gui` text/script
+sources found no `errorlog` call. Therefore the exact caller is not present
+in the inspected local GUI sources; dynamically loaded page code remains a
+possible source, not a confirmed caller.
+
 The source identity used for the call-site checks is
 `FirefallClient.exe.original`, 40,197,848 bytes, SHA-256
 `E0E8448393AC1CE05BE73E06F62DD70E3EFF3404CC2E7AAF3F04C79DEC0DE235`.

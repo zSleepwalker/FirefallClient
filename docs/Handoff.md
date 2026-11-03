@@ -3833,3 +3833,19 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   sentinel value remains untouched. Its semantic type is unresolved.
 - Added a decision model and sample guards for the destructor relationship,
   queue-record release, field destructors, and pointer sentinel handling.
+
+## FirefallClient Lua/web bridge source check
+
+- Installed `system\gui\components\Test\WebTest.lua` loads local
+  `awesomium_test.html`, registers `myfunc`/`MoveMe` with `AddWebCallback`,
+  exposes several `AddWebValue`s, and returns a nested Lua table from
+  `TestCallback`. The HTML calls `Red5.myfunc` with a trailing JavaScript
+  callback, calls `Red5.MoveMe`, and defines `Red5Callbacks.test_from_lua`
+  for Lua's `CallWebFunc`. This establishes the generic bidirectional test
+  contract, not an `errorlog` call or the exact native implementation behind
+  `AddWebCallback`.
+- The main UI Lua source reads `ingame_host` and loads
+  `host .. "/panelmanager"`; it also loads its selected panel URL in that
+  frame. A case-insensitive search of the installed `system\gui` text/script
+  sources found no `errorlog` call. The actual caller remains unresolved;
+  dynamically loaded page code is a possibility, not confirmed evidence.
