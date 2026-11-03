@@ -3710,7 +3710,7 @@ dialog slots already verified at `0x78`–`0x7A`.
   `0x6E3670` with the record, `+0x08` string, byte `+0x10`, byte `+0x12`, and
   the object at `+0x18`. The helper obtains a data pointer and length through
   that object's storage object and virtual `+0x0C` method, then switches on
-  byte `+0x12`; the switch's individual output templates remain unresolved.
+  byte `+0x12`; the 19 case targets and selected outputs are documented below.
   These traces establish consumer behavior, not record semantics or cooldown
   timing. Separately, the parser/receiver state mismatch above remains
   unresolved.
@@ -7035,6 +7035,79 @@ gates. Zone67 selects `"zone"` with decoded author/text/ID/flags. Selected
 and zero flags. An unselected announcement is rejected by the capture API,
 not fabricated as a broadcast. These captures do not invoke runtime callbacks,
 simulate their reentrancy, or model the post-notification `0x6F46F0` consumer.
+
+## Structured chat consumer switch (raw 0x6E3670)
+
+Evidence: read-only disassembly of
+`D:\SteamLibrary\steamapps\common\Firefall\system\bin\FirefallClient.exe.original`.
+Code addresses below are raw file offsets; `.text` VA = raw + `0x400C00`.
+The PE section table translates embedded pointers and literals independently.
+The active zero-based IDA database labels this routine
+`mid_helper_multicall_6E3670`, but its function ends at raw `0x6E3B12` and its
+switch operand is an unadjusted VA. Consequently its decompiler omits most
+cases and reports an invalid table. The original table is valid after PE
+translation: VA `0xAE5254` maps to raw `0x6E4654`.
+
+The optional-data path of `0x6E2590` supplies the record's `+0x12` byte to this
+consumer. At `0x6E36F2` it zero-extends the byte, subtracts one, and rejects an
+unsigned result greater than `18` (`0x6E3700/0x6E3703`). Thus selectors
+`1..19` reach the table; `0` and `20..255` return false at `0x6E3AF2`.
+Fourteen case bodies call distinct or shared payload readers. The other
+bodies use already-supplied identity/text/category or owner state; a missing
+reader below does not mean the outer message has no payload.
+
+| Selector | Case raw | Payload reader raw | Observed downstream behavior |
+| --- | --- | --- | --- |
+| 1 | `0x6E3710` | `0x6FDBB0` | Localizes literal `CHAT_DUEL_RESULT`, then calls shared chat display |
+| 2 | `0x6E38AE` | `0x6FDC30` | Resolves a row through `0x321EA0`; if present, dispatches numeric `353` |
+| 3 | `0x6E3998` | `0x6FDCC0` | Checks current identity, then conditionally calls `0x937A70` |
+| 4 | `0x6E3A3C` | `0x6FDD50` | Two owner/identity gates, then dispatches numeric `266` |
+| 5 | `0x6E3B12` | `0x6FDDC0` | Category `14` can dispatch `347`; categories `12/13` update matching state and dispatch `262`, conditionally also `224` |
+| 6 | `0x6E3D58` | none observed | Categories `12/13` set owner DWORD `+0x1E0`; category `14` sets `+0x1E4` |
+| 7 | `0x6E3DAB` | none observed | Category `14`: found entry can dispatch `347` before removal |
+| 8 | `0x6E3DAB` | none observed | Same body as `7`, but skips that `347` dispatch before removal |
+| 9 | `0x6E3E79` | `0x6FDE30` | Updates owner `+0x188` through `0x6F6230`, then dispatches `261` |
+| 10 | `0x6E3EFD` | `0x6FDEA0` | Updates owner `+0x1A0` through `0x6F7C90`, then dispatches `263` |
+| 11 | `0x6E3F6C` | `0x6FDF10` | Gated lookup/validation path can call `0x85B850`; failure paths log and return false |
+| 12 | `0x6E40D0` | `0x6FDFA0` | Owner `+0x1FC` lookup/compare/copy; selected updates dispatch `268` |
+| 13 | `0x6E44A2` | none observed | Gated owner `+0x170` lookup; missing entry dispatches `265` and is inserted |
+| 14 | `0x6E4213` | `0x6FE070` | Identity check, decode and gated call `0x95BCD0` |
+| 15 | `0x6E42B9` | `0x6FE120` | Identity check, decode and gated call `0x95BF50` |
+| 16 | `0x6E4347` | `0x6FE120` | Identity check, decode and call `0x488830` |
+| 17 | `0x6E43BB` | `0x6FE190` | Identity check, decode and call `0x96E2F0` |
+| 18 | `0x6E4423` | none observed | Gated localization through `0x390B00`, then shared chat display |
+| 19 | `0x6E458A` | `0x6FE240` | Decoded flag selects pending-state removal and numeric `345` or `346` |
+
+These are conditional consumer effects, not event names or a guarantee of
+dispatch. Case `13`, for example, returns true even when either initial gate
+prevents the event. The caller `0x6E2590` does not use this routine's Boolean
+return. No managed capture here executes the native callbacks.
+
+Selected literal-backed outputs:
+
+- Case `1` at `0x6E380F` supplies VA `0x1B6E374` (`CHAT_DUEL_RESULT`) to
+  localization helper `0x390F20`. The decoded pair is added as two formatting
+  arguments. It then uses helper `0x6E9E30` for the channel and calls
+  `0x6E3460` at `0x6E3855` with empty author, zero author ID, and zero flags.
+  The translated message wording and which participant won are not inferred.
+- Case `2` builds `player_name` from the decoded first field, `item_type_id`
+  from resolved row `+0x10`, and `quality` from row byte `+0x33`, then calls
+  `uiManager+0xAC` with code `353` at `0x6E395C`.
+- Case `4` builds `inviter` from the supplied author text and `player` from
+  the decoded field, then calls the same slot with `266` at `0x6E3ABE`.
+- Case `19` always builds `player_name` from the supplied text and
+  `unique_name` through `0x45DD50`. A nonzero decoded byte adds
+  `status_type = "PENDING_IN"`, selects owner `+0x34`, and dispatches `345`;
+  zero selects owner `+0x28` and `346` without that status property.
+  Both call `0x6F5BF0` before dispatch at `0x6E462B`.
+
+`StructuredChatMessageNativeLayout.cs` preserves all 19 case offsets and
+payload-reader targets. Startup checks verify the complete PE-translated
+table, the 14 reader call sites, selected output calls, and original literals.
+This does not reconcile selector `0x76`'s parser-side `slBlob` with the
+receiver's record range. Next static work: reconstruct the case-specific
+payload readers and owner helpers without assuming that this consumer proves
+the wire layout or the semantics of the conflicting Character RTTI name.
 
 ## Post-notification chat file log and folded hash
 

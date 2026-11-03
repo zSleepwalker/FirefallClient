@@ -785,7 +785,9 @@ helper calls against the original binary before committing and pushing.
   `+0x28/+0x2C` conflict is now tied to the shared `slBlob` vtable/storage-
   object layout, with no conversion found on the traced callback route. The
   zero-control consumer path is mapped to event335's text/author/author-ID/
-  channel/display-flag fields; the nonzero template switch remains unresolved.
+  channel/display-flag fields. The nonzero structured-chat switch now has all
+  19 targets and 14 payload-reader calls recorded, with selected literal-backed
+  effects; individual payload and owner-state semantics remain incomplete.
   Continue read-only; do not modify the sample/IDB.
 - Open items: field semantics, allocation-failure consequences, selector
   `0x55` copied but unwritten stack DWORD at object `+0x70` (source proven,
@@ -795,7 +797,7 @@ helper calls against the original binary before committing and pushing.
   `0x75`'s `+0x28` source tree and `+0x30` tree-vs-`slBlob` mismatch and
   selector `0x76`'s parser/receiver range-vs-`slBlob` mismatch (receiver uses
   the blob vtable/storage-object positions as range endpoints), its nonzero
-  `+0x14` template switch, selector `0x77` trailing-state extent. Whether an
+  `+0x14` structured-chat payloads, selector `0x77` trailing-state extent. Whether an
   intervening conversion or distinct object path explains either mismatch
   remains open.
 - Workflow per batch: preserve native evidence in the existing layout,
@@ -2692,7 +2694,7 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
 - With `+0x14 != 0`, the consumer requires a current chat and calls
   `0x6E3670` with `+0x08`, `+0x10`, `+0x12`, and the object at `+0x18`.
   That helper reads storage-object data and size and switches on `+0x12`;
-  individual templates remain unresolved.
+  the 19 targets are now mapped in the structured-chat follow-up below.
 - The parser/receiver `slBlob` versus range-endpoint mismatch is unchanged and
   remains static evidence only; no runtime outcome is claimed. The build and
   all 1,427 startup/binary checks passed against the original executable.
@@ -2700,3 +2702,24 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   otherwise continue with selector `0x75` tree semantics or selector `0x77`
   state extent. See `docs\MatrixConnection.md` and the matching
   `CharacterAbilityApplicationNativeLayout` constants/checks.
+
+## Structured-chat switch follow-up
+
+- Original-binary disassembly resolves all 19 entries of the `0x6E3670`
+  switch: table VA `0xAE5254` maps to raw `0x6E4654`, and every target is
+  translated through the PE sections. The IDA database's old function ends
+  at raw `0x6E3B12`; later case bodies are not assigned to a function. Do not
+  interpret the decompiler's invalid-table warning as invalid sample bytes.
+- Saved `StructuredChatMessageNativeLayout.cs`, the complete selector/reader
+  map, exhaustive byte-selector selection checks, binary table/call/literal
+  evidence, and detailed notes in `docs\MatrixConnection.md`. Cases7/8 share
+  a target but differ in whether they notify before removing an entry.
+- Literal-backed paths include `CHAT_DUEL_RESULT` localization, code353 with
+  `player_name/item_type_id/quality`, code266 with `inviter/player`, and
+  code345/346 selected by the decoded pending-state flag. Numeric event names
+  remain unassigned. This does not resolve the selector0x76 representation
+  conflict.
+- Next: reconstruct individual payload readers (`0x6FDBB0`, `0x6FDC30`,
+  `0x6FDD50`, `0x6FE240` are small starting points), then follow owner
+  helpers. The native caller ignores the switch's Boolean result; returning
+  true alone is not evidence that an event was dispatched.

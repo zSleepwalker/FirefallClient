@@ -16,6 +16,18 @@ var expected = new[]
     new AppModeSnapshot(ClientAppModeId.LookingGlass, "tfLookingGlass", 0x1368, 0x65A190, 0x1C6781C, 0x1E12C48, 0x1A11048)
 };
 
+Check("Structured chat selects exactly 19 cases and leaves all other byte selectors unselected",
+    Enumerable.Range(0, 256).All(value =>
+        StructuredChatMessageNativeLayout.Find((byte)value) is { } entry
+            ? value is >= 1 and <= 19 && entry.Selector == value
+            : value is not (>= 1 and <= 19))
+    && StructuredChatMessageNativeLayout.Cases.Count == 19);
+Check("Structured chat selectors7/8 share a body; later cases extend beyond the old IDA function boundary",
+    StructuredChatMessageNativeLayout.Find(7)!.Value.CaseFileOffset == 0x6E3DAB
+    && StructuredChatMessageNativeLayout.Find(8)!.Value.CaseFileOffset == 0x6E3DAB
+    && StructuredChatMessageNativeLayout.Find(5)!.Value.CaseFileOffset == 0x6E3B12
+    && StructuredChatMessageNativeLayout.Find(13)!.Value.CaseFileOffset == 0x6E44A2
+    && StructuredChatMessageNativeLayout.Find(19)!.Value.PayloadReaderFileOffset == 0x6FE240);
 Check("All three observed app modes are cataloged", AppModeCatalog.KnownModes.SequenceEqual(expected));
 Check("Mode 1 maps to tfLogin", AppModeCatalog.Find(1) == expected[0]);
 Check("Mode 2 maps to tfWorld", AppModeCatalog.Find(2) == expected[1]);

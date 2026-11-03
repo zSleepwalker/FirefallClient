@@ -9388,6 +9388,47 @@ internal static class StartupBinaryEvidence
             && RelativeBranchTargets(0x6E2678, 0xE8,
                 CharacterAbilityApplicationNativeLayout.AbilityCooldownsDisplayNotificationFileOffset)
             && Matches(0x6E35FE, "684F010000"));
+        check("Binary structured chat subtracts one, bounds19 selectors, and uses its PE-translated jump table",
+            Matches(0x6E36F2, "8A4D140FB6C148")
+            && Matches(0x6E3700, "83F812")
+            && RelativeConditionalBranchTargets(0x6E3703, 0x0F, 0x87,
+                StructuredChatMessageNativeLayout.DefaultReturnFalseFileOffset)
+            && Matches(0x6E3709, "FF24855452AE00")
+            && VirtualAddressToFileOffset(StructuredChatMessageNativeLayout.JumpTableVirtualAddress)
+                == StructuredChatMessageNativeLayout.JumpTableFileOffset
+            && StructuredChatMessageNativeLayout.Cases.All(entry =>
+                VirtualAddressToFileOffset(ReadUInt32(
+                    StructuredChatMessageNativeLayout.JumpTableFileOffset + 4 * (entry.Selector - 1)))
+                    == entry.CaseFileOffset));
+        (uint callSite, byte selector)[] structuredChatReaders =
+        [
+            (0x6E3735, 1), (0x6E38E7, 2), (0x6E39F2, 3), (0x6E3A74, 4),
+            (0x6E3B27, 5), (0x6E3EB2, 9), (0x6E3F32, 10), (0x6E3FB4, 11),
+            (0x6E40FE, 12), (0x6E4263, 14), (0x6E4300, 15), (0x6E4367, 16),
+            (0x6E43E4, 17), (0x6E4597, 19)
+        ];
+        check("Binary structured chat case bodies call their recorded payload readers",
+            structuredChatReaders.All(site =>
+                StructuredChatMessageNativeLayout.Find(site.selector)?.PayloadReaderFileOffset is { } reader
+                && RelativeBranchTargets(site.callSite, 0xE8, reader)));
+        check("Binary structured chat case1 localizes CHAT_DUEL_RESULT and forwards it to chat display",
+            ReadCStringAscii(StructuredChatMessageNativeLayout.DuelResultTemplateVirtualAddress, 17)
+                == StructuredChatMessageNativeLayout.DuelResultTemplate
+            && Matches(0x6E380F, "6874E3B601")
+            && RelativeBranchTargets(0x6E381B, 0xE8,
+                StructuredChatMessageNativeLayout.LocalizationHelperFileOffset)
+            && RelativeBranchTargets(0x6E3855, 0xE8,
+                StructuredChatMessageNativeLayout.DisplayHelperFileOffset));
+        check("Binary structured chat cases2/4 emit numeric353/266 and case19 selects345/346",
+            Matches(0x6E3955, "6861010000")
+            && Matches(0x6E395C, "FF90AC000000")
+            && Matches(0x6E3AB7, "680A010000")
+            && Matches(0x6E3ABE, "FF90AC000000")
+            && Matches(0x6E45E3, "80BD27FFFFFF00741C")
+            && Matches(0x6E45FE, "BE59010000")
+            && Matches(0x6E4608, "BE5A010000")
+            && Matches(0x6E462B, "FF90AC000000")
+            && ReadCStringAscii(0x1B6E510, 11) == StructuredChatMessageNativeLayout.PendingIncomingStatus);
         check("Binary NPCInteraction gates on its singleton, swaps state, and dispatches numeric uiManager code 356",
             RelativeBranchTargets(0xACE2A6, 0xE8,
                 CharacterAbilityApplicationNativeLayout.NpcInteractionRootAccessorFileOffset)
