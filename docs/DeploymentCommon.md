@@ -41,3 +41,8 @@ the three explicit COM property plans (play targets Launcher.exe, with
 FirefallClient.exe icons), uninstall arguments, and common-plus-user
 cleanup passes with nonrecursive empty-directory gates. The saved code
 only returns descriptors and decisions; it performs no COM/filesystem work.
+
+[Product identity and install-root selection](DeploymentCommonInstallRoot.md)
+confirms this sample's fixed `Firefall_Beta` registry identity versus
+`Firefall` display name, WPF installDir precedence, string-only registry
+values, and literal global ` --culture` removal rather than argument parsing.

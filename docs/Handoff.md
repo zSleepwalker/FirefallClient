@@ -3176,3 +3176,20 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
 - Follow-ons: ProductIdentifierDisplay mapping and install-root data source;
   Awesomium process-role agent is independent of this managed trace.
 - Build succeeds;1013 sample-backed checks and933 pure checks pass.
+
+## DeploymentCommon product identity and install root
+
+- ProductIdentifier2A is constant Firefall_Beta; display2B is Firefall.
+  Shortcut labels are therefore Firefall in this sample despite the beta
+  registry product key.
+- GetInstallLocation31 body RVA2658 prefers present nonempty WPF installDir,
+  castclass string; nonstring overrides throw. Otherwise GetInstallRegistryKey44
+  queries HKLM product InstallLocation and uses isinst string, yielding null
+  for nonstring/missing values.
+- Both selected string branches remove every exact " --culture" substring.
+  Not an argument parser: "=en-US" suffix survives. Pre-replacement nonempty
+  override may become empty without registry fallback. Null/empty distinct.
+- Saved pure single-observation model, synthetic edge cases, complete method
+  IL and user-string checks. Repeated native WPF reads/races and OS access
+  errors are not modeled or silently caught.
+- Build succeeds;1030 sample-backed checks and947 pure checks pass.

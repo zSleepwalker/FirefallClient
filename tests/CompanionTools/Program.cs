@@ -19,6 +19,37 @@ void Check(string name, bool condition)
     if (condition) passed++; else failed++;
 }
 
+foreach (var entry in new (bool Present, object? App, object? Registry, string? Expected)[]
+{
+    (false, @"C:\ignored", @"C:\registry", @"C:\registry"),
+    (true, null, @"C:\registry", @"C:\registry"),
+    (true, "", @"C:\registry", @"C:\registry"),
+    (true, @"C:\override", @"C:\registry", @"C:\override"),
+    (true, @"C:\override --culture=en-US", @"C:\registry", @"C:\override=en-US"),
+    (true, " --culture --culture", @"C:\registry", ""),
+    (true, @"C:\ --Culture", null, @"C:\ --Culture"),
+    (false, null, @"C:\ --culture --culture", @"C:\"),
+    (false, null, "", ""), (false, null, null, null),
+    (false, null, 123, null), (false, 123, @"C:\registry", @"C:\registry")
+})
+    Check($"Install root selection synthetic present={entry.Present}, result={entry.Expected ?? "<null>"}",
+        InstallLocationNativeLayout.CaptureInstallLocation(entry.Present, entry.App, entry.Registry) == entry.Expected);
+bool rejectedNonstringOverride = false;
+try
+{
+    InstallLocationNativeLayout.CaptureInstallLocation(true, 123, @"C:\registry");
+}
+catch (InvalidCastException)
+{
+    rejectedNonstringOverride = true;
+}
+Check("WPF installDir nonstring throws rather than silently selecting registry",
+    rejectedNonstringOverride);
+Check("Native product registry identity differs from shortcut display name",
+    InstallLocationNativeLayout.ProductIdentifier == "Firefall_Beta"
+    && InstallLocationNativeLayout.ProductIdentifierDisplay == "Firefall"
+    && BuildInformation.InstallRegistryKeyPath(InstallLocationNativeLayout.ProductIdentifier)
+        == @"Software\Red 5 Studios\Firefall_Beta\");
 foreach (string? display in new string?[] { "Firefall", "Firefall Beta", "", null })
 {
     var shortcuts = ShortcutNativeLayout.CaptureCreation(display);
@@ -754,6 +785,27 @@ if (args.Length == 2)
             (0x3835, "Uninstall {0}.lnk"), (0x3859, "uninstall"),
             (0x386D, "FirefallInstaller.exe"), (0x3899, "/uninstall"),
             (0x38AF, "Uninstall {0}"), (0x393F, "Red 5 Studios")));
+    Check("Managed product getter IL and string tokens distinguish beta key from display",
+        deployment.ManagedIlMatches(InstallLocationNativeLayout.ProductIdentifierMethodRow,
+            InstallLocationNativeLayout.ProductIdentifierBodyRva, "72370800702A")
+        && deployment.ManagedIlMatches(InstallLocationNativeLayout.ProductDisplayMethodRow,
+            InstallLocationNativeLayout.ProductDisplayBodyRva, "72530800702A")
+        && deployment.ManagedUserStringsMatch(
+            (0x837, InstallLocationNativeLayout.ProductIdentifier),
+            (0x853, InstallLocationNativeLayout.ProductIdentifierDisplay)));
+    Check("Managed install root IL retains override precedence, castclass, and global substring replacement",
+        deployment.ManagedIlMatches(InstallLocationNativeLayout.GetInstallLocationMethodRow,
+            InstallLocationNativeLayout.GetInstallLocationBodyRva,
+            "281F00000A6F2000000A72FD0800706F2100000A2C49281F00000A6F2000000A72FD0800706F2200000A7439000001282300000A2D29281F00000A6F2000000A72FD0800706F2200000A7439000001721309007072290900706F2400000A2A722B09007028440000060A06282300000A2D1106721309007072290900706F2400000A0A062A")
+        && deployment.ManagedUserStringsMatch(
+            (0x8FD, InstallLocationNativeLayout.ApplicationPropertyName),
+            (0x913, InstallLocationNativeLayout.RemovedCultureSubstring), (0x929, ""),
+            (0x92B, InstallLocationNativeLayout.RegistryValueName)));
+    Check("Managed install registry accessor IL uses LocalMachine and isinst string without coercion",
+        deployment.ManagedIlMatches(InstallLocationNativeLayout.GetInstallRegistryKeyMethodRow,
+            InstallLocationNativeLayout.GetInstallRegistryKeyBodyRva,
+            "7E2A00000A72250C0070282A000006281B00000A6F2E00000A0A062C0D06026F2F00000A75390000012A142A")
+        && deployment.ManagedUserStringsMatch((0xC25, @"Software\Red 5 Studios\{0}\")));
     Check("Managed shortcut removal complete IL preserves common plus user passes and nonrecursive empty-directory gates",
         deployment.ManagedIlMatches(ShortcutNativeLayout.RemoveShortcutsMethodRow,
             ShortcutNativeLayout.RemoveShortcutsBodyRva,

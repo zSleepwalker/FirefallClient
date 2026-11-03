@@ -76,5 +76,9 @@ COM/filesystem calls can propagate and prevent later steps.
 
 Pure reconstruction saves property plans, existence gates, and
 nonrecursive empty-directory decisions. It does not execute this cleanup.
-Exact ProductIdentifierDisplay mapping and install-location registry
-fallbacks remain separate data-source traces.
+The [product/install-root follow-up](DeploymentCommonInstallRoot.md)
+resolves this sample's display name to constant `Firefall` and registry
+identity to `Firefall_Beta`, and records installDir precedence and the
+literal culture-substring replacement. The descriptors accept an explicit
+display input for isolated template testing; those synthetic alternatives
+do not establish alternate native getter results.
