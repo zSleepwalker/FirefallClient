@@ -216,8 +216,22 @@ which replaces the list stored at frame offset `+0x468`. Each nonempty filter
 is retained only when `strncmp(last_character, "*", 1)` returns zero; other
 values are skipped and logged with `SetUrlFilters: Illegal URL filter: %s`.
 The usage example at VA `0x1BC7698` ends in `*`, consistent with this check.
-This establishes the setter's trailing-wildcard validation, not the later
-URL-matching semantics.
+The stored patterns are consumed by raw `0xCCCC10`: it iterates the list at
+`+0x468`, computes each pattern length minus one, and compares that many
+leading bytes against candidate text with case-sensitive `strncmp` (IAT VA
+`0x1AC4894`). The first equal prefix is a match. Thus the trailing `*` is
+treated as a prefix wildcard, not as a general glob; `*` alone has a zero-byte
+prefix and matches any candidate. An empty pattern does not match because
+its length-minus-one underflows the unsigned bound check, although the setter
+rejects it before storage.
+
+The callback at raw `0xCBDDE0` prepares candidate text via helpers including
+the call at `0x1AC4E98` and raw `0xCBB5E0`, then invokes `0xCCCC10`. If its
+context key is unchanged it returns false before matching. Otherwise it
+returns the inverse of the matcher result: false for a matching filter and
+true when no filter matches. The surrounding virtual callback's externally
+visible meaning is not named by this sample, so the return is documented
+without inferring whether it means allow, cancel, or redirect.
 
 `LogWebRequests` is registered to raw `0xCCB3D0` and takes a value after the
 frame. Although its usage string at VA `0x1BC7584` says `boolean`, the

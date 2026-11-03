@@ -62,6 +62,13 @@ public enum Red5LuaUrlFilterAction
     StoreInReplacementList
 }
 
+public enum Red5UrlFilterCallbackAction
+{
+    ReturnFalseForUnchangedContext,
+    ReturnFalseForMatchingFilter,
+    ReturnTrueForNoMatchingFilter
+}
+
 public enum Red5LuaWebRequestLoggingAction
 {
     Disable,
@@ -129,8 +136,11 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint LuaGetNaturalDimsRaw = 0xCCB710;
     public const uint LuaEnableTypeTargetRaw = 0xCCB7C0;
     public const uint LuaIsTypeTargetRaw = 0xCCB8C0;
+    public const uint LuaUrlFilterCallbackRaw = 0xCBDDE0;
+    public const uint LuaUrlFilterListMatcherRaw = 0xCCCC10;
     public const uint LuaUrlFilterListUpdateRaw = 0xCCCB20;
     public const uint LuaEnableTypeTargetHelperRaw = 0xCCD0F0;
+    public const uint LuaUrlFilterCandidateTextHelperRaw = 0xCBB5E0;
     public const uint LuaWebValueSetterRaw = 0xD651B0;
     public const uint LuaWebFunctionDispatcherRaw = 0xD65250;
     public const uint LuaWebFrameContentObjectOffset = 0x418;
@@ -216,6 +226,7 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint LuaUrlFilterWildcardVa = 0x1BC78C4;
     public const uint LuaUrlFilterIllegalFormatVa = 0x1BC78C8;
     public const uint LuaUrlFilterListOffset = 0x468;
+    public const uint LuaUrlFilterStringCompareImportVa = 0x1AC4894;
     public const uint CallbackLogHelperRaw = 0x2FC4F0;
     public const uint CallbackUnknownLogHelperRaw = 0x2FCC60;
     public const uint CreationFailureFormatVa = 0x1BD4B2C;
@@ -328,6 +339,34 @@ public static class Red5LoggingBridgeNativeLayout
         !string.IsNullOrEmpty(filter) && filter[^1] == '*'
             ? Red5LuaUrlFilterAction.StoreInReplacementList
             : Red5LuaUrlFilterAction.LogAndSkip;
+
+    public static bool CaptureUrlFilterListMatch(
+        IReadOnlyList<string> filters,
+        string? candidateText)
+    {
+        candidateText ??= string.Empty;
+        foreach (var filter in filters)
+        {
+            if (string.IsNullOrEmpty(filter) || filter[^1] != '*')
+                continue;
+
+            var prefix = filter.AsSpan(0, filter.Length - 1);
+            if (candidateText.AsSpan().StartsWith(prefix, StringComparison.Ordinal))
+                return true;
+        }
+
+        return false;
+    }
+
+    public static Red5UrlFilterCallbackAction CaptureUrlFilterCallback(
+        bool cachedContextUnchanged,
+        IReadOnlyList<string> filters,
+        string? candidateText) =>
+        cachedContextUnchanged
+            ? Red5UrlFilterCallbackAction.ReturnFalseForUnchangedContext
+        : CaptureUrlFilterListMatch(filters, candidateText)
+            ? Red5UrlFilterCallbackAction.ReturnFalseForMatchingFilter
+            : Red5UrlFilterCallbackAction.ReturnTrueForNoMatchingFilter;
 
     public static Red5LuaWebRequestLoggingAction CaptureLogWebRequests(bool luaValueIsTruthy) =>
         luaValueIsTruthy

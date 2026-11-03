@@ -3919,3 +3919,8 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   URLs use `0x2EE810`, and both paths call nested-view slot `+0x64`. The
   natural-dimension helper computes a clamped, rounded scale percentage and
   synchronizes nested-view slots `+0x38/+0x3C` only when the value changes.
+- Stored URL filters are consumed by `0xCCCC10`, which treats the final `*`
+  as a prefix wildcard and uses case-sensitive `strncmp` for the preceding
+  bytes. Callback `0xCBDDE0` returns false for an unchanged context key;
+  otherwise it negates the match result. The host callback's allow/cancel
+  semantics remain unidentified.

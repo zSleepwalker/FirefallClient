@@ -232,6 +232,31 @@ foreach (var filter in new (string? Value, Red5LuaUrlFilterAction Expected)[]
 })
     Check($"Awesomium SetUrlFilters accepts only nonempty trailing-wildcard patterns: {filter.Value}",
         Red5LoggingBridgeNativeLayout.CaptureSetUrlFilter(filter.Value) == filter.Expected);
+foreach (var match in new[]
+{
+    (Filters: new[] { "https://host/path/*" }, Candidate: "https://host/path/page", Expected: true),
+    (Filters: new[] { "https://host/path/*" }, Candidate: "https://host/path", Expected: false),
+    (Filters: new[] { "https://host/path/*" }, Candidate: "https://host/other/page", Expected: false),
+    (Filters: new[] { "https://host/path/*" }, Candidate: "HTTPS://host/path/page", Expected: false),
+    (Filters: new[] { "*" }, Candidate: "", Expected: true),
+    (Filters: new[] { "https://one/*", "https://two/*" }, Candidate: "https://two/page", Expected: true),
+    (Filters: new[] { "" }, Candidate: "anything", Expected: false)
+})
+    Check($"Awesomium URL filter list uses ordinal prefix matching: {match.Candidate}",
+        Red5LoggingBridgeNativeLayout.CaptureUrlFilterListMatch(match.Filters, match.Candidate)
+        == match.Expected);
+foreach (var callback in new[]
+{
+    (ContextUnchanged: true, Filters: new[] { "*" }, Candidate: "any",
+        Expected: Red5UrlFilterCallbackAction.ReturnFalseForUnchangedContext),
+    (ContextUnchanged: false, Filters: new[] { "https://host/*" }, Candidate: "https://host/page",
+        Expected: Red5UrlFilterCallbackAction.ReturnFalseForMatchingFilter),
+    (ContextUnchanged: false, Filters: new[] { "https://host/*" }, Candidate: "https://other/page",
+        Expected: Red5UrlFilterCallbackAction.ReturnTrueForNoMatchingFilter)
+})
+    Check($"Awesomium URL filter callback decision, context unchanged={callback.ContextUnchanged}",
+        Red5LoggingBridgeNativeLayout.CaptureUrlFilterCallback(
+            callback.ContextUnchanged, callback.Filters, callback.Candidate) == callback.Expected);
 foreach (bool truthy in new[] { false, true })
     Check($"Awesomium LogWebRequests stores Lua truthiness={truthy}",
         Red5LoggingBridgeNativeLayout.CaptureLogWebRequests(truthy)
@@ -1762,12 +1787,19 @@ if (args.Length == 2)
         && client.Calls(Red5LoggingBridgeNativeLayout.LuaUrlFilterListUpdateRaw + 0x29 + 0x400C00,
             0x2F89A0 + 0x400C00)
         && ClientMatches(0xCCCBBE, "FF159448AC01")
-        && client.ImportSlotNames(0x1AC4894, "strncmp")
+        && client.ImportSlotNames(Red5LoggingBridgeNativeLayout.LuaUrlFilterStringCompareImportVa, "strncmp")
         && client.Ascii(Red5LoggingBridgeNativeLayout.LuaUrlFilterWildcardVa) == "*"
         && client.Ascii(Red5LoggingBridgeNativeLayout.LuaUrlFilterIllegalFormatVa)
             == "SetUrlFilters: Illegal URL filter: %s"
         && client.Ascii(Red5LoggingBridgeNativeLayout.LuaSetUrlFiltersUsageVa)
             == "Usage: FRAME:SetUrlFilters('protocol://host/somepath/*', 'filter2', ...)");
+    Check("Original client compares candidate text against stored filter prefixes and inverts the match result",
+        ClientMatches(Red5LoggingBridgeNativeLayout.LuaUrlFilterListMatcherRaw + 0x44, "488945FC")
+        && ClientMatches(Red5LoggingBridgeNativeLayout.LuaUrlFilterListMatcherRaw + 0x52, "7729")
+        && ClientMatches(Red5LoggingBridgeNativeLayout.LuaUrlFilterListMatcherRaw + 0x70, "FF159448AC01")
+        && client.Calls(Red5LoggingBridgeNativeLayout.LuaUrlFilterCallbackRaw + 0xD1 + 0x400C00,
+            Red5LoggingBridgeNativeLayout.LuaUrlFilterListMatcherRaw + 0x400C00)
+        && ClientMatches(Red5LoggingBridgeNativeLayout.LuaUrlFilterCallbackRaw + 0xE4, "0F94C3"));
     Check("Original client LogWebRequests stores Lua truthiness in its frame flag",
         client.Ascii(Red5LoggingBridgeNativeLayout.LuaLogWebRequestsUsageVa)
             == "usage: FRAME:LogWebRequests(boolean)"
@@ -1812,7 +1844,7 @@ if (args.Length == 2)
             "FF5264")
         && ClientMatches(Red5LoggingBridgeNativeLayout.LuaLoadUrlImplementationRaw + 0x4D,
             "FF5074")
-        && client.ImportSlotNames(0x1AC4894, "strncmp")
+        && client.ImportSlotNames(Red5LoggingBridgeNativeLayout.LuaUrlFilterStringCompareImportVa, "strncmp")
         && client.Ascii(Red5LoggingBridgeNativeLayout.LuaLocalUrlPrefixVa) == "local://"
         && client.Ascii(Red5LoggingBridgeNativeLayout.LuaLocalUrlSeparatorVa) == "/");
     Check("Original client natural-dimension helper computes a clamped scale percentage",
