@@ -3103,3 +3103,23 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   Agent has finished; no additional agent work is scheduled by this batch.
 - Follow-ons: NativeMethods.ClientToScreen/MoveWindow or
   Utils.SHGetSpecialFolderPath, independently of native auth forwarding.
+
+## DumpTruck opaque auth forwarding
+
+- Verified RedHanded owner+0x10 -> --auth= variadic launcher pair at
+  0x404C90/94; direct CreateProcessA, DETACHED_PROCESS, no command shell.
+  Correct IAT slot is0x5442E8 (verified against the native call/import).
+- DumpTruck options+8 auth has a forge-byte+0x14 AND empty gate before
+  stored-credential helper0x404850. Submit handler independently calls
+  0x4024E0 only if auth is empty: this reads registry LoginName, **not**
+  a prompt. Nonempty output gets literal ! prefix; empty still continues.
+- Important constructor boundary:0x409830 is not a plain auth copy.
+  It invokes0x409460 to escape &,<,> in that order before storing at its
+  own+8. Request formatter0x409B8C uses this preescaped field in report XML;
+  exclamation is not stripped in this traced path.
+- Saved pure fallback decisions and C-string-visible XML transform with
+  synthetic fixtures. No actual registry values, credentials, uploads,
+  or target execution involved. Full stored-credential processing and
+  server semantics remain unresolved.
+- Build succeeds;981 sample-backed checks and910 pure checks pass.
+  Next native trace: who writes debugger owner state2 after a snapshot.

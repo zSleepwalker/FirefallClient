@@ -12,9 +12,14 @@ Static IDA analysis only. SHA256 `53796D440D586A306C36ADAE86744C580B9F9ECD3987D2
 
 ## Interpreted
 - Crash-report uploader launched by RedHanded; shows UI unless `--autosubmit`.
+- [Opaque auth forwarding](DumpTruckAuthHandoff.md) traces the client debug
+  string through RedHanded's detached launch, DumpTruck's separate
+  forge/empty-auth and LoginName fallbacks, and preescaped XML request text.
 
 ## Unresolved
-- Meaning of `forge`, `debuguser`, `dump-config`, `nodelete`; exact Authorization/signature derivation; the HTTP server's real hostname beyond the hardcoded fallback.
+- Complete behavior of `forge` beyond its observed empty-auth stored-credential
+  fallback; `debuguser`, `dump-config`, `nodelete`; exact Authorization/signature
+  derivation; the HTTP server's real hostname beyond the hardcoded fallback.
 
 ## HWStats handoff follow-up
 

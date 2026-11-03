@@ -19,6 +19,34 @@ void Check(string name, bool condition)
     if (condition) passed++; else failed++;
 }
 
+foreach (var entry in new[]
+{
+    (Forge: false, Empty: false, Action: AuthInitializationAction.KeepProvidedAuth),
+    (Forge: true, Empty: false, Action: AuthInitializationAction.KeepProvidedAuth),
+    (Forge: false, Empty: true, Action: AuthInitializationAction.LeaveEmpty),
+    (Forge: true, Empty: true, Action: AuthInitializationAction.TryStoredCredentials)
+})
+    Check($"Auth initialization forge={entry.Forge}, empty={entry.Empty}",
+        AuthHandoffNativeLayout.CaptureInitialization(entry.Forge, entry.Empty) == entry.Action);
+foreach (var entry in new[]
+{
+    (AuthEmpty: false, LoginEmpty: false, Action: AuthSubmitFallbackAction.KeepProvidedAuth),
+    (AuthEmpty: false, LoginEmpty: true, Action: AuthSubmitFallbackAction.KeepProvidedAuth),
+    (AuthEmpty: true, LoginEmpty: false, Action: AuthSubmitFallbackAction.UseMarkedRegistryLoginName),
+    (AuthEmpty: true, LoginEmpty: true, Action: AuthSubmitFallbackAction.LeaveEmptyAfterRegistryLookup)
+})
+    Check($"Submit auth fallback empty={entry.AuthEmpty}, registry empty={entry.LoginEmpty}",
+        AuthHandoffNativeLayout.CaptureSubmitFallback(entry.AuthEmpty, entry.LoginEmpty) == entry.Action);
+foreach (var entry in new (string? Input, string Expected)[]
+{
+    (null, ""), ("", ""), ("!opaque", "!opaque"),
+    ("!a&b<c>\"'", "!a&amp;b&lt;c&gt;\"'"),
+    ("&amp;&lt;&gt;", "&amp;amp;&amp;lt;&amp;gt;"),
+    ("&&<<>>", "&amp;&amp;&lt;&lt;&gt;&gt;"),
+    ("!value\0ignored&", "!value"), ("\0<&>", ""), ("line\r\n", "line\r\n")
+})
+    Check($"Auth XML synthetic input {entry.Input?.Length ?? -1} bytes, expected {entry.Expected.Length}",
+        AuthHandoffNativeLayout.CaptureXmlText(entry.Input) == entry.Expected);
 foreach (int pointerBytes in new[] { 4, 8 })
 foreach (bool exportAvailable in new[] { false, true })
 foreach (bool apiSucceeded in new[] { false, true })
@@ -402,6 +430,51 @@ if (args.Length == 2)
         && red.Calls(DebugStringHandoffNativeLayout.LogPathAssignCallVa, 0x406420)
         && red.Matches(0x409B8B, "8D430E508D4F10")
         && red.Calls(DebugStringHandoffNativeLayout.DumpAuthAssignCallVa, 0x406420));
+    Check("RedHanded forwards owner auth into explicit DumpTruck auth option without a command shell",
+        red.Ascii(0x5452E4) == "--auth="
+        && red.Matches(0x404BFD, "89542450")
+        && red.Matches(0x404C90, "FF74247468E4525400")
+        && red.Calls(0x404CAC, 0x4042D0)
+        && red.Matches(0x40437F, "6A08")
+        && red.Matches(0x404391, "FF15E8425400")
+        && red.ImportSlotNames(0x5442E8, "CreateProcessA"));
+    Check("DumpTruck parses auth option into owner+8 and requires forge plus empty auth for stored fallback",
+        truck.Ascii(0x475D60) == "auth"
+        && truck.Matches(0x40540F, "8D4908")
+        && truck.Calls(0x405412, 0x408710)
+        && truck.Matches(0x405479, "807E1400744A8D4E08")
+        && truck.Calls(0x405482, 0x409240)
+        && truck.Matches(0x405487, "84C0743E")
+        && truck.Calls(0x405491, AuthHandoffNativeLayout.StoredCredentialFallbackVa));
+    Check("Submit fallback reads registry login only when auth is empty and adds literal exclamation",
+        truck.Calls(0x403B8B, 0x409240)
+        && truck.Matches(0x403B90, "84C00F8483000000")
+        && truck.Calls(0x403B9C, AuthHandoffNativeLayout.RegistryLoginReaderVa)
+        && truck.Ascii(0x475C04) == AuthHandoffNativeLayout.RegistryLoginMarkerFormat
+        && truck.Matches(0x403BCC, "68045C4700")
+        && truck.Calls(0x403BD2, 0x410F60));
+    Check("Request constructor XML-escapes auth before copying it into its distinct owner+8",
+        truck.Calls(0x403E1C, AuthHandoffNativeLayout.RequestContextConstructorVa)
+        && truck.Matches(0x409942, "8B55108D4D0C")
+        && truck.Calls(0x40995A, AuthHandoffNativeLayout.XmlTextEscapeVa)
+        && truck.Calls(0x40996B, 0x4100D0));
+    Check("Auth XML substitution order is ampersand, less-than, greater-than",
+        truck.Ascii(0x475D88) == "&amp;" && truck.Ascii(0x475DC0) == "&"
+        && truck.Ascii(0x475DC4) == "&lt;" && truck.Ascii(0x475DCC) == "<"
+        && truck.Ascii(0x475DD0) == "&gt;" && truck.Ascii(0x475DD8) == ">"
+        && truck.Matches(0x4094E4, "68885D4700")
+        && truck.Matches(0x4094F2, "68C05D4700")
+        && truck.Calls(0x4094FE, 0x410BB0)
+        && truck.Matches(0x409504, "68C45D470068CC5D4700")
+        && truck.Calls(0x409510, 0x410BB0)
+        && truck.Matches(0x409516, "68D05D470068D85D4700")
+        && truck.Calls(0x409522, 0x410BB0));
+    Check("Request XML formatter receives preescaped auth from context+8 without removing marker",
+        truck.Matches(0x409B78, "8B430885C00F45F8")
+        && truck.Ascii(0x475E54) == AuthHandoffNativeLayout.NativeReportAuthFormat
+        && truck.Ascii(0x475E84) == "application/xml"
+        && truck.Matches(0x409B80, "5768545E470068845E470056")
+        && truck.Calls(0x409B8C, AuthHandoffNativeLayout.RequestAuthFormatterVa));
     Check("PDH identifies the process before reading a LARGE Virtual Bytes counter",
         red.Ascii(0x545468) == CrashMetadataNativeLayout.VirtualBytesCounterPattern
         && red.Matches(0x406CFD, "6868545400")
