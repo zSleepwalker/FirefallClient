@@ -237,7 +237,10 @@ raw `0xCBC410` writes vtable VA `0x1C747CC` at object offset `0` and VA
 `0x18733B8`; its first entry is VA `0x10BDEC0` (raw `0xCBD2C0`) and its
 second entry at table `+0x04` is VA `0x10BE9E0` (raw `0xCBDDE0`). This proves
 the filter callback is installed in the object's secondary vtable, but the
-owner's API type and callback contract remain unidentified. Setup routine raw
+owner's API type and callback contract remain unidentified. The first entry
+`0xCBD2C0` performs substantial work on an incoming object, but its normal
+epilogue always zeros `EAX` and returns after consuming one stack argument;
+its external callback meaning remains unknown. Setup routine raw
 `0xBFB310` calls factory `0xCBB7A0` with values from owner fields `+0x9A4`
 and `+0x9A8`, stores the returned object at `+0xA04`, then calls its primary
 vtable slot `+0x08` with a computed flag. The factory allocates `0x6C` bytes

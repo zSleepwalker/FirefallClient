@@ -229,6 +229,8 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint LuaUrlFilterStringCompareImportVa = 0x1AC4894;
     public const uint LuaUrlFilterDispatchTableVa = 0x1C747B8;
     public const uint LuaUrlFilterDispatchTableCallbackSlotVa = 0x1C747BC;
+    public const uint LuaUrlFilterDispatchFirstEntryPointerVa = 0x10BDEC0;
+    public const uint LuaUrlFilterDispatchFirstEntryRaw = 0xCBD2C0;
     public const uint LuaUrlFilterCallbackPointerVa = 0x10BE9E0;
     public const uint LuaUrlFilterDispatchObjectConstructorRaw = 0xCBC410;
     public const uint LuaUrlFilterDispatchObjectPrimaryVtableVa = 0x1C747CC;

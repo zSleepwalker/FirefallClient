@@ -3928,7 +3928,10 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   object through factory `0xCBB7A0` using owner fields `+0x9A4/+0x9A8`,
   stores it at `+0xA04`, then calls primary slot `+0x08`. Its mapped callback
   VA is `0x10BE9E0`; the owner's API type and callback allow/cancel semantics
-  remain unresolved. The primary table at file offset `0x18733CC` maps slot
+  remain unresolved. Secondary slot `+0x00` is raw `0xCBD2C0`; its normal
+  return path sets `EAX=0` and consumes one stack argument after substantial
+  object processing. Its contract remains unidentified. The primary table at
+  file offset `0x18733CC` maps slot
   `+0x08` to VA `0x10BCD80` (raw `0xCBC180`). That method calls `0xCBC270`,
   invokes the helper at object `+0x08` twice using configuration at `+0x14`,
   stores results at `+0x0C/+0x10`, then conditionally calls primary slot
