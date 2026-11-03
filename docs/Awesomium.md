@@ -66,3 +66,6 @@ mutex-creation versus critical-section allocation failure behavior.
 [Verbose rule lookup](AwesomiumVerboseRules.md) records full-path versus
 module-byte matching, exact `-inl` removal, first-match precedence and
 live-threshold fallback without introducing a wildcard parser.
+[Rule construction](AwesomiumVerboseConstruction.md) adds the comma/equals
+layout and shows that pair/numeric failure does not automatically discard
+the produced rule.

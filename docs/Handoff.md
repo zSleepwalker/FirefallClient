@@ -3641,3 +3641,24 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   per-module rule still appends output; rule-text helper102A0670 split and
   empty/duplicate handling unresolved. Keep prior snapshot-state2-writer
   task pending; no new evidence resolves it.
+
+## Awesomium verbose construction error retention
+
+- Verbose lookup batch committed/pushed as3b7c8b9.
+- Followed102A0670 ->102A03F0 ->102A0150: comma fragments trimmed on both
+  edges using exact bytes09/0A/0B/0C/0D/20. Empty trimmed fragments skipped.
+  Pair102A04D0 clears outputs, first "=" separates key, consecutive "="
+  skipped before one remaining value suffix. No independent key/value trim.
+- Pair error sets sticky false but still appends retained/empty outputs.
+  Constructor likewise continues with produced pairs despite aggregate false.
+  Numeric conversion102B58E6 status controls diagnostic cleanup only,
+  both outcomes append the observed output level at102B5911. Duplicate
+  patterns remain append-ordered; lookup earlier first-match wins.
+- Saved evidence docs/ledger and native guards, deliberately no parser.
+  Build succeeds;2146 pure and2418 sample-backed checks pass. Derived text
+  examples are static deductions, not runtime parser captures.
+- Agentbdfbfb74-e45b-490e-baa3-793c603663af has bounded managed downloader
+  cancellation/cleanup assignment; await and integrate report. No claim
+  that Thread.Abort means completed cancellation or disposed resources.
+- Next static follow-ons: verify verbose module levels relative to caller
+  source-span construction1028A790; allocator/aliasing behavior if required.

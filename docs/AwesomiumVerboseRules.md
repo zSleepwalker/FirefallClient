@@ -76,5 +76,6 @@ only the saved byte transforms and selection, including first-match wins
 and Int32 minimum negation wraparound.
 
 No sample, logger, wildcard parser, file API or callback was executed.
-Rule-text split/duplicate handling and dynamic updates/concurrent mutation
-remain outside this capture.
+[Rule construction](AwesomiumVerboseConstruction.md) separately records
+comma/equals boundaries, retained outputs on error, and duplicate append
+order. Dynamic updates/concurrent mutation remain outside this capture.

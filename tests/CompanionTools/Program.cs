@@ -954,6 +954,29 @@ if (args.Length == 2)
         && browser.Matches(0x102B7C9C, "8BCBC1E90A81E94028000066890C78")
         && browser.Matches(0x102B7CB3, "81E3FF03000081CB00DC000066895C7E02")
         && browser.Matches(0x102B7CC6, "B802000000"));
+    Check("Awesomium verbose construction supplies comma/equals delimiters and explicit trim table",
+        browser.Matches(0x102B581E, "6A2C6A3D")
+        && browser.Calls(0x102B582F, 0x102A0670)
+        && browser.Calls(0x102A01DB, 0x1029B0D0)
+        && browser.Matches(0x1029B0DE, "6810C12711")
+        && browser.Matches(0x1127C110, "090A0B0C0D2000"));
+    Check("Awesomium pair construction skips empty fragments but retains output after sticky failure",
+        browser.Matches(0x102A0730, "3959100F84E6020000")
+        && browser.Calls(0x102A0770, 0x102A04D0)
+        && browser.Matches(0x102A0778, "84C07504885C2413")
+        && browser.Calls(0x102A090F, 0x100C21A0));
+    Check("Awesomium pair extraction finds first equals then skips consecutive equals for a single value",
+        browser.Calls(0x102A054B, 0x1000A850)
+        && browser.Matches(0x102A0550, "8BF083FEFF7466")
+        && browser.Calls(0x102A055D, 0x100038B0)
+        && browser.Calls(0x102A059F, 0x1009F3F0)
+        && browser.Matches(0x102A05A4, "83F8FF7529")
+        && browser.Calls(0x102A05FC, 0x1000E260));
+    Check("Awesomium per-module numeric failure still reaches rule append with converter output",
+        browser.Calls(0x102B58E6, LoggingSetupNativeLayout.IntegerConversionWrapperVa)
+        && browser.Matches(0x102B58EE, "84C07515F644241008740E")
+        && browser.Calls(0x102B5902, ConversionDiagnosticNativeLayout.DestructorVa)
+        && browser.Calls(0x102B5911, VerboseRuleNativeLayout.AppendRuleVa));
     Check("Awesomium verbose source slice uses reverse separator/dot searches and exact inl suffix",
         browser.Ascii(0x1127B0F0) == "\\/"
         && browser.Matches(0x102B522F, "C7442414F0B02711")
