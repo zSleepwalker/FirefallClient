@@ -3816,3 +3816,20 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   slot, queue count, fresh method lookup, `call` method string, both invocation
   imports, and diagnostic formats. The JavaScript caller of `Red5.errorlog`
   remains unresolved.
+
+## FirefallClient Red5 bridge teardown
+
+- The deleting-destructor wrapper at raw `0xD64180` calls `0xD64250`; that
+  destructor calls cleanup routine `0xD64710` before destroying its member
+  containers.
+- Cleanup drains the pending queue at `this+0x4C` with count at `this+0x5C`.
+  Each queued record is passed to raw `0xD648A0`, which destroys its
+  `JSArray` at `+8`, destroys its `JSValue` at `+4`, and decrements/releases
+  the retained method-name text at `+0`. The queue item is then freed. This
+  loop does not call `JSObject::Invoke` or `InvokeAsync`.
+- Cleanup resets `this+0x24` to `-1`. The pointer at `this+4` is compared
+  with shared sentinel `[dword_1E002B8+0x5D0]`; a distinct non-null pointer
+  receives virtual slot0 with argument1 and is then cleared, while the
+  sentinel value remains untouched. Its semantic type is unresolved.
+- Added a decision model and sample guards for the destructor relationship,
+  queue-record release, field destructors, and pointer sentinel handling.

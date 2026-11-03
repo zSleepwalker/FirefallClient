@@ -82,6 +82,26 @@ synchronous path can log the return value. Conditional debug logs use
 `Executing callback '%s' from JavaScript` and `   #%d: %s`; this path's
 observed return format is `Javascript callback returned: %s`.
 
+## Bridge teardown
+
+The bridge's deleting-destructor wrapper is raw `0xD64180`; it calls
+`0xD64250` and performs the conditional storage release. The destructor calls
+cleanup routine `0xD64710` before destroying its member containers. Cleanup
+drains the pending queue at `this+0x4C` while its count at `this+0x5C` is
+nonzero. For each queued record it calls raw `0xD648A0`, which destroys the
+record's `JSArray` at `+8` and `JSValue` at `+4`, then decrements the retained
+method-name text reference at `+0`; zero-reference storage is released through
+the corresponding allocator path. The queue item is then freed. This cleanup
+path does not call the callback `Invoke` or `InvokeAsync` imports.
+
+Before queue draining, cleanup resets a field at `this+0x24` to `-1` and
+checks the pointer at `this+4` against a shared sentinel stored at
+`dword_1E002B8+0x5D0`. It calls the pointed object's virtual slot zero with
+argument `1` only when the pointer is non-null and differs from the sentinel,
+then clears the field. A pointer equal to the sentinel is neither released nor
+cleared. The inert model captures these three pointer-cleanup outcomes; the
+pointer's semantic type remains unidentified.
+
 If lookup falls through, the handler compares the callback method name
 against the UTF-16 literal `errorlog` at VA `0x1BD4994` using the imported
 `WebString::operator==` at VA `0x1AC4EA4`. A different method name is logged

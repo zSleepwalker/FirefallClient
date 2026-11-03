@@ -186,6 +186,16 @@ foreach (var invocation in new[]
     Check($"Awesomium Red5 queued callback invocation undefined={invocation.Undefined}, async={invocation.Async}",
         Red5LoggingBridgeNativeLayout.CaptureQueuedCallbackInvocation(
             invocation.Undefined, invocation.Async) == invocation.Expected);
+foreach (var pointerCleanup in new[]
+{
+    (IsNull: true, IsSentinel: false, Expected: Red5BridgePointerCleanupAction.ClearNullPointer),
+    (IsNull: true, IsSentinel: true, Expected: Red5BridgePointerCleanupAction.PreserveSharedSentinel),
+    (IsNull: false, IsSentinel: true, Expected: Red5BridgePointerCleanupAction.PreserveSharedSentinel),
+    (IsNull: false, IsSentinel: false, Expected: Red5BridgePointerCleanupAction.ReleaseAndClearPointer)
+})
+    Check($"Awesomium Red5 bridge pointer cleanup null={pointerCleanup.IsNull}, sentinel={pointerCleanup.IsSentinel}",
+        Red5LoggingBridgeNativeLayout.CaptureBridgePointerCleanup(
+            pointerCleanup.IsNull, pointerCleanup.IsSentinel) == pointerCleanup.Expected);
 foreach (uint fileHandle in new uint[] { 0, 1, 0x80000000, uint.MaxValue })
     Check($"Awesomium configuration closes nonzero prior file handle {fileHandle:X8}",
         LogFileNativeLayout.CaptureClosesPriorFileHandle(fileHandle) == (fileHandle != 0));
@@ -1615,6 +1625,24 @@ if (args.Length == 2)
             == "   #%d: %s"
         && client.Ascii(Red5LoggingBridgeNativeLayout.CallbackQueueReturnLogFormatVa)
             == "Javascript callback returned: %s");
+    Check("Original client bridge cleanup runs from its scalar-deleting destructor",
+        client.Calls(Red5LoggingBridgeNativeLayout.CallbackBridgeDeletingDestructorRaw + 6 + 0x400C00,
+            Red5LoggingBridgeNativeLayout.CallbackBridgeDestructorRaw + 0x400C00)
+        && ClientMatches(0xD6418B, "F64508017407")
+        && client.Calls(0xD642A3 + 0x400C00,
+            Red5LoggingBridgeNativeLayout.CallbackBridgeCleanupRaw + 0x400C00));
+    Check("Original client cleanup drains queued records and releases record JSArray and JSValue fields",
+        ClientMatches(0xD6475B, "C74324FFFFFFFF")
+        && ClientMatches(0xD64762, "A1B802E0013B88D0050000")
+        && ClientMatches(0xD6476F, "85C974068B016A01FF10C7430400000000")
+        && ClientMatches(0xD64780, "837B5C007457")
+        && client.Calls(0xD647CB + 0x400C00,
+            Red5LoggingBridgeNativeLayout.CallbackQueuedRecordCleanupRaw + 0x400C00)
+        && client.Calls(0xD647D2 + 0x400C00, 0x12C8D60 + 0x400C00)
+        && ClientMatches(0xD648C9, "8D4E08C745FC01000000FF154C4EAC01")
+        && ClientMatches(0xD648D9, "8D4E04C645FC00FF15604EAC01")
+        && client.ImportSlotNames(0x1AC4E4C, "??1JSArray@Awesomium@@QAE@XZ")
+        && client.ImportSlotNames(0x1AC4E60, "??1JSValue@Awesomium@@QAE@XZ"));
     Check("RedHanded message decoder admits500/501/502 with four parameters and length at most1024",
         red.Matches(0x40890B, "05002BD1FE83F8020F87CD040000")
         && red.Matches(0x408919, "837E10047324")

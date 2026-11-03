@@ -34,6 +34,13 @@ public enum Red5QueuedCallbackInvocationAction
     InvokeAsynchronously
 }
 
+public enum Red5BridgePointerCleanupAction
+{
+    PreserveSharedSentinel,
+    ClearNullPointer,
+    ReleaseAndClearPointer
+}
+
 /// <summary>Observed Red5 setup and callback decisions; invokes no browser or logging APIs.</summary>
 public static class Red5LoggingBridgeNativeLayout
 {
@@ -41,6 +48,10 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint CallbackHandlerRaw = 0xD65A60;
     public const uint CallbackHandlerVtableVa = 0x1C7656C;
     public const uint CallbackQueueConsumerRaw = 0xD64AE0;
+    public const uint CallbackBridgeCleanupRaw = 0xD64710;
+    public const uint CallbackBridgeDestructorRaw = 0xD64250;
+    public const uint CallbackBridgeDeletingDestructorRaw = 0xD64180;
+    public const uint CallbackQueuedRecordCleanupRaw = 0xD648A0;
     public const uint CallbackQueueConsumerRttiLocatorPointerVa = 0x1C765F8;
     public const uint CallbackQueueConsumerVtableSlotVa = 0x1C7664C;
     public const uint CallbackQueueConsumerClassDescriptorVa = 0x1E2E238;
@@ -126,4 +137,11 @@ public static class Red5LoggingBridgeNativeLayout
         callbackValueIsUndefined ? Red5QueuedCallbackInvocationAction.SkipUndefinedCallback
         : asynchronousInvokeEnabled ? Red5QueuedCallbackInvocationAction.InvokeAsynchronously
         : Red5QueuedCallbackInvocationAction.InvokeSynchronously;
+
+    public static Red5BridgePointerCleanupAction CaptureBridgePointerCleanup(
+        bool pointerIsNull,
+        bool pointerMatchesSharedSentinel) =>
+        pointerMatchesSharedSentinel ? Red5BridgePointerCleanupAction.PreserveSharedSentinel
+        : pointerIsNull ? Red5BridgePointerCleanupAction.ClearNullPointer
+        : Red5BridgePointerCleanupAction.ReleaseAndClearPointer;
 }
