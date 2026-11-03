@@ -19,6 +19,33 @@ void Check(string name, bool condition)
     if (condition) passed++; else failed++;
 }
 
+foreach (var entry in new (ulong Bytes, DriveSpaceAmounts Amounts, DriveSpaceDisplayUnit Unit)[]
+{
+    (0, new(0, 0), DriveSpaceDisplayUnit.None),
+    (1UL << 20, new(1, 1f / 1024), DriveSpaceDisplayUnit.None),
+    (2UL << 20, new(2, 1f / 512), DriveSpaceDisplayUnit.Megabytes),
+    (1UL << 30, new(1024, 1), DriveSpaceDisplayUnit.Megabytes),
+    (2UL << 30, new(2048, 2), DriveSpaceDisplayUnit.Gigabytes),
+    (1UL << 40, new(1048576, 1025), DriveSpaceDisplayUnit.Gigabytes),
+    (1UL << 51, new(-2147483648, -2095104), DriveSpaceDisplayUnit.None),
+    (1UL << 52, new(0, 4096), DriveSpaceDisplayUnit.Gigabytes)
+})
+    Check($"DriveSpace available-byte arithmetic {entry.Bytes}",
+        DriveSpaceNativeLayout.CaptureAvailableSpace(true, entry.Bytes) == entry.Amounts
+        && DriveSpaceNativeLayout.CaptureDisplayUnit(entry.Amounts) == entry.Unit
+        && DriveSpaceNativeLayout.CaptureAvailableSpace(false, entry.Bytes) == new DriveSpaceAmounts(0, 0));
+Check("DriveSpace totals accumulate even individually suppressed one-megabyte drives",
+    DriveSpaceNativeLayout.CaptureAccumulation(
+        DriveSpaceNativeLayout.CaptureAvailableSpace(true, 1UL << 20),
+        DriveSpaceNativeLayout.CaptureAvailableSpace(true, 1UL << 20))
+            == new DriveSpaceAmounts(2, 1f / 512));
+foreach (byte letter in new byte[] { 0, (byte)'A', (byte)'B', (byte)'C', (byte)'Z', (byte)'c', (byte)'z', (byte)'[' })
+    Check($"DriveSpace helper letter {letter}",
+        DriveSpaceNativeLayout.CaptureHelperDriveLetter(letter)
+            == (letter is (byte)'C' or (byte)'Z' or (byte)'c' or (byte)'z' ? (char)letter : 'C'));
+foreach (uint driveType in new uint[] { 0, 1, 2, 3, 4, 5, 6, uint.MaxValue })
+    Check($"DriveSpace fixed-drive type gate {driveType}",
+        DriveSpaceNativeLayout.CaptureDriveAdmission(driveType) == (driveType == 3));
 foreach (uint suffixLength in new uint[] { 0, 1, 8, 1024, uint.MaxValue })
 {
     Check($"Recognized bare browser switch does not infer a value from another argument ({suffixLength})",
@@ -862,6 +889,36 @@ if (args.Length == 2)
     Check("Browser command initialization uses wide Windows command-line/argv entry calls",
         browser.Matches(0x1028E234, "FF15EC042411")
         && browser.Matches(0x1028E19E, "FF1598BC5711"));
+    Check("HWStats DriveSpace iterates C through Z and admits only fixed drive type3",
+        hardware.Ascii(0x443160) == DriveSpaceNativeLayout.Header
+        && hardware.Matches(0x40381C, "B343BF43000000")
+        && hardware.Matches(0x403843, "FF156401440083F803")
+        && hardware.ImportSlotNames(0x440164, "GetDriveTypeW")
+        && hardware.Matches(0x40394B, "80FB5A0F8ECFFEFFFF"));
+    Check("HWStats space helper uses caller-available bytes, not total size or total free bytes",
+        hardware.ImportSlotNames(0x440168, "GetDiskFreeSpaceExW")
+        && hardware.Matches(0x4036E0, "8D45E4508D45F050")
+        && hardware.Matches(0x4036E8, "FF1568014400")
+        && hardware.Matches(0x403717, "8B55E48BCA8B75E8")
+        && hardware.Matches(0x4036F2, "85DB7402890385FF")
+        && hardware.Matches(0x403700, "C70700000000"));
+    Check("HWStats space arithmetic retains signed low-shift conversion and extra high-part term",
+        hardware.Matches(0x40371F, "81E2FFFF0F008BC6C1E914C1E00C0BC8C1EE08")
+        && hardware.Matches(0x40374E, "0F5BC9660F5AC00F5BD2")
+        && hardware.Matches(0x403758, "F30F59054C634800F30F58C80F28C1F30F590558634800F30F58D0")
+        && hardware.Word(0x48634C) == 0x35800000
+        && hardware.Word(0x486358) == 0x3A800000
+        && hardware.Word(0x486398) == 0x3F800000);
+    Check("HWStats space row and total use strict above-one thresholds with preserved formats",
+        hardware.Matches(0x403889, "0F2FD0")
+        && hardware.Matches(0x403896, "7649")
+        && hardware.Matches(0x4038E1, "0F2FC87662")
+        && hardware.Matches(0x403954, "0F2FE0764C")
+        && hardware.Matches(0x4039A5, "0F2FD8764F")
+        && hardware.Ascii(0x44316C) == DriveSpaceNativeLayout.DriveGigabytesFormat
+        && hardware.Ascii(0x44317C) == DriveSpaceNativeLayout.DriveMegabytesFormat
+        && hardware.Ascii(0x442FEC) == DriveSpaceNativeLayout.TotalGigabytesFormat
+        && hardware.Ascii(0x44304C) == DriveSpaceNativeLayout.TotalMegabytesFormat);
     Check("DeploymentCommon is a managed deployment assembly, not an observed native import of these helpers",
         deployment.ImportsFrom("mscoree.dll").Contains("_CorDllMain")
         && new[] { red, dumper, truck, hardware, child, browser, client }

@@ -16,7 +16,7 @@ public static class HWStatsLayout
     {
         ("macaddr", 0x404340), ("soundplayback/soundrecording (DirectSound)", 0x404340),
         ("ram/nprocessors + CPUID (sub_4035A0 -> sub_403350)", 0x4035A0), ("display registry (sub_4034C0)", 0x4034C0),
-        ("memory (sub_4037F0)", 0x4037F0), ("System: OS/DirectX version + BIOS registry values (sub_404020)", 0x404020),
+        ("DriveSpace: fixed-drive caller-available space (sub_4037F0)", 0x4037F0), ("System: OS/DirectX version + BIOS registry values (sub_404020)", 0x404020),
         ("D3D9/CPU features (sub_402250)", 0x402250), ("report object cleanup, not a section (sub_406880)", 0x406880),
     };
 
@@ -26,4 +26,3 @@ public static class HWStatsLayout
     public const int ReportObjectIndentOffset = 0x54;
     public const int ReportObjectHeapSlots = 20;
 }
-

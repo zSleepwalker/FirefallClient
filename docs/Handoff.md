@@ -3264,3 +3264,21 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
 - Build succeeds;1158 sample-backed checks and1053 pure checks pass.
   Next independent file: HWStats output evidence beyond its saved pipe
   and DumpTruck type3 compression handoff.
+
+## HWStats DriveSpace source and float/output decisions
+
+- Corrected old human label:4037F0 is DriveSpace, not memory. It scans
+  C-Z fixed-drive type3, calls403690, and uses GetDiskFreeSpaceExW's
+  FreeBytesAvailableToCaller field, not total size or total free.
+- Helper failure zeros both output floats. Successful helper clobbers EAX;
+  caller ignores that return and uses output slots. No real API called.
+- Arithmetic retains signed low-shift int->float and extra high>>8 term
+  in GB output. Synthetic2^40 bytes yields MB1048576/GB1025. Stored
+  source is instruction-equivalent, not a generic bytes/GB conversion.
+- Drive and total lines require GB>1 else MB>1 else none. Exactly1GiB
+  prints using MB; exactly1MiB suppresses row but still contributes to
+  totals because accumulation occurs first.
+- Saved DriveSpaceNativeLayout and byte/import/constant/format checks.
+  Follow-ons: RAM %ull format/source and system-affinity popcount;
+  OS/DirectX/BIOS registry key or NETAPI MAC helper.
+- Build succeeds;1187 sample-backed checks and1078 pure checks pass.
