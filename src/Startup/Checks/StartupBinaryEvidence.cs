@@ -9411,6 +9411,32 @@ internal static class StartupBinaryEvidence
             structuredChatReaders.All(site =>
                 StructuredChatMessageNativeLayout.Find(site.selector)?.PayloadReaderFileOffset is { } reader
                 && RelativeBranchTargets(site.callSite, 0xE8, reader)));
+        check("Binary structured chat simple payload fields call the recorded primitive readers",
+            StructuredChatMessageNativeLayout.PayloadFields.All(field =>
+                RelativeBranchTargets(field.ReadCallFileOffset, 0xE8, field.ReadHelperFileOffset)));
+        check("Binary structured chat simple readers preserve native field destinations",
+            Matches(0x6FDBE0, "8BD7")
+            && Matches(0x6FDBEE, "8D5704")
+            && Matches(0x6FDC60, "8BD7")
+            && Matches(0x6FDC6E, "8D5704")
+            && Matches(0x6FDC78, "8D4708")
+            && Matches(0x6FDC83, "8D470C")
+            && Matches(0x6FDCF0, "57")
+            && Matches(0x6FDCFD, "8D5704")
+            && Matches(0x6FDD07, "8D5708")
+            && Matches(0x6FDD7B, "8B5508")
+            && Matches(0x6FDF40, "57")
+            && Matches(0x6FDF4D, "8D5708")
+            && Matches(0x6FDF57, "8D570C")
+            && Matches(0x6FE149, "FF7508")
+            && Matches(0x6FE269, "8B5508"));
+        check("Binary structured chat byte-to-DWORD reader consumes one byte and zero-extends its store",
+            Matches(0x3849D1, "83F901")
+            && Matches(0x3849EB, "8A1840")
+            && Matches(0x384A14, "FF4F080FB6C35F8906")
+            && Matches(0x356D12, "8A008803FF4704")
+            && Matches(0x3370C5, "890883460404")
+            && Matches(0x356FA3, "8B0289018B420489410483460408"));
         check("Binary structured chat case1 localizes CHAT_DUEL_RESULT and forwards it to chat display",
             ReadCStringAscii(StructuredChatMessageNativeLayout.DuelResultTemplateVirtualAddress, 17)
                 == StructuredChatMessageNativeLayout.DuelResultTemplate
@@ -9426,7 +9452,9 @@ internal static class StartupBinaryEvidence
             && Matches(0x6E3ABE, "FF90AC000000")
             && Matches(0x6E45E3, "80BD27FFFFFF00741C")
             && Matches(0x6E45FE, "BE59010000")
+            && Matches(0x6E4603, "8D4F34")
             && Matches(0x6E4608, "BE5A010000")
+            && Matches(0x6E460D, "8D4F28")
             && Matches(0x6E462B, "FF90AC000000")
             && ReadCStringAscii(0x1B6E510, 11) == StructuredChatMessageNativeLayout.PendingIncomingStatus);
         check("Binary NPCInteraction gates on its singleton, swaps state, and dispatches numeric uiManager code 356",

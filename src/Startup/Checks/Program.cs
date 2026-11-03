@@ -28,6 +28,27 @@ Check("Structured chat selectors7/8 share a body; later cases extend beyond the 
     && StructuredChatMessageNativeLayout.Find(5)!.Value.CaseFileOffset == 0x6E3B12
     && StructuredChatMessageNativeLayout.Find(13)!.Value.CaseFileOffset == 0x6E44A2
     && StructuredChatMessageNativeLayout.Find(19)!.Value.PayloadReaderFileOffset == 0x6FE240);
+Check("Structured chat payload ledger separates one-byte input from zero-extended native DWORD storage",
+    StructuredChatMessageNativeLayout.PayloadFields.Count == 15
+    && StructuredChatMessageNativeLayout.PayloadFields
+        .Where(field => field.Encoding == StructuredChatFieldEncoding.ByteZeroExtendedToDword)
+        .Select(field => (field.ReaderFileOffset, field.NativeOffset,
+            field.NativeByteCount, field.FixedWireByteCount))
+        .SequenceEqual([(0x6FDC30u, 4, 4, (int?)1), (0x6FDCC0u, 8, 4, (int?)1)]));
+Check("Structured chat simple payload minimum byte counts include NUL terminators, not native padding",
+    new (uint Reader, int Minimum)[]
+    {
+        (0x6FDBB0, 2), (0x6FDC30, 10), (0x6FDCC0, 6), (0x6FDD50, 1),
+        (0x6FDF10, 10), (0x6FE120, 4), (0x6FE240, 1)
+    }.All(expectedPayload => StructuredChatMessageNativeLayout.PayloadFields
+        .Where(field => field.ReaderFileOffset == expectedPayload.Reader)
+        .Sum(field => field.FixedWireByteCount ?? 1) == expectedPayload.Minimum));
+Check("Structured chat pending flag treats every nonzero byte as incoming and omits status on zero",
+    Enumerable.Range(0, 256).All(value =>
+        StructuredChatMessageNativeLayout.CapturePendingNotification((byte)value)
+            == (value == 0
+                ? new StructuredChatPendingNotificationSnapshot(346, 0x28, null)
+                : new StructuredChatPendingNotificationSnapshot(345, 0x34, "PENDING_IN"))));
 Check("All three observed app modes are cataloged", AppModeCatalog.KnownModes.SequenceEqual(expected));
 Check("Mode 1 maps to tfLogin", AppModeCatalog.Find(1) == expected[0]);
 Check("Mode 2 maps to tfWorld", AppModeCatalog.Find(2) == expected[1]);

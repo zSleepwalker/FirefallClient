@@ -5,6 +5,29 @@ public readonly record struct StructuredChatCaseSnapshot(
     uint CaseFileOffset,
     uint? PayloadReaderFileOffset);
 
+public enum StructuredChatFieldEncoding
+{
+    NullTerminatedBytes,
+    Byte,
+    ByteZeroExtendedToDword,
+    RawUInt32LittleEndian,
+    RawUInt64LittleEndian
+}
+
+public readonly record struct StructuredChatPayloadFieldSnapshot(
+    uint ReaderFileOffset,
+    int NativeOffset,
+    int NativeByteCount,
+    int? FixedWireByteCount,
+    StructuredChatFieldEncoding Encoding,
+    uint ReadCallFileOffset,
+    uint ReadHelperFileOffset);
+
+public readonly record struct StructuredChatPendingNotificationSnapshot(
+    int EventCode,
+    int OwnerCollectionOffset,
+    string? StatusType);
+
 /// <summary>
 /// Observed structured-chat dispatch behind the nonzero optional-data branch
 /// of 0x6E2590. These are consumer cases, not a reconstruction of selector
@@ -29,6 +52,41 @@ public static class StructuredChatMessageNativeLayout
     public const int PendingIncomingNotificationCode = 345;
     public const int PendingOtherNotificationCode = 346;
     public const string PendingIncomingStatus = "PENDING_IN";
+
+    public static IReadOnlyList<StructuredChatPayloadFieldSnapshot> PayloadFields { get; } =
+        Array.AsReadOnly(new[]
+        {
+            new StructuredChatPayloadFieldSnapshot(0x6FDBB0, 0x00, 4, null,
+                StructuredChatFieldEncoding.NullTerminatedBytes, 0x6FDBE9, 0x12EE010),
+            new StructuredChatPayloadFieldSnapshot(0x6FDBB0, 0x04, 4, null,
+                StructuredChatFieldEncoding.NullTerminatedBytes, 0x6FDBF3, 0x12EE010),
+            new StructuredChatPayloadFieldSnapshot(0x6FDC30, 0x00, 4, null,
+                StructuredChatFieldEncoding.NullTerminatedBytes, 0x6FDC69, 0x12EE010),
+            new StructuredChatPayloadFieldSnapshot(0x6FDC30, 0x04, 4, 1,
+                StructuredChatFieldEncoding.ByteZeroExtendedToDword, 0x6FDC73, 0x3849C0),
+            new StructuredChatPayloadFieldSnapshot(0x6FDC30, 0x08, 4, 4,
+                StructuredChatFieldEncoding.RawUInt32LittleEndian, 0x6FDC7E, 0x3370A0),
+            new StructuredChatPayloadFieldSnapshot(0x6FDC30, 0x0C, 4, 4,
+                StructuredChatFieldEncoding.RawUInt32LittleEndian, 0x6FDC89, 0x3370A0),
+            new StructuredChatPayloadFieldSnapshot(0x6FDCC0, 0x00, 4, 4,
+                StructuredChatFieldEncoding.RawUInt32LittleEndian, 0x6FDCF8, 0x3370A0),
+            new StructuredChatPayloadFieldSnapshot(0x6FDCC0, 0x04, 4, null,
+                StructuredChatFieldEncoding.NullTerminatedBytes, 0x6FDD02, 0x12EE010),
+            new StructuredChatPayloadFieldSnapshot(0x6FDCC0, 0x08, 4, 1,
+                StructuredChatFieldEncoding.ByteZeroExtendedToDword, 0x6FDD0C, 0x3849C0),
+            new StructuredChatPayloadFieldSnapshot(0x6FDD50, 0x00, 4, null,
+                StructuredChatFieldEncoding.NullTerminatedBytes, 0x6FDD85, 0x12EE010),
+            new StructuredChatPayloadFieldSnapshot(0x6FDF10, 0x00, 8, 8,
+                StructuredChatFieldEncoding.RawUInt64LittleEndian, 0x6FDF48, 0x356F80),
+            new StructuredChatPayloadFieldSnapshot(0x6FDF10, 0x08, 4, null,
+                StructuredChatFieldEncoding.NullTerminatedBytes, 0x6FDF52, 0x12EE010),
+            new StructuredChatPayloadFieldSnapshot(0x6FDF10, 0x0C, 4, null,
+                StructuredChatFieldEncoding.NullTerminatedBytes, 0x6FDF5C, 0x12EE010),
+            new StructuredChatPayloadFieldSnapshot(0x6FE120, 0x00, 4, 4,
+                StructuredChatFieldEncoding.RawUInt32LittleEndian, 0x6FE153, 0x3370A0),
+            new StructuredChatPayloadFieldSnapshot(0x6FE240, 0x00, 1, 1,
+                StructuredChatFieldEncoding.Byte, 0x6FE273, 0x356CF0)
+        });
 
     public static IReadOnlyList<StructuredChatCaseSnapshot> Cases { get; } =
         Array.AsReadOnly(new[]
@@ -58,4 +116,10 @@ public static class StructuredChatMessageNativeLayout
         selector is >= FirstSelector and <= LastSelector
             ? Cases[selector - FirstSelector]
             : null;
+
+    /// <summary>Captures case19 after decoding; does not perform removal or dispatch.</summary>
+    public static StructuredChatPendingNotificationSnapshot CapturePendingNotification(byte decodedFlag) =>
+        decodedFlag != 0
+            ? new(PendingIncomingNotificationCode, 0x34, PendingIncomingStatus)
+            : new(PendingOtherNotificationCode, 0x28, null);
 }

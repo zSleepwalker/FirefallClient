@@ -7105,9 +7105,62 @@ Selected literal-backed outputs:
 payload-reader targets. Startup checks verify the complete PE-translated
 table, the 14 reader call sites, selected output calls, and original literals.
 This does not reconcile selector `0x76`'s parser-side `slBlob` with the
-receiver's record range. Next static work: reconstruct the case-specific
-payload readers and owner helpers without assuming that this consumer proves
-the wire layout or the semantics of the conflicting Character RTTI name.
+receiver's record range or establish the semantics of the conflicting
+Character RTTI name.
+
+### Structured-chat simple payload field ledger
+
+Same immutable sample: 40,197,848 bytes, SHA-256
+`E0E8448393AC1CE05BE73E06F62DD70E3EFF3404CC2E7AAF3F04C79DEC0DE235`.
+These layouts describe the byte stream passed to the consumer's payload
+readers, not the outer Matrix message or the parser-side blob's meaning.
+No packet capture or runtime invocation was used. Wire offsets are relative
+to the start of that payload; native offsets are relative to the destination
+temporary, not the `0x40`-byte chat record.
+
+`L`, `A`, and `B` below count text bytes excluding their NUL terminators.
+The shared-text helper `0x12EE010` copies raw bytes through the terminator,
+with no length prefix and no character decoding established. Raw multi-byte
+integers use x86 little-endian loads. No wire alignment bytes are introduced
+by these readers.
+
+| Selector / reader raw | Wire offset and width, in read order | Native destination offsets | Consumed bytes |
+| --- | --- | --- | --- |
+| 1 / `0x6FDBB0` | `0`: text A + NUL; `A+1`: text B + NUL | `+0`, `+4`: 32-bit shared-text pointers | `A+B+2` |
+| 2 / `0x6FDC30` | `0`: text + NUL; `L+1`: byte; `L+2`: DWORD; `L+6`: DWORD | `+0`: pointer; `+4`: zero-extended DWORD; `+8/+0xC`: DWORDs | `L+10` |
+| 3 / `0x6FDCC0` | `0`: DWORD; `4`: text + NUL; `L+5`: byte | `+0`: DWORD; `+4`: pointer; `+8`: zero-extended DWORD | `L+6` |
+| 4 / `0x6FDD50` | `0`: text + NUL | `+0`: shared-text pointer | `L+1` |
+| 11 / `0x6FDF10` | `0`: QWORD; `8`: text A + NUL; `A+9`: text B + NUL | `+0`: QWORD; `+8/+0xC`: shared-text pointers | `A+B+10` |
+| 15, 16 / `0x6FE120` | `0`: DWORD | `+0`: DWORD | `4` |
+| 19 / `0x6FE240` | `0`: byte | `+0`: byte | `1` |
+
+Important width evidence: raw `0x3849C0` bounds/refills **one** byte at
+`0x3849D1`, reads it at `0x3849EB`, decrements the stream's remaining count
+by one at `0x384A14`, then zero-extends and stores a DWORD at `0x384A17`
+and `0x384A1B`. Its native four-byte output is neither four wire bytes nor a
+float. In contrast, `0x356CF0` stores a byte (`0x356D12..0x356D16`).
+`0x3370A0` advances four bytes (`0x3370C5..0x3370C7`), and `0x356F80`
+copies two DWORDs and advances eight (`0x356FA3..0x356FAD`).
+
+For selector2, the first text becomes `player_name`; native `+8` is the row
+lookup input, whose resolved row supplies `item_type_id` and `quality`.
+The byte stored at native `+4` and DWORD at `+0xC` are decoded but their
+meanings are not established by this consumer. For selector19, the reader
+preserves the full byte; the later `cmp byte,0` selects the two branches
+for every nonzero value, not just `1`. `CapturePendingNotification` saves
+only that already-decoded decision and does not remove entries or emit
+notifications. The return value of removal helper `0x6F5BF0` is ignored;
+failure to find an entry does not add a dispatch gate.
+
+`StructuredChatMessageNativeLayout.PayloadFields` records the seven unique
+simple-reader layouts, primitive call sites, native widths, and wire widths.
+Checks cover all 15 field calls, their destination setup, the primitive
+width instructions, minimum sizes (`2/10/6/1/10/4/1`), and all 256 pending
+flag values. Those minimums are consumption arithmetic, not evidence that
+the native wrapper rejects shorter/trailing inputs gracefully. Remaining
+readers include nested optional/collection structures and remain outside
+this simple ledger. Next: trace `0x709750` (case5), `0x709560` (case9),
+`0x703910` (case10 optional record), and `0x705570` (case12 chunked map).
 
 ## Post-notification chat file log and folded hash
 

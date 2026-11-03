@@ -2723,3 +2723,21 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   `0x6FDD50`, `0x6FE240` are small starting points), then follow owner
   helpers. The native caller ignores the switch's Boolean result; returning
   true alone is not evidence that an event was dispatched.
+
+## Structured-chat simple payload follow-up
+
+- Seven simple readers (selectors1/2/3/4/11/15/16/19) now have a field ledger
+  in `StructuredChatMessageNativeLayout.PayloadFields` and
+  `docs\MatrixConnection.md`: 15 primitive calls, destination offsets,
+  native widths, and wire widths. Strings are raw NUL-terminated bytes.
+- Helper `0x3849C0` reads one wire byte and zero-extends it into a native
+  DWORD; do not treat native alignment or field width as wire padding.
+  Minimum consumed sizes are 2,10,6,1,10,4,1 bytes for the seven readers.
+- Saved the already-decoded case19 pending decision as a C# capture.
+  Every nonzero byte selects345, owner collection+34, and `PENDING_IN`;
+  zero selects346, collection+28, and no status property. Removal result is
+  ignored by the native caller, so absence does not suppress notification.
+- Next: nested readers `0x709750` (case5), `0x709560` (case9), `0x703910`
+  (case10 optional record), `0x705570` (case12 chunked map), plus the
+  case14/17 collection helpers. Keep these consumer payloads separate from
+  selector0x76's still-unresolved parser/receiver representation mismatch.
