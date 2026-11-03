@@ -69,6 +69,12 @@ public enum Red5UrlFilterCallbackAction
     ReturnTrueForNoMatchingFilter
 }
 
+public enum Red5DispatchObjectDeleteAction
+{
+    ResetAndPreserveAllocation,
+    ResetAndReleaseAllocation
+}
+
 public enum Red5LuaWebRequestLoggingAction
 {
     Disable,
@@ -240,12 +246,14 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint LuaUrlFilterDispatchObjectPrimaryCleanupSlotPointerVa = 0x10BCD60;
     public const uint LuaUrlFilterDispatchObjectSetupSlotPointerVa = 0x10BCD80;
     public const uint LuaUrlFilterDispatchObjectDeleteSlotPointerVa = 0x10BD0D0;
+    public const uint LuaUrlFilterDispatchObjectFinalPrimaryVtableVa = 0x1C747E4;
     public const uint LuaUrlFilterDispatchObjectPrimaryCleanupSlotRaw = 0xCBC160;
     public const uint LuaUrlFilterDispatchObjectPrimaryReleaseSlotRaw = 0xCBC150;
     public const uint LuaUrlFilterDispatchObjectSetupSlotRaw = 0xCBC180;
     public const uint LuaUrlFilterDispatchObjectDeleteSlotRaw = 0xCBC4D0;
     public const uint LuaUrlFilterDispatchObjectStateUpdateRaw = 0xCBC270;
     public const uint LuaUrlFilterDispatchObjectResetRaw = 0xCBC510;
+    public const uint LuaUrlFilterDispatchObjectResetMemberHelperRaw = 0xCBE080;
     public const uint LuaUrlFilterDispatchObjectResetWrapperRaw = 0xCBC4D0;
     public const uint LuaUrlFilterDispatchObjectStateStringStorageOffset = 0x28;
     public const uint LuaUrlFilterDispatchObjectPendingModeFlagOffset = 0x68;
@@ -388,6 +396,11 @@ public static class Red5LoggingBridgeNativeLayout
         && mode != 1
         && helperPresent
         && !firstResultPresent;
+
+    public static Red5DispatchObjectDeleteAction CaptureDispatchObjectDelete(bool releaseAllocation) =>
+        releaseAllocation
+            ? Red5DispatchObjectDeleteAction.ResetAndReleaseAllocation
+            : Red5DispatchObjectDeleteAction.ResetAndPreserveAllocation;
 
     public static bool CaptureUrlFilterListMatch(
         IReadOnlyList<string> filters,

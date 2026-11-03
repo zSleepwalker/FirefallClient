@@ -283,11 +283,21 @@ The constructor initializes a string-like member at `+0x24` with capacity
 field `+0x2C` equal to `7`. `CBC180` calls `CBC270` before producing its two
 results. `CBC270` returns unless mode and storage pointer `+0x28` are both
 nonzero; for mode other than `1`, it sets pending byte `+0x68` when helper
-`+0x08` exists and result `+0x0C` is absent. Reset routine `CBC510`, called
-through wrapper `CBC4D0`, checks that byte, calls `CBC270` with mode `2`,
-clears the byte, and releases/reset fields including the string-like member.
-This supports a deferred state-update/cleanup interpretation, but the
-application-level meaning of that state is still unknown.
+`+0x08` exists and result `+0x0C` is absent. Reset routine `CBC510` is called
+by wrapper `CBC4D0`; it calls `CBC270` with mode `2` only when `+0x68` is set,
+then clears that byte. It invokes cleanup on nonnull members at `+0x0C` and
+`+0x10`, calls an indirect helper when `+0x08` is nonnull, and clears all
+three fields. It also calls raw `0xCBE080` with member `+0x48`, conditionally
+passes the buffers at `+0x30` and `+0x18` to raw `0x12C8D60` when their
+capacity fields are at least `8`, and resets the observed capacities to `7`
+while clearing associated pointer/length fields. Finally, it calls an
+indirect initializer on member `+0x14`, replaces the secondary-vtable pointer
+from an unresolved global, and writes primary-vtable VA `0x1C747E4`.
+These observations support a deferred state-update plus member-cleanup
+interpretation; the identities and application-level meanings of the
+indirect helpers and state remain unknown. Wrapper `CBC4D0` always performs
+that reset, then tests argument bit 0 to decide whether to release the object
+allocation; its `retn 4` epilogue confirms one stack argument is consumed.
 
 `LogWebRequests` is registered to raw `0xCCB3D0` and takes a value after the
 frame. Although its usage string at VA `0x1BC7584` says `boolean`, the

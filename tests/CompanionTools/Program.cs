@@ -226,6 +226,12 @@ foreach (bool ownerFlag in new[] { false, true })
     Check($"Awesomium URL dispatch setup mode incoming={incomingFlag}, owner flag={ownerFlag}",
         Red5LoggingBridgeNativeLayout.CaptureDispatchObjectSetupMode(incomingFlag, ownerFlag)
         == (incomingFlag && ownerFlag ? 2 : 0));
+foreach (bool releaseAllocation in new[] { false, true })
+    Check($"Awesomium URL dispatch deletion release allocation={releaseAllocation}",
+        Red5LoggingBridgeNativeLayout.CaptureDispatchObjectDelete(releaseAllocation)
+        == (releaseAllocation
+            ? Red5DispatchObjectDeleteAction.ResetAndReleaseAllocation
+            : Red5DispatchObjectDeleteAction.ResetAndPreserveAllocation));
 foreach (int mode in new[] { 0, 1, 2, -1 })
 foreach (bool stateStringStorage in new[] { false, true })
 foreach (bool helperPresent in new[] { false, true })
@@ -1854,8 +1860,6 @@ if (args.Length == 2)
             "C6466801")
         && ClientMatches(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectResetRaw + 0x83,
             "C6466800")
-        && ClientMatches(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectResetRaw + 0xC1,
-            "C7462C07000000C7462800000000")
         && ClientMatches(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectOwnerCleanupRaw + 0x28A,
             "8B8BA4090000")
         && ClientMatches(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectOwnerCleanupRaw + 0x3A,
@@ -1906,6 +1910,39 @@ if (args.Length == 2)
             == Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectSetupSlotRaw + 0x400C00
         && Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectDeleteSlotPointerVa
             == Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectDeleteSlotRaw + 0x400C00);
+    Check("Original client URL dispatch reset clears helper fields",
+        ClientMatches(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectResetRaw + 0x48,
+            "C7460C00000000")
+        && ClientMatches(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectResetRaw + 0x5A,
+            "C7461000000000")
+        && ClientMatches(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectResetRaw + 0x6D,
+            "C7460800000000"));
+    Check("Original client URL dispatch reset clears its first buffer",
+        ClientMatches(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectResetRaw + 0x9F,
+            "C7464407000000C7464000000000"));
+    Check("Original client URL dispatch reset clears its second buffer",
+        ClientMatches(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectResetRaw + 0xC1,
+            "C7462C07000000C7462800000000"));
+    Check("Original client URL dispatch reset writes final primary vtable",
+        ClientMatches(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectResetRaw + 0xE8,
+            "C706E447C701")
+        && Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectFinalPrimaryVtableVa == 0x1C747E4);
+    Check("Original client URL dispatch reset calls member helper",
+        client.Calls(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectResetRaw
+                + 0x8A + 0x400C00,
+            Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectResetMemberHelperRaw + 0x400C00));
+    Check("Original client URL dispatch reset frees both buffers through shared helper",
+        client.Calls(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectResetRaw
+                + 0x98 + 0x400C00,
+            0x12C8D60 + 0x400C00)
+        && client.Calls(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectResetRaw
+                + 0xBA + 0x400C00,
+            0x12C8D60 + 0x400C00));
+    Check("Original client URL dispatch reset initializes member and secondary vtable",
+        ClientMatches(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectResetRaw + 0xDA,
+            "FF15704EAC01")
+        && ClientMatches(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectResetRaw + 0xE5,
+            "894604"));
     Check("Original client LogWebRequests stores Lua truthiness in its frame flag",
         client.Ascii(Red5LoggingBridgeNativeLayout.LuaLogWebRequestsUsageVa)
             == "usage: FRAME:LogWebRequests(boolean)"

@@ -3955,5 +3955,13 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   enters only for nonzero mode and storage pointer `+0x28`. For mode other
   than `1`, it sets pending byte `+0x68` when helper `+0x08` exists and result
   `+0x0C` is absent. Reset routine `0xCBC510` (called by wrapper `0xCBC4D0`)
-  handles that byte by calling `0xCBC270` with mode `2`, then clears it and
-  resets/releases fields. The user-facing meaning is unresolved.
+  calls `0xCBC270` with mode `2` only when `+0x68` is set, then clears it.
+  It invokes cleanup on nonnull members `+0x0C/+0x10`, indirectly releases
+  nonnull `+0x08`, calls `0xCBE080` with member `+0x48`, and conditionally
+  passes buffers `+0x30/+0x18` to `0x12C8D60` when capacities are at least
+  `8`. It restores observed capacities to `7`, clears pointer/length fields,
+  invokes an unresolved initializer on `+0x14`, and leaves primary vtable
+  `0x1C747E4` (the secondary-vtable source is unresolved). Wrapper
+  `0xCBC4D0` always resets first and tests argument bit 0 for allocation
+  release. Sample-backed assertions cover this cleanup sequence; exact
+  helper identities and the user-facing meaning remain unresolved.
