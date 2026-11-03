@@ -4153,3 +4153,29 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   tracking, but their individual runtime roles have not been traced. Do not
   conflate this millisecond tick source with the `_time64` seconds used by
   the server-adjusted query timestamp.
+
+# Round 27: ClientApi request timer lifecycle
+
+## Observed
+- The same `timeGetTime` import is sampled at three further request lifecycle
+  points. `dispatch_control_routine_BC43C0` (`0xBC43C0`) links the request into
+  the tracker at `0xBC4503`, then calls the import at `0xBC4508` and stores the
+  result at request `+0x6C` (`0xBC4512`).
+- `ClientApi_PumpRequestWorker` (`0xBC2B30`) calls the `WinHttpOpenRequest`
+  thunk at `0xBC2DB7` when a URL is available, then calls `timeGetTime` at
+  `0xBC2DD5` and stores the result at request `+0x70` (`0xBC2DE1`). When no URL
+  is available, the branch still samples the tick before the handle check.
+- In the worker's response-completion path, after response processing and
+  immediately before acquiring the request callback pair, it samples the same
+  import at `0xBC37C9` and stores the result at request `+0x74` (`0xBC37D5`).
+- The sample is
+  `D:\SteamLibrary\steamapps\common\Firefall\system\bin\FirefallClient.exe.original`.
+  The validated code-VA mapping is `IDA address + 0x400C00`. The byte stores
+  are `89 46 6C` at mapped VA `0xFC5112`, `89 41 70` at `0xFC39E1`, and
+  `89 41 74` at `0xFC43D5`. CompanionTools checks these stores in addition to
+  the reset initialization and import identity.
+
+## Interpretation and unresolved details
+- The stores provide request tracking, open-branch, and pre-callback tick
+  checkpoints, but no elapsed-time arithmetic or consumer of these specific
+  fields has been established. Their intended timer policy remains unresolved.

@@ -2115,6 +2115,13 @@ if (args.Length == 2)
             "timeGetTime")
         && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiRequestResetRaw + 0xE7 + 0x400C00,
             "FF15244DAC018947684889476C894770894774"));
+    Check("Original ClientApi worker records tracking, open, and pre-callback ticks",
+        client.Matches(Red5LoggingBridgeNativeLayout.ClientApiRequestSubmitTickStoreRaw + 0x400C00,
+            "89466C")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiRequestOpenTickStoreRaw + 0x400C00,
+            "894170")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiRequestCallbackTickStoreRaw + 0x400C00,
+            "894174"));
     Check("Original client URL message builder escapes host, path and configured identifier components",
         client.Calls(Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlMessageBuilderRaw + 0xFD + 0x400C00,
             Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlComponentEscapeRaw + 0x400C00)
