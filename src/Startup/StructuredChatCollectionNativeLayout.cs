@@ -15,6 +15,24 @@ public static class StructuredChatCollectionNativeLayout
     public const int Case9PrefixWireByteCount = 9;
     public const int Case14PrefixWireByteCount = 24;
     public const int Case17MinimumPayloadByteCount = 19;
+    public const uint Case12ReaderFileOffset = 0x705570;
+    public const uint Case12VectorReaderFileOffset = 0x7035C0;
+    public const uint Case12KeySetReaderFileOffset = 0x70A340;
+    public const uint Case12KeySetClearFileOffset = 0x70A2E0;
+    public const uint Case12KeySetInsertFileOffset = 0x38EC20;
+    public const int Case12KeyWireByteCount = 4;
+    public const int Case12MinimumPayloadByteCount = 1;
+    public const int Case12MinimumEntryWireByteCount = 6;
+    public const int Case12NativeNodeValueOffset = 0x0C;
+    public const int Case12NativeValueVectorOffset = 0;
+    public const int Case12NativeValueKeySetOffset = 0x20;
+    public const uint UnpackExceptionThrowThunkFileOffset = 0x159E27A;
+    public const uint CxxThrowExceptionImportVirtualAddress = 0x1AC4770;
+    public const uint UnpackExceptionPointerThrowInfoVirtualAddress = 0x1DB8108;
+    public const uint UnpackExceptionPointerCatchableArrayVirtualAddress = 0x1DB80FC;
+    public const uint UnpackExceptionPointerCatchableTypeVirtualAddress = 0x1DB80E0;
+    public const uint UnpackExceptionPointerTypeDescriptorVirtualAddress = 0x1E125C4;
+    public const string UnpackExceptionPointerRttiName = ".PAVunpack_exception@serialize@sl@@";
 
     public static IReadOnlyList<StructuredChatCollectionSnapshot> Collections { get; } =
         Array.AsReadOnly(new[]

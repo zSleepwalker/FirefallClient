@@ -9513,6 +9513,55 @@ internal static class StartupBinaryEvidence
             Matches(0x70950A, "80FFFF7513")
             && Matches(0x5DE6BE, "80FBFF0F84A9FEFFFF")
             && Matches(0x60046B, "80FBFF0F845EFEFFFF"));
+        check("Binary structured chat case12 reads a DWORD key, nested vector, then nested key set",
+            RelativeBranchTargets(0x6FDFD5, 0xE8,
+                StructuredChatCollectionNativeLayout.Case12ReaderFileOffset)
+            && Matches(0x70571B, "8B018945A48D4104894304")
+            && Matches(0x705745, "834308FC")
+            && RelativeBranchTargets(0x70574E, 0xE8,
+                StructuredChatCollectionNativeLayout.Case12VectorReaderFileOffset)
+            && RelativeBranchTargets(0x705758, 0xE8,
+                StructuredChatCollectionNativeLayout.Case12KeySetReaderFileOffset)
+            && Matches(0x705830, "8D700C")
+            && Matches(0x70583E, "8D4E20")
+            && Matches(0x7058F4, "80F9FF0F84E3FCFFFF")
+            && Matches(0x703672, "834708FC")
+            && Matches(0x70376B, "80FBFF0F845EFEFFFF"));
+        check("Binary structured chat case12 key set clears once and continues only after count255",
+            RelativeBranchTargets(0x70A35D, 0xE8,
+                StructuredChatCollectionNativeLayout.Case12KeySetClearFileOffset)
+            && Matches(0x70A3CE, "8B01894424108D4104894604")
+            && Matches(0x70A402, "834608FC")
+            && Matches(0x70A423, "80FFFF0F8436FFFFFF")
+            && RelativeBranchTargets(0x70A411, 0xE8,
+                StructuredChatCollectionNativeLayout.Case12KeySetInsertFileOffset));
+        check("Binary structured chat case12 rejects an existing inner key through the exception thunk",
+            Matches(0x38EC59, "394608742F")
+            && Matches(0x38EC92, "C6400400")
+            && Matches(0x38ED21, "C6400401")
+            && Matches(0x70A416, "807C2418007421")
+            && Matches(0x70A4A2, "680881DB01")
+            && RelativeBranchTargets(0x70A4AC, 0xE8,
+                StructuredChatCollectionNativeLayout.UnpackExceptionThrowThunkFileOffset)
+            && Matches(StructuredChatCollectionNativeLayout.UnpackExceptionThrowThunkFileOffset,
+                "FF257047AC01")
+            && ImportSlotNames(StructuredChatCollectionNativeLayout.CxxThrowExceptionImportVirtualAddress,
+                "_CxxThrowException"));
+        check("Binary structured chat duplicate-key throw metadata names an unpack_exception pointer, not an object",
+            ReadUInt32(VirtualAddressToFileOffset(
+                StructuredChatCollectionNativeLayout.UnpackExceptionPointerThrowInfoVirtualAddress) + 12)
+                    == StructuredChatCollectionNativeLayout.UnpackExceptionPointerCatchableArrayVirtualAddress
+            && ReadUInt32(VirtualAddressToFileOffset(
+                StructuredChatCollectionNativeLayout.UnpackExceptionPointerCatchableArrayVirtualAddress)) == 2
+            && ReadUInt32(VirtualAddressToFileOffset(
+                StructuredChatCollectionNativeLayout.UnpackExceptionPointerCatchableArrayVirtualAddress) + 4)
+                    == StructuredChatCollectionNativeLayout.UnpackExceptionPointerCatchableTypeVirtualAddress
+            && ReadUInt32(VirtualAddressToFileOffset(
+                StructuredChatCollectionNativeLayout.UnpackExceptionPointerCatchableTypeVirtualAddress) + 4)
+                    == StructuredChatCollectionNativeLayout.UnpackExceptionPointerTypeDescriptorVirtualAddress
+            && ReadCStringAscii(
+                StructuredChatCollectionNativeLayout.UnpackExceptionPointerTypeDescriptorVirtualAddress + 8, 40)
+                    == StructuredChatCollectionNativeLayout.UnpackExceptionPointerRttiName);
         check("Binary structured chat case1 localizes CHAT_DUEL_RESULT and forwards it to chat display",
             ReadCStringAscii(StructuredChatMessageNativeLayout.DuelResultTemplateVirtualAddress, 17)
                 == StructuredChatMessageNativeLayout.DuelResultTemplate

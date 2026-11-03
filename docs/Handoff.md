@@ -2776,3 +2776,26 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   and `0x70A340` map. Its decompiler has a JUMPOUT and a path that needs
   direct instruction tracing before a complete ledger can be claimed.
   The selector0x76 parser/receiver representation conflict is still open.
+
+## Structured-chat nested map follow-up
+
+- Case12's `0x705570` payload is now traced: counted outer entries contain
+  a DWORD key, counted DWORD vector (`0x7035C0`), and counted DWORD key set
+  (`0x70A340`). All three use count255 continuation; an empty map is one
+  byte, a single entry with empty nested collections is seven bytes.
+- The key-set JUMPOUT is an exception branch, not missing decode code.
+  Existing-key insertion flag0 goes through `_CxxThrowException`; new
+  keys get flag1. The set is cleared before the first chunk only, so
+  duplicate checks span continued chunks of that set. Outer keys have a
+  different lookup/assignment path; do not generalize this policy to them.
+- Original PE metadata identifies a thrown pointer to
+  `sl::serialize::unpack_exception` (`.PAVunpack_exception@serialize@sl@@`);
+  the call passes the address of an allocated pointer, not a by-value
+  exception object. Binary checks cover the insertion polarity, imported
+  throw thunk, and PE-translated ThrowInfo/catchable-type chain.
+- No runtime/caller-visible failure is inferred. All19 switch targets and
+  their payload shapes now have traces; next semantic work is the owner
+  comparison/update helper family (`0x6FE010`, `0x6F9840`, `0x6F6420`),
+  named subscribers for numeric events, or the pre-existing parser/receiver
+  mismatch. Read-only IDA works through the existing `ida_rpc.py` helper
+  even though this session's built-in MCP client initialization fails.

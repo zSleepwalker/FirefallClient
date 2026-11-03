@@ -96,6 +96,16 @@ Check("Structured chat collection prefixes and suffixes preserve minimum consump
         .Where(field => field.ReaderFileOffset == 0x6FE190)
         .Sum(field => field.FixedWireByteCount ?? 1) + 1
             == StructuredChatCollectionNativeLayout.Case17MinimumPayloadByteCount);
+Check("Structured chat case12 has a four-byte key and two independently counted DWORD collections",
+    StructuredChatCollectionNativeLayout.Case12KeyWireByteCount == 4
+    && StructuredChatCollectionNativeLayout.Case12MinimumPayloadByteCount == 1
+    && StructuredChatCollectionNativeLayout.Case12MinimumEntryWireByteCount
+        == StructuredChatCollectionNativeLayout.Case12KeyWireByteCount + 2
+    && StructuredChatCollectionNativeLayout.Case12NativeNodeValueOffset == 12
+    && StructuredChatCollectionNativeLayout.Case12NativeValueVectorOffset == 0
+    && StructuredChatCollectionNativeLayout.Case12NativeValueKeySetOffset == 32
+    && StructuredChatCollectionNativeLayout.UnpackExceptionPointerRttiName
+        == ".PAVunpack_exception@serialize@sl@@");
 Check("All three observed app modes are cataloged", AppModeCatalog.KnownModes.SequenceEqual(expected));
 Check("Mode 1 maps to tfLogin", AppModeCatalog.Find(1) == expected[0]);
 Check("Mode 2 maps to tfWorld", AppModeCatalog.Find(2) == expected[1]);

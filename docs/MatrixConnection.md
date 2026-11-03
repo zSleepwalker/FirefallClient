@@ -7263,8 +7263,73 @@ entry wire/native value sizes, continuation comparison sites, and the 19
 surrounding primitive reads. Binary checks cover those calls, the parent
 collection calls, per-entry cursor changes, 12-byte native append stride,
 and count255 comparisons at raw `0x70950A`, `0x5DE6BE`, and `0x60046B`.
-No new wire parser is introduced. Remaining payload work is chiefly case12's
-`0x705570` chunked map and its nested vector/map decoders.
+No new wire parser is introduced.
+
+### Structured-chat case12 nested map and duplicate rejection
+
+The case12 wrapper at raw `0x6FDFA0` calls `0x705570` at `0x6FDFD5`.
+That reader resets an outer DWORD-keyed map, then reads count-byte groups.
+Each transmitted outer entry is:
+
+1. A four-byte little-endian key, loaded at `0x70571B` and consumed by
+   `0x705720..0x705745`.
+2. A count-byte chunked DWORD vector through `0x7035C0`, called at
+   `0x70574E`.
+3. A count-byte chunked DWORD **key set** through `0x70A340`, called at
+   `0x705758`. No value bytes follow individual keys in this inner set.
+
+All three levels continue only after count255 (outer `0x7058F4`, vector
+`0x70376B`, set `0x70A423`). Every shorter count terminates its level.
+An empty outer map therefore consumes one byte. One outer entry with two
+empty inner collections consumes seven bytes: outer count, DWORD key, zero
+vector count, zero set count. In general consumption is the number of outer
+count bytes plus the sum of each entry's `4 + vector-count-bytes +
+4*vector-entry-count + set-count-bytes + 4*set-entry-count`.
+
+The destination outer node's value begins at node `+0xC`
+(`0x705830`). Its vector is assigned through `0x47A770`; the inner key set
+at value `+0x20` is assigned through `0x706C20`. The reader selects or inserts
+the outer node before these assignments. Do not apply the inner set's
+duplicate rejection policy to outer keys: their lookup/assignment path is
+different. Full replacement behavior of those assignment helpers is not
+reconstructed here.
+
+The decompiler's `JUMPOUT(0x70A4B1)` is explained by an exception path:
+
+- The inner reader clears its destination once through `0x70A2E0` at
+  `0x70A35D`, before the first count. A continued group jumps to
+  `0x70A362`, so earlier keys remain in the set across groups.
+- Each key is passed to lookup/insert helper `0x38EC20`. The comparison
+  at `0x38EC59` checks the full DWORD key. Existing-key return
+  `0x38EC92` stores insertion flag0; new-key return `0x38ED21` stores1.
+- At `0x70A416`, a zero insertion flag branches to `0x70A43E`, while a new
+  key proceeds to the next entry. This rejects repeated inner keys even
+  when the repetition is in a later count group of the same inner set.
+- The error path allocates a one-byte object, stores an object pointer in a
+  stack local, and passes the address of that pointer plus ThrowInfo VA
+  `0x1DB8108` to thunk raw `0x159E27A` at `0x70A4AC`. The thunk jumps
+  through IAT VA `0x1AC4770`, which the original PE import table identifies
+  as MSVCR120.dll `_CxxThrowException`; `0x70A4B1` is an `int3`, not an
+  omitted normal decoding continuation.
+- The original ThrowInfo's catchable array is VA `0x1DB80FC`, containing
+  two types. Its first CatchableType VA `0x1DB80E0` refers to descriptor
+  VA `0x1E125C4`, whose literal name is
+  `.PAVunpack_exception@serialize@sl@@`. This names a pointer to
+  `sl::serialize::unpack_exception`, not a by-value exception object.
+  The second descriptor is `.PAX` (`void*`).
+
+This is a statically established error route, not proof of an uncaught
+exception, a crash, or a particular caller-visible failure result.
+`StructuredChatCollectionNativeLayout` preserves the reader/assignment
+layout and exception metadata. Checks verify wire order, all three
+continuation branches, insert-result polarity, imported throw target, and
+the PE-translated ThrowInfo/type-descriptor chain. No error is replaced by
+silent duplicate collapse in the saved model.
+
+The 19 case targets and all payload shapes now have direct traces, including
+these nested structures. Open work is semantic: owner state update/compare
+helpers, callback names for numeric event codes, the localized text inputs,
+and the still-unresolved Character selector0x76 parser/receiver mismatch.
 
 ## Post-notification chat file log and folded hash
 
