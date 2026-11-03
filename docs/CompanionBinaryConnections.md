@@ -53,7 +53,8 @@ The companion projects already contain partial reconstructions. New source is
 `src\RedHanded\DumperHandoffNativeLayout.cs` and
 `src\RedHanded\CrashMetadataNativeLayout.cs`, plus
 `src\R5Dumper\UserStreamNativeLayout.cs`; hardware pipe facts extend
-`src\DumpTruck\DumpTruckLayout.cs`. No new wire parser, process launcher,
+`src\DumpTruck\DumpTruckLayout.cs` and
+`src\DumpTruck\HardwareReportNativeLayout.cs`. No new wire parser, process launcher,
 dump writer, or uploader is introduced.
 
 ## RedHanded to r5dumper: lifetime and framing
@@ -303,8 +304,85 @@ byte to the sink on its normal completion path (also on exit-code-query
 failure), at `0x42ADC7..0x42ADCE`. This is neither the CRLF dump-user-info
 protocol nor a minidump user-stream array. A native nonzero exit code is
 returned as itself; pipe/process/read failures have separate `-1` paths.
-No claims are made here about cancellation, timeouts, compression internals,
-or whether a later upload succeeds.
+No claims are made here about cancellation, timeouts, or whether a later
+upload succeeds.
+
+### Accumulation precedes compression
+
+The submit caller VA `0x40AC1A` initializes a `slBlob` with vtable
+VA `0x4BDF44`; slot `+0x18` points to `0x41BAE0`.
+That append function obtains the old byte length, grows to old+count,
+and calls memcpy for exactly the supplied count at `0x41BB10`.
+It does not compress each pipe chunk. The final one-byte NUL from
+`0x42ADCE` is therefore part of the blob's stored length, not just
+untracked spare capacity.
+
+After generator call `0x40AC3E`, a zero exit code proceeds to compression;
+**any nonzero** result (including `-1` represented as `0xFFFFFFFF`) logs
+the generator failure and omits the hardware layer while continuing report
+packaging. A zero exit creates report layer type3, loads blob data and
+length from its backing object `+4/+0xC` at `0x40AC63..0x40AC70`,
+and invokes compressor `0x409540` at `0x40AC7D`.
+The complete stored byte range, including the appended NUL, is input.
+Compression failure is different from generator failure: it logs
+`Error while compressing hardware report.`, destroys the layer/blob, and
+branches into the submit failure cleanup at `0x40ACE8`.
+The decision capture deliberately preserves that asymmetry.
+
+### Literal compression-loop behavior
+
+The embedded zlib version literal is `1.2.8` at VA `0x475DDC`.
+Hardware compressor `0x409540` zeroes a56-byte x86 z_stream, fills next_in
+and avail_in from ECX/EDX, and calls the deflate-family initializer
+`0x45FA80`. Its state initialization stores wrapper1, window bits15,
+level6, and method8; this is consistent with ordinary zlib-wrapped deflate,
+not evidence of a separate gzip header. No generated report fixture was
+available to verify the final compressed bytes.
+
+The following byte-level distinction is intentional in the saved metadata:
+
+| Property | Actual instruction evidence |
+|---|---|
+| Scratch allocation | `0x40958B`: ECX=`0x4000`, allocator `0x42D150` |
+| Advertised avail_out | `0x4095E5`: DWORD `[ebp-0x58]=4` |
+| Flush argument | `0x4095E0`: EDX=`4` (`Z_FINISH`) |
+| Deflate call | `0x4095F2` -> `0x460210` |
+| Accepted results | `0x4095F7..0x4095FF`: only signed results0 and1 |
+| Bytes appended | `0x409603..0x409610`: `4 - avail_out` |
+| Repeat condition | `0x409618..0x40961B`: repeat only when avail_out is zero |
+| Cleanup | Success and failure call `0x460A90` (deflateEnd) and free scratch |
+
+Despite allocating16KiB, this routine advertises **four bytes per call**.
+Do not silently replace4 with16384 based on the allocation size or expected
+zlib usage. Its own success branch follows accepted result plus nonzero
+avail_out; it is not an explicit `result == Z_STREAM_END` check.
+`CaptureDeflateDrain` preserves the result gates and DWORD subtraction,
+including wraparound for an out-of-contract remaining-output value.
+It does not claim that such values can be produced by valid zlib execution.
+The source does not implement a compressor or execute the bundled zlib.
+
+### Hardware layer framing
+
+Layer constructor `0x426CD0` writes a DWORD type, writes placeholder
+`0xFFFFFFFF` using another DWORD writer, and records the position immediately
+after the header. Both writers (`0x40C8B0`, `0x40C980`) store native x86
+DWORDs, establishing little-endian byte order with no extra field padding:
+
+| Offset from layer start | Width | Hardware layer value |
+|---|---:|---|
+| `+0` | 4 | Type3 |
+| `+4` | 4 | Compressed payload byte count, patched when the layer closes |
+| `+8` | variable | Compressor output, with original input including the final NUL |
+
+Layer close `0x426D30` subtracts the recorded payload-start position from
+the current position and writes that DWORD at payload-start minus4
+(`0x426D90..0x426DA0`). Thus the patched count excludes the8-byte header.
+Native assertion paths cover invalid position/length conditions; the
+reconstruction does not simulate their continuation or exception behavior.
+On the normal submit path a final DWORD0 tag is written at `0x40AD23`
+before the serializer is finalized. This is a local layer map, **not**
+a claim that all outer report headers, other layer types, or the upload
+envelope have been completely reconstructed.
 
 ## Reproducible checks and open work
 
@@ -321,6 +399,6 @@ exports. They do not execute any target or contact a service. Without
 with an explicit notice that binary evidence was not checked.
 
 Next bounded traces: the client-side source-address producer;
-the DumpTruck sink's compression boundary and interpretation of its return codes; and
+the outer report headers and other DumpTruck layer bodies; and
 the managed loader/callers of DeploymentCommon. Static import absence is
 not used as a claim that all nine form one direct-load chain.

@@ -113,6 +113,25 @@ foreach (var limits in new (ulong PageFile, ulong Virtual, ulong Expected)[]
             == (success ? limits.Expected : 0));
 }
 
+foreach (uint exitCode in new uint[] { 0, 1, 259, uint.MaxValue })
+foreach (bool compressed in new[] { false, true })
+{
+    Check($"Hardware packaging exit={exitCode}, compression={compressed}",
+        HardwareReportNativeLayout.CaptureHardwareReport(exitCode, compressed)
+            == new HardwareReportDecision(exitCode == 0, exitCode != 0,
+                exitCode == 0 && !compressed, exitCode == 0 && !compressed));
+}
+foreach (int result in new[] { int.MinValue, -5, -1, 0, 1, 2, int.MaxValue })
+foreach (uint remaining in new uint[] { 0, 1, 3, 4, 5, uint.MaxValue })
+{
+    bool accepted = result == 0 || result == 1;
+    var outcome = !accepted ? DeflateDrainOutcome.Failure
+        : remaining == 0 ? DeflateDrainOutcome.Repeat : DeflateDrainOutcome.Success;
+    Check($"Hardware deflate result={result}, avail_out={remaining}",
+        HardwareReportNativeLayout.CaptureDeflateDrain(result, remaining)
+            == new DeflateDrainDecision(outcome, accepted ? unchecked(4u - remaining) : 0));
+}
+
 if (args.Length == 2)
 {
     string root = args[1];
@@ -298,6 +317,51 @@ if (args.Length == 2)
         truck.Ascii(0x476BF1) == ""
         && DumpTruckLayout.HwReportReadChunkByteCount == 0x800
         && DumpTruckLayout.HwReportSinkVtableSlotOffset == 0x18);
+    Check("HWStats stdout accumulates in slBlob before compression",
+        truck.Matches(0x40AC1A, "C7458044DF4B00")
+        && truck.Word(HardwareReportNativeLayout.BlobVtableVa
+            + DumpTruckLayout.HwReportSinkVtableSlotOffset) == HardwareReportNativeLayout.BlobAppendVa
+        && truck.Calls(HardwareReportNativeLayout.RunGeneratorCallVa, DumpTruckLayout.HwReportRunnerVa)
+        && truck.Matches(0x40AC63, "8B458485C074088B500C8B4804")
+        && truck.Calls(HardwareReportNativeLayout.CompressCallVa, HardwareReportNativeLayout.CompressVa));
+    Check("slBlob append grows by the supplied byte count and copies exactly that count",
+        truck.Matches(0x41BAEA, "FF500C")
+        && truck.Matches(0x41BAF2, "6A018BCE8D141F52")
+        && truck.Calls(0x41BAFA, 0x41BD80)
+        && truck.Matches(0x41BB09, "53FF750803C750")
+        && truck.Calls(0x41BB10, 0x46FCEE));
+    Check("Nonzero HWStats exit omits hardware, while compression failure aborts packaging",
+        truck.Matches(0x40AC46, "85C00F85AD000000")
+        && truck.Matches(0x40AC85, "84C07564")
+        && truck.Calls(0x40AD0A, 0x40C940)
+        && truck.Matches(0x40ACE8, "E9E6FBFFFF"));
+    Check("Hardware compression allocates16KiB but advertises four output bytes per finish call",
+        truck.Matches(0x40958B, "B900400000")
+        && truck.Matches(0x4095E0, "BA04000000C745A804000000")
+        && truck.Calls(0x4095F2, HardwareReportNativeLayout.DeflateVa)
+        && truck.Matches(0x409603, "B9040000002BC8")
+        && truck.Calls(0x409610, 0x40DA40));
+    Check("Hardware compression accepts only zlib0/1 and repeats only on full output",
+        truck.Matches(0x4095F7, "85C0784383F8017F3E")
+        && truck.Matches(0x409618, "85C074C4")
+        && truck.Calls(0x40961F, HardwareReportNativeLayout.DeflateEndVa)
+        && truck.Calls(0x409641, HardwareReportNativeLayout.DeflateEndVa)
+        && truck.Ascii(0x475DDC) == "1.2.8"
+        && truck.Calls(0x40957B, HardwareReportNativeLayout.DeflateInitVa));
+    Check("Successful hardware report begins layer3 and report termination writes DWORD0",
+        truck.Matches(0x40AC4E, "6A03")
+        && truck.Calls(0x40AC5A, HardwareReportNativeLayout.LayerBeginVa)
+        && truck.Calls(0x40ACF4, HardwareReportNativeLayout.LayerEndVa)
+        && truck.Matches(0x40AD15, "C745AC00000000")
+        && truck.Calls(0x40AD23, 0x40C8B0));
+    Check("Report layers store DWORD type and length, then patch payload-only length at close",
+        truck.Calls(0x426CE4, 0x40C8B0)
+        && truck.Matches(0x426CEF, "C74508FFFFFFFF")
+        && truck.Calls(0x426CF6, 0x40C980)
+        && truck.Matches(0x40C8F0, "8B008901")
+        && truck.Matches(0x40C9C0, "8B008901")
+        && truck.Matches(0x426D3C, "8BF02B7704")
+        && truck.Matches(0x426D90, "8B0F8B470483E804508B11FF52085F8930"));
 
     var childImports = child.ImportsFrom(FirefallProcessLayout.ImportModule);
     Check("FirefallProcess imports exactly Awesomium ChildProcessMain, which the DLL exports",

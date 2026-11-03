@@ -23,3 +23,12 @@ The [cross-binary ledger](CompanionBinaryConnections.md) traces
 forwarding to sink slot `+0x18`, and final NUL byte. This is separate from
 RedHanded's CRLF user-stream pipe to r5dumper. No report upload is performed
 by the saved checks.
+
+The submit caller accumulates those bytes in a `slBlob` first, then compresses
+the complete stored range (including the final NUL) into report layer3.
+Generator nonzero exit logs and omits that layer; compressor failure instead
+aborts packaging. The compressor allocates16KiB but advertises four output
+bytes per finish call; the literal4 is verified in native instructions.
+The layer has little-endian DWORD type/length followed by compressed payload,
+with payload-only length patched at close. The ledger records exact addresses
+and separates this local layer map from the still-incomplete outer report format.

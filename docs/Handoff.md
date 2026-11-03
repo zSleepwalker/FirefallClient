@@ -2973,3 +2973,28 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   managed loading remains a separate unresolved connection.
 - Validation: solution build has zero warnings/errors;400 companion checks
   pass with the nine samples and364 pure checks pass without samples.
+
+## DumpTruck hardware blob and compression layer
+
+- Submit `0x40AC1A` supplies slBlob vtable `0x4BDF44`; sink slot+0x18
+  resolves to append `0x41BAE0`. It grows by count and copies exactly
+  count bytes, so HWStats's final NUL is included in the subsequently
+  compressed input range. This is accumulation, not per-pipe-read compression.
+- Only generator exit0 creates hardware report layer3. Nonzero exit logs
+  and omits that layer but continues packaging. Compression false logs,
+  closes/destroys layer/blob and takes submit failure cleanup.
+- Compressor `0x409540` initializes56-byte z_stream (version1.2.8) and
+  allocates0x4000 scratch, but literal avail_out is4 at `0x4095E5`.
+  Z_FINISH4 is separate from that output count. Only return0/1 is accepted;
+  appends4-avail_out bytes, repeats on avail_out0, otherwise returns success.
+  Added exact pure decision captures rather than replacing the4 with16KiB.
+- Layer begin `0x426CD0` writes DWORD type and DWORD placeholder length;
+  close `0x426D30` patches current-position minus payload-start at
+  payload-start minus4. Hardware header is type3/length/data at+0/+4/+8,
+  with little-endian DWORD fields and payload-only length. Normal report
+  completion writes DWORD0 before finalizing the serializer.
+- Saved `HardwareReportNativeLayout.cs`, matching native-byte checks, and
+  detailed ledger. Outer report headers/other layer bodies still need a
+  separate trace. No target, compressor, or report uploader was executed.
+- Validation: solution build has zero warnings/errors;457 companion checks
+  pass with the nine samples and414 pure checks pass without samples.
