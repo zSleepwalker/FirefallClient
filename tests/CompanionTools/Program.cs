@@ -161,6 +161,25 @@ foreach (var callback in new[]
         Red5LoggingBridgeNativeLayout.CaptureMethodCallback(
             callback.RemoteMatch, callback.MethodEntrySelected, callback.Method, callback.Count, callback.String)
         == callback.Expected);
+foreach (var registration in new[]
+{
+    (Context: false, Reference: true, Name: "myfunc", Existing: false,
+        Expected: Red5LuaCallbackRegistrationAction.RejectUnavailableContextOrInvalidReference),
+    (Context: true, Reference: false, Name: "myfunc", Existing: false,
+        Expected: Red5LuaCallbackRegistrationAction.RejectUnavailableContextOrInvalidReference),
+    (Context: true, Reference: true, Name: "bad'name", Existing: false,
+        Expected: Red5LuaCallbackRegistrationAction.RejectUnsupportedMethodName),
+    (Context: true, Reference: true, Name: @"bad\name", Existing: false,
+        Expected: Red5LuaCallbackRegistrationAction.RejectUnsupportedMethodName),
+    (Context: true, Reference: true, Name: "myfunc", Existing: false,
+        Expected: Red5LuaCallbackRegistrationAction.RegisterNewMethod),
+    (Context: true, Reference: true, Name: "myfunc", Existing: true,
+        Expected: Red5LuaCallbackRegistrationAction.ReplaceExistingMethod)
+})
+    Check($"Awesomium Red5 Lua callback registration context={registration.Context}, reference={registration.Reference}, existing={registration.Existing}",
+        Red5LoggingBridgeNativeLayout.CaptureLuaCallbackRegistration(
+            registration.Context, registration.Reference, registration.Name, registration.Existing)
+        == registration.Expected);
 foreach (var mappedArguments in new[]
 {
     (HasArguments: false, IsObject: false, CallableLike: false,
@@ -178,13 +197,13 @@ foreach (var mappedArguments in new[]
         == mappedArguments.Expected);
 foreach (var invocation in new[]
 {
-    (Undefined: true, Async: false, Expected: Red5QueuedCallbackInvocationAction.SkipUndefinedCallback),
-    (Undefined: true, Async: true, Expected: Red5QueuedCallbackInvocationAction.SkipUndefinedCallback),
-    (Undefined: false, Async: false, Expected: Red5QueuedCallbackInvocationAction.InvokeSynchronously),
-    (Undefined: false, Async: true, Expected: Red5QueuedCallbackInvocationAction.InvokeAsynchronously)
+    (Undefined: true, Async: false, Expected: Red5QueuedJavaScriptContinuationAction.SkipUndefinedContinuation),
+    (Undefined: true, Async: true, Expected: Red5QueuedJavaScriptContinuationAction.SkipUndefinedContinuation),
+    (Undefined: false, Async: false, Expected: Red5QueuedJavaScriptContinuationAction.InvokeSynchronously),
+    (Undefined: false, Async: true, Expected: Red5QueuedJavaScriptContinuationAction.InvokeAsynchronously)
 })
-    Check($"Awesomium Red5 queued callback invocation undefined={invocation.Undefined}, async={invocation.Async}",
-        Red5LoggingBridgeNativeLayout.CaptureQueuedCallbackInvocation(
+    Check($"Awesomium Red5 JavaScript continuation undefined={invocation.Undefined}, async={invocation.Async}",
+        Red5LoggingBridgeNativeLayout.CaptureQueuedJavaScriptContinuation(
             invocation.Undefined, invocation.Async) == invocation.Expected);
 foreach (var pointerCleanup in new[]
 {
@@ -1539,6 +1558,23 @@ if (args.Length == 2)
         ClientMatches(0xD64530 + 0x4B, "FF15E04EAC01")
         && client.ImportSlotNames(0x1AC4E10, "??0WebPreferences@Awesomium@@QAE@XZ")
         && ClientMatches(0xCBC1B1, "FF15104EAC01"));
+    Check("Original client AddWebCallback binds a Lua callback reference to the named JavaScript method",
+        client.Calls(0xCCAE67 + 0x400C00,
+            Red5LoggingBridgeNativeLayout.LuaCallbackReferenceCreateRaw + 0x400C00)
+        && client.Calls(0xCCAE74 + 0x400C00,
+            Red5LoggingBridgeNativeLayout.LuaCallbackRegistrationRaw + 0x400C00)
+        && ClientMatches(0xCCC162, "83B81804000000")
+        && ClientMatches(0xCCC172, "83FFFF")
+        && ClientMatches(0xCCC17B, "83FFFE")
+        && ClientMatches(0xCCC1A5, "6A270F45D853FF15C848AC01")
+        && ClientMatches(0xCCC1C5, "6A5C0F45F056FF15C848AC01")
+        && client.Calls(0xCCC20C + 0x400C00,
+            Red5LoggingBridgeNativeLayout.LuaCallbackReferenceReleaseRaw + 0x400C00)
+        && client.Calls(0xCCC22B + 0x400C00, 0xCCD210 + 0x400C00)
+        && ClientMatches(0xCCC233, "8930897804")
+        && ClientMatches(0xCCC238, "8B4424188B881C0400008B01FF5030")
+        && client.Matches(Red5LoggingBridgeNativeLayout.CallbackQueueConsumerRttiLocatorPointerVa, "E00FCD01")
+        && client.Matches(Red5LoggingBridgeNativeLayout.CallbackRegistrationVtableSlotVa, "30511601"));
     Check("Original client routes the other guarded Red5 call through SetPropertyAsync, not SetCustomMethod",
         ClientMatches(0xD651B0 + 0x68, "FF15F04EAC01")
         && client.ImportSlotNames(Red5LoggingBridgeNativeLayout.SetPropertyAsyncImportVa,
@@ -1625,6 +1661,12 @@ if (args.Length == 2)
             == "   #%d: %s"
         && client.Ascii(Red5LoggingBridgeNativeLayout.CallbackQueueReturnLogFormatVa)
             == "Javascript callback returned: %s");
+    Check("Original client converts JavaScript arguments and dispatches the registered Lua callback before its optional continuation",
+        client.Calls(0xD64C90 + 0x400C00,
+            Red5LoggingBridgeNativeLayout.LuaCallbackArgumentConversionRaw + 0x400C00)
+        && ClientMatches(0xD64E0E, "BA40950201")
+        && client.Calls(0xD64E52 + 0x400C00,
+            Red5LoggingBridgeNativeLayout.LuaCallbackInvocationWrapperRaw + 0x400C00));
     Check("Original client bridge cleanup runs from its scalar-deleting destructor",
         client.Calls(Red5LoggingBridgeNativeLayout.CallbackBridgeDeletingDestructorRaw + 6 + 0x400C00,
             Red5LoggingBridgeNativeLayout.CallbackBridgeDestructorRaw + 0x400C00)

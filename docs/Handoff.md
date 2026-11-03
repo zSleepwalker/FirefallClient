@@ -3803,10 +3803,14 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   `0x1C7664C`; complete-object locator VA `0x1CD0FE0`, object offset0).
 - The consumer drains the queue at `this+0x4C` while the pending count at
   `this+0x5C` is nonzero. A missing current mapping discards that queued
-  callback. Otherwise it prepares the stored callback and arguments, skips
-  an undefined callback value using imported `JSValue::IsUndefined` at IAT
-  VA `0x1AC4EE8`, then invokes its `call` method with a null receiver and
-  the prepared arguments.
+  callback. Otherwise it retrieves the mapped Lua state/reference, converts
+  the JavaScript arguments through `0xCBBE00`, and dispatches the Lua
+  callback via adapter `0x1029540` inside wrapper `0xCD6C10`. The `JSValue`
+  in the record is a separate, optional JavaScript continuation.
+- An undefined continuation, tested through imported `JSValue::IsUndefined`
+  at IAT VA `0x1AC4EE8`, skips only that JavaScript continuation. When
+  defined, Lua return values are marshalled into a `JSArray` and passed to
+  its `call` method with a null receiver.
 - Global VA `0x1E686C4` offset `+8` selects imported
   `JSObject::InvokeAsync` at IAT VA `0x1AC4EEC` when nonzero, or synchronous
   `JSObject::Invoke` at `0x1AC4EDC` otherwise. The synchronous path logs the
@@ -3842,10 +3846,38 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   `TestCallback`. The HTML calls `Red5.myfunc` with a trailing JavaScript
   callback, calls `Red5.MoveMe`, and defines `Red5Callbacks.test_from_lua`
   for Lua's `CallWebFunc`. This establishes the generic bidirectional test
-  contract, not an `errorlog` call or the exact native implementation behind
-  `AddWebCallback`.
+  contract, but does not show an `errorlog` call. The native
+  `AddWebCallback` implementation is traced below.
 - The main UI Lua source reads `ingame_host` and loads
   `host .. "/panelmanager"`; it also loads its selected panel URL in that
   frame. A case-insensitive search of the installed `system\gui` text/script
   sources found no `errorlog` call. The actual caller remains unresolved;
   dynamically loaded page code is a possibility, not confirmed evidence.
+
+## FirefallClient AddWebCallback Lua registration and dispatch
+
+- Raw `0xCCAD70` is the Lua `AddWebCallback` binding. It validates the
+  callback argument, obtains a callback reference through `0xC56170`, and
+  calls `0xCCC130` with the method name, Lua state, and reference.
+- Registration helper `0xCCC130` requires a nonzero field at `this+0x418`,
+  rejects reference values `-1` and `-2`, and rejects names containing `'`
+  or `\`. It stores the Lua state and reference in the method tree at
+  `this+0x474`; replacement releases the old reference through `0xC56250`
+  before removing and replacing the entry.
+- The helper calls virtual slot `+0x30` on the object at `this+0x41C`. A
+  vtable at VA `0x1C765FC` shares the `uiWebFrameInternal_17` RTTI locator
+  and has `0xD64530` at slot VA `0x1C7662C`; `0xD64530` gates and calls
+  `JSObject::SetCustomMethod`. The field's dynamic vptr assignment was not
+  independently located, so this is a strong slot match rather than a fully
+  closed runtime pointer trace.
+- Queue consumer `0xD64AE0` converts JavaScript arguments through
+  `0xCBBE00`, then dispatches the registered Lua callback via adapter
+  `0x1029540` inside wrapper `0xCD6C10`. The queued `JSValue` at `+4` is the
+  optional trailing JavaScript continuation, not the registered Lua
+  callback. The consumer invokes that continuation with marshalled Lua return
+  values when it is defined; the undefined check skips only the continuation.
+- Updated the inert C# decisions, sample guards, and Red5 bridge evidence
+  document to reflect registration/replacement and the two-stage
+  JavaScript-to-Lua-to-JavaScript flow. The installed `WebTest.lua` and HTML
+  corroborate the generic callback flow, but do not show a call to
+  `Red5.errorlog`; its JavaScript caller remains unresolved.

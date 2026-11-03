@@ -69,18 +69,47 @@ as the method-name key for a fresh lookup in the ordered tree rooted at
 pre-resolved tree entry. If the mapping is no longer found, that queued
 callback is discarded rather than invoked.
 
-For a selected entry, the consumer obtains the separately stored callback
-value and assembled argument array. When the callback value is undefined,
-as tested through imported `JSValue::IsUndefined` (IAT VA `0x1AC4EE8`), it
-skips invocation. Otherwise it converts the value to a JSObject and invokes
-that object's `call` method
-(UTF-16 literal at VA `0x1BD47B4`) with a null receiver followed by the
-prepared callback arguments. A state check at global VA `0x1E686C4` offset
-`+8` selects imported `JSObject::InvokeAsync` (IAT VA `0x1AC4EEC`) when
-nonzero, and `JSObject::Invoke` (IAT VA `0x1AC4EDC`) otherwise. The
-synchronous path can log the return value. Conditional debug logs use
-`Executing callback '%s' from JavaScript` and `   #%d: %s`; this path's
-observed return format is `Javascript callback returned: %s`.
+## Native Lua callback registration and dispatch
+
+The Lua binding at raw `0xCCAD70` implements the `AddWebCallback` method
+described by the usage string at VA `0x1BC766C`. It checks that the callback
+argument is function-like, obtains a callback reference through
+`0xC56170`, and calls registration helper `0xCCC130` with the method name,
+the Lua state, and that reference.
+
+The registration helper requires a nonzero field at `this+0x418` and rejects
+reference values `-1` and `-2`. It rejects method names containing an
+apostrophe or backslash. The method map is the ordered tree rooted at
+`this+0x474`, also used by the JavaScript method handler and queue consumer.
+When replacing a name, it releases the old callback reference through
+`0xC56250` and removes the old tree node. It then stores the Lua state and new
+reference in the map entry and calls virtual slot `+0x30` on the object at
+`this+0x41C`.
+
+A vtable at VA `0x1C765FC` has the same RTTI complete-object locator as the
+previously identified `uiWebFrameInternal_17` vtable and contains raw
+`0xD64530` at slot VA `0x1C7662C` (`+0x30`). That method calls
+`JSObject::SetCustomMethod` (IAT VA `0x1AC4EE0`) with the supplied name and
+trailing argument `0`, gated by successful bridge setup. This agrees with the
+registration path; the dynamic vptr assignment for the particular
+`this+0x41C` field was not independently located.
+
+On queue consumption, the selected map entry supplies the registered Lua
+state and callback reference. The consumer converts each JavaScript argument
+to the Lua-side value representation through raw `0xCBBE00`, then dispatches
+the registered Lua callback through adapter `0x1029540` inside wrapper
+`0xCD6C10`. The `JSValue` retained at record offset `+4` is instead the
+optional trailing JavaScript continuation separated by the method handler.
+If it is undefined, tested through imported `JSValue::IsUndefined` (IAT VA
+`0x1AC4EE8`), only that continuation is skipped; the mapped Lua callback
+has already been dispatched. Otherwise, Lua return values are marshalled
+into a `JSArray`, and the saved JavaScript function's `call` method (UTF-16
+literal at VA `0x1BD47B4`) is invoked with a null receiver and those values.
+A state check at global VA `0x1E686C4` offset `+8` selects imported
+`JSObject::InvokeAsync` (IAT VA `0x1AC4EEC`) when nonzero, and
+`JSObject::Invoke` (IAT VA `0x1AC4EDC`) otherwise. Conditional debug logs
+include `Executing callback '%s' from JavaScript`, `   #%d: %s`, and
+`Javascript callback returned: %s`.
 
 ## Bridge teardown
 
@@ -139,9 +168,10 @@ a Lua table with nested values (lines 24-39). The paired
 JavaScript callback and calls `Red5.MoveMe()` (lines 58 and 90); it also
 defines `Red5Callbacks.test_from_lua`, which the Lua side calls through
 `CallWebFunc` (Lua line 54; HTML line 65). This confirms a generic
-JavaScript-to-Lua callback and Lua-to-JavaScript function path, but it does
-not identify a call to `Red5.errorlog` or prove which native method implements
-`AddWebCallback`.
+JavaScript-to-Lua callback, its optional JavaScript continuation, and the
+Lua-to-JavaScript function path. The native
+`AddWebCallback` registration and Lua callback dispatch are now traced above,
+but this test does not identify a call to `Red5.errorlog`.
 
 The main UI Lua source gets `ingame_host` from an operator setting
 (`components\MainUI\Web\Mainframe\Mainframe.lua`, line 91) and loads

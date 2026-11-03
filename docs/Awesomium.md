@@ -73,6 +73,6 @@ layout and shows that pair/numeric failure does not automatically discard
 the produced rule.
 
 [Red5 logging bridge](AwesomiumRed5LoggingBridge.md) records one-shot object
-creation, the native `errorlog` callback's string-to-logger path, and the
-mapped callback queue's record/argument handling and synchronous/asynchronous
-consumer; the JavaScript caller remains unresolved.
+creation, the native `errorlog` callback's string-to-logger path, Lua
+`AddWebCallback` registration and dispatch, and its optional JavaScript
+continuation; the `errorlog` caller remains unresolved.

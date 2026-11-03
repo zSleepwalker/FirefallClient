@@ -27,9 +27,17 @@ public enum Red5MappedCallbackArgumentAction
     SeparateTrailingCallableLikeValue
 }
 
-public enum Red5QueuedCallbackInvocationAction
+public enum Red5LuaCallbackRegistrationAction
 {
-    SkipUndefinedCallback,
+    RejectUnavailableContextOrInvalidReference,
+    RejectUnsupportedMethodName,
+    RegisterNewMethod,
+    ReplaceExistingMethod
+}
+
+public enum Red5QueuedJavaScriptContinuationAction
+{
+    SkipUndefinedContinuation,
     InvokeSynchronously,
     InvokeAsynchronously
 }
@@ -48,6 +56,12 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint CallbackHandlerRaw = 0xD65A60;
     public const uint CallbackHandlerVtableVa = 0x1C7656C;
     public const uint CallbackQueueConsumerRaw = 0xD64AE0;
+    public const uint LuaAddWebCallbackRaw = 0xCCAD70;
+    public const uint LuaCallbackRegistrationRaw = 0xCCC130;
+    public const uint LuaCallbackReferenceCreateRaw = 0xC56170;
+    public const uint LuaCallbackReferenceReleaseRaw = 0xC56250;
+    public const uint LuaCallbackArgumentConversionRaw = 0xCBBE00;
+    public const uint LuaCallbackInvocationWrapperRaw = 0xCD6C10;
     public const uint CallbackBridgeCleanupRaw = 0xD64710;
     public const uint CallbackBridgeDestructorRaw = 0xD64250;
     public const uint CallbackBridgeDeletingDestructorRaw = 0xD64180;
@@ -55,6 +69,7 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint CallbackQueueConsumerRttiLocatorPointerVa = 0x1C765F8;
     public const uint CallbackQueueConsumerVtableSlotVa = 0x1C7664C;
     public const uint CallbackQueueConsumerClassDescriptorVa = 0x1E2E238;
+    public const uint CallbackRegistrationVtableSlotVa = 0x1C7662C;
     public const uint CallbackMethodLookupRaw = 0xCCD640;
     public const uint CallbackCallablePredicateRaw = 0xD64320;
     public const uint CallbackQueueAppendRaw = 0xD66B70;
@@ -131,12 +146,33 @@ public static class Red5LoggingBridgeNativeLayout
             ? Red5MappedCallbackArgumentAction.SeparateTrailingCallableLikeValue
             : Red5MappedCallbackArgumentAction.PreserveAllArguments;
 
-    public static Red5QueuedCallbackInvocationAction CaptureQueuedCallbackInvocation(
-        bool callbackValueIsUndefined,
+    public static Red5LuaCallbackRegistrationAction CaptureLuaCallbackRegistration(
+        bool registrationContextAvailable,
+        bool callbackReferenceValid,
+        string methodName,
+        bool methodAlreadyRegistered)
+    {
+        if (!registrationContextAvailable || !callbackReferenceValid)
+        {
+            return Red5LuaCallbackRegistrationAction.RejectUnavailableContextOrInvalidReference;
+        }
+
+        if (methodName.IndexOf('\'') >= 0 || methodName.IndexOf('\\') >= 0)
+        {
+            return Red5LuaCallbackRegistrationAction.RejectUnsupportedMethodName;
+        }
+
+        return methodAlreadyRegistered
+            ? Red5LuaCallbackRegistrationAction.ReplaceExistingMethod
+            : Red5LuaCallbackRegistrationAction.RegisterNewMethod;
+    }
+
+    public static Red5QueuedJavaScriptContinuationAction CaptureQueuedJavaScriptContinuation(
+        bool continuationValueIsUndefined,
         bool asynchronousInvokeEnabled) =>
-        callbackValueIsUndefined ? Red5QueuedCallbackInvocationAction.SkipUndefinedCallback
-        : asynchronousInvokeEnabled ? Red5QueuedCallbackInvocationAction.InvokeAsynchronously
-        : Red5QueuedCallbackInvocationAction.InvokeSynchronously;
+        continuationValueIsUndefined ? Red5QueuedJavaScriptContinuationAction.SkipUndefinedContinuation
+        : asynchronousInvokeEnabled ? Red5QueuedJavaScriptContinuationAction.InvokeAsynchronously
+        : Red5QueuedJavaScriptContinuationAction.InvokeSynchronously;
 
     public static Red5BridgePointerCleanupAction CaptureBridgePointerCleanup(
         bool pointerIsNull,
