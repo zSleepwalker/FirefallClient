@@ -75,6 +75,25 @@ Check("Awesomium diagnostic conversion error remains sticky through later valid 
     && !DiagnosticEncodingNativeLayout.CaptureAggregateConversionSuccess(true, false)
     && !DiagnosticEncodingNativeLayout.CaptureAggregateConversionSuccess(false, true)
     && !DiagnosticEncodingNativeLayout.CaptureAggregateConversionSuccess(false, false));
+foreach (bool disabled in new[] { false, true })
+foreach (bool childType in new[] { false, true })
+foreach (int observedLevel in new[] { int.MinValue, -2, 0, 2, 3, 4, int.MaxValue })
+{
+    var setup = LoggingSetupNativeLayout.CaptureNormalSetup(disabled, childType, observedLevel);
+    Check($"Awesomium normal logging setup disabled={disabled}, type={childType}, output={observedLevel}",
+        setup.OutputDestination == (disabled ? 0 : 1)
+        && setup.AppendExistingLog == childType && setup.DiagnosticChecksMode == 0
+        && setup.MinimumSeverityAfterNormalSetup == (observedLevel >= 3 ? 3 : observedLevel));
+}
+foreach (bool nonempty in new[] { false, true })
+foreach (bool succeeded in new[] { false, true })
+foreach (int observedVerbose in new[] { int.MinValue, -1, 0, 2, int.MaxValue })
+    Check($"Awesomium verbose threshold write nonempty={nonempty}, success={succeeded}, output={observedVerbose}",
+        LoggingSetupNativeLayout.CaptureVerboseThresholdAssignment(7, nonempty, succeeded, observedVerbose)
+        == (nonempty && succeeded ? unchecked(-observedVerbose) : 7));
+Check("Awesomium normal caller threshold override supersedes an earlier verbose assignment",
+    LoggingSetupNativeLayout.CaptureVerboseThresholdAssignment(0, true, true, 5) == -5
+    && LoggingSetupNativeLayout.CaptureNormalSetup(false, false, 2).MinimumSeverityAfterNormalSetup == 2);
 foreach (int severity in new[] { int.MinValue, -1, 0, 1, 2, 3, 4, int.MaxValue })
     Check($"Awesomium minimum severity assignment signed upper clamp {severity}",
         ConversionDiagnosticNativeLayout.CaptureMinimumSeverityAssignment(severity)
@@ -817,6 +836,32 @@ if (args.Length == 2)
         && browser.Matches(0x102B7C9C, "8BCBC1E90A81E94028000066890C78")
         && browser.Matches(0x102B7CB3, "81E3FF03000081CB00DC000066895C7E02")
         && browser.Matches(0x102B7CC6, "B802000000"));
+    Check("Awesomium logging setup initializes output and ignores numeric conversion status",
+        browser.Matches(0x10033BD7, "33DB")
+        && browser.Matches(0x10033D34, "895C2414")
+        && browser.Calls(0x10033D6E, LoggingSetupNativeLayout.IntegerConversionWrapperVa)
+        && browser.Matches(0x10033D73, "B80C57261183C408"));
+    Check("Awesomium caller supplies destination, child append and disabled-check mode before threshold override",
+        browser.Matches(0x10033E54, "33C9399C2450010000530F95C133D2385C24170F94C251535250")
+        && browser.Calls(0x10033E6E, LoggingSetupNativeLayout.InitializeLoggerVa)
+        && browser.Matches(0x10033E73, "8B44242850")
+        && browser.Calls(0x10033E78, ConversionDiagnosticNativeLayout.MinimumSeveritySetterVa)
+        && browser.Matches(0x1028A2CE, "8B8C2454010000")
+        && browser.Matches(0x1028A2E1, "890DF86A5911"));
+    Check("Awesomium verbose configuration receives threshold address and conditionally writes its negated output",
+        browser.Matches(0x1028A51B, "68046B5911")
+        && browser.Calls(0x1028A555, LoggingSetupNativeLayout.VerboseConfigurationConstructorVa)
+        && browser.Matches(0x102B57BC, "8B4610895C24203BC3744E")
+        && browser.Calls(0x102B57E7, LoggingSetupNativeLayout.IntegerConversionWrapperVa)
+        && browser.Matches(0x102B57EF, "84C0740D8B4C24208B5510F7D9890A"));
+    Check("Awesomium numeric failure can retain prefix output and saturates at signed Int32 limits",
+        browser.Matches(0x1029C43F, "C70600000000")
+        && browser.Matches(0x1029C3CF, "C70600000000")
+        && browser.Matches(0x1029C451, "8A018D50D080FA0977EE")
+        && browser.Matches(0x1029C478, "0FB6C00106413BCD75CF")
+        && browser.Matches(0x1029C489, "C706FFFFFF7F5E32C0")
+        && browser.Matches(0x1029C419, "C706000000805E32C0")
+        && browser.Matches(0x1029C8D2, "32DB"));
     Check("Awesomium minimum severity getter and signed setter preserve the fallback DWORD",
         browser.Matches(ConversionDiagnosticNativeLayout.MinimumSeverityGetterVa, "A1046B5911C3")
         && browser.Matches(ConversionDiagnosticNativeLayout.MinimumSeveritySetterVa,

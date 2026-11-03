@@ -75,8 +75,10 @@ and store that value instead. There is no lower clamp.
 the native return register: the upper branch leaves the address
 `0x1127B090` in EAX, whereas the lower branch leaves the argument.
 This does not establish a meaningful public return-value contract.
-The setter alone does not establish the current threshold: another observed
-writer exists in `0x1028A2A0` and has not been reconstructed here.
+The setter alone does not establish the current threshold. The xref in
+`0x1028A2A0` passes the storage address to verbose configuration, which can
+write through it. [Logging setup and precedence](AwesomiumLoggingSetup.md)
+records that write and the later `log-level` override.
 
 ## Severity 3 is not the severity-4 path
 

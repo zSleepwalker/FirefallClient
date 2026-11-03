@@ -44,3 +44,9 @@ empty output string.
 - The WebString at +0x08 is built from the FirefallProcess.exe path and is the `child_process_path` (so the client does set it, stock `awesomium_process` is not used); +0x04 is plugin_path, +0x0C log_path, +0x14 user_agent. Field names follow Awesomium 1.7 SDK order and are inferred, not proven by symbol.
 ### Unresolved
 - Which two strings fill `%s (%s)` and the meaning of +0x10 and +0x20 (+0x20=1 possibly a boolean flag); exact path branch semantics; the `WebPreferences` and `SetCustomMethod` call sites.
+## Logging setup follow-up
+
+[Logging setup and threshold precedence](AwesomiumLoggingSetup.md) records
+the ignored numeric-conversion status, disabled-check mode, destination/
+append arguments, and verbose-threshold write followed by `log-level`
+override. The saved code captures decisions only and performs no logging.

@@ -3489,3 +3489,29 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   callback, downloader, registry/hardware query or service was executed.
 - Follow-ons: DownloadObject non206 status/retry decisions; other threshold
   writer1028A2A0 or explicit setter caller10033BC0. These are not completed.
+
+## Awesomium logging setup precedence
+
+- Range/GPU-interceptor batch committed/pushed as68603b7.
+- Traced setup10033BC0: ASCII getters for type/log path/log-level,
+  numeric converter output initialized0 but success byte ignored,
+  disable-logging tested by presence. Normal logger-init return is followed
+  unconditionally by log-level setter10288E70, regardless of init success.
+- Init1028A2A0 receives destination0/1, argument3=0, append=nonempty ASCII
+  type and diagnostic-check mode0. The mode goes to11596AF8, so optional
+  mode1 diagnostics are disabled by this observed caller.
+- Corrected prior "other writer" shorthand:1028A51B passes address11596B04
+  to verbose constructor102B5720. Nonempty v plus successful numeric parse
+  writes unchecked negated result through that address, but the outer
+  log-level setter subsequently overrides it on normal return.
+- Numeric failure can retain a prefix value or saturate signed Int32.
+  Outer setup uses that output even on failure; verbose constructor
+  requires success. Saved observation-based decisions, not a byte parser.
+- Added LoggingSetupNativeLayout and focused docs/native checks. Build
+  succeeds;1637 pure and1882 sample-backed checks pass. No logger, file
+  deletion/open, mutex, target, callback or services executed.
+- Agent1eee0217-8d6a-414a-9e36-3b30e6ad8841 is assigned a bounded independent
+  DownloadObject response/retry trace. Do not mark complete before receiving,
+  integrating and validating its report.
+- Further logger follow-ons: verbose module match semantics and actual
+  file-opening helper10289C70; no implementation or completion claimed.
