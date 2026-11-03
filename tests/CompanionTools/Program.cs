@@ -85,6 +85,84 @@ Check("Awesomium duplicate normalized key overwrites earlier value",
     DuplicateSwitchNativeLayout.CaptureSameNormalizedKeyValue("renderer", "plugin") == "plugin");
 Check("Awesomium duplicate normalized key can clear earlier value",
     DuplicateSwitchNativeLayout.CaptureSameNormalizedKeyValue("renderer", "") == "");
+foreach (var admission in new (bool Scanning, bool Marker, bool Prefix, bool Next, bool Admitted)[]
+{
+    (false, false, false, false, false), (false, false, true, false, false),
+    (false, true, false, false, false), (false, true, true, false, false),
+    (true, false, false, true, false), (true, false, true, true, true),
+    (true, true, false, false, false), (true, true, true, false, false)
+})
+    Check($"Awesomium admission scanning={admission.Scanning}, marker={admission.Marker}, prefix={admission.Prefix}",
+        SwitchAdmissionNativeLayout.CaptureNextSwitchScanningState(admission.Scanning, admission.Marker) == admission.Next
+        && SwitchAdmissionNativeLayout.CaptureCurrentSwitchMapAdmission(
+            admission.Scanning, admission.Marker, admission.Prefix) == admission.Admitted);
+Check("Awesomium plain positional preserves scanning for a later type switch",
+    !SwitchAdmissionNativeLayout.CaptureCurrentSwitchMapAdmission(true, false, false)
+    && SwitchAdmissionNativeLayout.CaptureCurrentSwitchMapAdmission(
+        SwitchAdmissionNativeLayout.CaptureNextSwitchScanningState(true, false), false, true));
+Check("Awesomium exact marker blocks a later type switch",
+    !SwitchAdmissionNativeLayout.CaptureCurrentSwitchMapAdmission(
+        SwitchAdmissionNativeLayout.CaptureNextSwitchScanningState(true, true), false, true));
+foreach (var name in new (uint Minor, byte Type, string Expected)[]
+{
+    (0, 1, "Windows Vista "), (0, 3, "Windows Server 2008 "),
+    (1, 1, "Windows 7 "), (1, 0, "Windows Server 2008 R2 "),
+    (2, 1, "Windows 8 "), (2, 3, "Windows Server 8 "),
+    (3, 1, "Windows ? "), (uint.MaxValue, 3, "Windows ? ")
+})
+    Check($"NT6 exact name minor={name.Minor}, product type={name.Type}",
+        OsDescriptionTextNativeLayout.CaptureNt6Name(name.Minor, name.Type) == name.Expected);
+foreach (var edition in new (uint Code, string Expected)[]
+{
+    (1, "Ultimate Edition"), (2, "Home Basic Edition"), (3, "Home Premium Edition"),
+    (4, "Enterprise Edition"), (6, "Business Edition"), (7, "Standard Edition"),
+    (8, "Datacenter Edition"), (9, "Small Business Server"), (10, "Enterprise Edition"),
+    (11, "Starter Edition"), (12, "Datacenter Edition (core installation)"),
+    (13, "Standard Edition (core installation)"), (14, "Enterprise Edition (core installation)"),
+    (15, "Enterprise Edition for Itanium - based Systems"), (17, "Web Server Edition"),
+    (18, "Cluster Server Edition"), (25, "Small Business Server Premium Edition"), (48, "Professional"),
+    (0, ""), (5, ""), (16, ""), (49, ""), (uint.MaxValue, "")
+})
+    Check($"NT6 edition exact product code {edition.Code}",
+        OsDescriptionTextNativeLayout.CaptureNt6Edition(edition.Code) == edition.Expected);
+foreach (var name in new (uint Minor, byte Type, ushort Architecture, ushort Suites, bool R2, string Expected)[]
+{
+    (0, 1, 0, 0, false, "Windows 2000 Professional"),
+    (0, 3, 0, 0x82, false, "Windows 2000 Datacenter Server"),
+    (0, 3, 0, 2, false, "Windows 2000 Advanced Server"),
+    (0, 3, 0, 0, false, "Windows 2000 Server"),
+    (1, 1, 0, 0x200, false, "Windows XP Home Edition"),
+    (1, 3, 9, 0, true, "Windows XP Professional"),
+    (2, 1, 9, 0, false, "Windows XP Professional x64 Edition"),
+    (2, 1, 0, 0, false, "Windows Server 2003, "),
+    (2, 3, 0, 0, true, "Windows Server 2003 R2, Standard Edition"),
+    (2, 3, 6, 0x82, false, "Windows Server 2003, Datacenter Edition for Itanium-based Systems"),
+    (2, 3, 6, 2, false, "Windows Server 2003, Enterprise Edition for Itanium-based Systems"),
+    (2, 3, 6, 0, false, "Windows Server 2003, "),
+    (2, 3, 9, 0x82, false, "Windows Server 2003, Datacenter x64 Edition"),
+    (2, 3, 9, 2, false, "Windows Server 2003, Enterprise x64 Edition"),
+    (2, 3, 9, 0, false, "Windows Server 2003, Standard x64 Edition"),
+    (2, 3, 9, 0x4000, false, "Windows Server 2003, Standard x64 Edition"),
+    (2, 3, 0, 0x4082, false, "Windows Server 2003, Compute Cluster Edition"),
+    (2, 3, 0, 0x82, false, "Windows Server 2003, Datacenter Edition"),
+    (2, 3, 0, 2, false, "Windows Server 2003, Enterprise Edition"),
+    (2, 3, 0, 0x400, false, "Windows Server 2003, Web Edition"),
+    (2, 3, 0, 0, false, "Windows Server 2003, Standard Edition"),
+    (2, 3, 0, 0xA000, false, "Windows Storage Server 2003Standard Edition"),
+    (2, 3, 0, 0x8000, false, "Windows Home ServerStandard Edition"),
+    (2, 1, 9, 0x2000, false, "Windows Storage Server 2003"),
+    (2, 1, 9, 0xA000, true, "Windows Server 2003 R2, "),
+    (3, 1, 0, 0, false, "")
+})
+    Check($"NT5 exact name minor={name.Minor}, product={name.Type}, arch={name.Architecture}, suites={name.Suites:X4}, R2={name.R2}",
+        OsDescriptionTextNativeLayout.CaptureNt5Name(name.Minor, name.Type, name.Architecture, name.Suites, name.R2) == name.Expected);
+foreach (var suffix in new (uint Major, ushort Architecture, string Expected)[]
+{
+    (5, 9, ""), (6, 9, ", 64-bit"), (6, 0, ", 32-bit"),
+    (6, 6, ""), (10, 9, ", 64-bit"), (uint.MaxValue, ushort.MaxValue, "")
+})
+    Check($"OS architecture suffix major={suffix.Major}, architecture={suffix.Architecture}",
+        OsDescriptionTextNativeLayout.CaptureArchitectureSuffix(suffix.Major, suffix.Architecture) == suffix.Expected);
 foreach (var entry in new (ulong Bytes, DriveSpaceAmounts Amounts, DriveSpaceDisplayUnit Unit)[]
 {
     (0, new(0, 0), DriveSpaceDisplayUnit.None),
@@ -512,6 +590,22 @@ if (args.Length == 2)
         && browser.Calls(0x1028C4C4, 0x10007AB0)
         && browser.Calls(0x1028C4D4, 0x100F7110)
         && browser.Calls(0x1028C585, 0x10007FA0));
+    Check("Awesomium exact end marker clears initially enabled scanning state stickily",
+        browser.Calls(0x1028DFA6, SwitchAdmissionNativeLayout.ParsedSwitchLoopVa)
+        && browser.Matches(0x1028DD0F, "C644240B01")
+        && browser.Calls(SwitchAdmissionNativeLayout.EndOfSwitchComparisonCallVa, 0x10014B20)
+        && browser.Matches(0x1028DD9A, "85C00F95C2205424137455")
+        && browser.Matches(SwitchAdmissionNativeLayout.EndOfSwitchMarkerVa, "2D002D000000"));
+    Check("Awesomium admitted tokens use splitter and native prefix validator",
+        browser.Calls(SwitchAdmissionNativeLayout.SwitchSplitCallVa, 0x1028BC60)
+        && browser.Calls(SwitchAdmissionNativeLayout.PrefixValidatorCallVa, 0x1028BB70)
+        && browser.Calls(0x1028BBF4, 0x10014B20)
+        && browser.Matches(SwitchAdmissionNativeLayout.SwitchPrefixTableVa, "F0B32711ECB32711E8B32711")
+        && browser.Matches(0x1127B3E8, "2F0000002D0000002D002D000000"));
+    Check("Awesomium switch map and positional append paths remain distinct",
+        browser.Calls(0x1028DDCF, 0x1029A9C0)
+        && browser.Calls(SwitchAdmissionNativeLayout.SwitchMapBuilderCallVa, 0x1028D7F0)
+        && browser.Calls(SwitchAdmissionNativeLayout.PositionalAppendCallVa, 0x10155F50));
     var dbghelp = Load("dbghelp_red5.dll", 1213200,
         "C06430B8CB025BE506BE50A756488E1BCC3827C4F45158D93E4E3EEB98CE1E4F");
     var deployment = Load("DeploymentCommon.dll", 76800,
@@ -1150,6 +1244,114 @@ if (args.Length == 2)
         && hardware.Calls(0x40404A, OsDescriptionNativeLayout.BuilderVa)
         && hardware.Matches(0x40404F, "33C06A7E")
         && hardware.Matches(0x4040F0, "8D8568FDFFFF"));
+    Check("HWStats NT6 name branches distinguish workstation and minor zero/one/two",
+        hardware.Matches(0x403B38, "85C07514807DD2017507")
+        && hardware.Matches(0x403B50, "83F80175133845D27507")
+        && hardware.Matches(0x403B68, "83F8027514807DD2017507"));
+    foreach (var literal in new (uint SetupVa, uint TextVa, string Expected)[]
+    {
+        (0x403B08, 0x4431A8, OsDescriptionTextNativeLayout.MicrosoftPrefix),
+        (0x403B42, 0x4431C0, OsDescriptionTextNativeLayout.CaptureNt6Name(0, 1)),
+        (0x403B49, 0x4431E0, OsDescriptionTextNativeLayout.CaptureNt6Name(0, 3)),
+        (0x403B5A, 0x44320C, OsDescriptionTextNativeLayout.CaptureNt6Name(1, 1)),
+        (0x403B61, 0x443224, OsDescriptionTextNativeLayout.CaptureNt6Name(1, 3)),
+        (0x403B73, 0x443254, OsDescriptionTextNativeLayout.CaptureNt6Name(2, 1)),
+        (0x403B7A, 0x44326C, OsDescriptionTextNativeLayout.CaptureNt6Name(2, 3)),
+        (0x403B81, 0x443290, OsDescriptionTextNativeLayout.CaptureNt6Name(3, 1)),
+        (0x403C21, 0x443664, "Windows Server 2003 R2, "),
+        (0x403CE1, 0x443698, "Windows Storage Server 2003"),
+        (0x403CEF, 0x4436D0, "Windows Home Server"),
+        (0x403D04, 0x4436F8, "Windows XP Professional x64 Edition"),
+        (0x403D0B, 0x443740, "Windows Server 2003, "),
+        (0x403D39, 0x443798, "Datacenter Edition for Itanium-based Systems"),
+        (0x403D44, 0x443818, "Enterprise Edition for Itanium-based Systems"),
+        (0x403D58, 0x443874, "Datacenter x64 Edition"),
+        (0x403D69, 0x4438A4, "Enterprise x64 Edition"),
+        (0x403D70, 0x44376C, "Standard x64 Edition"),
+        (0x403D7E, 0x4438D4, "Compute Cluster Edition"),
+        (0x403D89, 0x443904, "Datacenter Edition"),
+        (0x403D94, 0x44392C, "Enterprise Edition"),
+        (0x403D9B, 0x443954, "Web Edition"),
+        (0x403DA7, 0x4437F4, "Standard Edition"),
+        (0x403DCF, 0x44396C, "Windows XP "),
+        (0x403DEC, 0x443984, "Home Edition"),
+        (0x403DF3, 0x4439A0, "Professional"),
+        (0x403E10, 0x4439BC, "Windows 2000 "),
+        (0x403E26, 0x4439D8, "Professional"),
+        (0x403E34, 0x4439F4, "Datacenter Server"),
+        (0x403E3B, 0x443A18, "Advanced Server"),
+        (0x403E44, 0x443A38, "Server"),
+        (0x403E71, 0x443A48, OsDescriptionTextNativeLayout.ServicePackSeparator),
+        (0x403E94, 0x443A50, OsDescriptionTextNativeLayout.BuildPrefix),
+        (0x403ECD, 0x443A64, OsDescriptionTextNativeLayout.CaptureArchitectureSuffix(6, 9)),
+        (0x403ED9, 0x443A78, OsDescriptionTextNativeLayout.CaptureArchitectureSuffix(6, 0))
+    })
+        Check($"HWStats OS literal {literal.TextVa:X}",
+            hardware.Matches(literal.SetupVa, "BA" + Convert.ToHexString(BitConverter.GetBytes(literal.TextVa)))
+            && hardware.Matches(literal.TextVa, Convert.ToHexString(System.Text.Encoding.Unicode.GetBytes(literal.Expected + "\0"))));
+    Check("HWStats product-code bounds and exact native index bytes",
+        hardware.Matches(0x403BD1, "4883F82F771E")
+        && hardware.Matches(OsDescriptionTextNativeLayout.ProductIndexTableVa,
+            "00010203120405060708090A0B0C0D120E0F121212121212101212121212121212121212121212121212121212121211")
+        && hardware.Word(OsDescriptionTextNativeLayout.ProductJumpTableVa + 18 * 4) == 0x403BF5);
+    foreach (var edition in new (uint Code, uint Index, uint BlockVa, uint TextVa)[]
+    {
+        (1, 0, 0x403BE5, 0x4432D4), (2, 1, 0x403C39, 0x443340),
+        (3, 2, 0x403C32, 0x443314), (4, 3, 0x403C40, 0x443368),
+        (6, 4, 0x403C47, 0x443390), (7, 5, 0x403C9C, 0x4435CC),
+        (8, 6, 0x403C5C, 0x443404), (9, 7, 0x403C88, 0x44342C),
+        (10, 8, 0x403C6A, 0x4434A8), (11, 9, 0x403C4E, 0x4433B4),
+        (12, 10, 0x403C63, 0x443458), (13, 11, 0x403CA6, 0x4435F0),
+        (14, 12, 0x403C74, 0x4434D0), (15, 13, 0x403C7E, 0x443520),
+        (17, 14, 0x403CB0, 0x44363C), (18, 15, 0x403C55, 0x4433D4),
+        (25, 16, 0x403C92, 0x443580), (48, 17, 0x403C2B, 0x4432F8)
+    })
+        Check($"HWStats product code {edition.Code} index, destination and wide edition",
+            hardware.Word(OsDescriptionTextNativeLayout.ProductJumpTableVa + edition.Index * 4) == edition.BlockVa
+            && hardware.Matches(edition.BlockVa, "BA" + Convert.ToHexString(BitConverter.GetBytes(edition.TextVa)))
+            && hardware.Matches(edition.TextVa, Convert.ToHexString(System.Text.Encoding.Unicode.GetBytes(
+                OsDescriptionTextNativeLayout.CaptureNt6Edition(edition.Code) + "\0"))));
+    Check("HWStats OS service-pack admission and unsigned build insertion preserve writer sequence",
+        hardware.Matches(0x403E60, "668B0183C1026685C075F5")
+        && hardware.Matches(0x403E6B, "2BCAD1F9741D")
+        && hardware.Calls(0x403E7C, OsDescriptionTextNativeLayout.WideTextWriterVa)
+        && hardware.Calls(0x403E89, OsDescriptionTextNativeLayout.WideTextWriterVa)
+        && hardware.ImportSlotNames(0x4402E4, "??6?$basic_ostream@_WU?$char_traits@_W@std@@@std@@QAEAAV01@K@Z")
+        && hardware.Matches(0x403E8E, "FFB5C4FEFFFF")
+        && hardware.Calls(0x403EB2, OsDescriptionTextNativeLayout.ClosingDelimiterWriterVa)
+        && hardware.Matches(0x406344, "C745E44C3A4400")
+        && hardware.Ascii(0x443A4C) == ((char)OsDescriptionTextNativeLayout.ClosingDelimiterInputByte).ToString());
+    Check("HWStats NT5.2 name priority is ServerR2 metric then storage, home, workstation AMD64",
+        hardware.Matches(0x403BF5, "83BDBCFEFFFF050F8552020000")
+        && hardware.Matches(0x403C08, "83F8020F85B9010000")
+        && hardware.ImportSlotNames(0x4405AC, "GetSystemMetrics")
+        && hardware.Matches(0x403C11, "6A59")
+        && hardware.Matches(0x403C19, "85C00F84B6000000")
+        && hardware.Matches(0x403CDA, "A9002000007407")
+        && hardware.Matches(0x403CE8, "A9008000007407")
+        && hardware.Matches(0x403CF6, "807DD201750F6683BDD4FDFFFF09"));
+    Check("HWStats NT5.2 editions skip workstation and branch on IA64 versus AMD64",
+        hardware.Matches(0x403D1B, "807DD2010F8492000000")
+        && hardware.Matches(0x403D25, "668B85D4FDFFFF6683F8067519")
+        && hardware.Matches(0x403D32, "8B45D084C07907")
+        && hardware.Matches(0x403D40, "A8027473")
+        && hardware.Matches(0x403D4B, "6683F8098B45D07523"));
+    Check("HWStats NT5.2 remaining architecture edition priority preserves suite tests",
+        hardware.Matches(0x403D77, "A9004000007407")
+        && hardware.Matches(0x403D85, "84C07907")
+        && hardware.Matches(0x403D90, "A8027407")
+        && hardware.Matches(0x403DA0, "A9000400007505"));
+    Check("HWStats NT5.1 personal suite and NT5.0 workstation/datacenter/enterprise gates",
+        hardware.Matches(0x403DCA, "83F801753D")
+        && hardware.Matches(0x403DDF, "F745D000020000")
+        && hardware.Matches(0x403E0C, "85C07544")
+        && hardware.Matches(0x403E20, "807DD2017507")
+        && hardware.Matches(0x403E30, "84C07907")
+        && hardware.Matches(0x403E40, "A8027505"));
+    Check("HWStats architecture suffix requires major at least six and AMD64 or x86",
+        hardware.Matches(0x403EB7, "83BDBCFEFFFF067229")
+        && hardware.Matches(0x403EC7, "6683F8097507")
+        && hardware.Matches(0x403ED4, "6685C07510"));
     Check("DeploymentCommon is a managed deployment assembly, not an observed native import of these helpers",
         deployment.ImportsFrom("mscoree.dll").Contains("_CorDllMain")
         && new[] { red, dumper, truck, hardware, child, browser, client }

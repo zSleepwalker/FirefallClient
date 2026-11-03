@@ -3354,3 +3354,31 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   sample-backed checks and1137 pure checks pass.
 - Follow-ons: Awesomium token admission around positional/end-marker
   arguments; HWStats exact OS/edition/service-pack/build text.
+
+## OS-name fragments and Awesomium token-admission state
+
+- Previous OS-guard/duplicate-map batch committed/pushed as56a3c8f.
+- Recovered all major6 name literals and18 recognized product-code
+  editions. The48-byte product-index table at403FA8 selects19 DWORD
+  destinations at403F5C (last is no-edition continuation).
+- Captured major5 minors0/1/2 names, SM_SERVERR2/suite/architecture
+  priorities, exact missing separators, and the lack of an IA64 Standard
+  fallback. Unknown major6 minor yields literal Windows ?; unknown edition
+  appends nothing. Do not modernize Windows Server 8 or other literals.
+- Captured Microsoft prefix, optional service-pack separator, build-prefix
+  ordering, unsigned-long build insertion and closing-helper input byte29.
+  Suffixes require major>=6 and arch9/0. C# saves fragments, not CRT stream
+  locale/padding/failure behavior or outer DirectX line.
+- GPT-6 Luna High agent6ee465fa completed token admission: plain positional
+  argument leaves switch scanning enabled; exact -- turns it off stickily.
+  Later type entries reach map only while scanning and prefix admission
+  pass. Saved capture uses classified booleans, not a raw argv parser.
+- Build succeeds;1417 sample-backed checks and1210 pure checks pass.
+- Next independent GPT-6 Luna High trace started as agent
+  e3046fa9-6eb9-4c09-a32f-b6f7623e07db: DumpTruck HWStats stdout pipe,
+  lifetime/read-result and captured-byte admission. It owns only a new
+  DumpTruck source/doc and will return inline check expressions; parent
+  must integrate/validate before committing that future work.
+- Remaining known boundaries: complete CRT/DirectX output behavior,
+  Awesomium name normalization, and unresolved RedHanded state2 writer.
+  No target execution, sample/IDA modification or real hardware collection.

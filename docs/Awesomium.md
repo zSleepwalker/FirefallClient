@@ -18,6 +18,11 @@ Static triage via IDA; image VAs, base 0x10000000. Concise: only Firefall-releva
 ## Unresolved
 - Exact pipe name suffix format. See client-side section for the remaining client-side unknowns.
 
+[Switch admission](AwesomiumSwitchAdmission.md) now distinguishes an
+ordinary positional argument, which leaves later switch scanning enabled,
+from the exact `--` marker, which disables it for all subsequent tokens.
+The saved state capture takes already-classified inputs, not raw argv.
+
 ## FirefallClient.exe client side (static, IDA addresses = raw file offsets; VA = raw+0x400C00 in .text, raw+0x401400 in .rdata)
 ### Observed
 - awesomium.dll is a plain static import (no LoadLibrary/GetProcAddress loop, no runtime table). Import descriptor RVA table: OFT RVA 0x19BDE4C, IAT FirstThunk RVA 0x16C4E00 (VA 0x1AC4E00..0x1AC4F54, stride 4), exactly 86 by-name entries; slot 0 `?ToBoolean@JSValue`, slot 85 `?ToString@JSValue`. The ~85 mangled strings at 0x19BD41C.. are that table's hint/name entries. IDA's own import list omits this descriptor, which caused the earlier "no static import" claim.
