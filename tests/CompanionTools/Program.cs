@@ -162,6 +162,14 @@ foreach (uint state in new uint[] { 0, 1, 2, 3, 4, uint.MaxValue })
             == new DebugSnapshotTransition(admitted, admitted ? 1u : state,
                 admitted ? 20u : 10u, !admitted && state == 3));
 }
+foreach (ushort unicode in new ushort[] { 0, 1, 2, ushort.MaxValue })
+foreach (ushort length in new ushort[] { 0, 1, 5, 6, 13, 14, ushort.MaxValue })
+{
+    bool read = unicode == 0 && length > 5;
+    Check($"Debug string read unicode={unicode}, reported length={length}",
+        DebugStringHandoffNativeLayout.CaptureRead(unicode, length)
+            == new DebugStringReadDecision(read, read ? length : 0u, read ? (uint)length + 1 : 0));
+}
 foreach (uint code in new uint[] { 0, 0x012ED4FF, 0x012ED500, 0x012ED501,
     0x012ED502, 0x012ED503, uint.MaxValue })
 foreach (uint count in new uint[] { 0, 2, 3, 4, uint.MaxValue })
@@ -350,6 +358,37 @@ if (args.Length == 2)
         red.Matches(0x4099C1, "C7470403000000FF15E8485400890784DB7448")
         && red.Matches(0x409A1C, "837F0403")
         && red.ImportSlotNames(0x5440D4, "TerminateProcess"));
+    Check("Client LOGPATH producer gates on debugger presence and emits formatted console-log path",
+        client.Ascii(0x1C155F4) == DebugStringHandoffNativeLayout.ClientLogPathFormat
+        && client.Ascii(0x1C1556C) == "console.log"
+        && client.ImportSlotNames(DebugStringHandoffNativeLayout.ClientOutputDebugStringImportVa,
+            "OutputDebugStringA")
+        && ClientMatches(0x12BBD1F, "FF15C043AC0185C0743A")
+        && ClientMatches(0x12BBD3E, "68F455C101")
+        && ClientMatches(0x12BBD55, "FF154C43AC01"));
+    Check("Client DUMPAUTH producer explicitly prefixes its opaque value with exclamation",
+        client.Ascii(0x1B61C14) == DebugStringHandoffNativeLayout.ClientDumpAuthFormat
+        && ClientMatches(0x63B134, "FF15C043AC0185C0742C")
+        && ClientMatches(0x63B143, "68141CB601")
+        && ClientMatches(0x63B15B, "FF154C43AC01"));
+    Check("RedHanded reads only ANSI debug strings with reported length above five",
+        red.Matches(0x409ACB, "66837DA00075D5")
+        && red.Matches(0x409AD2, "668B45A26683F80576CB")
+        && red.Matches(0x409ADC, "0FB7F08D4E01")
+        && red.Matches(DebugStringHandoffNativeLayout.RemoteReadCallVa, "FF15BC405400"));
+    Check("Debug-string trimming removes trailing NUL CR and LF then terminates local buffer",
+        red.Matches(0x409B07, "8A4433FF84C074083C0D74043C0A75034E75ED")
+        && red.Matches(0x409B1B, "C6043300"));
+    Check("Only RED5-prefixed fields update owner values using exact suffix offsets",
+        red.Ascii(0x54654C) == DebugStringHandoffNativeLayout.Prefix
+        && red.Ascii(0x546554) == DebugStringHandoffNativeLayout.LogPathField
+        && red.Ascii(0x546570) == DebugStringHandoffNativeLayout.DumpAuthField
+        && red.ImportSlotNames(0x5447AC, "strncmp")
+        && red.Matches(0x409B24, "6A05684C655400")
+        && red.Matches(0x409B55, "8D430D508D4F0C")
+        && red.Calls(DebugStringHandoffNativeLayout.LogPathAssignCallVa, 0x406420)
+        && red.Matches(0x409B8B, "8D430E508D4F10")
+        && red.Calls(DebugStringHandoffNativeLayout.DumpAuthAssignCallVa, 0x406420));
     Check("PDH identifies the process before reading a LARGE Virtual Bytes counter",
         red.Ascii(0x545468) == CrashMetadataNativeLayout.VirtualBytesCounterPattern
         && red.Matches(0x406CFD, "6868545400")

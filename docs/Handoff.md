@@ -3066,3 +3066,24 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
 - Validation:906 companion checks pass with all samples and849 pure checks
   pass without samples. Next independent trace is client debug-string
   LOGPATH/DUMPAUTH emission; managed DeploymentCommon trace is delegated.
+
+## Debug-string LOGPATH and DUMPAUTH handoff
+
+- Original client raw `0x12BBC60` composes console.log and emits
+  RED5-LOGPATH=%s newline at `0x12BBD55`. Raw `0x63AEF0` emits
+  RED5-DUMPAUTH=!%s newline at `0x63B15B`. Both gate on IsDebuggerPresent;
+  IAT VA `0x1AC434C` is independently verified OutputDebugStringA.
+- RedHanded event8 consumer requires Unicode WORD0 and reported length>5,
+  allocates length+1, reads exactly the reported16-bit count via
+  ReadProcessMemory, and checks BOOL. No1024-byte cap applies here.
+- Successful reads trim trailing NUL/CR/LF, then require case-sensitive
+  RED5- prefix and LOGPATH=/DUMPAUTH= fields. Bare LOGPATH/DUMPAUTH are
+  not recognized by this consumer (older doc corrected). Suffix offsets
+  13/14 update owner+0x0C/+0x10. The literal exclamation in DUMPAUTH
+  is retained; no actual credential values were read or saved.
+- Saved `DebugStringHandoffNativeLayout.cs` read decisions and native checks.
+  Next: downstream exclamation-marker handling, remaining snapshot-state
+  writers, or other producer sites. DeploymentCommon agent is independent.
+- Build succeeds;939 checks pass with all samples and877 pure checks pass
+  without samples. Next bounded investigation is downstream auth forwarding,
+  retaining opaque values and without contacting the legacy services.

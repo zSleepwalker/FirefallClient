@@ -41,6 +41,7 @@ sample's actual PE sections rather than subtracting one shared constant.
 | Producer | Consumer | Evidence and limits |
 |---|---|---|
 | FirefallClient | RedHanded | Existing bootstrap raw `0x2EA990` constructs the wrapper command and launches it; see [CrashHandler](CrashHandler.md). The wrapper is not a game-network message handler. |
+| FirefallClient | RedHanded debug events | Original-client OutputDebugStringA producers emit `RED5-LOGPATH=%s` and `RED5-DUMPAUTH=!%s`; the ANSI DEBUG_EVENT consumer copies suffixes into wrapper owner `+0x0C/+0x10`. See [RedHanded](RedHanded.md#client-debug-string-handoff); no live values are inspected. |
 | RedHanded | r5dumper | VA `0x407040` / raw `0x6440` builds positional arguments, inherits a metadata pipe, writes once, then checks child exit. |
 | r5dumper | dbghelp_red5 | `LoadLibraryA`/`GetProcAddress` in VA `0x401D50` resolve `MiniDumpWriteDump`. The actual DLL exports it at RVA `0x5E800`, ordinal31, without forwarding. |
 | RedHanded | DumpTruck | Existing fatal-result path constructs `--dump/--auth/--log/--app/--msg` options; see [RedHanded](RedHanded.md). Not the metadata pipe described below. |
