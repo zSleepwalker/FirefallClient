@@ -19,6 +19,36 @@ void Check(string name, bool condition)
     if (condition) passed++; else failed++;
 }
 
+long downloadChunkSize = DownloadPlanning.ChunkSize;
+var downloadRangeCases = new (long Total, (uint Part, long Start, long End)[] Expected)[]
+{
+    (-1, []), (long.MinValue, []), (0, []),
+    (1, [(0, 0, 1)]),
+    (downloadChunkSize - 1, [(0, 0, downloadChunkSize - 1)]),
+    (downloadChunkSize, [(0, 0, downloadChunkSize)]),
+    (downloadChunkSize + 1, [(0, 0, downloadChunkSize)]),
+    (downloadChunkSize + 2, [(0, 0, downloadChunkSize), (1, downloadChunkSize + 1, downloadChunkSize + 1)]),
+    (2 * downloadChunkSize, [(0, 0, downloadChunkSize), (1, downloadChunkSize + 1, 2 * downloadChunkSize - 1)]),
+    (2 * downloadChunkSize + 1, [(0, 0, downloadChunkSize), (1, downloadChunkSize + 1, 2 * downloadChunkSize)]),
+    (2 * downloadChunkSize + 2, [(0, 0, downloadChunkSize), (1, downloadChunkSize + 1, 2 * downloadChunkSize),
+        (2, 2 * downloadChunkSize + 1, 2 * downloadChunkSize + 1)])
+};
+var downloadPartMd5s = new Dictionary<uint, string> { [0] = "m0", [1] = "m1", [2] = "m2" };
+foreach (var test in downloadRangeCases)
+{
+    var chunks = DownloadPlanning.PlanChunks("range", test.Total, downloadPartMd5s);
+    Check($"DeploymentCommon zero-based inclusive range boundaries for total {test.Total}",
+        chunks.Select(x => (x.PartNumber, x.StartOffset, x.EndOffset)).SequenceEqual(test.Expected)
+        && chunks.Select(x => x.Length).SequenceEqual(test.Expected.Select(r => r.End - r.Start + 1))
+        && chunks.Select(x => x.LocalChunkPath).SequenceEqual(test.Expected.Select(
+            r => "range.part" + r.Part.ToString(System.Globalization.CultureInfo.InvariantCulture)))
+        && chunks.Select(x => x.PartMd5).SequenceEqual(test.Expected.Select(
+            r => "m" + r.Part.ToString(System.Globalization.CultureInfo.InvariantCulture))));
+}
+Check("DeploymentCommon missing zero-based part digest remains absent",
+    DownloadPlanning.PlanChunks("range", 1, new Dictionary<uint, string> { [1] = "wrong" })
+        .Single().PartMd5 is null);
+
 foreach (var entry in new (uint Scalar, DiagnosticScalarAppend Expected)[]
 {
     (0, new(true, 0, null)), (0x41, new(true, 0x41, null)),
@@ -45,6 +75,21 @@ Check("Awesomium diagnostic conversion error remains sticky through later valid 
     && !DiagnosticEncodingNativeLayout.CaptureAggregateConversionSuccess(true, false)
     && !DiagnosticEncodingNativeLayout.CaptureAggregateConversionSuccess(false, true)
     && !DiagnosticEncodingNativeLayout.CaptureAggregateConversionSuccess(false, false));
+foreach (int severity in new[] { int.MinValue, -1, 0, 1, 2, 3, 4, int.MaxValue })
+    Check($"Awesomium minimum severity assignment signed upper clamp {severity}",
+        ConversionDiagnosticNativeLayout.CaptureMinimumSeverityAssignment(severity)
+            == (severity >= 3 ? 3 : severity));
+foreach (bool initializationFailed in new[] { false, true })
+foreach (bool singleProcess in new[] { false, true })
+foreach (bool inProcessGpu in new[] { false, true })
+    Check($"Awesomium GPU interceptor installation failed={initializationFailed}, single={singleProcess}, inProcess={inProcessGpu}",
+        ConversionDiagnosticNativeLayout.CaptureGpuInterceptorInstallation(
+            initializationFailed, singleProcess, inProcessGpu)
+        == (!initializationFailed && !singleProcess && !inProcessGpu));
+Check("Awesomium normally returning GPU interceptor does not consume severity-three default handling",
+    ConversionDiagnosticNativeLayout.CaptureRoute(true,
+        ConversionDiagnosticNativeLayout.GpuInterceptorConsumesDiagnostic, false)
+        == SeverityThreeDiagnosticRoute.DefaultDisplayHelper);
 foreach (bool present in new[] { false, true })
 foreach (bool consumed in new[] { false, true })
 foreach (bool handler in new[] { false, true })
@@ -772,6 +817,35 @@ if (args.Length == 2)
         && browser.Matches(0x102B7C9C, "8BCBC1E90A81E94028000066890C78")
         && browser.Matches(0x102B7CB3, "81E3FF03000081CB00DC000066895C7E02")
         && browser.Matches(0x102B7CC6, "B802000000"));
+    Check("Awesomium minimum severity getter and signed setter preserve the fallback DWORD",
+        browser.Matches(ConversionDiagnosticNativeLayout.MinimumSeverityGetterVa, "A1046B5911C3")
+        && browser.Matches(ConversionDiagnosticNativeLayout.MinimumSeveritySetterVa,
+            "837C2404037D0C8D4424048B00A3046B5911C3B890B027118B08890D046B5911C3")
+        && browser.Word(ConversionDiagnosticNativeLayout.MinimumSeverityFallbackVa) == 3);
+    Check("Awesomium interceptor setter stores and returns the supplied pointer without calling it",
+        browser.Matches(ConversionDiagnosticNativeLayout.InterceptorSetterVa,
+            "8B442404A31C6B5911C3"));
+    Check("Awesomium GPU initialization gates interceptor installation on failure byte and switch absence",
+        browser.Matches(0x1019CAC1, "389E940000007460")
+        && browser.Ascii(0x11265E8C) == "single-process"
+        && browser.Ascii(0x11265BEC) == "in-process-gpu"
+        && browser.Calls(0x1019CB7F, 0x1028C3C0)
+        && browser.Matches(0x1019CB84, "84C0755A")
+        && browser.Calls(0x1019CBD4, 0x1028C3C0)
+        && browser.Matches(0x1019CBD9, "C64424130184C07405C644241300")
+        && browser.Matches(0x1019CC41, "807C241300740D68C0C91910")
+        && browser.Calls(0x1019CC4D, ConversionDiagnosticNativeLayout.InterceptorSetterVa));
+    Check("Awesomium GPU teardown clears global interceptor rather than restoring an earlier callback",
+        browser.Matches(0x1019C7F3, "6A00")
+        && browser.Calls(0x1019C802, ConversionDiagnosticNativeLayout.InterceptorSetterVa));
+    Check("Awesomium GPU interceptor attempts message forwarding then normally returns false",
+        browser.Calls(0x1019C9F2, 0x100038B0)
+        && browser.Matches(0x1019C9F7, "6AFF5657")
+        && browser.Calls(0x1019CA0F, 0x100038B0)
+        && browser.Calls(0x1019CA33, 0x1015DD90)
+        && browser.Calls(0x1019CA3E, 0x10190450)
+        && browser.Matches(0x1019CA43, "8B50048D48048B420456FFD0")
+        && browser.Matches(0x1019CA93, "32C0"));
     Check("Awesomium converter constructs severity-three diagnostic and preserves LastError",
         browser.Matches(0x1029AA0E, "6A0368A7010000")
         && browser.Matches(0x10289D30, "8B44240C")
@@ -1649,6 +1723,24 @@ if (args.Length == 2)
         hardware.Matches(0x403EB7, "83BDBCFEFFFF067229")
         && hardware.Matches(0x403EC7, "6683F8097507")
         && hardware.Matches(0x403ED4, "6685C07510"));
+    Check("DeploymentCommon first download range uses zero start and inclusive total-size clamp",
+        deployment.Matches(0x0040397A, "166A0C02287200000608200000A0006A58287E00000A0D")
+        && deployment.Matches(0x00403991, "161304"));
+    Check("DeploymentCommon constructs each zero-based part with its corresponding digest lookup",
+        deployment.Matches(0x004039A0,
+            "080902286A0000061104022868000006027B2B00000411046F8000000A2D03142B0D027B2B00000411046F8100000A02FE066600000673A2000006739D000006")
+        && deployment.ManagedIlMatches(0x9D, 0x44F4,
+            "02281300000A0203288C0000060204288E000006020572752200700E048C6D00000128BD00000A2890000006020E052892000006020E042888000006020E06288A000006020E077D3B0000042A"));
+    Check("DeploymentCommon later ranges advance end plus one with signed total-size comparison",
+        deployment.Matches(0x00403A1A,
+            "09176A580C022872000006176A5909200000A0006A58287E00000A0D080228720000063F"));
+    Check("DeploymentCommon cached length and HTTP Range header use the supplied inclusive endpoints",
+        deployment.Matches(0x00404571, "02288D00000602288B00000659176A580C")
+        && deployment.Matches(0x004046F1,
+            "D062000001285E00000A72051500701F24285F00000A130B720D24007002288B0000068C5900000102288D0000068C59000001281500000A130C110B110A6F6000000A188D0100000113121112167241150070A2111217110CA211126F6100000A26")
+        && deployment.ManagedUserStringsMatch(
+            (0x2275, ".part"), (0x1505, "AddWithoutValidate"),
+            (0x240D, "bytes={0}-{1}"), (0x1541, "Range")));
     Check("DeploymentCommon is a managed deployment assembly, not an observed native import of these helpers",
         deployment.ImportsFrom("mscoree.dll").Contains("_CorDllMain")
         && new[] { red, dumper, truck, hardware, child, browser, client }

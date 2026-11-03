@@ -16,7 +16,12 @@
 
 ## Interpreted
 - `.dfc` is a binary-diff (delta) container fetched when an install exists; the patcher uses a manifest (7z) + `patch_files` for per-file patching. Format not examined.
-- First-chunk end clamp in `DoFileDownload` was not fully isolated; reconstruction uses inclusive `[start, min(total-1,start+10MiB-1)]` (`DownloadObject` length = end-start+1 supports inclusive ranges).
+- The [download range follow-up](DeploymentCommonDownloadRanges.md) resolves the
+  first-chunk clamp: parts start at zero and the first inclusive range is
+  `0..min(total,10MiB)`, not the previously inferred uniform chunk formula.
+  Later ranges start at the prior end plus one and end at
+  `min(total-1,priorEnd+10MiB)`. The native one-byte overrun for positive totals
+  at or below10MiB is preserved, not repaired.
 
 ## Unresolved
 - Real runtime values (env/region names), `.dfc`/manifest/part-md5 file internals beyond line format, uninstaller/shortcut/Utils bodies, LZMA/7z extraction semantics, JSON parser details (hand-written, standard), WMI/traceroute usage specifics.

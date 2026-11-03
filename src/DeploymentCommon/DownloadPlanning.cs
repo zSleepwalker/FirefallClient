@@ -26,17 +26,20 @@ public static class DownloadPlanning
         return map;
     }
 
-    // Part numbers start at 1; inclusive byte ranges; chunk file is localFilePath + ".part" + number.
-    // The exact end clamp of the first chunk was not isolated in IL; total-1 clamping is interpreted.
+    // The first inclusive end uses totalSize, not totalSize - 1; preserve the native off-by-one.
     public static IReadOnlyList<DownloadChunk> PlanChunks(string localFilePath, long totalSize, IReadOnlyDictionary<uint, string> partMd5)
     {
         var list = new List<DownloadChunk>();
-        uint part = 1;
-        for (long start = 0; start < totalSize; start += ChunkSize, part++)
+        uint part = 0;
+        long start = 0;
+        long end = Math.Min(totalSize, ChunkSize);
+        while (start < totalSize)
         {
-            var end = Math.Min(totalSize - 1, start + ChunkSize - 1);
             partMd5.TryGetValue(part, out var md5);
             list.Add(new DownloadChunk(part, start, end, localFilePath + ".part" + part.ToString(CultureInfo.InvariantCulture), md5));
+            part = unchecked(part + 1);
+            start = unchecked(end + 1);
+            end = Math.Min(unchecked(totalSize - 1), unchecked(end + ChunkSize));
         }
         return list;
     }

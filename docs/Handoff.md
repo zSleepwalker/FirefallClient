@@ -3464,3 +3464,28 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   interpretation remain unresolved. No samples/codecs/helpers executed.
 - Saved DiagnosticEncodingNativeLayout and native guards. Build succeeds;
   1791 sample-backed checks and1559 pure checks pass.
+
+## DeploymentCommon exact ranges and GPU diagnostic configuration
+
+- Diagnostic scalar-boundary batch committed/pushed as b14b0c4.
+- GPT-6 Luna High agent e77c64d8-25dd-4020-93ef-cecd1cc1ff90 resolved
+  DoFileDownload MethodDef7C/body RVA38B0. Parts start at0, first end is
+  min(total,10485760), not min(total-1,10485759). Later start=end+1,
+  end=min(total-1,end+10485760); signed Int64 comparison and unchecked
+  arithmetic preserved. DownloadObject constructor9D/body44F4 uses .part0;
+  request9E/body4550 formats supplied inclusive endpoints directly.
+- Corrected DownloadPlanning instead of adding a duplicate planner. Small
+  positive totals request one byte past EOF; remote response is unresolved.
+  Added focused evidence docs and boundary/sample checks.
+- Direct Awesomium trace found threshold setter10288E70 preserves negative
+  inputs and clamps signed >=3 to static fallback3. Getter10288E40 returns
+  storage11596B04; another writer1028A2A0 remains untraced.
+- Interceptor setter10288E50 stores/returns supplied DWORD. GPU init1019CAA0
+  installs1019C9C0 only without initialization-failure byte and without
+  single-process/in-process-gpu switches. Teardown1019C7F0 clears it,
+  not restoring a prior pointer. Callback attempts unresolved virtual
+  forwarding and normally returns AL0, so does not consume severity3.
+- Build succeeds,1588 pure and1829 sample-backed checks pass. No target,
+  callback, downloader, registry/hardware query or service was executed.
+- Follow-ons: DownloadObject non206 status/retry decisions; other threshold
+  writer1028A2A0 or explicit setter caller10033BC0. These are not completed.
