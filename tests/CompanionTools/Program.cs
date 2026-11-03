@@ -60,6 +60,31 @@ foreach (var selection in new (byte[] Statuses, int? Expected)[]
 })
     Check($"MAC first zero ASTAT return in {Convert.ToHexString(selection.Statuses)}",
         MacAddressNativeLayout.CaptureFirstSuccessfulAttempt(selection.Statuses) == selection.Expected);
+foreach (var gate in new (bool Version, uint Platform, uint Major, bool Module, bool Export, OsDescriptionGate Expected)[]
+{
+    (false, 0, 0, false, false, OsDescriptionGate.VersionQueryFailed),
+    (false, 2, 6, true, true, OsDescriptionGate.VersionQueryFailed),
+    (true, 1, 6, true, true, OsDescriptionGate.PlatformRejected),
+    (true, uint.MaxValue, 6, true, true, OsDescriptionGate.PlatformRejected),
+    (true, 2, 0, true, true, OsDescriptionGate.MajorVersionRejected),
+    (true, 2, 4, true, true, OsDescriptionGate.MajorVersionRejected),
+    (true, 2, 5, false, false, OsDescriptionGate.ContinueFormatting),
+    (true, 2, 6, false, true, OsDescriptionGate.ProductInfoModuleMissing),
+    (true, 2, 6, true, false, OsDescriptionGate.ProductInfoExportMissing),
+    (true, 2, 6, true, true, OsDescriptionGate.ContinueFormatting),
+    (true, 2, 7, false, false, OsDescriptionGate.ContinueFormatting),
+    (true, 2, 10, false, false, OsDescriptionGate.ContinueFormatting),
+    (true, 2, uint.MaxValue, false, false, OsDescriptionGate.ContinueFormatting)
+})
+    Check($"OS builder gate for version={gate.Version}, platform={gate.Platform}, major={gate.Major}, module={gate.Module}, export={gate.Export}",
+        OsDescriptionNativeLayout.CaptureGate(gate.Version, gate.Platform, gate.Major, gate.Module, gate.Export) == gate.Expected);
+Check("OS builder chooses native system info only when export is available",
+    OsDescriptionNativeLayout.CaptureSystemInfoSource(true) == SystemInfoSource.GetNativeSystemInfo
+    && OsDescriptionNativeLayout.CaptureSystemInfoSource(false) == SystemInfoSource.GetSystemInfo);
+Check("Awesomium duplicate normalized key overwrites earlier value",
+    DuplicateSwitchNativeLayout.CaptureSameNormalizedKeyValue("renderer", "plugin") == "plugin");
+Check("Awesomium duplicate normalized key can clear earlier value",
+    DuplicateSwitchNativeLayout.CaptureSameNormalizedKeyValue("renderer", "") == "");
 foreach (var entry in new (ulong Bytes, DriveSpaceAmounts Amounts, DriveSpaceDisplayUnit Unit)[]
 {
     (0, new(0, 0), DriveSpaceDisplayUnit.None),
@@ -466,6 +491,27 @@ if (args.Length == 2)
     var hardware = Load("HWStats.exe", HWStatsLayout.FileSize, HWStatsLayout.Sha256);
     var child = Load("FirefallProcess.exe", FirefallProcessLayout.FileSize, FirefallProcessLayout.Sha256);
     var browser = Load("awesomium.dll", 23470048, AwesomiumLayout.Sha256);
+    Check("Awesomium parsed switches update the same map in admitted argument order",
+        browser.Calls(0x1028DFA6, 0x1028DCD0)
+        && browser.Calls(0x1028DDB4, 0x1028BC60)
+        && browser.Calls(0x1028DDCF, 0x1029A9C0)
+        && browser.Calls(0x1028DDDC, 0x1028D7F0)
+        && browser.Matches(0x1028DE67, "FF442414")
+        && browser.Matches(0x1028DE80, "83C51C"));
+    Check("Awesomium existing normalized key returns its value slot for unconditional assignment",
+        browser.Matches(0x1028D332, "3B6E047424837D20108B4D1C8D450C72028B00")
+        && browser.Calls(0x1028D34E, 0x1000A900)
+        && browser.Matches(0x1028D353, "85C00F89E3000000")
+        && browser.Matches(0x1028D444, "8D4528")
+        && browser.Calls(0x1028D82F, 0x10007AB0)
+        && browser.Calls(0x1028D8A0, 0x1028D310)
+        && browser.Calls(0x1028D8AB, 0x10007FA0));
+    Check("Awesomium child type getter reads the updated switch map",
+        browser.Calls(0x1003A694, 0x1028C8A0)
+        && browser.Ascii(0x11265DD8) == "type"
+        && browser.Calls(0x1028C4C4, 0x10007AB0)
+        && browser.Calls(0x1028C4D4, 0x100F7110)
+        && browser.Calls(0x1028C585, 0x10007FA0));
     var dbghelp = Load("dbghelp_red5.dll", 1213200,
         "C06430B8CB025BE506BE50A756488E1BCC3827C4F45158D93E4E3EEB98CE1E4F");
     var deployment = Load("DeploymentCommon.dll", 76800,
@@ -1065,6 +1111,45 @@ if (args.Length == 2)
         && hardware.Matches(0x4043C7, "0FB645F1500FB645F0500FB645EF500FB645EE500FB645ED500FB645EC50")
         && hardware.Ascii(0x443BB4) == MacAddressNativeLayout.NativeFormat
         && hardware.Calls(0x4043EE, 0x406A20));
+    Check("HWStats OS builder initializes EX structure size and rejects failed version query",
+        hardware.Matches(0x403A51, "681C010000")
+        && hardware.Matches(0x403A8E, "C785B8FEFFFF1C010000")
+        && hardware.ImportSlotNames(0x440160, "GetVersionExW")
+        && hardware.Matches(0x403A9F, "FF156001440085C00F8494040000"));
+    Check("HWStats OS builder resolves native system info with ordinary system-info fallback",
+        hardware.Ascii(0x4430CC) == OsDescriptionNativeLayout.NativeSystemInfoExport
+        && hardware.ImportSlotNames(0x440158, "GetModuleHandleW")
+        && hardware.ImportSlotNames(0x44017C, "GetProcAddress")
+        && hardware.ImportSlotNames(0x44015C, "GetSystemInfo")
+        && hardware.Matches(0x403AC4, "85C0740B")
+        && hardware.Matches(0x403ACF, "FFD0EB0D")
+        && hardware.Matches(0x403ADA, "FF155C014400"));
+    Check("HWStats OS builder rejects non-NT platform and unsigned major at most four",
+        hardware.Matches(0x403AE0, "83BDC8FEFFFF020F8554040000")
+        && hardware.Matches(0x403AED, "83BDBCFEFFFF040F8647040000")
+        && hardware.Matches(0x403F41, "32C0"));
+    Check("HWStats OS product-info availability guard is exclusive to major six",
+        hardware.Matches(0x403B1F, "83BDBCFEFFFF060F85C9000000")
+        && hardware.Matches(0x44318C, Convert.ToHexString(System.Text.Encoding.Unicode.GetBytes(
+            OsDescriptionNativeLayout.KernelModule + "\0")))
+        && hardware.Matches(0x4432A8, Convert.ToHexString(System.Text.Encoding.Unicode.GetBytes(
+            OsDescriptionNativeLayout.KernelModule + "\0")))
+        && hardware.Ascii(0x4432C4) == OsDescriptionNativeLayout.ProductInfoExport
+        && hardware.Matches(0x403B96, "85C00F841C010000")
+        && hardware.Matches(0x403BAA, "85C00F8408010000"));
+    Check("HWStats OS product code starts zero and API BOOL is ignored with zero service-pack arguments",
+        hardware.Matches(0x403A59, "C785B0FEFFFF00000000")
+        && hardware.Matches(0x403BB9, "6A006A00FFB5C0FEFFFFFFB5BCFEFFFF")
+        && hardware.Matches(0x403BC9, "FFD08B85B0FEFFFF")
+        && hardware.Matches(0x403CC0, "C685B7FEFFFF00"));
+    Check("HWStats OS destination copy passes 4096 wchar capacity and caller ignores builder result",
+        hardware.ImportSlotNames(0x44055C, "wcscpy_s")
+        && hardware.Matches(0x403F01, "6800100000FFB5ACFEFFFFFF155C054400")
+        && hardware.Matches(0x403F2D, "C685B7FEFFFF01")
+        && hardware.Matches(0x404044, "8D8D68EDFFFF")
+        && hardware.Calls(0x40404A, OsDescriptionNativeLayout.BuilderVa)
+        && hardware.Matches(0x40404F, "33C06A7E")
+        && hardware.Matches(0x4040F0, "8D8568FDFFFF"));
     Check("DeploymentCommon is a managed deployment assembly, not an observed native import of these helpers",
         deployment.ImportsFrom("mscoree.dll").Contains("_CorDllMain")
         && new[] { red, dumper, truck, hardware, child, browser, client }

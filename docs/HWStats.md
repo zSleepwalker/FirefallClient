@@ -23,6 +23,11 @@ Static IDA analysis only. SHA256 `0AE559DA740DE2C51A77A652906F021833A17E2A634757
 ## Unresolved
 - Exact OS string text.
 
+[OS-description guards](HWStatsOsDescriptionGuards.md) now preserve version
+and platform admission, native-system-info fallback, major-six export
+requirements, unchecked `GetProductInfo` results and the caller's unchecked
+destination use. The exact text renderer remains unresolved.
+
 ## DriveSpace follow-up
 
 [DriveSpace output](HWStatsDriveSpace.md) corrects the former memory

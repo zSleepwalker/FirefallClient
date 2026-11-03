@@ -3333,3 +3333,24 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   access, target execution, or Netbios requests in reconstruction.
 - Saved MacAddressNativeLayout and byte checks. Build succeeds;1255
   sample-backed checks and1121 pure checks pass. Follow-on: OS description.
+
+## OS-description guards and Awesomium duplicate switch values
+
+- MAC source batch committed/pushed as28b6fd7.
+- HWStats403A20: GetVersionExW must succeed, platform must be2 and unsigned
+  major>4. Native-system-info export falls back to GetSystemInfo.
+- Only major6 requires kernel32/GetProductInfo lookup; missing module or
+  export returnsfalse without destination copy. ProductInfo BOOL itself
+  is ignored; inputs use major/minor and zero service-pack arguments.
+- Saved admission reasons, not a successful-format guarantee. Native
+  wcscpy_s passes4096 wchar capacity while this caller has2048 wchar region;
+  no output maximum/overflow conclusion. Caller ignores builder return and
+  does not preinitialize description buffer. Exact text remains follow-on.
+- GPT-6 Luna High agent3356aa23 completed Awesomium duplicate-map trace:
+  admitted switches update same normalized-key slot in argument order;
+  last wins including empty. Child type getter reads that map. No claim
+  about aliases, full normalization, or tokens after a positional argument.
+- Integrated agent source/doc and byte checks. Build succeeds;1280
+  sample-backed checks and1137 pure checks pass.
+- Follow-ons: Awesomium token admission around positional/end-marker
+  arguments; HWStats exact OS/edition/service-pack/build text.
