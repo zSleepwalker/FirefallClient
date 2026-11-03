@@ -3969,4 +3969,7 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   shared allocator release path, clears it and `+0x0C/+0x10`, self-links the
   sentinel at `+0x00`, clears count `+0x04`, walks forward links releasing
   nodes, and tail-jumps to the release path with the sentinel. This matches
-  circular doubly-linked-list cleanup; exact types remain unknown.
+  circular doubly-linked-list cleanup; exact types remain unknown. Constructor
+  helper `0xCBE310` allocates its `0x14`-byte sentinel through `0xCBF080`, then
+  seeds 16 copies of that sentinel into a vector-like submember via
+  `0xCBEE50`. The pool-like role and later values `7/8` are unresolved.

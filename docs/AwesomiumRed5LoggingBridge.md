@@ -301,6 +301,13 @@ backend; then tail-jumps to that backend with the sentinel. This is consistent
 with a circular doubly-linked list, though the node/container type is not
 identified. The backend's allocator internals are outside this object's
 trace.
+Constructor helper `0xCBE310` creates this member by calling `0xCBF080`, which
+allocates a `0x14`-byte node and, for null input links, points both links back
+to the node. It stores that node as the sentinel, then calls `0xCBEE50` on the
+vector-like submember at `+0x08` with insertion position zero, count `0x10`,
+and the sentinel as the inserted value. Thus the constructor seeds 16
+sentinel-valued entries; the purpose of this pool-like state and the later
+values `7` and `8` is not established.
 These observations support a deferred state-update plus member-cleanup
 interpretation; the identities and application-level meanings of the
 indirect helpers and state remain unknown. Wrapper `CBC4D0` always performs

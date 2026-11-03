@@ -1960,6 +1960,21 @@ if (args.Length == 2)
             0x12C8D60 + 0x400C00)
         && ClientMatches(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectResetListHelperRaw + 0x51,
             "E98AAC6000"));
+    Check("Original client URL dispatch constructor allocates sentinel and seeds vector",
+        client.Calls(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectListConstructorRaw
+                + 0x3C + 0x400C00,
+            Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectListSentinelFactoryRaw + 0x400C00)
+        && ClientMatches(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectListConstructorRaw + 0x41,
+            "8906")
+        && ClientMatches(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectListConstructorRaw + 0x77,
+            "6A10")
+        && client.Calls(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectListConstructorRaw
+                + 0x81 + 0x400C00,
+            Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectListVectorInsertRaw + 0x400C00)
+        && ClientMatches(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectListConstructorRaw + 0x86,
+            "C7461407000000")
+        && ClientMatches(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectListConstructorRaw + 0x8F,
+            "C7461808000000"));
     Check("Original client LogWebRequests stores Lua truthiness in its frame flag",
         client.Ascii(Red5LoggingBridgeNativeLayout.LuaLogWebRequestsUsageVa)
             == "usage: FRAME:LogWebRequests(boolean)"
