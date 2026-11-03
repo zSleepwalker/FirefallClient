@@ -138,6 +138,27 @@ Check("Report layer order distinguishes uncompressed app text from the message o
     && CrashReportNativeLayout.LayersInProducerOrder.Single(layer => !layer.Compressed).Type == 4
     && CrashReportNativeLayout.OwnerApplicationNameOffset == 0x0C
     && CrashReportNativeLayout.OwnerMessageOffset == 0x10);
+Check("Client exception arguments preserve independent length/pointer pairs without NUL lengths",
+    DebugExceptionHandoffNativeLayout.CaptureArguments(3, 0x12345678, 4, 0x87654321)
+        == new DebugExceptionArguments(3, 0x12345678, 4, 0x87654321)
+    && DebugExceptionHandoffNativeLayout.CaptureRaiseFlags(true) == 0
+    && DebugExceptionHandoffNativeLayout.CaptureRaiseFlags(false) == 1);
+foreach (uint code in new uint[] { 0, 0x012ED4FF, 0x012ED500, 0x012ED501,
+    0x012ED502, 0x012ED503, uint.MaxValue })
+foreach (uint count in new uint[] { 0, 2, 3, 4, uint.MaxValue })
+foreach (uint length in new uint[] { 0, 1024, 1025, uint.MaxValue })
+foreach (bool success in new[] { false, true })
+{
+    bool recognized = code is 0x012ED500 or 0x012ED501 or 0x012ED502;
+    bool read = recognized && count >= 4 && length <= 1024;
+    var kind = !recognized ? PrivateExceptionMessageKind.NotPrivateCode
+        : count < 4 ? PrivateExceptionMessageKind.NoMessage
+        : length > 1024 ? PrivateExceptionMessageKind.TooLong
+        : success ? PrivateExceptionMessageKind.RemoteBytes : PrivateExceptionMessageKind.BadMemory;
+    Check($"Private exception message code={code:X}, parameters={count}, length={length}, read={success}",
+        DebugExceptionHandoffNativeLayout.CaptureMessage(code, count, length, success)
+            == new PrivateExceptionMessageDecision(kind, read, read ? length : 0));
+}
 foreach (int length in new[] { int.MinValue, -1, 0, 0x3FFFF, 0x40000, 0x40001, int.MaxValue })
 {
     Check($"Log clipping uses signed ftell threshold, observed={length}",
@@ -270,6 +291,37 @@ if (args.Length == 2)
         && red.Matches(0x4078A6, "68D8565400")
         && red.Matches(0x40791A, "68C0565400")
         && red.Matches(0x40792C, "68CC565400"));
+    bool ClientMatches(uint raw, string hex) => client.Matches(raw + 0x400C00, hex);
+    Check("Original client resolves its exception import to KERNEL32 RaiseException",
+        client.ImportSlotNames(DebugExceptionHandoffNativeLayout.ClientRaiseExceptionImportVa, "RaiseException")
+        && client.ImportsFrom("KERNEL32.dll").Contains("RaiseException"));
+    Check("Original client builds source/message strlen-pointer pairs and passes four DWORD arguments",
+        ClientMatches(0x12C34CD, "894DD4897DD8")
+        && ClientMatches(0x12C34E1, "894DDC8955E0")
+        && ClientMatches(0x12C34F3, "8D45D4506A046A0056FF15B041AC01")
+        && ClientMatches(0x12C351B, "8D45D4506A046A0156FF15B041AC01"));
+    Check("Original-client fatal path uses noncontinuable500 while assertion paths use continuable502",
+        ClientMatches(0x12C35C5, "6A00578BD3B900D52E01")
+        && client.Calls(0x12C35CF + 0x400C00, 0x12C3470 + 0x400C00)
+        && ClientMatches(0x12C36D5, "6A01538BD7B902D52E01")
+        && client.Calls(0x12C36DF + 0x400C00, 0x12C3470 + 0x400C00)
+        && ClientMatches(0x12C396D, "B902D52E01")
+        && client.Calls(0x12C3972 + 0x400C00, 0x12C3470 + 0x400C00));
+    Check("RedHanded message decoder admits500/501/502 with four parameters and length at most1024",
+        red.Matches(0x40890B, "05002BD1FE83F8020F87CD040000")
+        && red.Matches(0x408919, "837E10047324")
+        && red.Matches(0x408943, "8B7E1C81FF000400007624")
+        && red.Matches(0x4089A5, "FF7620")
+        && red.Matches(DebugExceptionHandoffNativeLayout.MessageReadCallVa, "FF15BC405400")
+        && red.Ascii(0x545BA4) == DebugExceptionHandoffNativeLayout.NoMessageMarker
+        && red.Ascii(0x545CC4) == DebugExceptionHandoffNativeLayout.TooLongMessageMarker
+        && red.Ascii(0x54629C) == DebugExceptionHandoffNativeLayout.BadMemoryMessageMarker);
+    Check("Code502 snapshot path sets owner state1 and joins metadata handling rather than fatal state3",
+        red.Matches(0x409911, "3D02D52E017554")
+        && red.Matches(0x409924, "83F8020F85EF000000")
+        && red.Calls(0x40992D, 0x409740)
+        && red.Matches(0x409932, "C7470401000000")
+        && red.Matches(0x409941, "E993000000"));
     Check("PDH identifies the process before reading a LARGE Virtual Bytes counter",
         red.Ascii(0x545468) == CrashMetadataNativeLayout.VirtualBytesCounterPattern
         && red.Matches(0x406CFD, "6868545400")

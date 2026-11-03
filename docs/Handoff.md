@@ -3027,3 +3027,24 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
 - Validation: solution build has zero warnings/errors;562 companion checks
   pass with the nine identified samples and512 pure checks pass without
   samples. All changes in this batch are C#, checks, and documentation.
+
+## Original-client exception handoff to RedHanded
+
+- Original helper raw `0x12C3470` prepares four DWORDs: source strlen/pointer
+  and message strlen/pointer. Null inputs select empty literals; lengths
+  exclude NUL and are not capped here. Import VA `0x1AC41B0` is verified
+  as KERNEL32!RaiseException in the original PE.
+- Fatal call raw `0x12C35CF` uses500/flags1 after IsDebuggerPresent.
+  Assert call raw `0x12C36DF` uses502/flags0 after the same debugger gate;
+  formatted assert raw `0x12C3972` uses502/flags0 with source ASSERT and
+  formatted stack text. A direct DWORD scan found no501 immediate in the
+  original client, not proof of no computed/other producer.
+- RedHanded message decoder `0x4088A0` accepts500..502, requires4 parameters,
+  reads message at record+0x1C/+0x20 with length <=1024. Its source decoder
+  accepts only500/501 with count2. Thus assertion502 source becomes EXCEPTION
+  even though its message is read. Added C# pure captures and byte checks.
+- Snapshot502 enters state1 only from0/2 and joins metadata capture; the
+  subsequent target-termination check is state3. Next task is all state
+  writers and unsigned2000ms throttle rather than guessing state2.
+- Validation: solution build has zero warnings/errors;848 companion checks
+  pass against the nine samples and793 pure checks pass without samples.

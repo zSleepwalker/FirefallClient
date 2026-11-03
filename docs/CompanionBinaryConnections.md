@@ -208,7 +208,11 @@ Failure markers are literal strings at VA `0x5456B0`, `0x5456D8`,
 `0x5456CC`, and `0x5456C0`. Source output eventually uses `%s` in the
 metadata formatter, so embedded NUL terminates its text representation
 and CRLF is not escaped. The source-address origin on the client side and
-any higher-level meaning of those bytes remain untraced.
+its four-argument layout are now traced in
+[CrashHandler](CrashHandler.md#client-to-redhanded-exception-payload).
+Fatal names occupy the source pair; assertion502 is accepted by the
+message reader but not this source reader, so its source marker is
+`EXCEPTION`. Higher-level meanings beyond the traced callers are not assumed.
 `CaptureDebugSource` saves only these decisions, not remote-memory access.
 
 ### Memory values are two different measurements
@@ -400,7 +404,7 @@ exports. They do not execute any target or contact a service. Without
 `--samples`, only the pure managed decisions and metadata checks run,
 with an explicit notice that binary evidence was not checked.
 
-Next bounded traces: the client-side source-address producer;
+Next bounded traces: snapshot-state writers and timing gates;
 an offline report fixture to independently check emitted body bytes; and
 the managed loader/callers of DeploymentCommon. Static import absence is
 not used as a claim that all nine form one direct-load chain.

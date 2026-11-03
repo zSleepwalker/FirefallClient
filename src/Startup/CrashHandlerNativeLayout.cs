@@ -18,6 +18,8 @@ public static class CrashHandlerNativeLayout
     public const int AnsiDumpWriterFileOffset = 0x12C2F90;
     public const int WideDumpWriterFileOffset = 0x12C3250;
     public const int FatalDispatcherFileOffset = 0x12C3550;
+    public const int RaiseExceptionHelperFileOffset = 0x12C3470;
+    public const int RaiseExceptionImportVirtualAddress = 0x1AC41B0;
     public const int AssertRaiseFileOffset = 0x12C3650;
     public const int SigAbrtHandlerFileOffset = 0x12C3710;
     public const int TerminateStubFileOffset = 0x12C3770;
