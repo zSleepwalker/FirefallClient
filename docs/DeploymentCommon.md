@@ -50,3 +50,8 @@ values, and literal global ` --culture` removal rather than argument parsing.
 The [permissions launch boundary](DeploymentCommonPermissionLaunch.md)
 records a system-folder icacls launch attempt with no exit observation,
 not a verified successful ACL reset. Saved descriptors are inert.
+
+The [INI wrapper trace](DeploymentCommonIniFile.md) records512-to32768
+buffer growth, null/too-large results, import charset asymmetry, and the
+original Boolean/default/null quirks. No INI parser or actual file reads/
+writes are introduced.

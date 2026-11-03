@@ -19,6 +19,42 @@ void Check(string name, bool condition)
     if (condition) passed++; else failed++;
 }
 
+foreach (int capacity in new[] { 512, 1024, 2048, 4096, 8192, 16384, 32768 })
+{
+    Check($"INI capacity {capacity}, zero count returns null",
+        IniFileNativeLayout.CaptureReadAttempt(capacity, 0)
+            == new IniReadDecision(IniReadAction.ReturnNull, null, 0));
+    Check($"INI capacity {capacity}, nSize-2 accepted without retry even for multi-string queries",
+        IniFileNativeLayout.CaptureReadAttempt(capacity, (uint)capacity - 2)
+            == new IniReadDecision(IniReadAction.CopyReturnedCharacters, null, (uint)capacity - 2));
+    Check($"INI capacity {capacity}, nSize-1 grows or throws at cap",
+        IniFileNativeLayout.CaptureReadAttempt(capacity, (uint)capacity - 1)
+            == (capacity < 32768
+                ? new IniReadDecision(IniReadAction.RetryWithLargerBuffer, capacity * 2, 0)
+                : new IniReadDecision(IniReadAction.ThrowValueTooLarge, null, 0)));
+}
+foreach (bool fallback in new[] { false, true })
+foreach (string value in new[] { "true", "TRUE", "TrUe", "1", "false", "0", "yes", "", " true ", "1 " })
+    Check($"INI Boolean value '{value}', supplied default={fallback}",
+        IniFileNativeLayout.CaptureBooleanValue(value, fallback)
+            == (value is "true" or "TRUE" or "TrUe" or "1" || fallback));
+bool nullIniBooleanThrows = false;
+try { IniFileNativeLayout.CaptureBooleanValue(null, true); }
+catch (NullReferenceException) { nullIniBooleanThrows = true; }
+Check("INI missing/empty GetString result throws in Boolean wrapper rather than using default",
+    nullIniBooleanThrows);
+Check("INI key search is ordinal-ignore-case and empty enumeration skips null-key dereference",
+    IniFileNativeLayout.CaptureKeyExists("WRITEPATH", new[] { "WritePath" })
+    && !IniFileNativeLayout.CaptureKeyExists("WritePath ", new[] { "WritePath" })
+    && !IniFileNativeLayout.CaptureKeyExists(null, Array.Empty<string>()));
+bool nullIniKeyThrows = false;
+try { IniFileNativeLayout.CaptureKeyExists(null, new[] { "WritePath" }); }
+catch (NullReferenceException) { nullIniKeyThrows = true; }
+Check("INI null requested key throws when a candidate exists", nullIniKeyThrows);
+foreach (uint nativeReturn in new uint[] { 0, 1, 2, uint.MaxValue })
+    Check($"INI SetString native return {nativeReturn}",
+        IniFileNativeLayout.CaptureSetStringResult(nativeReturn) == (nativeReturn != 0)
+        && IniFileNativeLayout.DiscardsSectionDeleteResult);
 foreach (string? directory in new string?[] { @"X:\synthetic", @"X:\synthetic folder", "", null })
 {
     var launch = PermissionLaunchNativeLayout.CaptureDescriptor(directory);
@@ -883,6 +919,36 @@ if (args.Length == 2)
     Check("Managed permission launch catches System.Exception over construction and start, not child exit",
         deployment.ManagedCatchMatches(PermissionLaunchNativeLayout.ResetPermissionsMethodRow,
             0, 79, 79, 50, "System.Exception"));
+    Check("Managed INI read/write imports preserve observed charset asymmetry and unsigned results",
+        deployment.ManagedImportMatches(0xE2, "kernel32.dll", "GetPrivateProfileString",
+            "0006090E0E0E1D03090E", 0x0106)
+        && deployment.ManagedImportMatches(0xE3, "kernel32.dll", "WritePrivateProfileString",
+            "0004090E0E0E0E", 0x0100)
+        && deployment.ManagedImportMatches(0xE4, "kernel32.dll", "WritePrivateProfileSection",
+            "0003090E0E0E", 0x0100));
+    Check("Managed INI read full IL retains 512 start, nSize-1 retry, max32768, and null/too-large branches",
+        deployment.ManagedIlMatches(IniFileNativeLayout.GetStringMethodRow,
+            IniFileNativeLayout.GetStringBodyRva,
+            "20000200000A068D450000010B0304722909007007078E69027B5200000428E20000060C082D02142A06185A0A086E078E6917596A330806200080000031C7086E078E6917596A331272902E00700304281500000A73E900000A7A08E08D450000010D0709086E28EA00000A0973EB00000A130411046FEC00000A2D02142A11042A")
+        && deployment.ManagedIlMatches(0xD9, 0x531F, "20FE7F00002A"));
+    Check("Managed INI Boolean wrapper uses instance Equals on true/1, not a null-safe Boolean parser",
+        deployment.ManagedIlMatches(IniFileNativeLayout.GetBoolWithDefaultMethodRow,
+            IniFileNativeLayout.GetBoolWithDefaultBodyRva,
+            "02030428DA0000060A0672D42E0070196F7D00000A2D0E0672DE2E0070196F7D00000A2C02172A052A")
+        && deployment.ManagedIlMatches(0xDC, 0x53DA, "0203041628DD0000062A")
+        && deployment.ManagedUserStringsMatch((0x2ED4, "true"), (0x2EDE, "1")));
+    Check("Managed INI key existence and deletion preserve instance compare and ignored section-write result",
+        deployment.ManagedIlMatches(IniFileNativeLayout.KeyExistsMethodRow,
+            IniFileNativeLayout.KeyExistsBodyRva,
+            "020328DF0000060A060D1613042B190911049A0B0407196F7D00000A2C04170CDE0F1104175813041104098E6932E0162A082A")
+        && deployment.ManagedIlMatches(IniFileNativeLayout.DeleteSectionKeysMethodRow,
+            IniFileNativeLayout.DeleteSectionKeysBodyRva, "037229090070027B5200000428E4000006262A")
+        && deployment.ManagedIlMatches(0xDB, 0x53B8, "030405027B5200000428E30000060A062C02172A162A"));
+    Check("Managed INI section/key enumeration passes null selectors and splits NUL with RemoveEmptyEntries",
+        deployment.ManagedIlMatches(0xDE, 0x5420,
+            "02141428DA0000060A062D07168D390000012A06178D450000010B07176FED00000A2A")
+        && deployment.ManagedIlMatches(0xDF, 0x5450,
+            "02031428DA0000060A062D07168D390000012A06178D450000010B07176FED00000A2A"));
     Check("Managed shortcut removal complete IL preserves common plus user passes and nonrecursive empty-directory gates",
         deployment.ManagedIlMatches(ShortcutNativeLayout.RemoveShortcutsMethodRow,
             ShortcutNativeLayout.RemoveShortcutsBodyRva,

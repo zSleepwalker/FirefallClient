@@ -3229,3 +3229,22 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
 - Build succeeds;1092 sample-backed checks and995 pure checks pass.
   Next independent work: managed INI wrapper boundaries; the browser type
   extraction agent has a separate read-only assignment.
+
+## DeploymentCommon INI wrapper boundaries
+
+- IniFile constructorD8 directly stores supplied path. Read importE2 is
+  uint/char[] with flags0106; writesE3/E4 are uint with0100. No SetLastError.
+- GetStringDA RVA5328 starts512, doubles only for count==nSize-1 through
+ 32768, then throws OutOfMemoryException if still saturated. Count0 null;
+  other positive counts copied exactly. GetterD9 advertises32766.
+  No nSize-2 retry branch, including multi-string enumeration callers.
+- GetBoolDD uses instance Equals true/1, OrdinalIgnoreCase. Other text
+  returns caller default (including false/0); null causes NullReferenceException
+  before default. Two-arg overload uses false default.
+- GetSections/GetSectionKeys split NUL with RemoveEmptyEntries, null=>empty
+  arrays. KeyExists requestedKey is instance receiver: null throws only
+  if a candidate is visited. SetString returns native result!=0;
+  DeleteSectionKeys writes empty-string section content and ignores result.
+- Saved pure read/default/key/write decisions and full IL/import checks.
+  No target config read/write or INI parser implementation.
+- Build succeeds;1145 sample-backed checks and1043 pure checks pass.
