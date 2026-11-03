@@ -56,6 +56,38 @@ public enum Red5LuaWebValueAction
     SetPropertyAsynchronously
 }
 
+public enum Red5LuaUrlFilterAction
+{
+    LogAndSkip,
+    StoreInReplacementList
+}
+
+public enum Red5LuaWebRequestLoggingAction
+{
+    Disable,
+    Enable
+}
+
+public enum Red5LuaLoadUrlAction
+{
+    ReportInvalidFrame,
+    ReportInvalidUrlValue,
+    ReturnWithoutLoading,
+    LoadAndReturnTrue
+}
+
+public enum Red5NaturalDimensionsAction
+{
+    KeepExistingDimensions,
+    UpdateAndNotify
+}
+
+public enum Red5TypeTargetFlagAction
+{
+    LeaveUnchanged,
+    UpdateFlag
+}
+
 public enum Red5QueuedJavaScriptContinuationAction
 {
     SkipUndefinedContinuation,
@@ -84,8 +116,29 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint LuaAddWebValueRaw = 0xCCAF10;
     public const uint LuaCallWebFuncRaw = 0xCCB060;
     public const uint LuaWebFrameBindingTableRaw = 0xCCB9A0;
+    public const uint LuaLoadUrlRaw = 0xCCABA0;
+    public const uint LuaGetUrlRaw = 0xCCACC0;
+    public const uint LuaSetUrlFiltersRaw = 0xCCB1C0;
+    public const uint LuaLogWebRequestsRaw = 0xCCB3D0;
+    public const uint LuaClearCookiesRaw = 0xCCB4E0;
+    public const uint LuaSetNaturalDimsRaw = 0xCCB5B0;
+    public const uint LuaGetNaturalDimsRaw = 0xCCB710;
+    public const uint LuaEnableTypeTargetRaw = 0xCCB7C0;
+    public const uint LuaIsTypeTargetRaw = 0xCCB8C0;
+    public const uint LuaUrlFilterListUpdateRaw = 0xCCCB20;
+    public const uint LuaEnableTypeTargetHelperRaw = 0xCCD0F0;
     public const uint LuaWebValueSetterRaw = 0xD651B0;
     public const uint LuaWebFunctionDispatcherRaw = 0xD65250;
+    public const uint LuaWebFrameContentObjectOffset = 0x418;
+    public const uint LuaWebFrameUrlOffset = 0x448;
+    public const uint LuaWebFrameTypeTargetSourceOffset = 0x398;
+    public const uint LuaWebRequestLoggingFlagOffset = 0x458;
+    public const uint LuaWebFrameTypeTargetFlagOffset = 0x459;
+    public const uint LuaWebFrameNaturalWidthOffset = 0x45C;
+    public const uint LuaWebFrameNaturalHeightOffset = 0x460;
+    public const uint LuaWebViewLoadUrlSlotByteOffset = 0x5C;
+    public const uint LuaWebFrameTargetDataOffset = 0x730;
+    public const uint LuaTypeTargetDispatcherGlobalVa = 0x1E002B8;
     public const uint LuaValueToJavaScriptRaw = 0xCBBDB0;
     public const uint LuaCallbackArgumentConversionRaw = 0xCBBE00;
     public const uint LuaCallbackInvocationWrapperRaw = 0xCD6C10;
@@ -126,6 +179,20 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint LuaWebFunctionReturnLogFormatVa = 0x1BD49D4;
     public const uint LuaWebFunctionMissingFormatVa = 0x1BD49A8;
     public const uint LuaWebCallbacksUnavailableFormatVa = 0x1BD4A10;
+    public const uint LuaLogWebRequestsUsageVa = 0x1BC7584;
+    public const uint LuaClearCookiesUsageVa = 0x1BC75D4;
+    public const uint LuaLoadUrlInvalidElementVa = 0x1BC7484;
+    public const uint LuaGetUrlInvalidElementVa = 0x1BC76E4;
+    public const uint LuaGetNaturalDimsInvalidElementVa = 0x1BC750C;
+    public const uint LuaEnableTypeTargetUsageVa = 0x1BC7534;
+    public const uint LuaEnableTypeTargetInvalidElementVa = 0x1BC780C;
+    public const uint LuaIsTypeTargetUsageVa = 0x1BC7834;
+    public const uint LuaIsTypeTargetInvalidElementVa = 0x1BC7858;
+    public const uint LuaGetUrlEmptyFallbackVa = 0x1C5EA68;
+    public const uint LuaSetUrlFiltersUsageVa = 0x1BC7698;
+    public const uint LuaUrlFilterWildcardVa = 0x1BC78C4;
+    public const uint LuaUrlFilterIllegalFormatVa = 0x1BC78C8;
+    public const uint LuaUrlFilterListOffset = 0x468;
     public const uint CallbackLogHelperRaw = 0x2FC4F0;
     public const uint CallbackUnknownLogHelperRaw = 0x2FCC60;
     public const uint CreationFailureFormatVa = 0x1BD4B2C;
@@ -233,6 +300,43 @@ public static class Red5LoggingBridgeNativeLayout
         webObjectAvailable
             ? Red5LuaWebValueAction.SetPropertyAsynchronously
             : Red5LuaWebValueAction.ReturnWithoutSettingForUnavailableObject;
+
+    public static Red5LuaUrlFilterAction CaptureSetUrlFilter(string? filter) =>
+        !string.IsNullOrEmpty(filter) && filter[^1] == '*'
+            ? Red5LuaUrlFilterAction.StoreInReplacementList
+            : Red5LuaUrlFilterAction.LogAndSkip;
+
+    public static Red5LuaWebRequestLoggingAction CaptureLogWebRequests(bool luaValueIsTruthy) =>
+        luaValueIsTruthy
+            ? Red5LuaWebRequestLoggingAction.Enable
+            : Red5LuaWebRequestLoggingAction.Disable;
+
+    public static Red5LuaLoadUrlAction CaptureLoadUrl(
+        bool frameIsValid,
+        bool urlValueIsConvertible,
+        bool webObjectAvailable) =>
+        !frameIsValid ? Red5LuaLoadUrlAction.ReportInvalidFrame
+        : !urlValueIsConvertible ? Red5LuaLoadUrlAction.ReportInvalidUrlValue
+        : webObjectAvailable ? Red5LuaLoadUrlAction.LoadAndReturnTrue
+        : Red5LuaLoadUrlAction.ReturnWithoutLoading;
+
+    public static string CaptureGetUrlResult(string? currentUrl) => currentUrl ?? string.Empty;
+
+    public static Red5NaturalDimensionsAction CaptureSetNaturalDimensions(
+        float currentWidth,
+        float currentHeight,
+        float requestedWidth,
+        float requestedHeight) =>
+        currentWidth != requestedWidth || currentHeight != requestedHeight
+            ? Red5NaturalDimensionsAction.UpdateAndNotify
+            : Red5NaturalDimensionsAction.KeepExistingDimensions;
+
+    public static Red5TypeTargetFlagAction CaptureEnableTypeTarget(byte currentFlag, bool requestedTruthy) =>
+        (currentFlag != 0) == requestedTruthy
+            ? Red5TypeTargetFlagAction.LeaveUnchanged
+            : Red5TypeTargetFlagAction.UpdateFlag;
+
+    public static bool CaptureIsTypeTarget(byte currentFlag) => currentFlag != 0;
 
     public static Red5QueuedJavaScriptContinuationAction CaptureQueuedJavaScriptContinuation(
         bool continuationValueIsUndefined,

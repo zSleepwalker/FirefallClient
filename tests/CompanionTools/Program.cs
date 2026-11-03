@@ -221,6 +221,64 @@ foreach (bool objectAvailable in new[] { false, true })
         == (objectAvailable
             ? Red5LuaWebValueAction.SetPropertyAsynchronously
             : Red5LuaWebValueAction.ReturnWithoutSettingForUnavailableObject));
+foreach (var filter in new (string? Value, Red5LuaUrlFilterAction Expected)[]
+{
+    (null, Red5LuaUrlFilterAction.LogAndSkip),
+    ("", Red5LuaUrlFilterAction.LogAndSkip),
+    ("*", Red5LuaUrlFilterAction.StoreInReplacementList),
+    ("https://host/path/*", Red5LuaUrlFilterAction.StoreInReplacementList),
+    ("https://host/path/*suffix", Red5LuaUrlFilterAction.LogAndSkip),
+    ("https://host/path/", Red5LuaUrlFilterAction.LogAndSkip)
+})
+    Check($"Awesomium SetUrlFilters accepts only nonempty trailing-wildcard patterns: {filter.Value}",
+        Red5LoggingBridgeNativeLayout.CaptureSetUrlFilter(filter.Value) == filter.Expected);
+foreach (bool truthy in new[] { false, true })
+    Check($"Awesomium LogWebRequests stores Lua truthiness={truthy}",
+        Red5LoggingBridgeNativeLayout.CaptureLogWebRequests(truthy)
+        == (truthy ? Red5LuaWebRequestLoggingAction.Enable : Red5LuaWebRequestLoggingAction.Disable));
+foreach (var load in new[]
+{
+    (FrameValid: false, UrlConvertible: true, WebObjectAvailable: true,
+        Expected: Red5LuaLoadUrlAction.ReportInvalidFrame),
+    (FrameValid: true, UrlConvertible: false, WebObjectAvailable: true,
+        Expected: Red5LuaLoadUrlAction.ReportInvalidUrlValue),
+    (FrameValid: true, UrlConvertible: true, WebObjectAvailable: false,
+        Expected: Red5LuaLoadUrlAction.ReturnWithoutLoading),
+    (FrameValid: true, UrlConvertible: true, WebObjectAvailable: true,
+        Expected: Red5LuaLoadUrlAction.LoadAndReturnTrue)
+})
+    Check($"Awesomium LoadUrl decision, valid frame={load.FrameValid}, convertible URL={load.UrlConvertible}, web object={load.WebObjectAvailable}",
+        Red5LoggingBridgeNativeLayout.CaptureLoadUrl(
+            load.FrameValid, load.UrlConvertible, load.WebObjectAvailable) == load.Expected);
+foreach (string? url in new string?[] { null, "", "https://example.invalid/" })
+    Check($"Awesomium GetUrl null-pointer fallback: {url ?? "<null>"}",
+        Red5LoggingBridgeNativeLayout.CaptureGetUrlResult(url) == (url ?? string.Empty));
+foreach (var dimensions in new[]
+{
+    (CurrentWidth: 800f, CurrentHeight: 600f, RequestedWidth: 800f, RequestedHeight: 600f,
+        Expected: Red5NaturalDimensionsAction.KeepExistingDimensions),
+    (CurrentWidth: 800f, CurrentHeight: 600f, RequestedWidth: 1024f, RequestedHeight: 600f,
+        Expected: Red5NaturalDimensionsAction.UpdateAndNotify),
+    (CurrentWidth: 800f, CurrentHeight: 600f, RequestedWidth: 800f, RequestedHeight: 768f,
+        Expected: Red5NaturalDimensionsAction.UpdateAndNotify),
+    (CurrentWidth: float.NaN, CurrentHeight: 600f, RequestedWidth: float.NaN, RequestedHeight: 600f,
+        Expected: Red5NaturalDimensionsAction.UpdateAndNotify)
+})
+    Check($"Awesomium SetNaturalDims comparison {dimensions.CurrentWidth}x{dimensions.CurrentHeight} -> {dimensions.RequestedWidth}x{dimensions.RequestedHeight}",
+        Red5LoggingBridgeNativeLayout.CaptureSetNaturalDimensions(
+            dimensions.CurrentWidth, dimensions.CurrentHeight,
+            dimensions.RequestedWidth, dimensions.RequestedHeight) == dimensions.Expected);
+foreach (var flag in new[]
+{
+    (Current: (byte)0, Requested: false, Expected: Red5TypeTargetFlagAction.LeaveUnchanged),
+    (Current: (byte)0, Requested: true, Expected: Red5TypeTargetFlagAction.UpdateFlag),
+    (Current: (byte)1, Requested: false, Expected: Red5TypeTargetFlagAction.UpdateFlag),
+    (Current: (byte)1, Requested: true, Expected: Red5TypeTargetFlagAction.LeaveUnchanged),
+    (Current: (byte)2, Requested: true, Expected: Red5TypeTargetFlagAction.LeaveUnchanged)
+})
+    Check($"Awesomium EnableTypeTarget flag transition {flag.Current} -> {flag.Requested}",
+        Red5LoggingBridgeNativeLayout.CaptureEnableTypeTarget(flag.Current, flag.Requested) == flag.Expected
+        && Red5LoggingBridgeNativeLayout.CaptureIsTypeTarget(flag.Current) == (flag.Current != 0));
 foreach (var mappedArguments in new[]
 {
     (HasArguments: false, IsObject: false, CallableLike: false,
@@ -1685,6 +1743,60 @@ if (args.Length == 2)
             Red5LoggingBridgeNativeLayout.LuaValueToJavaScriptRaw + 0x400C00)
         && client.ImportSlotNames(Red5LoggingBridgeNativeLayout.SetPropertyAsyncImportVa,
             "?SetPropertyAsync@JSObject@Awesomium@@QAEXABVWebString@2@ABVJSValue@2@@Z"));
+    Check("Original client replaces URL-filter storage and keeps only filters ending in a wildcard",
+        client.Calls(Red5LoggingBridgeNativeLayout.LuaSetUrlFiltersRaw + 0x18F + 0x400C00,
+            Red5LoggingBridgeNativeLayout.LuaUrlFilterListUpdateRaw + 0x400C00)
+        && client.Calls(Red5LoggingBridgeNativeLayout.LuaUrlFilterListUpdateRaw + 0x29 + 0x400C00,
+            0x2F89A0 + 0x400C00)
+        && ClientMatches(0xCCCBBE, "FF159448AC01")
+        && client.ImportSlotNames(0x1AC4894, "strncmp")
+        && client.Ascii(Red5LoggingBridgeNativeLayout.LuaUrlFilterWildcardVa) == "*"
+        && client.Ascii(Red5LoggingBridgeNativeLayout.LuaUrlFilterIllegalFormatVa)
+            == "SetUrlFilters: Illegal URL filter: %s"
+        && client.Ascii(Red5LoggingBridgeNativeLayout.LuaSetUrlFiltersUsageVa)
+            == "Usage: FRAME:SetUrlFilters('protocol://host/somepath/*', 'filter2', ...)");
+    Check("Original client LogWebRequests stores Lua truthiness in its frame flag",
+        client.Ascii(Red5LoggingBridgeNativeLayout.LuaLogWebRequestsUsageVa)
+            == "usage: FRAME:LogWebRequests(boolean)"
+        && ClientMatches(Red5LoggingBridgeNativeLayout.LuaLogWebRequestsRaw + 0x7F, "888758040000")
+        && ClientMatches(Red5LoggingBridgeNativeLayout.LuaLogWebRequestsRaw + 0x92, "888758040000"));
+    Check("Original client ClearCookies binding calls virtual slot +0x68; its usage string is mismatched",
+        ClientMatches(Red5LoggingBridgeNativeLayout.LuaClearCookiesRaw + 0x55, "FF5068")
+        && client.Ascii(Red5LoggingBridgeNativeLayout.LuaClearCookiesUsageVa)
+            == "usage: FRAME:LogWebRequests()");
+    Check("Original client LoadUrl forwards its URL through the frame object's virtual slot +0x5C",
+        ClientMatches(0xCCAC38, "8B8F1C040000508B11FF525C")
+        && client.Ascii(Red5LoggingBridgeNativeLayout.LuaLoadUrlInvalidElementVa)
+            == "Invalid Element - Element Destroyed?");
+    Check("Original client GetUrl returns the stored URL or an empty-string fallback",
+        ClientMatches(Red5LoggingBridgeNativeLayout.LuaGetUrlRaw + 0x2F, "8B874804000085C0BF68EAC5010F45F8")
+        && client.Ascii(Red5LoggingBridgeNativeLayout.LuaGetUrlEmptyFallbackVa) == ""
+        && client.Ascii(Red5LoggingBridgeNativeLayout.LuaGetUrlInvalidElementVa)
+            == "Invalid Element - Element Destroyed?");
+    Check("Original client SetNaturalDims updates both float fields and notifies only on change",
+        ClientMatches(Red5LoggingBridgeNativeLayout.LuaSetNaturalDimsRaw + 0xE4, "F30F11975C040000")
+        && ClientMatches(Red5LoggingBridgeNativeLayout.LuaSetNaturalDimsRaw + 0xEC, "F30F118F60040000")
+        && client.Calls(Red5LoggingBridgeNativeLayout.LuaSetNaturalDimsRaw + 0xF4 + 0x400C00,
+            0xCCC5C0 + 0x400C00));
+    Check("Original client GetNaturalDims returns the width and height fields as Lua numbers",
+        ClientMatches(Red5LoggingBridgeNativeLayout.LuaGetNaturalDimsRaw + 0x4F, "F30F108760040000")
+        && client.Ascii(Red5LoggingBridgeNativeLayout.LuaGetNaturalDimsInvalidElementVa)
+            == "Invalid Element - Element Destroyed?");
+    Check("Original client EnableTypeTarget uses Lua truthiness and updates its target flag",
+        client.Calls(Red5LoggingBridgeNativeLayout.LuaEnableTypeTargetRaw + 0x85 + 0x400C00,
+            Red5LoggingBridgeNativeLayout.LuaEnableTypeTargetHelperRaw + 0x400C00)
+        && ClientMatches(Red5LoggingBridgeNativeLayout.LuaEnableTypeTargetHelperRaw + 0x15,
+            "889159040000")
+        && client.Ascii(Red5LoggingBridgeNativeLayout.LuaEnableTypeTargetUsageVa)
+            == "usage: FRAME:EnableTypeTarget(boolean)"
+        && client.Ascii(Red5LoggingBridgeNativeLayout.LuaEnableTypeTargetInvalidElementVa)
+            == "Invalid Element - Element Destroyed?");
+    Check("Original client IsTypeTarget reads the stored flag as a boolean",
+        ClientMatches(Red5LoggingBridgeNativeLayout.LuaIsTypeTargetRaw + 0x52, "388F59040000")
+        && client.Ascii(Red5LoggingBridgeNativeLayout.LuaIsTypeTargetUsageVa)
+            == "usage: FRAME:IsTypeTarget(boolean)"
+        && client.Ascii(Red5LoggingBridgeNativeLayout.LuaIsTypeTargetInvalidElementVa)
+            == "Invalid Element - Element Destroyed?");
     Check("Original client errorlog callback validates its object ID, method name, and first string argument",
         ClientMatches(0xD65AF9, "FF15004FAC0139450C0F8515020000")
         && ClientMatches(0xD65B02, "0F8515020000")

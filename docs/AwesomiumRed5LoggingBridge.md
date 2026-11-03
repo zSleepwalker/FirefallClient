@@ -132,9 +132,9 @@ identify these implementation entry points:
 | `EnableTypeTarget` | `0xCCE950` | `0xCCB7C0` |
 | `IsTypeTarget` | `0xCCE960` | `0xCCB8C0` |
 
-The methods not traced in detail below remain behaviorally unresolved; the
-registration table and forwarding stubs establish their names and entry
-points, not their full semantics.
+The registration table and forwarding stubs establish the names and entry
+points. The following traces cover the URL, dimensions, and type-target
+bindings; `ClearCookies`'s indirect target remains only partially understood.
 
 The Lua binding at raw `0xCCAF10` implements `AddWebValue`, using the usage
 string at VA `0x1BC7734`. It requires the frame, property name, and value
@@ -161,6 +161,59 @@ selects `JSObject::InvokeAsync` (IAT VA `0x1AC4EEC`) when nonzero and
 value is used for the function-return diagnostic; it is not shown being
 returned to Lua. Diagnostics include the missing-function and unavailable-
 object formats at VAs `0x1BD49A8` and `0x1BD4A10`.
+
+`LoadUrl` at raw `0xCCABA0` accepts a string directly or converts a numeric
+Lua value to text. After validating the frame, it checks the associated object
+at offset `+0x418`; when present, it calls that object's virtual slot `+0x5C`
+with the URL string and pushes Lua `true`. If the associated object is null,
+the function returns without pushing a value. The invalid-frame branch uses
+`Invalid Element - Element Destroyed?` at VA `0x1BC7484`; lower-level URL
+loading behavior behind the virtual call is not established here.
+
+`GetUrl` at raw `0xCCACC0` reads the current URL pointer at frame offset
+`+0x448`, substituting the empty string at VA `0x1C5EA68` when the pointer is
+null, then returns one Lua string. `SetNaturalDims` at raw `0xCCB5B0`
+converts two arguments to floats and compares them with the stored width and
+height at `+0x45C` and `+0x460`. It writes both fields and calls raw `0xCCC5C0`
+only if either differs. The comparison is ordinary floating-point inequality,
+so equal NaN values still take the update path. `GetNaturalDims` at raw
+`0xCCB710` returns those same two fields as Lua numbers.
+
+`EnableTypeTarget` at raw `0xCCB7C0` converts its extra Lua argument using
+truthiness and calls raw `0xCCD0F0`. That helper does nothing when the stored
+flag at frame offset `+0x459` already matches; otherwise it updates the byte.
+If the pointer at `+0x398` is nonzero and equals the associated object at
+`+0x418`, the helper also calls the global target dispatcher with the
+associated object plus `0x730` when enabling, or null when disabling.
+`IsTypeTarget` at raw `0xCCB8C0` returns whether the byte at `+0x459` is
+nonzero. Its referenced usage string at VA `0x1BC7834` says
+`FRAME:IsTypeTarget(boolean)`, although the implementation reads no
+additional Lua argument; this appears to be a misleading usage string.
+
+The `SetUrlFilters` binding at raw `0xCCB1C0` requires the frame and at least
+one filter. It accepts string and numeric values; numbers pass through the
+Lua number-to-text helper. The resulting list is passed to raw `0xCCCB20`,
+which replaces the list stored at frame offset `+0x468`. Each nonempty filter
+is retained only when `strncmp(last_character, "*", 1)` returns zero; other
+values are skipped and logged with `SetUrlFilters: Illegal URL filter: %s`.
+The usage example at VA `0x1BC7698` ends in `*`, consistent with this check.
+This establishes the setter's trailing-wildcard validation, not the later
+URL-matching semantics.
+
+`LogWebRequests` is registered to raw `0xCCB3D0` and takes a value after the
+frame. Although its usage string at VA `0x1BC7584` says `boolean`, the
+implementation applies Lua truthiness without a boolean-type check and stores
+the result in the byte at frame offset `+0x458`.
+
+`ClearCookies` is registered to raw `0xCCB4E0`. Its binding checks the frame
+and calls virtual slot `+0x68` on the object at `this+0x41C`. The identified
+`uiWebFrameInternal_17` vtable has raw `0xD65A10` in that slot; the target
+loads a nested object from `this+0x1C` and calls that object's virtual slot
+`+0x04`. The dynamic vptr for the binding's object field and the nested
+method's semantics are not independently established. The binding's
+missing-argument string at VA `0x1BC75D4` says `usage: FRAME:LogWebRequests()`,
+which conflicts with the registered `ClearCookies` name and is treated as a
+stale or copied usage string, not evidence to rename the method.
 
 The installed `WebTest.lua`/HTML pair defines
 `Red5Callbacks.test_from_lua` and calls it through `CallWebFunc`, corroborating

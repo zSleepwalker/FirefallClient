@@ -3894,5 +3894,22 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
 - Raw `0xCCB9A0` registers twelve Lua WebFrame names from `LoadUrl` through
   `IsTypeTarget`. Twelve small stubs at `0xCCE8B0`-`0xCCE960` forward to
   their respective implementations. The names, stub bytes, and targets are
-  recorded in the bridge document; behaviors beyond the three traced bridge
-  methods still require individual data-flow analysis.
+  recorded in the bridge document, along with traced URL, filter, dimension,
+  logging, and type-target behavior.
+- `SetUrlFilters` (`0xCCB1C0`) replaces the list at frame offset `+0x468`;
+  `0xCCCB20` retains only nonempty patterns ending in `*` using `strncmp`,
+  logging other values. `LogWebRequests` (`0xCCB3D0`) stores Lua truthiness
+  at frame offset `+0x458` despite a boolean usage string. `ClearCookies`
+  (`0xCCB4E0`) calls virtual slot `+0x68`; its missing-argument usage string
+  incorrectly names `LogWebRequests`, and the indirect method remains
+  unresolved.
+- `LoadUrl` (`0xCCABA0`) converts numeric URLs to text and calls associated
+  object slot `+0x5C` when the object at frame offset `+0x418` exists; it
+  pushes `true` after dispatch and pushes no value when that object is null.
+  `GetUrl` (`0xCCACC0`) returns the pointer at `+0x448` or an empty string.
+- `SetNaturalDims` (`0xCCB5B0`) writes float dimensions at `+0x45C/+0x460`
+  and calls `0xCCC5C0` only on change; `GetNaturalDims` (`0xCCB710`) returns
+  both fields. `EnableTypeTarget` (`0xCCB7C0`) applies Lua truthiness via
+  `0xCCD0F0`, which updates flag `+0x459` and may synchronize the active
+  target; `IsTypeTarget` (`0xCCB8C0`) returns that flag. Its usage string
+  misleadingly advertises a boolean argument that its code does not read.
