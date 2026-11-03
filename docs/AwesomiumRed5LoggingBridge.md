@@ -246,6 +246,11 @@ and `+0x9A8`, stores the returned object at `+0xA04`, then calls its primary
 vtable slot `+0x08` with a computed flag. The factory allocates `0x6C` bytes
 and invokes constructor `0xCBC410` when allocation succeeds. The two input
 fields' application-level meaning and the flag's meaning are not established.
+Owner cleanup routine `0xBF8AC0` invokes the object at `+0xA04` through its
+vtable slot `+0x10` with argument `1`, then clears that field. It also
+releases the values at `+0x9A8` and `+0x9A4` through the shared-text release
+path and clears both fields, supporting their identification as
+reference-counted text values but not their application-level purpose.
 The primary table is at file offset `0x18733CC`; its `+0x08` entry is VA
 `0x10BCD80` (raw `0xCBC180`). That method first calls raw `0xCBC270`, then
 uses the helper object at member `+0x08` twice to populate members `+0x0C`
