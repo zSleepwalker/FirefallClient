@@ -289,6 +289,11 @@ Check("ClientApi adjusted request timestamp applies the signed server clock offs
         == 1_699_999_700
     && Red5LoggingBridgeNativeLayout.CaptureClientApiAdjustedTimestamp(int.MaxValue, 1)
         == int.MinValue);
+Check("ClientApi request timing defaults use the current tick and its wrapping predecessor",
+    Red5LoggingBridgeNativeLayout.CaptureClientApiRequestTimerDefaults(1234)
+        == new ClientApiRequestTimerDefaults(1234, 1233)
+    && Red5LoggingBridgeNativeLayout.CaptureClientApiRequestTimerDefaults(0)
+        == new ClientApiRequestTimerDefaults(0, uint.MaxValue));
 Check("ClientApi request query formats adjusted time, four nonce words, and 64-bit client ID",
     Red5LoggingBridgeNativeLayout.CaptureClientApiRequestQuery(
         1_700_000_000, 1, 0xABCD, 15, ushort.MaxValue,
@@ -2105,6 +2110,11 @@ if (args.Length == 2)
             "_strnicmp")
         && client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiRequestUtcTimeImportVa,
             "_mkgmtime64"));
+    Check("Original ClientApi request reset initializes timer fields from timeGetTime",
+        client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiRequestTimerImportVa,
+            "timeGetTime")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiRequestResetRaw + 0xE7 + 0x400C00,
+            "FF15244DAC018947684889476C894770894774"));
     Check("Original client URL message builder escapes host, path and configured identifier components",
         client.Calls(Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlMessageBuilderRaw + 0xFD + 0x400C00,
             Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlComponentEscapeRaw + 0x400C00)

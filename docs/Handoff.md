@@ -4129,3 +4129,27 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
 - The worker tree's precise relation to the map object at `request+0x20` is
   inferred from the matching name/value layout and store path; a full request
   object type has not been reconstructed.
+
+# Round 26: ClientApi request timer defaults
+
+## Observed
+- `ClientApiRequest_Reset` at IDA address `0xBC1280` calls the imported
+  `timeGetTime` at `0xBC1367` and writes the returned 32-bit tick at request
+  offset `+0x68`. It then decrements EAX and writes that value to offsets
+  `+0x6C`, `+0x70`, and `+0x74` (`0xBC136D` through `0xBC1377`).
+- The sample is
+  `D:\SteamLibrary\steamapps\common\Firefall\system\bin\FirefallClient.exe.original`.
+  Its PE-mapped code VA for IDA `0xBC1367` is `0x00FC1F67` under the already
+  validated `raw + 0x400C00` code mapping. Bytes there are
+  `FF 15 24 4D AC 01 89 47 68 48 89 47 6C 89 47 70 89 47 74`, confirming the
+  import call and four destination offsets. The IAT slot `0x1AC4D24` resolves
+  to `WINMM.dll!timeGetTime`.
+- `ClientApiRequestTimerDefaults` models the tick and its predecessor with
+  unsigned 32-bit wraparound. CompanionTools covers both ordinary and zero
+  tick behavior and checks the sample import and instruction bytes.
+
+## Interpretation and unresolved details
+- The initialized fields likely participate in request timeout/elapsed-time
+  tracking, but their individual runtime roles have not been traced. Do not
+  conflate this millisecond tick source with the `_time64` seconds used by
+  the server-adjusted query timestamp.

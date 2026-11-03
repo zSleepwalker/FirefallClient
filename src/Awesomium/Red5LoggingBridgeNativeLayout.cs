@@ -83,6 +83,7 @@ public readonly record struct Red5ParsedUrl(
     string Query);
 
 public readonly record struct ClientApiServerClockOffsetEntry(string Key, int OffsetSeconds);
+public readonly record struct ClientApiRequestTimerDefaults(uint Tick, uint PreviousTick);
 
 public enum Red5LuaWebRequestLoggingAction
 {
@@ -252,6 +253,7 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint LuaUrlFilterUrlParseDefaultPathVa = 0x1BB626C;
     public const uint ClientApiRequestUrlLookupRaw = 0xBC1460;
     public const uint ClientApiRequestUrlLookupUpdateRaw = 0xBC1680;
+    public const uint ClientApiRequestResetRaw = 0xBC1280;
     public const uint ClientApiRequestUrlLookupKeyBuilderRaw = 0xBC1040;
     public const uint ClientApiRequestUrlLookupTreeSearchRaw = 0xBC4D60;
     public const uint ClientApiRequestUrlLookupTreeLowerBoundRaw = 0xBC61C0;
@@ -264,6 +266,7 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint ClientApiRequestDateScanImportVa = 0x1AC48FC;
     public const uint ClientApiRequestMonthCompareImportVa = 0x1AC4898;
     public const uint ClientApiRequestUtcTimeImportVa = 0x1AC4988;
+    public const uint ClientApiRequestTimerImportVa = 0x1AC4D24;
     public const uint ClientApiRequestRandImportVa = 0x1AC48F8;
     public const uint ClientApiRequestHashCreateImportVa = 0x1AC4038;
     public const uint ClientApiRequestHashDataImportVa = 0x1AC402C;
@@ -550,6 +553,9 @@ public static class Red5LoggingBridgeNativeLayout
 
     public static int CaptureClientApiAdjustedTimestamp(int localTimestamp, int offsetSeconds) =>
         unchecked(localTimestamp + offsetSeconds);
+
+    public static ClientApiRequestTimerDefaults CaptureClientApiRequestTimerDefaults(uint tick) =>
+        new(tick, unchecked(tick - 1));
 
     public static string CaptureClientApiRequestQuery(
         uint adjustedTimestamp,
