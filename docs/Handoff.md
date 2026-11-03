@@ -3964,4 +3964,9 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   `0x1C747E4` (the secondary-vtable source is unresolved). Wrapper
   `0xCBC4D0` always resets first and tests argument bit 0 for allocation
   release. Sample-backed assertions cover this cleanup sequence; exact
-  helper identities and the user-facing meaning remain unresolved.
+  helper identities and the user-facing meaning remain unresolved. The
+  `0xCBE080` list helper passes an optional pointer at list `+0x08` to the
+  shared allocator release path, clears it and `+0x0C/+0x10`, self-links the
+  sentinel at `+0x00`, clears count `+0x04`, walks forward links releasing
+  nodes, and tail-jumps to the release path with the sentinel. This matches
+  circular doubly-linked-list cleanup; exact types remain unknown.

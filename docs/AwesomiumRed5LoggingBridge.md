@@ -293,6 +293,14 @@ capacity fields are at least `8`, and resets the observed capacities to `7`
 while clearing associated pointer/length fields. Finally, it calls an
 indirect initializer on member `+0x14`, replaces the secondary-vtable pointer
 from an unresolved global, and writes primary-vtable VA `0x1C747E4`.
+Helper `0xCBE080` treats its input as a list-like structure: it passes the
+optional pointer at `+0x08` to `0x12C8D60` and clears that pointer plus fields
+`+0x0C/+0x10`; resets the links of the `+0x00` sentinel to itself and clears
+the count at `+0x04`; walks the forward links, passing each node to the same
+backend; then tail-jumps to that backend with the sentinel. This is consistent
+with a circular doubly-linked list, though the node/container type is not
+identified. The backend's allocator internals are outside this object's
+trace.
 These observations support a deferred state-update plus member-cleanup
 interpretation; the identities and application-level meanings of the
 indirect helpers and state remain unknown. Wrapper `CBC4D0` always performs
