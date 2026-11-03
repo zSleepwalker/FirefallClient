@@ -3193,3 +3193,23 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   IL and user-string checks. Repeated native WPF reads/races and OS access
   errors are not modeled or silently caught.
 - Build succeeds;1030 sample-backed checks and947 pure checks pass.
+
+## Awesomium exported child gate and process roles
+
+- Independent agent finished the cross-binary trace; C++ ChildProcessMain
+  export ordinal217 RVA3A710 is imported directly by FirefallProcess.
+  `_Awe_ChildProcessMain@4` ordinal339 RVA4C840 is a wrapper, not the
+  imported entry. No export literally named AwesomiumProcessMain.
+- Parsed type must have nonzero length before entering content main;
+  absent/empty returns0. Byte checks corrected initial report offsets:
+  length compare1003A6B1, entry test1003A721, call1003A719.
+- Exact role table1124D400 has8 entries/stride8, key+0/callback+4:
+  empty, renderer, plugin, worker, ppapi, ppapi-broker, utility, gpu-process.
+  Empty-key BrowserMain mapping is excluded by this exported entry gate
+  but may be reachable by other entry paths.
+- Unknown nonempty type invokes a supplied delegate's vtable+10; only
+  no-delegate fallback returns1 with unknown-type diagnostic.
+- Saved table constants and pure split entry/dispatch decisions plus
+  sample-backed export/IAT/table/branch checks. Agent is finished/idle;
+  no callback internals, argv parser, or delegate implementation traced.
+- Build succeeds;1086 sample-backed checks and991 pure checks pass.

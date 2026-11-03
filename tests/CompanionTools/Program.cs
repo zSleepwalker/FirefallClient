@@ -19,6 +19,27 @@ void Check(string name, bool condition)
     if (condition) passed++; else failed++;
 }
 
+foreach (bool hasDelegate in new[] { false, true })
+{
+    foreach (string? type in new string?[] { null, "" })
+        Check($"Browser export excludes absent/empty type (delegate={hasDelegate})",
+            ChildProcessRoleNativeLayout.CaptureExportEntry(type, hasDelegate)
+                == new ChildProcessRoute(ChildProcessRouteKind.ImmediateReturn, null, 0));
+    foreach (var role in ChildProcessRoleNativeLayout.Roles)
+    {
+        var known = new ChildProcessRoute(ChildProcessRouteKind.KnownCallback, role.CallbackVa, null);
+        Check($"Content role {role.Key} exact match (delegate={hasDelegate})",
+            ChildProcessRoleNativeLayout.CaptureContentDispatch(role.Key, hasDelegate) == known);
+        if (role.Key.Length != 0)
+            Check($"Export dispatches nonempty role {role.Key} (delegate={hasDelegate})",
+                ChildProcessRoleNativeLayout.CaptureExportEntry(role.Key, hasDelegate) == known);
+    }
+    foreach (string unknown in new[] { "Renderer", "renderer ", "renderer-extra", "unknown", " browser" })
+        Check($"Unknown role {unknown} uses delegate only when available",
+            ChildProcessRoleNativeLayout.CaptureExportEntry(unknown, hasDelegate)
+                == (hasDelegate ? new ChildProcessRoute(ChildProcessRouteKind.DelegateFallback, null, null)
+                    : new ChildProcessRoute(ChildProcessRouteKind.ImmediateReturn, null, 1)));
+}
 foreach (var entry in new (bool Present, object? App, object? Registry, string? Expected)[]
 {
     (false, @"C:\ignored", @"C:\registry", @"C:\registry"),
@@ -740,6 +761,42 @@ if (args.Length == 2)
     Check("All86 original client Awesomium imports resolve to exports in the bundled DLL",
         clientImports.Count == AwesomiumLayout.ClientImportCount
         && clientImports.All(symbol => browser.Export(symbol) is not null));
+    Check("Browser child C++ export and C wrapper have distinct identities and direct wrapper call",
+        browser.Export(ChildProcessRoleNativeLayout.CppEntryExport) is { } cppEntry
+        && cppEntry.Rva == ChildProcessRoleNativeLayout.CppEntryRva
+        && cppEntry.Ordinal == 217 && !cppEntry.Forwarded
+        && browser.Export(ChildProcessRoleNativeLayout.CWrapperExport) is { } cEntry
+        && cEntry.Rva == ChildProcessRoleNativeLayout.CWrapperRva
+        && cEntry.Ordinal == 339 && !cEntry.Forwarded
+        && browser.Matches(0x1004C840, "8B44240450E8C6DEFEFF83C404C20400")
+        && browser.Calls(0x1004C845, 0x1003A710)
+        && child.ImportSlotNames(0x4060DC, ChildProcessRoleNativeLayout.CppEntryExport)
+        && child.Matches(0x40103E, "FF15DC604000"));
+    Check("Browser child entry tests parsed type length and returns zero before content main when absent/empty",
+        browser.Matches(0x1003A6B1, "837C2430007425")
+        && browser.Calls(0x1003A719, 0x1003A630)
+        && browser.Matches(0x1003A721, "84C07445")
+        && browser.Matches(0x1003A76A, "33C05E83C460C3"));
+    for (int index = 0; index < ChildProcessRoleNativeLayout.Roles.Count; index++)
+    {
+        var role = ChildProcessRoleNativeLayout.Roles[index];
+        uint entryVa = ChildProcessRoleNativeLayout.RoleTableVa
+            + (uint)(index * ChildProcessRoleNativeLayout.RoleEntryByteCount);
+        Check($"Browser role table entry {index} preserves key pointer and callback VA",
+            browser.Word(entryVa) == role.KeyVa
+            && browser.Ascii(role.KeyVa) == role.Key
+            && browser.Word(entryVa + 4) == role.CallbackVa);
+    }
+    Check("Browser dispatch requires full exact match and invokes matched callback indirectly",
+        browser.Calls(0x10064997, 0x1000A5D0)
+        && browser.Matches(0x1006499F, "85C0750D3BF772093BF70F95C085C07434")
+        && browser.Matches(0x100649F7, "FFD0"));
+    Check("Browser unknown role delegates at vtable+10 or returns one without delegate",
+        browser.Matches(0x100649C5, "85C9743E")
+        && browser.Matches(0x100649D0, "8B118B5210")
+        && browser.Matches(0x100649D7, "FFD2")
+        && browser.Matches(0x10064A07, "BE01000000")
+        && browser.Matches(0x10064A70, "5F8BC65E5D5B81C4B8000000C3"));
     Check("DeploymentCommon is a managed deployment assembly, not an observed native import of these helpers",
         deployment.ImportsFrom("mscoree.dll").Contains("_CorDllMain")
         && new[] { red, dumper, truck, hardware, child, browser, client }
