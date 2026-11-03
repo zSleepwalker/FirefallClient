@@ -19,6 +19,25 @@ void Check(string name, bool condition)
     if (condition) passed++; else failed++;
 }
 
+foreach (string? display in new string?[] { "Firefall", "Firefall Beta", "", null })
+{
+    var shortcuts = ShortcutNativeLayout.CaptureCreation(display);
+    Check($"Shortcut property plan for synthetic display {display ?? "<null>"}",
+        shortcuts.Length == 3
+        && shortcuts[0] == new ShortcutDefinition(ShortcutFolder.SelectedDesktop,
+            $"Play {display}.lnk", $"Play {display}", @"system\bin\Launcher.exe",
+            @"system\bin", @"system\bin\FirefallClient.exe", null)
+        && shortcuts[1] == (shortcuts[0] with { Folder = ShortcutFolder.SelectedStartMenuProductDirectory })
+        && shortcuts[2] == new ShortcutDefinition(ShortcutFolder.SelectedStartMenuProductDirectory,
+            $"Uninstall {display}.lnk", $"Uninstall {display}", @"uninstall\FirefallInstaller.exe",
+            "uninstall", null, "/uninstall"));
+}
+foreach (bool exists in new[] { false, true })
+foreach (uint entries in new uint[] { 0, 1, 2, uint.MaxValue })
+    Check($"Shortcut removal exists={exists}, remaining entries={entries}",
+        ShortcutNativeLayout.CaptureFileRemoval(exists) == exists
+        && ShortcutNativeLayout.CaptureDirectoryRemoval(exists, entries) == (exists && entries == 0)
+        && !ShortcutNativeLayout.RecursiveDirectoryRemoval);
 foreach (bool nativeBool in new[] { false, true })
 {
     Check($"Common folder ignores native BOOL {nativeBool} on normal return",
@@ -723,6 +742,22 @@ if (args.Length == 2)
         && deployment.ManagedImportMatches(0x57, "kernel32.dll", "GetCurrentProcess", "000018", 0x0146)
         && deployment.ManagedImportMatches(0x58, "kernel32.dll", "GetModuleHandle", "0001180E", 0x0106)
         && deployment.ManagedImportMatches(0x59, "kernel32.dll", "GetProcAddress", "000218180E", 0x0142));
+    Check("Managed shortcut creation complete IL preserves three links and exact COM property calls",
+        deployment.ManagedIlMatches(ShortcutNativeLayout.CreateShortcutMethodRow,
+            ShortcutNativeLayout.CreateShortcutBodyRva,
+            "729F37007028F9000006283100000672FD360070282600000A0A733B01000A0B1F191F1028280100060C07087209380070282B000006281B00000A282600000A6F3C01000A74AB0000010D09067213370070282600000A6F3D01000A097223380070282B000006281B00000A6F3E01000A090672D7360070282600000A6F3F01000A09066F4001000A096F4101000A1F161F0B28280100061304110472600E0070282B000006281B00000A282600000A13051105282500000A2D08110528D600000A260711057209380070282B000006281B00000A282600000A6F3C01000A74AB0000010D09067213370070282600000A6F3D01000A097223380070282B000006281B00000A6F3E01000A090672D7360070282600000A6F3F01000A09066F4001000A096F4101000A0711057235380070282B000006281B00000A282600000A6F3C01000A74AB0000010D28310000067259380070282600000A1306091106726D380070282600000A6F3D01000A0972993800706F4201000A0972AF380070282B000006281B00000A6F3E01000A0911066F4001000A096F4101000A72CB38007028F90000062A"));
+    Check("Managed shortcut string tokens match target, icon, description, and folder plans",
+        deployment.ManagedUserStringsMatch(
+            (0x36FD, @"system\bin"), (0x3809, "Play {0}.lnk"), (0x3713, "Launcher.exe"),
+            (0x3823, "Play {0}"), (0x36D7, "FirefallClient.exe"),
+            (0x0E60, ShortcutNativeLayout.StartMenuProductDirectoryFormat),
+            (0x3835, "Uninstall {0}.lnk"), (0x3859, "uninstall"),
+            (0x386D, "FirefallInstaller.exe"), (0x3899, "/uninstall"),
+            (0x38AF, "Uninstall {0}"), (0x393F, "Red 5 Studios")));
+    Check("Managed shortcut removal complete IL preserves common plus user passes and nonrecursive empty-directory gates",
+        deployment.ManagedIlMatches(ShortcutNativeLayout.RemoveShortcutsMethodRow,
+            ShortcutNativeLayout.RemoveShortcutsBodyRva,
+            "72D538007028F90000061F191F1028280100067209380070282B000006281B00000A282600000A0A06282700000A2C0606285500000A1F161F0B28280100060B07723F390070282600000A0C08282B000006282600000A0D097209380070282B000006281B00000A282600000A1304097235380070282B000006281B00000A282600000A13051104282700000A2C071104285500000A1105282700000A2C071105285500000A09282500000A2C1109284301000A8E692D070916284401000A08282500000A2C1108284301000A8E692D070816284401000A1F10282900000A7209380070282B000006281B00000A282600000A0A06282700000A2C0606285500000A1F0B282900000A0B07723F390070282600000A0C08282B000006282600000A0D097209380070282B000006281B00000A282600000A1304097235380070282B000006281B00000A282600000A13051104282700000A2C071104285500000A1105282700000A2C071105285500000A09282500000A2C1109284301000A8E692D070916284401000A08282500000A2C1108284301000A8E692D070816284401000A72CB38007028F90000062A"));
 }
 else
 {

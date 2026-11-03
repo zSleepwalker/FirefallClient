@@ -35,3 +35,9 @@ unused-in-the-scanned-IL window import declarations from the called shell
 folder helper. GetCommonPath ignores native BOOL failure and uses its
 managed backup only after a logged managed exception; saved decisions and
 metadata/IL/catch-region checks preserve this distinction.
+
+[Shortcut planning and cleanup](DeploymentCommonShortcuts.md) records
+the three explicit COM property plans (play targets Launcher.exe, with
+FirefallClient.exe icons), uninstall arguments, and common-plus-user
+cleanup passes with nonrecursive empty-directory gates. The saved code
+only returns descriptors and decisions; it performs no COM/filesystem work.

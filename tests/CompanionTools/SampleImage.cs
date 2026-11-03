@@ -67,6 +67,14 @@ internal sealed class SampleImage
             && metadata.GetBlobBytes(method.Signature).AsSpan().SequenceEqual(Convert.FromHexString(signature));
     }
 
+    public bool ManagedUserStringsMatch(params (int Offset, string Value)[] values)
+    {
+        using var pe = new PEReader(new MemoryStream(bytes, writable: false));
+        var metadata = pe.GetMetadataReader();
+        return values.All(value =>
+            metadata.GetUserString(MetadataTokens.UserStringHandle(value.Offset)) == value.Value);
+    }
+
     public bool ManagedIlMatches(int methodRow, uint bodyRva, string expectedIl)
     {
         using var pe = new PEReader(new MemoryStream(bytes, writable: false));

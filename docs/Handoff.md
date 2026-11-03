@@ -3157,3 +3157,22 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
 - Build succeeds;998 sample-backed checks and921 pure checks pass.
   Complete managed shortcut creation/removal is a follow-on, not yet
   implemented or inferred from the shell directory pairs alone.
+
+## DeploymentCommon shortcut creation/removal
+
+- Utils.CreateShortcut125 body RVA66A0 has423 IL bytes; RemoveShortcuts126
+  body RVA6854 has429. Complete IL checks saved with corrected native
+  transcription (user cleanup's product combine has no String.Format).
+- Creation saves three links: desktop play, Start Menu product play, and
+  Start Menu uninstall. Play targets Launcher.exe but uses FirefallClient.exe
+  as icon; uninstall targets uninstall\FirefallInstaller.exe with /uninstall.
+  Null descriptor icon/arguments means no setter, not property clearing.
+- Removal processes selected common-or-fallback folders, then explicitly
+  user DesktopDirectory/StartMenu. Existing links only; directories only
+  when existing and empty; recursive=false. No deduplication across passes
+  and no method-local catch. Reconstructed code has no side effects.
+- Created reusable read-only session scratch managed-il.ps1 to resolve IL
+  opcodes/member/string tokens with framework metadata APIs, no target load.
+- Follow-ons: ProductIdentifierDisplay mapping and install-root data source;
+  Awesomium process-role agent is independent of this managed trace.
+- Build succeeds;1013 sample-backed checks and933 pure checks pass.
