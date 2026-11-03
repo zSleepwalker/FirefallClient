@@ -3900,9 +3900,10 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   `0xCCCB20` retains only nonempty patterns ending in `*` using `strncmp`,
   logging other values. `LogWebRequests` (`0xCCB3D0`) stores Lua truthiness
   at frame offset `+0x458` despite a boolean usage string. `ClearCookies`
-  (`0xCCB4E0`) calls virtual slot `+0x68`; its missing-argument usage string
-  incorrectly names `LogWebRequests`, and the indirect method remains
-  unresolved.
+  (`0xCCB4E0`) calls internal-object slot `+0x68`, resolved by the object
+  constructor to thunk `0xD65A10`. The thunk calls nested-object slot `+0x04`;
+  that final method remains unresolved. Its missing-argument usage string
+  incorrectly names `LogWebRequests`.
 - `LoadUrl` (`0xCCABA0`) converts numeric URLs to text and calls associated
   object slot `+0x5C` when the object at frame offset `+0x418` exists; it
   pushes `true` after dispatch and pushes no value when that object is null.

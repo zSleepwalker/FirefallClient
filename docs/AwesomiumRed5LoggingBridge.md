@@ -225,14 +225,20 @@ implementation applies Lua truthiness without a boolean-type check and stores
 the result in the byte at frame offset `+0x458`.
 
 `ClearCookies` is registered to raw `0xCCB4E0`. Its binding checks the frame
-and calls virtual slot `+0x68` on the object at `this+0x41C`. The identified
-`uiWebFrameInternal_17` vtable has raw `0xD65A10` in that slot; the target
-loads a nested object from `this+0x1C` and calls that object's virtual slot
-`+0x04`. The dynamic vptr for the binding's object field and the nested
-method's semantics are not independently established. The binding's
-missing-argument string at VA `0x1BC75D4` says `usage: FRAME:LogWebRequests()`,
-which conflicts with the registered `ClearCookies` name and is treated as a
-stale or copied usage string, not evidence to rename the method.
+and calls virtual slot `+0x68` on the internal object at frame offset
+`+0x41C`. The initializer at raw `0xCCBD90` constructs that object through
+raw `0xD64060` and stores the result at `+0x41C`; the constructor sets its
+vptr to VA `0x1C765FC`. The vtable entry at VA `0x1C76664` (slot `+0x68`)
+points to the eight-byte forwarding thunk at raw `0xD65A10`. That thunk loads
+a nested pointer from internal-object offset `+0x1C`, reads its vptr, then
+calls that object's virtual slot `+0x04`. The constructor initializes the
+nested pointer from the result of global object's virtual slot `+0x0C`.
+This resolves the first dispatch and confirms the thunk target statically;
+the nested object's runtime type and slot `+0x04` semantics remain unresolved.
+The binding's missing-argument string at VA `0x1BC75D4` says
+`usage: FRAME:LogWebRequests()`, which conflicts with the registered
+`ClearCookies` name and is treated as a stale or copied usage string, not
+evidence to rename the method.
 
 The installed `WebTest.lua`/HTML pair defines
 `Red5Callbacks.test_from_lua` and calls it through `CallWebFunc`, corroborating

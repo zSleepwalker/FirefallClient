@@ -1775,8 +1775,15 @@ if (args.Length == 2)
         && ClientMatches(Red5LoggingBridgeNativeLayout.LuaLogWebRequestsRaw + 0x92, "888758040000"));
     Check("Original client ClearCookies binding calls virtual slot +0x68; its usage string is mismatched",
         ClientMatches(Red5LoggingBridgeNativeLayout.LuaClearCookiesRaw + 0x55, "FF5068")
-        && client.Matches(0x1C76664, "10661601")
-        && ClientMatches(0xD65A10, "8B491C8B01FF6004")
+        && client.Calls(Red5LoggingBridgeNativeLayout.LuaWebFrameInitializerRaw + 0x400C00 + 0x177,
+            Red5LoggingBridgeNativeLayout.LuaWebFrameInternalConstructorRaw + 0x400C00)
+        && ClientMatches(Red5LoggingBridgeNativeLayout.LuaWebFrameInitializerRaw + 0x18E,
+            "89861C040000")
+        && ClientMatches(Red5LoggingBridgeNativeLayout.LuaWebFrameInternalConstructorRaw + 0x74,
+            "C707FC65C701")
+        && client.Matches(Red5LoggingBridgeNativeLayout.LuaClearCookiesVtableSlotVa, "10661601")
+        && ClientMatches(Red5LoggingBridgeNativeLayout.LuaClearCookiesForwardingThunkRaw,
+            "8B491C8B01FF6004")
         && client.Ascii(Red5LoggingBridgeNativeLayout.LuaClearCookiesUsageVa)
             == "usage: FRAME:LogWebRequests()");
     Check("Original client LoadUrl forwards its URL through the frame object's virtual slot +0x5C",

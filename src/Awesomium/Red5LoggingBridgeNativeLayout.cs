@@ -122,6 +122,9 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint LuaSetUrlFiltersRaw = 0xCCB1C0;
     public const uint LuaLogWebRequestsRaw = 0xCCB3D0;
     public const uint LuaClearCookiesRaw = 0xCCB4E0;
+    public const uint LuaWebFrameInitializerRaw = 0xCCBD90;
+    public const uint LuaWebFrameInternalConstructorRaw = 0xD64060;
+    public const uint LuaClearCookiesForwardingThunkRaw = 0xD65A10;
     public const uint LuaSetNaturalDimsRaw = 0xCCB5B0;
     public const uint LuaGetNaturalDimsRaw = 0xCCB710;
     public const uint LuaEnableTypeTargetRaw = 0xCCB7C0;
@@ -131,6 +134,8 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint LuaWebValueSetterRaw = 0xD651B0;
     public const uint LuaWebFunctionDispatcherRaw = 0xD65250;
     public const uint LuaWebFrameContentObjectOffset = 0x418;
+    public const uint LuaWebFrameInternalObjectOffset = 0x41C;
+    public const uint LuaWebFrameInternalContextOffset = 0x1C;
     public const uint LuaWebFrameInternalWebViewOffset = 0x20;
     public const uint LuaWebFrameUrlOffset = 0x448;
     public const uint LuaWebFrameTypeTargetSourceOffset = 0x398;
@@ -148,6 +153,8 @@ public static class Red5LoggingBridgeNativeLayout
     public const float LuaNaturalFitScaleRoundingBias = 0.5f;
     public const uint LuaWebFrameVtableVa = 0x1C765FC;
     public const uint LuaWebFrameLoadUrlVtableSlotVa = 0x1C76658;
+    public const uint LuaClearCookiesVtableSlotVa = 0x1C76664;
+    public const uint LuaClearCookiesNestedMethodSlotByteOffset = 0x04;
     public const uint LuaWebFrameTargetDataOffset = 0x730;
     public const uint LuaTypeTargetDispatcherGlobalVa = 0x1E002B8;
     public const uint LuaLocalUrlPrefixVa = 0x1BD49F8;
