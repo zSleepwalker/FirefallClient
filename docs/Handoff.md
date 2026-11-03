@@ -4249,8 +4249,12 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
 - `ClientApi_PumpRequestWorker` allocates a 0x1C-byte context at `0xBC2D0E`.
   It clears the context, explicitly zeroes byte `+0x11` and dword `+0x14`,
   stores the `ClientApiResponse` pointer at `+0x18`, and later stores the
-  opened WinHTTP request handle at `+0`. At `0xBC31F8`, it pushes this context
-  as the final `dwContext` argument to `WinHttpSendRequest`.
+  opened WinHTTP request handle at `+0`. The sample IAT slot `0x1AC4D0C`
+  resolves to `WINHTTP.dll!WinHttpSetStatusCallback`; the call at `0xBC31E9`
+  registers the callback with all notification bits (`0xFFFFFFFF`) and
+  reserved argument zero. At `0xBC31F8`, the worker pushes this context as
+  the final `dwContext` argument to `WinHttpSendRequest` (`0x1AC4D10` resolves
+  to `WINHTTP.dll!WinHttpSendRequest`).
 - `ClientApi_WinHttpStatusCallback` checks that the callback's handle equals
   context `+0`, gates non-closing status dispatch on context `+0x14`, accesses
   the response through `+0x18`, and tests byte `+0x11` on HANDLE_CLOSING.
@@ -4259,4 +4263,5 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   unresolved. Other context fields at `+4`, `+8`, `+0xC`, and `+0x10` are kept
   unnamed.
 - CompanionTools checks the sample allocation size, initial flag/result
-  stores, and subsequent handle/result/response stores.
+  stores, subsequent handle/result/response stores, and the callback/send
+  import slots and callsites.

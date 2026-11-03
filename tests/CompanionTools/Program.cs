@@ -2163,6 +2163,17 @@ if (args.Length == 2)
             + 0x400C00, "894714")
         && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpCallbackContextResponseStoreRaw
             + 0x400C00, "894718"));
+    Check("Original ClientApi registers the callback and sends its context as WinHttpSendRequest dwContext",
+        client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiWinHttpSetStatusCallbackImportVa,
+            "WinHttpSetStatusCallback")
+        && client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiWinHttpSendRequestImportVa,
+            "WinHttpSendRequest")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiPumpRequestWorkerRaw + 0x6B9 + 0x400C00,
+            "FF150C4DAC01")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiPumpRequestWorkerRaw + 0x6C8 + 0x400C00,
+            "57")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiPumpRequestWorkerRaw + 0x6E3 + 0x400C00,
+            "FF15104DAC01"));
     Check("Original client URL message builder escapes host, path and configured identifier components",
         client.Calls(Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlMessageBuilderRaw + 0xFD + 0x400C00,
             Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlComponentEscapeRaw + 0x400C00)
