@@ -82,6 +82,8 @@ public readonly record struct Red5ParsedUrl(
     string Path,
     string Query);
 
+public readonly record struct ClientApiUrlLookupEntry(string Key, int Value);
+
 public enum Red5LuaWebRequestLoggingAction
 {
     Disable,
@@ -249,9 +251,11 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint LuaUrlFilterUrlParseHttpsSchemeVa = 0x1BB6264;
     public const uint LuaUrlFilterUrlParseDefaultPathVa = 0x1BB626C;
     public const uint ClientApiRequestUrlLookupRaw = 0xBC1460;
+    public const uint ClientApiRequestUrlLookupUpdateRaw = 0xBC1680;
     public const uint ClientApiRequestUrlLookupKeyBuilderRaw = 0xBC1040;
     public const uint ClientApiRequestUrlLookupTreeSearchRaw = 0xBC4D60;
     public const uint ClientApiRequestUrlLookupTreeLowerBoundRaw = 0xBC61C0;
+    public const uint ClientApiRequestUrlLookupTreeInsertOrReplaceRaw = 0xBC4CB0;
     public const uint ClientApiRequestUrlLookupLowercaseRaw = 0x12B9A20;
     public const uint ClientApiRequestUrlLookupLowercaseTextRaw = 0x12B9B00;
     public const uint ClientApiRequestUrlLookupFormatVa = 0x1C73534;
@@ -502,6 +506,22 @@ public static class Red5LoggingBridgeNativeLayout
             keys.Add(CaptureAsciiLowercase(parsed.Host[period..]));
 
         return keys.ToArray();
+    }
+
+    public static ClientApiUrlLookupEntry[] CaptureUrlLookupEntries(Red5ParsedUrl? url, int value)
+    {
+        string? hostPortKey = CaptureUrlHostPortLookupKey(url);
+        if (hostPortKey is null)
+            return Array.Empty<ClientApiUrlLookupEntry>();
+
+        var entries = new List<ClientApiUrlLookupEntry>
+        {
+            new(hostPortKey, value)
+        };
+        foreach (string key in CaptureDefaultPortHostSuffixLookupKeys(url))
+            entries.Add(new ClientApiUrlLookupEntry(key, value));
+
+        return entries.ToArray();
     }
 
     public static string? CaptureUrlHostPortLookupKey(Red5ParsedUrl? url) =>

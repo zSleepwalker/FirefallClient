@@ -4004,10 +4004,17 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   formatted by `"%s:%d"` at VA `0x1C73534`. The tree search is an ordered
   string search using `strcmp`.
 - The host-suffix behavior is modeled by
-  `CaptureUrlHostPortLookupKey` and `CaptureDefaultPortHostSuffixLookupKeys`,
-  covered by CompanionTools cases for key normalization, default/non-default
-  ports, case folding, multiple labels, and missing hosts. Sample guards
-  verify the direct key formatter, lookup order, and `strchr` suffix path.
+  `CaptureUrlHostPortLookupKey`, `CaptureDefaultPortHostSuffixLookupKeys`,
+  and `CaptureUrlLookupEntries`, covered by CompanionTools cases for key
+  normalization, default/non-default ports, case folding, multiple labels,
+  and missing hosts. Sample guards verify the direct key formatter, lookup
+  order, `strchr` suffix path, and direct/suffix value writes.
+- `0xBC1680`, called by `ClientApi_PumpRequestWorker` at `0xBC338D`, inserts
+  or updates the direct `host:port` entry and, for default ports, the same
+  suffix entries. Each entry receives the same `EDX - third-argument`
+  difference in node field `+0x14`; the difference's meaning is unresolved.
+  `0xBC4CB0` returns an existing value slot or inserts a missing key, and
+  `0xBC7A10` performs balanced ordered-tree insertion.
 
 ## Unresolved
 - The tree entries' meaning is unknown; only the `+0x14` numeric contribution

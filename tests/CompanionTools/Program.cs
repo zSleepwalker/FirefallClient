@@ -261,6 +261,18 @@ foreach (var keyCase in new (Red5ParsedUrl? Url, string? Expected)[]
 })
     Check($"ClientApi URL host-port lookup key: {keyCase.Expected}",
         Red5LoggingBridgeNativeLayout.CaptureUrlHostPortLookupKey(keyCase.Url) == keyCase.Expected);
+foreach (var entryCase in new (Red5ParsedUrl? Url, int Value, string Expected)[]
+{
+    (new Red5ParsedUrl(false, "www.Example.COM", 80, "/", ""), 37,
+        "www.example.com:80=37,.example.com=37,.com=37"),
+    (new Red5ParsedUrl(true, "api.Example.COM", 8443, "/", ""), 12,
+        "api.example.com:8443=12"),
+    (null, 99, "")
+})
+    Check($"ClientApi URL lookup entries: {entryCase.Expected}",
+        string.Join(",", Red5LoggingBridgeNativeLayout.CaptureUrlLookupEntries(
+            entryCase.Url, entryCase.Value).Select(entry => $"{entry.Key}={entry.Value}"))
+        == entryCase.Expected);
 foreach (var suffixCase in new (Red5ParsedUrl? Url, string Expected)[]
 {
     (new Red5ParsedUrl(false, "www.Example.COM", 80, "/", ""), ".example.com,.com"),
@@ -2021,6 +2033,17 @@ if (args.Length == 2)
             Red5LoggingBridgeNativeLayout.ClientApiRequestUrlLookupLowercaseRaw + 0x400C00)
         && client.Calls(Red5LoggingBridgeNativeLayout.ClientApiRequestUrlLookupLowercaseTextRaw + 0x48 + 0x400C00,
             Red5LoggingBridgeNativeLayout.ClientApiRequestUrlLookupLowercaseRaw + 0x400C00));
+    Check("Original ClientApi URL update stores the same value under direct and suffix keys",
+        client.Calls(Red5LoggingBridgeNativeLayout.ClientApiRequestUrlLookupUpdateRaw + 0x30 + 0x400C00,
+            Red5LoggingBridgeNativeLayout.ClientApiRequestUrlLookupKeyBuilderRaw + 0x400C00)
+        && client.Calls(Red5LoggingBridgeNativeLayout.ClientApiRequestUrlLookupUpdateRaw + 0x7B + 0x400C00,
+            Red5LoggingBridgeNativeLayout.ClientApiRequestUrlLookupTreeSearchRaw + 0x400C00)
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiRequestUrlLookupUpdateRaw + 0xDB + 0x400C00,
+            "895014")
+        && client.Calls(Red5LoggingBridgeNativeLayout.ClientApiRequestUrlLookupUpdateRaw + 0x1CF + 0x400C00,
+            Red5LoggingBridgeNativeLayout.ClientApiRequestUrlLookupTreeInsertOrReplaceRaw + 0x400C00)
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiRequestUrlLookupUpdateRaw + 0x1DB + 0x400C00,
+            "8908"));
     Check("Original ClientApi URL lookup format literal",
         client.Ascii(Red5LoggingBridgeNativeLayout.ClientApiRequestUrlLookupFormatVa)
             == "%s:%d");
