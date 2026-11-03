@@ -3929,7 +3929,9 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   stores it at `+0xA04`, then calls primary slot `+0x08`. Its mapped callback
   VA is `0x10BE9E0`; the owner's API type and callback allow/cancel semantics
   remain unresolved. Owner cleanup `0xBF8AC0` calls the `+0xA04` object's
-  vtable slot `+0x10` with `1`, then clears that field; it also releases and
+  primary slot `+0x10` with `1`, then clears that field. The slot at VA
+  `0x1C747DC` points to `0xCBC4D0`, which calls reset `0xCBC510` and uses the
+  low argument bit to select final release. Owner cleanup also releases and
   clears the shared-text values at `+0x9A8/+0x9A4`. Their meanings remain
   unknown. Setup copies its incoming path into owner field `+0x5C8`, adds a
   trailing separator as needed, and converts `/` to `\`; empty input uses

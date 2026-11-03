@@ -1886,6 +1886,10 @@ if (args.Length == 2)
         && client.Calls(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectResetWrapperRaw
                 + 0x06 + 0x400C00,
             Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectResetRaw + 0x400C00)
+        && ClientMatches(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectDeleteSlotRaw + 0x06,
+            "E835000000")
+        && ClientMatches(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectDeleteSlotRaw + 0x0B,
+            "F6450801")
         && client.Matches(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchTableVa, "C0DE0B01")
         && client.Matches(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchTableCallbackSlotVa, "E0E90B01")
         && Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchFirstEntryPointerVa
@@ -1893,12 +1897,15 @@ if (args.Length == 2)
         && client.Matches(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectPrimaryVtableVa, "50CD0B01")
         && client.Matches(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectPrimaryCleanupSlotVa, "60CD0B01")
         && client.Matches(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectSetupSlotVa, "80CD0B01")
+        && client.Matches(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectDeleteSlotVa, "D0D00B01")
         && Red5LoggingBridgeNativeLayout.LuaUrlFilterCallbackPointerVa
             == Red5LoggingBridgeNativeLayout.LuaUrlFilterCallbackRaw + 0x400C00
         && Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectPrimaryCleanupSlotPointerVa
             == Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectPrimaryCleanupSlotRaw + 0x400C00
         && Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectSetupSlotPointerVa
-            == Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectSetupSlotRaw + 0x400C00);
+            == Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectSetupSlotRaw + 0x400C00
+        && Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectDeleteSlotPointerVa
+            == Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectDeleteSlotRaw + 0x400C00);
     Check("Original client LogWebRequests stores Lua truthiness in its frame flag",
         client.Ascii(Red5LoggingBridgeNativeLayout.LuaLogWebRequestsUsageVa)
             == "usage: FRAME:LogWebRequests(boolean)"

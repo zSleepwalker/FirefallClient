@@ -247,7 +247,10 @@ vtable slot `+0x08` with a computed flag. The factory allocates `0x6C` bytes
 and invokes constructor `0xCBC410` when allocation succeeds. The two input
 fields' application-level meaning and the flag's meaning are not established.
 Owner cleanup routine `0xBF8AC0` invokes the object at `+0xA04` through its
-vtable slot `+0x10` with argument `1`, then clears that field. It also
+primary-vtable slot `+0x10` with argument `1`, then clears that field. That
+slot at VA `0x1C747DC` points to raw `0xCBC4D0`, which calls reset routine
+`0xCBC510` and uses the argument's low bit to decide whether to release the
+allocation. It also
 releases the values at `+0x9A8` and `+0x9A4` through the shared-text release
 path and clears both fields, supporting their identification as
 reference-counted text values but not their application-level purpose.
