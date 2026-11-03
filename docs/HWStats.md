@@ -23,6 +23,10 @@ Static IDA analysis only. SHA256 `0AE559DA740DE2C51A77A652906F021833A17E2A634757
 ## Unresolved
 - Complete CRT stream/outer-line formatting and failure-path text; OS name and edition fragments are captured.
 
+[DirectX buffer decisions](HWStatsDirectXVersion.md) preserve the wide
+registry read, ignored query status, and unusual doubled-byte-count
+terminator/range check rather than substituting a conventional string read.
+
 [OS-description guards](HWStatsOsDescriptionGuards.md) now preserve version
 and platform admission, native-system-info fallback, major-six export
 requirements, unchecked `GetProductInfo` results and the caller's unchecked

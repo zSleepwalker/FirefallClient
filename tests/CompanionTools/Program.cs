@@ -19,6 +19,56 @@ void Check(string name, bool condition)
     if (condition) passed++; else failed++;
 }
 
+foreach (var value in new (bool Open, uint Count, DirectXVersionReadDecision Expected)[]
+{
+    (false, 127, new(DirectXVersionReadAction.UseInitializedEmptyBuffer, null)),
+    (false, uint.MaxValue, new(DirectXVersionReadAction.UseInitializedEmptyBuffer, null)),
+    (true, 0, new(DirectXVersionReadAction.WriteWideTerminatorThenCloseKey, 0)),
+    (true, 20, new(DirectXVersionReadAction.WriteWideTerminatorThenCloseKey, 40)),
+    (true, 63, new(DirectXVersionReadAction.WriteWideTerminatorThenCloseKey, 126)),
+    (true, 64, new(DirectXVersionReadAction.RangeCheckFailure, null)),
+    (true, 127, new(DirectXVersionReadAction.RangeCheckFailure, null)),
+    (true, uint.MaxValue, new(DirectXVersionReadAction.RangeCheckFailure, null)),
+    (true, 0x80000000, new(DirectXVersionReadAction.WriteWideTerminatorThenCloseKey, 0)),
+    (true, 0x80000040, new(DirectXVersionReadAction.RangeCheckFailure, null))
+})
+    Check($"DirectX Version buffer gate opened={value.Open}, byte count={value.Count}",
+        DirectXVersionNativeLayout.CaptureReadDecision(value.Open, value.Count) == value.Expected);
+foreach (var startup in new (bool Pipe, bool Process, bool Query, HardwareSurveyCaptureDecision Expected)[]
+{
+    (false, true, true, new(HardwareSurveyCaptureAction.ReturnFailure, 0, 0, uint.MaxValue, false, false)),
+    (true, false, true, new(HardwareSurveyCaptureAction.ReturnFailure, 0, 0, uint.MaxValue, false, true)),
+    (true, true, false, new(HardwareSurveyCaptureAction.AppendNulAndReturn, 0, 0, uint.MaxValue, true, true)),
+    (true, true, true, new(HardwareSurveyCaptureAction.PollPipe, 0, 0, null, false, false))
+})
+    Check($"HWStats capture startup pipe={startup.Pipe}, process={startup.Process}, query={startup.Query}",
+        HardwareSurveyCaptureNativeLayout.CaptureStartup(startup.Pipe, startup.Process, startup.Query) == startup.Expected);
+foreach (var poll in new (bool Peek, uint Available, uint ExitCode, HardwareSurveyCaptureDecision Expected)[]
+{
+    (true, 1, 259, new(HardwareSurveyCaptureAction.ReadPipe, 0x800, 0, null, false, false)),
+    (true, 0x1000, 7, new(HardwareSurveyCaptureAction.ReadPipe, 0x800, 0, null, false, false)),
+    (false, 0, 259, new(HardwareSurveyCaptureAction.SleepThenQueryExitCode, 0, 0, null, false, false)),
+    (true, 0, 259, new(HardwareSurveyCaptureAction.SleepThenQueryExitCode, 0, 0, null, false, false)),
+    (false, 17, 0, new(HardwareSurveyCaptureAction.AppendNulAndReturn, 0, 0, 0, true, true)),
+    (true, 0, 7, new(HardwareSurveyCaptureAction.AppendNulAndReturn, 0, 0, 7, true, true))
+})
+    Check($"HWStats capture poll peek={poll.Peek}, available={poll.Available}, exit={poll.ExitCode}",
+        HardwareSurveyCaptureNativeLayout.CapturePipePoll(poll.Peek, poll.Available, poll.ExitCode) == poll.Expected);
+foreach (uint count in new uint[] { 0, 17, 0x800 })
+{
+    Check($"HWStats successful read forwards actual count {count}",
+        HardwareSurveyCaptureNativeLayout.CaptureReadResult(true, count)
+        == new HardwareSurveyCaptureDecision(HardwareSurveyCaptureAction.ForwardBytesThenPoll, 0, count, null, false, false));
+    Check($"HWStats failed read does not forward count {count} or append NUL",
+        HardwareSurveyCaptureNativeLayout.CaptureReadResult(false, count)
+        == new HardwareSurveyCaptureDecision(HardwareSurveyCaptureAction.ReturnFailure, 0, 0, uint.MaxValue, false, true));
+}
+Check("HWStats failed exit query appends NUL and enters cleanup",
+    HardwareSurveyCaptureNativeLayout.CaptureFollowupExitCodeQuery(false)
+    == new HardwareSurveyCaptureDecision(HardwareSurveyCaptureAction.AppendNulAndReturn, 0, 0, uint.MaxValue, true, true));
+Check("HWStats successful exit query resumes pipe polling",
+    HardwareSurveyCaptureNativeLayout.CaptureFollowupExitCodeQuery(true)
+    == new HardwareSurveyCaptureDecision(HardwareSurveyCaptureAction.PollPipe, 0, 0, null, false, false));
 foreach (var entry in new (ulong Bytes, RamLineArguments Expected)[]
 {
     (0, new(RamAndProcessorNativeLayout.SmallRamFormat, 0, 0, null)),
@@ -566,6 +616,54 @@ if (args.Length == 2)
     var red = Load("RedHanded.exe", RedHandedLayout.FileSize, RedHandedLayout.Sha256);
     var dumper = Load("r5dumper.exe", R5DumperLayout.FileSize, R5DumperLayout.Sha256);
     var truck = Load("DumpTruck.exe", DumpTruckLayout.FileSize, DumpTruckLayout.Sha256);
+    Check("HWStats pipe endpoints are inheritable and child inherits handles",
+        truck.Matches(0x42ABE2, "C785A8F7FFFF00010000")
+        && truck.Matches(0x42AC0A, "6800080000")
+        && truck.Matches(0x42AC16, "C785B8F7FFFFFFFFFFFF508D85E8F7FFFF")
+        && truck.Matches(0x42AC27, "C785C4F7FFFF0C000000")
+        && truck.Matches(0x42AC31, "50C785CCF7FFFF01000000")
+        && truck.Matches(0x42AC50, "FF1518514700")
+        && truck.ImportSlotNames(0x475118, "CreatePipe")
+        && truck.Matches(0x42AC93, "6A01")
+        && truck.Matches(0x42ACA0, "FF1510514700")
+        && truck.ImportSlotNames(0x475110, "CreateProcessA"));
+    Check("HWStats CreatePipe failure returns before common cleanup",
+        truck.Matches(0x42AC50, "FF151851470085C0751483C8FF5F5E5B")
+        && truck.Matches(0x42AC60, "8B4DF833CDE89C3104008BE55DC3"));
+    Check("HWStats CreateProcess failure joins cleanup without appending NUL",
+        truck.Matches(0x42ACA0, "FF151051470085C00F8425010000")
+        && truck.Matches(0x42ADD3, "83CBFF8B85E8F7FFFF8B350852470083F8FF"));
+    Check("HWStats ReadFile failure joins cleanup without appending NUL",
+        truck.Matches(0x42AD00, "8B35B4504700")
+        && truck.Matches(0x42AD45, "FFD685C00F8484000000")
+        && truck.Matches(0x42ADD3, "83CBFF8B85E8F7FFFF8B350852470083F8FF"));
+    Check("HWStats normal exit and exit-query failure append one NUL through sink slot +0x18",
+        truck.Matches(0x42AD7E, "8B85E0F7FFFF3D030100007536")
+        && truck.Matches(0x42ADC1, "8BD88BCF8B076A0168F16B4700FF5018")
+        && truck.Matches(0x42ADAE, "8B078BCF6A0168F16B470083CBFFFF")
+        && truck.Matches(0x42ADBC, "FF5018EB15")
+        && truck.Ascii(0x476BF1) == "");
+    Check("HWStats common cleanup conditionally closes both pipe endpoints and process handles",
+        truck.Matches(0x42ADDC, "8B350852470083F8FF740D50FFD6")
+        && truck.Matches(0x42ADF4, "8B85B8F7FFFF83F8FF740D50FFD6")
+        && truck.Matches(0x42AE0C, "8B85D4F7FFFF83F8FF740D50FFD6")
+        && truck.Matches(0x42AE24, "8B8DD0F7FFFF83F9FF740351FFD6")
+        && truck.ImportSlotNames(0x475208, "CloseHandle"));
+    Check("HWStats polls, reads requested chunks, and forwards actual ReadFile count",
+        truck.Matches(0x42ACFA, "8B1DB8504700")
+        && truck.ImportSlotNames(0x4750B8, "PeekNamedPipe")
+        && truck.Matches(0x42AD00, "8B35B4504700")
+        && truck.ImportSlotNames(0x4750B4, "ReadFile")
+        && truck.Matches(0x42ACEC, "FF151C52470085C00F84B40000008B1D")
+        && truck.ImportSlotNames(0x47521C, "GetExitCodeProcess")
+        && truck.Matches(0x42AD28, "76546A008D85E4F7FFFF506800080000")
+        && truck.Matches(0x42AD45, "FFD685C00F8484000000")
+        && truck.Matches(0x42AD4F, "FFB5E4F7FFFF")
+        && truck.Matches(0x42AD60, "FF5018")
+        && truck.Matches(0x42AD84, "3D030100007536")
+        && truck.Matches(0x42AD8D, "FF15C8514700")
+        && truck.ImportSlotNames(0x4751C8, "Sleep")
+        && truck.Matches(0x42ADA0, "FF151C52470085C00F8558FFFFFF"));
     var hardware = Load("HWStats.exe", HWStatsLayout.FileSize, HWStatsLayout.Sha256);
     var child = Load("FirefallProcess.exe", FirefallProcessLayout.FileSize, FirefallProcessLayout.Sha256);
     var browser = Load("awesomium.dll", 23470048, AwesomiumLayout.Sha256);
@@ -1210,6 +1308,27 @@ if (args.Length == 2)
         && hardware.Matches(0x403A8E, "C785B8FEFFFF1C010000")
         && hardware.ImportSlotNames(0x440160, "GetVersionExW")
         && hardware.Matches(0x403A9F, "FF156001440085C00F8494040000"));
+    Check("HWStats DirectX registry read clears 128-byte buffer and opens HKLM KEY_READ",
+        hardware.Matches(0x40404F, "33C06A7E5066898568FFFFFF")
+        && hardware.Matches(0x404071, "68190002006A0068983A44006802000080")
+        && hardware.Matches(0x443A98, Convert.ToHexString(System.Text.Encoding.Unicode.GetBytes(
+            DirectXVersionNativeLayout.Subkey + "\0")))
+        && hardware.ImportSlotNames(0x440000, "RegOpenKeyExW")
+        && hardware.Matches(0x404082, "FF150000440085C07556"));
+    Check("HWStats DirectX Version query uses byte capacity 127 with no type output",
+        hardware.Matches(0x404092, "C78560EDFFFF7F000000")
+        && hardware.Matches(0x4040A4, "6A006A0068D03A4400")
+        && hardware.Matches(0x443AD0, Convert.ToHexString(System.Text.Encoding.Unicode.GetBytes(
+            DirectXVersionNativeLayout.ValueName + "\0")))
+        && hardware.ImportSlotNames(0x440020, "RegQueryValueExW")
+        && hardware.Matches(0x4040B3, "FF15200044008B8560EDFFFF03C03D80000000"));
+    Check("HWStats DirectX query result is ignored; doubled count gates terminator and close",
+        hardware.Matches(0x4040C6, "0F83FD000000")
+        && hardware.Matches(0x4040D2, "33C966898C0568FFFFFFFF1504004400")
+        && hardware.Matches(0x443AE0, Convert.ToHexString(System.Text.Encoding.Unicode.GetBytes(
+            DirectXVersionNativeLayout.CombinedWideFormat + "\0")))
+        && hardware.Calls(0x4041C9, 0x43AFBA)
+        && hardware.ImportSlotNames(0x440558, "_swprintf"));
     Check("HWStats OS builder resolves native system info with ordinary system-info fallback",
         hardware.Ascii(0x4430CC) == OsDescriptionNativeLayout.NativeSystemInfoExport
         && hardware.ImportSlotNames(0x440158, "GetModuleHandleW")

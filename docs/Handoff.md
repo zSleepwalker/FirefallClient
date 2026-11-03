@@ -3382,3 +3382,29 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
 - Remaining known boundaries: complete CRT/DirectX output behavior,
   Awesomium name normalization, and unresolved RedHanded state2 writer.
   No target execution, sample/IDA modification or real hardware collection.
+
+## DumpTruck hardware capture and HWStats DirectX buffer
+
+- OS-text/token-admission batch committed/pushed as68f05d2.
+- Agent e3046fa9 completed: DumpTruck42AB90 makes both pipe endpoints
+  inheritable, passes child handle inheritance, and retains endpoints until
+  common cleanup. Poll/read requests2048 bytes, forwards actual read count,
+  uses Sleep1 plus GetExitCodeProcess rather than timeout/EOF wait.
+- Failed peek follows empty-pipe decision. Child exit or exit-query failure
+  appends one NUL; process/read failure skips NUL. Pipe failure returns
+  directly before common cleanup. PROCESS_INFORMATION failure contents
+  remain unknown; no invented invalid-handle effects.
+- Integrated HardwareSurveyCaptureNativeLayout and byte checks for each
+  branch/close path. Existing HardwareReportNativeLayout still controls
+  generator success vs omit-layer behavior and later compression.
+- HWStats404020 DirectX query initializes128-byte buffer and byte count127,
+  uses HKLM KEY_READ and RegQueryValueExW without type output/status test.
+  Doubles returned byte count modulo32 bits and requires result<128 before
+  writing a zero WORD at that doubled byte offset.64 ordinary bytes fails;
+  no query-failure default or conventional terminator arithmetic invented.
+- Saved DirectXVersionNativeLayout and buffer/format evidence. Build
+  succeeds;1455 sample-backed checks and1238 pure checks pass.
+  Both findings are inert; no target or
+  hardware/registry access. Agent has finished; no active agent assignment.
+- Follow-ons: DumpTruck submission-layer serialization boundaries and
+  Awesomium switch-name normalization. RedHanded state2 writer unresolved.

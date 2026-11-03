@@ -314,6 +314,13 @@ returned as itself; pipe/process/read failures have separate `-1` paths.
 No claims are made here about cancellation, timeouts, or whether a later
 upload succeeds.
 
+[Pipe lifetime and failure branches](DumpTruckHardwareCapture.md) refine
+that boundary: both endpoints are inheritable at child creation, the parent
+retains them through common cleanup, and the loop uses child-exit polling
+rather than EOF. A failed peek follows the empty-pipe decision path;
+read failure returns without appending NUL, unlike exit-code-query failure.
+The saved branch capture does not run HWStats or open a pipe.
+
 ### Accumulation precedes compression
 
 The submit caller VA `0x40AC1A` initializes a `slBlob` with vtable
