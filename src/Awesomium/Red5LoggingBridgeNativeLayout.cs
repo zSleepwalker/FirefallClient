@@ -254,6 +254,9 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint ClientApiRequestUrlLookupRaw = 0xBC1460;
     public const uint ClientApiRequestUrlLookupUpdateRaw = 0xBC1680;
     public const uint ClientApiRequestResetRaw = 0xBC1280;
+    public const uint ClientApiWinHttpStatusCallbackRaw = 0xBC26E0;
+    public const uint ClientApiWinHttpHandleClosingStatus = 0x800;
+    public const uint ClientApiWinHttpCloseHandleImportVa = 0x1AC4CF8;
     public const uint ClientApiRequestTrackRaw = 0xBC43C0;
     public const uint ClientApiRequestSubmitTickStoreRaw = 0xBC4512;
     public const uint ClientApiRequestOpenTickStoreRaw = 0xBC2DE1;

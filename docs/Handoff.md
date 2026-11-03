@@ -4179,3 +4179,30 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
 - The stores provide request tracking, open-branch, and pre-callback tick
   checkpoints, but no elapsed-time arithmetic or consumer of these specific
   fields has been established. Their intended timer policy remains unresolved.
+
+# Round 28: ClientApi WinHTTP callback close transitions
+
+## Observed
+- `ClientApi_WinHttpStatusCallback` at IDA address `0xBC26E0` first checks
+  that callback handle `a1` equals the handle in its context at `a2+0`.
+- For status `0x800`, the callback sets the response-kind word at
+  `*(a2+0x18)+8` to 3 only when that field is zero, clears the context handle,
+  and, when context byte `+0x11` is set, invokes the object at `a2+0x18` with
+  argument 1 and clears that pointer before releasing the callback context.
+- For other statuses, dispatch is skipped once context `+0x14` is nonzero.
+  Otherwise it calls `ClientApi_DispatchWinHttpStatus` (`0xBC1DA0`). A nonzero
+  return is saved to context `+0x14` if still empty, response kind is set to 4
+  only if unset, and the callback closes `a1` through the IAT slot at
+  `0x1AC4CF8`, resolved as `WINHTTP.dll!WinHttpCloseHandle`.
+- In the sample
+  `D:\SteamLibrary\steamapps\common\Firefall\system\bin\FirefallClient.exe.original`,
+  IDA `0xBC26E0` maps to code VA `0x00FC32E0` under `IDA + 0x400C00`. The
+  comparison for status `0x800` is at `0xFC330C`; the response-kind 3 and
+  handle-clear stores are at `0xFC331D` and `0xFC3328`. Response-kind 4 and
+  the indirect close call are at `0xFC337D` and `0xFC3385`. CompanionTools
+  checks these instructions and the import slot.
+
+## Interpretation and unresolved details
+- The callback has explicit handle-closing and close-after-dispatch paths,
+  but the full status-code mapping in `ClientApi_DispatchWinHttpStatus` and
+  the meanings of response-kind values 3 and 4 have not been established.

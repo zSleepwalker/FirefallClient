@@ -2122,6 +2122,17 @@ if (args.Length == 2)
             "894170")
         && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiRequestCallbackTickStoreRaw + 0x400C00,
             "894174"));
+    Check("Original ClientApi status callback handles handle-closing and close-handle transitions",
+        client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiWinHttpCloseHandleImportVa,
+            "WinHttpCloseHandle")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpStatusCallbackRaw + 0x2C + 0x400C00,
+            "81FA00080000753D")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpStatusCallbackRaw + 0x3D + 0x400C00,
+            "C7400803000000")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpStatusCallbackRaw + 0x9D + 0x400C00,
+            "C7400804000000")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpStatusCallbackRaw + 0xA5 + 0x400C00,
+            "FF15F84CAC01"));
     Check("Original client URL message builder escapes host, path and configured identifier components",
         client.Calls(Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlMessageBuilderRaw + 0xFD + 0x400C00,
             Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlComponentEscapeRaw + 0x400C00)
