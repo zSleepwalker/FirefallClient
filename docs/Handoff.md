@@ -4095,3 +4095,18 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
 - The AES mode, the consumer of the imported key/IV, and the ownership/lifetime
   of the key object remain unknown. The relationship between these derived
   values and the optional second ClientApi HMAC key is also unresolved.
+
+# Round 24: AES buffer helpers
+
+## Observed
+- `0x12E4680` passes the AES key object at parent offset `+0x58` to
+  `0x12EF0D0`. That helper calls CryptoAPI `CryptDecrypt` on a mutable stream
+  buffer and can resize it according to a configured block-size field.
+- `0x12EF1E0` contains a corresponding `CryptEncrypt` call on the same key
+  wrapper type. Neither `0x12E4680` nor `0x12EF1E0` has direct code xrefs in
+  the current IDB; their higher-level callers may be indirect or unrecognized.
+
+## Unresolved
+- The AES mode, the encryption/decryption dispatch path, and the application
+  data protected by these wrappers are not established. Do not model cipher
+  output until the stream contract and dispatch caller are resolved.
