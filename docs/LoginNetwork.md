@@ -149,3 +149,16 @@
 
 ## Unresolved
 - The purpose of request byte `+0x3D` and whether any path changes the redirect limit after reset.
+
+# Round 23: ClientApi per-URL proxy configuration
+
+## Observed
+- In `ClientApi_PumpRequestWorker` (`0xBC2B30`), the proxy path is guarded by a nonzero byte at global-object `+0x10` and a nonzero DWORD at `+0`. It builds a `WINHTTP_AUTOPROXY_OPTIONS` structure with `dwFlags=2` (`WINHTTP_AUTOPROXY_CONFIG_URL`), `lpszAutoConfigUrl` from global-object `+4`, zeroed other reserved/auto-detect fields, and `fAutoLogonIfChallenged=TRUE`. The worker formats the request URL and calls `WinHttpGetProxyForUrl` at `0xBC2E7F` (IAT `0x1AC4D00`).
+- On successful PAC lookup, the returned 12-byte `WINHTTP_PROXY_INFO` is applied to the request handle by `WinHttpSetOption(handle, 0x26, &proxyInfo, 12)` at `0xBC2EEB`. If PAC lookup fails, the worker queries the existing `WINHTTP_OPTION_PROXY` value with `WinHttpQueryOption` at `0xBC2EB9`; it applies that value with the same `WinHttpSetOption` only if the query succeeds. If the fallback query also fails, it logs and skips the set. The two optional strings in the proxy-info structure are released with imported `GlobalFree` at `0xBC2F18` and `0xBC2F25`.
+- The original PE import table maps `0x1AC4D00/0x1AC4D04/0x1AC4D08` to `WinHttpGetProxyForUrl`/`WinHttpQueryOption`/`WinHttpSetOption`, and `0x1AC4320` to `GlobalFree`. Microsoft's WinHTTP references identify option `0x26` as `WINHTTP_OPTION_PROXY` and flag `2` as `WINHTTP_AUTOPROXY_CONFIG_URL`; see [WinHttpGetProxyForUrl](https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpgetproxyforurl), [WINHTTP_AUTOPROXY_OPTIONS](https://learn.microsoft.com/en-us/windows/win32/api/winhttp/ns-winhttp-winhttp_autoproxy_options), and [option flags](https://learn.microsoft.com/en-us/windows/win32/winhttp/option-flags).
+
+## Interpreted
+- When the proxy gate is enabled, the client uses a configured PAC URL to resolve a proxy separately for each request URL, then explicitly applies the resulting proxy info to the request handle. On lookup failure it preserves the handle's current proxy configuration when that value can be queried.
+
+## Unresolved
+- The global object's field names and initialization source are unknown; the auto-proxy gate and PAC URL are recorded by offsets only. The meaning of the `0x02` byte adjacent to the redirect-limit value at request `+0x3D` remains separate and unresolved.

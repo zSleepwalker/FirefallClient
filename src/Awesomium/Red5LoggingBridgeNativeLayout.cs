@@ -290,6 +290,17 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint ClientApiRequestAutomaticRedirectLimitDefault = 5;
     public const uint ClientApiWinHttpSetAutomaticRedirectLimitRaw = 0xBC2F44;
     public const uint ClientApiWinHttpSetOptionImportVa = 0x1AC4D08;
+    public const uint ClientApiWinHttpGetProxyForUrlRaw = 0xBC2E7F;
+    public const uint ClientApiWinHttpQueryProxyInfoRaw = 0xBC2EB9;
+    public const uint ClientApiWinHttpSetProxyInfoRaw = 0xBC2EEB;
+    public const uint ClientApiWinHttpGetProxyForUrlImportVa = 0x1AC4D00;
+    public const uint ClientApiWinHttpQueryOptionImportVa = 0x1AC4D04;
+    public const uint ClientApiWinHttpProxyOption = 0x26;
+    public const uint ClientApiWinHttpProxyInfoSize = 0x0C;
+    public const uint ClientApiWinHttpAutoproxyConfigUrlFlag = 0x02;
+    public const uint ClientApiProxyStringGlobalFreeImportVa = 0x1AC4320;
+    public const uint ClientApiWinHttpProxyStringFreeOneRaw = 0xBC2F18;
+    public const uint ClientApiWinHttpProxyStringFreeTwoRaw = 0xBC2F25;
     public const uint ClientApiRequestUrlSchemeOffset = 0x0C;
     public const uint ClientApiRequestUrlHostOffset = 0x10;
     public const uint ClientApiRequestUrlPortOffset = 0x14;

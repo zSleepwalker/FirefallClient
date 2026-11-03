@@ -4372,3 +4372,38 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
 ## Unresolved
 - The purpose of request byte `+0x3D` and whether another path changes the
   limit after reset.
+
+# Round 38: ClientApi per-URL proxy configuration
+
+## Observed
+- `ClientApi_PumpRequestWorker` (`0xBC2B30`) enters the proxy path only when
+  global-object byte `+0x10` and DWORD `+0` are nonzero. It builds a
+  `WINHTTP_AUTOPROXY_OPTIONS` structure with `dwFlags=2`,
+  `lpszAutoConfigUrl` from global-object `+4`, and
+  `fAutoLogonIfChallenged=TRUE`; its other auto-detect/reserved fields are
+  zero. It formats the request URL and calls `WinHttpGetProxyForUrl` at
+  `0xBC2E7F` (original PE IAT `0x1AC4D00`).
+- A successful lookup supplies a 12-byte `WINHTTP_PROXY_INFO`, passed to
+  `WinHttpSetOption(handle, 0x26, &proxyInfo, 12)` at `0xBC2EEB`. If the
+  lookup fails, the worker queries the current `WINHTTP_OPTION_PROXY` with
+  `WinHttpQueryOption` at `0xBC2EB9`, then sets that value only when the query
+  succeeds. A failed fallback query logs and skips the set. Both optional
+  proxy strings are released with `GlobalFree` at `0xBC2F18/0xBC2F25`.
+- The original PE import table maps slots `0x1AC4D00`, `0x1AC4D04`,
+  `0x1AC4D08`, and `0x1AC4320` to `WinHttpGetProxyForUrl`,
+  `WinHttpQueryOption`, `WinHttpSetOption`, and `GlobalFree`. Microsoft's
+  WinHTTP references identify option `0x26` as `WINHTTP_OPTION_PROXY` and
+  auto-proxy flag `2` as `WINHTTP_AUTOPROXY_CONFIG_URL`. CompanionTools
+  verifies the imports, option setup, fallback query/set sites, and the
+  automatic-proxy field values.
+
+## Interpreted
+- When enabled, the client resolves a proxy per request URL through its
+  configured PAC URL and applies the returned proxy info to the request
+  handle. On lookup failure, it attempts to retain the handle's existing
+  proxy settings.
+
+## Unresolved
+- Names and initialization source for the global object fields at `+0`,
+  `+4`, and `+0x10`; no meaning is assigned to the adjacent request byte
+  `+0x3D`.

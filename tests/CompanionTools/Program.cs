@@ -2253,6 +2253,38 @@ if (args.Length == 2)
         && Red5LoggingBridgeNativeLayout.ClientApiRequestAutomaticRedirectLimitOffset == 0x3C
         && Red5LoggingBridgeNativeLayout.ClientApiRequestAutomaticRedirectLimitDefault == 5
         && Red5LoggingBridgeNativeLayout.ClientApiWinHttpSetAutomaticRedirectLimitRaw == 0xBC2F44);
+    Check("ClientApi worker resolves per-URL proxy settings and applies proxy info",
+        client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiWinHttpGetProxyForUrlImportVa,
+            "WinHttpGetProxyForUrl")
+        && client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiWinHttpQueryOptionImportVa,
+            "WinHttpQueryOption")
+        && client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiWinHttpSetOptionImportVa,
+            "WinHttpSetOption")
+        && client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiProxyStringGlobalFreeImportVa,
+            "GlobalFree")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpGetProxyForUrlRaw + 0x400C00,
+            "FF15004DAC01")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpQueryProxyInfoRaw + 0x400C00,
+            "FF15044DAC01")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpSetProxyInfoRaw + 0x400C00,
+            "FF15084DAC01")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiPumpRequestWorkerRaw + 0x2D6 + 0x400C00,
+            "8B40048D490C0F57C0")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiPumpRequestWorkerRaw + 0x310 + 0x400C00,
+            "C7855CFBFFFF02000000")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiPumpRequestWorkerRaw + 0x31A + 0x400C00,
+            "C78570FBFFFF01000000")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiPumpRequestWorkerRaw + 0x373 + 0x400C00,
+            "C78588FBFFFF0C000000508D8594FBFFFF506A26FF37FF15044DAC01")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiPumpRequestWorkerRaw + 0x3AE + 0x400C00,
+            "6A0C8D8594FBFFFF506A26FF37FF15084DAC01")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpProxyStringFreeOneRaw + 0x400C00,
+            "FFD6")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpProxyStringFreeTwoRaw + 0x400C00,
+            "FFD6")
+        && Red5LoggingBridgeNativeLayout.ClientApiWinHttpProxyOption == 0x26
+        && Red5LoggingBridgeNativeLayout.ClientApiWinHttpProxyInfoSize == 0x0C
+        && Red5LoggingBridgeNativeLayout.ClientApiWinHttpAutoproxyConfigUrlFlag == 0x02);
     Check("Original client URL message builder escapes host, path and configured identifier components",
         client.Calls(Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlMessageBuilderRaw + 0xFD + 0x400C00,
             Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlComponentEscapeRaw + 0x400C00)
