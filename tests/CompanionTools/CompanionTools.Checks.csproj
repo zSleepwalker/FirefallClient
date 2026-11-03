@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\RedHanded\Firefall.RedHanded.csproj" />
+    <ProjectReference Include="..\..\src\R5Dumper\Firefall.R5Dumper.csproj" />
+    <ProjectReference Include="..\..\src\DumpTruck\Firefall.DumpTruck.csproj" />
+    <ProjectReference Include="..\..\src\HWStats\Firefall.HWStats.csproj" />
+    <ProjectReference Include="..\..\src\FirefallProcess\Firefall.FirefallProcess.csproj" />
+    <ProjectReference Include="..\..\src\Awesomium\Firefall.Awesomium.csproj" />
+  </ItemGroup>
+</Project>

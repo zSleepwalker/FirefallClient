@@ -24,7 +24,8 @@ public sealed record UserInfoRecord(uint StreamType, UserInfoKind Kind, string V
 
 public static class R5DumperUserInfo
 {
-    // Parses "<key>|<type>|<value>" (type case-insensitive); two fields mean an empty value.
+    // Convenience subset, not the native tokenizer: native values can contain pipes,
+    // repeated separators are skipped, and native strtoul accepts numeric prefixes.
     public static UserInfoRecord Parse(string line)
     {
         var parts = line.Split('|');

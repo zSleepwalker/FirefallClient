@@ -22,6 +22,11 @@ public static class DumpTruckLayout
         "ver=%d&tc=%u&nonce=%04x%04x%04x%04x&uid=%s&host=%s&path=%s&hbody=%s&cid=%llu";
     public const string SignatureHeader = "X-Red5-Signature";
     public const string HwReportExe = "HWStats.exe";
+    public const int HwReportPipeRequestedCapacity = 0x800;
+    public const int HwReportReadChunkByteCount = 0x800;
+    public const int HwReportSinkVtableSlotOffset = 0x18;
+    public const uint HwReportStartupFlags = 0x100;
+    public const uint HwReportStillActiveExitCode = 259;
 
     public static readonly string[] Options =
         { "dump", "log", "auth", "app", "msg", "url", "autosubmit", "debug", "debuguser", "nodelete", "nofear", "userlangid", "forge", "dump-config" };

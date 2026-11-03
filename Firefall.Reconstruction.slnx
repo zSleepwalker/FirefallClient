@@ -45,6 +45,9 @@
     <Project Path="src/Serialization/Tools/SdbInspect/SdbInspect.csproj" />
   </Folder>
   <Folder Name="/tests/" />
+  <Folder Name="/tests/CompanionTools/">
+    <Project Path="tests/CompanionTools/CompanionTools.Checks.csproj" />
+  </Folder>
   <Folder Name="/tests/Serialization/">
     <Project Path="tests/Serialization/SerializationChecks.csproj" />
   </Folder>

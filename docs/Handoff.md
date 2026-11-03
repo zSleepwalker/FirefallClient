@@ -2889,3 +2889,40 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
 - Validation after these follow-ups: build has zero warnings/errors and
   all1,569 startup/original-binary checks pass. The original executable and
   IDA database were only read; all saved changes are C#, checks, and docs.
+
+## Companion-binary cross-check and dump handoff
+
+- User-directed expansion to the other eight files: all nine IDA instances
+  are reachable on ports13337..13345. Queried companion instances by their
+  direct local endpoints without changing the selected database or writing
+  database metadata. New addresses in companion notes are PE VAs, not client
+  raw offsets.
+- Added `docs\CompanionBinaryConnections.md` with every sample size/hash,
+  import/export connections, native metadata field ledger, and remaining
+  inference limits. The live client differs from `.original` before this
+  work; tests deliberately use the immutable original-client hash.
+- RedHanded's eleven actual IDs are `0x10000`, `0x10002..0x1000B`, not the
+  truncated low values printed by the decompiler. Each typed record is CRLF
+  terminated and a final blank CRLF line completes input. Parent waits before
+  closing its writer, so EOF cannot be the receiver's completion contract.
+- Receiver skips repeated separators and preserves the third-field remainder,
+  including later pipes. Existing `R5DumperUserInfo.Parse` is explicitly a
+  convenience subset, not native-equivalent. No new parser was implemented.
+- `r5dumper` builds12-byte native descriptors with unchanged types, sizes4/8
+  for integer buffers and string-length+1 for text. It passes null exception
+  and callback information to the real dbghelp writer export (ordinal31,
+  RVA `0x5E800`). Clarified file-deletion differences between OpenProcess
+  failure and dump-writer failure.
+- DumpTruck has a separate2048-byte HWStats stdout pipe; actual byte counts
+  go to sink slot `+0x18` with a final NUL. Do not mix this with dump-user-info.
+- Verified the exact FirefallProcess child import against Awesomium's export,
+  and all86 original-client Awesomium imports against the supplied DLL.
+  DeploymentCommon has a CLR header and managed bootstrap, not an observed
+  native static-import edge in the checked client/helpers.
+- New `tests\CompanionTools` project runs pure decisions without samples,
+  or hash-guarded cross-binary evidence with `--samples <system-bin-directory>`.
+  Next: trace stream-owner initialization, RedHanded debug handler arguments,
+  HWStats compression sink, or DeploymentCommon's managed callers.
+- Validation: solution build has zero warnings/errors;46 companion checks
+  pass with all nine samples,19 pure checks pass without samples, and the
+  existing1,569 startup/original-client checks remain passing.

@@ -13,7 +13,7 @@ Static, read-only triage (IDA MCP; no execution/patching).
 - wWinMain body: installs an SEH4 frame (`__except_handler4`, scope table `0x4078F0`), then calls
   `ds:?ChildProcessMain@Awesomium@@YAHPAUHINSTANCE__@@@Z` (IAT `0x4060DC`) with `hInstance` as the only argument and returns its result.
   The SEH handler path (`0x401068`) calls `ExitProcess(1)`. `lpCmdLine`, `hPrevInstance`, `nShowCmd` are unused.
-- Imports: KERNEL32 (CRT support only: heap, TLS/FLS, critical sections, `GetCommandLineW`, `LoadLibraryW`, `GetProcAddress`, `IsDebuggerPresent`, etc.), `awesomium.dll` (single import: `Awesomium::ChildProcessMain(HINSTANCE__*)`), USER32 `MessageBoxW` family (CRT runtime-error dialog only). No network, crypto, registry or file APIs beyond CRT.
+- Imports: KERNEL32 (CRT support: heap, TLS/FLS, critical sections, `GetCommandLineW`, `LoadLibraryW`, `GetProcAddress`, `IsDebuggerPresent`, etc.) and `awesomium.dll` (single import: `Awesomium::ChildProcessMain(HINSTANCE__*)`). The current PE descriptor check finds no USER32 descriptor; an earlier import summary included it incorrectly.
 - No application strings: only CRT locale/date strings, the PDB path and import names. No command-line literals/switch strings in this binary.
 
 ## Interpreted
@@ -26,3 +26,7 @@ Static, read-only triage (IDA MCP; no execution/patching).
 - Key classes: none present in this binary.
 
 Layout constants: `src\FirefallProcess\FirefallProcessLayout.cs`.
+
+The [companion binary checks](CompanionBinaryConnections.md) now verify both
+the stub's IAT call at VA `0x40103E` and the matching bundled Awesomium
+export at VA `0x1003A710`, rather than inferring compatibility from a filename.

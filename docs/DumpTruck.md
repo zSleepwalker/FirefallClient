@@ -15,3 +15,11 @@ Static IDA analysis only. SHA256 `53796D440D586A306C36ADAE86744C580B9F9ECD3987D2
 
 ## Unresolved
 - Meaning of `forge`, `debuguser`, `dump-config`, `nodelete`; exact Authorization/signature derivation; the HTTP server's real hostname beyond the hardcoded fallback.
+
+## HWStats handoff follow-up
+
+The [cross-binary ledger](CompanionBinaryConnections.md) traces
+`0x42AB90`'s2048-byte stdout pipe, `STILL_ACTIVE` polling, actual-count
+forwarding to sink slot `+0x18`, and final NUL byte. This is separate from
+RedHanded's CRLF user-stream pipe to r5dumper. No report upload is performed
+by the saved checks.
