@@ -217,3 +217,30 @@
 - The observed teardown code does not itself close or cancel the request
   handle stored at callback-context `+0`; cancellation and completion
   guarantees remain unestablished.
+
+# Round 27: ClientApi WinHTTP request-error conversion
+
+## Observed
+- `ClientApi_DispatchWinHttpStatus` (`0xBC1DA0`) recognizes
+  `WINHTTP_CALLBACK_STATUS_REQUEST_ERROR` (`0x200000`) at `0xBC2580`. It
+  checks the status-information length against 8 at `0xBC2599` and emits a
+  diagnostic if it differs, but still reads the DWORD at offset `+4`
+  (`dwError`) at `0xBC25BB`; `dwResult` at offset `+0` is not used in this
+  branch. The value is passed to the shared failure helper `0xBC1C40`.
+- `0xBC1C40` preserves negative input values, maps positive values to
+  `0x80070000 | (error & 0xFFFF)`, and substitutes `0x80004005` when the
+  resulting value is nonnegative. CompanionTools now checks the callback
+  status compare, length diagnostic, `dwError` load, conversion instructions,
+  the 8-byte layout and `+4` offset, and the modeled conversion cases against
+  the original sample.
+
+## Interpreted
+- Under the Windows `WINHTTP_ASYNC_RESULT` layout, positive WinHTTP error
+  codes become HRESULT-style `0x8007xxxx` values; zero becomes `E_FAIL`, and
+  already-negative values are retained. The callback layer then records this
+  failure result and closes the request handle as described in Round 28.
+
+## Unresolved
+- A malformed status-information length is logged but does not prevent the
+  `+4` read. Normal WinHTTP callback data is expected to use the documented
+  8-byte structure; behavior for an invalid pointer/length is not established.

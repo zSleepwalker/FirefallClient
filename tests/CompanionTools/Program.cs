@@ -2214,6 +2214,26 @@ if (args.Length == 2)
         && (uint)ClientApiWinHttpCallbackStatus.ReadComplete == 0x80000
         && (uint)ClientApiWinHttpCallbackStatus.WriteComplete == 0x100000
         && (uint)ClientApiWinHttpCallbackStatus.RequestError == 0x200000);
+    Check("ClientApi REQUEST_ERROR extracts dwError and maps it to a failure HRESULT",
+        client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpRequestErrorCompareRaw
+            + 0x400C00, "81FA00002000")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpRequestErrorLengthCheckRaw
+            + 0x400C00, "837D0C08741A")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpRequestErrorCodeLoadRaw
+            + 0x400C00, "FF7604")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpFailureHResultMapRaw
+            + 0x400C00, "7E090FB7F681CE0000078085F6C745FCFFFFFFFFB9054000800F49F1")
+        && ClientApiWinHttpErrorResultLayout.AsyncResultSize == 8
+        && ClientApiWinHttpErrorResultLayout.ErrorCodeOffset == 4);
+    foreach (var entry in new (int ErrorCode, int Result)[]
+    {
+        (0, unchecked((int)0x80004005u)),
+        (1, unchecked((int)0x80070001u)),
+        (0x123456, unchecked((int)0x80073456u)),
+        (unchecked((int)0x80072EE7u), unchecked((int)0x80072EE7u))
+    })
+        Check($"ClientApi WinHTTP error HRESULT mapping {entry.ErrorCode:X8}",
+            ClientApiWinHttpErrorResultLayout.CaptureFailureHResult(entry.ErrorCode) == entry.Result);
     Check("Original ClientApi redirect callback cracks the target and replays stored headers once",
         client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiWinHttpCrackUrlImportVa,
             "WinHttpCrackUrl")

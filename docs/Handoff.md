@@ -4468,3 +4468,13 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   sides of that flag, the context pointer store at `0xBC3280`, and the separate
   handle-close operation. This does not establish cancellation of the request
   handle at context `+0`.
+
+# Round 42: ClientApi WinHTTP async errors
+
+- `REQUEST_ERROR` (`0x200000`) checks the documented 8-byte async-result
+  length, reads `dwError` at `+4` (not `dwResult`), and passes it through
+  `0xBC1C40`. That helper preserves negative values, maps positive Win32 codes
+  to `0x80070000 | (code & 0xFFFF)`, and maps zero to `0x80004005`. The
+  sample-backed CompanionTools model and checks cover the field offset,
+  length check, conversion, and representative positive/zero/negative cases.
+  A length mismatch is logged but does not guard the subsequent read.

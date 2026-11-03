@@ -104,6 +104,21 @@ public enum ClientApiWinHttpCallbackStatus : uint
     RequestError = 0x200000
 }
 
+public static class ClientApiWinHttpErrorResultLayout
+{
+    public const uint AsyncResultSize = 8;
+    public const uint ErrorCodeOffset = 4;
+    public const int FailureFallbackHResult = unchecked((int)0x80004005u);
+
+    public static int CaptureFailureHResult(int errorCode)
+    {
+        int result = errorCode > 0
+            ? unchecked((int)(0x80070000u | ((uint)errorCode & 0xFFFF)))
+            : errorCode;
+        return result >= 0 ? FailureFallbackHResult : result;
+    }
+}
+
 /// <summary>
 /// Observed redirect header-replay gate. Host comparison models ASCII
 /// case-insensitivity; CRT locale-specific byte behavior is not simulated.
@@ -357,6 +372,10 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint ClientApiWinHttpWorkerDetachHandleCloseRaw = 0xBC28D7;
     public const uint ClientApiWinHttpCallbackContextCleanupFlagTestRaw = 0xBC2724;
     public const uint ClientApiWinHttpCallbackContextWorkerStoreRaw = 0xBC3280;
+    public const uint ClientApiWinHttpRequestErrorCompareRaw = 0xBC2580;
+    public const uint ClientApiWinHttpRequestErrorLengthCheckRaw = 0xBC2599;
+    public const uint ClientApiWinHttpRequestErrorCodeLoadRaw = 0xBC25BB;
+    public const uint ClientApiWinHttpFailureHResultMapRaw = 0xBC1D18;
     public const uint ClientApiWinHttpCallbackContextHandleStoreRaw = 0xBC2DEC;
     public const uint ClientApiWinHttpCallbackContextResultStoreRaw = 0xBC3264;
     public const uint ClientApiWinHttpCallbackContextResponseStoreRaw = 0xBC3270;
