@@ -3597,3 +3597,26 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
 - Agent0c7dcf0a-3f05-4c4e-974a-fd9bdbe8191e is assigned immediate managed
   downloader worker/caller exception propagation. Await its report before
   completing that task; no outcome claimed yet.
+
+## DeploymentCommon worker exception propagation
+
+- Synchronization batch committed/pushed as c82c959.
+- Agent0c7dcf0a-3f05-4c4e-974a-fd9bdbe8191e finished. Integrated
+  DownloadWorkerNativeLayout and focused worker evidence docs.
+- ThreadRunner Method7D/bodyRVA3E10 catches System.Exception around
+  DoDownload: WebException plus global recoverable count<10 and either
+  status14 or exact message "test" requeues/reset event and increments
+  part/global recoverable counters. This is separate from row9E's shared
+  response200/MD5 retry counter.
+- Nonqualifying exception records first fatal slot under lock, stops
+  running, aborts other workers and signals queued events. Already occupied
+  fatal slot is preserved. Terminal custom range exception is not WebException.
+- DoDownload finally marks complete/signals supplied event. Outer row7C
+  waits events/workers, logs captured error and throws retrieved exception
+  object, not IL rethrow. Empty slot only permits later assembly; it does
+  not guarantee all later filesystem/reporting operations succeed.
+- Build succeeds;2122 pure and2386 sample-backed checks pass. No target,
+  worker threads, network, files or callbacks executed.
+- Agent assignment complete; no active agent assignment remains.
+- Follow-ons: Awesomium verbose rule matching102B53A0, or managed worker
+  cancellation/Thread.Abort aftermath. Neither is captured as completed.

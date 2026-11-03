@@ -19,6 +19,22 @@ void Check(string name, bool condition)
     if (condition) passed++; else failed++;
 }
 
+foreach (bool webException in new[] { false, true })
+foreach (int status in new[] { 0, 14, 15 })
+foreach (string? message in new string?[] { null, "test", "Test", "test " })
+foreach (int budget in new[] { -1, 0, 9, 10, 11 })
+foreach (bool occupied in new[] { false, true })
+{
+    bool retry = webException && budget < 10 && (status == 14 || message == "test");
+    Check($"DeploymentCommon worker disposition web={webException}, status={status}, message={message}, count={budget}, occupied={occupied}",
+        DownloadWorkerNativeLayout.CaptureWorkerException(webException, status, message, budget, occupied)
+        == (retry ? DownloadWorkerExceptionAction.RetryPart
+            : occupied ? DownloadWorkerExceptionAction.KeepFirstFatalException
+            : DownloadWorkerExceptionAction.RecordFirstFatalException));
+}
+Check("DeploymentCommon outer downloader throws exactly when captured exception slot is occupied",
+    DownloadWorkerNativeLayout.ShouldThrowFromDoFileDownload(true)
+    && !DownloadWorkerNativeLayout.ShouldThrowFromDoFileDownload(false));
 foreach (bool initialized in new[] { false, true })
 foreach (int mode in new[] { int.MinValue, -1, 0, 1, 2, int.MaxValue })
 foreach (uint mutex in new uint[] { 0, 1, uint.MaxValue })
@@ -1914,6 +1930,36 @@ if (args.Length == 2)
         hardware.Matches(0x403EB7, "83BDBCFEFFFF067229")
         && hardware.Matches(0x403EC7, "6683F8097507")
         && hardware.Matches(0x403ED4, "6685C07510"));
+    Check("DeploymentCommon worker invokes DoDownload inside System.Exception catch",
+        deployment.Matches(0x00403E57, "120028A800000A120028A900000A6F9E000006DDE0020000")
+        && deployment.ManagedCatchMatches(DownloadWorkerNativeLayout.ThreadRunnerMethodRow,
+            0x3B, 0x18, 0x53, 0x2E0, "System.Exception"));
+    Check("DeploymentCommon worker retry classification uses global budget and per-part slots",
+        deployment.Matches(0x00403E6F,
+            "0B027B29000004251308288700000A07757800000139210100000775780000010C027B270000041F0A3C0D010000086FAA00000A1F0E2E15086F2D00000A72F41D0070281C00000A39EE000000")
+        && deployment.Matches(0x00403EBC,
+            "120028A800000A086F9C000006120028A800000A256F9900000617586F9A000006"));
+    Check("DeploymentCommon worker increments global count and requeues the reset event pair",
+        deployment.Matches(0x00403F53,
+            "02257B2700000417587D27000004120028A900000A75710000012C12120028A900000A75710000016FAB00000A26027B2900000425130A288700000A02286E000006066F8400000ADE08110A289600000ADCDDA5010000"));
+    Check("DeploymentCommon worker preserves first fatal slot and reports the caught exception",
+        deployment.Matches(0x00403FAA, "02287A0000062C05DDA301000002167D280000040207287B000006")
+        && deployment.Matches(0x00404053,
+            "72191F0070120028A800000A6F870000068C6D000001076F2D00000A281500000A28F9000006"));
+    Check("DeploymentCommon terminal retry exception reaches completion finally",
+        deployment.Matches(0x0040483B,
+            "72522500700228870000068C6D000001281B00000A28F900000672F32500700228870000068C6D000001281B00000A73650000067A")
+        && deployment.Matches(0x00404A12,
+            "021728980000060375710000012C0C0375710000016FB000000A26DC"));
+    Check("DeploymentCommon outer downloader reports then throws the captured exception",
+        deployment.Matches(0x00403BBE,
+            "02287A0000062C21725A1B007002287A0000066F2D00000A281E00000A28F900000602287A0000067A")
+        && deployment.ManagedUserStringsMatch(
+            (0x1DF4, "test"),
+            (0x1DFE, "Part {0} has encountered {1} total potentially recoverable errors.  {2}.  Status {3}.  Global recoverable error count {4}/{5}  Trying again."),
+            (0x1F19, "Caught an exception while downloading part number {0}: {1}"),
+            (0x1F8F, "A WebException occurred: "),
+            (0x1B5A, "An error occurred while using the multi-part downloader: ")));
     Check("DeploymentCommon response status and shared retry counter instruction boundaries",
         deployment.Matches(0x004047A1, "110D6F6500000A20CE0000003BBE000000")
         && deployment.Matches(0x00404808, "110D6F6500000A20C8000000335A")

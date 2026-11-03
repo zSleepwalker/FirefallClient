@@ -66,3 +66,8 @@ writes are introduced.
 Response-200 and final MD5 mismatch share a counter with a strict
 incremented-count >10 limit; API exceptions before status inspection remain
 outside that decision model.
+
+[Worker error handoff](DeploymentCommonDownloadWorker.md) distinguishes
+recoverable WebException requeueing from the first-fatal-exception slot.
+The custom range-retry exception is captured by the worker and thrown by
+the outer multi-part downloader after its waits, rather than silently lost.
