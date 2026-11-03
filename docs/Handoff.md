@@ -3987,3 +3987,32 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   helper `0xCBE310` allocates its `0x14`-byte sentinel through `0xCBF080`, then
   seeds 16 copies of that sentinel into a vector-like submember via
   `0xCBEE50`. The pool-like role and later values `7/8` are unresolved.
+
+# Round 20: ClientApi URL lookup and host-suffix fallback
+
+## Observed
+- `0xBC1460` is called by request handler `0xBC1990`; it returns the input
+  integer plus the selected global-tree entry's field at `+0x14`. It acquires
+  the tree lock through import slots `0x1AC4284/0x1AC4278`, increments the
+  tree counter at global `0x1E003D0 + 0x38`, performs lookups through
+  `0xBC4D60`/`0xBC61C0`, then decrements the counter and releases the lock.
+- The first lookup uses key builder `0xBC1040`. On a miss, the routine scans
+  the parsed host from its first `.` through later dots, forming suffixes
+  starting with each dot (for example `.example.com`, then `.com`). It
+  lowercases each suffix before lookup. This fallback runs only for HTTP on
+  port 80 or HTTPS on port 443. The direct key is lowercased `host:port`,
+  formatted by `"%s:%d"` at VA `0x1C73534`. The tree search is an ordered
+  string search using `strcmp`.
+- The host-suffix behavior is modeled by
+  `CaptureUrlHostPortLookupKey` and `CaptureDefaultPortHostSuffixLookupKeys`,
+  covered by CompanionTools cases for key normalization, default/non-default
+  ports, case folding, multiple labels, and missing hosts. Sample guards
+  verify the direct key formatter, lookup order, and `strchr` suffix path.
+
+## Unresolved
+- The tree entries' meaning is unknown; only the `+0x14` numeric contribution
+  is established. IDA's string read at `0x1C73534` disagreed with the
+  PE-section-mapped sample bytes, so prefer the latter for data addresses.
+  Earlier attempted mapping of these `0xBCxxxx` code addresses using the
+  unrelated `+0x400C00` scheme was incorrect; analyze them at their direct
+  IDA addresses.

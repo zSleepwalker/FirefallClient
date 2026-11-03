@@ -248,6 +248,14 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint LuaUrlFilterUrlParseHttpSchemeVa = 0x1BB625C;
     public const uint LuaUrlFilterUrlParseHttpsSchemeVa = 0x1BB6264;
     public const uint LuaUrlFilterUrlParseDefaultPathVa = 0x1BB626C;
+    public const uint ClientApiRequestUrlLookupRaw = 0xBC1460;
+    public const uint ClientApiRequestUrlLookupKeyBuilderRaw = 0xBC1040;
+    public const uint ClientApiRequestUrlLookupTreeSearchRaw = 0xBC4D60;
+    public const uint ClientApiRequestUrlLookupTreeLowerBoundRaw = 0xBC61C0;
+    public const uint ClientApiRequestUrlLookupLowercaseRaw = 0x12B9A20;
+    public const uint ClientApiRequestUrlLookupLowercaseTextRaw = 0x12B9B00;
+    public const uint ClientApiRequestUrlLookupFormatVa = 0x1C73534;
+    public const uint ClientApiRequestUrlLookupFormatSharedTextRaw = 0x12B9230;
     public const uint LuaUrlFilterUrlMessageBuilderRaw = 0x12E4100;
     public const uint LuaUrlFilterUrlMessageFormatVa = 0x1C576D0;
     public const uint LuaUrlFilterUrlComponentEscapeRaw = 0x12E4810;
@@ -484,6 +492,26 @@ public static class Red5LoggingBridgeNativeLayout
         return new Red5ParsedUrl(isHttps, host, port, "/" + pathAndQuery, query);
     }
 
+    public static string[] CaptureDefaultPortHostSuffixLookupKeys(Red5ParsedUrl? url)
+    {
+        if (url is not { } parsed || parsed.Port != (parsed.IsHttps ? 443 : 80))
+            return Array.Empty<string>();
+
+        var keys = new List<string>();
+        for (int period = parsed.Host.IndexOf('.'); period >= 0; period = parsed.Host.IndexOf('.', period + 1))
+            keys.Add(CaptureAsciiLowercase(parsed.Host[period..]));
+
+        return keys.ToArray();
+    }
+
+    public static string? CaptureUrlHostPortLookupKey(Red5ParsedUrl? url) =>
+        url is { } parsed
+            ? CaptureAsciiLowercase(string.Concat(
+                parsed.Host,
+                ":",
+                parsed.Port.ToString(System.Globalization.CultureInfo.InvariantCulture)))
+            : null;
+
     public static string CaptureUrlComponentEscape(ReadOnlySpan<byte> value)
     {
         const string hexDigits = "0123456789ABCDEF";
@@ -506,6 +534,18 @@ public static class Red5LoggingBridgeNativeLayout
         }
 
         return new string(escaped, 0, length);
+    }
+
+    private static string CaptureAsciiLowercase(string value)
+    {
+        var characters = value.ToCharArray();
+        for (int i = 0; i < characters.Length; i++)
+        {
+            if (characters[i] is >= 'A' and <= 'Z')
+                characters[i] = (char)(characters[i] + ('a' - 'A'));
+        }
+
+        return new string(characters);
     }
 
     private static bool TryCaptureDecimalPort(string value, out int port)

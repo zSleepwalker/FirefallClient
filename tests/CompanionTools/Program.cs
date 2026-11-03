@@ -253,6 +253,25 @@ foreach (var urlCase in new (string Input, Red5ParsedUrl? Expected)[]
         Red5LoggingBridgeNativeLayout.CaptureUrlComponents(urlCase.Input) == urlCase.Expected);
 Check("Awesomium native URL component parser rejects null",
     Red5LoggingBridgeNativeLayout.CaptureUrlComponents(null) is null);
+foreach (var keyCase in new (Red5ParsedUrl? Url, string? Expected)[]
+{
+    (new Red5ParsedUrl(false, "www.Example.COM", 80, "/", ""), "www.example.com:80"),
+    (new Red5ParsedUrl(true, "Example.COM", 443, "/", ""), "example.com:443"),
+    (null, null)
+})
+    Check($"ClientApi URL host-port lookup key: {keyCase.Expected}",
+        Red5LoggingBridgeNativeLayout.CaptureUrlHostPortLookupKey(keyCase.Url) == keyCase.Expected);
+foreach (var suffixCase in new (Red5ParsedUrl? Url, string Expected)[]
+{
+    (new Red5ParsedUrl(false, "www.Example.COM", 80, "/", ""), ".example.com,.com"),
+    (new Red5ParsedUrl(true, "a.B.Example.COM", 443, "/", ""), ".b.example.com,.example.com,.com"),
+    (new Red5ParsedUrl(false, "www.Example.COM", 8080, "/", ""), ""),
+    (new Red5ParsedUrl(true, "Example", 443, "/", ""), ""),
+    (null, "")
+})
+    Check($"ClientApi URL suffix lookup candidates: {suffixCase.Expected}",
+        string.Join(",", Red5LoggingBridgeNativeLayout.CaptureDefaultPortHostSuffixLookupKeys(
+            suffixCase.Url)) == suffixCase.Expected);
 foreach (var escapeCase in new (byte[] Input, string Expected)[]
 {
     (Array.Empty<byte>(), ""),
@@ -1982,6 +2001,29 @@ if (args.Length == 2)
             "00")
         && client.Ascii(Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlComponentEscapeHexDigitsVa)
             == "0123456789ABCDEF");
+    Check("Original ClientApi URL lookup does exact lookup before default-port suffix fallbacks",
+        client.Calls(Red5LoggingBridgeNativeLayout.ClientApiRequestUrlLookupRaw + 0x62 + 0x400C00,
+            Red5LoggingBridgeNativeLayout.ClientApiRequestUrlLookupKeyBuilderRaw + 0x400C00)
+        && client.Calls(Red5LoggingBridgeNativeLayout.ClientApiRequestUrlLookupRaw + 0x6E + 0x400C00,
+            Red5LoggingBridgeNativeLayout.ClientApiRequestUrlLookupTreeSearchRaw + 0x400C00)
+        && client.Calls(Red5LoggingBridgeNativeLayout.ClientApiRequestUrlLookupRaw + 0x176 + 0x400C00,
+            Red5LoggingBridgeNativeLayout.ClientApiRequestUrlLookupTreeSearchRaw + 0x400C00)
+        && client.Calls(Red5LoggingBridgeNativeLayout.ClientApiRequestUrlLookupTreeSearchRaw + 0x0C + 0x400C00,
+            Red5LoggingBridgeNativeLayout.ClientApiRequestUrlLookupTreeLowerBoundRaw + 0x400C00)
+        && client.Calls(Red5LoggingBridgeNativeLayout.ClientApiRequestUrlLookupKeyBuilderRaw + 0x81 + 0x400C00,
+            Red5LoggingBridgeNativeLayout.ClientApiRequestUrlLookupLowercaseTextRaw + 0x400C00)
+        && client.Calls(Red5LoggingBridgeNativeLayout.ClientApiRequestUrlLookupKeyBuilderRaw + 0x48 + 0x400C00,
+            Red5LoggingBridgeNativeLayout.ClientApiRequestUrlLookupFormatSharedTextRaw + 0x400C00)
+        && client.ImportSlotNames(Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlParseFindCharacterImportVa,
+            "strchr"));
+    Check("Original ClientApi URL lookup lowercases direct and suffix candidates",
+        client.Calls(Red5LoggingBridgeNativeLayout.ClientApiRequestUrlLookupLowercaseTextRaw + 0x39 + 0x400C00,
+            Red5LoggingBridgeNativeLayout.ClientApiRequestUrlLookupLowercaseRaw + 0x400C00)
+        && client.Calls(Red5LoggingBridgeNativeLayout.ClientApiRequestUrlLookupLowercaseTextRaw + 0x48 + 0x400C00,
+            Red5LoggingBridgeNativeLayout.ClientApiRequestUrlLookupLowercaseRaw + 0x400C00));
+    Check("Original ClientApi URL lookup format literal",
+        client.Ascii(Red5LoggingBridgeNativeLayout.ClientApiRequestUrlLookupFormatVa)
+            == "%s:%d");
     Check("Original client URL message builder escapes host, path and configured identifier components",
         client.Calls(Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlMessageBuilderRaw + 0xFD + 0x400C00,
             Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlComponentEscapeRaw + 0x400C00)
