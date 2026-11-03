@@ -230,6 +230,9 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint LuaUrlFilterDispatchTableVa = 0x1C747B8;
     public const uint LuaUrlFilterDispatchTableCallbackSlotVa = 0x1C747BC;
     public const uint LuaUrlFilterCallbackPointerVa = 0x10BE9E0;
+    public const uint LuaUrlFilterDispatchObjectConstructorRaw = 0xCBC410;
+    public const uint LuaUrlFilterDispatchObjectPrimaryVtableVa = 0x1C747CC;
+    public const uint LuaUrlFilterDispatchObjectSecondaryVtableOffset = 0x04;
     public const uint CallbackLogHelperRaw = 0x2FC4F0;
     public const uint CallbackUnknownLogHelperRaw = 0x2FCC60;
     public const uint CreationFailureFormatVa = 0x1BD4B2C;

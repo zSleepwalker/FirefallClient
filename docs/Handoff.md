@@ -3922,7 +3922,7 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
 - Stored URL filters are consumed by `0xCCCC10`, which treats the final `*`
   as a prefix wildcard and uses case-sensitive `strncmp` for the preceding
   bytes. Callback `0xCBDDE0` returns false for an unchanged context key;
-  otherwise it negates the match result. The host callback's allow/cancel
-  semantics remain unidentified. Its mapped VA `0x10BE9E0` appears as the
-  second pointer in the function table at file offset `0x18733B8` (VA
-  `0x1C747B8`); the table owner and callback contract remain unresolved.
+  otherwise it negates the match result. Constructor `0xCBC410` installs the
+  table at VA `0x1C747B8` as an object's secondary vtable at offset `+0x04`;
+  the callback occupies its second slot. Its mapped VA is `0x10BE9E0`.
+  The owner's API type and callback allow/cancel semantics remain unresolved.

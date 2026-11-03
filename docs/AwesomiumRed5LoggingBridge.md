@@ -231,12 +231,13 @@ context key is unchanged it returns false before matching. Otherwise it
 returns the inverse of the matcher result: false for a matching filter and
 true when no filter matches. The surrounding virtual callback's externally
 visible meaning is not named by this sample, so the return is documented
-without inferring whether it means allow, cancel, or redirect. A static
-function-pointer table at file offset `0x18733B8` (VA `0x1C747B8`) contains
-`0x10BDEC0` followed by `0x10BE9E0` at `+0x04`; the latter is the callback's
-mapped VA (raw `.text` offset `0xCBDDE0` plus `0x400C00`). The table locates
-a static dispatch reference, but its owner and callback contract remain
-unidentified.
+without inferring whether it means allow, cancel, or redirect. Constructor
+raw `0xCBC410` writes vtable VA `0x1C747CC` at object offset `0` and VA
+`0x1C747B8` at object offset `+0x04`. The secondary table is at file offset
+`0x18733B8`; its first entry is VA `0x10BDEC0` (raw `0xCBD2C0`) and its
+second entry at table `+0x04` is VA `0x10BE9E0` (raw `0xCBDDE0`). This proves
+the filter callback is installed in the object's secondary vtable, but the
+owner's API type and callback contract remain unidentified.
 
 `LogWebRequests` is registered to raw `0xCCB3D0` and takes a value after the
 frame. Although its usage string at VA `0x1BC7584` says `boolean`, the
