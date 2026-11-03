@@ -57,8 +57,9 @@ helper calls `SetFilePointer(handle,0,NULL,FILE_END)` at `0x10289D15` and
 returns true. The seek result is ignored; true is not evidence that the file
 pointer reached EOF. If fallback also returns zero or `0xFFFFFFFF`, it
 clears global storage at `0x10289D1F` and returns false. There is no
-CloseHandle call on this helper's paths. Caller-side replacement/cleanup
-and logging writes are separate from this capture.
+CloseHandle call on this helper's paths. Logger configuration separately
+closes a previous file handle before replacing a file destination, as
+documented in [synchronization/resource lifetime](AwesomiumLogSynchronization.md).
 
 The [logging setup caller](AwesomiumLoggingSetup.md) may first attempt
 DeleteFileW when append is false; OPEN_ALWAYS here does not itself truncate.

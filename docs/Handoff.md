@@ -3703,3 +3703,48 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
 - No active agent assignment. Follow-ons: named mutex collisions and
   initialization reset writers (xref11596B20), or client-side logging
   bridge into Awesomium; retain unresolved state2 snapshot writer.
+
+## Awesomium synchronization reset xref closure
+
+- Caller-extent batch committed/pushed as7ee9dba.
+- Direct xrefs in this Awesomium sample: initialized byte11596B20 is tested
+  and set1 only in initializer10289AE0; no direct reset writer found.
+  Critical-section pointer11596B24/mutex11596B2C are initialized and used
+  for enter/leave or wait/release; no direct close/destroy/reset xref found.
+  This is scoped to direct refs in this image, not proof about indirect
+  writes or code outside it.
+- Corrected distinction: reconfiguration1028A2A0 closes global log file
+  handle11596B0C at1028A684 and stores0 at1028A68A. It does not close
+  mutex or free critical-section object. Destinations0/2 retain stored
+  path object; other destinations replace it.
+- Added lifecycle decisions/docs and instruction guards. Build succeeds;
+  2238 pure and2521 sample-backed checks pass. No target, file, logger,
+  mutex or critical-section API executed.
+- Remaining global reset/concurrent mutation via indirect stores is
+  unresolved. Do not equate missing direct xrefs with proof of impossibility.
+
+## FirefallClient Red5 logging-method setup
+
+- Added an inert C# decision model and evidence checks for client raw
+  initializer `0xD668D0`, plus a focused evidence doc.
+- On the original client image, the initializer returns ready when byte
+  `this+0x73` is nonzero; returns unavailable without retry when `this+0x73`
+  is zero and `this+0x72` is nonzero; otherwise attempts setup. It requests
+  the `Red5` JS object and, after validity succeeds, registers `errorlog` via
+  imported `JSObject::SetCustomMethod` with trailing argument0, then sets
+  `this+0x73`. Failure selects a bounded string index 0..7, logs
+  `Unable to create Red5 JS object: %s`, and sets `this+0x72`.
+- The SetCustomMethod IAT slot has three observed call sites: raw
+  `0xD64530`, `0xD668D0`, and `0xD651B0`. The first and third use caller-
+  supplied names/strings and require successful Red5 setup; their method
+  behavior is not assigned. The separate WebPreferences constructor has one
+  direct call at raw `0xCBC1B1`; its adjacent initialization is not evidence
+  of a logging preference.
+- Checked the call sites, decorated imports, UTF-16 object/method names and
+  ASCII failure format against `FirefallClient.exe.original`. Build succeeds;
+  2256 pure and2543 sample-backed checks pass. No browser, script, logging
+  API, or callback was run.
+- Follow-up: locate the native handler behind `errorlog` and determine
+  whether JS-facing messages reach client logging; behavior is not proven by
+  the method-registration call alone. The pending state2 snapshot-writer
+  question also remains open.

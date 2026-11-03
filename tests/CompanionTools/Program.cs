@@ -126,6 +126,28 @@ foreach (var name in new (string Path, string Expected)[]
 foreach (uint handle in new uint[] { 0, 1, 0x80000000, uint.MaxValue })
     Check($"Awesomium mutex creation only zero prevents initialized flag {handle:X8}",
         LogSynchronizationNativeLayout.CaptureInitializedAfterMutexCreation(handle) == (handle != 0));
+foreach (bool initialized in new[] { false, true })
+    Check($"Awesomium logger initializer can change sync state only before its flag is set: {initialized}",
+        LogSynchronizationNativeLayout.CaptureInitializerCanChangeState(initialized) == !initialized);
+foreach (byte succeeded in new byte[] { 0, 1, 0x80, byte.MaxValue })
+foreach (byte attemptedWithoutSuccess in new byte[] { 0, 1, 0x80, byte.MaxValue })
+    Check($"Awesomium Red5 bridge state success={succeeded}, prior failure={attemptedWithoutSuccess}",
+        Red5LoggingBridgeNativeLayout.CaptureEntry(succeeded, attemptedWithoutSuccess) ==
+        (succeeded != 0 ? Red5LoggingBridgeEntryAction.ReturnReady
+            : attemptedWithoutSuccess != 0
+                ? Red5LoggingBridgeEntryAction.ReturnUnavailableAfterPriorFailure
+                : Red5LoggingBridgeEntryAction.AttemptCreation));
+foreach (bool created in new[] { false, true })
+    Check($"Awesomium Red5 bridge creation result: {created}",
+        Red5LoggingBridgeNativeLayout.CaptureCreationResult(created) ==
+        (created ? Red5LoggingBridgeCreationAction.RegisterErrorLogMethod
+            : Red5LoggingBridgeCreationAction.MarkUnavailableAndLogFailure));
+foreach (uint fileHandle in new uint[] { 0, 1, 0x80000000, uint.MaxValue })
+    Check($"Awesomium configuration closes nonzero prior file handle {fileHandle:X8}",
+        LogFileNativeLayout.CaptureClosesPriorFileHandle(fileHandle) == (fileHandle != 0));
+foreach (int destination in new[] { int.MinValue, -1, 0, 1, 2, 3, 4, int.MaxValue })
+    Check($"Awesomium configuration replaces path only outside destinations zero and two: {destination}",
+        LogFileNativeLayout.CaptureReplacesConfiguredPath(destination) == (destination != 0 && destination != 2));
 foreach (bool consumed in new[] { false, true })
 foreach (int destination in new[] { int.MinValue, -1, 0, 1, 2, 3, 4, int.MaxValue })
 foreach (int severity in new[] { int.MinValue, -1, 0, 1, 2, 3, 4, int.MaxValue })
@@ -1061,6 +1083,26 @@ if (args.Length == 2)
         && browser.Matches(0x102B5340, "803A2A75144249")
         && browser.Calls(0x102B537A, VerboseRuleNativeLayout.WildcardMatcherVa)
         && browser.Matches(0x102B5382, "84C075D7464F89742410897C241475DE"));
+    Check("Awesomium logger configuration locks according to persistent mode then closes only prior file handle",
+        browser.Calls(0x1028A64E, LogSynchronizationNativeLayout.InitializerVa)
+        && browser.Matches(0x1028A656, "393D286B5911")
+        && browser.Matches(0x1028A65E, "8B152C6B59116AFF52FF15D0042411")
+        && browser.ImportSlotNames(LogSynchronizationNativeLayout.MutexWaitImportVa, "WaitForSingleObject")
+        && browser.Matches(0x1028A664, "6AFF52FF15D0042411")
+        && browser.Matches(0x1028A66F, "8B0D246B5911")
+        && browser.Calls(0x1028A675, LogSynchronizationNativeLayout.CriticalSectionEnterVa)
+        && browser.Matches(0x1028A67A, "A10C6B59113BC7740D50")
+        && browser.ImportSlotNames(LogFileNativeLayout.CloseHandleImportVa, "CloseHandle")
+        && browser.Matches(LogFileNativeLayout.ConfiguredHandleCloseVa, "FF1590032411")
+        && browser.Matches(0x1028A68A, "893D0C6B5911"));
+    Check("Awesomium reconfiguration preserves file path for destinations zero/two and updates it otherwise",
+        browser.Matches(0x1028A697, "A3184A5511")
+        && browser.Matches(0x1028A69C, "3BC70F84A4000000")
+        && browser.Matches(0x1028A6A4, "83F8020F849B000000")
+        && browser.Matches(0x1028A6AD, "8B0D086B5911")
+        && browser.Calls(0x1028A6F6, 0x100080A0)
+        && browser.Matches(0x1028A6FB, "83BC2450010000007514")
+        && browser.ImportSlotNames(0x112404D8, "DeleteFileW"));
     Check("Awesomium logger synchronization flag gates mode changes and existing mutex reuse",
         browser.Matches(0x10289AEE, "803D206B5911008B5424600F8555010000")
         && browser.Matches(0x10289AFF, "8B44245CA3286B591185C00F851701000039052C6B59110F8531010000"));
@@ -1422,6 +1464,28 @@ if (args.Length == 2)
         && client.Calls(0x12C36DF + 0x400C00, 0x12C3470 + 0x400C00)
         && ClientMatches(0x12C396D, "B902D52E01")
         && client.Calls(0x12C3972 + 0x400C00, 0x12C3470 + 0x400C00));
+    Check("Original client attempts Red5 setup only before either cached state byte is set",
+        ClientMatches(Red5LoggingBridgeNativeLayout.InitializerRaw + 0x2A, "8A477384C00F85DE0000003847720F85D5000000")
+        && ClientMatches(Red5LoggingBridgeNativeLayout.InitializerRaw + 0x3E, "BAAC4BBD01")
+        && ClientMatches(Red5LoggingBridgeNativeLayout.InitializerRaw + 0x81, "FF15C84EAC01")
+        && ClientMatches(Red5LoggingBridgeNativeLayout.InitializerRaw + 0x8B, "FF15C44EAC01")
+        && ClientMatches(Red5LoggingBridgeNativeLayout.InitializerRaw + 0xA8, "FF15E04EAC01")
+        && ClientMatches(Red5LoggingBridgeNativeLayout.InitializerRaw + 0xB7, "C6477301B301")
+        && ClientMatches(Red5LoggingBridgeNativeLayout.InitializerRaw + 0xFB, "C647720132DB"));
+    Check("Original client imports the JSObject custom-method registration API",
+        client.ImportSlotNames(Red5LoggingBridgeNativeLayout.SetCustomMethodImportVa,
+            "?SetCustomMethod@JSObject@Awesomium@@QAEXABVWebString@2@_N@Z"));
+    Check("Original client constants name the Red5 JS object and errorlog method",
+        client.Matches(Red5LoggingBridgeNativeLayout.Red5ObjectNameVa, "52006500640035000000")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ErrorLogMethodNameVa,
+            "6500720072006F0072006C006F0067000000")
+        && client.Ascii(Red5LoggingBridgeNativeLayout.CreationFailureFormatVa)
+            == Red5LoggingBridgeNativeLayout.CreationFailureFormat);
+    Check("Original client has two additional guarded SetCustomMethod call sites and one WebPreferences constructor site",
+        ClientMatches(0xD64530 + 0x4B, "FF15E04EAC01")
+        && ClientMatches(0xD651B0 + 0x68, "FF15F04EAC01")
+        && client.ImportSlotNames(0x1AC4E10, "??0WebPreferences@Awesomium@@QAE@XZ")
+        && ClientMatches(0xCBC1B1, "FF15104EAC01"));
     Check("RedHanded message decoder admits500/501/502 with four parameters and length at most1024",
         red.Matches(0x40890B, "05002BD1FE83F8020F87CD040000")
         && red.Matches(0x408919, "837E10047324")

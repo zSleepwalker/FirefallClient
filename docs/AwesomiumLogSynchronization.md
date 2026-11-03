@@ -73,10 +73,44 @@ coordination was observed during analysis.
 
 The [sink caller](AwesomiumLogSinks.md) calls this initializer with `(0,0)`
 before file output and does not check whether initialization succeeded.
-Its subsequent wait result is also unchecked. Later reconfiguration does
-not override an already set initialized flag through this function alone.
+Its subsequent wait result is also unchecked.
+
+## Reconfiguration and resource lifetime
+
+The initialized byte has only two direct xrefs in this image: the test at
+`0x10289AEE` and the store of1 at `0x10289C4D`. The same bounded direct-xref
+query found the critical-section pointer read/writes only in initializer,
+lock/unlock calls and the logger configuration branch; mutex-handle reads/
+write are initializer, WaitForSingleObject and ReleaseMutex. No direct
+zero/reset writer for the initialized byte or synchronization handles was
+found outside initialization. In particular, reconfiguration through
+`0x1028A2A0` calls the initializer, but an already-set byte makes that call
+return without replacing mode or synchronization objects.
+
+This is an image-local direct-reference result, not a proof against
+undetected indirect writes or code outside the sample. No logger shutdown/
+destructor that closes the mutex or destroys the critical section was found
+in these xrefs. Treat those resources as having no observed teardown path,
+not as guaranteed process-lifetime objects.
+
+The configuration helper's cleanup concerns a different global:
+file handle `0x11596B0C`. Before applying a new file destination,
+`0x1028A2A0` reads that global and conditionally calls CloseHandle at
+`0x1028A684`, then stores0 at `0x1028A68A`. It does **not** close mutex
+`0x11596B2C` or free critical-section pointer `0x11596B24` there.
+Reconfiguration to destination0 or2 returns after this file-handle cleanup
+and does not replace stored path object `0x11596B08`. Other destinations
+copy the new path and proceed to optional DeleteFile/open logic.
+
+Consequently closing a previous log file is not evidence that the global
+lock/mutex is reset. Mutex wait/release calls and critical-section
+enter/leave calls protect configuration/output according to stored mode;
+their synchronization outcomes remain unchecked as recorded in
+[log sinks](AwesomiumLogSinks.md).
 
 Hash-guarded instruction checks bind flag/mode gates, path selection,
 normalization loop, prefix, CreateMutexW arguments, failure return, and
-critical-section null-allocation/initialized continuation. Pure cases record
-those local decisions; they do not promise successful synchronization.
+critical-section null-allocation/initialized continuation. Separate
+configuration guards bind CloseHandle to the file-handle global and its
+zeroing store. Pure cases record those local decisions; they do not promise
+successful synchronization or an observed reset in another code path.

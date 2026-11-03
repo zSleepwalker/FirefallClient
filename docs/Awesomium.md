@@ -62,6 +62,8 @@ WriteFile uses the stored byte length and ignores failure/partial counts.
 [Synchronization setup](AwesomiumLogSynchronization.md) preserves the
 first-initialization flag, `Global\` mutex-name transform and asymmetric
 mutex-creation versus critical-section allocation failure behavior.
+Direct xrefs show no observed reset/teardown writer for the synchronization
+globals; reconfiguration closes the file handle, not the mutex/critical section.
 
 [Verbose rule lookup](AwesomiumVerboseRules.md) records full-path versus
 module-byte matching, exact `-inl` removal, first-match precedence and
@@ -69,3 +71,7 @@ live-threshold fallback without introducing a wildcard parser.
 [Rule construction](AwesomiumVerboseConstruction.md) adds the comma/equals
 layout and shows that pair/numeric failure does not automatically discard
 the produced rule.
+
+[Red5 logging-method setup](AwesomiumRed5LoggingBridge.md) records the
+one-shot creation of the `Red5` JavaScript object and conditional registration
+of its `errorlog` custom method; the native callback body remains unresolved.

@@ -16,6 +16,10 @@ public static class LogSynchronizationNativeLayout
     public const uint CriticalSectionPointerVa = 0x11596B24;
     public const uint ModeVa = 0x11596B28;
     public const uint MutexHandleVa = 0x11596B2C;
+    public const uint MutexWaitImportVa = 0x112404D0;
+    public const uint MutexReleaseImportVa = 0x112404D4;
+    public const uint CriticalSectionEnterVa = 0x103B78C0;
+    public const uint CriticalSectionLeaveVa = 0x103B78D0;
     public const string MutexNamePrefix = @"Global\";
 
     public static LogSynchronizationInitAction CaptureEntry(
@@ -30,4 +34,7 @@ public static class LogSynchronizationNativeLayout
 
     public static bool CaptureInitializedAfterMutexCreation(uint observedReturnedHandle) =>
         observedReturnedHandle != 0;
+
+    public static bool CaptureInitializerCanChangeState(bool alreadyInitialized) =>
+        !alreadyInitialized;
 }

@@ -19,9 +19,12 @@ public static class LogFileNativeLayout
 {
     public const uint OpenHelperVa = 0x10289C70;
     public const uint DefaultPathBuilderVa = 0x10289A20;
+    public const uint LoggerConfigurationVa = 0x1028A2A0;
     public const uint StoredHandleVa = 0x11596B0C;
     public const uint PathObjectPointerVa = 0x11596B08;
     public const uint DestinationStorageVa = 0x11554A18;
+    public const uint ConfiguredHandleCloseVa = 0x1028A684;
+    public const uint CloseHandleImportVa = 0x11240390;
     public const uint GenericWrite = 0x40000000;
     public const uint ShareReadWrite = 3;
     public const uint OpenAlways = 4;
@@ -40,4 +43,10 @@ public static class LogFileNativeLayout
             ? LogFileOpenAction.SeekEndThenReturnTrue
             : fallbackAttempt ? LogFileOpenAction.ClearStoredHandleThenReturnFalse
             : LogFileOpenAction.AttemptFallbackOpen;
+
+    public static bool CaptureClosesPriorFileHandle(uint observedHandle) =>
+        observedHandle != 0;
+
+    public static bool CaptureReplacesConfiguredPath(int destination) =>
+        destination != 0 && destination != 2;
 }
