@@ -58,3 +58,7 @@ without claiming guaranteed truncation or append behavior.
 [Log sinks](AwesomiumLogSinks.md) distinguish debugger, stderr and file
 admission. Destination0 still permits high-severity stderr output;
 WriteFile uses the stored byte length and ignores failure/partial counts.
+
+[Synchronization setup](AwesomiumLogSynchronization.md) preserves the
+first-initialization flag, `Global\` mutex-name transform and asymmetric
+mutex-creation versus critical-section allocation failure behavior.

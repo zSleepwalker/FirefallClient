@@ -3576,3 +3576,24 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
 - Follow-ons: mutex name/setup10289AE0 (default path or caller path,
   backslash normalization, Global prefix, initialized flag/failure branch);
   downloader outer exception propagation. No active agent assignment.
+
+## Awesomium logger synchronization setup
+
+- Sink-admission batch committed/pushed as8edea89.
+- Initializer10289AE0 skips changes when byte11596B20!=0. Otherwise stores
+  supplied mode11596B28; nonzero mode attempts24-byte critical-section
+  allocation, zero mode reuses nonzero mutex11596B2C or builds/creates one.
+- Null critical allocation stores pointer0 yet marks initialized1. Mutex
+  creation0 stores0 and returns before flag assignment, allowing later retry.
+  Existing/nonzero mutex is not validated. Flag is not an interlocked once.
+- Nonnull path (even empty) copied via WCHAR terminator; null invokes
+  default builder10289A20. Copied path backslashes become forward slashes,
+  exact Global\ prefix prepended; case/colon/dot segments untouched.
+- CreateMutexW null security/initial ownerFALSE. Only zero is failure; no
+  GetLastError or existing-object branch. Saved names are observed copied
+  strings, not Win32 acceptance guarantees or a real lock implementation.
+- Build succeeds;1881 pure and2139 sample-backed checks pass. No target,
+  API, file or mutex executed/created.
+- Agent0c7dcf0a-3f05-4c4e-974a-fd9bdbe8191e is assigned immediate managed
+  downloader worker/caller exception propagation. Await its report before
+  completing that task; no outcome claimed yet.

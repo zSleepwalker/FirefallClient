@@ -19,6 +19,28 @@ void Check(string name, bool condition)
     if (condition) passed++; else failed++;
 }
 
+foreach (bool initialized in new[] { false, true })
+foreach (int mode in new[] { int.MinValue, -1, 0, 1, 2, int.MaxValue })
+foreach (uint mutex in new uint[] { 0, 1, uint.MaxValue })
+    Check($"Awesomium synchronization entry initialized={initialized}, mode={mode}, mutex={mutex:X8}",
+        LogSynchronizationNativeLayout.CaptureEntry(initialized, mode, mutex) ==
+        (initialized ? LogSynchronizationInitAction.ReturnWithoutChangingConfiguration
+            : mode != 0 ? LogSynchronizationInitAction.AllocateCriticalSectionThenMarkInitialized
+            : mutex != 0 ? LogSynchronizationInitAction.ReuseStoredMutexThenMarkInitialized
+            : LogSynchronizationInitAction.BuildNameAndAttemptMutexCreation));
+foreach (var name in new (string Path, string Expected)[]
+{
+    ("", @"Global\"), (@"C:\Game\debug.log", @"Global\C:/Game/debug.log"),
+    (@".\debug.log", @"Global\./debug.log"),
+    (@"\\server\share\debug.log", @"Global\//server/share/debug.log"),
+    ("C:/Game/../debug.log", @"Global\C:/Game/../debug.log"),
+    ("mixed\\UPPER/\u0100.log", "Global\\mixed/UPPER/\u0100.log")
+})
+    Check($"Awesomium mutex name preserves non-backslash code units: {name.Path}",
+        LogSynchronizationNativeLayout.CaptureMutexName(name.Path) == name.Expected);
+foreach (uint handle in new uint[] { 0, 1, 0x80000000, uint.MaxValue })
+    Check($"Awesomium mutex creation only zero prevents initialized flag {handle:X8}",
+        LogSynchronizationNativeLayout.CaptureInitializedAfterMutexCreation(handle) == (handle != 0));
 foreach (bool consumed in new[] { false, true })
 foreach (int destination in new[] { int.MinValue, -1, 0, 1, 2, 3, 4, int.MaxValue })
 foreach (int severity in new[] { int.MinValue, -1, 0, 1, 2, 3, 4, int.MaxValue })
@@ -884,6 +906,27 @@ if (args.Length == 2)
         && browser.Matches(0x102B7C9C, "8BCBC1E90A81E94028000066890C78")
         && browser.Matches(0x102B7CB3, "81E3FF03000081CB00DC000066895C7E02")
         && browser.Matches(0x102B7CC6, "B802000000"));
+    Check("Awesomium logger synchronization flag gates mode changes and existing mutex reuse",
+        browser.Matches(0x10289AEE, "803D206B5911008B5424600F8555010000")
+        && browser.Matches(0x10289AFF, "8B44245CA3286B591185C00F851701000039052C6B59110F8531010000"));
+    Check("Awesomium synchronization name selects null-path default and replaces backslashes over copied length",
+        browser.Matches(0x10289B2E, "85D27421")
+        && browser.Calls(0x10289B58, LogFileNativeLayout.DefaultPathBuilderVa)
+        && browser.Matches(0x10289BA0, "6683385C7508BA2F00000066891083C0023BC175EB")
+        && browser.Matches(0x10289BB5, "6808B12711")
+        && browser.Matches(0x1127B108, "47006C006F00620061006C005C000000"));
+    Check("Awesomium mutex create stores returned handle and zero returns before initialized flag assignment",
+        browser.ImportSlotNames(0x112404E0, "CreateMutexW")
+        && browser.Matches(0x10289BE4, "506A006A00FF15E0042411A32C6B5911")
+        && browser.Matches(0x10289BF8, "85C0751C")
+        && browser.Matches(0x10289C14, "83C458C3")
+        && browser.Matches(0x10289C25, "EB26")
+        && browser.Matches(0x10289C4D, "C605206B591101"));
+    Check("Awesomium critical-section allocation failure still reaches initialized flag assignment",
+        browser.Matches(0x10289C27, "6A18")
+        && browser.Matches(0x10289C31, "85C0740E")
+        && browser.Calls(0x10289C37, 0x10288CF0)
+        && browser.Matches(0x10289C41, "EB0AC705246B591100000000C605206B591101"));
     Check("Awesomium sink admission uses debugger destinations two/three and signed stderr severity threshold",
         browser.Matches(0x10289F3B, "83F802740C83F8037407833E027C4AEB15")
         && browser.ImportSlotNames(0x112404E4, "OutputDebugStringA")
