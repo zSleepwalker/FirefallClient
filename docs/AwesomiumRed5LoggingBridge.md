@@ -114,14 +114,27 @@ include `Executing callback '%s' from JavaScript`, `   #%d: %s`, and
 ## Lua-to-JavaScript values and function calls
 
 The Lua WebFrame registration builder at raw `0xCCB9A0` installs twelve
-named entries: `LoadUrl`, `GetUrl`, `AddWebCallback`, `AddWebValue`,
-`CallWebFunc`, `SetUrlFilters`, `LogWebRequests`, `SetNaturalDims`,
-`ClearCookies`, `GetNaturalDims`, `EnableTypeTarget`, and `IsTypeTarget`.
-Their closure-entry values map to raw offsets `0xCC38B0` through `0xCC3960`
-in `0x10` increments. Those entries fall inside two shared native code
-regions rather than resolving as twelve standalone functions, so the table
-alone does not establish their individual behavior. The three bridge methods
-whose paths are traced in this document are described below or above.
+named entries. Each closure uses a small forwarding stub; the `jmp` targets
+identify these implementation entry points:
+
+| Lua method | Stub (raw) | Implementation (raw) |
+|---|---:|---:|
+| `LoadUrl` | `0xCCE8B0` | `0xCCABA0` |
+| `GetUrl` | `0xCCE8C0` | `0xCCACC0` |
+| `AddWebCallback` | `0xCCE8D0` | `0xCCAD70` |
+| `AddWebValue` | `0xCCE8E0` | `0xCCAF10` |
+| `CallWebFunc` | `0xCCE8F0` | `0xCCB060` |
+| `SetUrlFilters` | `0xCCE900` | `0xCCB1C0` |
+| `LogWebRequests` | `0xCCE910` | `0xCCB3D0` |
+| `SetNaturalDims` | `0xCCE920` | `0xCCB5B0` |
+| `ClearCookies` | `0xCCE930` | `0xCCB4E0` |
+| `GetNaturalDims` | `0xCCE940` | `0xCCB710` |
+| `EnableTypeTarget` | `0xCCE950` | `0xCCB7C0` |
+| `IsTypeTarget` | `0xCCE960` | `0xCCB8C0` |
+
+The methods not traced in detail below remain behaviorally unresolved; the
+registration table and forwarding stubs establish their names and entry
+points, not their full semantics.
 
 The Lua binding at raw `0xCCAF10` implements `AddWebValue`, using the usage
 string at VA `0x1BC7734`. It requires the frame, property name, and value

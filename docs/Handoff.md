@@ -3892,6 +3892,7 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   bindings and their invocation decisions are recorded in the inert C# model
   and sample-backed checks; no executable or script was run.
 - Raw `0xCCB9A0` registers twelve Lua WebFrame names from `LoadUrl` through
-  `IsTypeTarget`. Their closure-entry values fall in shared code ranges, so
-  the remaining methods require individual data-flow traces before assigning
-  behavior.
+  `IsTypeTarget`. Twelve small stubs at `0xCCE8B0`-`0xCCE960` forward to
+  their respective implementations. The names, stub bytes, and targets are
+  recorded in the bridge document; behaviors beyond the three traced bridge
+  methods still require individual data-flow analysis.
