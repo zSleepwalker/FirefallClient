@@ -162,3 +162,16 @@
 
 ## Unresolved
 - The global object's field names and initialization source are unknown; the auto-proxy gate and PAC URL are recorded by offsets only. The meaning of the `0x02` byte adjacent to the redirect-limit value at request `+0x3D` remains separate and unresolved.
+
+# Round 24: ClientApi WinHTTP session settings
+
+## Observed
+- `0xBC39B0` creates the session with `WinHttpOpen` (IAT `0x1AC4D1C`), passing `0x10000000` (`WINHTTP_FLAG_ASYNC`) as flags. It derives access type as 3 (`WINHTTP_ACCESS_TYPE_NAMED_PROXY`) when the configured proxy-name pointer at global-object `+8` is nonzero, otherwise 0 (`WINHTTP_ACCESS_TYPE_DEFAULT_PROXY`); proxy name and bypass pointers come from `+8/+0x0C`.
+- After a session handle is returned, the initializer calls `WinHttpSetOption` on it twice. Option 79 (`WINHTTP_OPTION_ENABLE_FEATURE`) receives value 2 (`WINHTTP_ENABLE_SSL_REVERT_IMPERSONATION`); option 84 (`WINHTTP_OPTION_SECURE_PROTOCOLS`) receives `0x80` (`WINHTTP_FLAG_SECURE_PROTOCOL_TLS1`). Both values and calls use four-byte buffers. If either call fails, the initializer logs that option's failure but continues and still reports successful session creation when the handle is valid.
+- The original PE maps IAT slots `0x1AC4D1C` and `0x1AC4D08` to `WinHttpOpen` and `WinHttpSetOption`. CompanionTools checks the imports, asynchronous flag, option IDs, values, and call sequences. The names and values are corroborated by Microsoft's [WinHTTP option reference](https://learn.microsoft.com/en-us/windows/win32/winhttp/option-flags).
+
+## Interpreted
+- The initialized session explicitly opts into asynchronous operation, enables SSL impersonation reversion during certificate operations, and supplies only the TLS 1.0 protocol bit to WinHTTP's secure-protocol setting.
+
+## Unresolved
+- The source and runtime contents of the proxy name and bypass strings are not established. The effective TLS behavior may also depend on how the operating system handles this legacy protocol option.

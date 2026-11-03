@@ -301,6 +301,15 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint ClientApiProxyStringGlobalFreeImportVa = 0x1AC4320;
     public const uint ClientApiWinHttpProxyStringFreeOneRaw = 0xBC2F18;
     public const uint ClientApiWinHttpProxyStringFreeTwoRaw = 0xBC2F25;
+    public const uint ClientApiWinHttpSessionOpenRaw = 0xBC3A4B;
+    public const uint ClientApiWinHttpSessionEnableFeatureRaw = 0xBC3A71;
+    public const uint ClientApiWinHttpSessionSecureProtocolsRaw = 0xBC3A9A;
+    public const uint ClientApiWinHttpOpenImportVa = 0x1AC4D1C;
+    public const uint ClientApiWinHttpEnableFeatureOption = 79;
+    public const uint ClientApiWinHttpSslRevertImpersonationFeature = 2;
+    public const uint ClientApiWinHttpSecureProtocolsOption = 84;
+    public const uint ClientApiWinHttpTls10Protocol = 0x80;
+    public const uint ClientApiWinHttpOpenAsyncFlag = 0x10000000;
     public const uint ClientApiRequestUrlSchemeOffset = 0x0C;
     public const uint ClientApiRequestUrlHostOffset = 0x10;
     public const uint ClientApiRequestUrlPortOffset = 0x14;

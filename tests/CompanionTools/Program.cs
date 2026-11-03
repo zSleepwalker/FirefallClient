@@ -2285,6 +2285,22 @@ if (args.Length == 2)
         && Red5LoggingBridgeNativeLayout.ClientApiWinHttpProxyOption == 0x26
         && Red5LoggingBridgeNativeLayout.ClientApiWinHttpProxyInfoSize == 0x0C
         && Red5LoggingBridgeNativeLayout.ClientApiWinHttpAutoproxyConfigUrlFlag == 0x02);
+    Check("ClientApi opens asynchronous WinHTTP sessions with observed TLS settings",
+        client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiWinHttpOpenImportVa, "WinHttpOpen")
+        && client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiWinHttpSetOptionImportVa,
+            "WinHttpSetOption")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpSessionOpenRaw + 0x400C00,
+            "FF151C4DAC01")
+        && client.Matches(0xBC3A27 + 0x400C00, "6800000010")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpSessionEnableFeatureRaw - 0x0D
+            + 0x400C00, "6A04516A4F50C745EC02000000FFD7")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpSessionSecureProtocolsRaw - 0x11
+            + 0x400C00, "6A048D45ECC745EC80000000506A54FF36FFD7")
+        && Red5LoggingBridgeNativeLayout.ClientApiWinHttpEnableFeatureOption == 79
+        && Red5LoggingBridgeNativeLayout.ClientApiWinHttpSslRevertImpersonationFeature == 2
+        && Red5LoggingBridgeNativeLayout.ClientApiWinHttpSecureProtocolsOption == 84
+        && Red5LoggingBridgeNativeLayout.ClientApiWinHttpTls10Protocol == 0x80
+        && Red5LoggingBridgeNativeLayout.ClientApiWinHttpOpenAsyncFlag == 0x10000000);
     Check("Original client URL message builder escapes host, path and configured identifier components",
         client.Calls(Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlMessageBuilderRaw + 0xFD + 0x400C00,
             Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlComponentEscapeRaw + 0x400C00)

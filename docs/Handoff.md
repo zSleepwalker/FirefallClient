@@ -4407,3 +4407,33 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
 - Names and initialization source for the global object fields at `+0`,
   `+4`, and `+0x10`; no meaning is assigned to the adjacent request byte
   `+0x3D`.
+
+# Round 39: ClientApi WinHTTP session settings
+
+## Observed
+- `0xBC39B0` calls `WinHttpOpen` at `0xBC3A4B` (original PE IAT
+  `0x1AC4D1C`) with flags `0x10000000` (`WINHTTP_FLAG_ASYNC`). Its access
+  type is 3 (`WINHTTP_ACCESS_TYPE_NAMED_PROXY`) when the proxy-name pointer
+  at global-object `+8` is nonzero, otherwise 0
+  (`WINHTTP_ACCESS_TYPE_DEFAULT_PROXY`); name and bypass are passed from
+  global-object `+8/+0x0C`.
+- On a valid session handle, the initializer calls `WinHttpSetOption` on
+  that handle with option 79/value 2 at `0xBC3A71` and option 84/value
+  `0x80` at `0xBC3A9A`. The Windows SDK defines these as
+  `WINHTTP_OPTION_ENABLE_FEATURE` /
+  `WINHTTP_ENABLE_SSL_REVERT_IMPERSONATION` and
+  `WINHTTP_OPTION_SECURE_PROTOCOLS` / `WINHTTP_FLAG_SECURE_PROTOCOL_TLS1`.
+  Each call supplies a four-byte value. Failures are logged but do not
+  change the initializer's successful return when the session handle exists.
+  CompanionTools verifies the import names, exact calls, option IDs, values,
+  and asynchronous flag.
+
+## Interpreted
+- The session is asynchronous, enables SSL impersonation reversion for
+  certificate operations, and sets its secure-protocol mask to the TLS 1.0
+  bit only.
+
+## Unresolved
+- The source and actual contents of proxy name/bypass strings remain
+  unknown. Runtime TLS behavior on newer Windows versions is not inferred
+  from this legacy configuration alone.
