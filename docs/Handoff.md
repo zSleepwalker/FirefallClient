@@ -3515,3 +3515,21 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   integrating and validating its report.
 - Further logger follow-ons: verbose module match semantics and actual
   file-opening helper10289C70; no implementation or completion claimed.
+
+## DeploymentCommon response and shared retry boundary
+
+- Logging setup batch committed/pushed as17e754f.
+- Agent1eee0217-8d6a-414a-9e36-3b30e6ad8841 finished its response trace;
+  integrated DownloadResponseNativeLayout and evidence docs.
+- Method9E/bodyRVA4550: observed status206 reads stream directly, status200
+  sleeps1500ms then increments local6 and retries when incremented count<=10.
+  Other statuses log and read only if GetResponse returned normally; HTTP
+  error exceptions before this boundary are not modeled or suppressed.
+- Final MD5 mismatch increments the same local6 and uses the same strict
+  >10 terminal comparison. Counter starts0 outside retry loop, not reset
+  between attempts. Saved pure decisions perform no request/sleep/hash.
+- Build succeeds;1663 pure and1910 sample-backed checks pass. No target
+  assembly loaded/executed, no chunk files or network requests created.
+- Both recently assigned agents are finished; no active assignment remains.
+- Follow-ons remain logger file opening10289C70, verbose module matching,
+  or downloader outer exception propagation; none marked complete.

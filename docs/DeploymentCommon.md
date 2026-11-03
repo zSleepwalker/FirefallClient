@@ -60,3 +60,9 @@ The [INI wrapper trace](DeploymentCommonIniFile.md) records512-to32768
 buffer growth, null/too-large results, import charset asymmetry, and the
 original Boolean/default/null quirks. No INI parser or actual file reads/
 writes are introduced.
+
+[Download response decisions](DeploymentCommonDownloadResponses.md) separate
+206 stream admission, 200 retry behavior, and other observed status values.
+Response-200 and final MD5 mismatch share a counter with a strict
+incremented-count >10 limit; API exceptions before status inspection remain
+outside that decision model.

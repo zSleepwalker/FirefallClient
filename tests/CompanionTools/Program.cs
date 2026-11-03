@@ -19,6 +19,27 @@ void Check(string name, bool condition)
     if (condition) passed++; else failed++;
 }
 
+foreach (int status in new[] { 200, 201, 206, 416, 500 })
+foreach (int count in new[] { 0, 9, 10, 11 })
+{
+    var expected = status == 200
+        ? new DownloadResponseDecision(count >= 10 ? DownloadResponseAction.RetryLimitExceeded
+            : DownloadResponseAction.RetryRequest, count + 1)
+        : new DownloadResponseDecision(status == 206 ? DownloadResponseAction.ReadResponseStream
+            : DownloadResponseAction.ReadUnexpectedStatusResponseStream, count);
+    Check($"DeploymentCommon observed response status {status}, prior retry count {count}",
+        DownloadResponseNativeLayout.CaptureStatusCode(status, count) == expected);
+}
+foreach (int count in new[] { 0, 9, 10, 11, int.MaxValue })
+    Check($"DeploymentCommon MD5 mismatch increments shared counter {count}",
+        DownloadResponseNativeLayout.CaptureMd5Mismatch(count) ==
+        new DownloadResponseDecision(unchecked(count + 1) > 10
+            ? DownloadResponseAction.RetryLimitExceeded : DownloadResponseAction.RetryRequest,
+            unchecked(count + 1)));
+Check("DeploymentCommon status-200 retry then MD5 mismatch share one counter",
+    DownloadResponseNativeLayout.CaptureMd5Mismatch(
+        DownloadResponseNativeLayout.CaptureStatusCode(200, 9).RetryCount)
+        == new DownloadResponseDecision(DownloadResponseAction.RetryLimitExceeded, 11));
 long downloadChunkSize = DownloadPlanning.ChunkSize;
 var downloadRangeCases = new (long Total, (uint Part, long Start, long End)[] Expected)[]
 {
@@ -1768,6 +1789,23 @@ if (args.Length == 2)
         hardware.Matches(0x403EB7, "83BDBCFEFFFF067229")
         && hardware.Matches(0x403EC7, "6683F8097507")
         && hardware.Matches(0x403ED4, "6685C07510"));
+    Check("DeploymentCommon response status and shared retry counter instruction boundaries",
+        deployment.Matches(0x004047A1, "110D6F6500000A20CE0000003BBE000000")
+        && deployment.Matches(0x00404808, "110D6F6500000A20C8000000335A")
+        && deployment.Matches(0x00404820, "11061758130611061F0A300F")
+        && deployment.Matches(0x00404836, "DD45FEFFFF")
+        && deployment.Matches(0x00404984, "11061758130611061F0A300F")
+        && deployment.Matches(0x0040499A, "38E1FCFFFF"));
+    Check("DeploymentCommon response and MD5 retry diagnostic literals",
+        deployment.ManagedUserStringsMatch(
+            (0x2497, "Got an unexpected response code from range request with offset of {0}-{3} for chunk {2}: {1}"),
+            (0x16B8, "Trying download again"),
+            (0x2552, "Exceeded max number of retries (10), starting download over again for chunk {0}"),
+            (0x25F3, "Exceeded the maximum number of retry attempts for range request on chunk {0}."),
+            (0x272A, "Downloaded file part {0}, but MD5 didn't match.  Expected {1} but got {2}."),
+            (0x27C1, "Trying again"),
+            (0x27DB, "Exceeded max number of retries (10), starting chunk download over again for chunk {0}"),
+            (0x2888, "Exceeded the maximum number of retry attempts (MD5 mismatch) for chunk {0}.")));
     Check("DeploymentCommon first download range uses zero start and inclusive total-size clamp",
         deployment.Matches(0x0040397A, "166A0C02287200000608200000A0006A58287E00000A0D")
         && deployment.Matches(0x00403991, "161304"));
