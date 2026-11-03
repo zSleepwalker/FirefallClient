@@ -4005,21 +4005,72 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   string search using `strcmp`.
 - The host-suffix behavior is modeled by
   `CaptureUrlHostPortLookupKey`, `CaptureDefaultPortHostSuffixLookupKeys`,
-  and `CaptureUrlLookupEntries`, covered by CompanionTools cases for key
-  normalization, default/non-default ports, case folding, multiple labels,
-  and missing hosts. Sample guards verify the direct key formatter, lookup
-  order, `strchr` suffix path, and direct/suffix value writes.
+  and `CaptureClientApiServerClockOffsetEntries`, covered by CompanionTools
+  cases for key normalization, default/non-default ports, case folding,
+  multiple labels, and missing hosts. `CaptureClientApiAdjustedTimestamp`
+  models the native 32-bit timestamp-plus-offset arithmetic. Sample guards
+  verify the direct key formatter, lookup order, `strchr` suffix path, and
+  direct/suffix value writes.
 - `0xBC1680`, called by `ClientApi_PumpRequestWorker` at `0xBC338D`, inserts
   or updates the direct `host:port` entry and, for default ports, the same
-  suffix entries. Each entry receives the same `EDX - third-argument`
-  difference in node field `+0x14`; the difference's meaning is unresolved.
-  `0xBC4CB0` returns an existing value slot or inserts a missing key, and
-  `0xBC7A10` performs balanced ordered-tree insertion.
+  suffix entries. The worker extracts the `"date"` response header and parses
+  it at `0xBCB5A0` using the HTTP-date layout
+  `"%3s, %d %3s %d %d:%d:%d %3s"`, `_strnicmp` month matching, and
+  `_mkgmtime64`. It stores parsed server time minus current `_time64()` in
+  node field `+0x14`, an offset in seconds. Lookup `0xBC1460` adds the
+  matching offset to the input timestamp; no match leaves the timestamp
+  unchanged. `0xBC4CB0` returns an existing value slot or inserts a missing
+  key, and `0xBC7A10` performs balanced ordered-tree insertion. Sample-mapped
+  bytes/imports and CompanionTools guards confirm the date/clock-offset path.
 
 ## Unresolved
-- The tree entries' meaning is unknown; only the `+0x14` numeric contribution
-  is established. IDA's string read at `0x1C73534` disagreed with the
-  PE-section-mapped sample bytes, so prefer the latter for data addresses.
+- The application policy for the learned server clock correction, including
+  how long entries persist and when they are invalidated, is unknown. IDA's
+  string read at `0x1C73534` disagreed with the PE-section-mapped sample bytes,
+  so prefer the latter for data addresses.
   Earlier attempted mapping of these `0xBCxxxx` code addresses using the
   unrelated `+0x400C00` scheme was incorrect; analyze them at their direct
   IDA addresses.
+
+# Round 21: ClientApi adjusted-time query field
+
+## Observed
+- Request handler `0xBC1990` passes the timestamp returned by `0xBC1460` as
+  the last argument to builder `0x12E4100`. In that builder the value is
+  formatted as the unsigned `tc` field in the inner request query.
+- PE-mapped sample VA `0x1C57568` contains
+  `ver=%d&tc=%u&nonce=%04x%04x%04x%04x&uid=%s&host=%s&path=%s&hbody=%s&cid=%llu`.
+  The version argument is fixed at `2`; four calls to imported `rand()` supply
+  nonce values truncated to 16 bits and rendered as four-digit lowercase hex;
+  the named string fields are supplied in the order `uid`, `host`, `path`, and
+  `hbody`; the `cid` conversion consumes a 64-bit unsigned value from two
+  adjacent object words.
+- Builder `0x12E4100` then wraps the inner query as the middle `%s` in
+  `"Red5 %s %s %s"` at VA `0x1C576D0`; the other two fields are separately
+  constructed strings. `CaptureClientApiRequestQuery` models the inner query.
+  The sample-backed CompanionTools checks cover the format and `rand` import.
+
+## Unresolved
+- The native text encoding and semantic roles of several string/ID fields
+  beyond their literal query keys remain unknown.
+
+# Round 22: ClientApi request signatures
+
+## Observed
+- Builder `0x12E4100` applies the CryptoAPI SHA-1 construction to the inner
+  query twice, with separate keys from object fields at `+0x3C` and `+0x40`.
+  The helper at `0x12EEAD0` hashes keys longer than 64 bytes, zero-pads the
+  key block, and hashes its XOR-with-`0x36` inner pad. `0x12EECF0` appends the
+  query bytes. `0x12EED70` completes the inner SHA-1 digest, hashes the
+  key-block XOR `0x5C` plus that digest, and obtains the outer digest.
+- `0x12EE800` converts each 20-byte digest to 40 lowercase hexadecimal
+  characters using the table at VA `0x1C58590`. The two strings become the
+  first and third fields of `"Red5 %s %s %s"`, surrounding the query.
+  `CaptureClientApiRequestSignature` models the byte-level HMAC-SHA1 and
+  lowercase-hex conversion; a known-vector test and sample import/table guards
+  cover the model.
+
+## Unresolved
+- The source and semantics of both signing keys, including whether either can
+  be absent, and the native text encoding used when hashing the query remain
+  unresolved.

@@ -82,7 +82,7 @@ public readonly record struct Red5ParsedUrl(
     string Path,
     string Query);
 
-public readonly record struct ClientApiUrlLookupEntry(string Key, int Value);
+public readonly record struct ClientApiServerClockOffsetEntry(string Key, int OffsetSeconds);
 
 public enum Red5LuaWebRequestLoggingAction
 {
@@ -256,9 +256,26 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint ClientApiRequestUrlLookupTreeSearchRaw = 0xBC4D60;
     public const uint ClientApiRequestUrlLookupTreeLowerBoundRaw = 0xBC61C0;
     public const uint ClientApiRequestUrlLookupTreeInsertOrReplaceRaw = 0xBC4CB0;
+    public const uint ClientApiRequestDateHeaderParserRaw = 0xBCB5A0;
+    public const uint ClientApiPumpRequestWorkerRaw = 0xBC2B30;
+    public const uint ClientApiRequestDateHeaderNameVa = 0x1C737C4;
+    public const uint ClientApiRequestDateHeaderFormatVa = 0x1BB5F90;
+    public const uint ClientApiRequestTimeImportVa = 0x1AC48D8;
+    public const uint ClientApiRequestDateScanImportVa = 0x1AC48FC;
+    public const uint ClientApiRequestMonthCompareImportVa = 0x1AC4898;
+    public const uint ClientApiRequestUtcTimeImportVa = 0x1AC4988;
+    public const uint ClientApiRequestRandImportVa = 0x1AC48F8;
+    public const uint ClientApiRequestHashCreateImportVa = 0x1AC4038;
+    public const uint ClientApiRequestHashDataImportVa = 0x1AC402C;
+    public const uint ClientApiRequestHashGetValueImportVa = 0x1AC4010;
+    public const uint ClientApiRequestHashDestroyImportVa = 0x1AC4030;
+    public const uint ClientApiRequestSignatureHexDigitsVa = 0x1C58590;
     public const uint ClientApiRequestUrlLookupLowercaseRaw = 0x12B9A20;
     public const uint ClientApiRequestUrlLookupLowercaseTextRaw = 0x12B9B00;
     public const uint ClientApiRequestUrlLookupFormatVa = 0x1C73534;
+    public const uint ClientApiRequestQueryFormatVa = 0x1C57568;
+    public const string ClientApiRequestQueryNativeFormat =
+        "ver=%d&tc=%u&nonce=%04x%04x%04x%04x&uid=%s&host=%s&path=%s&hbody=%s&cid=%llu";
     public const uint ClientApiRequestUrlLookupFormatSharedTextRaw = 0x12B9230;
     public const uint LuaUrlFilterUrlMessageBuilderRaw = 0x12E4100;
     public const uint LuaUrlFilterUrlMessageFormatVa = 0x1C576D0;
@@ -508,21 +525,46 @@ public static class Red5LoggingBridgeNativeLayout
         return keys.ToArray();
     }
 
-    public static ClientApiUrlLookupEntry[] CaptureUrlLookupEntries(Red5ParsedUrl? url, int value)
+    public static ClientApiServerClockOffsetEntry[] CaptureClientApiServerClockOffsetEntries(
+        Red5ParsedUrl? url,
+        int offsetSeconds)
     {
         string? hostPortKey = CaptureUrlHostPortLookupKey(url);
         if (hostPortKey is null)
-            return Array.Empty<ClientApiUrlLookupEntry>();
+            return Array.Empty<ClientApiServerClockOffsetEntry>();
 
-        var entries = new List<ClientApiUrlLookupEntry>
+        var entries = new List<ClientApiServerClockOffsetEntry>
         {
-            new(hostPortKey, value)
+            new(hostPortKey, offsetSeconds)
         };
         foreach (string key in CaptureDefaultPortHostSuffixLookupKeys(url))
-            entries.Add(new ClientApiUrlLookupEntry(key, value));
+            entries.Add(new ClientApiServerClockOffsetEntry(key, offsetSeconds));
 
         return entries.ToArray();
     }
+
+    public static int CaptureClientApiAdjustedTimestamp(int localTimestamp, int offsetSeconds) =>
+        unchecked(localTimestamp + offsetSeconds);
+
+    public static string CaptureClientApiRequestQuery(
+        uint adjustedTimestamp,
+        ushort nonce0,
+        ushort nonce1,
+        ushort nonce2,
+        ushort nonce3,
+        string uid,
+        string host,
+        string path,
+        string body,
+        ulong clientId) =>
+        System.FormattableString.Invariant(
+            $"ver=2&tc={adjustedTimestamp}&nonce={nonce0:x4}{nonce1:x4}{nonce2:x4}{nonce3:x4}&uid={uid}&host={host}&path={path}&hbody={body}&cid={clientId}");
+
+    public static string CaptureClientApiRequestSignature(
+        ReadOnlySpan<byte> key,
+        ReadOnlySpan<byte> query) =>
+        Convert.ToHexString(System.Security.Cryptography.HMACSHA1.HashData(key, query))
+            .ToLowerInvariant();
 
     public static string? CaptureUrlHostPortLookupKey(Red5ParsedUrl? url) =>
         url is { } parsed

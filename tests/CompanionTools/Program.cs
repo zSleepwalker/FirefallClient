@@ -269,9 +269,9 @@ foreach (var entryCase in new (Red5ParsedUrl? Url, int Value, string Expected)[]
         "api.example.com:8443=12"),
     (null, 99, "")
 })
-    Check($"ClientApi URL lookup entries: {entryCase.Expected}",
-        string.Join(",", Red5LoggingBridgeNativeLayout.CaptureUrlLookupEntries(
-            entryCase.Url, entryCase.Value).Select(entry => $"{entry.Key}={entry.Value}"))
+    Check($"ClientApi server clock-offset entries: {entryCase.Expected}",
+        string.Join(",", Red5LoggingBridgeNativeLayout.CaptureClientApiServerClockOffsetEntries(
+            entryCase.Url, entryCase.Value).Select(entry => $"{entry.Key}={entry.OffsetSeconds}"))
         == entryCase.Expected);
 foreach (var suffixCase in new (Red5ParsedUrl? Url, string Expected)[]
 {
@@ -284,6 +284,22 @@ foreach (var suffixCase in new (Red5ParsedUrl? Url, string Expected)[]
     Check($"ClientApi URL suffix lookup candidates: {suffixCase.Expected}",
         string.Join(",", Red5LoggingBridgeNativeLayout.CaptureDefaultPortHostSuffixLookupKeys(
             suffixCase.Url)) == suffixCase.Expected);
+Check("ClientApi adjusted request timestamp applies the signed server clock offset with 32-bit wraparound",
+    Red5LoggingBridgeNativeLayout.CaptureClientApiAdjustedTimestamp(1_700_000_000, -300)
+        == 1_699_999_700
+    && Red5LoggingBridgeNativeLayout.CaptureClientApiAdjustedTimestamp(int.MaxValue, 1)
+        == int.MinValue);
+Check("ClientApi request query formats adjusted time, four nonce words, and 64-bit client ID",
+    Red5LoggingBridgeNativeLayout.CaptureClientApiRequestQuery(
+        1_700_000_000, 1, 0xABCD, 15, ushort.MaxValue,
+        "user", "api.example.com", "/v1", "x=1", ulong.MaxValue)
+    == "ver=2&tc=1700000000&nonce=0001abcd000fffff&uid=user&host=api.example.com"
+        + "&path=/v1&hbody=x=1&cid=18446744073709551615");
+Check("ClientApi signatures use lowercase-hex HMAC-SHA1",
+    Red5LoggingBridgeNativeLayout.CaptureClientApiRequestSignature(
+        System.Text.Encoding.ASCII.GetBytes("key"),
+        System.Text.Encoding.ASCII.GetBytes("The quick brown fox jumps over the lazy dog"))
+    == "de7c9b85b8b78aa6bc8a7a36f70a90701c9db4d9");
 foreach (var escapeCase in new (byte[] Input, string Expected)[]
 {
     (Array.Empty<byte>(), ""),
@@ -2047,6 +2063,33 @@ if (args.Length == 2)
     Check("Original ClientApi URL lookup format literal",
         client.Ascii(Red5LoggingBridgeNativeLayout.ClientApiRequestUrlLookupFormatVa)
             == "%s:%d");
+    Check("Original ClientApi request query format literal",
+        client.Ascii(Red5LoggingBridgeNativeLayout.ClientApiRequestQueryFormatVa)
+            == Red5LoggingBridgeNativeLayout.ClientApiRequestQueryNativeFormat);
+    Check("Original ClientApi uses rand and CryptoAPI SHA-1 for the request nonce and signatures",
+        client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiRequestRandImportVa, "rand")
+        && client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiRequestHashCreateImportVa,
+            "CryptCreateHash")
+        && client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiRequestHashDataImportVa,
+            "CryptHashData")
+        && client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiRequestHashGetValueImportVa,
+            "CryptGetHashParam")
+        && client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiRequestHashDestroyImportVa,
+            "CryptDestroyHash")
+        && client.Ascii(Red5LoggingBridgeNativeLayout.ClientApiRequestSignatureHexDigitsVa)
+            == "0123456789abcdef");
+    Check("Original ClientApi learns a per-host clock offset from the HTTP Date header",
+        client.Calls(Red5LoggingBridgeNativeLayout.ClientApiPumpRequestWorkerRaw + 0x831 + 0x400C00,
+            Red5LoggingBridgeNativeLayout.ClientApiRequestDateHeaderParserRaw + 0x400C00)
+        && client.Ascii(Red5LoggingBridgeNativeLayout.ClientApiRequestDateHeaderNameVa) == "date"
+        && client.Ascii(Red5LoggingBridgeNativeLayout.ClientApiRequestDateHeaderFormatVa)
+            == "%3s, %d %3s %d %d:%d:%d %3s"
+        && client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiRequestTimeImportVa, "_time64")
+        && client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiRequestDateScanImportVa, "sscanf")
+        && client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiRequestMonthCompareImportVa,
+            "_strnicmp")
+        && client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiRequestUtcTimeImportVa,
+            "_mkgmtime64"));
     Check("Original client URL message builder escapes host, path and configured identifier components",
         client.Calls(Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlMessageBuilderRaw + 0xFD + 0x400C00,
             Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlComponentEscapeRaw + 0x400C00)
