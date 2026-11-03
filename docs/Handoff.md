@@ -2799,3 +2799,28 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   named subscribers for numeric events, or the pre-existing parser/receiver
   mismatch. Read-only IDA works through the existing `ida_rpc.py` helper
   even though this session's built-in MCP client initialization fails.
+
+## Structured-chat case12 state update follow-up
+
+- Verified case12's owner state at `+0x1FC`: unsigned-QWORD tree keys at
+  node `+0x10`, stored map at node `+0x18`. `0x6F6600` is a key count,
+  not the decompiler's apparent constant0: `0x701630` writes a local through
+  ECX before the caller reloads it. The original instructions are checked.
+- Equality `0x6FE010 -> 0x6E2060 -> 0x6FD3E0` is outer-key lookup plus
+  positional DWORD vector equality plus inner-set membership equality.
+  Vector order matters; outer map and inner set iteration order do not.
+- Existing equal maps skip assignment/notification; existing changed maps
+  assign and notify. A missing owner key with a nonempty decoded map
+  assigns and notifies; an empty decoded map still creates/stores an entry
+  but skips notification. The post-decode C# capture records this decision.
+- Numeric event268 carries the same QWORD as `chatId` and `entityId`.
+  Named subscribers and the gameplay meaning remain unresolved.
+- Normal copy paths replace rather than merge: repeated outer payload
+  keys get the later vector/set, including clearing on empty input.
+  The owner-map copy clears its old entries too. No allocator failure
+  recovery, valid runtime delivery of selector0x76, or wire parser is
+  claimed.
+- Next focused trace: resolve `0x48C2B0`'s case12 prerequisite and its other
+  structured-chat callers, or find event268's named subscriber. Keep the
+  original selector0x76 `slBlob`/record-range mismatch separate from these
+  already-decoded consumer decisions.

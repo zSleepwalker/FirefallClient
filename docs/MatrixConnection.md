@@ -7291,8 +7291,8 @@ The destination outer node's value begins at node `+0xC`
 at value `+0x20` is assigned through `0x706C20`. The reader selects or inserts
 the outer node before these assignments. Do not apply the inner set's
 duplicate rejection policy to outer keys: their lookup/assignment path is
-different. Full replacement behavior of those assignment helpers is not
-reconstructed here.
+different. The assignment-helper follow-up below establishes replacement on
+their normal successful copy paths.
 
 The decompiler's `JUMPOUT(0x70A4B1)` is explained by an exception path:
 
@@ -7330,6 +7330,78 @@ The 19 case targets and all payload shapes now have direct traces, including
 these nested structures. Open work is semantic: owner state update/compare
 helpers, callback names for numeric event codes, the localized text inputs,
 and the still-unresolved Character selector0x76 parser/receiver mismatch.
+
+### Case12 stored-map equality and notification gate
+
+The original instructions at raw `0x6E40D0..0x6E4213` establish case12's
+owner update route. A failed `0x48C2B0` prerequisite or failed payload reader
+returns false. After those gates, the owner collection is at `+0x1FC`
+(`0x6E410B`); it is an ordered tree keyed by an unsigned QWORD. Lookup/create
+helper `0x6F6420` compares the key at node `+0x10`, then returns its map at
+node `+0x18` (`0x6F6475`, `0x6F64A6`).
+
+| Existing owner key | Decoded map condition | Assignment | Event268 |
+|---|---|---|---|
+| Present | Equal to stored map | No | No |
+| Present | Different, including replacement with an empty map | Yes | Yes |
+| Absent | Nonempty | Create owner entry and assign | Yes |
+| Absent | Empty | Create owner entry and assign empty map | No |
+
+`0x6E4131` calls outer equality helper `0x6FE010`; a true result branches
+directly to cleanup at `0x6E41B8`. A changed map goes through `0x6F9840` at
+`0x6E414F` before notification. The absent-key branch tests decoded outer
+count at `0x6E41CA`; zero takes the separate assignment at `0x6E41EC`, then
+returns true without passing the notification code. Thus a successful case
+return is not evidence that an event was emitted.
+
+The equality chain is structural, not a bytewise comparison of native
+allocations or hash bucket order:
+
+- `0x6FE010` compares outer entry counts, looks up each DWORD key through
+  `0x7001E0`, and compares the paired values through `0x6E2060`.
+  Outer entry iteration order does not determine equality.
+- `0x6E2060` compares vector element counts and then each DWORD in order
+  (`0x6E2090..0x6E209C`), so reordered vector elements can change the map.
+  Allocator/capacity state and native padding are not compared. The native
+  length check masks off the low two bits of byte-length differences;
+  element-count equality here assumes the valid DWORD ranges established
+  by decoding, not arbitrary malformed native pointers.
+- For the key set at value `+0x20`, `0x6FD3E0` compares counts and looks up
+  each DWORD key through `0x6F6B00`. Set insertion order is irrelevant;
+  membership is what is checked. These are valid decoded unique-key sets,
+  given the duplicate rejection established above.
+
+The event stores the same caller-provided QWORD under literal keys
+`chatId` (VA `0x1B6E454`) and `entityId` (VA `0x1B6E448`), then dispatches
+numeric268 through the application manager's slot `+0xAC`
+(`0x6E419C..0x6E41A3`). No named event/subscriber or gameplay meaning is
+inferred from those two field names.
+
+Replacement helpers also explain repeated outer payload keys:
+`0x7057C3..0x7057DA` selects an existing keyed node when found, then both
+new and existing nodes reach the same value assignment. Vector assignment
+`0x47A770` copies source elements and sets the destination end; an empty
+source resets that end to begin at `0x47A7B0..0x47A7B2`. Set assignment
+`0x706C20` clears destination nodes/count at `0x706C65..0x706C8B` before
+copying source keys through `0x707540`. Thus, on successful normal copies,
+later entries for the same outer key replace both nested collections,
+rather than merging them. The owner-map assignment `0x6F9840` similarly
+clears the old map via `0x6FB070`, then copies the new entries through
+`0x6FF6A0`. Allocation/error behavior is not replaced with managed fallback
+values in the saved capture.
+
+One important decompiler limitation: `0x6F6600` initially appears to return
+constant0. Its instructions instead initialize an output local at
+`0x6F6612`, pass its address in ECX to range-count helper `0x701630`, and
+reload it at `0x6F662A`. The helper writes the count through ECX at
+`0x701691`. Treating the decompiler's constant as authoritative would
+incorrectly eliminate the entire existing-key equality branch.
+
+`StructuredChatMessageNativeLayout.CaptureCase12MapUpdate` captures the
+decision only after the owner prerequisite and decode succeed. It does not
+parse bytes, perform native lookups/copies, or dispatch an event. Binary
+checks anchor the nested equality, output-local count, assignment paths,
+two literal field names, and notification suppression branches.
 
 ## Post-notification chat file log and folded hash
 

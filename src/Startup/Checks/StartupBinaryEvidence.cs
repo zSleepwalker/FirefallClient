@@ -9562,6 +9562,68 @@ internal static class StartupBinaryEvidence
             && ReadCStringAscii(
                 StructuredChatCollectionNativeLayout.UnpackExceptionPointerTypeDescriptorVirtualAddress + 8, 40)
                     == StructuredChatCollectionNativeLayout.UnpackExceptionPointerRttiName);
+        check("Binary structured chat case12 compares existing maps and suppresses notification when equal",
+            Matches(0x6E410B, "81C7FC010000")
+            && RelativeBranchTargets(0x6E4114, 0xE8,
+                StructuredChatMessageNativeLayout.Case12OwnerKeyCountFileOffset)
+            && RelativeBranchTargets(0x6E4124, 0xE8,
+                StructuredChatMessageNativeLayout.Case12OwnerFindOrCreateFileOffset)
+            && RelativeBranchTargets(0x6E4131, 0xE8,
+                StructuredChatMessageNativeLayout.Case12MapEqualsFileOffset)
+            && Matches(0x6E4136, "84C0757E")
+            && RelativeBranchTargets(0x6E414F, 0xE8,
+                StructuredChatMessageNativeLayout.Case12MapAssignmentFileOffset)
+            && Matches(0x6E41CA, "83BDBCFEFFFF000F8563FFFFFF")
+            && RelativeBranchTargets(0x6E41DA, 0xE8,
+                StructuredChatMessageNativeLayout.Case12OwnerFindOrCreateFileOffset)
+            && RelativeBranchTargets(0x6E41EC, 0xE8,
+                StructuredChatMessageNativeLayout.Case12MapAssignmentFileOffset)
+            && RelativeBranchTargets(0x6E41FE, 0xE9, 0x6E3AF4));
+        check("Binary structured chat case12 event268 copies the same QWORD into chatId and entityId",
+            Matches(0x6E4169, "FF7304FF336854E4B601")
+            && Matches(0x6E4178, "FF73048D8D2CFFFFFFFF336848E4B601")
+            && ReadCStringAscii(0x1B6E454, 7) == StructuredChatMessageNativeLayout.Case12ChatIdField
+            && ReadCStringAscii(0x1B6E448, 9) == StructuredChatMessageNativeLayout.Case12EntityIdField
+            && Matches(0x6E419C, "680C0100008B01FF90AC000000"));
+        check("Binary structured chat case12 outer equality is count, key lookup, and nested value equality",
+            Matches(0x6FE014, "8B4104538BDA3B43047407")
+            && RelativeBranchTargets(0x6FE03A, 0xE8, 0x7001E0)
+            && Matches(0x6FE03F, "8B45FC3B03741F")
+            && Matches(0x6FE046, "8D4E0C518D480C")
+            && RelativeBranchTargets(0x6FE04D, 0xE8,
+                StructuredChatMessageNativeLayout.Case12ValueEqualsFileOffset)
+            && Matches(0x700212, "8B42083B037404"));
+        check("Binary structured chat case12 nested vectors compare ordered DWORDs and nested sets compare membership",
+            Matches(0x6E207D, "2BD033F2F7C6FCFFFFFF7535")
+            && Matches(0x6E2090, "8B083B0C07752783C004")
+            && Matches(0x6E20A1, "8D51208B4DFC83C120")
+            && RelativeBranchTargets(0x6E20AA, 0xE8,
+                StructuredChatMessageNativeLayout.Case12KeySetEqualsFileOffset)
+            && Matches(0x6FD3E4, "8B4104538BDA3B43047407")
+            && RelativeBranchTargets(0x6FD40A, 0xE8, 0x6F6B00)
+            && Matches(0x6FD40F, "8B033945FC740F")
+            && Matches(0x6F6B32, "8B42083B037404"));
+        check("Binary structured chat case12 count helper updates an output local before returning it",
+            RelativeBranchTargets(0x6F660D, 0xE8, 0x6F9680)
+            && Matches(0x6F6612, "C74508000000008D4D08")
+            && RelativeBranchTargets(0x6F6625, 0xE8, 0x701630)
+            && Matches(0x6F662A, "8B4508")
+            && Matches(0x701640, "568B3746")
+            && Matches(0x701691, "8937")
+            && Matches(0x6F6474, "5F8D4618")
+            && Matches(0x6F64A6, "83C018"));
+        check("Binary structured chat case12 assignments replace rather than merge decoded collections",
+            Matches(0x7057C3, "3B58087404")
+            && Matches(0x7057D8, "3BC27554")
+            && RelativeBranchTargets(0x705839, 0xE8,
+                StructuredChatCollectionNativeLayout.Case12VectorAssignmentFileOffset)
+            && RelativeBranchTargets(0x705849, 0xE8,
+                StructuredChatCollectionNativeLayout.Case12KeySetAssignmentFileOffset)
+            && Matches(0x47A7A7, "8B138B43043BD0751B8B07894704")
+            && Matches(0x706C65, "8B078B0889008B07894004C7470400000000")
+            && RelativeBranchTargets(0x706CC0, 0xE8, 0x707540)
+            && RelativeBranchTargets(0x6F9885, 0xE8, 0x6FB070)
+            && RelativeBranchTargets(0x6F98BD, 0xE8, 0x6FF6A0));
         check("Binary structured chat case1 localizes CHAT_DUEL_RESULT and forwards it to chat display",
             ReadCStringAscii(StructuredChatMessageNativeLayout.DuelResultTemplateVirtualAddress, 17)
                 == StructuredChatMessageNativeLayout.DuelResultTemplate

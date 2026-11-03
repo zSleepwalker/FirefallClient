@@ -20,6 +20,8 @@ public static class StructuredChatCollectionNativeLayout
     public const uint Case12KeySetReaderFileOffset = 0x70A340;
     public const uint Case12KeySetClearFileOffset = 0x70A2E0;
     public const uint Case12KeySetInsertFileOffset = 0x38EC20;
+    public const uint Case12VectorAssignmentFileOffset = 0x47A770;
+    public const uint Case12KeySetAssignmentFileOffset = 0x706C20;
     public const int Case12KeyWireByteCount = 4;
     public const int Case12MinimumPayloadByteCount = 1;
     public const int Case12MinimumEntryWireByteCount = 6;

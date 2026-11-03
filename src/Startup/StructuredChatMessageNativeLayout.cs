@@ -29,6 +29,11 @@ public readonly record struct StructuredChatPendingNotificationSnapshot(
     int OwnerCollectionOffset,
     string? StatusType);
 
+public readonly record struct StructuredChatMapUpdateSnapshot(
+    bool CompareExistingMap,
+    bool AssignDecodedMap,
+    int? EventCode);
+
 /// <summary>
 /// Observed structured-chat dispatch behind the nonzero optional-data branch
 /// of 0x6E2590. These are consumer cases, not a reconstruction of selector
@@ -63,6 +68,18 @@ public static class StructuredChatMessageNativeLayout
     public const int Case10OptionalValueNativeExtent = 32;
     public const uint Case5PayloadReaderFileOffset = 0x709750;
     public const int Case5MinimumPayloadByteCount = 37;
+    public const int Case12MapChangedNotificationCode = 268;
+    public const int Case12OwnerCollectionOffset = 0x1FC;
+    public const int Case12OwnerNodeKeyOffset = 0x10;
+    public const int Case12OwnerNodeValueOffset = 0x18;
+    public const string Case12ChatIdField = "chatId";
+    public const string Case12EntityIdField = "entityId";
+    public const uint Case12OwnerKeyCountFileOffset = 0x6F6600;
+    public const uint Case12OwnerFindOrCreateFileOffset = 0x6F6420;
+    public const uint Case12MapEqualsFileOffset = 0x6FE010;
+    public const uint Case12ValueEqualsFileOffset = 0x6E2060;
+    public const uint Case12KeySetEqualsFileOffset = 0x6FD3E0;
+    public const uint Case12MapAssignmentFileOffset = 0x6F9840;
 
     /// <summary>Case5 fields in wire order, with the optional member between native +0x20 and +0x40.</summary>
     public static IReadOnlyList<StructuredChatPayloadFieldSnapshot> Case5FixedFields { get; } =
@@ -191,6 +208,17 @@ public static class StructuredChatMessageNativeLayout
         decodedFlag != 0
             ? new(PendingIncomingNotificationCode, 0x34, PendingIncomingStatus)
             : new(PendingOtherNotificationCode, 0x28, null);
+
+    /// <summary>
+    /// Captures case12 after the owner prerequisite and payload reader succeed.
+    /// An absent owner entry is created even when its decoded map is empty.
+    /// The equality input is used only when an owner entry already exists.
+    /// </summary>
+    public static StructuredChatMapUpdateSnapshot CaptureCase12MapUpdate(
+        bool ownerKeyPresent, uint decodedOuterEntryCount, bool mapsEqual) =>
+        ownerKeyPresent
+            ? new(true, !mapsEqual, mapsEqual ? null : Case12MapChangedNotificationCode)
+            : new(false, true, decodedOuterEntryCount == 0 ? null : Case12MapChangedNotificationCode);
 
     public static int Case5OptionalConsumedByteCount(byte presence) =>
         1 + (presence == 0 ? 0 : Case5OptionalValueWireByteCount);

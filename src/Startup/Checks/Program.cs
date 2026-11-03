@@ -106,6 +106,25 @@ Check("Structured chat case12 has a four-byte key and two independently counted 
     && StructuredChatCollectionNativeLayout.Case12NativeValueKeySetOffset == 32
     && StructuredChatCollectionNativeLayout.UnpackExceptionPointerRttiName
         == ".PAVunpack_exception@serialize@sl@@");
+Check("Structured chat case12 preserves owner layout and both notification field names",
+    StructuredChatMessageNativeLayout.Case12OwnerCollectionOffset == 0x1FC
+    && StructuredChatMessageNativeLayout.Case12OwnerNodeKeyOffset == 0x10
+    && StructuredChatMessageNativeLayout.Case12OwnerNodeValueOffset == 0x18
+    && StructuredChatMessageNativeLayout.Case12ChatIdField == "chatId"
+    && StructuredChatMessageNativeLayout.Case12EntityIdField == "entityId");
+foreach (bool ownerKeyPresent in new[] { false, true })
+foreach (uint decodedEntryCount in new uint[] { 0, 1, 255, 256, uint.MaxValue })
+foreach (bool mapsEqual in new[] { false, true })
+{
+    var update = StructuredChatMessageNativeLayout.CaptureCase12MapUpdate(
+        ownerKeyPresent, decodedEntryCount, mapsEqual);
+    bool expectedAssign = !ownerKeyPresent || !mapsEqual;
+    bool expectedNotify = ownerKeyPresent ? !mapsEqual : decodedEntryCount != 0;
+    Check($"Structured chat case12 existing={ownerKeyPresent}, entries={decodedEntryCount}, equal={mapsEqual}",
+        update.CompareExistingMap == ownerKeyPresent
+        && update.AssignDecodedMap == expectedAssign
+        && update.EventCode == (expectedNotify ? 268 : (int?)null));
+}
 Check("All three observed app modes are cataloged", AppModeCatalog.KnownModes.SequenceEqual(expected));
 Check("Mode 1 maps to tfLogin", AppModeCatalog.Find(1) == expected[0]);
 Check("Mode 2 maps to tfWorld", AppModeCatalog.Find(2) == expected[1]);
