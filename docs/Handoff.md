@@ -2946,3 +2946,30 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   follow DumpTruck's hardware-report sink into compression.
 - Validation: solution build has zero warnings/errors;57 companion checks
   pass with the nine samples and26 pure checks pass without samples.
+
+## Companion source bytes and memory metrics
+
+- RedHanded source stream `0x10006` comes from exception parameters, not
+  a proven codec. Codes `0x012ED500/501` require parameter count >=2;
+  parameter0 is byte count, parameter1 is remote address. Length <=1024
+  reaches ReadProcessMemory (including zero); larger length is
+  `<<TOOLONG>>`, failed read is `<<BADMEM>>`, unrelated exception is
+  `EXCEPTION`, and null/insufficient-parameter input keeps
+  `<<UNSPECIFIED>>`. Code501 selects flags2 before count/length checks.
+- Added `CrashMetadataNativeLayout.cs` to preserve those gates without
+  accessing target memory. The native caller checks the API BOOL but
+  supplies no bytes-read pointer. `%s` output still truncates embedded NUL
+  and does not escape CRLF.
+- Preferred stream `0x10008` helper `0x406B60` pairs PDH Virtual Bytes with
+  ID Process counters, returning the full EDX:EAX QWORD (the decompiler's
+  LONG return type is misleading). Caller `0x407A3B` falls back only when
+  both halves are zero. Fallback reads x86 PROCESS_MEMORY_COUNTERS
+  PagefileUsage at+0x20 and zero-extends it, without checking API BOOL.
+  Preserve the distinct metrics and the observed post-call field value.
+- Stream `0x10009` separately chooses the unsigned full-QWORD minimum of
+  total-page-file and total-virtual memory, or zero on status failure.
+- Next bounded target: DumpTruck HWStats sink slot+0x18 and compression,
+  or the original client's source-exception producer. DeploymentCommon
+  managed loading remains a separate unresolved connection.
+- Validation: solution build has zero warnings/errors;400 companion checks
+  pass with the nine samples and364 pure checks pass without samples.

@@ -18,7 +18,7 @@ Static IDA analysis only. SHA256 `1FBD21966A9DA297AB46A061ECE94BE8F4822ACC103BF2
 - `rh::subsystem::DebuggerIntegrity` and IpcMessageHeader RTTI suggest a named-pipe link to the client and anti-tamper checks.
 
 ## Unresolved
-- Full `sub_406820` semantics, broader debugger IPC, use of WinVerifyTrust/Crypt*, remaining `--debug` effects, and decoded-source/process-memory metadata semantics.
+- Full `sub_406820` semantics, broader debugger IPC, use of WinVerifyTrust/Crypt*, remaining `--debug` effects, and the client-side producer of exception-supplied source bytes.
 
 The [companion handoff ledger](CompanionBinaryConnections.md) verifies that
 r5dumper's three decimal arguments are PID, dump flags, and inherited read handle.
@@ -29,3 +29,9 @@ build number, and environment mnemonic/name options. Stream `0x1000A` is the
 debug event's thread ID in both exception and RIP-event calls. Numeric option
 defaults replace only zero after `atoi`; negative nonzero values survive and
 are emitted with unsigned decimal formatting.
+Source stream `0x10006` reads at most1024 exception-supplied bytes for private
+codes `0x012ED500/501`, otherwise preserving explicit source markers.
+Memory stream `0x10008` prefers64-bit PDH Virtual Bytes, falling back only
+on zero to a zero-extended DWORD PagefileUsage; it is not uniformly a
+working-set measurement. See the ledger for the gates, API-result caveats,
+and the independent total-page-file/total-virtual ceiling in stream `0x10009`.

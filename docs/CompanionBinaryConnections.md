@@ -51,6 +51,7 @@ sample's actual PE sections rather than subtracting one shared constant.
 
 The companion projects already contain partial reconstructions. New source is
 `src\RedHanded\DumperHandoffNativeLayout.cs` and
+`src\RedHanded\CrashMetadataNativeLayout.cs`, plus
 `src\R5Dumper\UserStreamNativeLayout.cs`; hardware pipe facts extend
 `src\DumpTruck\DumpTruckLayout.cs`. No new wire parser, process launcher,
 dump writer, or uploader is introduced.
@@ -129,9 +130,9 @@ the actual bytes, preserved in checks, are authoritative.
 | `0x10003` | str | Environment name, owner `+0x30` | `0x407BFB / 0x6FFB` |
 | `0x10004` | i32 | Source revision, owner `+0x24` | `0x407C92 / 0x7092` |
 | `0x10005` | i32 | Build number, owner `+0x28` | `0x407D30 / 0x7130` |
-| `0x10006` | str | Decoded debug source | `0x407DCF / 0x71CF` |
+| `0x10006` | str | Exception-supplied source bytes or explicit marker | `0x407DCF / 0x71CF` |
 | `0x10007` | str | Handler message argument | `0x407E68 / 0x7268` |
-| `0x10008` | i64 | Process memory measurement, with fallback | `0x407F08 / 0x7308` |
+| `0x10008` | i64 | PDH Virtual Bytes, or DWORD PagefileUsage when preferred result is zero | `0x407F08 / 0x7308` |
 | `0x10009` | i64 | Minimum total-page-file/total-virtual memory, or0 on status failure | `0x407FA3 / 0x73A3` |
 | `0x1000A` | i32 | Debug event's thread ID | `0x40803D / 0x743D` |
 | `0x1000B` | str | Application name, owner `+0x20` | `0x4080DF / 0x74DF` |
@@ -174,8 +175,77 @@ or chance flag. For case9 the exception-record argument is null; the
 thread ID still comes from the same debug event.
 
 These are static data-flow conclusions with instruction-byte checks.
-The exact meaning of decoded-source stream `0x10006` and the process-memory
-measurement/fallback stream `0x10008` still needs its own bounded trace.
+
+### Source bytes and explicit source markers
+
+Stream `0x10006` is not decoded by an observed codec. The handler copies
+exception-supplied bytes from the monitored process, or substitutes one of
+four fixed marker strings. The source starts as `<<UNSPECIFIED>>` at
+VA `0x407871..0x40788A`, with dump flags `0x40`.
+
+| Exception-record condition | Source result | Flags / read behavior |
+|---|---|---|
+| Null record (including the RIP-event caller) | `<<UNSPECIFIED>>` | `0x40`; no read |
+| Code other than `0x012ED500` or `0x012ED501` | `EXCEPTION` | `0x40`; no read |
+| Private code, fewer than2 parameters | `<<UNSPECIFIED>>` | `0x40` for code500, `2` for code501; no read |
+| Private code, at least2 parameters, length greater than1024 | `<<TOOLONG>>` | Same code-dependent flags; no read |
+| Private code, at least2 parameters, length0..1024, read succeeds | Requested source bytes | Same flags; read attempted |
+| Same length/count gates, read fails | `<<BADMEM>>` | Same flags; read attempted |
+
+These are the original 32-bit `EXCEPTION_RECORD` offsets: `+0` exception
+code, `+0x10` NumberParameters, `+0x14` ExceptionInformation[0] (byte count),
+and `+0x18` ExceptionInformation[1] (remote address). Native instructions
+`0x40789A..0x4078C9` test the codes, count, and **unsigned** byte limit;
+code501 switches flags before the count/length gates.
+`0x4078E9` writes a local NUL at the requested length. `ReadProcessMemory`
+at `0x407910` reads from the supplied remote address and receives a null
+bytes-read pointer. The caller tests its BOOL result, not a separately
+verified exact byte count. Zero-length input reaches that call too; this
+is a control-flow fact, not a prediction of API success for arbitrary handles.
+
+Failure markers are literal strings at VA `0x5456B0`, `0x5456D8`,
+`0x5456CC`, and `0x5456C0`. Source output eventually uses `%s` in the
+metadata formatter, so embedded NUL terminates its text representation
+and CRLF is not escaped. The source-address origin on the client side and
+any higher-level meaning of those bytes remain untraced.
+`CaptureDebugSource` saves only these decisions, not remote-memory access.
+
+### Memory values are two different measurements
+
+Stream `0x10008` prefers the full 64-bit result of helper
+VA `0x406B60` / raw `0x5F60`. That helper derives the executable's basename,
+expands `\Process(<basename>*)\Virtual Bytes` via PDH, and pairs candidates
+with `ID Process` counters. After `PdhCollectQueryData`, it obtains each PID
+with `PDH_FMT_LONG` (`0x100`) and matches the requested DWORD PID.
+For the first match it reads Virtual Bytes with `PDH_FMT_LARGE` (`0x400`).
+The literal paths and the PID comparison are anchored at `0x406CFD`,
+`0x406E84`, and `0x406F36..0x406F72`.
+`0x406F7C..0x406F87` loads both halves of the counter value; the return at
+`0x406FD5..0x406FD8` is **EDX:EAX**, not the decompiler's apparent
+32-bit `LONG`. The formatted-value API status is tested, but its returned
+`CStatus` is not independently checked in this path.
+
+At caller `0x407A26`, a nonzero result in either half is preserved.
+Only when **both** halves are zero (`0x407A3B..0x407A42`) does it call
+`GetProcessMemoryInfo` with a zero-initialized40-byte x86
+`PROCESS_MEMORY_COUNTERS`. It reads `PagefileUsage` at structure `+0x20`
+(`0x407A7A`) and zero-extends that DWORD to the stream's64-bit value.
+This is not WorkingSetSize and is not equivalent to Virtual Bytes.
+The native caller does not test the PSAPI BOOL before reading the field;
+the reconstruction accepts the observed post-call DWORD rather than
+claiming a failed API can never have modified it.
+The stream formatter pushes the saved high and low halves at
+`0x407EF6` and `0x407F02`, using unsigned `%llu` with no clipping.
+Thus even a nonzero signed-negative PDH bit pattern is forwarded unchanged.
+`CaptureProcessMemory` explicitly reports which metric was selected.
+
+Stream `0x10009` is separate: `GlobalMemoryStatusEx` at `0x4079AE` produces
+the unsigned minimum of ullTotalPageFile and ullTotalVirtual. Their native
+offsets from the64-byte structure are `+0x18` and `+0x28`.
+High-half comparisons precede low-half comparisons at
+`0x4079B8..0x4079D5`, so this is not a low-DWORD comparison.
+API failure selects the zero QWORD initialized at `0x407988`, not either
+structure field. `CaptureMemoryCeiling` preserves that distinction.
 
 ### Receiver tokenization and native descriptors
 
@@ -250,7 +320,7 @@ exports. They do not execute any target or contact a service. Without
 `--samples`, only the pure managed decisions and metadata checks run,
 with an explicit notice that binary evidence was not checked.
 
-Next bounded traces: decoded-source and process-memory metadata semantics;
+Next bounded traces: the client-side source-address producer;
 the DumpTruck sink's compression boundary and interpretation of its return codes; and
 the managed loader/callers of DeploymentCommon. Static import absence is
 not used as a claim that all nine form one direct-load chain.

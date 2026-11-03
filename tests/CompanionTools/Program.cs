@@ -67,6 +67,52 @@ foreach (var counts in new (uint Requested, uint Written)[]
         && decision.TerminateExitCode == (complete ? null : (uint?)0xBADC0DE));
 }
 
+foreach (bool hasRecord in new[] { false, true })
+foreach (uint code in new uint[] { 0, 0xC0000005,
+    CrashMetadataNativeLayout.EmbeddedSourceExceptionCode,
+    CrashMetadataNativeLayout.FullMemorySourceExceptionCode })
+foreach (uint count in new uint[] { 0, 1, 2, uint.MaxValue })
+foreach (uint length in new uint[] { 0, 1, 1024, 1025, uint.MaxValue })
+foreach (bool readSucceeded in new[] { false, true })
+{
+    bool custom = code == 0x012ED500 || code == 0x012ED501;
+    bool read = hasRecord && custom && count >= 2 && length <= 1024;
+    uint flags = hasRecord && code == 0x012ED501 ? 2u : 0x40u;
+    DebugSourceKind kind = !hasRecord || (custom && count < 2)
+        ? DebugSourceKind.Unspecified
+        : !custom ? DebugSourceKind.Exception
+        : length > 1024 ? DebugSourceKind.TooLong
+        : readSucceeded ? DebugSourceKind.RemoteBytes : DebugSourceKind.BadMemory;
+    Check($"Source gate record={hasRecord}, code={code:X}, count={count}, length={length}, read={readSucceeded}",
+        CrashMetadataNativeLayout.CaptureDebugSource(hasRecord, code, count, length, readSucceeded)
+            == new DebugSourceDecision(kind, flags, read, read ? length : 0));
+}
+foreach (var measurement in new (ulong Preferred, uint PageFile, ulong Expected, bool Fallback)[]
+{
+    (0, 0, 0, true),
+    (0, 123, 123, true),
+    (0, uint.MaxValue, uint.MaxValue, true),
+    (1, uint.MaxValue, 1, false),
+    (0x100000000, 123, 0x100000000, false),
+    (ulong.MaxValue, 0, ulong.MaxValue, false)
+})
+{
+    Check($"Process-memory source preferred={measurement.Preferred}, pagefile={measurement.PageFile}",
+        CrashMetadataNativeLayout.CaptureProcessMemory(measurement.Preferred, measurement.PageFile)
+            == new ProcessMemoryMetadataDecision(measurement.Expected, measurement.Fallback));
+}
+foreach (bool success in new[] { false, true })
+foreach (var limits in new (ulong PageFile, ulong Virtual, ulong Expected)[]
+{
+    (0, 0, 0), (1, 2, 1), (2, 1, 1), (0x100000000, 0xFFFFFFFF, 0xFFFFFFFF),
+    (0xFFFFFFFF, 0x100000000, 0xFFFFFFFF), (ulong.MaxValue, ulong.MaxValue, ulong.MaxValue)
+})
+{
+    Check($"Memory ceiling status={success}, pagefile={limits.PageFile}, virtual={limits.Virtual}",
+        CrashMetadataNativeLayout.CaptureMemoryCeiling(success, limits.PageFile, limits.Virtual)
+            == (success ? limits.Expected : 0));
+}
+
 if (args.Length == 2)
 {
     string root = args[1];
@@ -164,6 +210,52 @@ if (args.Length == 2)
         && red.Matches(0x407670, "898DC4FCFFFF")
         && red.Matches(0x408031, "FFB5C4FCFFFF")
         && red.Matches(0x40803D, "680A000100"));
+    Check("Source reads require a private exception, two parameters, and length at most1024",
+        red.Matches(0x40789A, "8B062D00D52E01741748740A")
+        && red.Matches(0x4078B0, "C785CCFCFFFF02000000")
+        && red.Matches(0x4078BA, "837E1002727C8B761481FE000400007761")
+        && red.Matches(0x407908, "FF7018")
+        && red.Matches(CrashMetadataNativeLayout.ReadSourceCallVa, "FF15BC405400")
+        && red.ImportSlotNames(0x5440BC, "ReadProcessMemory")
+        && red.Matches(0x407916, "85C07528"));
+    Check("Source failures use explicit markers rather than fabricated source text",
+        red.Ascii(0x5456B0) == CrashMetadataNativeLayout.UnspecifiedSourceMarker
+        && red.Ascii(0x5456C0) == CrashMetadataNativeLayout.BadMemorySourceMarker
+        && red.Ascii(0x5456CC) == CrashMetadataNativeLayout.TooLongSourceMarker
+        && red.Ascii(0x5456D8) == CrashMetadataNativeLayout.ExceptionSourceMarker
+        && red.Matches(0x407871, "68B0565400")
+        && red.Matches(0x4078A6, "68D8565400")
+        && red.Matches(0x40791A, "68C0565400")
+        && red.Matches(0x40792C, "68CC565400"));
+    Check("PDH identifies the process before reading a LARGE Virtual Bytes counter",
+        red.Ascii(0x545468) == CrashMetadataNativeLayout.VirtualBytesCounterPattern
+        && red.Matches(0x406CFD, "6868545400")
+        && red.Ascii(0x545484) == CrashMetadataNativeLayout.ProcessIdCounterName
+        && red.Matches(0x406E84, "6884545400")
+        && red.ImportSlotNames(0x54497C, "PdhGetFormattedCounterValue")
+        && red.Matches(0x406F1A, "8B1D7C495400")
+        && red.Matches(0x406F36, "6800010000")
+        && red.Matches(0x406F48, "398560F7FFFF7411")
+        && red.Matches(0x406F6A, "6800040000FF760CFFD3")
+        && red.Matches(0x406F7C, "8B9D50F7FFFF8BB554F7FFFF")
+        && red.Matches(0x406FD5, "8BC38BD6"));
+    Check("Zero in both preferred-result halves selects unchecked DWORD PagefileUsage",
+        red.Calls(CrashMetadataNativeLayout.ProcessVirtualBytesCallVa,
+            CrashMetadataNativeLayout.ProcessVirtualBytesVa)
+        && red.Matches(0x407A3B, "85C9755185C0754D")
+        && red.Matches(0x407A60, "C78534FDFFFF28000000")
+        && red.Matches(CrashMetadataNativeLayout.ProcessMemoryInfoCallVa, "FF15F8475400")
+        && red.ImportSlotNames(0x5447F8, "GetProcessMemoryInfo")
+        && red.Matches(0x407A7A, "8B8554FDFFFF8985BCFCFFFFC785E8FCFFFF00000000")
+        && red.Matches(0x407EF6, "FFB5E8FCFFFF")
+        && red.Matches(0x407F02, "FFB5BCFCFFFF"));
+    Check("Global memory ceiling compares full unsigned QWORDs and uses zero on API failure",
+        red.ImportSlotNames(0x5440B8, "GlobalMemoryStatusEx")
+        && red.Matches(0x4079AE, "FF15B840540085C07450")
+        && red.Matches(0x4079B8, "8B8510FDFFFF3B8520FDFFFF7729720E")
+        && red.Matches(0x4079C8, "8B850CFDFFFF3B851CFDFFFF7319")
+        && red.Matches(0x407988, "660F1385DCFCFFFF")
+        && red.Matches(0x407A08, "8B85E0FCFFFF8985B8FCFFFF8B85DCFCFFFF8985B4FCFFFF"));
     Check("r5dumper reads 512-byte chunks, appends as a C string, and extracts CRLF lines",
         dumper.Matches(0x401320, "6800020000")
         && dumper.ImportSlotNames(0x404008, "ReadFile")
