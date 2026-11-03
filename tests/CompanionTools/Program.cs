@@ -221,6 +221,11 @@ foreach (bool objectAvailable in new[] { false, true })
         == (objectAvailable
             ? Red5LuaWebValueAction.SetPropertyAsynchronously
             : Red5LuaWebValueAction.ReturnWithoutSettingForUnavailableObject));
+foreach (bool incomingFlag in new[] { false, true })
+foreach (bool ownerFlag in new[] { false, true })
+    Check($"Awesomium URL dispatch setup mode incoming={incomingFlag}, owner flag={ownerFlag}",
+        Red5LoggingBridgeNativeLayout.CaptureDispatchObjectSetupMode(incomingFlag, ownerFlag)
+        == (incomingFlag && ownerFlag ? 2 : 0));
 foreach (var filter in new (string? Value, Red5LuaUrlFilterAction Expected)[]
 {
     (null, Red5LuaUrlFilterAction.LogAndSkip),

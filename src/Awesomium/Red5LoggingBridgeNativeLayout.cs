@@ -245,6 +245,7 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint LuaUrlFilterDispatchObjectFirstArgumentFieldOffset = 0x9A4;
     public const uint LuaUrlFilterDispatchObjectSecondArgumentFieldOffset = 0x9A8;
     public const uint LuaUrlFilterDispatchObjectStorageFieldOffset = 0xA04;
+    public const uint LuaUrlFilterDispatchObjectSetupOwnerFlagOffset = 0x5C;
     public const uint LuaUrlFilterDispatchObjectSetupSlotByteOffset = 0x08;
     public const uint CallbackLogHelperRaw = 0x2FC4F0;
     public const uint CallbackUnknownLogHelperRaw = 0x2FCC60;
@@ -358,6 +359,9 @@ public static class Red5LoggingBridgeNativeLayout
         !string.IsNullOrEmpty(filter) && filter[^1] == '*'
             ? Red5LuaUrlFilterAction.StoreInReplacementList
             : Red5LuaUrlFilterAction.LogAndSkip;
+
+    public static int CaptureDispatchObjectSetupMode(bool incomingFlag, bool ownerFlag) =>
+        incomingFlag && ownerFlag ? 2 : 0;
 
     public static bool CaptureUrlFilterListMatch(
         IReadOnlyList<string> filters,
