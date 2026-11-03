@@ -52,6 +52,40 @@ public static class StructuredChatMessageNativeLayout
     public const int PendingIncomingNotificationCode = 345;
     public const int PendingOtherNotificationCode = 346;
     public const string PendingIncomingStatus = "PENDING_IN";
+    public const uint Case5OptionalReaderFileOffset = 0x709650;
+    public const uint Case10OptionalReaderFileOffset = 0x703910;
+    public const uint Case10OptionalAssignmentFileOffset = 0x6F7D20;
+    public const int OptionalValueNativeOffset = 8;
+    public const int Case5OptionalValueWireByteCount = 14;
+    public const int Case5OptionalCopyByteCount = 16;
+    public const int Case10OptionalValueWireByteCount = 28;
+    public const int Case10OptionalValueNativeExtent = 32;
+
+    /// <summary>Fields relative to the optional reader's temporary value, excluding its presence byte.</summary>
+    public static IReadOnlyList<StructuredChatPayloadFieldSnapshot> OptionalValueFields { get; } =
+        Array.AsReadOnly(new[]
+        {
+            new StructuredChatPayloadFieldSnapshot(0x709650, 0x00, 8, 8,
+                StructuredChatFieldEncoding.RawUInt64LittleEndian, 0x7096C8, 0x356F80),
+            new StructuredChatPayloadFieldSnapshot(0x709650, 0x08, 4, 4,
+                StructuredChatFieldEncoding.RawUInt32LittleEndian, 0x7096D3, 0x3370A0),
+            new StructuredChatPayloadFieldSnapshot(0x709650, 0x0C, 1, 1,
+                StructuredChatFieldEncoding.Byte, 0x7096DD, 0x337180),
+            new StructuredChatPayloadFieldSnapshot(0x709650, 0x0D, 1, 1,
+                StructuredChatFieldEncoding.Byte, 0x7096E7, 0x337180),
+            new StructuredChatPayloadFieldSnapshot(0x703910, 0x00, 4, 4,
+                StructuredChatFieldEncoding.RawUInt32LittleEndian, 0x703989, 0x3370A0),
+            new StructuredChatPayloadFieldSnapshot(0x703910, 0x08, 8, 8,
+                StructuredChatFieldEncoding.RawUInt64LittleEndian, 0x703994, 0x356F80),
+            new StructuredChatPayloadFieldSnapshot(0x703910, 0x10, 4, 4,
+                StructuredChatFieldEncoding.RawUInt32LittleEndian, 0x70399F, 0x3370A0),
+            new StructuredChatPayloadFieldSnapshot(0x703910, 0x14, 4, 4,
+                StructuredChatFieldEncoding.RawUInt32LittleEndian, 0x7039AA, 0x3568E0),
+            new StructuredChatPayloadFieldSnapshot(0x703910, 0x18, 4, 4,
+                StructuredChatFieldEncoding.RawUInt32LittleEndian, 0x7039B5, 0x3568E0),
+            new StructuredChatPayloadFieldSnapshot(0x703910, 0x1C, 4, 4,
+                StructuredChatFieldEncoding.RawUInt32LittleEndian, 0x7039C0, 0x3568E0)
+        });
 
     public static IReadOnlyList<StructuredChatPayloadFieldSnapshot> PayloadFields { get; } =
         Array.AsReadOnly(new[]
@@ -122,4 +156,10 @@ public static class StructuredChatMessageNativeLayout
         decodedFlag != 0
             ? new(PendingIncomingNotificationCode, 0x34, PendingIncomingStatus)
             : new(PendingOtherNotificationCode, 0x28, null);
+
+    public static int Case5OptionalConsumedByteCount(byte presence) =>
+        1 + (presence == 0 ? 0 : Case5OptionalValueWireByteCount);
+
+    public static int Case10OptionalConsumedByteCount(byte presence) =>
+        1 + (presence == 0 ? 0 : Case10OptionalValueWireByteCount);
 }

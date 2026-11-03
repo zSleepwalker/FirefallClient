@@ -49,6 +49,26 @@ Check("Structured chat pending flag treats every nonzero byte as incoming and om
             == (value == 0
                 ? new StructuredChatPendingNotificationSnapshot(346, 0x28, null)
                 : new StructuredChatPendingNotificationSnapshot(345, 0x34, "PENDING_IN"))));
+Check("Structured chat optional readers consume1 byte when absent and15/29 for every nonzero presence byte",
+    Enumerable.Range(0, 256).All(value =>
+        StructuredChatMessageNativeLayout.Case5OptionalConsumedByteCount((byte)value)
+            == (value == 0 ? 1 : 15)
+        && StructuredChatMessageNativeLayout.Case10OptionalConsumedByteCount((byte)value)
+            == (value == 0 ? 1 : 29)));
+Check("Structured chat optional values distinguish wire widths from native padding and copy extent",
+    StructuredChatMessageNativeLayout.OptionalValueFields.Count == 10
+    && StructuredChatMessageNativeLayout.OptionalValueFields
+        .Where(field => field.ReaderFileOffset == 0x709650)
+        .Sum(field => field.FixedWireByteCount) == 14
+    && StructuredChatMessageNativeLayout.OptionalValueFields
+        .Where(field => field.ReaderFileOffset == 0x703910)
+        .Sum(field => field.FixedWireByteCount) == 28
+    && StructuredChatMessageNativeLayout.OptionalValueFields
+        .Where(field => field.ReaderFileOffset == 0x703910)
+        .Select(field => field.NativeOffset).SequenceEqual([0, 8, 16, 20, 24, 28])
+    && StructuredChatMessageNativeLayout.Case5OptionalCopyByteCount == 16
+    && StructuredChatMessageNativeLayout.Case10OptionalValueNativeExtent == 32
+    && StructuredChatMessageNativeLayout.OptionalValueNativeOffset == 8);
 Check("All three observed app modes are cataloged", AppModeCatalog.KnownModes.SequenceEqual(expected));
 Check("Mode 1 maps to tfLogin", AppModeCatalog.Find(1) == expected[0]);
 Check("Mode 2 maps to tfWorld", AppModeCatalog.Find(2) == expected[1]);

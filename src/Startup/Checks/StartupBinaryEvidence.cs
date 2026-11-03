@@ -9437,6 +9437,39 @@ internal static class StartupBinaryEvidence
             && Matches(0x356D12, "8A008803FF4704")
             && Matches(0x3370C5, "890883460404")
             && Matches(0x356FA3, "8B0289018B420489410483460408"));
+        check("Binary structured chat optional fields call their primitive readers at the recorded offsets",
+            StructuredChatMessageNativeLayout.OptionalValueFields.All(field =>
+                RelativeBranchTargets(field.ReadCallFileOffset, 0xE8, field.ReadHelperFileOffset))
+            && RelativeBranchTargets(0x6FDDF6, 0xE8, 0x709750)
+            && RelativeBranchTargets(0x7097BE, 0xE8,
+                StructuredChatMessageNativeLayout.Case5OptionalReaderFileOffset)
+            && RelativeBranchTargets(0x6FDED5, 0xE8,
+                StructuredChatMessageNativeLayout.Case10OptionalReaderFileOffset)
+            && Matches(0x70396D, "8D45D8")
+            && Matches(0x70398E, "8D45E0")
+            && Matches(0x703999, "8D45E8")
+            && Matches(0x7039A4, "8D45EC")
+            && Matches(0x7039AF, "8D45F0")
+            && Matches(0x7039BA, "8D45F4")
+            && Matches(0x7096AD, "8D45E8")
+            && Matches(0x7096CD, "8D45F0")
+            && Matches(0x7096D8, "8D55F4")
+            && Matches(0x7096E2, "8D55F5"));
+        check("Binary structured chat optional readers branch on nonzero presence and clear only the absent flag",
+            Matches(0x703966, "FF4F0884C9746A")
+            && Matches(0x7039D7, "803B007403C60300")
+            && Matches(0x7096A6, "FF4F0884C9746F")
+            && Matches(0x70971C, "803B007403C60300")
+            && RelativeBranchTargets(0x7039CB, 0xE8,
+                StructuredChatMessageNativeLayout.Case10OptionalAssignmentFileOffset)
+            && Matches(0x6F7D30, "8946088B4208894610")
+            && Matches(0x6F7D8E, "C60601"));
+        check("Binary structured chat case5 optional copies16 bytes after initializing and reading only14",
+            Matches(0x7096B0, "C745F0000000000F57C066C745F40000")
+            && Matches(0x7096C3, "660F1345E8")
+            && Matches(0x7096F1, "F30F6F45E8F30F7F4308")
+            && Matches(0x709709, "F30F6F45E8F30F7F00")
+            && Matches(0x709712, "C60301"));
         check("Binary structured chat case1 localizes CHAT_DUEL_RESULT and forwards it to chat display",
             ReadCStringAscii(StructuredChatMessageNativeLayout.DuelResultTemplateVirtualAddress, 17)
                 == StructuredChatMessageNativeLayout.DuelResultTemplate

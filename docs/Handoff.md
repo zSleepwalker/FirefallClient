@@ -2741,3 +2741,20 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   (case10 optional record), `0x705570` (case12 chunked map), plus the
   case14/17 collection helpers. Keep these consumer payloads separate from
   selector0x76's still-unresolved parser/receiver representation mismatch.
+
+## Structured-chat optional-value follow-up
+
+- Case5's nested optional (`0x709650`, destination+28) and case10's optional
+  (`0x703910`) now have exact wire/native ledgers and binary checks.
+  Any nonzero presence byte reads14/28 value bytes (15/29 with presence);
+  zero consumes one byte and clears only an existing native flag.
+- Case10 has a four-byte native alignment gap before its QWORD, but no
+  corresponding wire padding. Its assignment helper `0x6F7D20` copies
+  fields, not that padding.
+- Case5 initializes/reads14 temporary bytes and copies16 via SSE on both
+  assignment paths. The two-byte tail has no write on the traced local path.
+  Do not model it as extra wire bytes or claim a runtime consequence.
+- Saved constants, ten field descriptors, consumed-size helpers, exhaustive
+  presence checks, and source fingerprints in the existing structured-chat
+  layout/checks. Next: remaining case5 prefix/suffix fields, case9's
+  `0x709560`, case12's `0x705570`, and case14/17 collections.

@@ -7159,8 +7159,50 @@ width instructions, minimum sizes (`2/10/6/1/10/4/1`), and all 256 pending
 flag values. Those minimums are consumption arithmetic, not evidence that
 the native wrapper rejects shorter/trailing inputs gracefully. Remaining
 readers include nested optional/collection structures and remain outside
-this simple ledger. Next: trace `0x709750` (case5), `0x709560` (case9),
-`0x703910` (case10 optional record), and `0x705570` (case12 chunked map).
+this simple ledger.
+
+### Structured-chat optional values (cases5 and10)
+
+The original executable's case5 wrapper calls `0x709750` at raw `0x6FDDF6`.
+That reader reaches `0x709650` at `0x7097BE`, passing its destination's
+`+0x28` optional member. Case10 wrapper calls `0x703910` at `0x6FDED5`.
+Both optional readers first consume one raw presence byte; zero skips the
+value reads, while **any nonzero byte** reads a value. Both store the native
+value beginning at optional `+8`, with a flag at optional `+0`.
+
+| Reader / case | Payload-relative wire offsets when present | Temporary native offsets | Total consumed, including presence |
+| --- | --- | --- | --- |
+| `0x709650` / nested case5 optional | `0`: presence; `1`: QWORD; `9`: DWORD; `13/14`: bytes | `+0`: QWORD; `+8`: DWORD; `+0xC/+0xD`: bytes | zero: `1`; nonzero: `15` |
+| `0x703910` / case10 | `0`: presence; `1`: DWORD; `5`: QWORD; `13/17/21/25`: four DWORDs | `+0`: DWORD; `+8`: QWORD; `+0x10/+0x14/+0x18/+0x1C`: DWORDs | zero: `1`; nonzero: `29` |
+
+No four-byte alignment gap precedes the case10 wire QWORD: the gap at
+temporary native `+4..+7` is a destination-layout feature. Helper
+`0x6F7D20`, called at `0x7039CB`, assigns fields individually to optional
+`+8/+0x10/+0x14/+0x18/+0x1C/+0x20/+0x24`; it does not copy the temporary's
+padding. The final three DWORDs are read through `0x3568E0`; its observed
+load/store and four-byte cursor advance establish their width but not their
+meaning, so the ledger preserves raw words rather than naming coordinates.
+
+For case5's optional value, the temporary holds 14 initialized/read bytes
+but both assignment paths copy **16** bytes. Initialization at
+`0x7096B0..0x7096C3` writes a QWORD, DWORD, and WORD; the following reads
+replace those same 14 bytes. The two-byte tail is not written on the traced
+local path. Instructions at `0x7096F1/0x7096F6` load/store a full 16 bytes,
+as do `0x709709/0x70970E` for first assignment. This is a static
+initialization/copy-extent observation: it does not establish a visible
+runtime effect or imply two additional wire bytes.
+
+On absent input, `0x7039D7..0x7039DC` and
+`0x70971C..0x709721` clear an existing presence flag without clearing the
+stored value bytes. Present paths normalize the native flag to `1`.
+`OptionalValueFields` records the ten primitive read calls relative to each
+temporary, and the two consumed-byte-count helpers describe only branch
+arithmetic; they neither decode a packet nor synthesize absent values.
+Checks cover every presence byte, all field calls/destinations, the wrapper
+chain, flag writes, and copy extents against the immutable original sample.
+
+Next: case5's remaining fields, case9 reader `0x709560`, case12 chunked map
+`0x705570`, and the case14/17 collection helpers.
 
 ## Post-notification chat file log and folded hash
 
