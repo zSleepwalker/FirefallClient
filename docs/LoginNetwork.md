@@ -175,3 +175,14 @@
 
 ## Unresolved
 - The source and runtime contents of the proxy name and bypass strings are not established. The effective TLS behavior may also depend on how the operating system handles this legacy protocol option.
+
+# Round 25: ClientApi WinHTTP platform preflight
+
+## Observed
+- `0xBC39B0` begins with `WinHttpCheckPlatform` at `0xBC39DA` (original PE IAT `0x1AC4D18`). A false result returns failure immediately; a true result continues to the `WinHttpOpen` and session-option setup described in Round 24. Microsoft's API reference defines the result as whether the current platform is supported by WinHTTP. CompanionTools checks the IAT name and call/branch bytes.
+
+## Interpreted
+- ClientApi session initialization refuses to proceed when WinHTTP reports the platform unsupported; this check is synchronous even though the subsequently created session is asynchronous.
+
+## Unresolved
+- No runtime behavior is inferred for platforms on which the check returns false.

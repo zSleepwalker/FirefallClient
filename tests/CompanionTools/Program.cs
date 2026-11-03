@@ -2286,7 +2286,13 @@ if (args.Length == 2)
         && Red5LoggingBridgeNativeLayout.ClientApiWinHttpProxyInfoSize == 0x0C
         && Red5LoggingBridgeNativeLayout.ClientApiWinHttpAutoproxyConfigUrlFlag == 0x02);
     Check("ClientApi opens asynchronous WinHTTP sessions with observed TLS settings",
-        client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiWinHttpOpenImportVa, "WinHttpOpen")
+        client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiWinHttpCheckPlatformImportVa,
+            "WinHttpCheckPlatform")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpSessionPlatformCheckRaw + 0x400C00,
+            "FF15184DAC01")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpSessionPlatformCheckRaw + 6 + 0x400C00,
+            "85C07514")
+        && client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiWinHttpOpenImportVa, "WinHttpOpen")
         && client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiWinHttpSetOptionImportVa,
             "WinHttpSetOption")
         && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpSessionOpenRaw + 0x400C00,

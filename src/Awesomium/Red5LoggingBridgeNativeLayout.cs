@@ -304,7 +304,9 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint ClientApiWinHttpSessionOpenRaw = 0xBC3A4B;
     public const uint ClientApiWinHttpSessionEnableFeatureRaw = 0xBC3A71;
     public const uint ClientApiWinHttpSessionSecureProtocolsRaw = 0xBC3A9A;
+    public const uint ClientApiWinHttpSessionPlatformCheckRaw = 0xBC39DA;
     public const uint ClientApiWinHttpOpenImportVa = 0x1AC4D1C;
+    public const uint ClientApiWinHttpCheckPlatformImportVa = 0x1AC4D18;
     public const uint ClientApiWinHttpEnableFeatureOption = 79;
     public const uint ClientApiWinHttpSslRevertImpersonationFeature = 2;
     public const uint ClientApiWinHttpSecureProtocolsOption = 84;

@@ -4437,3 +4437,22 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
 - The source and actual contents of proxy name/bypass strings remain
   unknown. Runtime TLS behavior on newer Windows versions is not inferred
   from this legacy configuration alone.
+
+# Round 40: ClientApi WinHTTP platform preflight
+
+## Observed
+- `0xBC39B0` starts by calling `WinHttpCheckPlatform` at `0xBC39DA`
+  (original PE IAT `0x1AC4D18`). If the result is false, it returns false
+  before attempting `WinHttpOpen`; a true result continues through session
+  creation and option setup. The IAT name and call/branch are sample-backed
+  in CompanionTools. Microsoft documents this API as checking whether the
+  current platform is supported by WinHTTP.
+
+## Interpreted
+- ClientApi initialization has an explicit supported-platform gate;
+  `WinHttpCheckPlatform` itself is synchronous despite the later async
+  session flag.
+
+## Unresolved
+- No behavior is inferred for the unsupported-platform path beyond the
+  initializer's failure return.
