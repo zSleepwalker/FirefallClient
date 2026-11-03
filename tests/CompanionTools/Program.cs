@@ -132,6 +132,30 @@ foreach (uint remaining in new uint[] { 0, 1, 3, 4, 5, uint.MaxValue })
             == new DeflateDrainDecision(outcome, accepted ? unchecked(4u - remaining) : 0));
 }
 
+Check("Report layer order distinguishes uncompressed app text from the message option",
+    CrashReportNativeLayout.LayersInProducerOrder.Select(layer => layer.Type)
+        .SequenceEqual(new uint[] { 1, 4, 2, 5, 3 })
+    && CrashReportNativeLayout.LayersInProducerOrder.Single(layer => !layer.Compressed).Type == 4
+    && CrashReportNativeLayout.OwnerApplicationNameOffset == 0x0C
+    && CrashReportNativeLayout.OwnerMessageOffset == 0x10);
+foreach (int length in new[] { int.MinValue, -1, 0, 0x3FFFF, 0x40000, 0x40001, int.MaxValue })
+{
+    Check($"Log clipping uses signed ftell threshold, observed={length}",
+        CrashReportNativeLayout.SelectsClippedLogPath(length) == (length > 262144));
+}
+foreach (int result in new[] { int.MinValue, -6, -5, -2, -1, 0, 1, 2, int.MaxValue })
+foreach (uint remaining in new uint[] { 0, 1, 4, 5, uint.MaxValue })
+foreach (bool eof in new[] { false, true })
+{
+    var outcome = result == -2 ? FileDeflateOutcome.Failure
+        : remaining == 0 ? FileDeflateOutcome.RepeatDrain
+        : eof ? FileDeflateOutcome.Success : FileDeflateOutcome.ReadInput;
+    Check($"File deflate result={result}, avail_out={remaining}, EOF={eof}",
+        CrashReportNativeLayout.CaptureFileDrain(result, remaining, eof)
+            == new FileDeflateDecision(outcome, result == -2 ? 0 : unchecked(4u - remaining))
+        && CrashReportNativeLayout.SelectFileFlush(eof) == (eof ? 4 : 0));
+}
+
 if (args.Length == 2)
 {
     string root = args[1];
@@ -362,6 +386,66 @@ if (args.Length == 2)
         && truck.Matches(0x40C9C0, "8B008901")
         && truck.Matches(0x426D3C, "8BF02B7704")
         && truck.Matches(0x426D90, "8B0F8B470483E804508B11FF52085F8930"));
+    Check("Report starts with native little-endian DEFEC8ED magic in a fresh request blob",
+        truck.Word(CrashReportNativeLayout.MagicLiteralVa) == CrashReportNativeLayout.Magic
+        && truck.Matches(0x40A863, "6814634700")
+        && truck.Calls(CrashReportNativeLayout.MagicWriteCallVa, 0x40C980)
+        && truck.Matches(0x40D91B, "C7462C44DF4B00")
+        && truck.Matches(0x40D922, "C7463000000000C7463400000000C7463800000000")
+        && truck.Matches(0x40A854, "8D472C")
+        && truck.Calls(0x40A85E, 0x425DA0)
+        && truck.Matches(0x425E0A, "C7410800000000C7410C00000000"));
+    Check("Producer assigns layer1/core, layer2/log, layer5/browser log in report order",
+        truck.Matches(0x40A8FA, "6A01")
+        && truck.Calls(0x40A909, HardwareReportNativeLayout.LayerBeginVa)
+        && truck.Calls(0x40A91B, CrashReportNativeLayout.FileCompressorVa)
+        && truck.Matches(0x40AA99, "6A02")
+        && truck.Calls(0x40AAA3, CrashReportNativeLayout.OptionalLogWriterVa)
+        && truck.Matches(0x40AB7F, "6A05")
+        && truck.Calls(0x40AB89, CrashReportNativeLayout.OptionalLogWriterVa));
+    Check("Application-name layer4 copies stored text plus NUL without compression",
+        truck.Matches(0x40A9A1, "C7459C04000000")
+        && truck.Calls(0x40A9B5, 0x40C8B0)
+        && truck.Matches(0x40AA08, "8B460C")
+        && truck.Matches(0x40AA23, "408D8D4CFFFFFF50")
+        && truck.Calls(0x40AA2E, 0x426DB0)
+        && truck.Matches(0x40AA33, "8B4E0C")
+        && truck.Calls(0x40AA42, 0x46FCEE)
+        && truck.Calls(0x40AA51, HardwareReportNativeLayout.LayerEndVa));
+    Check("App option initializes owner+0C while msg initializes owner+10",
+        truck.Matches(0x40541C, "B9685D4700")
+        && truck.Ascii(0x475D68) == "app"
+        && truck.Matches(0x40542D, "8D490C")
+        && truck.Calls(0x405430, 0x408710)
+        && truck.Matches(0x40543A, "B96C5D4700")
+        && truck.Ascii(0x475D6C) == "msg"
+        && truck.Matches(0x40544B, "8D4910")
+        && truck.Calls(0x40544E, 0x408710));
+    Check("File deflate requests four input bytes and advertises four output bytes",
+        truck.Matches(0x409757, "6A046A01")
+        && truck.Matches(0x40975F, "FF15A4554700")
+        && truck.ImportSlotNames(0x4755A4, "fread")
+        && truck.Matches(0x409781, "C745A404000000")
+        && truck.Calls(0x40979C, HardwareReportNativeLayout.DeflateVa)
+        && truck.Matches(0x409793, "F7D81BC083E0048BD0"));
+    Check("File deflate rejects only -2 and uses avail_out plus EOF for continuation",
+        truck.Matches(0x4097A1, "83F8FE7459")
+        && truck.Matches(0x4097A9, "B9040000002BC8")
+        && truck.Calls(0x4097B7, 0x40DA40)
+        && truck.Matches(0x4097BF, "85C074BD")
+        && truck.ImportSlotNames(0x47559C, "feof")
+        && truck.Matches(0x4097C9, "85C07508")
+        && truck.Calls(0x4097D8, HardwareReportNativeLayout.DeflateEndVa));
+    Check("Optional log writer uses signed 256KiB threshold and a 2048-byte prefix",
+        truck.Matches(0x40A0AD, "FF1594554700")
+        && truck.ImportSlotNames(0x475594, "ftell")
+        && truck.Matches(0x40A0B9, "3D000004000F8FAC000000")
+        && truck.Matches(0x40A18E, "6800000400")
+        && truck.Matches(0x40A1B8, "6800080000")
+        && truck.Matches(0x40A238, "68485F4700")
+        && truck.Ascii(0x475F48) == CrashReportNativeLayout.ClippedLogMarkerFormat
+        && truck.Calls(0x40A12B, CrashReportNativeLayout.FileCompressorVa)
+        && truck.Calls(0x40A340, HardwareReportNativeLayout.CompressVa));
 
     var childImports = child.ImportsFrom(FirefallProcessLayout.ImportModule);
     Check("FirefallProcess imports exactly Awesomium ChildProcessMain, which the DLL exports",

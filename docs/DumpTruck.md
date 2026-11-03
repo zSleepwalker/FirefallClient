@@ -31,4 +31,12 @@ aborts packaging. The compressor allocates16KiB but advertises four output
 bytes per finish call; the literal4 is verified in native instructions.
 The layer has little-endian DWORD type/length followed by compressed payload,
 with payload-only length patched at close. The ledger records exact addresses
-and separates this local layer map from the still-incomplete outer report format.
+and links the broader [report body reconstruction](DumpTruckReport.md).
+
+The body starts with DWORD `0xDEFEC8ED`, then producer-order layers1 (core),
+4 (uncompressed NUL-terminated application name),2 (main log),5 (browser log),
+and3 (hardware), omitting gated layers and ending with DWORD0.
+Type4 reads the `app` option field, not `msg`. Logs over a signed256KiB
+`ftell` result use prefix/marker/tail clipping and memory compression; smaller
+logs use the file compressor. The file loop explicitly rejects only zlib-2,
+unlike the memory loop's0/1 gate. No parser or upload implementation was added.

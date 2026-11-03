@@ -380,9 +380,11 @@ the current position and writes that DWORD at payload-start minus4
 Native assertion paths cover invalid position/length conditions; the
 reconstruction does not simulate their continuation or exception behavior.
 On the normal submit path a final DWORD0 tag is written at `0x40AD23`
-before the serializer is finalized. This is a local layer map, **not**
-a claim that all outer report headers, other layer types, or the upload
-envelope have been completely reconstructed.
+before the serializer is finalized. The follow-up
+[report body reconstruction](DumpTruckReport.md) identifies the leading
+`0xDEFEC8ED` magic, other producer layer types, application-name text,
+file-compression gates, and large-log clipping. The upload envelope is
+still separate from these local report-body facts.
 
 ## Reproducible checks and open work
 
@@ -399,6 +401,6 @@ exports. They do not execute any target or contact a service. Without
 with an explicit notice that binary evidence was not checked.
 
 Next bounded traces: the client-side source-address producer;
-the outer report headers and other DumpTruck layer bodies; and
+an offline report fixture to independently check emitted body bytes; and
 the managed loader/callers of DeploymentCommon. Static import absence is
 not used as a claim that all nine form one direct-load chain.

@@ -2998,3 +2998,32 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   separate trace. No target, compressor, or report uploader was executed.
 - Validation: solution build has zero warnings/errors;457 companion checks
   pass with the nine samples and414 pure checks pass without samples.
+
+## DumpTruck outer body and optional-file paths
+
+- Body serializer starts on the new request's empty blob at+0x2C; first
+  explicit write `0x40A879` copies magic `0xDEFEC8ED` (bytes ED C8 FE DE)
+  from VA `0x476314`. Producer layer order is1/core,4/application name,
+  2/main log,5/awesomium.log,3/hardware, then DWORD0 with no length field.
+- Type4 is uncompressed owner+0x0C text plus NUL, even if empty.
+  Initialization proves app->+0x0C and msg->+0x10; do not call it a
+  message layer. Conditional layers and open/compression-failure behavior
+  are documented in `docs\DumpTruckReport.md`.
+- File compressor `0x409660` allocates16KiB input/output but requests4
+  input bytes and advertises4 output bytes. feof chooses flush0/4.
+  Only zlib result-2 takes its explicit failure branch, unlike memory
+  compressor0/1 acceptance. Full output drains again; space plus second
+  EOF query determines more input versus success. C# captures this branch
+  behavior rather than running zlib or implementing a compressor.
+- Optional logs use signed ftell >0x40000 to select prefix/marker/tail
+  clipping into a256KiB logical blob (2048-byte prefix request). Then
+  memory compression is used; <=threshold, including negative observed
+  ftell, selects file compression. No log-specific trailing NUL append
+  is observed; do not apply HWStats's trailing-NUL rule to logs.
+- Saved `CrashReportNativeLayout.cs`, new focused report documentation,
+  and hash-guarded instruction checks. An authorized offline save_poo
+  fixture remains the smallest independent validation of emitted bytes;
+  no target process or network operation was used to generate one.
+- Validation: solution build has zero warnings/errors;562 companion checks
+  pass with the nine identified samples and512 pure checks pass without
+  samples. All changes in this batch are C#, checks, and documentation.
