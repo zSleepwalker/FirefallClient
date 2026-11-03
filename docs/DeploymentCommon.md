@@ -46,3 +46,7 @@ only returns descriptors and decisions; it performs no COM/filesystem work.
 confirms this sample's fixed `Firefall_Beta` registry identity versus
 `Firefall` display name, WPF installDir precedence, string-only registry
 values, and literal global ` --culture` removal rather than argument parsing.
+
+The [permissions launch boundary](DeploymentCommonPermissionLaunch.md)
+records a system-folder icacls launch attempt with no exit observation,
+not a verified successful ACL reset. Saved descriptors are inert.

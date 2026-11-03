@@ -3213,3 +3213,19 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   sample-backed export/IAT/table/branch checks. Agent is finished/idle;
   no callback internals, argv parser, or delegate implementation traced.
 - Build succeeds;1086 sample-backed checks and991 pure checks pass.
+
+## DeploymentCommon permissions launch descriptor
+
+- Utils.ResetInstallFolderPermissions12F body RVA6E18 builds a system-folder
+  icacls.exe path (SpecialFolder37) and quoted-directory /RESET /T /Q /C args.
+  CreateNoWindow=true, ErrorDialog=false, UseShellExecute=false.
+- Process.Start Boolean is popped. No WaitForExit or ExitCode observation:
+  method return does not prove permissions changed.
+- System.Exception catch IL0/79, handler79/50 logs exception message via
+  LogLine and LogPersistentEvent("Permissions",...). It cannot observe
+  later child exit failure.
+- Saved inert PermissionLaunchDescriptor, full IL/string/catch checks,
+  and synthetic inputs. No process or permission operations performed.
+- Build succeeds;1092 sample-backed checks and995 pure checks pass.
+  Next independent work: managed INI wrapper boundaries; the browser type
+  extraction agent has a separate read-only assignment.

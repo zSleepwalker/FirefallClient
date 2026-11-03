@@ -19,6 +19,14 @@ void Check(string name, bool condition)
     if (condition) passed++; else failed++;
 }
 
+foreach (string? directory in new string?[] { @"X:\synthetic", @"X:\synthetic folder", "", null })
+{
+    var launch = PermissionLaunchNativeLayout.CaptureDescriptor(directory);
+    Check($"Permission launch descriptor only, synthetic directory length={directory?.Length ?? -1}",
+        launch == new PermissionLaunchDescriptor(37, "icacls.exe",
+            $"\"{directory}\" /RESET /T /Q /C", true, false, false, false, false)
+        && PermissionLaunchNativeLayout.DiscardsProcessStartBoolean);
+}
 foreach (bool hasDelegate in new[] { false, true })
 {
     foreach (string? type in new string?[] { null, "" })
@@ -863,6 +871,18 @@ if (args.Length == 2)
             InstallLocationNativeLayout.GetInstallRegistryKeyBodyRva,
             "7E2A00000A72250C0070282A000006281B00000A6F2E00000A0A062C0D06026F2F00000A75390000012A142A")
         && deployment.ManagedUserStringsMatch((0xC25, @"Software\Red 5 Studios\{0}\")));
+    Check("Managed permission launch complete IL ignores Start BOOL and does not observe process exit",
+        deployment.ManagedIlMatches(PermissionLaunchNativeLayout.ResetPermissionsMethodRow,
+            PermissionLaunchNativeLayout.ResetPermissionsBodyRva,
+            "733001000A0B071F25282900000A723A3D0070282600000A72503D007002281B00000A734B01000A0C08176F4C01000A08166F4D01000A08166F4E01000A086F5001000A070A066F3601000A26DE320D727C3D0070096F2D00000A281E00000A28F900000672B43D0070727C3D0070096F2D00000A281E00000A28FC000006DE002A")
+        && deployment.ManagedUserStringsMatch(
+            (0x3D3A, PermissionLaunchNativeLayout.ExecutableName),
+            (0x3D50, PermissionLaunchNativeLayout.ArgumentFormat),
+            (0x3D7C, PermissionLaunchNativeLayout.ExceptionLogPrefix),
+            (0x3DB4, PermissionLaunchNativeLayout.PersistentEventName)));
+    Check("Managed permission launch catches System.Exception over construction and start, not child exit",
+        deployment.ManagedCatchMatches(PermissionLaunchNativeLayout.ResetPermissionsMethodRow,
+            0, 79, 79, 50, "System.Exception"));
     Check("Managed shortcut removal complete IL preserves common plus user passes and nonrecursive empty-directory gates",
         deployment.ManagedIlMatches(ShortcutNativeLayout.RemoveShortcutsMethodRow,
             ShortcutNativeLayout.RemoveShortcutsBodyRva,
