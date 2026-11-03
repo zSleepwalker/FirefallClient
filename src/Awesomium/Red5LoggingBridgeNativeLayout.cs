@@ -128,6 +128,16 @@ public static class ClientApiWinHttpSecureFailureLayout
     public static uint CaptureLabeledFlags(uint flags) => flags & LabeledFlagMask;
 }
 
+public static class ClientApiWinHttpPreSendFailureLayout
+{
+    public const uint RequestHandleOffset = 0;
+    public const uint ResultOffset = 0x14;
+    public const uint ResponseKindOffset = 8;
+    public const uint ResponseKind = 4;
+
+    public static bool ShouldSubmitRequest(int storedFailure) => storedFailure == 0;
+}
+
 /// <summary>
 /// Observed redirect header-replay gate. Host comparison models ASCII
 /// case-insensitivity; CRT locale-specific byte behavior is not simulated.
@@ -391,6 +401,15 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint ClientApiWinHttpSecureFailureFlagLoadRaw = 0xBC1E2D;
     public const uint ClientApiWinHttpSecureFailureFlagTestsRaw = 0xBC1E55;
     public const uint ClientApiWinHttpSecureFailureReportRaw = 0xBC1F18;
+    public const uint ClientApiWinHttpPreSendFailureLastErrorCallRaw = 0xBC31AD;
+    public const uint ClientApiWinHttpPreSendFailureHelperCallRaw = 0xBC31BB;
+    public const uint ClientApiWinHttpPreSendFailureResultStoreRaw = 0xBC31C3;
+    public const uint ClientApiWinHttpPreSendFailureGateRaw = 0xBC31D8;
+    public const uint ClientApiWinHttpPreSendRequestCallRaw = 0xBC3213;
+    public const uint ClientApiWinHttpPreSendFailureHandleCloseRaw = 0xBC3222;
+    public const uint ClientApiWinHttpPreSendFailureHandleClearRaw = 0xBC322E;
+    public const uint ClientApiWinHttpPreSendFailureResponseKindStoreRaw = 0xBC3273;
+    public const uint ClientApiWinHttpGetLastErrorImportVa = 0x1AC4378;
     public const uint ClientApiWinHttpCallbackContextHandleStoreRaw = 0xBC2DEC;
     public const uint ClientApiWinHttpCallbackContextResultStoreRaw = 0xBC3264;
     public const uint ClientApiWinHttpCallbackContextResponseStoreRaw = 0xBC3270;

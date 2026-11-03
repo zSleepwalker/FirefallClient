@@ -4487,3 +4487,13 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   Short status data is treated as a zero mask without an assertion. The
   sample-backed model records the labeled-bit mask `0x8000007F`; individual
   client text labels are still encoded and unnamed.
+
+# Round 44: ClientApi pre-send failure handoff
+
+- The worker stores a nonzero setup result in callback-context `+0x14`
+  (`0xBC31C3`) and gates off callback registration/`WinHttpSendRequest`
+  (`0xBC31D8`). That branch closes the opened request handle, clears context
+  `+0`, assigns observed response kind 4, and attaches the context to worker
+  `+0x1C` for normal result delivery. Its error-capture path calls imported
+  `GetLastError` and `ClientApi_WinHttpFailureHelper`; exact setup operation
+  ownership remains unresolved.

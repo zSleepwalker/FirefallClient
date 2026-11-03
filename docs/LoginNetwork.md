@@ -269,3 +269,32 @@
 ## Unresolved
 - The client-specific text labels for the recognized bits remain encoded in
   the sample; no names are assigned to individual bits here.
+
+# Round 29: ClientApi pre-send failure gate
+
+## Observed
+- In `ClientApi_PumpRequestWorker` (`0xBC2B30`), a failure result is first
+  stored at callback-context `+0x14` at `0xBC31C3`. The worker tests that field
+  at `0xBC31D8`; a nonzero result branches around both status-callback
+  registration (`0xBC31E9`) and `WinHttpSendRequest` (`0xBC3213`).
+- On that failure branch, the worker closes the already-open request handle
+  through `WinHttpCloseHandle` at `0xBC3222`, clears callback-context handle
+  `+0` at `0xBC322E`, and sets response kind 4 at `0xBC3273`. It then stores
+  the callback context to worker `+0x1C` at `0xBC3280`, allowing the normal
+  completion/result pump to observe the nonzero failure. Sample checks verify
+  the result gate, skipped send call path, handle close/clear, and response
+  kind store.
+- The result at `+0x14` is produced by `ClientApi_WinHttpFailureHelper`
+  (`0xBC1C40`) and recorded before the gate. The observed error-capture call
+  uses the original PE IAT slot `0x1AC4378`, identified as `GetLastError` by
+  the sample import table and the repository's import-slot mapping.
+
+## Interpreted
+- This is a synchronous request-setup failure route, distinct from the
+  asynchronous `REQUEST_ERROR` callback: it tears down the request handle
+  before sending and delivers a response-kind-4 completion through the
+  worker's ordinary completion path.
+
+## Unresolved
+- The precise WinHTTP setup operation responsible for every stored
+  pre-send failure is not established by this branch alone.

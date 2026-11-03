@@ -2255,6 +2255,32 @@ if (args.Length == 2)
         && ClientApiWinHttpSecureFailureLayout.StatusDataSize == 4
         && ClientApiWinHttpSecureFailureLayout.FailureErrorCode == 12175
         && ClientApiWinHttpSecureFailureLayout.CaptureLabeledFlags(0xFFFFFFFF) == 0x8000007F);
+    Check("ClientApi suppresses WinHttpSendRequest when an earlier setup failure is stored",
+        client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiWinHttpGetLastErrorImportVa,
+            "GetLastError")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpPreSendFailureLastErrorCallRaw
+            + 0x400C00, "FF157843AC01")
+        && client.Calls(Red5LoggingBridgeNativeLayout.ClientApiWinHttpPreSendFailureHelperCallRaw
+            + 0x400C00,
+            Red5LoggingBridgeNativeLayout.ClientApiWinHttpFailureHelperRaw + 0x400C00)
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpPreSendFailureResultStoreRaw
+            + 0x400C00, "894714")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpPreSendFailureGateRaw
+            + 0x400C00, "837F1400753D")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiPumpRequestWorkerRaw + 0x6E3 + 0x400C00,
+            "FF15104DAC01")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpPreSendFailureHandleCloseRaw
+            + 0x400C00, "FF15F84CAC01")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpPreSendFailureHandleClearRaw
+            + 0x400C00, "C70700000000")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpPreSendFailureResponseKindStoreRaw
+            + 0x400C00, "C7400804000000")
+        && ClientApiWinHttpPreSendFailureLayout.ShouldSubmitRequest(0)
+        && !ClientApiWinHttpPreSendFailureLayout.ShouldSubmitRequest(unchecked((int)0x80070005u))
+        && ClientApiWinHttpPreSendFailureLayout.RequestHandleOffset == 0
+        && ClientApiWinHttpPreSendFailureLayout.ResultOffset == 0x14
+        && ClientApiWinHttpPreSendFailureLayout.ResponseKindOffset == 8
+        && ClientApiWinHttpPreSendFailureLayout.ResponseKind == 4);
     Check("Original ClientApi redirect callback cracks the target and replays stored headers once",
         client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiWinHttpCrackUrlImportVa,
             "WinHttpCrackUrl")
