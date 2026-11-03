@@ -2200,6 +2200,21 @@ if (args.Length == 2)
         && (uint)ClientApiWinHttpCallbackStatus.ReadComplete == 0x80000
         && (uint)ClientApiWinHttpCallbackStatus.WriteComplete == 0x100000
         && (uint)ClientApiWinHttpCallbackStatus.RequestError == 0x200000);
+    Check("Original ClientApi redirect callback cracks the target and replays stored headers once",
+        client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiWinHttpCrackUrlImportVa,
+            "WinHttpCrackUrl")
+        && client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiRequestAddHeadersImportVa,
+            "WinHttpAddRequestHeaders")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpRedirectCrackUrlRaw + 0x400C00,
+            "FF15F04CAC01")
+        && client.Calls(Red5LoggingBridgeNativeLayout.ClientApiWinHttpRedirectHostCompareRaw + 0x400C00,
+            0x2FC540 + 0x400C00)
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpRedirectHeaderFlagsRaw + 0x400C00,
+            "6800000080")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpRedirectAddHeadersRaw + 0x400C00,
+            "FF15F44CAC01")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpRedirectReplayFlagStoreRaw + 0x400C00,
+            "C6431001"));
     Check("Original client URL message builder escapes host, path and configured identifier components",
         client.Calls(Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlMessageBuilderRaw + 0xFD + 0x400C00,
             Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlComponentEscapeRaw + 0x400C00)

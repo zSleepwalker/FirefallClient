@@ -288,6 +288,12 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint ClientApiWinHttpQueryHeadersImportVa = 0x1AC4CE4;
     public const uint ClientApiWinHttpQueryDataAvailableImportVa = 0x1AC4CE8;
     public const uint ClientApiWinHttpReadDataImportVa = 0x1AC4CEC;
+    public const uint ClientApiWinHttpCrackUrlImportVa = 0x1AC4CF0;
+    public const uint ClientApiWinHttpRedirectCrackUrlRaw = 0xBC1F8C;
+    public const uint ClientApiWinHttpRedirectHostCompareRaw = 0xBC1FF0;
+    public const uint ClientApiWinHttpRedirectHeaderFlagsRaw = 0xBC207B;
+    public const uint ClientApiWinHttpRedirectAddHeadersRaw = 0xBC2085;
+    public const uint ClientApiWinHttpRedirectReplayFlagStoreRaw = 0xBC20B5;
     public const uint ClientApiWinHttpSetStatusCallbackImportVa = 0x1AC4D0C;
     public const uint ClientApiWinHttpSendRequestImportVa = 0x1AC4D10;
     public const uint ClientApiWinHttpCallbackContextAllocRaw = 0xBC2D0E;

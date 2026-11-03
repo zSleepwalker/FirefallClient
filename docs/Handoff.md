@@ -4286,3 +4286,21 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   response-kind meanings are not fully established.
 - CompanionTools checks the import-slot names, representative indirect call
   sites, and the callback-status numeric values against the sample/model.
+
+# Round 33: ClientApi redirect header replay
+
+## Observed
+- In `ClientApi_DispatchWinHttpStatus` (`0xBC1DA0`), the `0x4000`
+  redirect branch calls `WinHttpCrackUrl` at `0xBC1F8C` and compares its
+  parsed host text with the request's stored host text through `0x2FC540`
+  (`0xBC1FF0`).
+- The branch returns without replay when request `+0x24` is zero or callback
+  context byte `+0x10` is already set. When the host comparison is unequal,
+  it walks the request header tree, formats each entry into a temporary
+  buffer, and calls
+  `WinHttpAddRequestHeaders` at `0xBC2085` with `0x80000000`
+  (`WINHTTP_ADDREQ_FLAG_REPLACE`). It then sets context byte `+0x10` at
+  `0xBC20B5`.
+- The request gate's purpose and the host comparison's case sensitivity are
+  unresolved. CompanionTools checks the import names, host-comparison call,
+  replacement flag, header submission, and one-shot context-flag store.
