@@ -3087,3 +3087,19 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
 - Build succeeds;939 checks pass with all samples and877 pure checks pass
   without samples. Next bounded investigation is downstream auth forwarding,
   retaining opaque values and without contacting the legacy services.
+
+## DeploymentCommon managed WOW64 follow-up
+
+- Independent read-only agent traced Wow getters `0x06000053/54` and
+  ModuleContainsFunction `0x06000055`. Process bitness is IntPtr.Size==8;
+  OS bitness short-circuits x64, otherwise requires export availability,
+  successful IsWow64Process, and a true out flag.
+- ModuleContainsFunction uses GetModuleHandle/GetProcAddress, not LoadLibrary.
+  False may indicate missing export/API failure, not solely32-bit Windows.
+- Saved pure `WowNativeLayout.cs`, [IL/metadata ledger](DeploymentCommonWow.md),
+  and complete IL byte checks. Added DeploymentCommon project reference to
+  CompanionTools (its first managed companion behavior checks).
+- Build succeeds;958 checks pass with all samples and893 pure checks pass.
+  Agent has finished; no additional agent work is scheduled by this batch.
+- Follow-ons: NativeMethods.ClientToScreen/MoveWindow or
+  Utils.SHGetSpecialFolderPath, independently of native auth forwarding.

@@ -22,4 +22,10 @@
 - Real runtime values (env/region names), `.dfc`/manifest/part-md5 file internals beyond line format, uninstaller/shortcut/Utils bodies, LZMA/7z extraction semantics, JSON parser details (hand-written, standard), WMI/traceroute usage specifics.
 
 ## Reconstruction
-`src\DeploymentCommon\` (`BuildInformation.cs` URL/JSON model, `DownloadPlanning.cs` chunking/part-md5/file naming/MD5). Built with `dotnet build Firefall.Reconstruction.slnx -v:q` (0 warnings/errors). No tests added.
+`src\DeploymentCommon\` (`BuildInformation.cs` URL/JSON model, `DownloadPlanning.cs` chunking/part-md5/file naming/MD5). Built with `dotnet build Firefall.Reconstruction.slnx -v:q` (0 warnings/errors).
+
+The [WOW64 follow-up](DeploymentCommonWow.md) records method tokens, complete
+IL locations, and P/Invoke metadata for process/OS bitness detection.
+`WowNativeLayout.cs` preserves its pure decisions; CompanionTools checks
+exercise Boolean outcomes and verify the three getter/helper IL sequences
+against the identified assembly without loading it.

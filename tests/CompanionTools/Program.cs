@@ -1,5 +1,6 @@
 using Firefall.Reconstruction.Awesomium;
 using Firefall.Reconstruction.DumpTruck;
+using Firefall.Reconstruction.DeploymentCommon;
 using Firefall.Reconstruction.FirefallProcess;
 using Firefall.Reconstruction.HWStats;
 using Firefall.Reconstruction.R5Dumper;
@@ -18,6 +19,18 @@ void Check(string name, bool condition)
     if (condition) passed++; else failed++;
 }
 
+foreach (int pointerBytes in new[] { 4, 8 })
+foreach (bool exportAvailable in new[] { false, true })
+foreach (bool apiSucceeded in new[] { false, true })
+foreach (bool reportedWow64 in new[] { false, true })
+{
+    bool expected = pointerBytes == 8
+        || (exportAvailable && apiSucceeded && reportedWow64);
+    Check($"Managed OS bitness pointer={pointerBytes}, export={exportAvailable}, success={apiSucceeded}, wow64={reportedWow64}",
+        WowNativeLayout.CaptureIs64BitProcess(pointerBytes) == (pointerBytes == 8)
+        && WowNativeLayout.CaptureIs64BitOperatingSystem(
+            pointerBytes, exportAvailable, apiSucceeded, reportedWow64) == expected);
+}
 Check("Producer records all eleven actual stream IDs, not decompiler-truncated low bytes",
     DumperHandoffNativeLayout.Fields.Select(field => field.StreamType).SequenceEqual(
         new uint[] { 0x10000, 0x10002, 0x10003, 0x10004, 0x10005, 0x10006,
@@ -582,6 +595,15 @@ if (args.Length == 2)
         deployment.ImportsFrom("mscoree.dll").Contains("_CorDllMain")
         && new[] { red, dumper, truck, hardware, child, browser, client }
             .All(sample => sample.ImportsFrom("DeploymentCommon.dll").Count == 0));
+    Check("Managed process bitness compares IntPtr.Size exactly with eight",
+        deployment.Matches(deployment.ImageBase + WowNativeLayout.Is64BitProcessIlRva,
+            "284200000A1EFE012A"));
+    Check("Managed OS bitness short-circuits x64 and guards the WOW64 API success/out result",
+        deployment.Matches(deployment.ImageBase + WowNativeLayout.Is64BitOperatingSystemIlRva,
+            "28530000062C02172A72F0110070720A12007028550000062C102857000006120028560000062C02062A162A"));
+    Check("Managed export detection uses already-loaded module handle and compares pointers to zero",
+        deployment.Matches(deployment.ImageBase + WowNativeLayout.ModuleContainsFunctionIlRva,
+            "0228580000060A067E4300000A284400000A2C12060328590000067E4300000A284400000A2A162A"));
 }
 else
 {
