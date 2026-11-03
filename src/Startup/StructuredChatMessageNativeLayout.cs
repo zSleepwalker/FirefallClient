@@ -80,6 +80,22 @@ public static class StructuredChatMessageNativeLayout
     public const uint Case12ValueEqualsFileOffset = 0x6E2060;
     public const uint Case12KeySetEqualsFileOffset = 0x6FD3E0;
     public const uint Case12MapAssignmentFileOffset = 0x6F9840;
+    public const uint MultiEntryPrerequisiteFileOffset = 0x48C2B0;
+    public const int PrerequisiteWordOffset = 0x118;
+    public const int PrerequisiteRangeBeginOffset = 0x10C;
+    public const int PrerequisiteRangeEndOffset = 0x110;
+    public const int PrerequisiteEntryNativeByteCount = 104;
+
+    public static IReadOnlyList<(byte Selector, uint CallFileOffset, uint FailureTarget, bool FailureReturn)>
+        MultiEntryPrerequisiteCalls { get; } = Array.AsReadOnly(new (byte, uint, uint, bool)[]
+        {
+            (9, 0x6E3E7B, 0x6E3AF2, false),
+            (10, 0x6E3EFF, 0x6E3AF2, false),
+            (11, 0x6E3F6E, 0x6E3AF2, false),
+            (12, 0x6E40D2, 0x6E3AF2, false),
+            (13, 0x6E44A4, 0x6E4583, true),
+            (18, 0x6E4425, 0x6E3AF2, false)
+        });
 
     /// <summary>Case5 fields in wire order, with the optional member between native +0x20 and +0x40.</summary>
     public static IReadOnlyList<StructuredChatPayloadFieldSnapshot> Case5FixedFields { get; } =
@@ -219,6 +235,20 @@ public static class StructuredChatMessageNativeLayout
         ownerKeyPresent
             ? new(true, !mapsEqual, mapsEqual ? null : Case12MapChangedNotificationCode)
             : new(false, true, decodedOuterEntryCount == 0 ? null : Case12MapChangedNotificationCode);
+
+    /// <summary>
+    /// Captures the native arithmetic, not validation of a managed collection.
+    /// Subtraction wraps, division is signed, and the final comparison is unsigned.
+    /// </summary>
+    public static bool PassesMultiEntryPrerequisite(uint nativeWord118, uint rangeBegin, uint rangeEnd)
+    {
+        if (nativeWord118 == 0)
+            return false;
+
+        int byteLength = unchecked((int)(rangeEnd - rangeBegin));
+        uint entryCount = unchecked((uint)(byteLength / PrerequisiteEntryNativeByteCount));
+        return entryCount > 1;
+    }
 
     public static int Case5OptionalConsumedByteCount(byte presence) =>
         1 + (presence == 0 ? 0 : Case5OptionalValueWireByteCount);

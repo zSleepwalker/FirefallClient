@@ -9624,6 +9624,22 @@ internal static class StartupBinaryEvidence
             && RelativeBranchTargets(0x706CC0, 0xE8, 0x707540)
             && RelativeBranchTargets(0x6F9885, 0xE8, 0x6FB070)
             && RelativeBranchTargets(0x6F98BD, 0xE8, 0x6FF6A0));
+        check("Binary structured chat prerequisite requires a nonzero word and unsigned count above one",
+            Matches(StructuredChatMessageNativeLayout.MultiEntryPrerequisiteFileOffset,
+                "83B918010000007425")
+            && Matches(0x48C2B9, "8B9110010000B84FECC44E2B910C010000")
+            && Matches(0x48C2CA, "F7EAC1FA058BC2C1E81F03C283F8017603B001C332C0C3"));
+        check("Binary six structured chat cases branch on prerequisite failure, with case13 returning true",
+            StructuredChatMessageNativeLayout.MultiEntryPrerequisiteCalls.All(call =>
+                RelativeBranchTargets(call.CallFileOffset, 0xE8,
+                    StructuredChatMessageNativeLayout.MultiEntryPrerequisiteFileOffset)
+                && Matches(call.CallFileOffset + 5, "84C0")
+                && RelativeConditionalBranchTargets(call.CallFileOffset + 7, 0x0F, 0x84,
+                    call.FailureTarget))
+            && Matches(0x6E3AF2, "32C0")
+            && Matches(0x6E4583, "B001")
+            && RelativeBranchTargets(0x6E4585, 0xE9,
+                StructuredChatMessageNativeLayout.SharedReturnFileOffset));
         check("Binary structured chat case1 localizes CHAT_DUEL_RESULT and forwards it to chat display",
             ReadCStringAscii(StructuredChatMessageNativeLayout.DuelResultTemplateVirtualAddress, 17)
                 == StructuredChatMessageNativeLayout.DuelResultTemplate

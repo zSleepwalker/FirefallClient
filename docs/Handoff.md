@@ -2824,3 +2824,24 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   structured-chat callers, or find event268's named subscriber. Keep the
   original selector0x76 `slBlob`/record-range mismatch separate from these
   already-decoded consumer decisions.
+
+## Structured-chat shared prerequisite follow-up
+
+- Resolved `0x48C2B0` in cases9,10,11,12,13,18. Each case tests AL before
+  handling. Cases9,10,11,12,18 return false at `0x6E3AF2` on failure;
+  case13 skips its body but returns true via `0x6E4583`. Do not generalize
+  the failure return across all gated cases. The current IDA xref
+  list omits these switch bodies; original bytes verify all six calls.
+- The helper requires nonzero DWORD `+0x118` and an unsigned-greater-than1
+  result after signed division of wrapped `(end+0x110 - begin+0x10C)` by104.
+  For valid ranges it requires at least two104-byte entries. It is not
+  range/order validation: negative quotients can pass the unsigned test.
+  The C# capture preserves subtraction wrap, signed division, and that
+  final unsigned comparison, including boundary/reversed-range cases.
+- Still unknown: the owner word and104-byte entry semantics. A next bounded
+  investigation can trace their writers/constructors, or event268's
+  subscriber names, without conflating them with selector0x76's conflicting
+  parser-side representation.
+- Current saved validation: the solution builds without warnings/errors;
+  all1,519 startup/original-binary checks pass. Analysis remained read-only
+  for both the executable and IDA database.

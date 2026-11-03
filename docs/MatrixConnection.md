@@ -7327,8 +7327,8 @@ the PE-translated ThrowInfo/type-descriptor chain. No error is replaced by
 silent duplicate collapse in the saved model.
 
 The 19 case targets and all payload shapes now have direct traces, including
-these nested structures. Open work is semantic: owner state update/compare
-helpers, callback names for numeric event codes, the localized text inputs,
+these nested structures. Open work is semantic: other cases' owner
+update/compare helpers, callback names for numeric event codes, localized text inputs,
 and the still-unresolved Character selector0x76 parser/receiver mismatch.
 
 ### Case12 stored-map equality and notification gate
@@ -7402,6 +7402,37 @@ decision only after the owner prerequisite and decode succeed. It does not
 parse bytes, perform native lookups/copies, or dispatch an event. Binary
 checks anchor the nested equality, output-local count, assignment paths,
 two literal field names, and notification suppression branches.
+
+### Shared structured-chat multi-entry prerequisite
+
+The case12 prerequisite `0x48C2B0` is also called by cases9,10,11,13,18.
+Original direct-call sites are respectively `0x6E40D2`, `0x6E3E7B`,
+`0x6E3EFF`, `0x6E3F6E`, `0x6E44A4`, `0x6E4425`. Every call is followed
+by an AL test before further handling. Cases9,10,11,12,18 return false
+through `0x6E3AF2` on failure. **Case13 differs:** it branches to
+`0x6E4583`, sets AL1, and returns true without processing its case body.
+This is another reason not to equate a true dispatcher return with event
+delivery. IDA's current xref list omits these unassigned switch bodies;
+the original instructions, rather than that incomplete list, establish
+the six calls.
+
+The helper first requires the DWORD at owner `+0x118` to be nonzero.
+It then subtracts the DWORD range begin at `+0x10C` from range end at
+`+0x110`, interprets the wrapped32-bit difference as signed, divides by104
+with signed truncation, and accepts only when the quotient cast to unsigned
+is greater than1. Original `0x48C2BF..0x48C2D4` implements signed division
+with multiplier `0x4EC4EC4F`, high-half shift5 and sign correction; the
+`jbe` at `0x48C2D9` is unsigned.
+
+For well-formed element ranges, this means nonzero owner word and at least
+two104-byte elements. It does **not** validate range order or alignment.
+A reversed range of exactly104 bytes yields quotient-1, which passes the
+unsigned comparison when the owner word is nonzero. A reversed difference
+of one byte truncates to0 and fails. These arithmetic facts are preserved
+by `PassesMultiEntryPrerequisite`; they are not claims of valid native
+objects or observable runtime consequences. The `+0x118` word's meaning
+and the104-byte element type remain unnamed pending writer/consumer
+evidence.
 
 ## Post-notification chat file log and folded hash
 

@@ -125,6 +125,35 @@ foreach (bool mapsEqual in new[] { false, true })
         && update.AssignDecodedMap == expectedAssign
         && update.EventCode == (expectedNotify ? 268 : (int?)null));
 }
+Check("Structured chat multi-entry prerequisite records six gated selectors and native range layout",
+    StructuredChatMessageNativeLayout.MultiEntryPrerequisiteCalls.Select(call => call.Selector)
+        .SequenceEqual(new byte[] { 9, 10, 11, 12, 13, 18 })
+    && StructuredChatMessageNativeLayout.MultiEntryPrerequisiteCalls
+        .All(call => call.FailureReturn == (call.Selector == 13))
+    && StructuredChatMessageNativeLayout.PrerequisiteWordOffset == 0x118
+    && StructuredChatMessageNativeLayout.PrerequisiteRangeBeginOffset == 0x10C
+    && StructuredChatMessageNativeLayout.PrerequisiteRangeEndOffset == 0x110
+    && StructuredChatMessageNativeLayout.PrerequisiteEntryNativeByteCount == 104);
+foreach (uint nativeWord in new uint[] { 0, 1, uint.MaxValue })
+foreach (var range in new (uint Begin, uint End, bool PassesWhenNonzero)[]
+{
+    (0, 0, false),
+    (0, 103, false),
+    (0, 104, false),
+    (0, 207, false),
+    (0, 208, true),
+    (1000, 1312, true),
+    (uint.MaxValue - 103, 104, true),
+    (1, 0, false),
+    (104, 0, true),
+    (208, 0, true),
+    (0, 0x80000000, true)
+})
+{
+    Check($"Structured chat prerequisite word={nativeWord:X}, begin={range.Begin:X}, end={range.End:X}",
+        StructuredChatMessageNativeLayout.PassesMultiEntryPrerequisite(nativeWord, range.Begin, range.End)
+            == (nativeWord != 0 && range.PassesWhenNonzero));
+}
 Check("All three observed app modes are cataloged", AppModeCatalog.KnownModes.SequenceEqual(expected));
 Check("Mode 1 maps to tfLogin", AppModeCatalog.Find(1) == expected[0]);
 Check("Mode 2 maps to tfWorld", AppModeCatalog.Find(2) == expected[1]);
