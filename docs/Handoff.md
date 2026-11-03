@@ -3446,3 +3446,21 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   1764 sample-backed checks and1536 pure checks pass.
 - Follow-ons: message conversion10296210; callback installation if needed.
   Keep logger sinks and helper internals out of the saved pure model.
+
+## Awesomium diagnostic conversion scalar boundary
+
+- Diagnostic-routing batch committed/pushed as626ab04.
+- Wrapper10296210 initializes wide output, reserves using102B7A10 and calls
+  conversion10295F10, then ignores its aggregate-error byte.
+- Reader102B78A0 uses shared UTF-8 multibyte decoder102B7D10 in mode-1,
+  then validates scalar outsideD800-DFFF and <=10FFFF. Loop replaces
+  rejected scalar withFFFD and sets sticky error0, but continues.
+- Saved scalar append and UTF-16 pair arithmetic, not a byte-stream parser.
+  Malformed input does not imply empty converted message. Embedded scalar0
+  remains a stored WORD; later null-terminated API behavior is separate.
+- Loop length comparison is signed-positive; synthetic high-bit DWORD
+  lengths skip decoding only if allocation/reservation reaches that point.
+- Exact malformed-byte consumption, allocator failure and helper argv
+  interpretation remain unresolved. No samples/codecs/helpers executed.
+- Saved DiagnosticEncodingNativeLayout and native guards. Build succeeds;
+  1791 sample-backed checks and1559 pure checks pass.

@@ -29,6 +29,9 @@ the child-role getter rejects any non-ASCII wide value by returning empty.
 [Conversion-diagnostic routing](AwesomiumConversionDiagnostic.md) separates
 interception and custom handling from the optional helper/UI path; it does
 not guarantee continuation through installed callbacks or blocking display.
+[Diagnostic conversion](AwesomiumDiagnosticEncoding.md) preserves scalar
+replacement and UTF-16 emission without equating a decoding error with an
+empty output string.
 
 ## FirefallClient.exe client side (static, IDA addresses = raw file offsets; VA = raw+0x400C00 in .text, raw+0x401400 in .rdata)
 ### Observed

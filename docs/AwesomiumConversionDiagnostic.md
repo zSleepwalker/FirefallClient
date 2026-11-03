@@ -53,8 +53,10 @@ after its final backslash when one is found, and appends the wide literal
 `debug_message.exe` at `0x1127B0C0`.
 
 It converts the message using `0x10296210`; an empty converted string
-also returns without display (`0x10288F46` onward). The encoding behavior
-of that separate conversion is not modeled here.
+also returns without display (`0x10288F46` onward).
+[Message-conversion evidence](AwesomiumDiagnosticEncoding.md) captures
+scalar validation, U+FFFD replacement and ignored aggregate-error status
+without implementing the full byte decoder.
 
 For a nonempty converted message it attempts `CreateProcessW` at
 `0x10288FA9`, using the constructed helper path as the application and

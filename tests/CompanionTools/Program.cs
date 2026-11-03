@@ -19,6 +19,32 @@ void Check(string name, bool condition)
     if (condition) passed++; else failed++;
 }
 
+foreach (var entry in new (uint Scalar, DiagnosticScalarAppend Expected)[]
+{
+    (0, new(true, 0, null)), (0x41, new(true, 0x41, null)),
+    (0x7F, new(true, 0x7F, null)), (0x80, new(true, 0x80, null)),
+    (0xD7FF, new(true, 0xD7FF, null)),
+    (0xD800, new(false, 0xFFFD, null)), (0xDFFF, new(false, 0xFFFD, null)),
+    (0xE000, new(true, 0xE000, null)), (0xFDD0, new(true, 0xFDD0, null)),
+    (0xFFFE, new(true, 0xFFFE, null)), (0xFFFF, new(true, 0xFFFF, null)),
+    (0x10000, new(true, 0xD800, 0xDC00)), (0x1F600, new(true, 0xD83D, 0xDE00)),
+    (0x10FFFF, new(true, 0xDBFF, 0xDFFF)),
+    (0x110000, new(false, 0xFFFD, null)), (uint.MaxValue, new(false, 0xFFFD, null))
+})
+    Check($"Awesomium diagnostic scalar append {entry.Scalar:X}",
+        DiagnosticEncodingNativeLayout.CaptureScalarAppend(entry.Scalar) == entry.Expected);
+foreach (var length in new (uint Count, bool Admitted)[]
+{
+    (0, false), (1, true), (127, true), (int.MaxValue, true),
+    (0x80000000, false), (uint.MaxValue, false)
+})
+    Check($"Awesomium diagnostic decode loop uses signed-positive input length {length.Count}",
+        DiagnosticEncodingNativeLayout.CaptureDecodeLoopAdmission(length.Count) == length.Admitted);
+Check("Awesomium diagnostic conversion error remains sticky through later valid scalars",
+    DiagnosticEncodingNativeLayout.CaptureAggregateConversionSuccess(true, true)
+    && !DiagnosticEncodingNativeLayout.CaptureAggregateConversionSuccess(true, false)
+    && !DiagnosticEncodingNativeLayout.CaptureAggregateConversionSuccess(false, true)
+    && !DiagnosticEncodingNativeLayout.CaptureAggregateConversionSuccess(false, false));
 foreach (bool present in new[] { false, true })
 foreach (bool consumed in new[] { false, true })
 foreach (bool handler in new[] { false, true })
@@ -718,6 +744,34 @@ if (args.Length == 2)
     var hardware = Load("HWStats.exe", HWStatsLayout.FileSize, HWStatsLayout.Sha256);
     var child = Load("FirefallProcess.exe", FirefallProcessLayout.FileSize, FirefallProcessLayout.Sha256);
     var browser = Load("awesomium.dll", 23470048, AwesomiumLayout.Sha256);
+    Check("Awesomium diagnostic wrapper initializes wide result and ignores aggregate conversion flag",
+        browser.Matches(0x10296216, "C7461407000000C746100000000033C0668906")
+        && browser.Calls(0x10296236, DiagnosticEncodingNativeLayout.ReserveHelperVa)
+        && browser.Calls(0x1029623E, DiagnosticEncodingNativeLayout.ConversionLoopVa)
+        && browser.Matches(0x10296243, "83C4185F8BC65E5BC3")
+        && browser.Calls(0x10288F3E, DiagnosticEncodingNativeLayout.WrapperVa));
+    Check("Awesomium diagnostic loop uses signed length and appends replacement while recording failure",
+        browser.Matches(0x10295F17, "B301")
+        && browser.Matches(0x10295F21, "85F67E51")
+        && browser.Calls(0x10295F3C, DiagnosticEncodingNativeLayout.ScalarReaderVa)
+        && browser.Matches(0x10295F45, "84C0740F")
+        && browser.Calls(0x10295F4E, DiagnosticEncodingNativeLayout.Utf16AppendVa)
+        && browser.Matches(0x10295F58, "68FDFF0000")
+        && browser.Calls(0x10295F5D, DiagnosticEncodingNativeLayout.Utf16AppendVa)
+        && browser.Matches(0x10295F65, "32DB")
+        && browser.Matches(0x10295F76, "5E8AC35B"));
+    Check("Awesomium decoded-scalar validity excludes surrogate range and values above 10FFFF",
+        browser.Matches(0x102B78B2, "3C80721F8D484080F93E7314")
+        && browser.Matches(0x102B78BE, "6AFF")
+        && browser.Calls(0x102B78C8, 0x102B7D10)
+        && browser.Matches(0x102B78D2, "83C8FF")
+        && browser.Matches(0x102B78DE, "3D00D8000072113D00E0000072073DFFFF10007603"));
+    Check("Awesomium wide append uses one BMP code unit or native surrogate-pair arithmetic",
+        browser.Matches(0x102B7C16, "81FBFFFF0000774D")
+        && browser.Calls(0x102B7C5E, 0x10276E10)
+        && browser.Matches(0x102B7C9C, "8BCBC1E90A81E94028000066890C78")
+        && browser.Matches(0x102B7CB3, "81E3FF03000081CB00DC000066895C7E02")
+        && browser.Matches(0x102B7CC6, "B802000000"));
     Check("Awesomium converter constructs severity-three diagnostic and preserves LastError",
         browser.Matches(0x1029AA0E, "6A0368A7010000")
         && browser.Matches(0x10289D30, "8B44240C")
