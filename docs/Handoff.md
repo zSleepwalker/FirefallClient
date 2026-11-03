@@ -4304,3 +4304,17 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
 - The request gate's purpose and the host comparison's case sensitivity are
   unresolved. CompanionTools checks the import names, host-comparison call,
   replacement flag, header submission, and one-shot context-flag store.
+
+# Round 34: ClientApi request header tree count
+
+## Observed
+- `ClientApiRequest_Reset` (`0xBC1280`) clears the DWORD at request `+0x24`
+  while resetting the tree sentinel at `+0x20`.
+- Request header insertion at `0xBC1990` passes `request+0x20` to the
+  find-or-insert helper `0x4969A0`. Its insertion path enters the generic
+  ordered-tree insert at `0x31D720`; the node-insert helper increments the
+  container's `this+4` DWORD at `0x31E95F`. This confirms request `+0x24` is
+  the header-tree element count.
+- The `REDIRECT` handler's `request+0x24 != 0` condition is therefore a
+  nonempty-header gate, not an unexplained request flag. CompanionTools checks
+  the reset store, request tree base, insertion chain, and increment.

@@ -2215,6 +2215,16 @@ if (args.Length == 2)
             "FF15F44CAC01")
         && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpRedirectReplayFlagStoreRaw + 0x400C00,
             "C6431001"));
+    Check("Original ClientApi request header count is a resettable tree size",
+        client.Matches(Red5LoggingBridgeNativeLayout.ClientApiRequestResetRaw + 0x41 + 0x400C00,
+            "C7472400000000")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiRequestHeaderInsertRaw + 0x102 + 0x400C00,
+            "8D4B20E8064F8DFF")
+        && client.Calls(0x496A1F + 0x400C00, 0x31D720 + 0x400C00)
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiRequestTreeCountIncrementRaw + 0x400C00,
+            "8B5D1840894704")
+        && Red5LoggingBridgeNativeLayout.ClientApiRequestHeaderTreeHeadOffset == 0x20
+        && Red5LoggingBridgeNativeLayout.ClientApiRequestHeaderCountOffset == 0x24);
     Check("Original client URL message builder escapes host, path and configured identifier components",
         client.Calls(Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlMessageBuilderRaw + 0xFD + 0x400C00,
             Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlComponentEscapeRaw + 0x400C00)
