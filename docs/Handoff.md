@@ -3684,3 +3684,22 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
 - No active agent assignment remains. Follow-ons: verbose source-span
   caller1028A790 and negative threshold fallback arithmetic; cancellation
   effects beyond immediate managed boundary remain unresolved.
+
+## Awesomium verbose caller extent and fallback arithmetic
+
+- Cancellation batch committed/pushed as173681b.
+- Level helper1028A790 mode==1/minimum<=3/extent0 can diagnose N > 0U,
+  then continues on returning paths and reloads threshold. Configured path
+  decrements supplied extent modulo32, not strlen; synthetic0 yieldsFFFFFFFF.
+- Representative caller1006D799 passes41-byte source literal with extent42,
+  then signed level>=20 admits severity-20 diagnostic. Not generalized to
+  every caller or malformed pointer validity.
+- Unconfigured fallback is max(unchecked(-minimum),-1), verified NEG then
+  CMP/JG flags. Configured no-match fallback remains raw negation, so3
+  gives-1 versus-3, Int32.MinValue gives-1 versusInt32.MinValue.
+- Saved VerboseLevelNativeLayout and updated evidence docs/native guards.
+  Build succeeds;2224 pure and2505 sample-backed checks pass. No target,
+  source-pointer dereference, diagnostic, callback or logger executed.
+- No active agent assignment. Follow-ons: named mutex collisions and
+  initialization reset writers (xref11596B20), or client-side logging
+  bridge into Awesomium; retain unresolved state2 snapshot writer.

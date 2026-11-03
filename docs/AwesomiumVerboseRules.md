@@ -51,6 +51,41 @@ No filesystem path normalization occurs; a slash only determines the
 span's basename boundary. High bytes and embedded NUL are ordinary stored
 bytes here, not decoded Unicode or a new terminator.
 
+## Caller extent and no-configuration fallback
+
+Caller helper `0x1028A790` first tests diagnostic mode exactly1 and signed
+minimum severity<=3. With supplied extent0 it can construct severity3
+diagnostic `N > 0U` (`logging.cc`, line424), then continues on returning
+paths. It does not convert extent0 into a safe empty span or return early.
+After such a diagnostic it reloads the minimum threshold, so a callback's
+possible state changes must not be hidden by a stale modeled observation.
+
+With configuration pointer `0x11596AFC` nonzero, instructions
+`0x1028A814-0x1028A81E` decrement the supplied extent modulo32 and pass
+that explicit source byte length to rule lookup `0x102B53A0`. It does not
+recompute strlen. A synthetic extent0 therefore yields `0xFFFFFFFF`, not0;
+no source access safety is implied.
+
+One representative real caller at `0x1006D799` supplies literal
+`browser\download\download_manager_impl.cc` (41 bytes) and extent42,
+supporting interpretation as a source-literal extent including NUL.
+That caller tests the returned signed level>=20 and constructs severity-20
+logging when admitted. This is representative evidence, not a claim that
+every caller uses a valid literal extent.
+
+With no configuration, `neg eax; cmp eax,-1; jg` at
+`0x1028A82B-0x1028A846` returns **max(unchecked(-minimum),-1)**.
+This is different from the configured lookup's raw fallback negation.
+For minimum3 the no-configuration result is-1 but an empty configured rule
+vector returns-3. For minimum `Int32.MinValue`, negation wraps back to
+that minimum: no configuration returns-1, configured no-match returns
+`Int32.MinValue`. The later signed CMP replaces flags from NEG; do not
+interpret NEG overflow as changing that comparison.
+
+`VerboseLevelNativeLayout.cs` saves these arithmetic/admission boundaries
+from supplied observations only. It never dereferences a source pointer,
+constructs diagnostics or assumes callbacks return.
+
 ## Matcher evidence, not a replacement implementation
 
 Matcher `0x102B52B0` compares literal bytes case-sensitively at

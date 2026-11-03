@@ -19,6 +19,31 @@ void Check(string name, bool condition)
     if (condition) passed++; else failed++;
 }
 
+foreach (var entry in new (int Minimum, int WithoutConfiguration)[]
+{
+    (int.MinValue, -1), (-20, 20), (-1, 1), (0, 0), (1, -1), (2, -1),
+    (3, -1), (int.MaxValue, -1)
+})
+    Check($"Awesomium no-configuration level uses signed max after negation {entry.Minimum}",
+        VerboseLevelNativeLayout.CaptureLevelWithoutConfiguration(entry.Minimum) == entry.WithoutConfiguration);
+foreach (var entry in new (uint Extent, uint Length)[]
+{
+    (0, uint.MaxValue), (1, 0), (42, 41), (0x80000000, 0x7FFFFFFF),
+    (uint.MaxValue, uint.MaxValue - 1)
+})
+    Check($"Awesomium verbose source extent decrements modulo32 {entry.Extent}",
+        VerboseLevelNativeLayout.CaptureLookupByteLength(entry.Extent) == entry.Length);
+foreach (int mode in new[] { -1, 0, 1, 2 })
+foreach (int minimum in new[] { int.MinValue, 0, 3, 4, int.MaxValue })
+foreach (uint extent in new uint[] { 0, 1, uint.MaxValue })
+    Check($"Awesomium zero-extent diagnostic mode={mode}, minimum={minimum}, extent={extent}",
+        VerboseLevelNativeLayout.CaptureZeroExtentDiagnosticAdmission(mode, minimum, extent)
+        == (mode == 1 && minimum <= 3 && extent == 0));
+Check("Awesomium configured no-match fallback differs from unconfigured clamped level",
+    VerboseRuleNativeLayout.CaptureLevel([], 3) == -3
+    && VerboseLevelNativeLayout.CaptureLevelWithoutConfiguration(3) == -1
+    && VerboseRuleNativeLayout.CaptureLevel([], int.MinValue) == int.MinValue
+    && VerboseLevelNativeLayout.CaptureLevelWithoutConfiguration(int.MinValue) == -1);
 Check("DeploymentCommon abort requests exclude current worker only",
     DownloadCancellationNativeLayout.GetAbortDisposition(true) == DownloadWorkerAbortDisposition.SkipCurrentThread
     && DownloadCancellationNativeLayout.GetAbortDisposition(false) == DownloadWorkerAbortDisposition.RequestAbortOtherThread);
@@ -966,6 +991,23 @@ if (args.Length == 2)
         && browser.Matches(0x102B7C9C, "8BCBC1E90A81E94028000066890C78")
         && browser.Matches(0x102B7CB3, "81E3FF03000081CB00DC000066895C7E02")
         && browser.Matches(0x102B7CC6, "B802000000"));
+    Check("Awesomium verbose caller gates zero-extent diagnostic and reloads threshold afterward",
+        browser.Matches(0x1028A796, "833DF86A591101")
+        && browser.Matches(0x1028A7AC, "83F8037F4E")
+        && browser.Matches(0x1028A7B9, "85F67542")
+        && browser.Ascii(0x1127B19C) == "N > 0U"
+        && browser.Calls(0x1028A7F5, ConversionDiagnosticNativeLayout.DestructorVa)
+        && browser.Matches(0x1028A7FA, "A1046B59118B0DFC6A591185C97422"));
+    Check("Awesomium verbose caller decrements supplied extent and clamps only without configuration",
+        browser.Matches(0x1028A814, "4E508954240C89742410")
+        && browser.Calls(0x1028A81E, VerboseRuleNativeLayout.LookupVa)
+        && browser.Matches(0x1028A82B,
+            "F7D88944240483F8FFC7442408FFFFFFFF8D4424047F048D4424088B00"));
+    Check("Awesomium representative verbose call uses source literal length including terminator",
+        browser.Ascii(0x1124DB7C) == @"browser\download\download_manager_impl.cc"
+        && browser.Matches(0x1006D78A, "6A2A33DB687CDB2411")
+        && browser.Calls(0x1006D799, VerboseLevelNativeLayout.LevelGetterVa)
+        && browser.Matches(0x1006D7AF, "83F8140F8C9F0000006AEC"));
     Check("Awesomium verbose construction supplies comma/equals delimiters and explicit trim table",
         browser.Matches(0x102B581E, "6A2C6A3D")
         && browser.Calls(0x102B582F, 0x102A0670)
