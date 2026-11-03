@@ -244,3 +244,28 @@
 - A malformed status-information length is logged but does not prevent the
   `+4` read. Normal WinHTTP callback data is expected to use the documented
   8-byte structure; behavior for an invalid pointer/length is not established.
+
+# Round 28: ClientApi secure-failure details
+
+## Observed
+- `ClientApi_DispatchWinHttpStatus` selects `SECURE_FAILURE` (`0x10000`) at
+  `0xBC1E15`. It reads the DWORD status-information mask only when the reported
+  length is at least 4; shorter data becomes a zero mask without a diagnostic.
+  The message formatter appends separate labels for mask bits `0x01` through
+  `0x40` and for bit `0x80000000`; it does not append per-bit labels for
+  `0x80` through `0x40000000`. It then reports failure code 12175 through the
+  shared helper with its logging flag enabled. CompanionTools checks the
+  status/length/load sequence, each tested bit, the helper call, and the
+  observed mask model against the original sample.
+- Microsoft documents the secure-failure callback payload as a DWORD bitwise
+  OR of error values in [`WINHTTP_STATUS_CALLBACK`](https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nc-winhttp-winhttp_status_callback).
+
+## Interpreted
+- The callback always terminates this dispatch as a secure-failure result,
+  even when the status payload is shorter than one DWORD; in that case its
+  additional flag labels are absent. The generic error helper maps code 12175
+  to `0x80072F8F`.
+
+## Unresolved
+- The client-specific text labels for the recognized bits remain encoded in
+  the sample; no names are assigned to individual bits here.

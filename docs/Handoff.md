@@ -4478,3 +4478,12 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   sample-backed CompanionTools model and checks cover the field offset,
   length check, conversion, and representative positive/zero/negative cases.
   A length mismatch is logged but does not guard the subsequent read.
+
+# Round 43: ClientApi secure-failure diagnostics
+
+- The `SECURE_FAILURE` callback reads a four-byte status mask when available,
+  appends labels for bits `0x01..0x40` and `0x80000000`, then reports
+  `ERROR_WINHTTP_SECURE_FAILURE` (12175) through the common failure helper.
+  Short status data is treated as a zero mask without an assertion. The
+  sample-backed model records the labeled-bit mask `0x8000007F`; individual
+  client text labels are still encoded and unnamed.

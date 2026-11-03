@@ -2234,6 +2234,27 @@ if (args.Length == 2)
     })
         Check($"ClientApi WinHTTP error HRESULT mapping {entry.ErrorCode:X8}",
             ClientApiWinHttpErrorResultLayout.CaptureFailureHResult(entry.ErrorCode) == entry.Result);
+    uint[] secureFailureBits = { 1, 2, 4, 8, 0x10, 0x20, 0x40 };
+    Check("Original ClientApi SECURE_FAILURE reads a DWORD status mask",
+        client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpSecureFailureStatusCompareRaw
+            + 0x400C00, "81FA00000100")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpSecureFailureLengthCheckRaw
+            + 0x400C00, "837D0C04")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpSecureFailureFlagLoadRaw
+            + 0x400C00, "8B06"));
+    Check("Original ClientApi SECURE_FAILURE labels the observed mask bits",
+        secureFailureBits.Select((bit, index) => client.Matches(
+            Red5LoggingBridgeNativeLayout.ClientApiWinHttpSecureFailureFlagTestsRaw
+                + (uint)(0x16 * index) + 0x400C00,
+            $"A8{bit:X2}")).All(matches => matches)
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpSecureFailureFlagTestsRaw
+            + 0x16 * 7 + 0x400C00, "85C0790E"));
+    Check("Original ClientApi SECURE_FAILURE reports through the shared failure helper",
+        client.Calls(Red5LoggingBridgeNativeLayout.ClientApiWinHttpSecureFailureReportRaw + 0x400C00,
+            Red5LoggingBridgeNativeLayout.ClientApiWinHttpFailureHelperRaw + 0x400C00)
+        && ClientApiWinHttpSecureFailureLayout.StatusDataSize == 4
+        && ClientApiWinHttpSecureFailureLayout.FailureErrorCode == 12175
+        && ClientApiWinHttpSecureFailureLayout.CaptureLabeledFlags(0xFFFFFFFF) == 0x8000007F);
     Check("Original ClientApi redirect callback cracks the target and replays stored headers once",
         client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiWinHttpCrackUrlImportVa,
             "WinHttpCrackUrl")
