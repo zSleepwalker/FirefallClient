@@ -3923,4 +3923,6 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   as a prefix wildcard and uses case-sensitive `strncmp` for the preceding
   bytes. Callback `0xCBDDE0` returns false for an unchanged context key;
   otherwise it negates the match result. The host callback's allow/cancel
-  semantics remain unidentified.
+  semantics remain unidentified. Its mapped VA `0x10BE9E0` appears as the
+  second pointer in the function table at file offset `0x18733B8` (VA
+  `0x1C747B8`); the table owner and callback contract remain unresolved.

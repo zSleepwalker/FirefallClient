@@ -1799,7 +1799,11 @@ if (args.Length == 2)
         && ClientMatches(Red5LoggingBridgeNativeLayout.LuaUrlFilterListMatcherRaw + 0x70, "FF159448AC01")
         && client.Calls(Red5LoggingBridgeNativeLayout.LuaUrlFilterCallbackRaw + 0xD1 + 0x400C00,
             Red5LoggingBridgeNativeLayout.LuaUrlFilterListMatcherRaw + 0x400C00)
-        && ClientMatches(Red5LoggingBridgeNativeLayout.LuaUrlFilterCallbackRaw + 0xE4, "0F94C3"));
+        && ClientMatches(Red5LoggingBridgeNativeLayout.LuaUrlFilterCallbackRaw + 0xE4, "0F94C3")
+        && client.Matches(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchTableVa, "C0DE0B01")
+        && client.Matches(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchTableCallbackSlotVa, "E0E90B01")
+        && Red5LoggingBridgeNativeLayout.LuaUrlFilterCallbackPointerVa
+            == Red5LoggingBridgeNativeLayout.LuaUrlFilterCallbackRaw + 0x400C00);
     Check("Original client LogWebRequests stores Lua truthiness in its frame flag",
         client.Ascii(Red5LoggingBridgeNativeLayout.LuaLogWebRequestsUsageVa)
             == "usage: FRAME:LogWebRequests(boolean)"

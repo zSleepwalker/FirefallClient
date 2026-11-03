@@ -231,7 +231,12 @@ context key is unchanged it returns false before matching. Otherwise it
 returns the inverse of the matcher result: false for a matching filter and
 true when no filter matches. The surrounding virtual callback's externally
 visible meaning is not named by this sample, so the return is documented
-without inferring whether it means allow, cancel, or redirect.
+without inferring whether it means allow, cancel, or redirect. A static
+function-pointer table at file offset `0x18733B8` (VA `0x1C747B8`) contains
+`0x10BDEC0` followed by `0x10BE9E0` at `+0x04`; the latter is the callback's
+mapped VA (raw `.text` offset `0xCBDDE0` plus `0x400C00`). The table locates
+a static dispatch reference, but its owner and callback contract remain
+unidentified.
 
 `LogWebRequests` is registered to raw `0xCCB3D0` and takes a value after the
 frame. Although its usage string at VA `0x1BC7584` says `boolean`, the
