@@ -84,3 +84,37 @@ code501 immediate was found by a four-byte constant scan of this original
 client; this does not exclude computed codes or another binary as a producer.
 Next: resolve the snapshot-state writers and timing gates before assigning
 broader meanings to state2 or promising repeat-snapshot behavior.
+
+### Snapshot admission and fatal dump throttling
+
+RedHanded helper PE VA `0x409850` tests owner DWORD `+4`: zero admits
+immediately; otherwise unsigned32-bit `timeGetTime() - ownerTick+0` must be
+**strictly greater than2000**. Exactly2000 is not eligible. The subtraction
+wraps at32 bits; this is a modular elapsed-tick test, not a signed elapsed
+comparison or a guarantee about arbitrarily long pauses.
+
+Fatal first-chance handling duplicates that comparison at
+`0x4099A7..0x4099C0`; the second-chance fatal path calls the helper at
+`0x40998B`. Both reach `0x4099C1`, which sets state3, takes another
+timeGetTime sample, and replaces the owner tick **before** testing whether
+to invoke metadata capture. When throttled, the dump work is skipped but
+state3 and its refreshed timestamp remain. The shared state3 check at
+`0x409A1C` still calls TerminateProcess with exit code `0xFFFFFFFF`.
+Thus suppression of a repeat dump does not suppress fatal termination.
+The captures accept separate eligibility/update clock observations rather
+than assuming both native calls returned the same tick.
+
+Code502 is different: state0 or state2 admits the snapshot, shows the
+snapshot notification (`0x409740`), sets state1, updates the tick, and
+joins metadata capture. Other prior states skip those operations and
+preserve the existing state/tick. The shared state3 termination check
+still applies even on that skipped path. No2000ms test occurs in the
+code502 admission branch itself, so elapsed time alone does not readmit
+a prior-state1 snapshot.
+
+These are bounded branch captures in `DebugExceptionHandoffNativeLayout`,
+not a complete owner state machine. State2's writer and transition lifecycle
+remain unresolved; its observed admission role is not enough to name it
+"completed" or "ready". Allocation, notification, and metadata-handler
+early-return failures can prevent later effects; captured decisions describe
+the normal-return control-flow path.

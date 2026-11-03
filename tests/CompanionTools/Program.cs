@@ -143,6 +143,25 @@ Check("Client exception arguments preserve independent length/pointer pairs with
         == new DebugExceptionArguments(3, 0x12345678, 4, 0x87654321)
     && DebugExceptionHandoffNativeLayout.CaptureRaiseFlags(true) == 0
     && DebugExceptionHandoffNativeLayout.CaptureRaiseFlags(false) == 1);
+foreach (uint state in new uint[] { 0, 1, 2, 3, uint.MaxValue })
+foreach (uint previous in new uint[] { 0, uint.MaxValue - 1000 })
+foreach (uint elapsed in new uint[] { 0, 1999, 2000, 2001, uint.MaxValue })
+{
+    uint now = unchecked(previous + elapsed);
+    bool eligible = state == 0 || elapsed > 2000;
+    Check($"Fatal dump admission state={state}, previous={previous}, elapsed={elapsed}",
+        DebugExceptionHandoffNativeLayout.CaptureDumpEligibility(state, previous, now) == eligible
+        && DebugExceptionHandoffNativeLayout.CaptureFatalTransition(state, previous, now, unchecked(now + 1))
+            == new DebugSnapshotTransition(eligible, 3, unchecked(now + 1), true));
+}
+foreach (uint state in new uint[] { 0, 1, 2, 3, 4, uint.MaxValue })
+{
+    bool admitted = state == 0 || state == 2;
+    Check($"Continuable snapshot admission state={state}",
+        DebugExceptionHandoffNativeLayout.CaptureSnapshotTransition(state, 10, 20)
+            == new DebugSnapshotTransition(admitted, admitted ? 1u : state,
+                admitted ? 20u : 10u, !admitted && state == 3));
+}
 foreach (uint code in new uint[] { 0, 0x012ED4FF, 0x012ED500, 0x012ED501,
     0x012ED502, 0x012ED503, uint.MaxValue })
 foreach (uint count in new uint[] { 0, 2, 3, 4, uint.MaxValue })
@@ -322,6 +341,15 @@ if (args.Length == 2)
         && red.Calls(0x40992D, 0x409740)
         && red.Matches(0x409932, "C7470401000000")
         && red.Matches(0x409941, "E993000000"));
+    Check("Dump throttle uses unsigned tick subtraction and strict greater-than2000ms",
+        red.Matches(0x409853, "837E04007504B001")
+        && red.ImportSlotNames(0x5448E8, "timeGetTime")
+        && red.Matches(0x40985D, "FF15E84854002B06B9D00700003BC85E1BC0F7D8")
+        && red.Matches(0x4099B1, "FF15E84854002B073DD00700000F97C3"));
+    Check("Fatal path sets state3 and refreshes tick before possibly skipping metadata",
+        red.Matches(0x4099C1, "C7470403000000FF15E8485400890784DB7448")
+        && red.Matches(0x409A1C, "837F0403")
+        && red.ImportSlotNames(0x5440D4, "TerminateProcess"));
     Check("PDH identifies the process before reading a LARGE Virtual Bytes counter",
         red.Ascii(0x545468) == CrashMetadataNativeLayout.VirtualBytesCounterPattern
         && red.Matches(0x406CFD, "6868545400")

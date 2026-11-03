@@ -3048,3 +3048,21 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   writers and unsigned2000ms throttle rather than guessing state2.
 - Validation: solution build has zero warnings/errors;848 companion checks
   pass against the nine samples and793 pure checks pass without samples.
+
+## Snapshot admission and fatal throttle
+
+- RedHanded helper `0x409850` admits state0 or unsigned modular
+  timeGetTime-ownerTick >2000; equality2000 suppresses. First-chance fatal
+  handling duplicates it; second-chance fatal calls the helper.
+- Fatal join `0x4099C1` sets state3 and replaces tick using a second clock
+  call before testing eligibility. Metadata may be suppressed, but shared
+  state3 check still terminates the monitored process with0xFFFFFFFF.
+- Snapshot502 admits only prior0/2, sets1 and updates tick, with no elapsed
+  gate in that branch. Other states preserve their values; prior3 still
+  reaches termination. Do not equate time passage with snapshot readmission.
+- Added pure branch/transition captures and boundary/wraparound checks.
+  State2 writer/lifecycle remains a future trace, explicitly not named from
+  its admission role alone.
+- Validation:906 companion checks pass with all samples and849 pure checks
+  pass without samples. Next independent trace is client debug-string
+  LOGPATH/DUMPAUTH emission; managed DeploymentCommon trace is delegated.

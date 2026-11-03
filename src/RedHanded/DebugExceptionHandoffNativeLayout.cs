@@ -20,6 +20,12 @@ public readonly record struct PrivateExceptionMessageDecision(
     bool ReadsRemoteMemory,
     uint RemoteByteCount);
 
+public readonly record struct DebugSnapshotTransition(
+    bool CaptureMetadata,
+    uint ResultingState,
+    uint ResultingTick,
+    bool TerminateMonitoredProcess);
+
 /// <summary>Original-client raw offsets and RedHanded PE VAs for the exception handoff.</summary>
 public static class DebugExceptionHandoffNativeLayout
 {
@@ -35,6 +41,8 @@ public static class DebugExceptionHandoffNativeLayout
     public const int MessageAddressRecordOffset = 0x20;
     public const uint MessageReaderVa = 0x4088A0;
     public const uint MessageReadCallVa = 0x4089AA;
+    public const uint DumpThrottleVa = 0x409850;
+    public const uint DumpThrottleMilliseconds = 2000;
     public const string NoMessageMarker = "RED5_HALT <<NOMSG>>";
     public const string TooLongMessageMarker = "RED5_HALT <<MSGTOOLONG>>";
     public const string BadMemoryMessageMarker = "RED5_HALT <<BADMEM>>";
@@ -45,6 +53,22 @@ public static class DebugExceptionHandoffNativeLayout
         new(sourceByteCount, sourceAddress, messageByteCount, messageAddress);
 
     public static uint CaptureRaiseFlags(bool continuable) => continuable ? 0u : 1u;
+
+    public static bool CaptureDumpEligibility(uint state, uint previousTick, uint observedTick) =>
+        state == 0 || unchecked(observedTick - previousTick) > DumpThrottleMilliseconds;
+
+    /// <summary>Separate clock observations preserve the native check-then-update call order.</summary>
+    public static DebugSnapshotTransition CaptureFatalTransition(
+        uint previousState, uint previousTick, uint eligibilityTick, uint stateUpdateTick) =>
+        new(CaptureDumpEligibility(previousState, previousTick, eligibilityTick), 3, stateUpdateTick, true);
+
+    public static DebugSnapshotTransition CaptureSnapshotTransition(
+        uint previousState, uint previousTick, uint stateUpdateTick)
+    {
+        bool capture = previousState == 0 || previousState == 2;
+        uint state = capture ? 1u : previousState;
+        return new(capture, state, capture ? stateUpdateTick : previousTick, state == 3);
+    }
 
     public static PrivateExceptionMessageDecision CaptureMessage(
         uint exceptionCode, uint parameterCount, uint messageByteCount, bool readSucceeded)
