@@ -85,6 +85,14 @@ public readonly record struct Red5ParsedUrl(
 public readonly record struct ClientApiServerClockOffsetEntry(string Key, int OffsetSeconds);
 public readonly record struct ClientApiRequestTimerDefaults(uint Tick, uint PreviousTick);
 
+public enum ClientApiResponseObservedKind : uint
+{
+    WorkerInitialized = 0,
+    ResetDefault = 1,
+    HandleClosing = 3,
+    CloseAfterStatusDispatch = 4
+}
+
 public enum Red5LuaWebRequestLoggingAction
 {
     Disable,
@@ -254,6 +262,11 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint ClientApiRequestUrlLookupRaw = 0xBC1460;
     public const uint ClientApiRequestUrlLookupUpdateRaw = 0xBC1680;
     public const uint ClientApiRequestResetRaw = 0xBC1280;
+    public const uint ClientApiResponseResetRaw = 0xBC11D0;
+    public const uint ClientApiResponseCtorRaw = 0x3845D0;
+    public const uint ClientApiResponseSize = 0x20;
+    public const uint ClientApiResponseRequestOffset = 0x04;
+    public const uint ClientApiResponseKindOffset = 0x08;
     public const uint ClientApiWinHttpStatusCallbackRaw = 0xBC26E0;
     public const uint ClientApiWinHttpHandleClosingStatus = 0x800;
     public const uint ClientApiWinHttpCloseHandleImportVa = 0x1AC4CF8;

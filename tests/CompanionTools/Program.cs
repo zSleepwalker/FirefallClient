@@ -2133,6 +2133,19 @@ if (args.Length == 2)
             "C7400804000000")
         && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpStatusCallbackRaw + 0xA5 + 0x400C00,
             "FF15F84CAC01"));
+    Check("Original ClientApi response uses a 0x20-byte object with distinct reset and worker kinds",
+        client.Matches(Red5LoggingBridgeNativeLayout.ClientApiResponseResetRaw + 0x08 + 0x400C00,
+            "C7470400000000C7470801000000C7470C000000")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiResponseResetRaw + 0x4D + 0x400C00,
+            "C7471400000000")
+        && client.Calls(Red5LoggingBridgeNativeLayout.ClientApiResponseCtorRaw + 0x60 + 0x400C00,
+            Red5LoggingBridgeNativeLayout.ClientApiResponseResetRaw + 0x400C00)
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiPumpRequestWorkerRaw + 0x106 + 0x400C00,
+            "6A20")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiPumpRequestWorkerRaw + 0x147 + 0x400C00,
+            "894E04C7460800000000")
+        && (uint)ClientApiResponseObservedKind.HandleClosing == 3
+        && (uint)ClientApiResponseObservedKind.CloseAfterStatusDispatch == 4);
     Check("Original client URL message builder escapes host, path and configured identifier components",
         client.Calls(Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlMessageBuilderRaw + 0xFD + 0x400C00,
             Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlComponentEscapeRaw + 0x400C00)

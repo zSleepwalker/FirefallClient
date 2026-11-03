@@ -4206,3 +4206,25 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
 - The callback has explicit handle-closing and close-after-dispatch paths,
   but the full status-code mapping in `ClientApi_DispatchWinHttpStatus` and
   the meanings of response-kind values 3 and 4 have not been established.
+
+# Round 29: ClientApi response context layout
+
+## Observed
+- `ClientApiResponse_Ctor` (`0x3845D0`) initializes a 0x20-byte response
+  object and calls `ClientApiResponse_Reset` (`0xBC11D0`). Reset clears
+  offsets `+4`, `+0xC`, and `+0x14`, sets `+8` to 1, initializes the
+  tree-shaped sentinel at `+0x10`, and clears shared-text fields at `+0x18`
+  and `+0x1C`.
+- `ClientApi_PumpRequestWorker` allocates `0x20` bytes for this object, then
+  stores its request pointer at response `+4` and sets response `+8` to 0.
+  The callback previously traced changes `+8` to 3 on HANDLE_CLOSING or 4
+  after a nonzero status-dispatch result. These are enumerated as observed
+  states only; their broader meanings remain unresolved.
+- CompanionTools now verifies the reset stores, constructor-to-reset call,
+  allocation size, request pointer/kind initialization, and kind values.
+
+## Interpretation and unresolved details
+- The sentinel at `+0x10` appears to head an ordered container, likely the
+  response's header collection based on its use in status/header processing;
+  that association is not established by constructor code alone. The purpose
+  of fields `+0xC`, `+0x14`, `+0x18`, and `+0x1C` is still unknown.
