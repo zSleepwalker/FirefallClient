@@ -3138,3 +3138,22 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
 - Saved pure CaptureRipTransition and byte/branch checks. Pending work
   remains state2 writer aliasing or managed native window/path helpers.
 - Build succeeds;988 sample-backed checks and916 pure checks pass.
+
+## DeploymentCommon native utility boundaries
+
+- Method tokens104/105 are user32 ClientToScreen/MoveWindow imports.
+  No direct call/callvirt/function-pointer token candidate found in managed
+  method bodies; do not infer a window-positioning algorithm.
+- Utils.GetCommonPath token128 body RVA6A10 (IL RVA6A1C, raw4C1C)
+  creates capacity260, calls shell folder query with fCreate=false,
+  **pops BOOL**, and returns builder text on normal return. False alone
+  does not invoke managed fallback.
+- Catch System.Exception protects IL0/34, handler34/50; logged exception
+  flow reaches Environment.GetFolderPath backup. Shortcut routines use
+  shell/backup pairs25/16 and22/11; complete COM shortcut logic untraced.
+- Saved NativeUtilityNativeLayout and documentation. Companion SampleImage
+  now reads managed import metadata, IL, and catch regions without loading
+  assemblies; also guards the prior WOW64 P/Invoke signature/flags evidence.
+- Build succeeds;998 sample-backed checks and921 pure checks pass.
+  Complete managed shortcut creation/removal is a follow-on, not yet
+  implemented or inferred from the shell directory pairs alone.

@@ -19,6 +19,22 @@ void Check(string name, bool condition)
     if (condition) passed++; else failed++;
 }
 
+foreach (bool nativeBool in new[] { false, true })
+{
+    Check($"Common folder ignores native BOOL {nativeBool} on normal return",
+        NativeUtilityNativeLayout.CaptureCommonPathSource(nativeBool, false)
+            == CommonFolderPathSource.ShellStringBuilder);
+    Check($"Common folder selects managed fallback only on exception (native BOOL {nativeBool})",
+        NativeUtilityNativeLayout.CaptureCommonPathSource(nativeBool, true)
+            == CommonFolderPathSource.ManagedSpecialFolderFallback);
+}
+Check("Shell path helper requests capacity260 without creating folders",
+    NativeUtilityNativeLayout.ShellPathBufferCapacity == 260
+    && !NativeUtilityNativeLayout.CreateShellFolder
+    && NativeUtilityNativeLayout.CommonDesktopDirectoryId == 25
+    && NativeUtilityNativeLayout.DesktopDirectoryFallbackId == 16
+    && NativeUtilityNativeLayout.CommonStartMenuId == 22
+    && NativeUtilityNativeLayout.StartMenuFallbackId == 11);
 foreach (var entry in new[]
 {
     (Forge: false, Empty: false, Action: AuthInitializationAction.KeepProvidedAuth),
@@ -687,6 +703,26 @@ if (args.Length == 2)
     Check("Managed export detection uses already-loaded module handle and compares pointers to zero",
         deployment.Matches(deployment.ImageBase + WowNativeLayout.ModuleContainsFunctionIlRva,
             "0228580000060A067E4300000A284400000A2C12060328590000067E4300000A284400000A2A162A"));
+    Check("Managed window P/Invokes retain WinApi convention without SetLastError flags",
+        deployment.ManagedImportMatches(NativeUtilityNativeLayout.ClientToScreenMethodRow,
+            "user32.dll", "ClientToScreen", "00020218101175", 0x0100)
+        && deployment.ManagedImportMatches(NativeUtilityNativeLayout.MoveWindowMethodRow,
+            "user32.dll", "MoveWindow", "000602180808080802", 0x0100));
+    Check("Managed shell folder import signature and flags match its observed boundary",
+        deployment.ManagedImportMatches(NativeUtilityNativeLayout.ShellFolderImportMethodRow,
+            "shell32.dll", "SHGetSpecialFolderPath", "0004021812650802", 0x0100));
+    Check("Common folder full IL pops native BOOL and falls back only through the exception path",
+        deployment.ManagedIlMatches(NativeUtilityNativeLayout.GetCommonPathMethodRow,
+            NativeUtilityNativeLayout.GetCommonPathBodyRva,
+            "200401000073EF00000A0A7E4300000A060216282701000626066F4100000A0CDE390B725B390070076F2D00000A281E00000A28F900000672FC390070725B390070076F2D00000A281E00000A28FC000006DE0003282900000A2A082A"));
+    Check("Common folder fallback is protected by the observed System.Exception catch region",
+        deployment.ManagedCatchMatches(NativeUtilityNativeLayout.GetCommonPathMethodRow,
+            0, 34, 34, 50, "System.Exception"));
+    Check("WOW64 probe P/Invoke signature and flags match guarded IL call",
+        deployment.ManagedImportMatches(0x56, "kernel32.dll", "IsWow64Process", "000202181002", 0x0140)
+        && deployment.ManagedImportMatches(0x57, "kernel32.dll", "GetCurrentProcess", "000018", 0x0146)
+        && deployment.ManagedImportMatches(0x58, "kernel32.dll", "GetModuleHandle", "0001180E", 0x0106)
+        && deployment.ManagedImportMatches(0x59, "kernel32.dll", "GetProcAddress", "000218180E", 0x0142));
 }
 else
 {

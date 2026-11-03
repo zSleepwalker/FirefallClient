@@ -1,5 +1,7 @@
 using System.Buffers.Binary;
 using System.Reflection.PortableExecutable;
+using System.Reflection.Metadata;
+using System.Reflection.Metadata.Ecma335;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -51,6 +53,48 @@ internal sealed class SampleImage
 
     public bool Matches(uint va, string hex) =>
         bytes.AsSpan(Offset(va), hex.Length / 2).SequenceEqual(Convert.FromHexString(hex));
+
+    public bool ManagedImportMatches(int methodRow, string module, string name, string signature, ushort flags)
+    {
+        using var pe = new PEReader(new MemoryStream(bytes, writable: false));
+        var metadata = pe.GetMetadataReader();
+        var method = metadata.GetMethodDefinition(MetadataTokens.MethodDefinitionHandle(methodRow));
+        var import = method.GetImport();
+        return !import.Module.IsNil
+            && metadata.GetString(metadata.GetModuleReference(import.Module).Name) == module
+            && metadata.GetString(import.Name) == name
+            && (ushort)import.Attributes == flags
+            && metadata.GetBlobBytes(method.Signature).AsSpan().SequenceEqual(Convert.FromHexString(signature));
+    }
+
+    public bool ManagedIlMatches(int methodRow, uint bodyRva, string expectedIl)
+    {
+        using var pe = new PEReader(new MemoryStream(bytes, writable: false));
+        var metadata = pe.GetMetadataReader();
+        var method = metadata.GetMethodDefinition(MetadataTokens.MethodDefinitionHandle(methodRow));
+        return method.RelativeVirtualAddress == bodyRva
+            && pe.GetMethodBody(method.RelativeVirtualAddress).GetILContent().AsSpan()
+                .SequenceEqual(Convert.FromHexString(expectedIl));
+    }
+
+    public bool ManagedCatchMatches(int methodRow, int tryOffset, int tryLength,
+        int handlerOffset, int handlerLength, string exceptionType)
+    {
+        using var pe = new PEReader(new MemoryStream(bytes, writable: false));
+        var metadata = pe.GetMetadataReader();
+        var method = metadata.GetMethodDefinition(MetadataTokens.MethodDefinitionHandle(methodRow));
+        foreach (var region in pe.GetMethodBody(method.RelativeVirtualAddress).ExceptionRegions)
+        {
+            if (region.Kind != ExceptionRegionKind.Catch || region.CatchType.Kind != HandleKind.TypeReference)
+                continue;
+            var type = metadata.GetTypeReference((TypeReferenceHandle)region.CatchType);
+            if (region.TryOffset == tryOffset && region.TryLength == tryLength
+                && region.HandlerOffset == handlerOffset && region.HandlerLength == handlerLength
+                && $"{metadata.GetString(type.Namespace)}.{metadata.GetString(type.Name)}" == exceptionType)
+                return true;
+        }
+        return false;
+    }
 
     public bool Calls(uint va, uint target) =>
         bytes[Offset(va)] == 0xE8

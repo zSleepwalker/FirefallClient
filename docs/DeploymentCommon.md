@@ -29,3 +29,9 @@ IL locations, and P/Invoke metadata for process/OS bitness detection.
 `WowNativeLayout.cs` preserves its pure decisions; CompanionTools checks
 exercise Boolean outcomes and verify the three getter/helper IL sequences
 against the identified assembly without loading it.
+
+The [native utility follow-up](DeploymentCommonNativeUtilities.md) separates
+unused-in-the-scanned-IL window import declarations from the called shell
+folder helper. GetCommonPath ignores native BOOL failure and uses its
+managed backup only after a logged managed exception; saved decisions and
+metadata/IL/catch-region checks preserve this distinction.
