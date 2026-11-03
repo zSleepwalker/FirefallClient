@@ -46,9 +46,12 @@ A non-ASCII WORD then constructs the diagnostic
 `Check failed: IsStringASCII(wide). ` from `string_util.cc`, line 423,
 and calls its cleanup/destructor at `0x1029AA58`.
 
-Whether that diagnostic cleanup can terminate or otherwise interrupt
-execution has not been traced. The capture records **admission to that
-diagnostic**, not a guarantee of continuation for non-ASCII names.
+[Diagnostic-routing evidence](AwesomiumConversionDiagnostic.md) now
+distinguishes the early interceptor, custom severity-three handler and
+optional default helper/UI path. The default helper has a normal return
+path but may wait indefinitely, and custom handlers remain unknown.
+The capture records **admission to that diagnostic**, not a guarantee of
+continuation for non-ASCII names.
 
 If control reaches `0x1029AA5D` onward, it calculates source end as
 base + 2*stored length and calls `0x1000B350` at `0x1029AA99`. That range

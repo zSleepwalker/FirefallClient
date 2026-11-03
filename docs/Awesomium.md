@@ -26,8 +26,9 @@ The saved state capture takes already-classified inputs, not raw argv.
 [Switch names and ASCII values](AwesomiumSwitchNames.md) trace ASCII-only
 name lowercasing before prefix removal and lookup. Values keep their case;
 the child-role getter rejects any non-ASCII wide value by returning empty.
-The generic converter's non-ASCII diagnostic behavior remains a separate
-unresolved boundary.
+[Conversion-diagnostic routing](AwesomiumConversionDiagnostic.md) separates
+interception and custom handling from the optional helper/UI path; it does
+not guarantee continuation through installed callbacks or blocking display.
 
 ## FirefallClient.exe client side (static, IDA addresses = raw file offsets; VA = raw+0x400C00 in .text, raw+0x401400 in .rdata)
 ### Observed

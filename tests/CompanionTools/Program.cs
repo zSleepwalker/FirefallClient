@@ -19,6 +19,24 @@ void Check(string name, bool condition)
     if (condition) passed++; else failed++;
 }
 
+foreach (bool present in new[] { false, true })
+foreach (bool consumed in new[] { false, true })
+foreach (bool handler in new[] { false, true })
+    Check($"Awesomium severity-three route interceptor={present}, consumed={consumed}, handler={handler}",
+        ConversionDiagnosticNativeLayout.CaptureRoute(present, consumed, handler) ==
+        (present && consumed ? SeverityThreeDiagnosticRoute.ConsumedByInterceptor
+            : handler ? SeverityThreeDiagnosticRoute.CustomHandler
+            : SeverityThreeDiagnosticRoute.DefaultDisplayHelper));
+foreach (bool message in new[] { false, true })
+foreach (bool enabled in new[] { false, true })
+foreach (bool converted in new[] { false, true })
+    Check($"Awesomium default diagnostic admission message={message}, enabled={enabled}, converted={converted}",
+        ConversionDiagnosticNativeLayout.CaptureDefaultDisplayAdmission(message, enabled, converted) ==
+        (message && enabled && converted ? DiagnosticDisplayAction.AttemptHelperLaunch
+            : DiagnosticDisplayAction.ReturnWithoutDisplay));
+Check("Awesomium default diagnostic waits after launch and falls back to UI on launch failure",
+    ConversionDiagnosticNativeLayout.CaptureLaunchResult(true) == DiagnosticLaunchAction.WaitIndefinitelyThenCloseHandles
+    && ConversionDiagnosticNativeLayout.CaptureLaunchResult(false) == DiagnosticLaunchAction.ShowMessageBox);
 for (int value = 0; value <= byte.MaxValue; value++)
     Check($"Awesomium byte lowercase preserves non-ASCII and folds only A-Z, byte {value:X2}",
         SwitchNameNativeLayout.CaptureAsciiLowercaseByte((byte)value)
@@ -700,6 +718,46 @@ if (args.Length == 2)
     var hardware = Load("HWStats.exe", HWStatsLayout.FileSize, HWStatsLayout.Sha256);
     var child = Load("FirefallProcess.exe", FirefallProcessLayout.FileSize, FirefallProcessLayout.Sha256);
     var browser = Load("awesomium.dll", 23470048, AwesomiumLayout.Sha256);
+    Check("Awesomium converter constructs severity-three diagnostic and preserves LastError",
+        browser.Matches(0x1029AA0E, "6A0368A7010000")
+        && browser.Matches(0x10289D30, "8B44240C")
+        && browser.Matches(0x10289D40, "8906")
+        && browser.ImportSlotNames(0x11240308, "GetLastError")
+        && browser.Matches(0x10289D65, "8986AC000000")
+        && browser.ImportSlotNames(0x11240328, "SetLastError")
+        && browser.Matches(0x1028A0DB, "8B96AC00000052"));
+    Check("Awesomium diagnostic interceptor can bypass severity dispatch",
+        browser.Matches(0x10289EEC, "A11C6B591185C0743B")
+        && browser.Matches(0x10289F12, "FFD083C41484C07415")
+        && browser.Matches(0x10289F20, "0F82B5010000")
+        && browser.Matches(0x10289F2B, "E9A3010000"));
+    Check("Awesomium severity three selects custom handler or default display, distinct from severity four",
+        browser.Matches(0x1028A042, "83F8047533")
+        && browser.Matches(0x1028A07A, "83F8037548")
+        && browser.Matches(0x1028A07F, "833D186B591100")
+        && browser.Matches(0x1028A08E, "7412")
+        && browser.Matches(0x1028A09A, "FF15186B5911")
+        && browser.Calls(0x1028A0AC, ConversionDiagnosticNativeLayout.DefaultDisplayHelperVa));
+    Check("Awesomium default diagnostic display requires nonempty original and converted messages and enable byte",
+        browser.Matches(0x10288EBC, "837E10000F8446010000")
+        && browser.Matches(0x10288EC6, "803D136B5911000F8439010000")
+        && browser.Calls(0x10288F3E, 0x10296210)
+        && browser.Matches(0x10288F46, "837C2470007515"));
+    Check("Awesomium diagnostic launch uses debug_message.exe and blocks waiting after successful creation",
+        browser.Matches(0x1127B0C0, Convert.ToHexString(System.Text.Encoding.Unicode.GetBytes(
+            ConversionDiagnosticNativeLayout.HelperFileName + "\0")))
+        && browser.Matches(0x10288F01, "68C0B02711")
+        && browser.ImportSlotNames(0x112404DC, "CreateProcessW")
+        && browser.Matches(0x10288FA9, "FF15DC04241185C07423")
+        && browser.Matches(0x10288FB7, "6AFF51FF15D0042411")
+        && browser.ImportSlotNames(0x112404D0, "WaitForSingleObject")
+        && browser.ImportSlotNames(0x11240390, "CloseHandle")
+        && browser.Matches(0x10288FCB, "FFD68B44240C50FFD6"));
+    Check("Awesomium failed diagnostic launch selects Fatal error message box",
+        browser.Matches(0x1127B0A8, Convert.ToHexString(System.Text.Encoding.Unicode.GetBytes(
+            ConversionDiagnosticNativeLayout.MessageBoxTitle + "\0")))
+        && browser.Matches(0x10288FE5, "681000040068A8B02711506A00")
+        && browser.Matches(0x10288FF2, "FF15C8BD5711"));
     Check("Awesomium names lower only ASCII uppercase bytes through length-bounded loop",
         browser.Matches(0x10007ACD, "8B561003D03BCA7415")
         && browser.Matches(0x10007AD6, "8A018D50BF0FBEC080FA19770383C020880141EBD6")

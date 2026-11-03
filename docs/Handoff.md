@@ -3427,3 +3427,22 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   sample-backed checks and1519 pure checks pass.
 - Follow-ons: diagnostic cleanup10289EC0 behavior, and DumpTruck report
   layer serialization. No target execution, sample edits or remote calls.
+
+## Awesomium severity-three conversion diagnostic
+
+- Switch-name batch committed/pushed asf2cdfb7.
+- Diagnostic constructor stores severity3, not4. Destructor10289EC0 calls
+  optional interceptor11596B1C first; nonzero AL skips built-in logging and
+  severity handling. Unconsumed severity3 selects callback11596B18 or
+  default display helper10288EA0. Callback implementations remain unknown.
+- Default helper returns if original message empty/display-enable byte0,
+  or message conversion yields empty. Otherwise builds debug_message.exe
+  beside current executable and calls CreateProcessW. Success waits
+  INFINITE then closes thread/process; failure shows Fatal error message
+  box. No unconditional termination or exit-code observation in helper.
+- Returning paths can continue to name narrowing, but callbacks, child wait
+  and UI still forbid guaranteed continuation. No helpers/UI executed.
+- Saved ConversionDiagnosticNativeLayout and exact guards. Build succeeds;
+  1764 sample-backed checks and1536 pure checks pass.
+- Follow-ons: message conversion10296210; callback installation if needed.
+  Keep logger sinks and helper internals out of the saved pure model.
