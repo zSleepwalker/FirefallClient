@@ -1804,6 +1804,14 @@ if (args.Length == 2)
             "C706CC47C701")
         && ClientMatches(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectConstructorRaw + 0x43,
             "C74604B847C701")
+        && client.Calls(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectSetupRaw + 0x52E + 0x400C00,
+            Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectFactoryRaw + 0x400C00)
+        && client.Calls(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectFactoryRaw + 0x47 + 0x400C00,
+            Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectConstructorRaw + 0x400C00)
+        && ClientMatches(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectSetupRaw + 0x533,
+            "8987040A0000")
+        && ClientMatches(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectSetupRaw + 0x554,
+            "FF5008")
         && client.Matches(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchTableVa, "C0DE0B01")
         && client.Matches(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchTableCallbackSlotVa, "E0E90B01")
         && Red5LoggingBridgeNativeLayout.LuaUrlFilterCallbackPointerVa

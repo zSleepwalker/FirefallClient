@@ -3924,5 +3924,8 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   bytes. Callback `0xCBDDE0` returns false for an unchanged context key;
   otherwise it negates the match result. Constructor `0xCBC410` installs the
   table at VA `0x1C747B8` as an object's secondary vtable at offset `+0x04`;
-  the callback occupies its second slot. Its mapped VA is `0x10BE9E0`.
-  The owner's API type and callback allow/cancel semantics remain unresolved.
+  the callback occupies its second slot. Setup routine `0xBFB310` gets the
+  object through factory `0xCBB7A0` using owner fields `+0x9A4/+0x9A8`,
+  stores it at `+0xA04`, then calls primary slot `+0x08`. Its mapped callback
+  VA is `0x10BE9E0`; the owner's API type and callback allow/cancel semantics
+  remain unresolved.
