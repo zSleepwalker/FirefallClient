@@ -18,10 +18,10 @@ Static IDA analysis only. SHA256 `0AE559DA740DE2C51A77A652906F021833A17E2A634757
 - Report object: FILE* at +0, indent level at +0x54 (printed as `%<4*n>s` padding before each line).
 
 ## Interpreted
-- The OS/DirectX line uses the unrecovered wstream text of `sub_403A20`; the decompiler lost the buffer link into `sub_404020`'s `%s`. Exact registry path for BIOS values (`sub_406F30`) not traced.
+- The OS/DirectX line uses the unrecovered wstream text of `sub_403A20`; the decompiler lost the buffer link into `sub_404020`'s `%s`. [BIOS registry evidence](HWStatsBiosRegistry.md) now traces `sub_406F30`: HKLM `HARDWARE\DESCRIPTION\SYSTEM\`, KEY_ALL_ACCESS, ANSI queries and REG_SZ/REG_MULTI_SZ-only print admission.
 
 ## Unresolved
-- Exact OS string text, `sub_406F30` registry key, and NETAPI usage (likely the `macaddr` code).
+- Exact OS string text and NETAPI usage (likely the `macaddr` code).
 
 ## DriveSpace follow-up
 

@@ -3300,3 +3300,20 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
 - Build succeeds;1205 sample-backed checks and1092 pure checks pass.
 - Follow-ons: BIOS key406F30 and OS description403A20; NETAPI MAC helper.
   State2 writer in RedHanded remains unresolved, not a named ready state.
+
+## HWStats BIOS registry root and typed output
+
+- RAM/affinity batch committed/pushed as8e8adee.
+- System section's five calls40415B/16F/183/197/1AB share literal
+  HARDWARE/DESCRIPTION/SYSTEM; writer4030F0 calls406F30 with no middle
+  component and a1024-byte output buffer.
+- Slash-copy406EC0 maps ASCII '/' to backslash only. Opened path retains
+  trailing backslash; RegOpenKeyExA uses HKLM and KEY_ALL_ACCESS F003F.
+- Helper queries value/type, copies type even on query failure, closes
+  key and maps nonzero open/query status to80004005. Open failure leaves
+  caller type output uninitialized; no invented failure type in capture.
+- Writer admits only type1/7 and successful helper status; prints raw
+  narrow `%s = %s\n` without multi-string joining or terminator insertion.
+- Saved BiosRegistryNativeLayout and exact five-call/native checks.
+- Build succeeds;1237 sample-backed checks and1114 pure checks pass.
+  Follow-ons: OS description403A20 and NETAPI MAC helper.

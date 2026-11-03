@@ -39,6 +39,20 @@ foreach (var masks in new (uint Process, uint System, int Count)[]
 })
     Check($"Processor count uses system mask {masks.System:X8}, not process mask {masks.Process:X8}",
         RamAndProcessorNativeLayout.CaptureProcessorCount(masks.Process, masks.System) == masks.Count);
+Check("BIOS requests preserve native order",
+    BiosRegistryNativeLayout.ValueNames.SequenceEqual(
+        ["Identifier", "SystemBiosDate", "SystemBiosVersion", "VideoBiosDate", "VideoBiosVersion"]));
+foreach (uint status in new uint[] { 0, 2, 5, 234, uint.MaxValue })
+    Check($"BIOS helper collapses registry status {status} to HRESULT",
+        BiosRegistryNativeLayout.CaptureQueryHelperResult(status) ==
+        (status == 0 ? 0 : 0x80004005));
+foreach (uint type in new uint[] { 0, 1, 2, 3, 4, 7, 11, uint.MaxValue })
+{
+    Check($"BIOS success admits only REG_SZ and REG_MULTI_SZ, type {type}",
+        BiosRegistryNativeLayout.CapturePrintAdmission(0, type) == (type is 1 or 7));
+    Check($"BIOS helper failure suppresses type {type}",
+        !BiosRegistryNativeLayout.CapturePrintAdmission(0x80004005, type));
+}
 foreach (var entry in new (ulong Bytes, DriveSpaceAmounts Amounts, DriveSpaceDisplayUnit Unit)[]
 {
     (0, new(0, 0), DriveSpaceDisplayUnit.None),
@@ -963,6 +977,50 @@ if (args.Length == 2)
         && hardware.Matches(0x403651, "8BC683E00183C8007401470FACD601D1EA")
         && hardware.Ascii(0x443140) == RamAndProcessorNativeLayout.ProcessorCountKey
         && hardware.Calls(0x403670, 0x406AE0));
+    foreach (var request in new (int Index, uint BaseVa, uint ValueVa, uint SetupVa, uint CallVa)[]
+    {
+        (0, 0x443B50, 0x443B2C, 0x404154, 0x40415B),
+        (1, 0x443B80, 0x443B6C, 0x404163, 0x40416F),
+        (2, 0x443BE0, 0x443BA0, 0x404177, 0x404183),
+        (3, 0x443C10, 0x443BFC, 0x40418B, 0x404197),
+        (4, 0x443C50, 0x443C30, 0x40419F, 0x4041AB)
+    })
+    {
+        Check($"HWStats BIOS request {request.Index} root/value arguments and writer",
+            hardware.Ascii(request.BaseVa) == BiosRegistryNativeLayout.SourceBasePath
+            && hardware.Ascii(request.ValueVa) == BiosRegistryNativeLayout.ValueNames[request.Index]
+            && hardware.Matches(request.SetupVa, "BA" + Convert.ToHexString(BitConverter.GetBytes(request.BaseVa)))
+            && hardware.Matches(request.Index == 0 ? 0x40414F : request.CallVa - 5,
+                "68" + Convert.ToHexString(BitConverter.GetBytes(request.ValueVa)))
+            && hardware.Calls(request.CallVa, BiosRegistryNativeLayout.ValueWriterVa));
+    }
+    Check("HWStats BIOS query uses 1024-byte buffer and no middle subkey",
+        hardware.Matches(0x403112, "6800040000")
+        && hardware.Matches(0x403126, "33D28BC8")
+        && hardware.Calls(0x40312A, BiosRegistryNativeLayout.QueryHelperVa));
+    Check("HWStats registry copy replaces slashes without case normalization",
+        hardware.Matches(0x406EF7, "BB5C000000")
+        && hardware.Matches(0x406F00, "803C372F8D76010FB65437FF0F44D38856FF4875EB")
+        && hardware.Calls(0x4070BE, BiosRegistryNativeLayout.SlashCopyHelperVa)
+        && hardware.Calls(0x4070C8, BiosRegistryNativeLayout.SlashCopyHelperVa)
+        && hardware.Calls(0x4070D2, BiosRegistryNativeLayout.SlashCopyHelperVa));
+    Check("HWStats BIOS open appends trailing slash and requests HKLM KEY_ALL_ACCESS",
+        hardware.Ascii(0x443C2C) == "\\"
+        && hardware.Matches(0x40710A, "682C3C4400")
+        && hardware.Matches(0x40711D, "683F000F006A00566802000080")
+        && hardware.ImportSlotNames(0x440008, "RegOpenKeyExA")
+        && hardware.Matches(0x40712A, "FF1508004400"));
+    Check("HWStats registry helper queries and closes then collapses error status",
+        hardware.ImportSlotNames(0x44000C, "RegQueryValueExA")
+        && hardware.ImportSlotNames(0x440004, "RegCloseKey")
+        && hardware.Matches(0x407146, "FF150C004400")
+        && hardware.Matches(0x407157, "8901FF1504004400")
+        && hardware.Matches(0x4071AD, "F7DF1BFF81E7054000808BC7"));
+    Check("HWStats BIOS type and helper-result gates precede narrow percent-s output",
+        hardware.Matches(0x40313A, "83F801741A83F8077415")
+        && hardware.Matches(0x403159, "85F6754B")
+        && hardware.Ascii(0x443C7C) == BiosRegistryNativeLayout.NativeFormat
+        && hardware.Matches(0x403198, "687C3C4400"));
     Check("DeploymentCommon is a managed deployment assembly, not an observed native import of these helpers",
         deployment.ImportsFrom("mscoree.dll").Contains("_CorDllMain")
         && new[] { red, dumper, truck, hardware, child, browser, client }
