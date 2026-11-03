@@ -278,6 +278,9 @@ public static class Red5LoggingBridgeNativeLayout
         "ver=%d&tc=%u&nonce=%04x%04x%04x%04x&uid=%s&host=%s&path=%s&hbody=%s&cid=%llu";
     public const uint ClientApiRequestSignatureHeaderNameVa = 0x1BB5328;
     public const string ClientApiRequestSignatureHeaderName = "X-Red5-Signature";
+    public const uint ClientApiRequestHeaderFormatVa = 0x1C736C8;
+    public const string ClientApiRequestHeaderNativeFormat = "%s: %s\r\n";
+    public const uint ClientApiRequestAddHeadersImportVa = 0x1AC4CF4;
     public const uint ClientApiRequestUrlLookupFormatSharedTextRaw = 0x12B9230;
     public const uint LuaUrlFilterUrlMessageBuilderRaw = 0x12E4100;
     public const uint LuaUrlFilterUrlMessageFormatVa = 0x1C576D0;
@@ -567,6 +570,9 @@ public static class Red5LoggingBridgeNativeLayout
         ReadOnlySpan<byte> query) =>
         Convert.ToHexString(System.Security.Cryptography.HMACSHA1.HashData(key, query))
             .ToLowerInvariant();
+
+    public static string CaptureClientApiRequestHeaderLine(string name, string value) =>
+        string.Concat(name, ": ", value, "\r\n");
 
     public static string? CaptureUrlHostPortLookupKey(Red5ParsedUrl? url) =>
         url is { } parsed

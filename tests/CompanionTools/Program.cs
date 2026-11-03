@@ -300,6 +300,9 @@ Check("ClientApi signatures use lowercase-hex HMAC-SHA1",
         System.Text.Encoding.ASCII.GetBytes("key"),
         System.Text.Encoding.ASCII.GetBytes("The quick brown fox jumps over the lazy dog"))
     == "de7c9b85b8b78aa6bc8a7a36f70a90701c9db4d9");
+Check("ClientApi request header lines use colon-space and CRLF",
+    Red5LoggingBridgeNativeLayout.CaptureClientApiRequestHeaderLine(
+        "X-Red5-Signature", "signature") == "X-Red5-Signature: signature\r\n");
 foreach (var escapeCase in new (byte[] Input, string Expected)[]
 {
     (Array.Empty<byte>(), ""),
@@ -2069,6 +2072,15 @@ if (args.Length == 2)
     Check("Original ClientApi stores its signed request under the signature header name",
         client.Ascii(Red5LoggingBridgeNativeLayout.ClientApiRequestSignatureHeaderNameVa)
             == Red5LoggingBridgeNativeLayout.ClientApiRequestSignatureHeaderName);
+    Check("Original ClientApi formats map entries and submits them with WinHttpAddRequestHeaders",
+        client.Ascii(Red5LoggingBridgeNativeLayout.ClientApiRequestHeaderFormatVa)
+            == Red5LoggingBridgeNativeLayout.ClientApiRequestHeaderNativeFormat
+        && client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiRequestAddHeadersImportVa,
+            "WinHttpAddRequestHeaders")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiPumpRequestWorkerRaw
+            + 0x539 + 0x400C00, "FF15F44CAC01")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiPumpRequestWorkerRaw
+            + 0x64E + 0x400C00, "FF15F44CAC01"));
     Check("Original ClientApi uses rand and CryptoAPI SHA-1 for the request nonce and signatures",
         client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiRequestRandImportVa, "rand")
         && client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiRequestHashCreateImportVa,

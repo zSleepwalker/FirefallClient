@@ -4119,8 +4119,13 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   `"X-Red5-Signature"`, now modeled as
   `ClientApiRequestSignatureHeaderName`.
 - The header-shaped key supports interpreting the signed query as an HTTP
-  request header. A CompanionTools sample check verifies the literal.
+  request header. `ClientApi_PumpRequestWorker` traverses a name/value tree,
+  formats each pair as `"%s: %s\r\n"`, and calls
+  `WinHttpAddRequestHeaders`; a separate call adds the `Content-Type` header.
+  `CaptureClientApiRequestHeaderLine` models the map-entry format, and
+  CompanionTools checks the native format, imports, and both worker callsites.
 
 ## Unresolved
-- The final path that enumerates the request map and emits this value through
-  the HTTP API has not been traced.
+- The worker tree's precise relation to the map object at `request+0x20` is
+  inferred from the matching name/value layout and store path; a full request
+  object type has not been reconstructed.
