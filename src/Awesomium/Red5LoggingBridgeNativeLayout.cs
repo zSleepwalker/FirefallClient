@@ -118,6 +118,7 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint LuaWebFrameBindingTableRaw = 0xCCB9A0;
     public const uint LuaLoadUrlRaw = 0xCCABA0;
     public const uint LuaGetUrlRaw = 0xCCACC0;
+    public const uint LuaLoadUrlImplementationRaw = 0xD65690;
     public const uint LuaSetUrlFiltersRaw = 0xCCB1C0;
     public const uint LuaLogWebRequestsRaw = 0xCCB3D0;
     public const uint LuaClearCookiesRaw = 0xCCB4E0;
@@ -130,6 +131,7 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint LuaWebValueSetterRaw = 0xD651B0;
     public const uint LuaWebFunctionDispatcherRaw = 0xD65250;
     public const uint LuaWebFrameContentObjectOffset = 0x418;
+    public const uint LuaWebFrameInternalWebViewOffset = 0x20;
     public const uint LuaWebFrameUrlOffset = 0x448;
     public const uint LuaWebFrameTypeTargetSourceOffset = 0x398;
     public const uint LuaWebRequestLoggingFlagOffset = 0x458;
@@ -137,8 +139,22 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint LuaWebFrameNaturalWidthOffset = 0x45C;
     public const uint LuaWebFrameNaturalHeightOffset = 0x460;
     public const uint LuaWebViewLoadUrlSlotByteOffset = 0x5C;
+    public const uint LuaWebViewUrlLoadSlotByteOffset = 0x64;
+    public const uint LuaWebViewPrepareSlotByteOffset = 0x74;
+    public const float LuaNaturalFitScaleDimensionThreshold = 1f;
+    public const float LuaNaturalFitScaleMinimum = 0.2f;
+    public const float LuaNaturalFitScaleMaximum = 5f;
+    public const float LuaNaturalFitScalePercentMultiplier = 100f;
+    public const float LuaNaturalFitScaleRoundingBias = 0.5f;
+    public const uint LuaWebFrameVtableVa = 0x1C765FC;
+    public const uint LuaWebFrameLoadUrlVtableSlotVa = 0x1C76658;
     public const uint LuaWebFrameTargetDataOffset = 0x730;
     public const uint LuaTypeTargetDispatcherGlobalVa = 0x1E002B8;
+    public const uint LuaLocalUrlPrefixVa = 0x1BD49F8;
+    public const uint LuaLocalUrlSeparatorVa = 0x1BD4988;
+    public const uint LuaWebFrameViewportWidthOffset = 0x420;
+    public const uint LuaWebFrameViewportHeightOffset = 0x424;
+    public const uint LuaWebFrameScalePercentOffset = 0x464;
     public const uint LuaValueToJavaScriptRaw = 0xCBBDB0;
     public const uint LuaCallbackArgumentConversionRaw = 0xCBBE00;
     public const uint LuaCallbackInvocationWrapperRaw = 0xCD6C10;
@@ -330,6 +346,33 @@ public static class Red5LoggingBridgeNativeLayout
         currentWidth != requestedWidth || currentHeight != requestedHeight
             ? Red5NaturalDimensionsAction.UpdateAndNotify
             : Red5NaturalDimensionsAction.KeepExistingDimensions;
+
+    public static int CaptureNaturalFitScalePercent(
+        int viewportWidth,
+        int viewportHeight,
+        float naturalWidth,
+        float naturalHeight)
+    {
+        var scale = 1f;
+        if (naturalWidth >= LuaNaturalFitScaleDimensionThreshold
+            && naturalHeight >= LuaNaturalFitScaleDimensionThreshold)
+        {
+            var widthScale = viewportWidth / naturalWidth;
+            var heightScale = viewportHeight / naturalHeight;
+            scale = heightScale <= widthScale ? heightScale : widthScale;
+        }
+        else if (naturalWidth >= LuaNaturalFitScaleDimensionThreshold)
+        {
+            scale = viewportWidth / naturalWidth;
+        }
+        else if (naturalHeight >= LuaNaturalFitScaleDimensionThreshold)
+        {
+            scale = viewportHeight / naturalHeight;
+        }
+
+        scale = Math.Clamp(scale, LuaNaturalFitScaleMinimum, LuaNaturalFitScaleMaximum);
+        return (int)(scale * LuaNaturalFitScalePercentMultiplier + LuaNaturalFitScaleRoundingBias);
+    }
 
     public static Red5TypeTargetFlagAction CaptureEnableTypeTarget(byte currentFlag, bool requestedTruthy) =>
         (currentFlag != 0) == requestedTruthy

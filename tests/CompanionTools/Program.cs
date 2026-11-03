@@ -268,6 +268,19 @@ foreach (var dimensions in new[]
         Red5LoggingBridgeNativeLayout.CaptureSetNaturalDimensions(
             dimensions.CurrentWidth, dimensions.CurrentHeight,
             dimensions.RequestedWidth, dimensions.RequestedHeight) == dimensions.Expected);
+foreach (var scale in new[]
+{
+    (ViewportWidth: 800, ViewportHeight: 600, NaturalWidth: 800f, NaturalHeight: 600f, Expected: 100),
+    (ViewportWidth: 400, ViewportHeight: 300, NaturalWidth: 800f, NaturalHeight: 600f, Expected: 50),
+    (ViewportWidth: 1600, ViewportHeight: 1200, NaturalWidth: 800f, NaturalHeight: 600f, Expected: 200),
+    (ViewportWidth: 800, ViewportHeight: 600, NaturalWidth: 0.5f, NaturalHeight: 0.5f, Expected: 100),
+    (ViewportWidth: 800, ViewportHeight: 600, NaturalWidth: 10000f, NaturalHeight: 10000f, Expected: 20),
+    (ViewportWidth: 10000, ViewportHeight: 10000, NaturalWidth: 100f, NaturalHeight: 100f, Expected: 500)
+})
+    Check($"Awesomium natural-dimension fit scale is clamped/rounded: {scale.NaturalWidth}x{scale.NaturalHeight} in {scale.ViewportWidth}x{scale.ViewportHeight}",
+        Red5LoggingBridgeNativeLayout.CaptureNaturalFitScalePercent(
+            scale.ViewportWidth, scale.ViewportHeight,
+            scale.NaturalWidth, scale.NaturalHeight) == scale.Expected);
 foreach (var flag in new[]
 {
     (Current: (byte)0, Requested: false, Expected: Red5TypeTargetFlagAction.LeaveUnchanged),
@@ -1762,6 +1775,8 @@ if (args.Length == 2)
         && ClientMatches(Red5LoggingBridgeNativeLayout.LuaLogWebRequestsRaw + 0x92, "888758040000"));
     Check("Original client ClearCookies binding calls virtual slot +0x68; its usage string is mismatched",
         ClientMatches(Red5LoggingBridgeNativeLayout.LuaClearCookiesRaw + 0x55, "FF5068")
+        && client.Matches(0x1C76664, "10661601")
+        && ClientMatches(0xD65A10, "8B491C8B01FF6004")
         && client.Ascii(Red5LoggingBridgeNativeLayout.LuaClearCookiesUsageVa)
             == "usage: FRAME:LogWebRequests()");
     Check("Original client LoadUrl forwards its URL through the frame object's virtual slot +0x5C",
@@ -1782,6 +1797,25 @@ if (args.Length == 2)
         ClientMatches(Red5LoggingBridgeNativeLayout.LuaGetNaturalDimsRaw + 0x4F, "F30F108760040000")
         && client.Ascii(Red5LoggingBridgeNativeLayout.LuaGetNaturalDimsInvalidElementVa)
             == "Invalid Element - Element Destroyed?");
+    Check("Original client routes LoadUrl through its WebFrame vtable and handles local URLs specially",
+        client.Matches(Red5LoggingBridgeNativeLayout.LuaWebFrameLoadUrlVtableSlotVa, "90621601")
+        && ClientMatches(Red5LoggingBridgeNativeLayout.LuaLoadUrlImplementationRaw + 0x9E,
+            "FF159448AC01")
+        && ClientMatches(Red5LoggingBridgeNativeLayout.LuaLoadUrlImplementationRaw + 0x259,
+            "FF5264")
+        && ClientMatches(Red5LoggingBridgeNativeLayout.LuaLoadUrlImplementationRaw + 0x4D,
+            "FF5074")
+        && client.ImportSlotNames(0x1AC4894, "strncmp")
+        && client.Ascii(Red5LoggingBridgeNativeLayout.LuaLocalUrlPrefixVa) == "local://"
+        && client.Ascii(Red5LoggingBridgeNativeLayout.LuaLocalUrlSeparatorVa) == "/");
+    Check("Original client natural-dimension helper computes a clamped scale percentage",
+        client.Matches(0x1C81BE8, "0000803F")
+        && client.Matches(0x1C81A18, "CDCC4C3E")
+        && client.Matches(0x1C81F20, "0000A040")
+        && client.Matches(0x1C820AC, "0000C842")
+        && client.Matches(0x1C81AD4, "0000003F")
+        && ClientMatches(0xCCC67E, "FF5038")
+        && ClientMatches(0xCCC68E, "FF503C"));
     Check("Original client EnableTypeTarget uses Lua truthiness and updates its target flag",
         client.Calls(Red5LoggingBridgeNativeLayout.LuaEnableTypeTargetRaw + 0x85 + 0x400C00,
             Red5LoggingBridgeNativeLayout.LuaEnableTypeTargetHelperRaw + 0x400C00)

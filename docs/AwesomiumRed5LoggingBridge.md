@@ -167,8 +167,17 @@ Lua value to text. After validating the frame, it checks the associated object
 at offset `+0x418`; when present, it calls that object's virtual slot `+0x5C`
 with the URL string and pushes Lua `true`. If the associated object is null,
 the function returns without pushing a value. The invalid-frame branch uses
-`Invalid Element - Element Destroyed?` at VA `0x1BC7484`; lower-level URL
-loading behavior behind the virtual call is not established here.
+`Invalid Element - Element Destroyed?` at VA `0x1BC7484`. In the identified
+WebFrame vtable at VA `0x1C765FC`, slot `+0x5C` points to raw `0xD65690`.
+That routine returns if its nested view pointer at `+0x20` is null, otherwise
+calls the nested view's virtual slot `+0x74` before preparing the URL. A
+case-sensitive eight-byte comparison against `local://` (VA `0x1BD49F8`)
+selects a special branch that strips the prefix and passes the suffix, a base
+string at `this+0x4C`, and `/` (VA `0x1BD4988`) through string/path helpers.
+Other URLs go through raw `0x2EE810`. Both branches pass the resulting
+temporary to the IAT helper at VA `0x1AC4EF8` and then call nested-view slot
+`+0x64`. The meanings of the preliminary `+0x74` call and the exact temporary
+URL type remain unresolved.
 
 `GetUrl` at raw `0xCCACC0` reads the current URL pointer at frame offset
 `+0x448`, substituting the empty string at VA `0x1C5EA68` when the pointer is
@@ -178,6 +187,16 @@ height at `+0x45C` and `+0x460`. It writes both fields and calls raw `0xCCC5C0`
 only if either differs. The comparison is ordinary floating-point inequality,
 so equal NaN values still take the update path. `GetNaturalDims` at raw
 `0xCCB710` returns those same two fields as Lua numbers.
+
+The `SetNaturalDims` notification helper, raw `0xCCC5C0`, derives a fit scale
+from viewport dimensions at `+0x420/+0x424` and natural dimensions at
+`+0x45C/+0x460`. For dimensions at least `1`, it uses the smaller applicable
+viewport-to-natural ratio; if neither natural dimension reaches `1`, it
+starts from `1.0`. The ratio is clamped to `[0.2, 5.0]`, multiplied by `100`,
+rounded by adding `0.5` before integer conversion, and stored at `+0x464`.
+When the associated object at `+0x418` exists, the helper reads its current
+value through slot `+0x38` and writes the new integer through slot `+0x3C`
+only when they differ. The API behind those slots is not named by this sample.
 
 `EnableTypeTarget` at raw `0xCCB7C0` converts its extra Lua argument using
 truthiness and calls raw `0xCCD0F0`. That helper does nothing when the stored

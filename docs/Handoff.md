@@ -3913,3 +3913,8 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   `0xCCD0F0`, which updates flag `+0x459` and may synchronize the active
   target; `IsTypeTarget` (`0xCCB8C0`) returns that flag. Its usage string
   misleadingly advertises a boolean argument that its code does not read.
+- `LoadUrl`'s vtable slot `+0x5C` resolves to `0xD65690`. This handles
+  `local://` specially using a suffix and base-path helper chain; ordinary
+  URLs use `0x2EE810`, and both paths call nested-view slot `+0x64`. The
+  natural-dimension helper computes a clamped, rounded scale percentage and
+  synchronizes nested-view slots `+0x38/+0x3C` only when the value changes.
