@@ -40,8 +40,25 @@ handler obtains the saved `JSObject` remote ID through the imported
 `remote_id` slot at VA `0x1AC4F00` and compares it with the callback's
 incoming remote ID. A mismatch goes to the unknown-callback log path.
 
-When the remote ID matches, the handler first attempts its mapped-object
-path. If that path does not apply, it compares the callback method name
+When the remote ID matches, the handler performs an ordered, string-keyed
+lookup rooted at offset `+0x474` of the enclosing object, using the incoming
+method name. The lookup helper at raw `0xCCD640` uses `strcmp`; an exact
+match enters the mapped callback path, while a miss (or the helper's
+additional sentinel condition) falls through to the special-method check.
+The mapped path creates a
+12-byte record holding a retained lookup result, a `JSValue`, and a `JSArray`.
+It examines the final array argument, not the first. When that value is an
+object, raw `0xD64320` applies a cached JavaScript predicate whose ASCII
+source is at VA `0x1BD4570`:
+`(function (object) { return !!(object && object.constructor && object.call && object.apply); })`.
+The helper invokes the predicate's `call` method (method-name literal
+`call` at VA `0x1BD4544`) with `null` and the candidate object. If the result
+is defined and truthy, the handler stores that trailing value separately and
+pops it from the copied argument array; otherwise it preserves the full
+array. Raw `0xD66B70` appends the record to the handler's collection at
+`this+0x34`. The later consumer of this queue remains unresolved.
+
+If lookup falls through, the handler compares the callback method name
 against the UTF-16 literal `errorlog` at VA `0x1BD4994` using the imported
 `WebString::operator==` at VA `0x1AC4EA4`. A different method name is logged
 as an unknown callback. For `errorlog`, an empty argument array or a
@@ -55,10 +72,11 @@ object is at VA `0x1E68688`.
 
 The unrelated/unknown callback message uses format VA `0x1BD48F0`
 (`uiWebFrame='%s', unknown callback was used by Javascript: %s`) and logger
-object VA `0x1E68668`, through the helper at raw `0x2FCC60`. The handler's
-mapped-object path and the JavaScript code that invokes `Red5.errorlog`
-remain untraced; the callback's errorlog fallback and its string-to-logger
-handoff are established by the native instructions.
+object VA `0x1E68668`, through the helper at raw `0x2FCC60`. The mapped
+callback's queue consumer and the JavaScript code that invokes `Red5.errorlog`
+remain untraced; the callback's routing, callable-like argument handling,
+and errorlog string-to-logger handoff are established by the native
+instructions.
 
 The separate `WebPreferences::WebPreferences` import has one direct call
 site at raw `0xCBC1B1` in function `0xCBC180`. That routine then initializes

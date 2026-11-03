@@ -15,10 +15,16 @@ public enum Red5LoggingBridgeCreationAction
 
 public enum Red5MethodCallbackAction
 {
-    ContinueMappedObjectPath,
+    QueueMappedMethodCallback,
     LogErrorMessage,
     LogUnknownCallback,
     ReturnWithoutLogging
+}
+
+public enum Red5MappedCallbackArgumentAction
+{
+    PreserveAllArguments,
+    SeparateTrailingCallableLikeValue
 }
 
 /// <summary>Observed Red5 setup and callback decisions; invokes no browser or logging APIs.</summary>
@@ -27,6 +33,9 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint InitializerRaw = 0xD668D0;
     public const uint CallbackHandlerRaw = 0xD65A60;
     public const uint CallbackHandlerVtableVa = 0x1C7656C;
+    public const uint CallbackMethodLookupRaw = 0xCCD640;
+    public const uint CallbackCallablePredicateRaw = 0xD64320;
+    public const uint CallbackQueueAppendRaw = 0xD66B70;
     public const uint SetCustomMethodImportVa = 0x1AC4EE0;
     public const uint SetPropertyAsyncImportVa = 0x1AC4EF0;
     public const uint Red5ObjectNameVa = 0x1BD4BAC;
@@ -34,6 +43,8 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint CallbackErrorLogMethodNameVa = 0x1BD4994;
     public const uint CallbackMessageFormatVa = 0x1BD498C;
     public const uint CallbackUnknownFormatVa = 0x1BD48F0;
+    public const uint CallbackMethodCallNameVa = 0x1BD4544;
+    public const uint CallbackCallablePredicateVa = 0x1BD4570;
     public const uint CallbackLogHelperRaw = 0x2FC4F0;
     public const uint CallbackUnknownLogHelperRaw = 0x2FCC60;
     public const uint CreationFailureFormatVa = 0x1BD4B2C;
@@ -57,7 +68,7 @@ public static class Red5LoggingBridgeNativeLayout
 
     public static Red5MethodCallbackAction CaptureMethodCallback(
         bool remoteObjectMatches,
-        bool mappedObjectPathSelected,
+        bool mappedMethodEntrySelected,
         string methodName,
         uint argumentCount,
         bool firstArgumentIsString)
@@ -67,9 +78,9 @@ public static class Red5LoggingBridgeNativeLayout
             return Red5MethodCallbackAction.LogUnknownCallback;
         }
 
-        if (mappedObjectPathSelected)
+        if (mappedMethodEntrySelected)
         {
-            return Red5MethodCallbackAction.ContinueMappedObjectPath;
+            return Red5MethodCallbackAction.QueueMappedMethodCallback;
         }
 
         if (!string.Equals(methodName, ErrorLogMethodName, StringComparison.Ordinal))
@@ -81,4 +92,12 @@ public static class Red5LoggingBridgeNativeLayout
             ? Red5MethodCallbackAction.LogErrorMessage
             : Red5MethodCallbackAction.ReturnWithoutLogging;
     }
+
+    public static Red5MappedCallbackArgumentAction CaptureMappedCallbackArguments(
+        bool hasArguments,
+        bool trailingArgumentIsObject,
+        bool trailingArgumentPassesCallableLikePredicate) =>
+        hasArguments && trailingArgumentIsObject && trailingArgumentPassesCallableLikePredicate
+            ? Red5MappedCallbackArgumentAction.SeparateTrailingCallableLikeValue
+            : Red5MappedCallbackArgumentAction.PreserveAllArguments;
 }

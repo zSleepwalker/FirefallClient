@@ -144,23 +144,38 @@ foreach (bool created in new[] { false, true })
             : Red5LoggingBridgeCreationAction.MarkUnavailableAndLogFailure));
 foreach (var callback in new[]
 {
-    (RemoteMatch: false, MappedPath: false, Method: "errorlog", Count: 1U, String: true,
+    (RemoteMatch: false, MethodEntrySelected: false, Method: "errorlog", Count: 1U, String: true,
         Expected: Red5MethodCallbackAction.LogUnknownCallback),
-    (RemoteMatch: true, MappedPath: true, Method: "errorlog", Count: 1U, String: true,
-        Expected: Red5MethodCallbackAction.ContinueMappedObjectPath),
-    (RemoteMatch: true, MappedPath: false, Method: "other", Count: 1U, String: true,
+    (RemoteMatch: true, MethodEntrySelected: true, Method: "errorlog", Count: 1U, String: true,
+        Expected: Red5MethodCallbackAction.QueueMappedMethodCallback),
+    (RemoteMatch: true, MethodEntrySelected: false, Method: "other", Count: 1U, String: true,
         Expected: Red5MethodCallbackAction.LogUnknownCallback),
-    (RemoteMatch: true, MappedPath: false, Method: "errorlog", Count: 1U, String: true,
+    (RemoteMatch: true, MethodEntrySelected: false, Method: "errorlog", Count: 1U, String: true,
         Expected: Red5MethodCallbackAction.LogErrorMessage),
-    (RemoteMatch: true, MappedPath: false, Method: "errorlog", Count: 0U, String: false,
+    (RemoteMatch: true, MethodEntrySelected: false, Method: "errorlog", Count: 0U, String: false,
         Expected: Red5MethodCallbackAction.ReturnWithoutLogging),
-    (RemoteMatch: true, MappedPath: false, Method: "errorlog", Count: 1U, String: false,
+    (RemoteMatch: true, MethodEntrySelected: false, Method: "errorlog", Count: 1U, String: false,
         Expected: Red5MethodCallbackAction.ReturnWithoutLogging)
 })
     Check($"Awesomium Red5 callback routes {callback.Method} with {callback.Count} argument(s)",
         Red5LoggingBridgeNativeLayout.CaptureMethodCallback(
-            callback.RemoteMatch, callback.MappedPath, callback.Method, callback.Count, callback.String)
+            callback.RemoteMatch, callback.MethodEntrySelected, callback.Method, callback.Count, callback.String)
         == callback.Expected);
+foreach (var mappedArguments in new[]
+{
+    (HasArguments: false, IsObject: false, CallableLike: false,
+        Expected: Red5MappedCallbackArgumentAction.PreserveAllArguments),
+    (HasArguments: true, IsObject: false, CallableLike: false,
+        Expected: Red5MappedCallbackArgumentAction.PreserveAllArguments),
+    (HasArguments: true, IsObject: true, CallableLike: false,
+        Expected: Red5MappedCallbackArgumentAction.PreserveAllArguments),
+    (HasArguments: true, IsObject: true, CallableLike: true,
+        Expected: Red5MappedCallbackArgumentAction.SeparateTrailingCallableLikeValue)
+})
+    Check($"Awesomium Red5 mapped callback argument handling, object={mappedArguments.IsObject}, callable={mappedArguments.CallableLike}",
+        Red5LoggingBridgeNativeLayout.CaptureMappedCallbackArguments(
+            mappedArguments.HasArguments, mappedArguments.IsObject, mappedArguments.CallableLike)
+        == mappedArguments.Expected);
 foreach (uint fileHandle in new uint[] { 0, 1, 0x80000000, uint.MaxValue })
     Check($"Awesomium configuration closes nonzero prior file handle {fileHandle:X8}",
         LogFileNativeLayout.CaptureClosesPriorFileHandle(fileHandle) == (fileHandle != 0));
@@ -1512,6 +1527,23 @@ if (args.Length == 2)
         ClientMatches(0xD65AF9, "FF15004FAC0139450C0F8515020000")
         && ClientMatches(0xD65B02, "0F8515020000")
         && client.Matches(Red5LoggingBridgeNativeLayout.CallbackHandlerVtableVa, "60661601")
+        && ClientMatches(0xD65B15, "8D8E74040000E8207BF6FF")
+        && ClientMatches(0xD65B24, "3B86740400000F840F010000")
+        && ClientMatches(0xD65B33, "0F8406010000")
+        && client.Calls(0xD65B1B + 0x400C00,
+            Red5LoggingBridgeNativeLayout.CallbackMethodLookupRaw + 0x400C00)
+        && ClientMatches(0xD65BA9, "8BCFFF15244EAC0185C0746E48")
+        && ClientMatches(0xD65BC5, "FF151C4EAC01")
+        && client.Calls(0xD65BDF + 0x400C00,
+            Red5LoggingBridgeNativeLayout.CallbackCallablePredicateRaw + 0x400C00)
+        && client.ImportSlotNames(0x1AC4EDC,
+            "?Invoke@JSObject@Awesomium@@QAE?AVJSValue@2@ABVWebString@2@ABVJSArray@2@@Z")
+        && ClientMatches(0xD65BF5, "8D4E04FF15D44EAC01")
+        && ClientMatches(0xD65C02, "FF15044FAC01")
+        && ClientMatches(0xD65C08, "8D4E08FF15084FAC01")
+        && client.ImportSlotNames(0x1AC4F08, "?Pop@JSArray@Awesomium@@QAEXXZ")
+        && client.Calls(0xD65C19 + 0x400C00,
+            Red5LoggingBridgeNativeLayout.CallbackQueueAppendRaw + 0x400C00)
         && ClientMatches(0xD65C3F, "BA9449BD018D4C2414E8035BF5FF")
         && ClientMatches(0xD65C57, "FF15A44EAC01")
         && ClientMatches(0xD65C78, "FF15244EAC0185C0")
@@ -1530,7 +1562,11 @@ if (args.Length == 2)
             "6500720072006F0072006C006F0067000000")
         && client.Ascii(Red5LoggingBridgeNativeLayout.CallbackMessageFormatVa) == "%s - %s"
         && client.Ascii(Red5LoggingBridgeNativeLayout.CallbackUnknownFormatVa)
-            == "uiWebFrame='%s', unknown callback was used by Javascript: %s");
+            == "uiWebFrame='%s', unknown callback was used by Javascript: %s"
+        && client.Matches(Red5LoggingBridgeNativeLayout.CallbackMethodCallNameVa,
+            "630061006C006C000000")
+        && client.Ascii(Red5LoggingBridgeNativeLayout.CallbackCallablePredicateVa)
+            == "(function (object) { return !!(object && object.constructor && object.call && object.apply); })");
     Check("RedHanded message decoder admits500/501/502 with four parameters and length at most1024",
         red.Matches(0x40890B, "05002BD1FE83F8020F87CD040000")
         && red.Matches(0x408919, "837E10047324")

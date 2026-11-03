@@ -3744,7 +3744,7 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   ASCII failure format against `FirefallClient.exe.original`. Build succeeds;
   2256 pure and2543 sample-backed checks pass. No browser, script, logging
   API, or callback was run.
-- Follow-up: trace the callback's mapped-object branch and identify the
+- Follow-up: identify the mapped callback queue consumer and the
   JavaScript-side call site. The pending state2 snapshot-writer question
   also remains open.
 
@@ -3768,11 +3768,26 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   The first format value is the frame label when non-null, otherwise the
   empty-string pointer VA `0x1C5EA68`.
 - Unknown names use format VA `0x1BD48F0` and logger object VA `0x1E68668`
-  through helper raw `0x2FCC60`. The mapped-object handling path and actual
-  JavaScript caller of `Red5.errorlog` remain open; no target or callback
-  was executed.
-- Added the callback fallback decision model, sample instruction/string
-  checks, and corrected the earlier SetCustomMethod call-site assertion.
+  through helper raw `0x2FCC60`. No target or callback was executed.
+- The mapped path uses an ordered string-keyed tree rooted at offset `+0x474`
+  of the enclosing object. Raw `0xCCD640`/`0xCCDC70` compare the method key
+  with `strcmp`; a lookup miss or second sentinel check falls through to the
+  `errorlog` special case. On a match, raw `0xD65A60` creates a 12-byte
+  record with the retained lookup result, a `JSValue`, and a `JSArray`.
+- For nonempty arrays, the handler checks the final argument; if it is an
+  object, raw `0xD64320` invokes a cached predicate from ASCII source VA
+  `0x1BD4570`. The predicate requires truthy `object`, `constructor`, `call`,
+  and `apply` properties. A defined, truthy result causes the handler to
+  separate that final value and pop it from the copied array. Otherwise it
+  preserves all arguments. Raw `0xD66B70` appends the record to the handler's
+  collection at `this+0x34`.
+- Added callback route and trailing-callable-like-argument decision models,
+  plus sample guards for the lookup, predicate, array pop, and queue append.
+  The queue consumer and actual JavaScript caller of `Red5.errorlog` remain
+  unresolved.
+- Validation: solution build succeeded with 0 warnings/errors; all 2556
+  CompanionTools checks passed, including original-sample checks; `git diff
+  --check` is clean.
 - Validation: solution build succeeded with 0 warnings/errors; all 2552
   CompanionTools checks passed, including original-sample checks; `git diff
   --check` is clean.
