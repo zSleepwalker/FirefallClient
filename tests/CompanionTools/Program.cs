@@ -2205,18 +2205,24 @@ if (args.Length == 2)
             "WinHttpCrackUrl")
         && client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiWinHttpRedirectHostCompareImportVa,
             "_stricmp")
+        && client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiRequestHostLowercaseImportVa,
+            "tolower")
         && client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiRequestAddHeadersImportVa,
             "WinHttpAddRequestHeaders")
         && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpRedirectCrackUrlRaw + 0x400C00,
             "FF15F04CAC01")
         && client.Calls(Red5LoggingBridgeNativeLayout.ClientApiWinHttpRedirectHostCompareRaw + 0x400C00,
-            0x2FC540 + 0x400C00)
+            Red5LoggingBridgeNativeLayout.ClientApiWinHttpRedirectHostCompareHelperRaw + 0x400C00)
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpRedirectHostCompareHelperRaw
+            + 0x18 + 0x400C00, "FF15A848AC01")
         && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpRedirectHeaderFlagsRaw + 0x400C00,
             "6800000080")
         && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpRedirectAddHeadersRaw + 0x400C00,
             "FF15F44CAC01")
         && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpRedirectReplayFlagStoreRaw + 0x400C00,
-            "C6431001"));
+            "C6431001")
+        && client.Calls(Red5LoggingBridgeNativeLayout.ClientApiRequestUrlHostLowercaseCallRaw + 0x400C00,
+            Red5LoggingBridgeNativeLayout.ClientApiRequestUrlHostLowercaseHelperRaw + 0x400C00));
     Check("Original ClientApi request header count is a resettable tree size",
         client.Matches(Red5LoggingBridgeNativeLayout.ClientApiRequestResetRaw + 0x41 + 0x400C00,
             "C7472400000000")
@@ -2227,6 +2233,16 @@ if (args.Length == 2)
             "8B5D1840894704")
         && Red5LoggingBridgeNativeLayout.ClientApiRequestHeaderTreeHeadOffset == 0x20
         && Red5LoggingBridgeNativeLayout.ClientApiRequestHeaderCountOffset == 0x24);
+    Check("ClientApi redirect replay is gated by header count, one-shot flag, and host-only comparison",
+        !ClientApiRedirectHeaderReplayPolicy.ShouldReplay("api.example", "API.EXAMPLE", 1, false)
+        && ClientApiRedirectHeaderReplayPolicy.ShouldReplay("api.example", "other.example", 1, false)
+        && !ClientApiRedirectHeaderReplayPolicy.ShouldReplay("api.example", "other.example", 0, false)
+        && !ClientApiRedirectHeaderReplayPolicy.ShouldReplay("api.example", "other.example", 1, true)
+        && Red5LoggingBridgeNativeLayout.ClientApiRequestUrlSchemeOffset == 0x0C
+        && Red5LoggingBridgeNativeLayout.ClientApiRequestUrlHostOffset == 0x10
+        && Red5LoggingBridgeNativeLayout.ClientApiRequestUrlPortOffset == 0x14
+        && Red5LoggingBridgeNativeLayout.ClientApiRequestUrlPathOffset == 0x18
+        && Red5LoggingBridgeNativeLayout.ClientApiRequestUrlQueryOffset == 0x1C);
     Check("Original client URL message builder escapes host, path and configured identifier components",
         client.Calls(Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlMessageBuilderRaw + 0xFD + 0x400C00,
             Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlComponentEscapeRaw + 0x400C00)

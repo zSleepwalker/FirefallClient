@@ -104,6 +104,19 @@ public enum ClientApiWinHttpCallbackStatus : uint
     RequestError = 0x200000
 }
 
+/// <summary>
+/// Observed redirect header-replay gate. Host comparison models ASCII
+/// case-insensitivity; CRT locale-specific byte behavior is not simulated.
+/// </summary>
+public static class ClientApiRedirectHeaderReplayPolicy
+{
+    public static bool ShouldReplay(string requestHost, string redirectedHost, uint headerCount,
+        bool replayAlreadyAttempted) =>
+        headerCount != 0
+        && !replayAlreadyAttempted
+        && !string.Equals(requestHost, redirectedHost, StringComparison.OrdinalIgnoreCase);
+}
+
 public enum Red5LuaWebRequestLoggingAction
 {
     Disable,
@@ -273,6 +286,15 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint ClientApiRequestUrlLookupRaw = 0xBC1460;
     public const uint ClientApiRequestUrlLookupUpdateRaw = 0xBC1680;
     public const uint ClientApiRequestResetRaw = 0xBC1280;
+    public const uint ClientApiRequestUrlSchemeOffset = 0x0C;
+    public const uint ClientApiRequestUrlHostOffset = 0x10;
+    public const uint ClientApiRequestUrlPortOffset = 0x14;
+    public const uint ClientApiRequestUrlPathOffset = 0x18;
+    public const uint ClientApiRequestUrlQueryOffset = 0x1C;
+    public const uint ClientApiRequestUrlParserRaw = 0xBCE800;
+    public const uint ClientApiRequestUrlHostLowercaseCallRaw = 0xBCE99A;
+    public const uint ClientApiRequestUrlHostLowercaseHelperRaw = 0x12B9B00;
+    public const uint ClientApiRequestHostLowercaseImportVa = 0x1AC4978;
     public const uint ClientApiRequestHeaderTreeHeadOffset = 0x20;
     public const uint ClientApiRequestHeaderCountOffset = 0x24;
     public const uint ClientApiRequestHeaderInsertRaw = 0xBC1990;
@@ -296,6 +318,7 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint ClientApiWinHttpRedirectHostCompareImportVa = 0x1AC48A8;
     public const uint ClientApiWinHttpRedirectCrackUrlRaw = 0xBC1F8C;
     public const uint ClientApiWinHttpRedirectHostCompareRaw = 0xBC1FF0;
+    public const uint ClientApiWinHttpRedirectHostCompareHelperRaw = 0x2FC540;
     public const uint ClientApiWinHttpRedirectHeaderFlagsRaw = 0xBC207B;
     public const uint ClientApiWinHttpRedirectAddHeadersRaw = 0xBC2085;
     public const uint ClientApiWinHttpRedirectReplayFlagStoreRaw = 0xBC20B5;

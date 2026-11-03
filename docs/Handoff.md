@@ -4326,4 +4326,26 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   for a zero return. Resolving the slot in the original PE import table
   identifies it as `_stricmp`, so redirect host comparison ignores ASCII
   case.
-- CompanionTools now verifies the IAT slot resolves to `_stricmp`.
+- The request URL parser at `0xBCE800` stores the host at request `+0x10`
+  and calls `0x12B9B00` to lowercase the host; that helper calls imported
+  `tolower` at IAT slot `0x1AC4978`.
+- CompanionTools now verifies both IAT names and the host-normalization and
+  comparison callsites.
+
+# Round 36: Redirect comparison is host-only
+
+## Observed
+- The URL parser receives `request+0x0C`; its outputs are scheme at `+0x0C`,
+  host at `+0x10`, port at `+0x14`, path at `+0x18`, and query at `+0x1C`.
+- The redirect branch initializes `URL_COMPONENTS` with size `0x3C`, calls
+  `WinHttpCrackUrl`, terminates its returned host using the returned host
+  length, converts that host to shared text, and compares it against
+  `request+0x10`. It does not read the cracked scheme or port for this
+  comparison. Therefore only a host change triggers the observed
+  cross-host header-replay condition; a scheme-only or port-only change does
+  not.
+- The replay flag is in callback-context byte `+0x10`, initialized to zero
+  with the adjacent `+0x11` cleanup flag. It is set after the stored headers
+  have been traversed and submitted, so subsequent redirect callbacks for
+  this context skip replay. CompanionTools now includes the host-only policy
+  cases and guards the URL-component offsets.
