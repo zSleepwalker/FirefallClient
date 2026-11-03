@@ -3553,3 +3553,26 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   execution. True does not prove a valid stored handle or successful seek.
 - Next bounded trace: destructor10289EC0 actual log-file write and error
   return handling, or independent downloader outer exception propagation.
+
+## Awesomium log sink admission and writes
+
+- File-opening batch committed/pushed as0e0cd83.
+- Unconsumed destructor10289EC0: destinations2/3 call OutputDebugStringA
+  and stderr regardless of severity; others call stderr only signed
+  severity>=2. Destination0 therefore does not suppress all diagnostics.
+- stderr uses fprintf("%s") and fflush on CRT array11553420+40, whose
+  static FILE descriptor is2. Results ignored. File block admits any
+  destination except0/2, attempts synchronization, calls open helper,
+  checks only AL, then seeks EOF again and writes stored string byte length.
+- WriteFile BOOL and bytes-written local ignored, no partial-write retry,
+  FlushFileBuffers, close or result-driven failure branch in this path.
+  Null-terminated debugger/stderr output differs from length-based write.
+- Synthetic unknown destinations can enter file block while zero-handle
+  open helper skips actual open and returns true; do not normalize them
+  or equate attempted output with delivery.
+- Saved LogSinkNativeLayout, focused docs and native guards. Build succeeds;
+  1835 pure and2089 sample-backed checks pass. No target/sink/filesystem or
+  synchronization API executed.
+- Follow-ons: mutex name/setup10289AE0 (default path or caller path,
+  backslash normalization, Global prefix, initialized flag/failure branch);
+  downloader outer exception propagation. No active agent assignment.

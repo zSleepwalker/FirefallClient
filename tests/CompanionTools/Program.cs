@@ -19,6 +19,20 @@ void Check(string name, bool condition)
     if (condition) passed++; else failed++;
 }
 
+foreach (bool consumed in new[] { false, true })
+foreach (int destination in new[] { int.MinValue, -1, 0, 1, 2, 3, 4, int.MaxValue })
+foreach (int severity in new[] { int.MinValue, -1, 0, 1, 2, 3, 4, int.MaxValue })
+{
+    var sinks = LogSinkNativeLayout.CaptureSinkAdmission(consumed, destination, severity);
+    Check($"Awesomium sink admission consumed={consumed}, destination={destination}, severity={severity}",
+        sinks.OutputDebugString == (!consumed && destination is 2 or 3)
+        && sinks.StandardErrorAndFlush == (!consumed && (destination is 2 or 3 || severity >= 2))
+        && sinks.EnterFileOutputBlock == (!consumed && destination != 0 && destination != 2));
+}
+foreach (bool entered in new[] { false, true })
+foreach (bool opened in new[] { false, true })
+    Check($"Awesomium file write admission entered={entered}, helper={opened}",
+        LogSinkNativeLayout.CaptureFileWriteAdmission(entered, opened) == (entered && opened));
 foreach (uint stored in new uint[] { 0, 1, 0x80000000, uint.MaxValue })
 foreach (int destination in new[] { int.MinValue, -1, 0, 1, 2, 3, 4, int.MaxValue })
     Check($"Awesomium log file entry handle={stored:X8}, destination={destination}",
@@ -870,6 +884,34 @@ if (args.Length == 2)
         && browser.Matches(0x102B7C9C, "8BCBC1E90A81E94028000066890C78")
         && browser.Matches(0x102B7CB3, "81E3FF03000081CB00DC000066895C7E02")
         && browser.Matches(0x102B7CC6, "B802000000"));
+    Check("Awesomium sink admission uses debugger destinations two/three and signed stderr severity threshold",
+        browser.Matches(0x10289F3B, "83F802740C83F8037407833E027C4AEB15")
+        && browser.ImportSlotNames(0x112404E4, "OutputDebugStringA")
+        && browser.Matches(0x10289F5B, "FF15E4042411")
+        && browser.Matches(0x10289FA5, "85C00F849300000083F8020F848A000000"));
+    Check("Awesomium stderr uses third static CRT stream and ignores formatted-output/flush results",
+        browser.Matches(0x1004E6A8, "B820345511C3")
+        && browser.Word(LogSinkNativeLayout.StandardStreamsVa + 0x10) == 0
+        && browser.Word(LogSinkNativeLayout.StandardStreamsVa + 0x30) == 1
+        && browser.Word(LogSinkNativeLayout.StandardStreamsVa + 0x50) == 2
+        && browser.Ascii(0x1127ADE0) == "%s"
+        && browser.Calls(0x10289F75, 0x1004E6A8)
+        && browser.Matches(0x10289F7A, "83C04050")
+        && browser.Calls(0x10289F7E, 0x1004F011)
+        && browser.Calls(0x10289F83, 0x1004E6A8)
+        && browser.Matches(0x10289F88, "83C04050")
+        && browser.Calls(0x10289F8C, 0x1004E9E7)
+        && browser.Matches(0x10289F91, "83C4106A006A00"));
+    Check("Awesomium file output checks helper byte but ignores seek and write outcomes",
+        browser.Calls(0x10289F98, LogSinkNativeLayout.SynchronizationInitializerVa)
+        && browser.Calls(0x10289FDA, LogFileNativeLayout.OpenHelperVa)
+        && browser.Matches(0x10289FDF, "84C0743B")
+        && browser.Matches(0x10289FE9, "6A026A006A0051FF158C032411")
+        && browser.ImportSlotNames(LogSinkNativeLayout.WriteFileImportVa, "WriteFile")
+        && browser.Matches(0x1028A004, "8B4C24246A008D542414528B150C6B5911515052FF15F8022411")
+        && browser.Matches(0x1028A01E, "833D286B591100750E")
+        && browser.ImportSlotNames(0x112404D4, "ReleaseMutex")
+        && browser.Matches(0x1028A02D, "FF15D4042411EB0B"));
     Check("Awesomium default log path uses unchecked module filename and optional backslash truncation",
         browser.ImportSlotNames(0x11240300, "GetModuleFileNameW")
         && browser.Matches(0x10289A3C, "68040100008D44240C506A00FF150003241133C9")

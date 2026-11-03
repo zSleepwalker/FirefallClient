@@ -54,3 +54,7 @@ override. The saved code captures decisions only and performs no logging.
 [Log-file opening](AwesomiumLogFile.md) records configured/fallback
 OPEN_ALWAYS attempts, entry-handle shortcut and ignored EOF-seek result,
 without claiming guaranteed truncation or append behavior.
+
+[Log sinks](AwesomiumLogSinks.md) distinguish debugger, stderr and file
+admission. Destination0 still permits high-severity stderr output;
+WriteFile uses the stored byte length and ignores failure/partial counts.
