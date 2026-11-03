@@ -4465,5 +4465,6 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   closes and clears worker handle `+0x20`. The registered WinHTTP callback
   checks the same context byte on `HANDLE_CLOSING` and releases/clears response
   pointer `+0x18` before releasing the context. Sample checks now cover both
-  sides of that flag and the separate handle-close operation. This does not
-  establish cancellation of the request handle at context `+0`.
+  sides of that flag, the context pointer store at `0xBC3280`, and the separate
+  handle-close operation. This does not establish cancellation of the request
+  handle at context `+0`.

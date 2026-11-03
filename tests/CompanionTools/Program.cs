@@ -2164,7 +2164,9 @@ if (args.Length == 2)
         && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpCallbackContextResponseStoreRaw
             + 0x400C00, "894718"));
     Check("ClientApi worker teardown marks its callback context for handle-close cleanup",
-        client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiWinHttpCloseHandleImportVa,
+        client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpCallbackContextWorkerStoreRaw
+            + 0x400C00, "89781C")
+        && client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiWinHttpCloseHandleImportVa,
             "WinHttpCloseHandle")
         && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpWorkerDetachRaw + 0x34 + 0x400C00,
             "8B431C85C07404C6401101")
