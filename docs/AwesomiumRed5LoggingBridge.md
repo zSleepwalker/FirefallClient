@@ -243,6 +243,12 @@ and `+0x9A8`, stores the returned object at `+0xA04`, then calls its primary
 vtable slot `+0x08` with a computed flag. The factory allocates `0x6C` bytes
 and invokes constructor `0xCBC410` when allocation succeeds. The two input
 fields' application-level meaning and the flag's meaning are not established.
+The primary table is at file offset `0x18733CC`; its `+0x08` entry is VA
+`0x10BCD80` (raw `0xCBC180`). That method first calls raw `0xCBC270`, then
+uses the helper object at member `+0x08` twice to populate members `+0x0C`
+and `+0x10` from the configuration at `+0x14`. When its flag is nonzero, it
+also calls primary-vtable slot `+0x04`. This identifies the immediate
+initialization work, but not the user-facing meaning of the helper fields.
 
 `LogWebRequests` is registered to raw `0xCCB3D0` and takes a value after the
 frame. Although its usage string at VA `0x1BC7584` says `boolean`, the
