@@ -240,7 +240,20 @@ the filter callback is installed in the object's secondary vtable, but the
 owner's API type and callback contract remain unidentified. The first entry
 `0xCBD2C0` performs substantial work on an incoming object, but its normal
 epilogue always zeros `EAX` and returns after consuming one stack argument;
-its external callback meaning remains unknown. Setup routine raw
+its external callback meaning remains unknown. During this processing it
+passes text obtained through the incoming object's virtual methods to raw
+`0xBCE800`, a bounded URL-component parser. It copies at most 2,048 bytes
+with `strncpy`, recognizes only `http://` and `https://` scheme prefixes
+using `_stricmp`, and treats text without such a prefix as HTTP. A nonempty
+authority is required; the first colon separates an optional port, parsed
+with `atoi`, and accepted only in the range 1–65535. Missing ports default
+to 80 or 443. The parser writes the secure-scheme flag, host, port, path, and
+query to output offsets `+0`, `+4`, `+8`, `+0x0C`, and `+0x10`. Path defaults
+to `/`; when present, its leading slash is restored after splitting, the
+fragment is stripped before query extraction, and the query excludes the
+fragment. The first-colon port split is not IPv6-literal aware. This confirms
+the helper's decomposition behavior but does not identify the callback's
+public API contract. Setup routine raw
 `0xBFB310` calls factory `0xCBB7A0` with values from owner fields `+0x9A4`
 and `+0x9A8`, stores the returned object at `+0xA04`, then calls its primary
 vtable slot `+0x08` with a computed flag. The factory allocates `0x6C` bytes

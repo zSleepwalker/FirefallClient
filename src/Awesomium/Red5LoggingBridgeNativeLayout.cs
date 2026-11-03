@@ -75,6 +75,13 @@ public enum Red5DispatchObjectDeleteAction
     ResetAndReleaseAllocation
 }
 
+public readonly record struct Red5ParsedUrl(
+    bool IsHttps,
+    string Host,
+    int Port,
+    string Path,
+    string Query);
+
 public enum Red5LuaWebRequestLoggingAction
 {
     Disable,
@@ -233,6 +240,14 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint LuaUrlFilterIllegalFormatVa = 0x1BC78C8;
     public const uint LuaUrlFilterListOffset = 0x468;
     public const uint LuaUrlFilterStringCompareImportVa = 0x1AC4894;
+    public const uint LuaUrlFilterUrlParseCompareImportVa = 0x1AC48A8;
+    public const uint LuaUrlFilterUrlParseCopyImportVa = 0x1AC486C;
+    public const uint LuaUrlFilterUrlParseFindCharacterImportVa = 0x1AC48C8;
+    public const uint LuaUrlFilterUrlParsePortImportVa = 0x1AC48D4;
+    public const uint LuaUrlFilterUrlParseRaw = 0xBCE800;
+    public const uint LuaUrlFilterUrlParseHttpSchemeVa = 0x1BB625C;
+    public const uint LuaUrlFilterUrlParseHttpsSchemeVa = 0x1BB6264;
+    public const uint LuaUrlFilterUrlParseDefaultPathVa = 0x1BB626C;
     public const uint LuaUrlFilterDispatchTableVa = 0x1C747B8;
     public const uint LuaUrlFilterDispatchTableCallbackSlotVa = 0x1C747BC;
     public const uint LuaUrlFilterDispatchFirstEntryPointerVa = 0x10BDEC0;
@@ -405,6 +420,88 @@ public static class Red5LoggingBridgeNativeLayout
         releaseAllocation
             ? Red5DispatchObjectDeleteAction.ResetAndReleaseAllocation
             : Red5DispatchObjectDeleteAction.ResetAndPreserveAllocation;
+
+    public static Red5ParsedUrl? CaptureUrlComponents(string? candidateUrl)
+    {
+        if (candidateUrl is null)
+            return null;
+
+        int nulIndex = candidateUrl.IndexOf('\0');
+        int length = nulIndex >= 0 ? nulIndex : candidateUrl.Length;
+        var source = candidateUrl[..Math.Min(length, 2048)];
+        var isHttps = false;
+        int schemeSeparator = source.IndexOf(':');
+        if (schemeSeparator >= 0
+            && source.AsSpan(schemeSeparator).StartsWith("://", StringComparison.Ordinal))
+        {
+            var scheme = source[..schemeSeparator];
+            if (string.Equals(scheme, "http", StringComparison.OrdinalIgnoreCase))
+            {
+                isHttps = false;
+            }
+            else if (string.Equals(scheme, "https", StringComparison.OrdinalIgnoreCase))
+            {
+                isHttps = true;
+            }
+            else
+            {
+                return null;
+            }
+
+            source = source[(schemeSeparator + 3)..];
+        }
+
+        int pathStart = source.IndexOf('/');
+        var authority = pathStart >= 0 ? source[..pathStart] : source;
+        var pathAndQuery = pathStart >= 0 ? source[(pathStart + 1)..] : string.Empty;
+        int authorityPortSeparator = authority.IndexOf(':');
+        var host = authorityPortSeparator >= 0 ? authority[..authorityPortSeparator] : authority;
+        if (host.Length == 0)
+            return null;
+
+        int port = isHttps ? 443 : 80;
+        if (authorityPortSeparator >= 0
+            && !TryCaptureDecimalPort(authority[(authorityPortSeparator + 1)..], out port))
+            return null;
+
+        int fragmentStart = pathAndQuery.IndexOf('#');
+        if (fragmentStart >= 0)
+            pathAndQuery = pathAndQuery[..fragmentStart];
+
+        var query = string.Empty;
+        int queryStart = pathAndQuery.IndexOf('?');
+        if (queryStart >= 0)
+        {
+            query = pathAndQuery[(queryStart + 1)..];
+            pathAndQuery = pathAndQuery[..queryStart];
+        }
+
+        return new Red5ParsedUrl(isHttps, host, port, "/" + pathAndQuery, query);
+    }
+
+    private static bool TryCaptureDecimalPort(string value, out int port)
+    {
+        port = 0;
+        int index = 0;
+        while (index < value.Length && value[index] is ' ' or '\t' or '\n' or '\r' or '\f' or '\v')
+            index++;
+
+        bool negative = index < value.Length && value[index] == '-';
+        if (negative || (index < value.Length && value[index] == '+'))
+            index++;
+
+        int digitStart = index;
+        while (index < value.Length && value[index] is >= '0' and <= '9')
+        {
+            int digit = value[index] - '0';
+            if (port > (65535 - digit) / 10)
+                return false;
+            port = (port * 10) + digit;
+            index++;
+        }
+
+        return !negative && index > digitStart && port is >= 1 and <= 65535;
+    }
 
     public static bool CaptureUrlFilterListMatch(
         IReadOnlyList<string> filters,

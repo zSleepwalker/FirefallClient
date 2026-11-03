@@ -226,6 +226,31 @@ foreach (bool ownerFlag in new[] { false, true })
     Check($"Awesomium URL dispatch setup mode incoming={incomingFlag}, owner flag={ownerFlag}",
         Red5LoggingBridgeNativeLayout.CaptureDispatchObjectSetupMode(incomingFlag, ownerFlag)
         == (incomingFlag && ownerFlag ? 2 : 0));
+foreach (var urlCase in new (string Input, Red5ParsedUrl? Expected)[]
+{
+    ("HTTP://Example.invalid", new Red5ParsedUrl(false, "Example.invalid", 80, "/", "")),
+    ("hTtPs://Example.invalid/a/b?x=1#fragment",
+        new Red5ParsedUrl(true, "Example.invalid", 443, "/a/b", "x=1")),
+    ("example.invalid:8443/path?x=1#fragment",
+        new Red5ParsedUrl(false, "example.invalid", 8443, "/path", "x=1")),
+    ("example.invalid/path#fragment?ignored",
+        new Red5ParsedUrl(false, "example.invalid", 80, "/path", "")),
+    ("http://example.invalid:80suffix/path",
+        new Red5ParsedUrl(false, "example.invalid", 80, "/path", "")),
+    ("http://example.invalid: +80/path",
+        new Red5ParsedUrl(false, "example.invalid", 80, "/path", "")),
+    ("ftp://example.invalid/path", null),
+    ("http:///path", null),
+    ("http://example.invalid:0/path", null),
+    ("http://example.invalid:65536/path", null),
+    ("http://example.invalid:-1/path", null),
+    ("http://[::1]/path", null),
+    (new string('a', 2049), new Red5ParsedUrl(false, new string('a', 2048), 80, "/", ""))
+})
+    Check($"Awesomium native URL component parser: {urlCase.Input}",
+        Red5LoggingBridgeNativeLayout.CaptureUrlComponents(urlCase.Input) == urlCase.Expected);
+Check("Awesomium native URL component parser rejects null",
+    Red5LoggingBridgeNativeLayout.CaptureUrlComponents(null) is null);
 foreach (bool releaseAllocation in new[] { false, true })
     Check($"Awesomium URL dispatch deletion release allocation={releaseAllocation}",
         Red5LoggingBridgeNativeLayout.CaptureDispatchObjectDelete(releaseAllocation)
@@ -1910,6 +1935,29 @@ if (args.Length == 2)
             == Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectSetupSlotRaw + 0x400C00
         && Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectDeleteSlotPointerVa
             == Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectDeleteSlotRaw + 0x400C00);
+    Check("Original client URL parser recognizes HTTP and HTTPS case-insensitively",
+        client.ImportSlotNames(Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlParseCompareImportVa, "_stricmp")
+        && client.Ascii(Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlParseHttpSchemeVa) == "http"
+        && client.Ascii(Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlParseHttpsSchemeVa) == "https"
+        && ClientMatches(Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlParseRaw + 0x5D,
+            "8B3DA848AC01"));
+    Check("Original client URL parser copies at most 2048 characters and uses atoi ports",
+        client.ImportSlotNames(Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlParseCopyImportVa, "strncpy")
+        && client.ImportSlotNames(Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlParseFindCharacterImportVa,
+            "strchr")
+        && client.ImportSlotNames(Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlParsePortImportVa, "atoi")
+        && ClientMatches(Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlParseRaw + 0x19,
+            "6800080000")
+        && ClientMatches(Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlParseRaw + 0xE3,
+            "B8BB010000B950000000")
+        && ClientMatches(Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlParseRaw + 0x100,
+            "3Dfeff0000"));
+    Check("Original client URL parser initializes slash path",
+        client.Ascii(Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlParseDefaultPathVa) == "/");
+    Check("Original client URL parser splits fragments",
+        ClientMatches(Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlParseRaw + 0x149, "6A23"));
+    Check("Original client URL parser splits queries",
+        ClientMatches(Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlParseRaw + 0x15C, "6A3F"));
     Check("Original client URL dispatch reset clears helper fields",
         ClientMatches(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectResetRaw + 0x48,
             "C7460C00000000")
