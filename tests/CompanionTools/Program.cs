@@ -2203,6 +2203,8 @@ if (args.Length == 2)
     Check("Original ClientApi redirect callback cracks the target and replays stored headers once",
         client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiWinHttpCrackUrlImportVa,
             "WinHttpCrackUrl")
+        && client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiWinHttpRedirectHostCompareImportVa,
+            "_stricmp")
         && client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiRequestAddHeadersImportVa,
             "WinHttpAddRequestHeaders")
         && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpRedirectCrackUrlRaw + 0x400C00,

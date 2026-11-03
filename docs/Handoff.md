@@ -4318,3 +4318,12 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
 - The `REDIRECT` handler's `request+0x24 != 0` condition is therefore a
   nonempty-header gate, not an unexplained request flag. CompanionTools checks
   the reset store, request tree base, insertion chain, and increment.
+
+# Round 35: ClientApi redirect host comparison
+
+## Observed
+- The comparison helper `0x2FC540` calls import slot `0x1AC48A8` and tests
+  for a zero return. Resolving the slot in the original PE import table
+  identifies it as `_stricmp`, so redirect host comparison ignores ASCII
+  case.
+- CompanionTools now verifies the IAT slot resolves to `_stricmp`.
