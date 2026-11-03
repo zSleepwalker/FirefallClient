@@ -3533,3 +3533,23 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
 - Both recently assigned agents are finished; no active assignment remains.
 - Follow-ons remain logger file opening10289C70, verbose module matching,
   or downloader outer exception propagation; none marked complete.
+
+## Awesomium log-file opening
+
+- Response/retry batch committed/pushed as0dcf696.
+- Open helper10289C70 returns true for any already nonzero stored handle,
+  even syntheticFFFFFFFF. Zero first prepares path, then destinations1/3
+  request file opening; other destinations return true without an open.
+- Configured/fallback attempts use GENERIC_WRITE, share3, OPEN_ALWAYS4,
+  normal attributes80. Zero/FFFFFFFF configured result tries .\debug.log.
+  Accepted handle seeks0 from FILE_END2, ignores result and returns true.
+  Failed fallback clears storage11596B0C and returns false. No close here.
+- Default builder10289A20 uses GetModuleFileNameW260 with ignored return,
+  scans WCHAR terminator, truncates after last backslash when found, then
+  appends debug.log. Missing backslash does not add a separator. Allocation
+  failure/path API errors remain unresolved; no safe fallback invented.
+- Saved LogFileNativeLayout and focused docs plus native guards. Build
+  succeeds;1703 pure and1954 sample-backed checks pass. No log/files/API
+  execution. True does not prove a valid stored handle or successful seek.
+- Next bounded trace: destructor10289EC0 actual log-file write and error
+  return handling, or independent downloader outer exception propagation.

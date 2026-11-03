@@ -50,3 +50,7 @@ empty output string.
 the ignored numeric-conversion status, disabled-check mode, destination/
 append arguments, and verbose-threshold write followed by `log-level`
 override. The saved code captures decisions only and performs no logging.
+
+[Log-file opening](AwesomiumLogFile.md) records configured/fallback
+OPEN_ALWAYS attempts, entry-handle shortcut and ignored EOF-seek result,
+without claiming guaranteed truncation or append behavior.

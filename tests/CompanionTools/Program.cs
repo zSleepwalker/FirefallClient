@@ -19,6 +19,19 @@ void Check(string name, bool condition)
     if (condition) passed++; else failed++;
 }
 
+foreach (uint stored in new uint[] { 0, 1, 0x80000000, uint.MaxValue })
+foreach (int destination in new[] { int.MinValue, -1, 0, 1, 2, 3, 4, int.MaxValue })
+    Check($"Awesomium log file entry handle={stored:X8}, destination={destination}",
+        LogFileNativeLayout.CaptureEntry(stored, destination) ==
+        (stored != 0 ? LogFileEntryAction.ReturnTrueForNonzeroStoredHandle
+            : destination is 1 or 3 ? LogFileEntryAction.PreparePathThenAttemptConfiguredOpen
+            : LogFileEntryAction.PreparePathThenReturnTrueWithoutOpen));
+foreach (uint result in new uint[] { 0, 1, 0x80000000, uint.MaxValue })
+foreach (bool fallback in new[] { false, true })
+    Check($"Awesomium log open result={result:X8}, fallback={fallback}",
+        LogFileNativeLayout.CaptureOpenResult(result, fallback) ==
+        (result != 0 && result != uint.MaxValue ? LogFileOpenAction.SeekEndThenReturnTrue
+            : fallback ? LogFileOpenAction.ClearStoredHandleThenReturnFalse : LogFileOpenAction.AttemptFallbackOpen));
 foreach (int status in new[] { 200, 201, 206, 416, 500 })
 foreach (int count in new[] { 0, 9, 10, 11 })
 {
@@ -857,6 +870,33 @@ if (args.Length == 2)
         && browser.Matches(0x102B7C9C, "8BCBC1E90A81E94028000066890C78")
         && browser.Matches(0x102B7CB3, "81E3FF03000081CB00DC000066895C7E02")
         && browser.Matches(0x102B7CC6, "B802000000"));
+    Check("Awesomium default log path uses unchecked module filename and optional backslash truncation",
+        browser.ImportSlotNames(0x11240300, "GetModuleFileNameW")
+        && browser.Matches(0x10289A3C, "68040100008D44240C506A00FF150003241133C9")
+        && browser.Matches(0x10289A70, "668B0883C0026685C975F5")
+        && browser.Calls(0x10289C94, LogFileNativeLayout.DefaultPathBuilderVa)
+        && browser.Matches(0x10289A99, "C74424105C000000")
+        && browser.Calls(0x10289AA1, 0x1007DD70)
+        && browser.Matches(0x10289AA6, "83F8FF740B6AFF40508BCE")
+        && browser.Calls(0x10289AB1, 0x100076A0)
+        && browser.Matches(0x10289AB6, "6A0968F4B02711")
+        && browser.Calls(0x10289ABF, 0x10047380)
+        && browser.Matches(0x1127B0F4, "640065006200750067002E006C006F0067000000"));
+    Check("Awesomium log open entry accepts any nonzero stored handle and gates file opening on destination one or three",
+        browser.Matches(LogFileNativeLayout.OpenHelperVa, "833D0C6B5911007403B001C3")
+        && browser.Matches(0x10289CA5, "8B0D184A55115683F901740583F9037565")
+        && browser.Matches(0x10289CB6, "8378140872028B00"));
+    Check("Awesomium log configured and fallback opens preserve write/share/open-always flags",
+        browser.ImportSlotNames(0x112403E4, "CreateFileW")
+        && browser.Matches(0x10289CC4, "6A0068800000006A046A006A03680000004050FFD6")
+        && browser.Matches(0x10289CD9, "A30C6B591183F8FF740485C07527")
+        && browser.Matches(0x10289CE7, "6A0068800000006A046A006A0368000000406818B12711FFD6")
+        && browser.Matches(0x10289D00, "A30C6B591183F8FF741585C07411"));
+    Check("Awesomium log accepted handle attempts EOF seek without inspecting result and fallback failure clears storage",
+        browser.ImportSlotNames(0x1124038C, "SetFilePointer")
+        && browser.Matches(0x10289D0E, "6A026A006A0050FF158C032411B0015EC3")
+        && browser.Matches(0x10289D1F, "C7050C6B59110000000032C05EC3")
+        && browser.Matches(0x1127B118, "2E005C00640065006200750067002E006C006F0067000000"));
     Check("Awesomium logging setup initializes output and ignores numeric conversion status",
         browser.Matches(0x10033BD7, "33DB")
         && browser.Matches(0x10033D34, "895C2414")
