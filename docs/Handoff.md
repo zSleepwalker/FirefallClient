@@ -3620,3 +3620,24 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
 - Agent assignment complete; no active agent assignment remains.
 - Follow-ons: Awesomium verbose rule matching102B53A0, or managed worker
   cancellation/Thread.Abort aftermath. Neither is captured as completed.
+
+## Awesomium verbose rule source and precedence
+
+- Worker-propagation batch committed/pushed as4192d02.
+- Lookup102B53A0 scans36-byte records forward and returns first matching
+  rule level+1C; no-match/empty rules negate live threshold via object+10,
+  unchecked. Kind+20 exactly1 selects full original source; otherwise module.
+- Pattern containing either slash creates kind1 (constructor102B58A7);
+  append102B5650 preserves order/level/kind. Source module102B5210 strips
+  through last slash/backslash, last-dot extension, then exact "-inl".
+  No Unicode decode, lowercase, filesystem canonicalization or NUL truncation
+  in saved observed byte-span transformation.
+- Matcher102B52B0 literals case-sensitive, separator spellings equivalent,
+  question mark consumes one byte, star recursively tries suffix positions.
+  Saved only match-observation selection, not wildcard/rule-text parser.
+- Added VerboseRuleNativeLayout and focused docs. Build succeeds;
+  2146 pure and2414 sample-backed checks pass. No target/logger execution.
+- No active agent assignment. Follow-on: numeric failure while constructing
+  per-module rule still appends output; rule-text helper102A0670 split and
+  empty/duplicate handling unresolved. Keep prior snapshot-state2-writer
+  task pending; no new evidence resolves it.

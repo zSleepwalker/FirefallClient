@@ -19,6 +19,38 @@ void Check(string name, bool condition)
     if (condition) passed++; else failed++;
 }
 
+foreach (var entry in new (string Source, string Module)[]
+{
+    (@"dir\widget-inl.cc", "widget"), ("dir/widget.test.cc", "widget.test"),
+    ("widget-INL.cc", "widget-INL"), (".hidden", ""), ("dir/", ""),
+    ("widget-inl", "widget"), ("x-inl.more.cc", "x-inl.more"),
+    (@"a/b\c-inl.h", "c"), ("noextension", "noextension"), ("", "")
+})
+{
+    byte[] source = System.Text.Encoding.ASCII.GetBytes(entry.Source);
+    var slice = VerboseRuleNativeLayout.CaptureModuleSlice(source);
+    Check($"Awesomium verbose module byte slice: {entry.Source}",
+        source.AsSpan(slice.Offset, slice.Length).SequenceEqual(
+            System.Text.Encoding.ASCII.GetBytes(entry.Module)));
+}
+Check("Awesomium verbose source slicing preserves high and embedded NUL bytes",
+    VerboseRuleNativeLayout.CaptureModuleSlice(new byte[] { 0x80, 0, 0x81, (byte)'.', (byte)'h' })
+        == new VerboseSourceSlice(0, 3));
+foreach (var pattern in new (string Value, bool Full)[]
+{
+    ("*", false), ("widget", false), ("", false), ("dir/*", true),
+    (@"dir\*", true), ("/", true), (@"\", true)
+})
+    Check($"Awesomium verbose rule selects full path only with separator: {pattern.Value}",
+        VerboseRuleNativeLayout.CaptureUsesFullSourcePath(
+            System.Text.Encoding.ASCII.GetBytes(pattern.Value)) == pattern.Full);
+Check("Awesomium verbose first matching rule wins rather than later or greatest level",
+    VerboseRuleNativeLayout.CaptureLevel(
+        [new(false, 99), new(true, 2), new(true, 9)], 3) == 2);
+foreach (int minimum in new[] { int.MinValue, -3, 0, 3, int.MaxValue })
+    Check($"Awesomium verbose no-match fallback negates live minimum {minimum}",
+        VerboseRuleNativeLayout.CaptureLevel([], minimum) == unchecked(-minimum)
+        && VerboseRuleNativeLayout.CaptureLevel([new(false, 100)], minimum) == unchecked(-minimum));
 foreach (bool webException in new[] { false, true })
 foreach (int status in new[] { 0, 14, 15 })
 foreach (string? message in new string?[] { null, "test", "Test", "test " })
@@ -922,6 +954,36 @@ if (args.Length == 2)
         && browser.Matches(0x102B7C9C, "8BCBC1E90A81E94028000066890C78")
         && browser.Matches(0x102B7CB3, "81E3FF03000081CB00DC000066895C7E02")
         && browser.Matches(0x102B7CC6, "B802000000"));
+    Check("Awesomium verbose source slice uses reverse separator/dot searches and exact inl suffix",
+        browser.Ascii(0x1127B0F0) == "\\/"
+        && browser.Matches(0x102B522F, "C7442414F0B02711")
+        && browser.Calls(0x102B523F, 0x102993E0)
+        && browser.Matches(0x102B5247, "83F8FF7406400106294604")
+        && browser.Matches(0x102B5252, "6AFF6A2E56")
+        && browser.Calls(0x102B5257, 0x10299370)
+        && browser.Calls(0x102B5265, 0x102994D0)
+        && browser.Ascii(0x1127EB2C) == "-inl"
+        && browser.Matches(0x102B5281, "6A048D543AFC682CEB271152")
+        && browser.Calls(0x102B528D, 0x1000A5D0)
+        && browser.Matches(0x102B5295, "85C08BC6750E83C7FC897E04"));
+    Check("Awesomium verbose rule chooses full source only for kind one and returns first matching level",
+        browser.Matches(0x102B53D0, "837E20018B450874048D442420")
+        && browser.Calls(0x102B540D, VerboseRuleNativeLayout.WildcardMatcherVa)
+        && browser.Matches(0x102B5415, "84C0751783C6243BF775B0")
+        && browser.Matches(0x102B5420, "8B4B108B01F7D8")
+        && browser.Matches(0x102B5430, "8B461C"));
+    Check("Awesomium verbose rules append level and path kind in thirty-six-byte records",
+        browser.Calls(0x102B58A7, 0x1012F1D0)
+        && browser.Matches(0x102B58AC, "83F8FF740BC784240401000001000000")
+        && browser.Calls(0x102B5911, VerboseRuleNativeLayout.AppendRuleVa)
+        && browser.Matches(0x102B56FB, "8B4E1C894B1C8B562089532083470424"));
+    Check("Awesomium verbose matcher uses literal byte and equivalent separator comparisons",
+        browser.Matches(0x102B52E6, "3C2A74433C2F740C3C3F74163C5C74043A06EB08")
+        && browser.Matches(0x102B52FA, "8A063C2F74083C5C0F858A000000")
+        && browser.Matches(0x102B5308, "4942464F")
+        && browser.Matches(0x102B5340, "803A2A75144249")
+        && browser.Calls(0x102B537A, VerboseRuleNativeLayout.WildcardMatcherVa)
+        && browser.Matches(0x102B5382, "84C075D7464F89742410897C241475DE"));
     Check("Awesomium logger synchronization flag gates mode changes and existing mutex reuse",
         browser.Matches(0x10289AEE, "803D206B5911008B5424600F8555010000")
         && browser.Matches(0x10289AFF, "8B44245CA3286B591185C00F851701000039052C6B59110F8531010000"));
