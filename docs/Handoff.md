@@ -4074,3 +4074,24 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
 - The source and semantics of both signing keys, including whether either can
   be absent, and the native text encoding used when hashing the query remain
   unresolved.
+
+# Round 23: Auto-login AES key setup
+
+## Observed
+- `Login_StartAutoLogin` (`0x63DE80`) calls `0x12E3960` on accepted branches
+  with a non-empty input string. The callee stores that string at
+  object offsets `+0x3C` and `+0x48`, then clears `+0x40`. These offsets match
+  the first signing-key field, `uid`, and optional second signing-key field
+  read by `0x12E4100`, but identity between the object instances used by the
+  login and ClientApi paths is not established.
+- `0x12E3960` hashes two separate suffixed forms of the input with CryptoAPI
+  SHA-1 (`CALG_SHA1`, 20-byte digest). The second digest is converted into a
+  28-byte `PLAINTEXTKEYBLOB` for `CALG_AES_128` (`0x660E`): its first 16 bytes
+  become the AES key. `CryptSetKeyParam` with parameter 1 sets the first
+  digest as the IV. The key object is stored at `this+0x58`. Embedded suffix
+  values are intentionally not reproduced in the source reconstruction.
+
+## Unresolved
+- The AES mode, the consumer of the imported key/IV, and the ownership/lifetime
+  of the key object remain unknown. The relationship between these derived
+  values and the optional second ClientApi HMAC key is also unresolved.
