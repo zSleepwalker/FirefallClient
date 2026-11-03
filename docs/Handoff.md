@@ -3282,3 +3282,21 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   Follow-ons: RAM %ull format/source and system-affinity popcount;
   OS/DirectX/BIOS registry key or NETAPI MAC helper.
 - Build succeeds;1187 sample-backed checks and1078 pure checks pass.
+
+## HWStats RAM variadic arguments and system-affinity count
+
+- DriveSpace batch committed/pushed as8a5a180.
+- Instruction-verified4035A0: memory BOOL ignored, only dwLength64
+  initialized, ullTotalPhys+8 used regardless. No invented failure default.
+- Threshold uses low32 of totalPhys>>20 >=1024. Small path pushes original
+  physical bytes, not MB, with literal `ram = %ull MB\n`; saved argument
+  descriptor deliberately does not implement CRT formatting.
+- GB path uses corrected unsigned DWORD conversion, float rounding/scaling,
+  then double vararg promotion. Synthetic2^52 bytes wraps threshold input
+  to0;2^51 correctly takes unsigned GB path.
+- Affinity BOOL also ignored; both masks initialized0. The loop counts
+  system mask bits, not process mask, and has zero high DWORD (max32).
+- Saved RamAndProcessorNativeLayout, exact native checks and docs.
+- Build succeeds;1205 sample-backed checks and1092 pure checks pass.
+- Follow-ons: BIOS key406F30 and OS description403A20; NETAPI MAC helper.
+  State2 writer in RedHanded remains unresolved, not a named ready state.

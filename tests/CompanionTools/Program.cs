@@ -19,6 +19,26 @@ void Check(string name, bool condition)
     if (condition) passed++; else failed++;
 }
 
+foreach (var entry in new (ulong Bytes, RamLineArguments Expected)[]
+{
+    (0, new(RamAndProcessorNativeLayout.SmallRamFormat, 0, 0, null)),
+    ((1UL << 30) - 1, new(RamAndProcessorNativeLayout.SmallRamFormat, 0x3FFFFFFF, 0, null)),
+    (1UL << 30, new(RamAndProcessorNativeLayout.GigabytesRamFormat, null, null, 1)),
+    ((1UL << 30) + (1UL << 20) - 1, new(RamAndProcessorNativeLayout.GigabytesRamFormat, null, null, 1)),
+    ((1UL << 30) + (1UL << 20), new(RamAndProcessorNativeLayout.GigabytesRamFormat, null, null, 1.0009765625)),
+    (1UL << 51, new(RamAndProcessorNativeLayout.GigabytesRamFormat, null, null, 2097152)),
+    (1UL << 52, new(RamAndProcessorNativeLayout.SmallRamFormat, 0, 0x100000, null))
+})
+    Check($"RAM native variadic argument capture {entry.Bytes}",
+        RamAndProcessorNativeLayout.CaptureRamArguments(entry.Bytes) == entry.Expected);
+foreach (var masks in new (uint Process, uint System, int Count)[]
+{
+    (0, 0, 0), (1, 0, 0), (0, 1, 1), (1, 0xFF, 8),
+    (uint.MaxValue, 0x80000000, 1), (1, uint.MaxValue, 32),
+    (0xFFFF, 0xAAAAAAAA, 16)
+})
+    Check($"Processor count uses system mask {masks.System:X8}, not process mask {masks.Process:X8}",
+        RamAndProcessorNativeLayout.CaptureProcessorCount(masks.Process, masks.System) == masks.Count);
 foreach (var entry in new (ulong Bytes, DriveSpaceAmounts Amounts, DriveSpaceDisplayUnit Unit)[]
 {
     (0, new(0, 0), DriveSpaceDisplayUnit.None),
@@ -919,6 +939,30 @@ if (args.Length == 2)
         && hardware.Ascii(0x44317C) == DriveSpaceNativeLayout.DriveMegabytesFormat
         && hardware.Ascii(0x442FEC) == DriveSpaceNativeLayout.TotalGigabytesFormat
         && hardware.Ascii(0x44304C) == DriveSpaceNativeLayout.TotalMegabytesFormat);
+    Check("HWStats RAM initializes only status length then reads total physical bytes without checking BOOL",
+        hardware.Matches(0x4035B6, "C745B840000000")
+        && hardware.Matches(0x4035C0, "FF15740144008B55C08BCA8B75C4")
+        && hardware.ImportSlotNames(0x440174, "GlobalMemoryStatusEx")
+        && hardware.Matches(0x4035D0, "0FACC114C1E81481F9000400007309"));
+    Check("HWStats small RAM path passes raw physical-byte DWORDs to the literal percent-ull format",
+        hardware.Ascii(0x443120) == RamAndProcessorNativeLayout.SmallRamFormat
+        && hardware.Matches(0x4035DF, "56526820314400EB30")
+        && hardware.Ascii(0x443130) == RamAndProcessorNativeLayout.GigabytesRamFormat
+        && hardware.Calls(0x403619, 0x406A20));
+    Check("HWStats large RAM path restores unsigned conversion before float rounding and binary scaling",
+        hardware.Matches(0x4035E8, "660F6EC1F30FE6C0C1E91F")
+        && hardware.Matches(0x4035F6, "F20F5804CD00644800")
+        && hardware.Matches(0x4035FF, "660F5AC0F30F5905586348000F5AC0")
+        && hardware.Word(0x486400) == 0 && hardware.Word(0x486404) == 0
+        && hardware.Word(0x486408) == 0 && hardware.Word(0x48640C) == 0x41F00000);
+    Check("HWStats affinity initializes both masks and loads the system output without testing API BOOL",
+        hardware.Matches(0x403621, "C745B000000000")
+        && hardware.Matches(0x40362B, "C745B400000000")
+        && hardware.ImportSlotNames(0x440170, "GetProcessAffinityMask")
+        && hardware.Matches(0x40363E, "FF15700144008B75B433D2")
+        && hardware.Matches(0x403651, "8BC683E00183C8007401470FACD601D1EA")
+        && hardware.Ascii(0x443140) == RamAndProcessorNativeLayout.ProcessorCountKey
+        && hardware.Calls(0x403670, 0x406AE0));
     Check("DeploymentCommon is a managed deployment assembly, not an observed native import of these helpers",
         deployment.ImportsFrom("mscoree.dll").Contains("_CorDllMain")
         && new[] { red, dumper, truck, hardware, child, browser, client }
