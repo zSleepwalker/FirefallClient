@@ -248,6 +248,11 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint LuaUrlFilterUrlParseHttpSchemeVa = 0x1BB625C;
     public const uint LuaUrlFilterUrlParseHttpsSchemeVa = 0x1BB6264;
     public const uint LuaUrlFilterUrlParseDefaultPathVa = 0x1BB626C;
+    public const uint LuaUrlFilterUrlMessageBuilderRaw = 0x12E4100;
+    public const uint LuaUrlFilterUrlMessageFormatVa = 0x1C576D0;
+    public const uint LuaUrlFilterUrlComponentEscapeRaw = 0x12E4810;
+    public const uint LuaUrlFilterUrlComponentEscapeAllowlistVa = 0x16E55D4;
+    public const uint LuaUrlFilterUrlComponentEscapeHexDigitsVa = 0x1C80D70;
     public const uint LuaUrlFilterDispatchTableVa = 0x1C747B8;
     public const uint LuaUrlFilterDispatchTableCallbackSlotVa = 0x1C747BC;
     public const uint LuaUrlFilterDispatchFirstEntryPointerVa = 0x10BDEC0;
@@ -477,6 +482,30 @@ public static class Red5LoggingBridgeNativeLayout
         }
 
         return new Red5ParsedUrl(isHttps, host, port, "/" + pathAndQuery, query);
+    }
+
+    public static string CaptureUrlComponentEscape(ReadOnlySpan<byte> value)
+    {
+        const string hexDigits = "0123456789ABCDEF";
+        var escaped = new char[checked(value.Length * 3)];
+        int length = 0;
+        foreach (byte current in value)
+        {
+            if (current is >= (byte)'a' and <= (byte)'z'
+                or >= (byte)'A' and <= (byte)'Z'
+                or >= (byte)'0' and <= (byte)'9'
+                or (byte)'-' or (byte)'.' or (byte)'_' or (byte)'~')
+            {
+                escaped[length++] = (char)current;
+                continue;
+            }
+
+            escaped[length++] = '%';
+            escaped[length++] = hexDigits[current >> 4];
+            escaped[length++] = hexDigits[current & 0x0F];
+        }
+
+        return new string(escaped, 0, length);
     }
 
     private static bool TryCaptureDecimalPort(string value, out int port)

@@ -231,6 +231,8 @@ foreach (var urlCase in new (string Input, Red5ParsedUrl? Expected)[]
     ("HTTP://Example.invalid", new Red5ParsedUrl(false, "Example.invalid", 80, "/", "")),
     ("hTtPs://Example.invalid/a/b?x=1#fragment",
         new Red5ParsedUrl(true, "Example.invalid", 443, "/a/b", "x=1")),
+    ("http://example.invalid?x=1#fragment",
+        new Red5ParsedUrl(false, "example.invalid?x=1#fragment", 80, "/", "")),
     ("example.invalid:8443/path?x=1#fragment",
         new Red5ParsedUrl(false, "example.invalid", 8443, "/path", "x=1")),
     ("example.invalid/path#fragment?ignored",
@@ -251,6 +253,17 @@ foreach (var urlCase in new (string Input, Red5ParsedUrl? Expected)[]
         Red5LoggingBridgeNativeLayout.CaptureUrlComponents(urlCase.Input) == urlCase.Expected);
 Check("Awesomium native URL component parser rejects null",
     Red5LoggingBridgeNativeLayout.CaptureUrlComponents(null) is null);
+foreach (var escapeCase in new (byte[] Input, string Expected)[]
+{
+    (Array.Empty<byte>(), ""),
+    (new byte[] { (byte)'A', (byte)'z', (byte)'0', (byte)'9', (byte)'-', (byte)'.', (byte)'_', (byte)'~' },
+        "Az09-._~"),
+    (new byte[] { (byte)'/', (byte)'?', (byte)'&', (byte)'=', (byte)' ' }, "%2F%3F%26%3D%20"),
+    (new byte[] { 0x00, 0x7F, 0x80, 0xFF }, "%00%7F%80%FF")
+})
+    Check($"Awesomium URL component escaping: {escapeCase.Expected}",
+        Red5LoggingBridgeNativeLayout.CaptureUrlComponentEscape(escapeCase.Input)
+        == escapeCase.Expected);
 foreach (bool releaseAllocation in new[] { false, true })
     Check($"Awesomium URL dispatch deletion release allocation={releaseAllocation}",
         Red5LoggingBridgeNativeLayout.CaptureDispatchObjectDelete(releaseAllocation)
@@ -1958,6 +1971,26 @@ if (args.Length == 2)
         ClientMatches(Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlParseRaw + 0x149, "6A23"));
     Check("Original client URL parser splits queries",
         ClientMatches(Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlParseRaw + 0x15C, "6A3F"));
+    Check("Original client URL component escape preserves only alphanumerics and RFC unreserved punctuation",
+        ClientMatches(Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlComponentEscapeRaw + 0xAB,
+            "0FBEC383C0D383F8517777")
+        && client.Matches(Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlComponentEscapeAllowlistVa,
+            "000001")
+        && client.Matches(Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlComponentEscapeAllowlistVa + 50,
+            "00")
+        && client.Matches(Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlComponentEscapeAllowlistVa + 81,
+            "00")
+        && client.Ascii(Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlComponentEscapeHexDigitsVa)
+            == "0123456789ABCDEF");
+    Check("Original client URL message builder escapes host, path and configured identifier components",
+        client.Calls(Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlMessageBuilderRaw + 0xFD + 0x400C00,
+            Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlComponentEscapeRaw + 0x400C00)
+        && client.Calls(Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlMessageBuilderRaw + 0x114 + 0x400C00,
+            Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlComponentEscapeRaw + 0x400C00)
+        && client.Calls(Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlMessageBuilderRaw + 0x138 + 0x400C00,
+            Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlComponentEscapeRaw + 0x400C00)
+        && client.Ascii(Red5LoggingBridgeNativeLayout.LuaUrlFilterUrlMessageFormatVa)
+            == "Red5 %s %s %s");
     Check("Original client URL dispatch reset clears helper fields",
         ClientMatches(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectResetRaw + 0x48,
             "C7460C00000000")

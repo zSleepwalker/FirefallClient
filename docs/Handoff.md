@@ -3948,9 +3948,15 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   prefixless text to HTTP, parses optional ports with `atoi` (valid 1–65535,
   default 80/443), and fills output offsets `+0/+4/+8/+0x0C/+0x10` with
   secure flag, host, port, slash-prefixed path, and query. It removes the
-  fragment before splitting the query; the first-colon port split does not
-  support IPv6 literals. These details are sample-guarded; callback meaning
-  remains unresolved. The primary table at file offset `0x18733CC` maps slot
+  fragment before splitting the query, but only when a slash path exists;
+  without a slash, query/fragment text remains part of the parsed host. The
+  first-colon port split does not support IPv6 literals. Builder `0x12E4100`
+  applies bytewise component escaper `0x12E4810` to parsed host/path and a
+  configured identifier. It preserves ASCII alphanumerics and `-._~`, and
+  emits uppercase `%HH` for other bytes. A separate local formatter uses
+  `"Red5 %s %s %s"` at VA `0x1C576D0`; this alone does not establish network
+  transmission. These details are sample-guarded; callback meaning remains
+  unresolved. The primary table at file offset `0x18733CC` maps slot
   `+0x08` to VA `0x10BCD80` (raw `0xCBC180`). That method calls `0xCBC270`,
   invokes the helper at object `+0x08` twice using configuration at `+0x14`,
   stores results at `+0x0C/+0x10`, then conditionally calls primary slot

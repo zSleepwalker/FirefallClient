@@ -251,9 +251,18 @@ to 80 or 443. The parser writes the secure-scheme flag, host, port, path, and
 query to output offsets `+0`, `+4`, `+8`, `+0x0C`, and `+0x10`. Path defaults
 to `/`; when present, its leading slash is restored after splitting, the
 fragment is stripped before query extraction, and the query excludes the
-fragment. The first-colon port split is not IPv6-literal aware. This confirms
-the helper's decomposition behavior but does not identify the callback's
-public API contract. Setup routine raw
+fragment. Query and fragment splitting is only attempted after a slash was
+found, so a no-slash value such as `http://host?x=1` leaves `?x=1` in the
+parsed host. The first-colon port split is not IPv6-literal aware. This
+confirms the helper's decomposition behavior but does not identify the
+callback's public API contract. The downstream message builder at raw
+`0x12E4100` runs a bytewise component escaper on the parsed host and path and
+on a configured identifier before composing its shared-text result. The
+escaper at raw `0x12E4810` preserves ASCII letters, digits, and `-._~`;
+other bytes become `%HH` using uppercase hexadecimal digits. A separate
+formatter uses the literal `Red5 %s %s %s` at VA `0x1C576D0`. These call and
+format references do not establish that the composed text is transmitted
+over a network. Setup routine raw
 `0xBFB310` calls factory `0xCBB7A0` with values from owner fields `+0x9A4`
 and `+0x9A8`, stores the returned object at `+0xA04`, then calls its primary
 vtable slot `+0x08` with a computed flag. The factory allocates `0x6C` bytes
