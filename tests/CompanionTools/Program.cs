@@ -226,6 +226,14 @@ foreach (bool ownerFlag in new[] { false, true })
     Check($"Awesomium URL dispatch setup mode incoming={incomingFlag}, owner flag={ownerFlag}",
         Red5LoggingBridgeNativeLayout.CaptureDispatchObjectSetupMode(incomingFlag, ownerFlag)
         == (incomingFlag && ownerFlag ? 2 : 0));
+foreach (int mode in new[] { 0, 1, 2, -1 })
+foreach (bool stateStringStorage in new[] { false, true })
+foreach (bool helperPresent in new[] { false, true })
+foreach (bool firstResultPresent in new[] { false, true })
+    Check($"Awesomium URL dispatch pending mode flag mode={mode}, storage={stateStringStorage}, helper={helperPresent}, first={firstResultPresent}",
+        Red5LoggingBridgeNativeLayout.CaptureDispatchObjectSetsPendingModeFlag(
+            mode, stateStringStorage, helperPresent, firstResultPresent)
+        == (mode != 0 && stateStringStorage && mode != 1 && helperPresent && !firstResultPresent));
 foreach (var filter in new (string? Value, Red5LuaUrlFilterAction Expected)[]
 {
     (null, Red5LuaUrlFilterAction.LogAndSkip),
@@ -1819,10 +1827,26 @@ if (args.Length == 2)
             "FF5008")
         && ClientMatches(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectSetupRaw + 0x53B,
             "385520740B38575CB8020000000F45D0")
+        && ClientMatches(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectConstructorRaw + 0x67,
+            "C7462C07000000C7462800000000")
         && ClientMatches(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectPrimaryReleaseSlotRaw,
             "8B490885C974058B01FF6018C3")
         && ClientMatches(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectPrimaryCleanupSlotRaw,
             "568BF18B4E0C85C97405")
+        && ClientMatches(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectStateUpdateRaw + 0x41,
+            "837E2800")
+        && ClientMatches(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectStateUpdateRaw + 0x100,
+            "C6466801")
+        && ClientMatches(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectResetRaw + 0x83,
+            "C6466800")
+        && ClientMatches(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectResetRaw + 0xC1,
+            "C7462C07000000C7462800000000")
+        && client.Calls(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectResetRaw
+                + 0x7E + 0x400C00,
+            Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectStateUpdateRaw + 0x400C00)
+        && client.Calls(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectResetWrapperRaw
+                + 0x06 + 0x400C00,
+            Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectResetRaw + 0x400C00)
         && client.Matches(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchTableVa, "C0DE0B01")
         && client.Matches(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchTableCallbackSlotVa, "E0E90B01")
         && client.Matches(Red5LoggingBridgeNativeLayout.LuaUrlFilterDispatchObjectPrimaryVtableVa, "50CD0B01")

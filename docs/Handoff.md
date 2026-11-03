@@ -3937,4 +3937,9 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   and `+0x04` point to `0xCBC150` and `0xCBC160`, which call virtual slot
   `+0x18` on the nonnull helper objects at `+0x08`, and `+0x0C/+0x10`,
   respectively. They appear to release those helpers; interface semantics
-  remain unknown.
+  remain unknown. Constructor capacity field `+0x2C` starts at `7`; `CBC270`
+  enters only for nonzero mode and storage pointer `+0x28`. For mode other
+  than `1`, it sets pending byte `+0x68` when helper `+0x08` exists and result
+  `+0x0C` is absent. Reset routine `0xCBC510` (called by wrapper `0xCBC4D0`)
+  handles that byte by calling `0xCBC270` with mode `2`, then clears it and
+  resets/releases fields. The user-facing meaning is unresolved.

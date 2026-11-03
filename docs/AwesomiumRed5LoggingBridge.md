@@ -256,6 +256,15 @@ at VA `0x1C747CC` points to raw `0xCBC150`, which calls the helper at object
 which similarly calls virtual slot `+0x18` on nonnull objects at `+0x0C` and
 `+0x10`. These methods appear to release helper objects, but their allocator
 or interface semantics are not established.
+The constructor initializes a string-like member at `+0x24` with capacity
+field `+0x2C` equal to `7`. `CBC180` calls `CBC270` before producing its two
+results. `CBC270` returns unless mode and storage pointer `+0x28` are both
+nonzero; for mode other than `1`, it sets pending byte `+0x68` when helper
+`+0x08` exists and result `+0x0C` is absent. Reset routine `CBC510`, called
+through wrapper `CBC4D0`, checks that byte, calls `CBC270` with mode `2`,
+clears the byte, and releases/reset fields including the string-like member.
+This supports a deferred state-update/cleanup interpretation, but the
+application-level meaning of that state is still unknown.
 
 `LogWebRequests` is registered to raw `0xCCB3D0` and takes a value after the
 frame. Although its usage string at VA `0x1BC7584` says `boolean`, the

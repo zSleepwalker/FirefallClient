@@ -239,6 +239,11 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint LuaUrlFilterDispatchObjectPrimaryCleanupSlotRaw = 0xCBC160;
     public const uint LuaUrlFilterDispatchObjectPrimaryReleaseSlotRaw = 0xCBC150;
     public const uint LuaUrlFilterDispatchObjectSetupSlotRaw = 0xCBC180;
+    public const uint LuaUrlFilterDispatchObjectStateUpdateRaw = 0xCBC270;
+    public const uint LuaUrlFilterDispatchObjectResetRaw = 0xCBC510;
+    public const uint LuaUrlFilterDispatchObjectResetWrapperRaw = 0xCBC4D0;
+    public const uint LuaUrlFilterDispatchObjectStateStringStorageOffset = 0x28;
+    public const uint LuaUrlFilterDispatchObjectPendingModeFlagOffset = 0x68;
     public const uint LuaUrlFilterDispatchObjectSecondaryVtableOffset = 0x04;
     public const uint LuaUrlFilterDispatchObjectFactoryRaw = 0xCBB7A0;
     public const uint LuaUrlFilterDispatchObjectSetupRaw = 0xBFB310;
@@ -362,6 +367,17 @@ public static class Red5LoggingBridgeNativeLayout
 
     public static int CaptureDispatchObjectSetupMode(bool incomingFlag, bool ownerFlag) =>
         incomingFlag && ownerFlag ? 2 : 0;
+
+    public static bool CaptureDispatchObjectSetsPendingModeFlag(
+        int mode,
+        bool stateStringStoragePresent,
+        bool helperPresent,
+        bool firstResultPresent) =>
+        mode != 0
+        && stateStringStoragePresent
+        && mode != 1
+        && helperPresent
+        && !firstResultPresent;
 
     public static bool CaptureUrlFilterListMatch(
         IReadOnlyList<string> filters,
