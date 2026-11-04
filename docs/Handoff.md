@@ -11432,3 +11432,11 @@ receiver+10 and captured global-pool+10 each receive XADD -1 independently.
 Cleanup's surrounding empty/retry attempt at raw `0x12C0348..0x12C0382`
 is assigned to `66a7c789-a164-4aa0-849e-e38519bb9583`; it compares
 a fresh tag only after reading head-next, and ignores queue-pop return.
+
+Queue-pop completion code is pushed at `e7603fc`. A further focused check
+now covers equal captured counter addresses without replacing the later
+counter capture by the earlier arithmetic result. Standard validation is
+temporarily blocked by the active sentinel-return author's unfinished
+constant references; that author has been notified. Embedded pool drain
+binding in raw `0x12C0382..0x12C03AF` is assigned as a read-only scope
+to `ae98f90d-dcdd-47a7-a8df-0f8cac6dbfa5`.

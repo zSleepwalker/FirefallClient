@@ -169,5 +169,17 @@ internal static class QueuePopCompletionChecks
                     Pointer: 0x10203040,
                     TargetRawFileOffset: 0x12CDA60,
                     TargetVirtualAddress: 0x16CE660));
+
+        var sharedCounterAddress = QueuePopCompletionProjection.Project(
+            returned.Capture with
+            {
+                GlobalPoolPointer = returned.Capture.ReceiverPointer,
+                ReceiverCounterBeforeXadd = 9,
+                PoolCounterBeforeXadd = 3
+            });
+        check("Equal captured counter addresses do not substitute the first arithmetic result for the later capture",
+            sharedCounterAddress.ReceiverCounterAddress == sharedCounterAddress.PoolCounterAddress
+            && sharedCounterAddress.ReceiverCounterAfterXadd == 8
+            && sharedCounterAddress.PoolCounterAfterXadd == 2);
     }
 }
