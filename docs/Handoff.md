@@ -11,8 +11,8 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are nested teardown evidence reconstruction
-and helper `0xC3FC10`'s concrete list-release contract.
+file-close path. Active boundaries are immutable UI lifecycle byte/import checks
+and concrete publication of nested list callback objects.
 UI lifecycle code/checks are committed.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
@@ -10201,6 +10201,28 @@ Later `+0x120` reaches `0xC3FC10` at `0xC33C2B`, before
 (`0xC33C3A..0xC33C58`). Its exact policy is the next bounded task.
 These slot-zero cleanup passes remain distinct from `0xC376A0`'s
 slot-`+0x14` callback traversal; matching fields do not merge the operations.
+
+## Nested list cleanup frees backing allocation and nodes, not observed callback objects
+
+Raw `0xC3FC10` receives container base for `+0x120`.
+Container `+0` points to sentinel, `+4` is count, and conditional
+backing pointer `+8` reaches allocator transfer `0xC3FC1A`.
+Only when that pointer is nonnull are container `+8/+0xC/+0x10`
+zeroed. It self-links sentinel next/previous and clears count.
+The forward walk reads node `+0`, saves next before node free
+`0xC3FC52`, and finally tail-frees sentinel at `0xC3FC61`.
+It does not read node `+8`; the backing pointer must not be conflated
+with per-node callback objects. The initial report's payload-release
+interpretation is superseded by this instruction-level distinction.
+Its reopened VirtualFree gap is also invalid: IAT VA `0x1AC42B4`
+was already PE-bound; raw numeric-VA fill is not an import value.
+
+The static nested teardown sequence and slot/argument distinctions are
+now represented in `StartupObjectLifecycleNativeLayout`. Coordinator review
+made the evidence sequences read-only and named node `+0x10` as a key
+field, not a refcount location. Additional immutable PE checks and a
+bounded list-publication trace are active; no callback-object ownership
+is inferred from node erasure.
 
 The report's apparent VA lookup discrepancy is not a new mapping gap:
 the IDB is raw/base-zero and a numeric runtime VA must not be used directly

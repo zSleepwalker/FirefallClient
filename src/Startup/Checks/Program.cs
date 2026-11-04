@@ -7111,6 +7111,42 @@ Check("Selected application event IDs remain explicitly unbound; native event-li
     && DialogApplicationDispatchNativeLayout.UnreferencedNativeEventNameLiterals.All(literal =>
         !DialogApplicationDispatchNativeLayout.SelectedEventNameBindings.Any(binding =>
             binding.EventName == literal.Name)));
+Check("Scripting-object cleanup closes the VM before the ordered payload passes and resets",
+    StartupObjectLifecycleNativeLayout.VmCloseCallFileOffset
+        < StartupObjectLifecycleNativeLayout.ObservedPayloadDispatches[0].LoopFileOffset
+    && StartupObjectLifecycleNativeLayout.PayloadPassContainerOffsets.SequenceEqual(
+        [0xF0, 0xE8, 0xE0, 0xD8, 0x100, 0x110, 0x118, 0x140])
+    && StartupObjectLifecycleNativeLayout.PayloadResetContainerOffsets.SequenceEqual(
+        StartupObjectLifecycleNativeLayout.PayloadPassContainerOffsets)
+    && StartupObjectLifecycleNativeLayout.Container118ResetBlockStartFileOffset
+        < StartupObjectLifecycleNativeLayout.Container118ResetBlockEndFileOffset
+    && StartupObjectLifecycleNativeLayout.PostPassContainer120CallFileOffset
+        > StartupObjectLifecycleNativeLayout.Container118ResetBlockEndFileOffset
+    && StartupObjectLifecycleNativeLayout.StoredObjectReleaseBlockStartFileOffset
+        < StartupObjectLifecycleNativeLayout.StoredObjectReleaseBlockEndFileOffset);
+Check("Cleanup callback payload offsets, virtual slots, and explicit arguments remain distinct",
+    StartupObjectLifecycleNativeLayout.ObservedPayloadDispatches.SequenceEqual(
+    [
+        new StartupPayloadDispatchSnapshot(0xE8, 0xC33326, 0xC3335D, 0x14, 0, 1),
+        new StartupPayloadDispatchSnapshot(0x118, 0xC336DA, 0xC33706, 0x14, 0, 1)
+    ])
+    && StartupObjectLifecycleNativeLayout.CallbackWalkerFileOffset == 0xC376A0
+    && StartupObjectLifecycleNativeLayout.CallbackWalkerVirtualSlotOffset == 0x14
+    && StartupObjectLifecycleNativeLayout.ObservedPayloadDispatches.All(dispatch =>
+        dispatch.VirtualSlotOffset != dispatch.ExplicitArgumentValue));
+Check("Manager destruction and insertion-failure anchors record only observed release actions",
+    StartupObjectLifecycleNativeLayout.Manager6B0DestructorFileOffset == 0xBF8AC0
+    && StartupObjectLifecycleNativeLayout.ManagerKeyCleanupMethodFileOffset == 0xC0BD90
+    && StartupObjectLifecycleNativeLayout.ManagerNodeReleaseMethodFileOffset == 0xC0EB00
+    && StartupObjectLifecycleNativeLayout.ManagerNodeKeyOffset == 0x10
+    && StartupObjectLifecycleNativeLayout.ManagerDestructorPathFileOffsets.SequenceEqual(
+        [0xBF8AC0u, 0xC0BD90u, 0xC0EB00u])
+    && StartupObjectLifecycleNativeLayout.InsertFailurePathHelperFileOffset == 0xC3C9B0
+    && StartupObjectLifecycleNativeLayout.InsertFailurePathAnchorFileOffset == 0xC64420
+    && StartupObjectLifecycleNativeLayout.InsertFailurePathFileOffsets.SequenceEqual(
+        [0xC3C9B0u, 0xC64420u])
+    && StartupObjectLifecycleNativeLayout.InsertFailurePayloadVirtualSlotOffset == 0
+    && StartupObjectLifecycleNativeLayout.InsertFailurePayloadExplicitArgumentValue == 1);
 
 if (args.Length != 0)
 {

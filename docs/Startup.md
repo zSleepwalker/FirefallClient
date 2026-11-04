@@ -34,6 +34,18 @@ IDA names assigned during this investigation: `ClientProcessEntryThunk` (`0x136A
 
 Login-specific IDA names/comments include `AppMode_Login_Initialize` (`0x636FF0`), `AppMode_Login_Shutdown` (`0x63B360`), `Login_HandleLoginResponse` (`0x63B7C0`), `Login_HandleCharacterRefreshResponse` (`0x63C5F0`), `Login_HandleZoneListResponse` (`0x63D270`), `Login_PickBackgroundZone` (`0x639840`), `Login_LoadAutoLoginSettings` (`0x63D760`), `Login_StartAutoLogin` (`0x63DE80`), and `Login_QueueLoginRequest` (`0x63B550`). The `tfWorld` slot-11 record handler is named `TfWorld_ApplyRecordInput` (`0x64DCF0`); its offset-only member getters are `TfWorld_GetMember_2E8` (`0x64A0C0`) and `TfWorld_GetMember_2EC` (`0x64A0D0`).
 
+### Scripting-object teardown and payload callbacks
+
+The startup scripting-object cleanup at raw file offset `0xC33060` closes its VM through the call at `0xC33291` to `0xCD5510` before iterating the object's payload containers. The payload passes visit container offsets, in order, `+0xF0`, `+0xE8`, `+0xE0`, `+0xD8`, `+0x100`, `+0x110`, `+0x118`, and `+0x140`; cleanup then resets those same containers in that order. The `+0x118` reset uses `0xC0BE90` in the block at `0xC33973..0xC33993`, which also resets its head/count state.
+
+Two observed payload dispatches are recorded narrowly. The `+0xE8` loop at `0xC33326` dispatches at `0xC3335D` through virtual slot byte offset `0` with explicit argument value `1`. The `+0x118` loop at `0xC336DA` obtains its payload from node offset `+0x14`, then dispatches in `0xC33706..0xC33711` through virtual slot byte offset `0`, again with explicit argument value `1`. The node payload offset, virtual slot offset, and explicit argument are separate quantities. This cleanup dispatch is not the callback walker at `0xC376A0`, whose observed virtual slot byte offset is `+0x14`; neither observation identifies an unresolved indirect target as a concrete destructor.
+
+After the ordered container resets, the path calls helper `0xC3FC10` for container `+0x120` at `0xC33C2B`, then uses `0xC0BD90` for container `+0x118` and performs a generic stored-object release in `0xC33C3A..0xC33C58`. The later `0xC3FC10` body frees a conditional backing allocation at container `+8`, then list nodes and sentinel; it never reads per-node `+8` callback objects. Its direct allocator transfers are raw `0xC3FC1A`, `0xC3FC52`, and `0xC3FC61`. This is not proof of callback-object destruction. The other later helpers/releases remain unverified here.
+
+The manager's `+0x6B0` destructor path is bounded to `0xBF8AC0 -> 0xC0BD90 -> 0xC0EB00`: the observed node cleanup decrements the key reference at node offset `+0x10` and frees the node. This evidence does not establish destruction of the node's payload at `+0x14`. On the insertion-failure path, anchors `0xC3C9B0` and `0xC64420` lead to payload virtual slot byte offset `0` with explicit argument value `1`; successful insertion ownership remains unresolved. In particular, the static evidence does not justify calling successful payloads leaked or assigning a global ownership rule.
+
+`StartupObjectLifecycleNativeLayout` holds the read-only ordered offsets and dispatch facts. `Startup.Checks` validates the VM-close and later-helper relative calls when given a binary path, along with in-memory order and slot-versus-argument checks. Run the quiet checks with `dotnet run --project src\Startup\Checks\Startup.Checks.csproj -v:q`.
+
 The `tfLogin` constructor builds three callback wrappers whose stored target
 PE VAs map to the Login, character-refresh, and zone-list handlers above. The
 three request paths attach their matching wrappers to the shared request
