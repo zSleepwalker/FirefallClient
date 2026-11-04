@@ -10971,3 +10971,15 @@ Pooled return/control dispatch PE windows are pushed at `425a649`.
 Active work also includes pool-return and control-deleting layouts and
 the immediate pooled acquisition interface; their implementations remain
 uncommitted until their completion reports and coordinator review.
+
+The pooled return and control-deleting layouts are now registered and
+pushed at `fe27bd4`. All registered checks pass, including the control
+release check file that briefly caused a concurrent build error while
+its writer was still editing. Do not treat that transient report as a
+remaining baseline failure.
+
+Active successor IDs: `44e52414-d931-4053-8077-7324cc9ed841`
+(nonpool captured release), `3614ab89-c0ab-421c-92b1-d95040533284`
+(pooled acquisition interface), `7611a4ab-2088-4915-a104-fecce5b46f3d`
+(nonpool immutable PE owner), and `84ff872f-2b85-44a8-b7d2-185110613bf7`
+(nearest pool singleton writer). Keep their scopes separate.
