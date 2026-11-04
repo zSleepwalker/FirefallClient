@@ -11824,3 +11824,15 @@ word-growth guard `[BE6306,BE6325)`; PE owner is
 alternate anchors. This guard uses wrapping DWORD arithmetic and unsigned
 comparison before the opaque `BE68A0` call; no slot allocation/copy work
 is assigned yet.
+
+Pushed alternate handoff as `927d52c`. Growth guard is now registered and
+passes the pinned runner with forwarding, alternate, and growth immutable
+anchors. Corrected its missing-read helper argument name and changed branch
+fixtures to exercise valid skips rather than accidentally supplying an
+unreached call return. IDA confirms call raw `BE6320 -> BE68A0`.
+Read-only slot trace agent declined the external sample path; coordinator
+obtained IDA disassembly directly. Luna
+`b4e44058-f80c-45ff-9f99-2794ed44d520` now owns only postguard slot-index
+projection/checks `[BE6325,BE6352)`, not allocation/copy.
+The prior trace's epilogue addresses were off: IDA shows INC at `BE6389`,
+POP ESI `BE638C`, POP EBP `BE638D`, RET 4 at `BE638E` (ends `BE6391`).

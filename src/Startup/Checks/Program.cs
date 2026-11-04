@@ -1,6 +1,7 @@
 using Firefall.Reconstruction.Startup;
 
 int failures = 0;
+PayloadWordGrowthGateChecks.Run(Check);
 
 void Check(string name, bool condition)
 {
