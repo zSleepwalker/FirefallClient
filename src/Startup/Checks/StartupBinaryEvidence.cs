@@ -6483,6 +6483,174 @@ internal static class StartupBinaryEvidence
         check("Binary received-queue caller compares the pop result with 0x10 and uses unsigned JNB to raw 0xBD40BF",
             Matches(0xBD3EB6, "83FF100F8300020000")
             && RelativeConditionalBranchTargets(0xBD3EB9, 0x0F, 0x83, 0xBD40BF));
+        check("Binary smallstatus window [raw 0xBD3EBF, 0xBD3F1C) length 0x5D maps to code VA [0xFD4ABF, 0xFD4B1C) via raw+0x400C00 and preserves every sample byte",
+            0xBD3F1C - 0xBD3EBF == 0x5D
+            && 0xBD3EBF + 0x400C00 == 0xFD4ABF
+            && 0xBD3F1C + 0x400C00 == 0xFD4B1C
+            && VirtualAddressToFileOffset(0xFD4ABF) == 0xBD3EBF
+            && VirtualAddressToFileOffset(0xFD4B1B) == 0xBD3F1B
+            && Matches(0xBD3EBF,
+                "83FF0275098BCEE865E5FFFFEB9383FF03754A83BE080100000475858D8E30020000E87A8BFFFF84C0740A6683BE4802000000751A6A0068EB04000068AF83B50168B283B501FF15A05EC10183C4106A058BCEE859DCFFFFE944FFFFFF"));
+        check("Binary smallstatus value 2 calls raw 0xBD2430 and rejoins at raw 0xBD3E60",
+            Matches(0xBD3EBF, "83FF02")
+            && ShortConditionalBranchTargets(0xBD3EC2, 0x75, 0xBD3ECD)
+            && Matches(0xBD3EC4, "8BCE")
+            && RelativeBranchTargets(0xBD3EC6, 0xE8, 0xBD2430)
+            && ShortConditionalBranchTargets(0xBD3ECB, 0xEB, 0xBD3E60));
+        check("Binary smallstatus value 3 requires this+0x108 == 4 before calling raw 0xBCCA60 with ECX=this+0x230",
+            Matches(0xBD3ECD, "83FF03")
+            && ShortConditionalBranchTargets(0xBD3ED0, 0x75, 0xBD3F1C)
+            && Matches(0xBD3ED2, "83BE0801000004")
+            && ShortConditionalBranchTargets(0xBD3ED9, 0x75, 0xBD3E60)
+            && Matches(0xBD3EDB, "8D8E30020000")
+            && RelativeBranchTargets(0xBD3EE1, 0xE8, 0xBCCA60));
+        check("Binary smallstatus AL-zero branches directly to report 0x4EB without reaching the WORD[this+0x248] test; AL-nonzero tests that WORD and skips report when it is nonzero",
+            Matches(0xBD3EE6, "84C0")
+            && ShortConditionalBranchTargets(0xBD3EE8, 0x74, 0xBD3EF4)
+            && Matches(0xBD3EEA, "6683BE4802000000")
+            && ShortConditionalBranchTargets(0xBD3EF2, 0x75, 0xBD3F0E)
+            && Matches(0xBD3EF4, "6A0068EB04000068AF83B50168B283B501FF15A05EC10183C410")
+            && Matches(0xBD3F0B, "83C410"));
+        check("Binary smallstatus normal report path calls raw 0xBD1B70 with argument 5 and rejoins at raw 0xBD3E60",
+            Matches(0xBD3F0E, "6A058BCE")
+            && RelativeBranchTargets(0xBD3F12, 0xE8, 0xBD1B70)
+            && Matches(0xBD3F17, "E944FFFFFF")
+            && RelativeBranchTargets(0xBD3F17, 0xE9, 0xBD3E60));
+        check("Binary largequeueentrygates window [raw 0xBD40BF, 0xBD412B) length 0x6C maps to code VA [0xFD4CBF, 0xFD4D2B) via raw+0x400C00 and preserves every sample byte",
+            0xBD412B - 0xBD40BF == 0x6C
+            && 0xBD40BF + 0x400C00 == 0xFD4CBF
+            && 0xBD412B + 0x400C00 == 0xFD4D2B
+            && VirtualAddressToFileOffset(0xFD4CBF) == 0xBD40BF
+            && VirtualAddressToFileOffset(0xFD4D2A) == 0xBD412A
+            && Matches(0xBD40BF,
+                "8B860801000083F803742483F805741F83F808741A6A0068FA04000068AD83B50168AE83B501FF15A05EC10183C41080BE950D0000000F851901000083BE08010000037527B800C000006685070F8502010000578BCEE846F6FFFF8B0D84FFDF0157E83A1B0000E935FDFFFF"));
+        check("Binary largequeueentrygates report for initial states other than 3, 5 and 8 precedes an independent byte[this+0xD95] nonzero branch to raw 0xBD4214",
+            Matches(0xBD40BF, "8B860801000083F803")
+            && ShortConditionalBranchTargets(0xBD40C8, 0x74, 0xBD40EE)
+            && Matches(0xBD40CA, "83F805")
+            && ShortConditionalBranchTargets(0xBD40CD, 0x74, 0xBD40EE)
+            && Matches(0xBD40CF, "83F808")
+            && ShortConditionalBranchTargets(0xBD40D2, 0x74, 0xBD40EE)
+            && Matches(0xBD40D4, "6A0068FA04000068AD83B50168AE83B501FF15A05EC10183C41080BE950D000000")
+            && RelativeConditionalBranchTargets(0xBD40F5, 0x0F, 0x85, 0xBD4214));
+        check("Binary largequeueentrygates later state 3 tests whether WORD[EDI] mask 0xC000 is nonzero for handoff at raw 0xBD4214; other states branch to dispatch at raw 0xBD412B",
+            Matches(0xBD40FB, "83BE0801000003")
+            && ShortConditionalBranchTargets(0xBD4102, 0x75, 0xBD412B)
+            && Matches(0xBD4104, "B800C00000668507")
+            && RelativeConditionalBranchTargets(0xBD410C, 0x0F, 0x85, 0xBD4214)
+            && Matches(0xBD4112, "578BCE")
+            && RelativeBranchTargets(0xBD4115, 0xE8, 0xBD3760)
+            && Matches(0xBD411A, "8B0D84FFDF0157")
+            && RelativeBranchTargets(0xBD4121, 0xE8, 0xBD5C60)
+            && RelativeBranchTargets(0xBD4126, 0xE9, 0xBD3E60));
+        check("Binary header-dispatch window [raw 0xBD412B, 0xBD4141) maps via raw+0x400C00 to code VA [0xFD4D2B, 0xFD4D41), and the four-entry table at raw 0xBD422C / VA 0xFD4E2C contains the four case addresses",
+            0xBD4141 - 0xBD412B == 0x16
+            && 0xBD412B + 0x400C00 == 0xFD4D2B
+            && 0xBD4141 + 0x400C00 == 0xFD4D41
+            && VirtualAddressToFileOffset(0xFD4D2B) == 0xBD412B
+            && VirtualAddressToFileOffset(0xFD4D40) == 0xBD4140
+            && Matches(0xBD412B, "0FB707C1E80E83F8030F87C0000000FF24852C4EFD00")
+            && VirtualAddressToFileOffset(0xFD4E2C) == 0xBD422C
+            && Matches(0xBD422C, "414DFD005A4DFD008D4DFD00C04DFD00")
+            && ReadUInt32(0xBD422C) == 0x00FD4D41
+            && ReadUInt32(0xBD4230) == 0x00FD4D5A
+            && ReadUInt32(0xBD4234) == 0x00FD4D8D
+            && ReadUInt32(0xBD4238) == 0x00FD4DC0
+            && VirtualAddressToFileOffset(0x00FD4D41) == 0xBD4141
+            && VirtualAddressToFileOffset(0x00FD4D5A) == 0xBD415A
+            && VirtualAddressToFileOffset(0x00FD4D8D) == 0xBD418D
+            && VirtualAddressToFileOffset(0x00FD4DC0) == 0xBD41C0);
+        check("Binary four header-dispatch cases pin their first handoff bytes and decode calls to raw 0xBD3760, 0xBD5BA0, 0xBD5BA0 and 0xBD5C00",
+            Matches(0xBD4141, "578BCEE817F6FFFF")
+            && RelativeBranchTargets(0xBD4144, 0xE8, 0xBD3760)
+            && Matches(0xBD415A, "578D8E6C0D0000E83A1A0000")
+            && RelativeBranchTargets(0xBD4161, 0xE8, 0xBD5BA0)
+            && Matches(0xBD418D, "578D8E700D0000E8071A0000")
+            && RelativeBranchTargets(0xBD4194, 0xE8, 0xBD5BA0)
+            && Matches(0xBD41C0, "578D8E740D0000E8341A0000")
+            && RelativeBranchTargets(0xBD41C7, 0xE8, 0xBD5C00));
+        check("Binary state-entry window [raw 0xBD1B98, 0xBD1BC2) maps via raw+0x400C00 to code VA [0xFD2798, 0xFD27C2), compares EDI with [ESI+0x108], and on inequality JNZ at raw 0xBD1BA3 skips the diagnostic call through slot 0x1C15EA0 to raw 0xBD1BC2",
+            0xBD1BC2 - 0xBD1B98 == 0x2A
+            && 0xBD1B98 + 0x400C00 == 0xFD2798
+            && 0xBD1BC2 + 0x400C00 == 0xFD27C2
+            && VirtualAddressToFileOffset(0xFD2798) == 0xBD1B98
+            && VirtualAddressToFileOffset(0xFD27C1) == 0xBD1BC1
+            && Matches(0xBD1B98,
+                "8BF18B7D083BBE08010000751D68B066BB01687F01000068777DB50168937DB501FF15A05EC10183C410")
+            && Matches(0xBD1B9D, "3BBE08010000")
+            && ShortConditionalBranchTargets(0xBD1BA3, 0x75, 0xBD1BC2)
+            && Matches(0xBD1BB9, "FF15A05EC101")
+            && 0xBD1BB9 + 0x400C00 == 0xFD27B9);
+        check("Binary status predicate window [raw 0xBCCA60, 0xBCCAB0) maps to code VA [0xFCD660, 0xFCD6B0) via raw+0x400C00 and preserves every sample byte",
+            0xBCCAB0 - 0xBCCA60 == 0x50
+            && 0xBCCA60 + 0x400C00 == 0xFCD660
+            && 0xBCCAB0 + 0x400C00 == 0xFCD6B0
+            && VirtualAddressToFileOffset(0xFCD660) == 0xBCCA60
+            && VirtualAddressToFileOffset(0xFCD6AF) == 0xBCCAAF
+            && Matches(0xBCCA60,
+                "568BF18A0684C075025EC3A801740A33C03946045E0F95C0C3A802751A6A00683C020000686178B501686278B501FF15A05EC10183C4108B46080B460C750A8B46100B461475025EC3B8010000005EC3"));
+        check("Binary status predicate returns immediately on status byte zero without changing EAX above AL, and returns a normalized DWORD[this+4] comparison when bit 0 is set",
+            Matches(0xBCCA60, "568BF18A0684C0")
+            && ShortConditionalBranchTargets(0xBCCA67, 0x75, 0xBCCA6B)
+            && Matches(0xBCCA69, "5EC3")
+            && Matches(0xBCCA6B, "A801740A")
+            && ShortConditionalBranchTargets(0xBCCA6D, 0x74, 0xBCCA79)
+            && Matches(0xBCCA6F, "33C03946045E0F95C0C3"));
+        check("Binary status predicate with status bits 0 and 1 clear reports 0x23C through the exact assertion cell, then on normal return reads [this+8]|[this+C] and only if zero reads [this+10]|[this+14]",
+            Matches(0xBCCA79, "A802751A")
+            && ShortConditionalBranchTargets(0xBCCA7B, 0x75, 0xBCCA97)
+            && Matches(0xBCCA7D, "6A00683C020000686178B501686278B501")
+            && 0xBCCA8E + 0x400C00 == 0xFCD68E
+            && Matches(0xBCCA8E, "FF15A05EC101")
+            && VirtualAddressToFileOffset(0x1C15EA0) == 0x1814AA0
+            && ReadUInt32(VirtualAddressToFileOffset(0x1C15EA0)) == 0x016C37C0
+            && VirtualAddressToFileOffset(ReadUInt32(VirtualAddressToFileOffset(0x1C15EA0))) == 0x12C2BC0
+            && Matches(0xBCCA94, "83C4108B46080B460C750A")
+            && ShortConditionalBranchTargets(0xBCCA9D, 0x75, 0xBCCAA9)
+            && Matches(0xBCCA9F, "8B46100B46147502")
+            && ShortConditionalBranchTargets(0xBCCAA5, 0x75, 0xBCCAA9)
+            && Matches(0xBCCAA7, "5EC3")
+            && Matches(0xBCCAA9, "B8010000005EC3"));
+        check("Binary deferred-control callback window [raw 0xBD37D8, 0xBD37EB) maps to code VA [0xFD43D8, 0xFD43EB) via raw+0x400C00 and preserves every sample byte",
+            0xBD37EB - 0xBD37D8 == 0x13
+            && 0xBD37D8 + 0x400C00 == 0xFD43D8
+            && 0xBD37EB + 0x400C00 == 0xFD43EB
+            && VirtualAddressToFileOffset(0xFD43D8) == 0xBD37D8
+            && VirtualAddressToFileOffset(0xFD43EA) == 0xBD37EA
+            && Matches(0xBD37D8, "8B47088D4F08FF7704FF50048BD8F60308741A"));
+        check("Binary deferred-control callback loads payload+8, calls its slot+4 with ECX=payload+8 and payload+4 pushed, tests returned EAX bit 3, and branches on clear to raw 0xBD3805",
+            Matches(0xBD37D8, "8B47088D4F08FF7704")
+            && 0xBD37E1 + 0x400C00 == 0xFD43E1
+            && Matches(0xBD37E1, "FF5004")
+            && Matches(0xBD37E4, "8BD8F60308")
+            && ShortConditionalBranchTargets(0xBD37E9, 0x74, 0xBD3805)
+            && 0xBD3805 + 0x400C00 == 0xFD4405);
+        check("Binary VIBE lock-free push wrapper window [raw 0xBD5C72, 0xBD5CD9) length 0x67 maps to code VA [0xFD6872, 0xFD68D9) via raw+0x400C00 and preserves every sample byte",
+            0xBD5CD9 - 0xBD5C72 == 0x67
+            && 0xBD5C72 + 0x400C00 == 0xFD6872
+            && 0xBD5CD9 + 0x400C00 == 0xFD68D9
+            && VirtualAddressToFileOffset(0xFD6872) == 0xBD5C72
+            && VirtualAddressToFileOffset(0xFD68D8) == 0xBD5CD8
+            && Matches(0xBD5C72,
+                "8B731085F674238D46048BCFF00FC10875188B068BCEFF108D46088BD7F00FC11075078B068BCEFF5004C7430814FCC50185DB751953685A020000689343B701686F43B701FF15A05EC10183C4108B4DFC8D4110F00FC13853E8907D6F005F5E5B8BE55DC20400"));
+        check("Binary VIBE wrapper null-associated branch at raw 0xBD5C77 and both LOCK XADD retry branches at 0xBD5C82 and 0xBD5C93 target tag write 0xBD5C9C",
+            Matches(0xBD5C72, "8B731085F6")
+            && ShortConditionalBranchTargets(0xBD5C77, 0x74, 0xBD5C9C)
+            && Matches(0xBD5C7E, "F00FC108")
+            && ShortConditionalBranchTargets(0xBD5C82, 0x75, 0xBD5C9C)
+            && Matches(0xBD5C84, "8B068BCEFF10")
+            && Matches(0xBD5C8F, "F00FC110")
+            && ShortConditionalBranchTargets(0xBD5C93, 0x75, 0xBD5C9C)
+            && Matches(0xBD5C95, "8B068BCEFF5004")
+            && Matches(0xBD5C9C, "C7430814FCC501")
+            && Matches(0xBD5CA3, "85DB")
+            && ShortConditionalBranchTargets(0xBD5CA5, 0x75, 0xBD5CC0)
+            && Matches(0xBD5CB7, "FF15A05EC101")
+            && Matches(0xBD5CC0, "8B4DFC")
+            && Matches(0xBD5CC6, "F00FC138")
+            && Matches(0xBD5CCB, "E8907D6F00")
+            && RelativeBranchTargets(0xBD5CCB, 0xE8, 0x12CDA60)
+            && Matches(0xBD5CD6, "C20400"));
         check("Binary zero-context handshake parser compares the exact ABRT, HEHE and HUGG tags",
             ImportSlotNames(0x1AC4894, "strncmp")
             && ReadCStringAscii(0x1BB70C4, 5) == "ABRT"

@@ -11661,3 +11661,45 @@ production/check files, bounded at the first case call; table VA `0xFD4E2C`
 maps to raw `0xBD422C`, four targets `BD4141/BD415A/BD418D/BD41C0`.
 `1eeac3d1-4b5f-417b-b5b4-333d4c08bf6e` owns recycle-tail files,
 starting at the late node+8 write and stopping at wrapper return.
+
+Pushed `aabddd1` with callback code/checks/registration. New immutable
+status/predicate/callback windows independently match the pinned PE
+(37 literal windows); final runner is waiting for active header writer
+to finish a tuple typing correction. State setter trace shows equality
+does not early-return: raw `BD1BA3` JNZ skips only the report block;
+equal state reaches the indirect reporter at `BD1BB9`.
+State write `BD2035` remains beyond the entry boundary and is not assumed
+reachable for requested state five. Luna `6f163dbf-5770-49ad-af46-f5008c82f3ea`
+owns the bounded state-entry production/check pair.
+
+Header dispatch is reviewed and registered; every instruction/table window
+independently matches the PE. Active code writers are still compiling into
+the default SDK glob, so defer the next serialized runner until they report
+ready. Predicate author is correcting sequential missing-read validation:
+`+C` cannot be captured without `+8`, nor `+14` without `+10`.
+Header/state immutable writer is now
+`4ee9f9e2-df4d-4427-a5e8-c8d2b1901faf`; recycle-prefix read-only trace is
+`539db0c1-58d6-4c02-bad1-e7b2ac8f0487`, stopping before the tail writer's
+`BD5C9C` entry. Avoid committing those active files until reviewed.
+
+Predicate sequential-read revision and bounded state entry are reviewed and
+registered, as is header dispatch. Their code/check files are ready for a
+serialized runner after recycle writers finish. The 46 pending immutable
+literal windows independently match the pinned PE. Recycle tail reviewer
+found that missing receiver/counter captures still allowed helper/epilogue;
+author is splitting those boundaries and rejecting later captures.
+Luna successors: `6903d850-7cab-449c-a2ac-3cffc8d8cd8b` owns recycle-prefix
+code/checks, `bdb5f485-f8d8-478a-b587-13b135d020bb` traces header helper
+first handoffs, and `72dff284-e9f6-48df-93bf-32ce32b0fa3d` exclusively owns
+the PE evidence file for recycle wrapper windows.
+
+The ordinary pinned runner now passes with header dispatch, predicate,
+state entry and recycle tail registered. Prefix files are not registered
+yet and remain owned by `6903d850`; do not include them in this commit.
+All 59 new immutable literal windows independently matched the PE.
+Header helper trace found `BD5BA0` and `BD5C00` are identical plain-RET
+getters, not RET-4 queue consumers. Their final `[ESI]` reload is independent
+even when the initial nonzero comparison skips diagnostics. Getter code
+belongs to Luna `86e26c28-2cc4-4ba8-8d8d-f7ea3688e907`; caller continuation
+trace belongs to `1489fb32-5beb-4925-b96e-4042e9121b6e`. The pushed EDI
+must not be assumed consumed by those getters.

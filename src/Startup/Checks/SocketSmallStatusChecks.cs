@@ -307,7 +307,7 @@ internal static class SocketSmallStatusChecks
             }));
         SocketSmallStatusPlan nonzeroWordWithUnreachedDiagnostic = SocketSmallStatusProjection.Project(
             new(0x10203040, 3, null, 4, 1, 1, false, null));
-        check("WORD==0 reports after nonzero AL; nonzero WORD skips that diagnostic, and both reach state 5",
+        check("WORD==0 reports after nonzero AL; nonzero WORD skips that diagnostic, and both call the helper with argument 5",
             allWordGateCombinations
             && nonzeroWordWithUnreachedDiagnostic.Outcome
                 == SocketSmallStatusOutcome.UnreachedCaptureProvided);
@@ -316,7 +316,7 @@ internal static class SocketSmallStatusChecks
             new(0x10203040, 3, null, 4, 1, 0, true, true));
         SocketSmallStatusPlan skippedDiagnosticAndStateReturned = SocketSmallStatusProjection.Project(
             new(0x10203040, 3, null, 4, 1, ushort.MaxValue, null, true));
-        check("Every case-3 diagnostic decision sets state 5 only after the observed calls and then joins",
+        check("Every case-3 diagnostic decision calls the helper with argument 5 and joins only after normal return",
             diagnosticAndStateReturned.Outcome
                 == SocketSmallStatusOutcome.SetStateNormalReturnJoins
             && diagnosticAndStateReturned.DiagnosticPath
