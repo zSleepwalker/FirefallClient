@@ -10434,3 +10434,12 @@ The comparison of child `+0x74` at `0xCA6799` supplies flags for
 It is not a second allocation-success test. A pure captured-continuation
 projection is assigned, explicitly limited to reaching this join, alongside
 a separate bounded trace of the remaining initializer return/caller use.
+
+The captured allocation continuation is now implemented and registered with
+focused checks. Its nullable result explicitly represents that the join was
+not reached when a null-allocation diagnostic did not return. Coordinator
+review named the boundary a continuation join, not a function return:
+`0xCA6799` is not RET. High-bit captured pointers and the independent
+`+0x74` gate are covered. This code/docs integration is pushed.
+Exact initializer AL-return/caller failure bytes and the final `0xCA6C80`
+boolean helper are the next independent bounded evidence scopes.
