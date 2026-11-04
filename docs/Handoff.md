@@ -10,8 +10,8 @@ PrivateDialog receiver identification, AES "block-size" interpretation,
 and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
-Current delegated boundaries are indentation descriptor self-alias constructors
-and allocation-failure reporter dispatch. Mode-16 fixed scatter and normal
+Current delegated boundaries are startup formatting-depth pairing
+and downstream assertion-reporter termination policy. Mode-16 fixed scatter and normal
 buffer release are resolved.
 Shutdown-request callers
 and texture writer dispatch/serialization are bounded unresolved stops,
@@ -7351,3 +7351,33 @@ the correct stored string VA is `0x1BDF798` (and con.indentChar
 raw `0x17DE3D0` maps to VA `0x1BDF7D0`).
 The next narrow check follows self-alias object constructors and stored
 VAs, not another raw-string xref scan or adjacent-default inference.
+
+## Indentation defaults and flags are bound by exact constructors
+
+The active-sample CRT initializer raw `0x2D3350` (VA `0x6D3F50`)
+selects con.indentAmount object **VA** `0x1E6ABE8`, name **VA**
+`0x1BDF798`, default **VA** `0x1BDF7C8` bytes `32 00` (2).
+Raw `0x2D336B`, bytes `68 80 00 00 00`, supplies flags `0x80`.
+Character initializer raw `0x2D3310` (VA `0x6D3F10`) selects
+object **VA** `0x1E6AB78`, name **VA** `0x1BDF7D0`, default
+**VA** `0x1BDF7CC` bytes `20 00` (space).
+Raw `0x2D332B`, bytes `6A 00`, supplies flags zero.
+Both call constructor **VA** `0x11D5CA0`; raw `0xDD5158`
+stores self at `+0x5C`, proving the formatter aliases.
+CRT pointers raw `0x16C6524/0x16C6528` contain the respective
+initializer VAs. Defaults are now constructor-bound, not inferred by adjacency.
+
+## Allocation reporter cell maps to a return-capable assertion wrapper
+
+Correct mapping of reporter **VA** `0x1C15EA0` is raw
+`0x1814AA0`, not the initially suggested `0x1804AA0`.
+Cell bytes `C0 37 6C 01` contain **VA** `0x16C37C0`,
+target raw `0x12C2BC0`. Allocator raw `0x12B8006` bytes
+`FF 15 A0 5E C1 01` call this cell.
+The wrapper invokes raw `0x12C38E0`; both have explicit returns
+at `0x12C2BD8/0x12C39A9`. The callee formats assertions,
+flushes, and invokes downstream reporting.
+The cell lies in read-only .rdata; the bounded literal-reference scan found
+calls, not publication writes.
+This proves return-capable structure only, not that downstream reporting
+returns in the selected failure scenario. The next scope is raw `0x12C3470`.
