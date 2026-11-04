@@ -10583,6 +10583,71 @@ internal static class StartupBinaryEvidence
             && StartupObjectLifecycleNativeLayout.Container118ResetBlockEndFileOffset
                 < StartupObjectLifecycleNativeLayout.PostPassContainer120CallFileOffset);
 
+        check("Binary nested-container initializer passes this+0x120 and captures the sentinel in [EBP-0x10] before passing count 0x10",
+            Matches(
+                StartupObjectLifecycleNativeLayout.Container120InitializerCallerSetupFileOffset,
+                "8D8F20010000")
+            && RelativeBranchTargets(
+                StartupObjectLifecycleNativeLayout.Container120InitializerCallFileOffset,
+                0xE8,
+                StartupObjectLifecycleNativeLayout.Container120InitializerMethodFileOffset)
+            && Matches(
+                StartupObjectLifecycleNativeLayout.Container120SentinelPointerCaptureFileOffset - 0xD,
+                "8D55F08B0652C7461C0000803F8945F08B016A10508941048D45E850")
+            && RelativeBranchTargets(
+                0xC416F1,
+                0xE8,
+                StartupObjectLifecycleNativeLayout.Container120BackingAllocationFileOffset));
+
+        check("Binary nested-container sentinel is 12 bytes; its empty vector allocates 16 DWORDs, fills from the captured pointer, and stores fields 0x14/0x18",
+            Matches(
+                0xC416B1,
+                "89068D4E08C745FC00000000C70100000000C7410400000000C7410800000000")
+            && RelativeBranchTargets(
+                0xC416AC,
+                0xE8,
+                StartupObjectLifecycleNativeLayout.Container120SentinelAllocationFileOffset)
+            && Matches(
+                StartupObjectLifecycleNativeLayout.Container120SentinelAllocationFileOffset,
+                "558BEC6A0CE896556600")
+            && RelativeBranchTargets(0xC5330B, 0xE8, 0xC52C20)
+            && Matches(0xC52C49, "03D13B55080F4255088BC25DC20400")
+            && Matches(0xC53310, "508945ECE8F7F9FFFF")
+            && RelativeBranchTargets(
+                0xC53314,
+                0xE8,
+                StartupObjectLifecycleNativeLayout.Container120BackingCapacityReadFileOffset)
+            && Matches(
+                StartupObjectLifecycleNativeLayout.Container120BackingCapacityReadFileOffset,
+                "558BEC8B450833C985C0741F3DFFFFFF3F7712C1E00250")
+            && RelativeBranchTargets(
+                0xC52D27,
+                0xE8,
+                0x12B7FB0)
+            && Matches(
+                StartupObjectLifecycleNativeLayout.Container120BackingCapacityMultiplyFileOffset,
+                "C1E002")
+            && Matches(
+                0xC5331B,
+                "8BD68B450C2B03C745FC00000000FF750CC1F80283EC08897DE88945108D0C87FF7514")
+            && RelativeBranchTargets(
+                StartupObjectLifecycleNativeLayout.Container120BackingFillSentinelFileOffset,
+                0xE8,
+                StartupObjectLifecycleNativeLayout.Container120BackingFillFileOffset)
+            && Matches(
+                StartupObjectLifecycleNativeLayout.Container120BackingFillFileOffset,
+                "558BEC85D27418568B7508EB038D490085C974048B06890183C1044A75F2")
+            && Matches(0xC416F6, "C74614070000008BC6C7461808000000"));
+
+        check("Binary nested-container cleanup releases its backing pointer at +8 separately from sentinel-linked list nodes",
+            Matches(0xC3FC10, "578BF98B4F0885C9741A")
+            && RelativeBranchTargets(0xC3FC1A, 0xE8, 0x12C8D60)
+            && Matches(0xC3FC1F, "C7470800000000C7470C00000000C7471000000000")
+            && Matches(0xC3FC36, "8B0889008B07894004C74704000000003B0F741456EB")
+            && Matches(0xC3FC50, "8B31")
+            && RelativeBranchTargets(0xC3FC52, 0xE8, 0x12C8D60)
+            && RelativeBranchTargets(0xC3FC61, 0xE9, 0x12C8D60));
+
         check("Binary UI manager shutdown checks the partial-init byte, clears both init bytes, and dispatches state sync through slot +0xB0",
             Matches(
                 UiManagerNativeLayout.UiManagerShutdownMethodFileOffset + 0x32,
