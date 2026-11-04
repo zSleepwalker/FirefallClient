@@ -69,6 +69,8 @@ SocketPayloadRecycleTailChecks.Run(Check);
 SocketPayloadRecyclePrefixChecks.Run(Check);
 SocketHeaderFieldGetterChecks.Run(Check);
 SocketHeaderCaseContinuationChecks.Run(Check);
+ReliableReceiveEntryChecks.Run(Check);
+UnreliableReceiveEntryChecks.Run(Check);
 SharedTextPoolSingletonChecks.Run(Check);
 UiShaderSourcePoolTeardownChecks.Run(Check);
 UiShaderSourcePoolSingletonDestructorChecks.Run(Check);

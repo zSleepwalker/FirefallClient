@@ -11740,3 +11740,29 @@ pinned runner, including all 256 AL values on all three routes. Its immutable
 anchors remain with the active evidence writer. Luna
 `eb01b0b6-4311-4e57-9baf-0869ee389c02` traces only case-three receiver
 entry `BE5A40`'s initial guards and first opaque handoff.
+
+Pushed `0866de0` for post-getter routing. Ten new literal windows for its
+immutable anchors and reliable entry independently match the sample.
+Case-three entry code now belongs to Luna
+`408ec12e-7bf9-4915-800c-6958d14b229d`, bounded only through its diagnostic
+guard at `BE5A6B`; no sequence comparison/parser reconstruction yet.
+Its immutable evidence writer is `3cc18dd5-03c0-4680-9fb6-a6820314f917`,
+preserving pending continuation/reliable anchors. Reliable-entry code owner
+remains `d92b68c2-8daf-4482-ab9f-d4f933246bee`, not yet reviewed.
+
+Reliable entry review requests removal of unrelated diagnostic-data prefix
+claims and an explicit invalid-later-capture outcome when the diagnostic
+return is missing but the second flag is supplied. The author is revising.
+Luna `53ac1b08-e3a6-477f-9795-cb85aaa793ce` traces only the next reliable
+sequence gate `[BE5227,BE526C]`, stopping at the first opaque call or its
+alternate JA boundary; no parser/callee expansion.
+
+Reliable entry revision and unreliable entry are reviewed, registered, and
+pass the ordinary pinned runner. Their exact 55-byte/43-byte windows
+independently match the PE. New Luna modular delta code writer is
+`e9260f1f-ea39-44ae-a548-3c445fa48bec`; immutable evidence writer is
+`58843c58-b5e8-4c8e-a651-115da5609ff5`. Both stop at the `BE524D` JA:
+`d=(payloadWord-receiverWord) mod 65536`, compare
+`(d-0x100) mod 65536` unsigned against `0x7EFF`; fallthrough iff
+`0x100 <= d <= 0x7FFF`. No call-stack interpretation from the trace is
+integrated; the trace's stack-slot table was not relied on.
