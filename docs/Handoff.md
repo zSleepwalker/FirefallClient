@@ -11,7 +11,7 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are scripting prefix-registry removal/lifetime
+file-close path. Active boundaries are scripting prefix-registry bulk teardown
 and direct-mapped allocation selection/fallback policy.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
@@ -9184,3 +9184,17 @@ remainingSize|oldPreviousInUse|2 (`0x12C994D..0x12C996B`).
 Alignment/remaining-size checks can reach abort.
 Direct-mapping selection in `0x12C7690` is flag/threshold gated;
 exact configuration/fallback is the next bounded question.
+
+## Prefix replacement does not release old value locally; failure cleanup precedes publication
+
+The bounded follow-up confirms raw `0xBFCBC1`'s duplicate assertion,
+if returning, continues to `0xC07380` and stores the new pointer at
+`0xBFCC05` without reading/releasing the prior mapped value locally.
+Its broader replacement ownership policy remains unresolved.
+
+Crucially, the only identified direct caller of `0xC341C0` is
+`0xC34100`'s construction-failure path, before registry insertion.
+Absence of prefix-tree erase in that failure cleanup does not establish
+missing erase for successfully published objects.
+Repeated tracing of that path is parked. The next task follows actual
+manager shutdown/destructor and bulk prefix-container cleanup.
