@@ -11,10 +11,14 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are exact preserve-helper failure anchors
-and unsigned loader-request clamp PE assertions; callback publication and composite
-container semantic identity remain parked. UI lifecycle, arithmetic/import
-regressions, and immutable backing-slot projection code/checks are committed.
+file-close path. Current continuation is the UI shader-source `slBlob`
+lifecycle: read gates/tails, capacity reuse, preservation copy, pooled/nonpool
+allocation and release, and wrapper copy/destruction have captured code and
+immutable PE anchors. See the latest appended sections for corrections and
+active assignments. Singleton teardown and source-initialization copy are
+active; callback publication and composite container semantic identity remain
+parked. UI lifecycle, arithmetic/import regressions, and immutable backing-slot
+projection code/checks are committed.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
 Normal native CRT return selects `exit(status)`.
