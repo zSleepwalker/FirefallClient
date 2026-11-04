@@ -10592,3 +10592,15 @@ transfers BL to AL at `0xCA7061`.
 The earlier initial direct-call failure bypasses scratch cleanup.
 Its callee is not labeled a parser without separate evidence.
 A bounded static failure-layout/check integration is assigned.
+
+The scratch failure layout/check registration is now committed and pushed
+after a focused coordinator run. Review distinguished the destination
+replacement loop `0xCA6EF0` from failure entry `0xCA6F50`,
+renamed result instructions so they are not described as calls, and kept
+the `var_58..var_1C` suffixes as decompiler-local names rather than
+unverified runtime stack coordinates. Exact machine geometry is assigned.
+
+The shader-frame implementation initially reported completion without the
+requested files appearing in this worktree. A same-task delivery correction
+is pending; it is not integrated or committed. Independent active scopes
+are compile import/literal PE assertions and code/error blob cleanup.
