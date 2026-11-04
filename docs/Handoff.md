@@ -10,8 +10,9 @@ PrivateDialog receiver identification, AES "block-size" interpretation,
 and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
-Current delegated boundaries are logger unwind guard-to-global binding
-and thread wait/close PE import verification. Assertion interception is a bounded
+Current delegated boundaries are local-file PE wait/close import verification
+and timed-join caller object identity. Logger unwind binding is now composed
+from the recorded guard initialization and exact EH action. Assertion interception is a bounded
 unresolved stop. Mode-16 fixed scatter and normal
 buffer release are resolved.
 Shutdown-request callers
@@ -7749,3 +7750,28 @@ separate field `+8`; worker termination is not established by that timed path.
 Import names need direct PE verification, not empty IDA import enumeration.
 The report's VA for raw `0x12BFF70` was arithmetically wrong:
 correct text VA is `0x16C0B70`, not `0x16CCB70`.
+
+## Logger guard initialization closes the exceptional-release chain
+
+Raw `0x12C164F` stores critical-section address **VA** `0x1F11414`
+at `[ebp-0x684]`; `0x12C1657` sets guard byte `+4` to 1.
+The previously recorded EH map selects this same stack guard through
+cleanup `0x16948D0 -> 0x2ECED0`.
+Together these observations establish conditional unwind decrement of
+`[0x1F11414+0x30]`, namely depth **VA** `0x1F11444`,
+then LeaveCriticalSection. Normal acquire increments at `0x12C1671`;
+normal release decrements at `0x12C199C`.
+The follow-on's uninspected-handler caveat does not reopen the already
+recorded handler/map/action evidence. Exact new opcode-byte strings were
+not returned; binding relies on its cited operand inspection.
+
+## Wait import remains unresolved after failed IDA helper; local parsing follows
+
+Wait call raw `0x12BFFC5` is confirmed as bytes
+`FF 15 C8 42 AC 01`, operand **VA** `0x1AC42C8`.
+The bounded IDA-side PE parser failed due to helper scope; no DLL/name
+identity is inferred from that failure or from empty import enumeration.
+The next check parses the immutable local PE with a normal inspection
+script, avoiding repeated IDA helper-scope failures.
+Separately, timed caller `0x1309900`'s concrete object identity is checked
+before assigning its ten-second behavior to the heartbeat lock itself.
