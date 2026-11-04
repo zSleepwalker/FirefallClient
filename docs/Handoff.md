@@ -10,8 +10,9 @@ PrivateDialog receiver identification, AES "block-size" interpretation,
 and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
-Current delegated boundaries are application shutdown's service-owner virtual
-dispatch and the frame collection behind DumpKeyComboThread's traceback logging.
+Application shutdown's service-cell dispatch now reaches the concrete console
+file-close path; the frame collection behind DumpKeyComboThread's traceback
+logging remains the active boundary.
 Normal native CRT return selects `exit(status)`.
 Exit registration and its logger cleanup predicate are resolved.
 Generic wrapper field `+8` is a duplicated diagnostic label:
@@ -8138,7 +8139,7 @@ logging. The earlier unreadable-string result arose from failing to map
 VA constants before inspection. A nearby Lua 5.3 marker alone does not
 identify the node type; exact frame enumeration/field semantics remain open.
 
-## Shutdown clears service +B4; final owner dispatch still needs receiver binding
+## Shutdown service-cell slot +4 reaches console fclose before service return
 
 Helper raw `0x30D150` tail-calls uiManager virtual `+0x34`;
 shutdown's subsequent calls are slots `+0x10/+0x14` at
@@ -8146,10 +8147,44 @@ shutdown's subsequent calls are slots `+0x10/+0x14` at
 resolves to raw `0xE4FB00`, storing zero into service `+0xB4`.
 This is not a store to the separate category callback slot.
 
-Near raw `0x10D8E30`'s end, call `0x10D8F6F` dispatches virtual `+4`
-through alias **VA** `0x1E60EA4`. Its receiver/dereference levels must
-be verified before calling it static-owner destruction: prior alias evidence
-identifies an address of the service cell, not automatically the owner object.
-Shutdown later invokes generic nested-container drain raw `0x12DB320`
-at `0x309883`. Bootstrap cleanup continues after shutdown and returns at
-`0x2EB2FF`. No actual console-close call ordering follows from these edges yet.
+The aliases carry the address of the service pointer cell, not the static owner.
+Raw `0x2D2D60..0x2D2D65` copies the DWORD at **VA** `0x1DFC82C`
+(backed raw `0x19FAC2C`, bytes `70 04 E0 01`, value **VA**
+`0x1E00470`) to alias **VA** `0x1E60E3C`; raw `0x2D2D70..0x2D2D75`
+copies that DWORD to alias **VA** `0x1E60EA4`. The latter is in the
+virtual-only data tail, so its value is established by these copy instructions,
+not by reading an unrelated raw offset.
+
+The exact shutdown operand sequence at raw `0x10D8F6A..0x10D8F73` is
+`A1 A4 0E E6 01 8B 08 8B 01 FF 50 04`: load the alias value (the address
+of cell `0x1E00470`), load the service object from that cell into ECX, load
+its vptr, then call slot byte-offset `+4` with the service object as receiver.
+This is not a call on the static owner at **VA** `0x1E00460`.
+
+The service constructor raw `0xE4DFA0` installs object vptr **VA**
+`0x1C77C2C`; the owner itself has a different vptr, **VA** `0x1C77C1C`.
+With the `.rdata` mapping, the service vtable's slot `+4` is at raw
+`0x1876830`; exact bytes `F0 5F 25 01` encode target **VA** `0x1255FF0`,
+which maps to code raw `0xE553F0`. That method's normal path calls the
+console object's virtual slot `+8` at raw `0xE55541`. Console vptr **VA**
+`0x1C77EA8` has slot `+8` at raw `0x1876AB0`, bytes `20 FB 25 01`,
+target **VA** `0x125FB20` / raw `0xE5EF20`.
+
+At raw `0xE5EF68`, that method loads its receiver's vptr and calls slot
+`+0xD0`. Console vtable raw `0x1876B78` contains bytes `E0 FA 25 01`,
+target **VA** `0x125FAE0` / raw `0xE5EEE0`. The close body conditionally
+passes the two global FILE handles **VA** `0x1E49A18` and `0x1E49A14`
+to `fclose` through IAT **VA** `0x1AC49A8` (raw `0x16C35A8`), then
+zeros each corresponding global. The handle closes are conditional on each
+pointer being nonnull.
+
+Thus the synchronous order is app shutdown raw `0x309804` calling
+`0x10D8E30`, service slot `+4` -> `0xE553F0`, console slot `+8` ->
+`0xE5EF20`, then console slot `+0xD0` -> `0xE5EEE0`/`fclose`.
+This occurs before the service method returns and before app shutdown's later
+generic nested-container drain call raw `0x309883 -> 0x12DB320`; bootstrap
+cleanup then continues past shutdown and returns at `0x2EB2FF`.
+`0xE5EF20` continues after the close call, so this proves the close operation's
+position in the chain, not that the FILE globals remain null after every later
+operation. The separate service `+0x64` clearing `+0xB4` is not restoration of
+category callback slot **VA** `0x1DF96F8`.
