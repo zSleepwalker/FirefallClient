@@ -11,8 +11,8 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are buffer allocation-failure reporting
-and the VM callback/wrapper failed-resize pointer ledger.
+file-close path. Active boundaries are heap-free ownership metadata
+and virtual-memory region allocation/release.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
 Normal native CRT return selects `exit(status)`.
@@ -8792,3 +8792,45 @@ userdata or oldSize, so selection is global rather than userdata-specific.
 A reported null-result path logs diagnostic 4528, frees a nonnull prior
 pointer, and returns null. Its exact interaction with the VM wrapper's
 same-pointer retry remains a pointer-lifetime follow-up, not a runtime finding.
+
+## VM failed-resize callback releases the pointer before the wrapper's same-value retry
+
+Raw `0xD675C0` saves the incoming pointer. Eligible recovery calls
+`0xCD9EC0(VM,1)` at `0xD675E3..0xD675E8`, then
+`0xD675ED..0xD675FA` reloads the same saved pointer and sizes for retry.
+Callback raw `0xC3C0B0`, after `0x12CAE30` returns null, logs 4528
+at `0xC3C120` and passes its original pointer to `0x12CA6F0`
+at `0xC3C13E..0xC3C140` before returning null.
+
+The inner resize helper first attempts `0x12C94D0`, then allocation
+`0x12CA410`. Successful fallback copies/frees old storage at
+`0x12CAF14..0x12CAF20`; failed fallback branches to null return
+at `0x12CAEEA/0x12CAF25..0x12CAF2D`, preserving old storage there.
+Thus the callback, not that failed inner allocation branch, releases the old
+allocation before the wrapper retries with its saved pointer value.
+This is a static resource-contract ledger, not proof of runtime reuse,
+dereference, or exploitability. Zero-size requests bypass wrapper retry.
+
+Layout is now explicit: allocation base B, VM=B+4, embedded context
+S=B+0x78=VM+0x74; `0xCD54B0` sets `[VM+0x0C]=S`.
+At `0xCD576C/0xCD576E`, bytes `89 06` and `89 5E 04`
+store callback/userdata at `[ESI]/[ESI+4]`, with ESI=S.
+Raw `0xCD5771` sets `[S+0x88]=VM`, and `0xCD57C7` clears
+retry gate `[S+0x8C]`. This context is not the process-global heap object.
+
+## Buffer OOM wrapper uses the known continuable assertion reporter
+
+Raw `0x12B8030` calls allocator `0x12C8A20`; null formats
+`"OOM allocating %lu bytes."` from **VA** `0x1C5EBB8`,
+raw `0x185D7B8`, with requested size.
+It calls reporter slot **VA** `0x1C15EA0` with the same
+`0x1C5EA58` pointer twice, line `0xDA` (218), and the formatted buffer.
+The previously verified reporter raises code `0x12ED502` with flags 1;
+line 218 is not that flags argument. If reporting returns, this wrapper
+returns null, preserving the conditional continuation in the buffer ledger.
+
+The allocator's region-growth call at raw `0x12C771A` resolves to
+`VirtualAlloc(NULL,size,0x3000,4)` (reserve+commit, read/write).
+A failed call returns zero with no retry/fallback observed in that path.
+This identifies one region-growth boundary, not all small-block allocation
+policy; region metadata and matching release are the next task.
