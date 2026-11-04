@@ -10,7 +10,7 @@ PrivateDialog receiver identification, AES "block-size" interpretation,
 and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
-Current delegated boundaries are local-file PE wait/close import verification
+Current delegated boundaries are logger exit-cleanup registration
 and timed-join caller object identity. Logger unwind binding is now composed
 from the recorded guard initialization and exact EH action. Assertion interception is a bounded
 unresolved stop. Mode-16 fixed scatter and normal
@@ -7785,3 +7785,12 @@ bytes `DA FB 9B 01`, pointing to import-name RVA `0x19BFBDA`
 `0x12BFFC5` without relying on raw-IDB import enumeration.
 The first inspected window did not contain the later CloseHandle call;
 that final import operand is checked with a narrowly extended window.
+
+## Thread join's later CloseHandle import is independently verified
+
+Extended immutable-file inspection finds raw `0x12C003B` bytes
+`FF 15 88 43 AC 01`, calling **KERNEL32.dll!CloseHandle**.
+IAT **VA** `0x1AC4388` is RVA `0x16C4388`, raw `0x16C2F88`;
+hint/name RVA is `0x19BF84E`, hint `0x52`.
+This supplies direct import evidence for the previously traced handle cleanup,
+separate from whether waiting succeeded or the worker actually terminated.
