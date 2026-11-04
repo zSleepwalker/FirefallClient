@@ -10898,3 +10898,15 @@ preserve byte, and preserves all byte values' zero/nonzero behavior.
 Primary/secondary control count names avoid unsupported ownership labels.
 Alignment capacity correction remains pending; do not stage that pair
 until its native capacity store and corrected focused checks are reviewed.
+
+The corrected alignment projection and independent PE capacity-store
+anchor are integrated and pushed at `afff299`, together with copy gate,
+alignment branch, and control-initialization PE checks. Header capacity
+now preserves the caller input; registered boundary matrices include
+zero, one, `0x20`, and maximum DWORD capacity. The pinned sample run passes.
+
+Active continuations: pooled control vtable targets, nonpool output-pair
+writer, absolute resize adapter, and wrapper destructor layout. The
+destructor's first report repeated the XADD prior-zero interpretation;
+it has been returned for exact flag verification before any integration.
+Do not accept that wording without inspecting XADD/JNZ versus XADD/DEC/JNZ.
