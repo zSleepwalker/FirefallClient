@@ -2281,6 +2281,44 @@ if (args.Length == 2)
         && ClientApiWinHttpPreSendFailureLayout.ResultOffset == 0x14
         && ClientApiWinHttpPreSendFailureLayout.ResponseKindOffset == 8
         && ClientApiWinHttpPreSendFailureLayout.ResponseKind == 4);
+    Check("ClientApi DATA_AVAILABLE zero-byte completion marks EOF without starting a read",
+        client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpDataAvailableEmptyBranchRaw
+            + 0x400C00, "8B7D0C85FF75198B43183978087507C7400801000000B801000000")
+        && ClientApiWinHttpDataAvailableLayout.BytesAvailableOffset == 0
+        && ClientApiWinHttpDataAvailableLayout.StatusDataSize == 4
+        && ClientApiWinHttpDataAvailableLayout.ResponseKindOffset == 8
+        && ClientApiWinHttpDataAvailableLayout.ShouldStartRead(1)
+        && !ClientApiWinHttpDataAvailableLayout.ShouldStartRead(0)
+        && ClientApiWinHttpDataAvailableLayout.CaptureResponseKindOnEmptyData(0) == 1
+        && ClientApiWinHttpDataAvailableLayout.CaptureResponseKindOnEmptyData(3) == 3);
+    Check("ClientApi callback preserves DATA_AVAILABLE terminal kind while closing the handle",
+        client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpDataAvailableTerminalCallbackRaw
+            + 0x400C00, "85C07420837E140075038946148B4618837808007507C740080400000057FF15F84CAC01"));
+    Check("ClientApi WinHttpOpenRequest selects secure and refresh flags from request fields",
+        client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiWinHttpOpenRequestImportVa,
+            "WinHttpOpenRequest")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpOpenRequestSecureFlagRaw
+            + 0x400C00, "8D410C33F68338018985C8FBFFFFB8000080000F44F0")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpOpenRequestRefreshFlagRaw
+            + 0x400C00, "80796000740681CE00010000")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpOpenRequestRefreshFlagResetRaw
+            + 0x400C00, "C6476000")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpOpenRequestArgumentsRaw
+            + 0x400C00, "566A006A006A00")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiWinHttpOpenRequestCallRaw
+            + 0x400C00, "FF15FC4CAC01")
+        && new[]
+        {
+            (Https: 0u, Bypass: (byte)0, Flags: 0u),
+            (Https: 1u, Bypass: (byte)0, Flags: 0x00800000u),
+            (Https: 0u, Bypass: (byte)1, Flags: 0x00000100u),
+            (Https: 1u, Bypass: (byte)1, Flags: 0x00800100u),
+            (Https: 2u, Bypass: (byte)0xFF, Flags: 0x00000100u)
+        }.All(entry => ClientApiWinHttpOpenRequestFlagLayout.CaptureFlags(entry.Https, entry.Bypass)
+            == entry.Flags)
+        && ClientApiWinHttpOpenRequestFlagLayout.HttpsSchemeOffset
+            == Red5LoggingBridgeNativeLayout.ClientApiRequestUrlSchemeOffset
+        && ClientApiWinHttpOpenRequestFlagLayout.BypassProxyCacheOffset == 0x60);
     Check("Original ClientApi redirect callback cracks the target and replays stored headers once",
         client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiWinHttpCrackUrlImportVa,
             "WinHttpCrackUrl")

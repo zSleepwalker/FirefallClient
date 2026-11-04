@@ -4497,3 +4497,23 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   `+0x1C` for normal result delivery. Its error-capture path calls imported
   `GetLastError` and `ClientApi_WinHttpFailureHelper`; exact setup operation
   ownership remains unresolved.
+
+# Round 45: ClientApi empty response body
+
+- For `DATA_AVAILABLE`, the dispatcher reads the four-byte available count.
+  Zero skips capacity growth and `WinHttpReadData`, sets response kind 1 only
+  if unset, and returns terminal status. The callback then records its
+  completion result, preserves the already-set kind 1 (it writes kind 4 only
+  when the kind is zero), and closes the request handle. `LoginNetwork.md`
+  Round 30 and CompanionTools capture this empty-body path; the status length
+  is not validated before the DWORD read.
+
+# Round 46: ClientApi WinHttpOpenRequest flags
+
+- The worker passes `WINHTTP_FLAG_SECURE` (`0x00800000`) only when parsed
+  HTTPS field `request+0x0C` equals 1, and `WINHTTP_FLAG_REFRESH` /
+  `WINHTTP_FLAG_BYPASS_PROXY_CACHE` (`0x100`) when request byte `+0x60` is
+  nonzero; `ClientApiRequest_Reset` initializes that byte to zero. The
+  `WinHttpOpenRequest` call receives null HTTP-version, referrer, and accept-
+  type pointers. The C# model/test and `LoginNetwork.md` Round 31 save this
+  policy. Writers after reset and callers that enable it remain unknown.

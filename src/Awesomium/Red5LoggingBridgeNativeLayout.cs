@@ -138,6 +138,31 @@ public static class ClientApiWinHttpPreSendFailureLayout
     public static bool ShouldSubmitRequest(int storedFailure) => storedFailure == 0;
 }
 
+public static class ClientApiWinHttpDataAvailableLayout
+{
+    public const uint BytesAvailableOffset = 0;
+    public const uint StatusDataSize = 4;
+    public const uint ResponseKindOffset = 8;
+    public const uint EmptyBodyResponseKind = 1;
+
+    public static bool ShouldStartRead(uint bytesAvailable) => bytesAvailable != 0;
+
+    public static uint CaptureResponseKindOnEmptyData(uint existingKind) =>
+        existingKind == 0 ? EmptyBodyResponseKind : existingKind;
+}
+
+public static class ClientApiWinHttpOpenRequestFlagLayout
+{
+    public const uint HttpsSchemeOffset = 0x0C;
+    public const uint BypassProxyCacheOffset = 0x60;
+    public const uint SecureFlag = 0x00800000;
+    public const uint RefreshFlag = 0x00000100;
+
+    public static uint CaptureFlags(uint httpsSchemeFlag, byte bypassProxyCache) =>
+        (httpsSchemeFlag == 1 ? SecureFlag : 0)
+        | (bypassProxyCache != 0 ? RefreshFlag : 0);
+}
+
 /// <summary>
 /// Observed redirect header-replay gate. Host comparison models ASCII
 /// case-insensitivity; CRT locale-specific byte behavior is not simulated.
@@ -410,6 +435,14 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint ClientApiWinHttpPreSendFailureHandleClearRaw = 0xBC322E;
     public const uint ClientApiWinHttpPreSendFailureResponseKindStoreRaw = 0xBC3273;
     public const uint ClientApiWinHttpGetLastErrorImportVa = 0x1AC4378;
+    public const uint ClientApiWinHttpDataAvailableEmptyBranchRaw = 0xBC2423;
+    public const uint ClientApiWinHttpDataAvailableTerminalCallbackRaw = 0xBC2767;
+    public const uint ClientApiWinHttpOpenRequestSecureFlagRaw = 0xBC2CCD;
+    public const uint ClientApiWinHttpOpenRequestRefreshFlagRaw = 0xBC2CE3;
+    public const uint ClientApiWinHttpOpenRequestRefreshFlagResetRaw = 0xBC131C;
+    public const uint ClientApiWinHttpOpenRequestArgumentsRaw = 0xBC2D92;
+    public const uint ClientApiWinHttpOpenRequestCallRaw = 0xBC2DB7;
+    public const uint ClientApiWinHttpOpenRequestImportVa = 0x1AC4CFC;
     public const uint ClientApiWinHttpCallbackContextHandleStoreRaw = 0xBC2DEC;
     public const uint ClientApiWinHttpCallbackContextResultStoreRaw = 0xBC3264;
     public const uint ClientApiWinHttpCallbackContextResponseStoreRaw = 0xBC3270;

@@ -298,3 +298,64 @@
 ## Unresolved
 - The precise WinHTTP setup operation responsible for every stored
   pre-send failure is not established by this branch alone.
+
+# Round 30: ClientApi zero-byte DATA_AVAILABLE completion
+
+## Observed
+- In `ClientApi_DispatchWinHttpStatus` (`0xBC1DA0`), the
+  `DATA_AVAILABLE` branch reads the available-byte count from the first DWORD
+  of the callback payload. At `0xBC2423`, a zero count skips the response-body
+  capacity and `WinHttpReadData` path. If response kind at `+8` is still zero,
+  it writes 1, then returns 1 as a terminal dispatcher result. A nonzero
+  count continues to reserve body capacity and issue `WinHttpReadData`.
+- The outer callback (`0xBC26E0`, `0xBC2767` onward) stores that nonzero
+  dispatcher result in context `+0x14` if unset, changes response kind to 4
+  only if it is still zero, and closes the request handle. Since the
+  zero-available branch already set response kind 1, the callback preserves
+  that value while signaling completion and closing the handle. CompanionTools
+  checks the exact zero-count branch and the callback's result/close sequence.
+
+## Interpreted
+- An empty `DATA_AVAILABLE` notification is treated as end-of-body by this
+  client and is a terminal result, parallel to its previously documented
+  zero-byte `READ_COMPLETE` path. The response kind remains 1 through callback
+  closure; no body read is issued for the empty notification.
+
+## Unresolved
+- The native status-payload length is not checked in this branch before the
+  DWORD read. Normal WinHTTP `DATA_AVAILABLE` notifications carry four bytes;
+  malformed callback payload behavior is not established.
+
+# Round 31: ClientApi WinHttpOpenRequest flags
+
+## Observed
+- `ClientApi_PumpRequestWorker` (`0xBC2B30`) constructs `dwFlags` for
+  `WinHttpOpenRequest` from the request's parsed HTTPS indicator at `+0x0C`
+  and byte `+0x60`. It sets `0x00800000` only when the DWORD at `+0x0C` is
+  exactly 1, and ORs `0x00000100` when byte `+0x60` is nonzero
+  (`0xBC2CCD`–`0xBC2CE9`). The URL parser stores its HTTPS boolean at
+  request `+0x0C` (Round 16), so this path selects the secure flag for HTTPS.
+- At `0xBC2D92`, the worker supplies the flags, then three null optional
+  arguments (HTTP version, referrer, accept types); it passes the worker's
+  session handle, selected verb, and request object-name pointer before calling
+  `WinHttpOpenRequest` at `0xBC2DB7`. Original PE IAT VA `0x1AC4CFC` resolves
+  to `WINHTTP.dll!WinHttpOpenRequest`. CompanionTools checks the imports,
+  flag-construction bytes, null argument sequence, callsite, and modeled
+  flag truth table against the sample.
+- WinHTTP names `0x00800000` as `WINHTTP_FLAG_SECURE`; `0x00000100` is
+  `WINHTTP_FLAG_REFRESH` (also named `WINHTTP_FLAG_BYPASS_PROXY_CACHE`) in
+  the [`WinHttpOpenRequest` reference](https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpopenrequest).
+- `ClientApiRequest_Reset` (`0xBC1280`) initializes request byte `+0x60` to
+  zero at `0xBC131C`; CompanionTools checks this default store as well.
+
+## Interpreted
+- Request byte `+0x60` controls whether the refresh/bypass-cache flag is
+  passed to the handle-opening API. Its request-reset default is disabled.
+  This establishes only the flag argument, not effective cache behavior or
+  which callers later enable the byte.
+- The null HTTP-version argument delegates version selection to WinHTTP; it
+  does not establish an explicit HTTP-version policy in the client.
+
+## Unresolved
+- Writer provenance for request byte `+0x60` beyond reset has not yet been
+  located. No caller behavior is inferred from this field alone.
