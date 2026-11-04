@@ -10853,3 +10853,24 @@ virtual size is obtained before the later wrapper backing-pointer load.
 The pending implementation must accept those as independent captures,
 including nonzero earlier size and later null backing. It must not infer
 the earlier size from the later pointer's nullness.
+
+The corrected independent-size getter and separate-capacity reuse predicate
+are registered and pushed at `16e3dcd`. Their focused checks include crossed
+size/backing captures and distinct first/second capacity values.
+
+Bounded successor findings awaiting implementation/PE integration:
+preservation copies unsigned minimum of the later virtual-size accessor
+result and requested size, not an assumed earlier backing-length snapshot.
+The accessor is reached on the positive replacement path even when the
+preserve flag later suppresses copying. The pool control helper
+`0x12CC700` initializes visible count fields `+4/+8` to one when its
+captured control allocation is nonnull, then writes output control before
+header; this does not establish a general ownership type.
+
+Constructor `0x12CB700` performs DWORD capacity-plus-alignment allocation
+arithmetic. Its diagnostic tests zero capacity, not allocator nullness.
+Nonzero alignment uses alignment minus unsigned remainder, advancing a
+full alignment unit when already aligned. Zero alignment avoids division.
+The constructor report's claimed raw `0xECB100` was an address-basis
+error: the IDB EA is already raw `0x12CB700` (VA `0x16CC300`).
+No allocator-return null guard or runtime-fault guarantee is inferred.
