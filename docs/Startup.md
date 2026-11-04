@@ -197,6 +197,8 @@ Its separate entry projection reports `0x76` when the captured global readiness 
 
 `UiShaderSourcePoolPopProjection` records one attempt against a receiver-relative head/tag pair. A null captured head returns zero without an exchange. Otherwise, the proposed pair contains the captured node link and wrapping tag increment; the explicit comparisons of returned low and high DWORDs select return versus an unmodeled recapture boundary. It does not mutate memory or simulate contention. These offsets are relative to the pair receiver, which the teardown supplies as `pool+8`, not to every containing pool object.
 
+`SingletonTeardownWalkerProjectionRules` records the surrounding list walker at raw `0x12C3AF0`: after any returning entry diagnostic, capture the initial global head, clear byte VA `0x1E4B096`, and set guard byte VA `0x1E4B095`. A nonnull head receives one slot-eight dispatch, followed by an independent global-head capture. A null initial or later head selects the final guard clear; a nonnull later head stops at the repeat boundary. The walker itself reads no next link and supplies no explicit dispatch arguments. This is not a virtual-callback or complete-shutdown simulation.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves

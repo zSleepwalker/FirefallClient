@@ -11108,3 +11108,15 @@ Other active scopes: teardown entry captures
 `8200e808-cd08-4fff-bc28-4d7d9404d805`, and acquisition continuation
 `57dca23a-a9a0-4649-aac9-3f70d64147a8`. The immutable evidence file
 has no active writer after `db06904f-7a37-42a9-98a8-3e848a5c34f9`.
+
+The walker author corrected all mapping errors and removed unrelated entry
+bytes. Its raw `0x12C3AF0` entry and `0x12C3Bxx` instruction anchors
+now match the immutable PE assertions; it is registered for integration.
+Teardown entry diagnostic captures are pushed at `833ca7c`.
+
+New active code scopes: tagged push
+`fcfddf15-e1be-4e05-9cef-2f28401842ca`, successful-acquisition continuation
+`c5a79a94-7b26-4fcc-a623-0753724be491`; exclusive PE writer
+`6be31f83-b449-424d-9c1c-170bef4fc379` binds both. Adjacent singleton
+callback identity/differences are read-only scope
+`cc1189e2-11b8-422d-ba0e-4382bccf569a`.
