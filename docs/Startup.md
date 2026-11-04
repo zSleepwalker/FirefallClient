@@ -171,6 +171,10 @@ The captured control writer supports both observed variants: pooled controls req
 
 `UiShaderSourceDestructorNativeLayout` records wrapper slot-zero release gates and disposition. The first XADD/JNZ tests the post-decrement sum; only its zero edge reaches slot-zero callback and the separate second-counter XADD/DEC/JNZ sequence. Captured callback effects are not modeled. The destructor replaces its vptr, conditionally releases wrapper storage on deleting-flag bit zero, and does not directly clear wrapper backing/control fields.
 
+`UiShaderSourceControlReleaseNativeLayout` separates pooled header-release dispatch from control-storage deleting dispatch. Slot zero checks header `+0xC`; slot four guards a null receiver before invoking slot eight with deleting argument one. Slot eight replaces the control vptr and gates its allocator-release call on argument bit zero, without directly releasing the header.
+
+`UiShaderSourcePoolReturnNativeLayout` records conditional diagnostics for header `+8` and capacity, then the continuation assuming reached calls return. Initial and later `+8` captures remain separate. The later value is negated for the release-helper argument; header `+4` is cleared before that call, then pool `+0x10` is atomically decremented before the header handoff. This does not substitute a presumed data pointer or emulate the handoff helper.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves
