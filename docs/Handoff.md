@@ -11,8 +11,9 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Current delegated boundaries are the runtime exit helper's non-sentinel list
-helper and the distinct timed wrapper's field-8 producer/consumer semantics. Its cleanup import is
-MSVCR120.dll!free; the earlier constructor candidate is another destructor.
+contract and the concrete DumpKeyComboThread worker/teardown ordering.
+Generic wrapper field `+8` is a duplicated diagnostic label:
+MSVCR120.dll!_strdup/free; the earlier constructor candidate is another destructor.
 Logger unwind binding is now composed
 from the recorded guard initialization and exact EH action. Assertion interception is a bounded
 unresolved stop. Mode-16 fixed scatter and normal
@@ -7893,3 +7894,36 @@ and `0x1F1B470`, calls a helper, then re-encodes/stores the pair.
 The follow-up did not return that helper's exact target or argument contract,
 so only the sentinel forwarding path is fully identified here.
 Import-slot file bytes are lookup RVAs, not runtime function addresses.
+
+## Thread wrapper owns a duplicated diagnostic label
+
+Immutable PE import parsing identifies **VA** `0x1AC493C` as
+**MSVCR120.dll!_strdup**, paired with `free` at `0x1AC4940`.
+Initializer raw `0x12BFE00` therefore owns a duplicate of argument `a2`
+in `this+8`. Join helper raw `0x12BFF70` uses it in timeout/error logging;
+destructor raw `0x1309900` conditionally waits 10000 ms, then frees it.
+This field is neither a thread HANDLE nor worker data inferred from that name.
+
+Concrete caller raw `0x2EA330` supplies label **VA** `0x1C5E964`,
+backed raw `0x185D564`, bytes `DumpKeyComboThread\0`.
+That identifies this caller's diagnostic label, not every base-wrapper caller
+or the heartbeat wrapper. The next trace follows this concrete worker and
+its stop/teardown ordering.
+
+## Non-sentinel exit helper reaches IAT 1AC47A0
+
+Raw `0x136B5DB..0x136B5E7` arranges the encoded callback and pointers to
+locals holding decoded globals **VA** `0x1F1B474/0x1F1B470`.
+Call raw `0x136B5E7`, bytes `E8 B0 01 00 00`, reaches stub
+raw `0x136B79C`, bytes `FF 25 A0 47 AC 01`, jumping through IAT
+**VA** `0x1AC47A0`. Return is retained in EDI at `0x136B5EF`
+and returned in EAX at `0x136B614`. Its import identity remains pending
+immutable PE parsing; empty raw-IDB import queries do not resolve it.
+
+Cleanup raw `0x16C17D0` conditionally calls the already documented
+assertion reporter through **VA** `0x1C15EA0`, then passes critical-section
+address **VA** `0x1F11414` to IAT **VA** `0x1AC4274`.
+That slot was previously verified as **KERNEL32.dll!DeleteCriticalSection**;
+the follow-up's empty import query does not reopen its identity.
+The cleanup's assertion predicate and non-sentinel registration contract
+remain the next bounded checks.
