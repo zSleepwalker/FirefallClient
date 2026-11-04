@@ -11,7 +11,7 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are the separate Login UI-manager startup call
+file-close path. Active boundaries are Login UI-manager startup argument retention
 and VM-close finalizer ordering/error handling.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
@@ -9403,7 +9403,7 @@ The getter's concrete target/publication remains unresolved and is parked.
 Initial zero bytes in its backed pointer slot do not establish a runtime vptr.
 
 The UI-manager pointer is separately loaded at `0x30B1A9` and dispatched
-at `0x30B200`. That distinct concrete call is the next trace.
+at `0x30B200`. The follow-up below binds that distinct initialization dispatch.
 The already verified manager table's `+0x1C -> 0xBFB310` entry does
 not bind the preceding getter-returned object merely by slot coincidence.
 
@@ -9428,3 +9428,29 @@ the follow-up's unresolved-indirect label does not reopen that mechanism.
 No explicit errno assignment was found in the inspected oversized branches.
 The allocator edge investigation is closed at these boundaries; the next
 independent task follows VM finalization, not another allocation micro-case.
+
+## Login UI initialization dispatch and inherited stack arguments
+
+In the active sample `D:\SteamLibrary\steamapps\common\Firefall\system\bin\FirefallClient.exe`,
+raw `0x30B1A9` loads UI-manager global VA `0x1E002B8`, saves the pointer
+at `0x30B1B1`, and loads its vptr at `0x30B1BA`. Call `0x30B200`
+(VA `0x70BE00`) uses that receiver and slot `+0x1C`. With the previously
+verified constructor vptr VA `0x1C73EBC`, table raw `0x1872AD8` contains
+`10 BF FF 00`, mapping VA `0xFFBF10` to raw `0xBFB310`.
+This composes constructor/table evidence with the concrete call; it does not
+assert that the global cannot hold a different runtime vptr.
+
+Only the return from the separate call `0x30B1F6` is newly pushed before
+`0x30B200`; seven prior arguments remain on the stack. Callee order is:
+preceding return, zero, `[VA 0x1DFFFC0]`, `[VA 0x1DE0868 + EDX*4]`,
+EDI, caller `arg_0`, caller `arg_8`, second getter return plus `0x48`.
+`0xBFB310` ends with `retn 0x20`, consistent with eight stack arguments.
+These are positional values, not recovered semantic names or ownership.
+
+Login raw `0x636FF0` calls `0x30AF50` at `0x63703E` and tests AL
+at `0x637043`. One input flag comes from
+`byte[[VA 0x1E5C834] + 0x40] == 0`. Initialization failure passes through
+`0x30AF50`'s common local object/text cleanup at `0x30BDF0` and returns
+zero; Login then logs and returns zero. Success branches to `0x63706C`.
+The next bounded investigation follows the eight inputs' retained fields
+and ownership, without reopening the unidentified getter receiver.
