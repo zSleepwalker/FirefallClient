@@ -18,6 +18,40 @@ internal static class UiShaderSourceWrapperChecks
             && UiShaderSourceWrapperNativeLayout.BackingDataPointerFieldOffset == 0x04
             && UiShaderSourceWrapperNativeLayout.BackingSizeFieldOffset == 0x0C);
 
+        check("Preserve helper, allocation call, and target use distinct raw file offsets",
+            UiShaderSourceWrapperNativeLayout.PreserveRawHelperEntryRawFileOffset == 0x12CBCB0
+            && UiShaderSourceWrapperNativeLayout.PreserveSlowPathAllocationCallRawFileOffset == 0x12CBDA6
+            && UiShaderSourceWrapperNativeLayout.PreserveSlowPathAllocationTargetRawFileOffset == 0x12CBF30);
+
+        check("Preserve copy-path header reads precede the copy call",
+            UiShaderSourceWrapperNativeLayout.PreserveCopyPathInstructions.SequenceEqual(new[]
+            {
+                new UiShaderSourceWrapperInstructionEvidence("Read old header +4", 0x12CBDC8),
+                new UiShaderSourceWrapperInstructionEvidence("Read new header +4", 0x12CBDD0),
+                new UiShaderSourceWrapperInstructionEvidence("Copy call", 0x12CBDD3)
+            }));
+
+        check("Preserve no-copy path records the new-header load before the unguarded compare",
+            UiShaderSourceWrapperNativeLayout.PreserveNoCopyPathInstructions.SequenceEqual(new[]
+            {
+                new UiShaderSourceWrapperInstructionEvidence("Load new header into EBX", 0x12CBDDB),
+                new UiShaderSourceWrapperInstructionEvidence("Compare ESI with [EBX]", 0x12CBDDF)
+            }));
+
+        check("Preserve later stores remain distinct from the copy-path read and follow the path accesses",
+            UiShaderSourceWrapperNativeLayout.PreservePostAccessWrites.SequenceEqual(new[]
+            {
+                new UiShaderSourceWrapperInstructionEvidence("Write logical size", 0x12CBDFD),
+                new UiShaderSourceWrapperInstructionEvidence("Write wrapper +8", 0x12CBE07),
+                new UiShaderSourceWrapperInstructionEvidence("Write wrapper +4", 0x12CBE15)
+            })
+            && UiShaderSourceWrapperNativeLayout.PreserveCopyPathInstructions[0].RawFileOffset
+                != UiShaderSourceWrapperNativeLayout.PreservePostAccessWrites[0].RawFileOffset
+            && UiShaderSourceWrapperNativeLayout.PreserveCopyPathInstructions[^1].RawFileOffset
+                < UiShaderSourceWrapperNativeLayout.PreservePostAccessWrites[0].RawFileOffset
+            && UiShaderSourceWrapperNativeLayout.PreserveNoCopyPathInstructions[^1].RawFileOffset
+                < UiShaderSourceWrapperNativeLayout.PreservePostAccessWrites[0].RawFileOffset);
+
         check("Captured size projection returns zero for a null backing pointer",
             UiShaderSourceWrapperSizeProjectionRules.ReadCapturedSize(0, null) == 0);
 

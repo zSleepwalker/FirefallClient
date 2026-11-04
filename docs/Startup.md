@@ -149,6 +149,8 @@ The local source wrapper uses vtable VA `0x1C80CC4` (raw `0x187F8C4`). Slot `+0x
 
 The loader's chunk call at raw `0x12BB40E` is PE-bound to `MSVCR120.dll!fread` through IAT VA `0x1AC490C` (raw `0x16C350C`). `UiShaderSourceReadProjectionRules` first selects the unsigned minimum of captured size and caller cap (`0x12BB3D0/0x12BB3D3`, cap at `[EBP+0xC]`). Receiver slot `+0x1C` is called at `0x12BB3DA` before the zero-length test at `0x12BB3E3`; a zero request does not skip that setup call. The projection separately captures the `0x01000000`-byte chunk cap and accepts only returned element count one for `fread(buffer, chunk, 1, handle)`. It does not confuse byte count with element count, execute reads, advance receiver state, or emulate failure cleanup.
 
+The wrapper layout also records branch-specific slow-preserve instruction order: old/new backing data-pointer reads and the copy call precede logical-length and wrapper-pointer writes. These anchors are static access evidence only. A captured null allocation-output header does not acquire a clean failure result in this projection, and external allocator/reporting behavior is not executed or inferred.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves
