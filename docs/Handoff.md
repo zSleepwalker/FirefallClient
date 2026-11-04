@@ -11,8 +11,8 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are concrete publication into the manager
-callback trees and nested scripting callback-container teardown.
+file-close path. Active boundaries are manager callback payload disposal
+and remaining nested scripting containers `+0x118/+0x120`.
 UI lifecycle code/checks are committed.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
@@ -10149,6 +10149,32 @@ after dispatch; no snapshot or safety guarantee is introduced.
 The delegated Startup checks reported 886 passes and no failures.
 Successor work follows nested-container cleanup and manager registry
 publication, not another reconstruction of the established arithmetic.
+
+## Manager callback publication acquires the key, not an observed payload reference
+
+Raw `0xBFDE80`, reached from initialization, passes UI `+0x6B0` to
+`0xC3C9B0` at `0xBFE2CB`. That helper derives a shared-text key,
+creates/configures a payload through `0xC63D80/0xC64C90`, and inserts
+through `0xC06A60`; existing keys are rejected.
+`0xC164C0` stores node `+0x10` with explicit atomic key incref and
+copies the payload pointer to `+0x14` without an observed payload incref.
+`0xC16570` links, and `0xC08A20` releases the temporary key.
+Failure invokes `0xC64420` and payload slot zero. Success publishes
+the pointer for the later callback; the report's "tree-owned" interpretation
+awaits a concrete successful-payload disposal path.
+
+## Nested E8 payload cleanup follows VM close, unlike the callback walker
+
+Raw `0xC376A0` is traversal only in the inspected function; no unlink,
+free, or payload-release operation was observed.
+Concrete script close `0xC33060` calls `0xC33E60` at `0xC33206`,
+then `0xC3E990` at `0xC3327C`, then VM close `0xCD5510` at
+`0xC33291`. Its `+0xE8` cleanup loop begins at `0xC33326`.
+For each nonnull node `+0x14` payload, raw `0xC33352..0xC3335D`
+invokes slot zero with argument one. This is payload-directed cleanup
+after VM close, not only key/node erasure. Concrete slot-zero target and
+node-storage release remain unbound by this report.
+The next task follows only remaining `+0x118/+0x120` cleanup surfaces.
 
 The report's apparent VA lookup discrepancy is not a new mapping gap:
 the IDB is raw/base-zero and a numeric runtime VA must not be used directly
