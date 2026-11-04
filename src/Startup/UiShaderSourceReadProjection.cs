@@ -10,8 +10,11 @@ public static class UiShaderSourceReadProjectionRules
     public const uint FreadImportAddressRawFileOffset = 0x16C350C;
     public const string FreadImportModule = "MSVCR120.dll";
     public const string FreadImportName = "fread";
+    public const uint CapturedSizeLoadRawFileOffset = 0x12BB366;
     public const uint ReceiverBufferVirtualCallRawFileOffset = 0x12BB403;
     public const uint ReceiverBufferVirtualCallVtableSlotOffset = 0x04;
+    public const uint RequestedLengthCompareRawFileOffset = 0x12BB3D0;
+    public const uint RequestedLengthClampRawFileOffset = 0x12BB3D3;
     public const uint RequestedLengthSlotSetupRawFileOffset = 0x12BB3DA;
     public const uint RequestedLengthReceiverOffset = 0x1C;
     public const uint FreadCallRawFileOffset = 0x12BB40E;
@@ -26,6 +29,14 @@ public static class UiShaderSourceReadProjectionRules
         remainingByteCount < MaximumChunkByteCount
             ? remainingByteCount
             : MaximumChunkByteCount;
+
+    public static uint SelectRequestedLength(uint capturedSize, uint callerCap) =>
+        capturedSize < callerCap
+            ? capturedSize
+            : callerCap;
+
+    public static bool IsRequestedLengthSetupNeeded(uint requestedLength) =>
+        requestedLength != 0;
 
     public static bool IsCompleteChunkRead(uint capturedFreadElementCount) =>
         capturedFreadElementCount == FreadElementCount;

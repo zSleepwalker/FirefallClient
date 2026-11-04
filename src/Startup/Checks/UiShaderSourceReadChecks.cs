@@ -9,8 +9,11 @@ internal static class UiShaderSourceReadChecks
             && UiShaderSourceReadProjectionRules.FreadImportAddressRawFileOffset == 0x16C350C
             && UiShaderSourceReadProjectionRules.FreadImportModule == "MSVCR120.dll"
             && UiShaderSourceReadProjectionRules.FreadImportName == "fread"
+            && UiShaderSourceReadProjectionRules.CapturedSizeLoadRawFileOffset == 0x12BB366
             && UiShaderSourceReadProjectionRules.ReceiverBufferVirtualCallRawFileOffset == 0x12BB403
             && UiShaderSourceReadProjectionRules.ReceiverBufferVirtualCallVtableSlotOffset == 0x04
+            && UiShaderSourceReadProjectionRules.RequestedLengthCompareRawFileOffset == 0x12BB3D0
+            && UiShaderSourceReadProjectionRules.RequestedLengthClampRawFileOffset == 0x12BB3D3
             && UiShaderSourceReadProjectionRules.RequestedLengthSlotSetupRawFileOffset == 0x12BB3DA
             && UiShaderSourceReadProjectionRules.RequestedLengthReceiverOffset == 0x1C
             && UiShaderSourceReadProjectionRules.FreadCallRawFileOffset == 0x12BB40E
@@ -25,6 +28,38 @@ internal static class UiShaderSourceReadChecks
             && UiShaderSourceReadProjectionRules.SelectChunk(0x01000000) == 0x01000000
             && UiShaderSourceReadProjectionRules.SelectChunk(0x01000001) == 0x01000000
             && UiShaderSourceReadProjectionRules.SelectChunk(uint.MaxValue) == 0x01000000);
+
+        uint[] boundaryValues = { 0, 1, 0x7FFFFFFF, 0x80000000, uint.MaxValue };
+        bool requestedLengthSelectionIsUnsigned = true;
+        bool requestedLengthChunkCompositionIsBounded = true;
+
+        for (int capturedIndex = 0; capturedIndex < boundaryValues.Length; capturedIndex++)
+        {
+            for (int capIndex = 0; capIndex < boundaryValues.Length; capIndex++)
+            {
+                uint expectedLength = boundaryValues[capturedIndex < capIndex ? capturedIndex : capIndex];
+                uint selectedLength = UiShaderSourceReadProjectionRules.SelectRequestedLength(
+                    boundaryValues[capturedIndex],
+                    boundaryValues[capIndex]);
+
+                requestedLengthSelectionIsUnsigned &= selectedLength == expectedLength;
+                requestedLengthChunkCompositionIsBounded &=
+                    UiShaderSourceReadProjectionRules.SelectChunk(selectedLength)
+                    == (expectedLength < UiShaderSourceReadProjectionRules.MaximumChunkByteCount
+                        ? expectedLength
+                        : UiShaderSourceReadProjectionRules.MaximumChunkByteCount);
+            }
+        }
+
+        check("Shader-source requested length uses an unsigned captured-size and caller-cap minimum",
+            requestedLengthSelectionIsUnsigned
+            && UiShaderSourceReadProjectionRules.SelectRequestedLength(0x80000000, 0x7FFFFFFF) == 0x7FFFFFFF
+            && UiShaderSourceReadProjectionRules.SelectRequestedLength(0x7FFFFFFF, 0x80000000) == 0x7FFFFFFF);
+
+        check("Shader-source requested length composes with the chunk cap and skips zero-length setup",
+            requestedLengthChunkCompositionIsBounded
+            && UiShaderSourceReadProjectionRules.IsRequestedLengthSetupNeeded(0) == false
+            && UiShaderSourceReadProjectionRules.IsRequestedLengthSetupNeeded(1));
 
         check("fread success compares its element count to one, not its byte count",
             UiShaderSourceReadProjectionRules.FreadElementCount == 1
