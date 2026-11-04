@@ -11374,3 +11374,19 @@ Iteration-tail implementation is assigned to
 then item index. Removal instead enters at `0x12CDDE0`, increments only
 item index, and uses the fresh unsigned bound comparison. Keep these
 entry modes distinct.
+
+Storage code is pushed at `828539e`. Secondary initial gate is registered
+and standard checks pass. Separate secondary release/repeat projection is
+assigned to `2ab8156d-8a95-4a9e-86de-6449800697b4`: opaque release at
+`0x12CDDE9`, next pop at `0x12CDDF1`, nonzero backedge to alignment,
+zero fallthrough to `0x12CDE01` (unlike initial zero at `0x12CDE04`).
+Queue/sentinel return helper raw `0x12CE280` is a new bounded trace,
+assigned to `2794ccfa-9896-4b51-a571-9f75242dc4c2`; it is not the
+singleton detach/drain.
+
+Primary initial/repeat gate and concrete cleanup callback are now registered.
+Coordinator corrected the primary check's pop code VA to `0x16CE6E0`
+(raw `0x12CDAE0` plus `0x400C00`). Serialized registered/pinned checks
+pass with primary and secondary gates, concrete callback, and storage
+replacement. Immutable evidence remains uncommitted only while its sole
+writer finishes the final gate/callback windows.
