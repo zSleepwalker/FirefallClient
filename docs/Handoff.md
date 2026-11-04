@@ -10,7 +10,7 @@ PrivateDialog receiver identification, AES "block-size" interpretation,
 and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
-Current delegated boundaries are the encoded CRT exit-list lifetime
+Current delegated boundaries are the CRT exit-mode flag initialization
 and the concrete DumpKeyComboThread chord state/action.
 Exit registration and its logger cleanup predicate are resolved.
 Generic wrapper field `+8` is a duplicated diagnostic label:
@@ -8002,3 +8002,26 @@ The pass also reported apparent `0x05050505` bytes for globals
 Those are not accepted as loader initial values until the PE section's
 raw-size/virtual-size bounds are checked. Do not extrapolate raw-IDB
 contents into virtual-only globals.
+
+## CRT post-application exit boundary and loader-zero list globals
+
+Immutable PE parsing resolves IAT **VA** `0x1AC4828` to
+**MSVCR120.dll!exit** and `0x1AC47E4` to **MSVCR120.dll!_cexit**.
+After application return, the CRT saves EAX in **VA** `0x1E36614`.
+If **VA** `0x1E36618` is zero, call raw `0x136AEEE` passes that status
+to `exit`. Otherwise it skips `exit`; call raw `0x136AF56` invokes
+`_cexit` only if **VA** `0x1E36610` is zero, then follows local
+cleanup/return. Code following the external `exit` call is reached only
+if that call returns. These imports do not expose CRT-internal callback order.
+
+Both successful initialization/runloop and initialization failure in
+bootstrap raw `0x2EAE70` reach ClientApplicationShutdown at `0x2EB1F9`
+before application return. Which CRT exit-mode branch this standalone
+sample selects remains a flag-initialization continuation.
+
+PE `.data` has RVA `0x19C5000`, VirtualSize `0x15647C`,
+PointerToRawData `0x19C3400`, and SizeOfRawData `0x71800`.
+List globals **VA** `0x1F1B470/0x1F1B474` have RVAs
+`0x1B1B470/0x1B1B474`: inside its virtual range but beyond raw backing.
+Their loader initial values are zero, not the previously observed
+raw-IDB `0x05050505`. They have no corresponding backed raw file offsets.
