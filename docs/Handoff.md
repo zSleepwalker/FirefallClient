@@ -11,8 +11,8 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are registry range-erase sentinel comparisons
-and heap batch-free validation/error policy.
+file-close path. Active boundaries are scripting-object success publication
+and allocator chunk-header encoding/alignment metadata.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
 Normal native CRT return selects `exit(status)`.
@@ -9098,3 +9098,40 @@ surprising miss behavior remains provisional until range arguments and branch
 bytes are bound. Do not equate empty range with full range from symbol names.
 Zero input reaches assertions (caller line 2392, cleanup line 1491) before
 continuation if reporting returns; the known reporter is not newly unresolved.
+
+## Registry miss is a no-op in a nonempty container, not a full clear
+
+The follow-up supplied useful instruction bytes but mislabeled IDB offsets
+as VAs and subtracted the code bias. Addresses below retain raw IDB offsets;
+its alternative `0x7FC3E2/0x809729/0x8095BE` mappings are not propagated.
+At raw `0xBFCFE2`, the erase call receives registry `this+0x5EC` in ECX
+and stack arguments `(&key,begin,end)`, pushed end, begin, key pointer.
+On miss, raw `0xC0A329` bytes `8B 45 08 89 38 89 78 04`
+store the head into both endpoints.
+
+Raw `0xC0A1BE`, bytes `3B 01 75 19 3B D1 75 15`, compares
+begin with `head->next`, then end with head. Only that full-range pair
+takes `0xC07560`; otherwise equal endpoints return without erasing.
+Therefore an absent key in a nonempty registry is a no-op.
+For an empty self-linked registry, head/head also denotes the full empty
+range, and clearing merely resets the already empty container.
+This supersedes the earlier missing-key/full-clear interpretation.
+Container fields are head `+0`, count `+4`, bucket storage `+8`;
+nodes use next `+0`, previous `+4`, pointer-value key `+8`.
+
+## Batch-free validation calls CRT abort, not the continuable project reporter
+
+The guard at raw `0x12C9C6E..0x12C9C80` checks chunk header
+`h=pointer-8`: unsigned h below heap `+0x10`, or
+`(DWORD[h+4] & 3)==1`, takes the error branch.
+The lower-bound field is maintained from VirtualAlloc bases at `0x12C6E70`.
+This guard does not compare a magic constant or establish full owner identity.
+Slot clearing precedes it; there is no upper-bound check in this guard.
+
+Raw `0x12C9D06`, bytes `FF 15 24 4A AC 01`, calls
+**MSVCR120.dll!abort**, PE-verified IAT **VA** `0x1AC4A24`,
+raw `0x16C3624`, without arguments.
+With internal locking enabled, this branch precedes normal LeaveCriticalSection
+at `0x12C9CF8` and has no local unlock. This is the external CRT abort
+boundary, not an inference from the following INT3 padding.
+The header's first-word interpretation remains a producer-side follow-up.
