@@ -10784,3 +10784,11 @@ review corrected concatenated code addresses `0x12CBDFD8/0x12CBE078/
 0x12CBE158` to `0x12CBDFD/0x12CBE07/0x12CBE15`, corrected the
 compare to `0x12CBDDF`, and separated allocation call versus target names.
 Independent immutable PE checks of those anchors remain active.
+
+Prior-art navigation: the earlier "AES destination is slBlob, not a cursor
+stream" and "AES publication fields and realignment correction" sections
+already bind RTTI, slot `+0x1C` as logical resize with preservation,
+slot `+0x14` as zero resize without preservation, and backing/control
+field geometry. Subsequent tasks must reuse those facts. The current
+source-read connection adds its captured caller gates and PE regressions,
+not a new wrapper identity or capacity-only interpretation of setup.
