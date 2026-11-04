@@ -11,8 +11,8 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are UI child backing null-result continuation
-projection and initializer return/caller contract; callback publication and composite
+file-close path. Active boundaries are required-lookup terminal byte verification,
+success pair-replacement inputs, and reuse of the existing diagnostic-cell binding; callback publication and composite
 container semantic identity remain parked. UI lifecycle, arithmetic/import
 regressions, and immutable backing-slot projection code/checks are committed.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
@@ -10494,3 +10494,24 @@ uses shared non-import global VA `0x1C15EA0`. Its exact callee
 and return contract remain unresolved; the static return continuation
 does not prove the diagnostic returns. A single initializer/writer
 check is assigned, not another broad logger investigation.
+
+## Required lookup projection integrated; diagnostic binding was already known
+
+The terminal required-lookup predicate is registered and pushed after a
+focused coordinator run. Its scope is explicitly the final dispatcher/output
+test, not the preceding query stages.
+
+The diagnostic publication check found that the previous handoff already
+bound global VA `0x1C15EA0`: its `.rdata` raw offset is `0x1814AA0`,
+bytes `C0 37 6C 01`, pointing to VA `0x16C37C0`, raw `0x12C2BC0`.
+See the earlier "Allocation reporter cell maps to a return-capable assertion
+wrapper" section. Thus the null-allocation call is not a new unresolved
+callee/publication gap. The `.rdata` cell is image-initialized; prior
+bounded references found callers, not publication writes. Downstream
+termination behavior is not inferred from this binding. An immutable
+caller-to-existing-cell regression extension is active.
+
+Initializer AL-return PE checks are awaiting final combined integration;
+coordinator review corrected their label to say that failure clears child
+field `+0x6C`, not the whole child. The success pair-replacement trace
+and exact required-lookup predicate bytes remain separate bounded tasks.
