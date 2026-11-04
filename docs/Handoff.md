@@ -12,7 +12,7 @@ are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
 file-close path. Active boundaries are scripting-manager normal-startup init binding
-and heap usable-size/copy-bound reporting.
+and ordinary-chunk usable tail-word lifetime.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
 Normal native CRT return selects `exit(status)`.
@@ -9323,3 +9323,21 @@ manager `+0xA04`'s virtual `+0x10(1)` and clears `+0xA04`.
 Slot `+0x14`, raw `0xBF91D0`, sweeps remaining prefix/nested tracking entries.
 Neither changes the two initialization bytes.
 The normal-startup indirect binding to `0xBFB310` remains the next task.
+
+## Realloc copy bound uses ordinary size minus 4, not minus 8
+
+Raw `0x12CAE30` reads size/flags at user pointer-4, masks `0xFFFFFFF8`,
+and subtracts 8 for low-two-bits-zero direct mappings, otherwise 4.
+Fallback copy at `0x12CAF14` uses min(original requested bytes, that bound),
+then frees old allocation at `0x12CAF20`.
+Raw `0x12C9D10` independently uses the same subtraction rule.
+This supersedes earlier ordinary usable-capacity statements of chunkSize-8:
+the observed copy ceiling is ordinary chunkSize-4, direct chunkSize-8.
+Exact next-header/previous-size word lifetime explaining this distinction
+is the next bounded check.
+
+Null old pointer delegates to `0x12CA410`; nonnull with zero request frees
+and returns zero. Requests >=`0xFFFFFFC0` return zero before that free path.
+Wrapper `0x12B8030` passes requested size only and does not query capacity.
+No separate usable-size helper call was found on the inspected copy path;
+the bound is computed inline.
