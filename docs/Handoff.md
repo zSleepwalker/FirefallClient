@@ -10,8 +10,8 @@ PrivateDialog receiver identification, AES "block-size" interpretation,
 and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
-Current delegated boundaries are default-logger synchronization primitives
-and texture lock-heartbeat thread ownership/failure cleanup. Assertion interception is a bounded
+Current delegated boundaries are the logger's exact unwind cleanup action
+and heartbeat vtable startup/worker targets. Assertion interception is a bounded
 unresolved stop. Mode-16 fixed scatter and normal
 buffer release are resolved.
 Shutdown-request callers
@@ -7618,3 +7618,67 @@ Normal return is raw `0x12C19CF`.
 Arguments are borrowed, formatting stack-local, with no thread handoff or
 ownership transfer observed. Lock-shaped initialization/acquire/release is
 the next scope; first-use concurrency safety is not assumed.
+
+## Heartbeat startup failure retains held state until owner release
+
+Thread construction raw `0x12BFE00` clears stop/started bytes
+`+4/+5`; lock ctor `0x13092D0` sets `+0x1C=self`, held
+`+0x38=0`. After rename acquisition, raw `0x1309560` sets held,
+joins any prior thread via `0x12BFF70(0)`, clears stop, and invokes
+virtual `+4`. False from that hook returns false without clearing held.
+The later thread-create-shaped call likewise returns false on null HANDLE,
+stored at `+0xC`; started byte reflects handle nonzero, ID is `+0x14`.
+These terminal failures happen after claim, not because the retry loop gave up.
+
+Join helper sets stop, waits only when started/handle are nonzero, maps timeout
+zero to INFINITE, closes/nulls the handle and clears started.
+Worker `0x1309880` can perform a final heartbeat open/close even when
+stop is noticed during the wait.
+Final owner release checks held independently of successful thread creation,
+joins, removes the name and clears held. Other wrapper cleanup is gated.
+Thread API names remain call-shape interpretations in this report; the next
+scope verifies the PE import, start argument and virtual hook to close worker
+entry linkage rather than assuming it from a function label.
+
+## Default logger serializes its body with a Win32 critical section
+
+PE evidence identifies Initialize/Enter/Leave/TryEnter/DeleteCriticalSection
+IAT **VAs** `0x1AC4280/0x1AC4278/0x1AC427C/0x1AC4284/0x1AC4274`.
+Logger globals are guard **VA** `0x1F11410`, critical section
+`0x1F11414`, and depth DWORD `0x1F11444`.
+Raw `0x12C161C` tests bit zero then uses a plain OR/store of the
+guard **before** initializing the critical section, without atomic/interlocked
+instructions in that branch. Concurrent first-use safety is therefore not
+established; actual simultaneous first use was not observed.
+
+Raw `0x12C164A..0x12C1677` tries entry, blocks via Enter on
+failure, increments depth and sets unwind state zero. Formatting, CRT output
+and flush run within the critical section. Raw `0x12C199C` decrements
+depth and leaves normally.
+Exit cleanup raw `0x16C17D0` asserts nonzero depth before deleting
+the critical section. Registration resembles exit cleanup but its runtime-init
+helper contract remains unverified.
+The next narrow scope follows handler raw `0x16948DB` to its cleanup
+action before assuming exceptional release.
+
+## Heartbeat uses _beginthreadex and a virtual worker thunk
+
+The interrupted follow-on verifies PE import **VA** `0x1AC4AB0`
+as MSVCR120!_beginthreadex, correcting earlier CreateThread-shaped naming.
+Raw `0x13095EA`, bytes `68 D0 09 6C 01`, supplies start
+**VA** `0x16C09D0`, raw `0x12BFDD0`.
+Thunk raw `0x12BFDD9..0x12BFDDE`, bytes
+`8B 4D 08 8B 01 FF 50 0C`, calls argument virtual `+0xC`,
+then _endthreadex(0). Startup hook at raw `0x13095D7`
+uses virtual `+4`; false skips thread creation.
+Exact lock vtable slots remain the narrow next check before joining this
+thunk to worker `0x1309880`.
+
+## Logger unwind metadata identifies one cleanup action
+
+Handler raw `0x16948DB` loads metadata **VA** `0x1DAE670`
+(raw `0x19AD270`), magic `0x19930522`, maxState 1, no try blocks.
+Unwind map **VA** `0x1DAE694` (raw `0x19AD294`) has state
+0->-1 cleanup **VA** `0x1A954D0`, raw `0x16948D0`.
+This identifies the action but does not yet prove its instructions decrement
+depth or leave the critical section; the next bounded task decodes that action.
