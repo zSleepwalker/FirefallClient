@@ -18,6 +18,11 @@ public readonly record struct UiManagerPayloadCleanupStep(
     uint CallSiteFileOffset,
     uint TargetMethodFileOffset);
 
+public readonly record struct UiManagerChild24ShutdownStep(
+    string Operation,
+    uint CallSiteFileOffset,
+    uint? TargetMethodFileOffset);
+
 public readonly record struct UiManagerStateSyncInput(
     byte GetterResult,
     byte ReadyFlag,
@@ -78,6 +83,51 @@ public static class UiManagerNativeLayout
     public const uint UiPayloadDescriptorAppendMethodFileOffset = 0xC97380;
     public const uint UiPayloadDescriptorGrowMethodFileOffset = 0xC978F0;
     public const uint UiManagerShutdownMethodFileOffset = 0xBFA0D0;
+    public const uint UiManagerShutdownChild24PointerLoadFileOffset = 0xBFAD2A;
+    public const uint UiManagerShutdownChild24InitialNullTestFileOffset = 0xBFAD37;
+    public const uint UiManagerShutdownChild24PrimaryCallSiteFileOffset = 0xBFAD3B;
+    public const uint UiManagerShutdownChild24PrimaryCallTargetFileOffset = 0xCA7330;
+    public const uint UiManagerShutdownChild24ReloadFileOffset = 0xBFAD40;
+    public const uint UiManagerShutdownChild24SecondNullTestFileOffset = 0xBFAD43;
+    public const uint UiManagerShutdownChild24SecondNullBranchFileOffset = 0xBFAD45;
+    public const uint UiManagerShutdownChild24ReleaseHelperCallSiteFileOffset = 0xBFAD48;
+    public const uint UiManagerShutdownChild24ReleaseHelperFileOffset = 0xBFAF40;
+    public const uint UiManagerShutdownChild24PointerClearFileOffset = 0xBFAD4D;
+    public const int UiManagerShutdownChild24PointerOffset = 0x24;
+    public const bool UiManagerShutdownChild24CallsAreNullGated = true;
+    public const uint UiManagerChild24ShutdownResetMethodFileOffset = 0xCA7330;
+    public const uint UiManagerChild24ShutdownResetFirstLoopCallFileOffset = 0xCA734A;
+    public const uint UiManagerChild24ShutdownResetFirstLoopStoreFileOffset = 0xCA734D;
+    public const uint UiManagerChild24ShutdownResetSecondLoopCallFileOffset = 0xCA735D;
+    public const uint UiManagerChild24ShutdownResetSecondLoopStoreFileOffset = 0xCA7360;
+    public const uint UiManagerChild24ShutdownResetChild8StoreFileOffset = 0xCA7379;
+    public const uint UiManagerChild24ShutdownResetChild64FreeCallFileOffset = 0xCA73F2;
+    public const uint UiManagerChild24ShutdownResetChild68ClearFileOffset = 0xCA73F7;
+    public const uint UiManagerChild24ShutdownResetReturnFileOffset = 0xCA7401;
+    public const int UiManagerChildShutdownResetPairLoopCount = 8;
+    public const int UiManagerChildShutdownResetLoopPointerFieldCount = 16;
+    public static IReadOnlyList<int> UiManagerChildShutdownResetLoopPointerOffsets { get; } =
+        Array.AsReadOnly(Enumerable.Range(0, UiManagerChildShutdownResetLoopPointerFieldCount)
+            .Select(index => 0x24 + index * 4)
+            .ToArray());
+    public static IReadOnlyList<int> UiManagerChildShutdownResetLaterPointerOffsets { get; } =
+        Array.AsReadOnly(new[] { 0x08, 0x14, 0x0C, 0x10, 0x74 });
+    public const int UiManagerChildObjectCleanupFieldOffset = 0x150;
+    public const bool UiManagerChildReleaseHelperUsesThiscallReceiverInEcx = true;
+    public const bool UiManagerChildReleaseHelperCallerPushesUnreadChildCopy = true;
+    public const int UiManagerChildReleaseHelperReturnStackBytes = 4;
+    public const uint UiManagerChild150CleanupCallSiteFileOffset = 0xBFAF50;
+    public const uint UiManagerChild150CleanupMethodFileOffset = 0xCA6070;
+    public const uint UiManagerChild150NativeFreeCallSiteFileOffset = 0xBFAF57;
+    public const uint UiManagerChildDependencyZeroTestFileOffset = 0xBFAF5C;
+    public const uint UiManagerChildDependencyZeroBranchFileOffset = 0xBFAF60;
+    public const uint UiManagerChildDependencyLoadFileOffset = 0xBFAF7C;
+    public const uint UiManagerChildDependencyVirtualCallFileOffset = 0xBFAF82;
+    public const int UiManagerChildDependencyPointerOffset = 4;
+    public const int UiManagerChildDependencyVtableOffset = 8;
+    public const uint UiManagerChildObjectNativeFreeCallSiteFileOffset = 0xBFAF87;
+    public const uint UiManagerChildObjectNativeFreeMethodFileOffset = 0x12C8D60;
+    public const uint UiManagerChildReleaseHelperReturnFileOffset = 0xBFAF90;
     public const uint UiManagerPayloadTreeInternalCloseCallSiteFileOffset = 0xBFA278;
     public const uint UiManagerPayloadTreeNativeObjectFreeCallSiteFileOffset = 0xBFA27F;
     public const uint UiManagerPayloadTreeIdentityRemovalCallSiteFileOffset = 0xBFA28B;
@@ -218,6 +268,35 @@ public static class UiManagerNativeLayout
                 "KeyRelease",
                 UiManagerPayloadTreeKeyReleaseCallSiteFileOffset,
                 UiManagerPayloadKeyReleaseMethodFileOffset)
+        });
+
+    public static IReadOnlyList<UiManagerChild24ShutdownStep> Child24ShutdownSequence { get; } =
+        Array.AsReadOnly(new[]
+        {
+            new UiManagerChild24ShutdownStep(
+                "Child24PrimaryCall",
+                UiManagerShutdownChild24PrimaryCallSiteFileOffset,
+                UiManagerShutdownChild24PrimaryCallTargetFileOffset),
+            new UiManagerChild24ShutdownStep(
+                "Child24ReleaseHelperCall",
+                UiManagerShutdownChild24ReleaseHelperCallSiteFileOffset,
+                UiManagerShutdownChild24ReleaseHelperFileOffset),
+            new UiManagerChild24ShutdownStep(
+                "Child150Cleanup",
+                UiManagerChild150CleanupCallSiteFileOffset,
+                UiManagerChild150CleanupMethodFileOffset),
+            new UiManagerChild24ShutdownStep(
+                "Child150NativeFree",
+                UiManagerChild150NativeFreeCallSiteFileOffset,
+                UiManagerChildObjectNativeFreeMethodFileOffset),
+            new UiManagerChild24ShutdownStep(
+                "ChildDependencyVirtualCall",
+                UiManagerChildDependencyVirtualCallFileOffset,
+                null),
+            new UiManagerChild24ShutdownStep(
+                "ChildObjectNativeFree",
+                UiManagerChildObjectNativeFreeCallSiteFileOffset,
+                UiManagerChildObjectNativeFreeMethodFileOffset)
         });
 
     public static UiManagerInitializationFlagSnapshot CaptureObservedInitializationFlags(

@@ -911,6 +911,53 @@ Check("UI manager payload-tree cleanup keeps internal close, object free, identi
         new UiManagerPayloadCleanupStep("IdentityRemoval", 0xBFA28B, 0xBFCF30),
         new UiManagerPayloadCleanupStep("KeyRelease", 0xBFA29C, 0xC09D10)
     ]));
+Check("UI manager gated shutdown records the null-gated child +0x24 trace",
+    UiManagerNativeLayout.UiManagerShutdownMethodFileOffset == 0xBFA0D0
+    && UiManagerNativeLayout.UiManagerShutdownChild24PointerLoadFileOffset == 0xBFAD2A
+    && UiManagerNativeLayout.UiManagerShutdownChild24InitialNullTestFileOffset == 0xBFAD37
+    && UiManagerNativeLayout.UiManagerShutdownChild24PointerOffset == 0x24
+    && UiManagerNativeLayout.UiManagerShutdownChild24ReloadFileOffset == 0xBFAD40
+    && UiManagerNativeLayout.UiManagerShutdownChild24SecondNullTestFileOffset == 0xBFAD43
+    && UiManagerNativeLayout.UiManagerShutdownChild24SecondNullBranchFileOffset == 0xBFAD45
+    && UiManagerNativeLayout.Child24ShutdownSequence.SequenceEqual(
+    [
+        new UiManagerChild24ShutdownStep("Child24PrimaryCall", 0xBFAD3B, 0xCA7330),
+        new UiManagerChild24ShutdownStep("Child24ReleaseHelperCall", 0xBFAD48, 0xBFAF40),
+        new UiManagerChild24ShutdownStep("Child150Cleanup", 0xBFAF50, 0xCA6070),
+        new UiManagerChild24ShutdownStep("Child150NativeFree", 0xBFAF57, 0x12C8D60),
+        new UiManagerChild24ShutdownStep("ChildDependencyVirtualCall", 0xBFAF82, null),
+        new UiManagerChild24ShutdownStep("ChildObjectNativeFree", 0xBFAF87, 0x12C8D60)
+    ])
+    && UiManagerNativeLayout.UiManagerShutdownChild24PointerClearFileOffset == 0xBFAD4D
+    && UiManagerNativeLayout.UiManagerShutdownChild24CallsAreNullGated
+    && UiManagerNativeLayout.UiManagerChild24ShutdownResetMethodFileOffset == 0xCA7330
+    && UiManagerNativeLayout.UiManagerChildShutdownResetPairLoopCount == 8
+    && UiManagerNativeLayout.UiManagerChildShutdownResetLoopPointerFieldCount == 16
+    && UiManagerNativeLayout.UiManagerChildShutdownResetLoopPointerOffsets.SequenceEqual(
+        Enumerable.Range(0, UiManagerNativeLayout.UiManagerChildShutdownResetLoopPointerFieldCount)
+            .Select(index => 0x24 + index * 4))
+    && UiManagerNativeLayout.UiManagerChildShutdownResetLaterPointerOffsets.SequenceEqual(
+        [0x08, 0x14, 0x0C, 0x10, 0x74])
+    && UiManagerNativeLayout.UiManagerChild24ShutdownResetFirstLoopCallFileOffset == 0xCA734A
+    && UiManagerNativeLayout.UiManagerChild24ShutdownResetFirstLoopStoreFileOffset == 0xCA734D
+    && UiManagerNativeLayout.UiManagerChild24ShutdownResetSecondLoopCallFileOffset == 0xCA735D
+    && UiManagerNativeLayout.UiManagerChild24ShutdownResetSecondLoopStoreFileOffset == 0xCA7360
+    && UiManagerNativeLayout.UiManagerChild24ShutdownResetChild8StoreFileOffset == 0xCA7379
+    && UiManagerNativeLayout.UiManagerChild24ShutdownResetChild64FreeCallFileOffset == 0xCA73F2
+    && UiManagerNativeLayout.UiManagerChild24ShutdownResetChild68ClearFileOffset == 0xCA73F7
+    && UiManagerNativeLayout.UiManagerChild24ShutdownResetReturnFileOffset == 0xCA7401
+    && UiManagerNativeLayout.UiManagerChildObjectCleanupFieldOffset == 0x150
+    && UiManagerNativeLayout.UiManagerChildReleaseHelperUsesThiscallReceiverInEcx
+    && UiManagerNativeLayout.UiManagerChildReleaseHelperCallerPushesUnreadChildCopy
+    && UiManagerNativeLayout.UiManagerChildReleaseHelperReturnStackBytes == 4
+    && UiManagerNativeLayout.UiManagerChild150CleanupCallSiteFileOffset == 0xBFAF50
+    && UiManagerNativeLayout.UiManagerChildDependencyZeroTestFileOffset == 0xBFAF5C
+    && UiManagerNativeLayout.UiManagerChildDependencyZeroBranchFileOffset == 0xBFAF60
+    && UiManagerNativeLayout.UiManagerChildDependencyLoadFileOffset == 0xBFAF7C
+    && UiManagerNativeLayout.UiManagerChildDependencyPointerOffset == 4
+    && UiManagerNativeLayout.UiManagerChildDependencyVtableOffset == 8
+    && UiManagerNativeLayout.UiManagerChildObjectNativeFreeCallSiteFileOffset == 0xBFAF87
+    && UiManagerNativeLayout.UiManagerChildReleaseHelperReturnFileOffset == 0xBFAF90);
 Check("UI-set folder traversal and native file-enumeration imports are recorded",
     UiComponentLoadingNativeLayout.UiSetXmlLoaderFileOffset == 0x30AF50
     && UiComponentLoadingNativeLayout.FolderPathLoaderFileOffset == 0x30AB90
