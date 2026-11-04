@@ -7834,7 +7834,7 @@ allocation routine or concrete resource type.
 Raw `0x13093E0` is another destructor: it releases reference-counted fields
 before the conditional join and `free(this+8)`. Its shared vptr store is
 not evidence of construction. The shared vptr **VA** `0x1C80C5C` maps to
-backed raw `0x188F85C`; it remains distinct from heartbeat vptr
+backed raw `0x187F85C`; it remains distinct from heartbeat vptr
 `0x1C812B0`. A bounded successor searches actual initialization stores
 and one field-8 producer; no heartbeat allocation ownership follows yet.
 
@@ -7843,3 +7843,21 @@ imports, not the requested helper's forwarding targets. Those imports
 do not resolve or refute exit registration. The next check starts from
 the direct E8 displacement at raw `0x12C1642`, rather than the neighboring
 indirect calls.
+
+## Exit helper direct edge resolved; timed vptr search corrected
+
+Immutable bytes at raw `0x12C1642` are `E8 E1 9F 0A 00`.
+Signed displacement `+0xA9FE1` resolves to raw `0x136B628`
+(code **VA** `0x176C228`). This thin helper calls raw `0x136B57F`
+at `0x136B62E`; its own body has no indirect call. The unresolved
+forwarding targets belong to the latter body, not the thin wrapper.
+The preceding callback push at raw `0x12C163D` is
+`68 D0 23 AC 01`. Existing runtime-init names do not establish its contract.
+
+The timed-wrapper follow-up searched the wrong table offset and byte
+pattern, so its negative results are not useful evidence of absence.
+Arithmetic correction: vptr **VA** `0x1C80C5C` minus rdata mapping
+`0x401400` is raw `0x187F85C`, not `0x188F85C`.
+Its little-endian bytes are `5C 0C C8 01`, not `5C 0C 80 01`.
+The next pass verifies the destructor's actual immediate before searching
+its packed bytes for initialization stores. Allocation origin remains open.
