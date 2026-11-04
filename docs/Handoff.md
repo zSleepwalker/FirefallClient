@@ -12,7 +12,7 @@ are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
 file-close path. Active boundaries are cursor-selection cache-marker provenance
-and exact allocation/max-count guard import bindings.
+and reconstruction of the PE-bound vector exception guards.
 UI lifecycle code/checks are committed.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
@@ -9993,6 +9993,30 @@ the exact half-growth boundary, maximum-used guard, and out-of-domain
 arguments. The delegated Startup run reported 865 passes and no failures.
 Allocation outcome, source rebasing, pointer publication, and guard
 nonreturn behavior remain separate static contracts.
+
+## Vector guards bind to standard-library exception helpers
+
+Read-only PE parsing binds IAT VA `0x1AC4424` to
+`MSVCP120.dll!std::_Xbad_alloc(void)`. Raw `0xC97FFB` calls it
+without explicit arguments on allocation failure, bytes `FF 15 24 44 AC 01`;
+fallthrough is `0xC98001`. Under the normal runtime contract it throws.
+The EXE alone does not establish that an externally replaced implementation
+cannot return; this qualification is not evidence that normal failure
+continues into copy/free/publication.
+
+At maximum used count, raw `0xC9791C` calls IAT VA `0x1AC45C0`,
+bound to `MSVCP120.dll!std::_Xlength_error(char const*)`, after pushing
+VA `0x1C5EA14`, mapped string `"vector<T> too long"`.
+Normal behavior throws length_error; hypothetical fallthrough at
+`0xC97922` can reach the allocation helper's over-limit guard.
+The report does not supply that guard's exact call site, so it remains
+distinct from these two verified call sites.
+
+Only under hypothetical returning exception helpers does copy helper
+`0xC9BBD0`'s null-destination skip/advance become relevant; it does not
+establish a normal failure-preservation guarantee. No runtime finding is
+claimed. A code task now records the verified imports and call sites
+without simulating hypothetical memory accesses or external exceptions.
 
 The report's apparent VA lookup discrepancy is not a new mapping gap:
 the IDB is raw/base-zero and a numeric runtime VA must not be used directly
