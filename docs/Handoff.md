@@ -11,8 +11,8 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are PrintConfig echo-mode unwind cleanup
-and protected VM fixed-error value ownership.
+file-close path. Active boundaries are PrintConfig file/buffer admission
+and VM allocator failure/retry behavior.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
 Normal native CRT return selects `exit(status)`.
@@ -8602,3 +8602,46 @@ The outer `0xC278C0(state,savedIndex)` restores the original entry top;
 nonzero status makes `0xC3B3C0` return false.
 The shared catch cleanup at `0xCD6C7F` restores error-frame pointer
 `[VM+0x2C]` and word `+0x6A` before returning status.
+
+## PrintConfig EH cleanup releases locals but does not reset echo mode
+
+Raw `0xE8A9F0` registers handler **VA** `0x1A61950`
+(raw `0x1660D50`), loading FuncInfo **VA** `0x1D76214`
+(raw `0x1974E14`). Magic is `0x19930522`, maxState 4;
+try-block/IP-map counts are zero. Unwind map **VA** `0x1D76238`
+(raw `0x1974E38`) contains:
+
+| State | Next | Action VA |
+|---|---|---|
+| 0 | -1 | `0x1A61930` |
+| 1 | 0 | `0x1A61938` |
+| 2 | 0 | `0x1A61940` |
+| 3 | 2 | `0x1A61948` |
+
+State returns to 2 at raw `0xE8AACE`, before setter `0xE8AB2B`
+and pump `0xE8AB3A`. Its unwind action passes `[ebp-0x44]`
+to `0xDF2F60`, then state 0 passes `[ebp-0x50]` to `0x3A59D0`.
+These release the holder/shared-text locals, not the global mode flag.
+The setter with 0 at `0xE8AB45` is normal-return-only on this path;
+the decoded state-2 unwind does not reset it.
+
+## VM fixed errors are interned strings; status 4 reuses an allocation-failure cache
+
+PE-mapped **VA** `0x1BC7E6C`, raw `0x17C6A6C`, contains the
+23 bytes `"error in error handling"`. Status 6 requests its interning
+via raw `0xCD4E50` at `0xCD6B30..0xCD6B35`.
+Status 4 instead reuses `[VM+0x0C]+0x90`; initializer raw `0xCD4D40`
+interns `"not enough memory"` from **VA** `0x1BC7C94`,
+raw `0x17C6894`, and stores that object at `+0x90` at `0xCD4D6C`.
+State setup raw `0xCD5460` calls that initializer.
+Allocator helper raw `0xD675A0` raises status 4 via `0xCD6B70`
+after allocation failure, concretely linking that code to the cached message.
+
+Normalizer `0xCD6B00` writes the object pointer at slot `+0`,
+tag at `+8` as object type byte `+4 | 0x40` (string type 4 gives `0x44`),
+and advances top by 16. Other statuses copy the complete prior top value.
+Before normalization, `0xCD5AB0` unlinks open entries at/above the slot,
+copying their 16-byte values into entry-owned storage. Flagged values may
+take `0xCD7CF0`; another branch releases the 24-byte entry via `0xD675A0`.
+The fixed values are VM-interned objects, not caller-owned text buffers;
+status 6 may obtain an already interned object.
