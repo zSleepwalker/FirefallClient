@@ -6458,6 +6458,31 @@ internal static class StartupBinaryEvidence
             Matches(0xBD2F0B,
                 "8B8EF40D00008D4424345083C118E8E20A010050FF7424148BCEE806010000")
             && Matches(0xBD2FDC, "FFB618010000FF15544DAC01"));
+        check("Binary fragment-enqueue caller window [raw 0xBE47C0, 0xBE480A) maps raw+0x400C00 to code VA 0xFE53C0 and preserves all 0x4A sample bytes",
+            VirtualAddressToFileOffset(0xBE47C0 + 0x400C00) == 0xBE47C0
+            && 0xBE47C0 + 0x400C00 == 0xFE53C0
+            && Matches(0xBE47C0,
+                "558BEC51568B7508578BF9B9FF070000668B066623C1B970050000663BC1761A6A0068B2000000689789B50168058AB501FF15A05EC10183C410568D4F38E80D9B6E005F5E595DC20400"));
+        check("Binary fragment-enqueue caller masks the first payload WORD to 11 bits and uses unsigned threshold 0x570",
+            Matches(0xBE47CB, "B9FF070000668B066623C1B970050000663BC1761A")
+            && ShortConditionalBranchTargets(0xBE47DE, 0x76, 0xBE47FA));
+        check("Binary fragment-enqueue caller emits diagnostic 0xB2, calls append with receiver this+0x38, and preserves EAX through its register-pop/RET 4 tail",
+            Matches(0xBE47E0, "6A0068B2000000689789B50168058AB501FF15A05EC10183C410")
+            && Matches(0xBE47FA, "568D4F38E80D9B6E00")
+            && RelativeBranchTargets(0xBE47FE, 0xE8, 0x12CE310)
+            && Matches(0xBE4803, "5F5E595DC20400"));
+        check("Binary received-queue caller window [raw 0xBD3EA5, 0xBD3EBF) maps raw+0x400C00 to code VA 0xFD4AA5 and preserves all 0x1A sample bytes",
+            VirtualAddressToFileOffset(0xBD3EA5 + 0x400C00) == 0xBD3EA5
+            && 0xBD3EA5 + 0x400C00 == 0xFD4AA5
+            && Matches(0xBD3EA5, "8D8E60020000E850A56F008BF885FF74AA83FF100F8300020000"));
+        check("Binary received-queue caller passes this+0x260 to pop, tests the returned EAX, and branches on zero to raw 0xBD3E60",
+            Matches(0xBD3EA5, "8D8E60020000")
+            && RelativeBranchTargets(0xBD3EAB, 0xE8, 0x12CE400)
+            && Matches(0xBD3EB0, "8BF885FF")
+            && ShortConditionalBranchTargets(0xBD3EB4, 0x74, 0xBD3E60));
+        check("Binary received-queue caller compares the pop result with 0x10 and uses unsigned JNB to raw 0xBD40BF",
+            Matches(0xBD3EB6, "83FF100F8300020000")
+            && RelativeConditionalBranchTargets(0xBD3EB9, 0x0F, 0x83, 0xBD40BF));
         check("Binary zero-context handshake parser compares the exact ABRT, HEHE and HUGG tags",
             ImportSlotNames(0x1AC4894, "strncmp")
             && ReadCStringAscii(0x1BB70C4, 5) == "ABRT"
@@ -11616,6 +11641,44 @@ internal static class StartupBinaryEvidence
             && Matches(0x12CE3C3, "833E00741A6A0068F002000068F742B701684B43B701FF15A05EC10183C410")
             && ShortConditionalBranchTargets(0x12CE3C6, 0x74, 0x12CE3E2)
             && Matches(0x12CE3E2, "8B45088946048B44240C5F89065E5B8BE55DC20400"));
+
+        const uint rawContextAppendPreparationFileOffset = 0xBD3456;
+        const uint contextAppendPreparationCodeVirtualAddress =
+            rawContextAppendPreparationFileOffset + 0x400C00;
+        check("Binary context append-preparation window [raw 0xBD3456, 0xBD3477) maps raw+0x400C00 to code VA 0xFD4056 and preserves all 0x21 bytes",
+            contextAppendPreparationCodeVirtualAddress == 0xFD4056
+            && VirtualAddressToFileOffset(contextAppendPreparationCodeVirtualAddress)
+                == rawContextAppendPreparationFileOffset
+            && Matches(rawContextAppendPreparationFileOffset,
+                "8D8E600200002B4424240FB7C08947048B44242857894718E89DAE6F00837D0C02"));
+        check("Binary context append preparation subtracts stack +0x24 from EAX, zero-extends AX, stores EDI+4, reloads stack +0x28 to EAX, stores EDI+0x18, and pushes EDI",
+            Matches(0xBD345C, "2B4424240FB7C0894704")
+            && Matches(0xBD3466, "8B44242857894718"));
+        check("Binary context append preparation calls raw 0x12CE310 from raw 0xBD346E",
+            RelativeBranchTargets(0xBD346E, 0xE8, 0x12CE310));
+
+        const uint rawOwnerCallbackContinuationFileOffset = 0xBD523E;
+        const uint ownerCallbackContinuationCodeVirtualAddress =
+            rawOwnerCallbackContinuationFileOffset + 0x400C00;
+        check("Binary owner-callback continuation window [raw 0xBD523E, 0xBD5277) maps raw+0x400C00 to code VA 0xFD5E3E and preserves all 0x39 bytes",
+            ownerCallbackContinuationCodeVirtualAddress == 0xFD5E3E
+            && VirtualAddressToFileOffset(ownerCallbackContinuationCodeVirtualAddress)
+                == rawOwnerCallbackContinuationFileOffset
+            && Matches(rawOwnerCallbackContinuationFileOffset,
+                "8944241485C074318B8E0C0100008D542414528B01FF50048B4C241485C9741983CAFF8D4108F00FC11083FA01750A85C974068B0152FF5008"));
+        check("Binary owner-callback continuation saves EAX at stack +0x14 and branches on null to raw 0xBD5277",
+            Matches(0xBD523E, "8944241485C0")
+            && ShortConditionalBranchTargets(0xBD5244, 0x74, 0xBD5277));
+        check("Binary owner-callback continuation loads its receiver from this+0x10C, passes the saved-result address, and calls the receiver vtable slot +4",
+            Matches(0xBD5246, "8B8E0C0100008D542414528B01FF5004"));
+        check("Binary owner-callback continuation reloads the possibly replaced stack +0x14 value after the callback and skips a null value at raw 0xBD5277",
+            Matches(0xBD5256, "8B4C241485C9")
+            && ShortConditionalBranchTargets(0xBD525C, 0x74, 0xBD5277));
+        check("Binary owner-callback continuation applies LOCK XADD -1 to the saved payload field at +8, compares the returned old value with 1, and conditionally calls payload vtable slot +8 with that value",
+            Matches(0xBD525E, "83CAFF8D4108F00FC11083FA01")
+            && ShortConditionalBranchTargets(0xBD526B, 0x75, 0xBD5277)
+            && ShortConditionalBranchTargets(0xBD526F, 0x74, 0xBD5277)
+            && Matches(0xBD5271, "8B0152FF5008"));
 
         const uint rawCleanupEmptyAttemptFileOffset = 0x12C0348;
         const uint cleanupEmptyAttemptCodeVirtualAddress = rawCleanupEmptyAttemptFileOffset + 0x400C00;

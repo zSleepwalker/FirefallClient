@@ -11602,3 +11602,23 @@ Small-status implementation assigned Luna
 case 3 diagnoses if predicate AL is zero **or** the independently read word
 is zero; AL zero branches directly to reporting, so that word is unreached.
 Do not copy the trace narrative's erroneous AND condition.
+
+Pushed `84a9da2`: context append preparation is persistent. New context/
+callback PE assertions reviewed; context label claimed 33 bytes while its
+literal contained only 29, now extended through the four-byte following
+compare. All literal byte anchors independently match the sample.
+Callback code review caught inverted mapping: author had treated IDA raw
+`0xBD523E` as a VA and subtracted the mapping delta. Correct raw is
+`0xBD523E`, VA `0xFD5E3E`; author is fixing all constants/checks plus
+an unmatched parenthesis. Not registered or staged yet.
+
+Deferred-control callback trace Luna
+`8f589b01-67dd-4ffe-858b-4ce4df9e81de` is bounded to raw
+`0xBD37D8` through the first returned-byte branch, no handler-wide scan.
+
+Owner callback mapping/syntax corrected, reviewed and registered. Raw
+`[0xBD523E,0xBD5277)` is projected; next seven-byte compare is evidence
+only. Source VAs now derive from raw offsets. Pinned runner passes including
+callback replacement-to-null and old-counter 0/1/2 paths, plus all pending
+socket/context/callback immutable evidence. Deferred-control callback code
+is assigned Luna `bb5847fc-cbb8-4e40-81f2-da79bfdad3a8`.
