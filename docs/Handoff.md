@@ -10,8 +10,8 @@ PrivateDialog receiver identification, AES "block-size" interpretation,
 and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
-Current delegated boundaries are console startup dispatch-readiness ordering
-and mode-16 scratch initialization/fixed reconstruction after short output.
+Current delegated boundaries are console formatting-depth balance/width
+and texture request-buffer lifetime. Mode-16 fixed scatter is resolved.
 Shutdown-request callers
 and texture writer dispatch/serialization are bounded unresolved stops,
 not ongoing broad scans.
@@ -7208,9 +7208,46 @@ and dispatch-readiness ordering before startup configuration/--cmd processing.
 Startup raw `0xE54DBA` bytes `FF 90 BC 00 00 00` calls
 console vtable byte offset `+0xBC`, after registry registration and before
 the configuration/--cmd passes. Correct table backing is raw `0x1876AA8`;
-adding `0xBC` yields raw `0x1876B64`, containing **VA** `0x125BDC0`,
-target raw `0xE551C0`.
+adding `0xBC` yields raw `0x1876B64`. A subsequent byte check corrects
+the initially reported target: bytes `C0 BC 25 01` contain **VA**
+`0x125BCC0`, target raw `0xE5B0C0`, not `0x125BDC0/0xE551C0`.
 The initial report used raw `0x187C564` by arithmetic error and interpreted
 unrelated bytes as an import thunk. That target/import interpretation is
 discarded; no readiness behavior follows from it.
-The next narrow scope inspects the actual target body.
+The actual body and formatting-only effect are recorded below.
+
+## Mode-16 fixed reconstruction reads scratch through exclusive offset C000
+
+The active-sample post-decode scatter is independent of returned produced
+lengths on the successful-call path. Each output contains 1024 sixteen-byte
+records; scratch ranges below are inclusive and relative to S.
+
+| Output record field | Width / stride | Output 0 | Output 1 | Output 2 |
+|---|---|---|---|---|
+| `+0xC` | 4 / 4 | `0000..0FFF` | `1000..1FFF` | `2000..2FFF` |
+| `+2` | 4+2 / 6 | `3000..47FF` | `4800..5FFF` | `6000..77FF` |
+| `+8` | 4 / 4 | `7800..87FF` | `8800..97FF` | `9800..A7FF` |
+| `+0` | 2 / 2 | `A800..AFFF` | `B000..B7FF` | `B800..BFFF` |
+
+Raw `0xE98C1B` bytes `8B 44 38 FC` and `0xE98C26`
+bytes `8B 47 FC` load DWORD planes. Six-byte planes use DWORD
+loads at `0xE98C78/0xE98C9E/0xE98CBC` and word loads at
+`0xE98C85/0xE98CAA/0xE98CD0`; two-byte planes use word
+loads at `0xE98CE8/0xE98CFF/0xE98D16`.
+Loop raw `0xE98D24..0xE98D32` increments destination offset by
+`0x10`, continuing while less than `0x4000`; last record starts
+at `0x3FF0`. Combined scratch reads end exclusively at S+`0xC000`.
+Raw `0xE98D39` jumps to successful cleanup `0xE988BD`.
+This establishes fixed read extents, not a runtime malformed-input outcome.
+
+## Console startup +BC increments formatting depth, not readiness
+
+Correct target raw `0xE5B0C0` (VA `0x125BCC0`) consists of
+`FF 05 10 9A E4 01 C3`: increment DWORD **VA** `0x1E49A10`,
+then return. It consumes no stack arguments and has no callees.
+Startup raw `0xE54DBA` invokes it with the console object's address
+in ECX before configuration/command processing.
+Raw `0xE5ABA6` multiplies this counter by a configured width; later
+memset prefixes output, capped at 32 characters. This is formatting depth,
+not a dispatch-readiness gate or callback.
+The next scope resolves paired decrement/reset and width binding.
