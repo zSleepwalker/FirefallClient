@@ -10388,3 +10388,30 @@ must not be merged with outer-child `+4`, whose virtual dispatch remains
 unresolved. Likewise a structure field at `+8` is not a vtable slot.
 A bounded static layout/check implementation is assigned; no native
 cleanup execution or inferred alias/refcount contract is introduced.
+
+The corrected outer-child shutdown/reset layout and focused checks are now
+committed and pushed. Coordinator review also removed a spurious second
+"child +8 loop" constant: the store at `0xCA7379` follows the exhausted
+eight-pair loop and uses its zero counter; it does not precede another
+eight-iteration loop. The reset-phase PE assertions are awaiting completion.
+An independent bounded successor examines only constructor/initializer
+writes relating the child `+0x64` allocation and `+0x68` field.
+
+## Backing allocation anchors and nested layout review
+
+The bounded constructor/initializer trace establishes outer child
+`+0x64/+0x68` zero stores at `0xCA63D9/0xCA63E0`.
+Initializer `0xCA6748` requests `0x800` bytes through raw allocator
+`0x12C8A20` at `0xCA674D`. The returned allocation is stored
+at child `+0x64` at `0xCA67A0`; subsequent stores set
+`+0x68=0x20` and `+0x6C=0`. These values do not alone prove
+a capacity/count or record-size interpretation. A bounded successor
+checks the allocation result's null branch and initialization stores.
+Neutral layout/check integration and immutable PE anchors are active.
+
+The nested cleanup model now has a standalone focused check registration.
+Coordinator review corrected another concatenated instruction/address:
+the RET address is raw `0xCA6105`, with byte `C3`, not
+`0xCA6105C3`. The current focused Startup build/check run passed.
+Reset-phase PE assertions add the sample SHA-256 predicate and exact
+loop/free-versus-clear bytes; their final combined integration is pending.
