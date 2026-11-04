@@ -8101,3 +8101,24 @@ to application return remain unresolved. Consequently a blanket claim that
 the inspected shutdown leaves the callback unchanged after file close would
 overstate the evidence. The successor follows the concrete service teardown
 edges rather than repeating direct-reference scans.
+
+## Diagnostic list payload is tagged; virtual binding needs table-byte verification
+
+In raw `0xC294A0`, the current node is saved at `[ebp-0x10]`;
+formatter raw `0xCCFB20` reaches that local through its output-buffer
+argument plus `0x60`. The node's first field points to a 16-byte tagged
+value. For `(value+8) & 0x1F == 6`, it passes the first DWORD to
+raw `0xCCF8C0`; otherwise that argument is zero. This representation
+does not identify the semantic meaning of tag 6 or prove UI-event storage.
+Raw `0xC293D0` manipulates 16-byte values with low-nibble tags 3 and 4,
+normalizes tag-3 values via `0xCD6550`, and calls `0xC294A0(5, context)`.
+The insertion path remains untraced.
+
+The follow-up did not verify that uiManager's vptr **VA** `0x1C73EBC`
+has `0xC05FF0` at slot `+0xFC`. Earlier statements resolving that virtual
+edge are therefore provisional until exact table bytes are checked;
+the independently inspected `0xC05FF0 -> 0xC294A0` chain remains valid
+conditional on dispatch to that wrapper.
+Formatter constants **VA** `0x1BBAD6C/0x1BBAEC4` also require
+PE-aware string mapping before declaring them unreadable. The successor
+checks those two concrete mapping-sensitive points.
