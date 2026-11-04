@@ -9950,6 +9950,16 @@ precedes `+0x590` and `+0x594` updates and `0xBFFA3F`'s sync call.
 Miss is not a separate explicit-zero return. Exact zero-store/cache-return
 details are awaiting a bounded instruction clarification.
 
+Clarification: on every cache-miss completion, raw `0xBFFA14`
+unconditionally writes EBX to `+0x58C`. EBX is zeroed at `0xBFF9D4`;
+sentinel skips the payload load at `0xBFF9ED`, so a missing key clears
+the selection rather than preserving an old value. A zero payload can log,
+then reaches the same store. At `0xBFF958`, EAX loads `+0x990`;
+equality at `0xBFF95E` returns that loaded value through `0xBFFA45`.
+The clarification's newly subtracted `0x7FF...` offsets are invalid:
+its `0xBFF...` IDB addresses were already raw, not runtime VAs.
+Only the instruction evidence and original raw addresses are retained.
+
 ## Record vector growth separates count arithmetic from failure guard behavior
 
 Raw `0xC97380` preserves an in-range source's record offset across
