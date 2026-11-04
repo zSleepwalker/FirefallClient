@@ -12,7 +12,7 @@ are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
 file-close path. Active boundaries are the UI synchronization helper record
-and exact local record order in the native producer.
+and the native producer's pre-append helper effects.
 UI lifecycle code/checks are committed.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
@@ -9739,6 +9739,23 @@ At `0xC5EF75..0xC5EF84`, COMISS compares global float against parent
 `+0x2C0` and JA exits for ordered global greater than field. Unordered
 flags do not take JA; an unmasked floating-point exception remains outside
 that branch-only observation.
+
+## Exact local record order corrected from source register stores
+
+The bounded clarification resolves the conflicting report. Raw `0xC95516`,
+`0xC95521`, `0xC95529`, and `0xC95531` load source `+0x338` into XMM2,
+`+0x344` into XMM3, `+0x33C` into XMM0, and `+0x340` into XMM1.
+Stores at `0xC9553A/0xC9553F/0xC95544/0xC95549` place XMM0/XMM2/
+XMM1/XMM3 at `EBP-0x34/-0x30/-0x2C/-0x28`.
+LEA `0xC9551E` and push `0xC95539` pass `EBP-0x34` to the append.
+Therefore actual ascending record order is **33C, 338, 340, 344**.
+The earlier report's destination associations, not that ordering, were wrong.
+
+`UiManagerNativeLayout`'s positional source constants and their regression
+check now use this exact order, superseding the earlier ascending-source
+assumption. The code still does not assign semantic names or wire meaning.
+The successor task follows only pre-append calls and their possible source
+state updates, not another scan of the now-resolved copy instructions.
 
 The report's apparent VA lookup discrepancy is not a new mapping gap:
 the IDB is raw/base-zero and a numeric runtime VA must not be used directly

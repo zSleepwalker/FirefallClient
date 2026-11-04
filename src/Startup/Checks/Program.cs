@@ -818,7 +818,7 @@ Check("UI payload descriptor consumer and append helper retain the observed poin
         UiManagerNativeLayout.UiPayloadDescriptorPositionField1Offset,
         UiManagerNativeLayout.UiPayloadDescriptorPositionField2Offset,
         UiManagerNativeLayout.UiPayloadDescriptorPositionField3Offset
-    }.SequenceEqual([0x338, 0x33C, 0x340, 0x344]));
+    }.SequenceEqual([0x33C, 0x338, 0x340, 0x344]));
 Check("UI manager payload-tree drain tests byte +671 but clears both initialization bytes",
     UiManagerNativeLayout.UiManagerShutdownStateWordOffset == 0x671
     && UiManagerNativeLayout.UiManagerShutdownStateWordSize == 2

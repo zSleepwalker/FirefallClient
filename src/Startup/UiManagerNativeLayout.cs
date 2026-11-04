@@ -157,8 +157,8 @@ public static class UiManagerNativeLayout
     public const int UiPayloadDescriptorPositionRecordByteCount = 0x10;
     public const int UiPayloadDescriptorPositionRecordCopiedDwordCount = 4;
     public const int UiPayloadDescriptorPositionRecordEndAdvance = 0x10;
-    public const int UiPayloadDescriptorPositionField0Offset = 0x338;
-    public const int UiPayloadDescriptorPositionField1Offset = 0x33C;
+    public const int UiPayloadDescriptorPositionField0Offset = 0x33C;
+    public const int UiPayloadDescriptorPositionField1Offset = 0x338;
     public const int UiPayloadDescriptorPositionField2Offset = 0x340;
     public const int UiPayloadDescriptorPositionField3Offset = 0x344;
     public const int UiManagerConstructorStateWordOffset = 0x670;
