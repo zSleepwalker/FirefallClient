@@ -10701,6 +10701,17 @@ internal static class StartupBinaryEvidence
             && Matches(0xCA6748, "B900080000")
             && RelativeBranchTargets(0xCA674D, 0xE8, 0x12C8A20)
             && Matches(0xCA67A0, "897E64C7466820000000C7466C00000000"));
+        check("Binary UI child allocation captures EAX in EDI and its nonzero-result branch skips diagnostics to the continuation join",
+            RelativeBranchTargets(0xCA674D, 0xE8, 0x12C8A20)
+            && Matches(0xCA6752, "8BF885FF")
+            && ShortConditionalBranchTargets(0xCA6756, 0x75, 0xCA6799));
+        check("Binary UI child allocation's null path reaches the shared initializer after the diagnostic call sequence returns",
+            Matches(0xCA6758, "6A27508845D48D45D550E893718F00")
+            && Matches(0xCA6767, "680008000068B8EBC5018D45D46A2750FF157048AC01")
+            && Matches(0xCA6780, "5068DA0000006858EAC5016858EAC501FF15A05EC101")
+            && Matches(0xCA6796, "83C42C")
+            && Matches(0xCA6799, "837E74008D5E74897E64C7466820000000C7466C00000000")
+            && ShortConditionalBranchTargets(0xCA67B1, 0x74, 0xCA67CD));
 
         check("Binary UI manager shutdown checks the partial-init byte, clears both init bytes, and dispatches state sync through slot +0xB0",
             Matches(
