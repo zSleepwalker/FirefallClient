@@ -11016,3 +11016,10 @@ destination vptr and zero pair precede helper `0x12CC430`; source
 alignment is read later. Captured constructor code and the old-destination
 assignment-order trace have separate assignments; no deep backing copy
 or atomic source snapshot is inferred.
+
+Pool singleton captured publication, registered checks, and candidate/
+publication PE anchors are pushed at `0e08ec7`. The complete pinned-sample
+runner passes. The projection deliberately starts after allocator return;
+own-entry guards and nearest teardown remain separate active traces.
+The PE file is now assigned to
+`330036bf-8b4d-421e-9e0d-a5306d064a8c` for copy-constructor/pair order.
