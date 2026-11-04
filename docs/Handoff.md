@@ -11,7 +11,7 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are corrected raw nested-container initialization
+file-close path. Active boundaries are exact nested-container backing-slot fill
 and arithmetic/import binary regression evidence; callback publication remains parked.
 UI lifecycle code/checks are committed.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
@@ -10255,6 +10255,22 @@ The existing separation between container `+8` backing and node `+8`
 callback remains supported by the earlier exact cleanup instructions.
 IAT VA `0x1AC4424` remains PE-bound to standard `_Xbad_alloc`;
 another empty import query does not reopen it.
+
+## Correct raw initializer confirms sentinel and separate sixteen-slot allocation
+
+Direct raw-IDB verification confirms caller `0xC32A73` loads ECX with
+`this+0x120`, then calls `0xC41670`; `0x120` is not a stack count.
+The initializer zeros container `+0/+4` and backing triple `+8/+0xC/+0x10`.
+Wrapper `0xC52A10` requests a twelve-byte sentinel and stores its
+pointer at container `+0`. A separate vector-helper count of sixteen
+requests a sixty-four-byte backing buffer. Both use
+`0x12B7FB0 -> 0x12C8A20`, but they are distinct allocation requests.
+
+This supports sixteen DWORD backing slots, not sixteen list nodes.
+The exact fill source/values and remaining structural fields are the next
+bounded task before calling the composite container a specific library type.
+The corrected trace supersedes only the rejected mapping/caller assumptions;
+callback entry ownership remains unbound.
 
 The report's apparent VA lookup discrepancy is not a new mapping gap:
 the IDB is raw/base-zero and a numeric runtime VA must not be used directly
