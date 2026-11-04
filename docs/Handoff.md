@@ -11,8 +11,8 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are scripting-owner post-creation failure cleanup
-and the additional heap region-release helper's role.
+file-close path. Active boundaries are scripting registry removal after object
+release and heap batch-free pointer-slot ownership.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
 Normal native CRT return selects `exit(status)`.
@@ -9018,3 +9018,46 @@ load ECX=`0xFFF`, compare EDI with ECX, select EDI with signed CMOVG,
 and store ECX at heap `+0x20`.
 Thus reset is `max(0xFFF, (int32_t)visitedCount)`, not a cap/minimum.
 Earlier capped-count statements are superseded by these exact instructions.
+
+## Shared chunk free differs from collection and trim; query State check clarified
+
+Raw `0x12C7D30` is a shared free/coalescing routine, not inherently a
+destructor. Its direct region-release branch requires chunk-header low two
+bits clear. Batch-free caller `0x12C9C20` clears a nonnull pointer slot
+before passing chunk header/size; adjacent entries may coalesce.
+Splitting caller `0x12C9860` tags split chunks with mask 2, selecting the
+ordinary free-list path instead of this VirtualFree branch.
+
+Its query buffer has size `0x1C`. Offsets `+0/+4` (BaseAddress/
+AllocationBase) must match ESI; `+0x10` (State) must equal `0x1000`;
+`+0x0C` (RegionSize) must not exceed remaining extent.
+This corrects the arbitration report's mistaken fixed-RegionSize wording.
+Only after complete release at `0x12C7DB5` does it subtract
+`previousSize + a3 + 16` from heap `+0x1B0`.
+Query/free failure leaves accounting unchanged; a query-success/field-mismatch
+path can still return nonzero, so that raw return is not blanket release success.
+
+## Scripting initialization failure closes VM before freeing object and removing registry identity
+
+Caller raw `0xBFCA30` derives a string prefix by splitting its input at `'.'`
+and passes that string to `0xC34100`, not an owner object pointer.
+The newly constructed object is ECX for `0xC34450`; the string is a
+separate stack argument. On failure it calls `0xC341C0`, and the caller
+does not insert the new object into its success-only structures.
+
+For nonnull cleanup, `0xC341C0` calls `0xC33060(object)`, releases
+the object through `0x12C8D60`, then calls `0xBFCF30` through global
+**VA** `0x1E002B8` with the object's pointer value.
+Raw `0xC33060` removes matching references via `0xBF9BD0`
+(global-context list `+0x6F0`), performs `0xC3E990(object,1)`,
+and releases removed-entry references through `0xC33E60`.
+
+At `0xC33281`, bytes
+`8B 43 78 85 C0 74 0E 8B 40 0C 8B 88 88 00 00 00 E8 7A 22 0A 00`
+follow object `+0x78` through the VM context's `+0x88` main VM pointer
+and invoke `0xCD5510`. That close drains/finalizes VM queues, releases
+buffers, and frees base `VM-4`, size `0x390`, through the stored allocator.
+No object `+0x78` clear is needed to describe this observed sequence:
+the enclosing object is freed next, not shown reused.
+The later `0xBFCF30` registry pointer usage remains a separate bounded check;
+the order alone does not establish a stale-pointer dereference.
