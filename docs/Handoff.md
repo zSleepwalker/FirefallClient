@@ -11,8 +11,8 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are PrintConfig file/buffer admission
-and VM allocator failure/retry behavior.
+file-close path. Active boundaries are shared config-file loader size/capacity
+handling and the VM allocator's retry helper/initialization gate.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
 Normal native CRT return selects `exit(status)`.
@@ -8645,3 +8645,50 @@ copying their 16-byte values into entry-owned storage. Flagged values may
 take `0xCD7CF0`; another branch releases the 24-byte entry via `0xD675A0`.
 The fixed values are VM-interned objects, not caller-owned text buffers;
 status 6 may obtain an already interned object.
+
+## PrintConfig admits only successful whole-file loads into its local buffer
+
+Addresses below are raw file/IDB offsets; several VAs in the follow-up
+were arithmetically inconsistent and are deliberately not propagated.
+PrintConfig raw `0xE8A9F0` resolves its path through `0x1318870`
+and takes a shared-text reference through `0x3A5910`.
+The resolver rejects input `strlen > 0x200`; leading `!` strips one
+character and bypasses ordinary root-candidate search.
+
+Loader raw `0x12BB660` uses UTF-8/wide wrapper `0x12BA030` and
+the verified `_wfopen` import with `"rb"` (**VA** `0x1C15568`,
+raw `0x1814168`). The wrapper converts path/mode with CP_UTF8,
+source length -1, without checking conversion results.
+The loader uses `_fileno` and a stat helper, fails/closes on stat error,
+and reads a 32-bit length at stat buffer `+0x18`.
+For nonempty input it reserves length+1 and requires exact-length
+`fread(buffer,1,length,file)`. A short read resets the buffer, closes,
+and returns false. Empty input skips reserve/read and succeeds with the
+initial NUL buffer. Exact stat import/layout and capacity arithmetic are
+the next bounded checks, not inferred from the helper's name.
+
+The local facade starts with a one-byte heap buffer via `0x12B8030`;
+successful reads append NUL, and PrintConfig releases the allocation.
+Embedded NULs are loaded but scanner raw `0xE89790` stops at the first,
+so later file bytes are not parsed. Open/stat/read failures precede the
+mode setter; successful load alone reaches echo-mode set/pump/normal clear.
+Loader's known direct callers include PrintConfig and BufferFile,
+not the previously named ProcessFile entry.
+
+## VM allocator retries nonzero-size failure once behind a context gate
+
+Raw `0xD675A0` is fastcall: ECX VM state, EDX pointer, stack old/new sizes.
+With context `[VM+0x0C]`, it calls `[ctx]` as
+`(userdata=[ctx+4], pointer, oldSize, newSize)`.
+If allocation returns null with nonzero new size, context `+0x8C` nonnull
+permits one `0xCD9EC0` retry-helper call and a second allocation attempt;
+no gate or second failure raises status 4 through `0xCD6B70`.
+The retry helper's exact effects and gate identity remain open.
+
+On return, accounting `[ctx+0x0C]` changes by
+`newSize - (pointer ? oldSize : 0)`.
+Zero new size does not retry/raise; a null result still subtracts old size
+for a nonnull pointer. Context owns callback/opaque-userdata references
+in this path; the wrapper neither copies nor frees userdata.
+Setup raw `0xCD5460` writes gate `+0x8C`, but callback/userdata
+initialization was not established.
