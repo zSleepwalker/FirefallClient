@@ -10611,3 +10611,24 @@ registered their focused checks, and pushed the verified capture-only
 projection. It preserves all eleven arguments and does not compile code.
 Independent source-object provenance, blob cleanup, and failure-loop byte
 geometry traces are active alongside the compile-frame PE integration.
+
+## Scratch machine coordinates and compile blob cleanup
+
+The exact scratch failure loop initializes ESI=0 at `0xCA6F50`,
+uses `[ESP+ESI*8+0x24]` and `[ESP+ESI*8+0x28]`, and branches
+from `0xCA6F82` back to `0xCA6F52` through eight iterations.
+These encoded ESP operands do not justify `[EBP-0x58]` addressing
+from a decompiler-local suffix. Their structural constants/checks are pushed.
+Misplaced duplicate shader-frame files under `newsrc/newChecks` were
+removed after their corrected versions were integrated under `src`.
+
+The bounded compiler blob trace reports code output `[EBP-4]` and
+error output `[EBP+0x10]`; the original caller output address survives in EBX.
+On negative compile status, error output is used for diagnostics then
+conditionally cleaned through virtual `+8`; that branch does not clean
+the code output, without establishing whether the API can leave it nonzero.
+On accepted compile status, a nonzero error blob is cleaned and its slot
+zeroed before code use. Code output is then cleaned on either terminal
+lookup result. The shared failure cleanup therefore handles a selected
+pointer, not an unconditional list of both outputs.
+A bounded static path layout and immutable PE checks are active.
