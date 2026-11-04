@@ -11,7 +11,7 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are scripting-manager normal-startup init binding
+file-close path. Active boundaries are startup UI-getter receiver binding
 and exact request-normalization boundary arithmetic.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
@@ -9361,3 +9361,16 @@ The follow-up incorrectly described `(n+11)&~7` as ceil-to-8 of n+11
 and overclaimed its slack. The mask rounds that sum down to a multiple of 8;
 no `C-4 >= n+7` guarantee follows. Exact normalization comparisons and
 small/upper-bound cases are the next arithmetic check.
+
+## Manager init table slot confirmed; Login startup receiver remains conditional
+
+Manager vtable **VA** `0x1C73EBC`, raw `0x1872ABC`, slot `+0x1C`
+at raw `0x1872AD8` contains **VA** `0xFFBF10`, code raw `0xBFB310`.
+This binds the known initialization routine to that concrete table.
+
+Login mode init raw `0x636FF0` calls dispatch routine `0x30AF50`
+at `0x63703E`. Its call `0x30B1F6` invokes virtual `+0x1C`
+with ECX=EBX, obtained from global **VA** `0x1DFE970`'s virtual
+`+0x3C` getter. The receiver's vptr was not established; matching slot
+offset alone does not bind this startup call to the manager's init.
+The next trace follows that getter's concrete target/publication and return.
