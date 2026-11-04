@@ -11,8 +11,8 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are nested-container initializer PE anchors
-and UI child `+0x24` destructor release; callback publication and composite
+file-close path. Active boundaries are UI child `+0x24` shutdown release byte
+verification and its bounded structural projection; callback publication and composite
 container semantic identity remain parked. UI lifecycle, arithmetic/import
 regressions, and immutable backing-slot projection code/checks are committed.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
@@ -10305,3 +10305,45 @@ The bounded lookup-shape search found no anchored key/bucket operation;
 semantic container identity remains parked, not disproved.
 Active successors verify initializer PE anchors and separately trace UI child
 `+0x24` release from the concrete manager destructor.
+
+## Composite initializer PE anchors integrated; shutdown child transfer located
+
+Coordinator execution of the immutable-binary Startup checks passed after
+adding initializer/allocation/fill and separate backing/list teardown checks.
+Raw `0xC416E2` is `89 45 F0`, storing the sentinel in `[EBP-0x10]`;
+the immediate count `0x10` is pushed at `0xC416E7`. These are not a
+positive frame-offset count read. The byte-backed checks are committed.
+
+The bounded manager destructor inspection did not establish direct child
+`+0x24` release; its thunk's conditional free uses the original manager.
+A separate shutdown trace located a candidate concrete transfer:
+`0xBFAD2A` loads child `+0x24`, `0xBFAD3B` calls `0xCA7330`,
+`0xBFAD48` calls `0xBFAF40`, then `0xBFAD4D` clears the field.
+Exact bytes and helper argument/free flow are assigned for verification.
+The initial helper report is not yet accepted as a release conclusion:
+it mixes address labels and contradicts its own reported outer-pointer
+free. Its decimal displacement `336` must be read as hex `0x150`,
+not field `0x336`. No dependency virtual target or ownership is inferred.
+
+## Exact child shutdown bytes establish receiver-based native release
+
+The verified raw-IDB bytes resolve the candidate shutdown sequence.
+`0xBFAD2A` is `8B 4B 24`; `0xBFAD37` tests ECX and skips on null.
+`0xBFAD3B` calls `0xCA7330`; `0xBFAD40` reloads the field, tests it again,
+then pushes the same pointer before `0xBFAD48 -> 0xBFAF40`.
+`0xBFAD4D` clears manager `+0x24` after the helper returns.
+
+Helper `0xBFAF40` takes its actual receiver from ECX into ESI, not from
+the pushed copy. It loads child `+0x150` into EDI and, when nonnull,
+calls `0xCA6070` at `0xBFAF50`, then native free `0x12C8D60`
+at `0xBFAF57` with that captured pointer. It loads dependency `+4`
+and dispatches its vtable slot `+8` at `0xBFAF82`; the intervening
+null diagnostic is not evidence that execution cannot continue.
+`0xBFAF85` sets ECX=ESI, and `0xBFAF87` calls `0x12C8D60`
+on the child itself. `0xBFAF90` is `C2 04 00`; the stack copy is
+not read by this body. These are separate release actions, not proof
+that child and nested pointer values cannot alias. The indirect
+dependency target and its ownership contract remain unresolved.
+The earlier report's first-stack-argument receiver and missing-child-free
+interpretations are superseded. A bounded successor traces only the
+preceding `0xCA7330` phase; the structural code integration is active.
