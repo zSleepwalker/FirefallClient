@@ -11,8 +11,8 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are UI child pre-release reset structural
-integration/PE anchors and nested `+0x150` cleanup reconstruction; callback publication and composite
+file-close path. Active boundaries are UI child backing null-result continuation
+projection and initializer return/caller contract; callback publication and composite
 container semantic identity remain parked. UI lifecycle, arithmetic/import
 regressions, and immutable backing-slot projection code/checks are committed.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
@@ -10415,3 +10415,22 @@ the RET address is raw `0xCA6105`, with byte `C3`, not
 `0xCA6105C3`. The current focused Startup build/check run passed.
 Reset-phase PE assertions add the sample SHA-256 predicate and exact
 loop/free-versus-clear bytes; their final combined integration is pending.
+
+## Nested cleanup and backing reconstruction integrated with binary evidence
+
+The registered nested cleanup checks, neutral backing initialization layout,
+reset-loop byte assertions, and nested cleanup/allocator PE anchors all pass
+in a combined coordinator run against the pinned sample. The integration
+is committed and pushed. Coordinator review corrected the backing layout's
+mistyped constructor offsets `0xCA6379/0xCA6380` to the independently
+byte-checked `0xCA63D9/0xCA63E0`.
+
+The allocation-return trace observes EAX copied to EDI at `0xCA6752`,
+tested at `0xCA6754`, and nonzero branching around a diagnostic at
+`0xCA6756`. A null result reaches the same stores at `0xCA6799`
+if that diagnostic returns; there is no intervening caller-side loop.
+The comparison of child `+0x74` at `0xCA6799` supplies flags for
+`0xCA67B1`: the intervening three stores do not change them.
+It is not a second allocation-success test. A pure captured-continuation
+projection is assigned, explicitly limited to reaching this join, alongside
+a separate bounded trace of the remaining initializer return/caller use.
