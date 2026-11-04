@@ -11440,3 +11440,85 @@ temporarily blocked by the active sentinel-return author's unfinished
 constant references; that author has been notified. Embedded pool drain
 binding in raw `0x12C0382..0x12C03AF` is assigned as a read-only scope
 to `ae98f90d-dcdd-47a7-a8df-0f8cac6dbfa5`.
+
+All reviewed reset/storage/wrapper/queue cleanup/pop immutable PE additions
+are pushed at `e3bac11`, including the independent-counter-address check.
+Queue initializer projection is assigned to
+`e3f1e1dd-16a5-46fb-a92b-bdd0ed583087`; one tail-CAS append attempt to
+`07d6a4ff-e7a0-4f15-9b99-fc1b6ac6d9aa`; new initializer/append/cleanup
+predicate PE assertions exclusively to
+`e7c322e8-09f4-4ea1-8d63-10a72299fba4`.
+The constructor configures the embedded pool this+`0x20` as `(12,8,1)`;
+the sentinel pool's narrow initializer uses `(8,32,8)`. These are distinct
+pool configurations and must not be conflated.
+
+Sentinel-return review found its first implementation inferred plain return
+after an opaque push without a captured normal return and omitted counter
+arithmetic. The same author is correcting those before registration.
+Append publication raw `0x12CE3C3..0x12CE3F7` is assigned to
+`c2132f16-743b-49f5-9984-d5973cc8a282`: a later next-field diagnostic
+`0x2F0` precedes payload-then-link stores; no full-append atomicity is claimed.
+
+Queue pop-attempt is reviewed and registered. Finalization now explicitly
+distinguishes initial-secondary-empty from post-drain entry and rejects
+nonzero retained EDI on the former; a composed gate/finalization check
+preserves the `0x12CDE04` edge. The next coordinator validation was blocked
+only by an active append check's int-versus-uint Contains literal, reported
+to its author.
+Embedded-pool drain implementation is assigned to
+`af15500b-2c9d-4965-a7f9-31963151fc39`; it preserves saved embedded-pool
+and saved queue pointers independently.
+
+Coordinator read-only PE import-name resolution identifies:
+cell VA `0x1AC4424` = `?_Xbad_alloc@std@@YAXXZ`,
+`0x1AC45C0` = `?_Xlength_error@std@@YAXPBD@Z`,
+`0x1AC489C` = `memmove`, `0x1AC4870` = `_snprintf`.
+The active evidence writer is adding exact-name assertions. Keep imported
+identity distinct from captured runtime outcomes and do not silently
+remove conservative call boundaries.
+
+Coordinator independently matched pop-attempt 117 bytes, cleanup predicate
+58 bytes, and append-attempt 95 bytes to the pinned PE. Append's VA literals
+were wrong in both source and mirrored checks; corrected raw `0x12CE364`
+to VA `0x16CEF64`, end `0x16CEFC3`, and derive source constants from
+the mapping rather than transcribing them.
+
+Additional reviewed queue code now registered: successful-CAS publication
+(`0x12CE3C3`, 52 bytes), sentinel return (`0x12CE280`, 138 bytes), and
+embedded drain (`0x12C0382`, 45 bytes). All embedded byte captures were
+independently matched to the SHA-pinned sample. Drain initially rejected a
+valid cleanup-return capture before discovering the next pop was zero;
+author corrected this and added regressions. Mirrored pop/cleanup VAs were
+also corrected to `0x16CE6E0` and `0x16CEE80`.
+
+Initializer and acquisition code remain under review, not registered yet.
+Initializer author is fixing compile errors and mixed raw/VA API naming.
+Acquisition author is fixing an extra hex digit in VAs and unconditional
+unreached-capture rejection that prevented missing-prefix boundaries.
+Only coordinator runs the checks. A targeted DefaultItemExcludes override
+was not useful: it also removed default obj/bin exclusions, causing duplicate
+generated attributes. Use the ordinary runner once initializer checks are coherent.
+
+Successor static traces, explicitly Luna: `e2575825-ed8e-4453-8fa2-00f05b910978`
+for global sentinel initializer `0xBBFAC0`, and
+`7d5c72ac-5ad3-46db-8258-f1223b6e6a15` for destructor continuation after
+`0x12C03AF`. Evidence writer `e7c322e8-09f4-4ea1-8d63-10a72299fba4`
+again exclusively owns `StartupBinaryEvidence.cs` to bind embedded drain.
+
+Pushed `11c223e`: reset finalization now distinguishes the initial-empty
+secondary edge retaining zero EDI from post-drain count loading. The shared
+runner compiled and exercised this correction, then exposed three queue-pop
+attempt assertions and an append-attempt low-mismatch fixture supplying an
+unreached high-half capture. Authors are correcting these before the queue
+batch is committed. Initializer/acquisition reviews are complete and checks
+registered after their fixes; no exclusion override is needed.
+
+The ordinary pinned runner now passes with all eight queue projections
+registered: pop attempt, cleanup predicate, append attempt, append publication,
+sentinel return, embedded drain, sentinel initialization, and append acquisition.
+Further fixture corrections retained the explicit-half comparisons and missing
+capture contracts, rather than weakening them. Verified helper VAs:
+pop `0x16CE6E0`, release `0x16C9960`, queue cleanup `0x16CEE80`.
+Global singleton initialization and ordinary destructor finalization are
+successor code assignments; a fresh evidence agent exclusively owns the PE
+authority for the final 27-byte destructor tail.
