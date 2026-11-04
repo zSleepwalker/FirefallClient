@@ -87,6 +87,38 @@ internal static class StartupBinaryEvidence
                 throw new InvalidDataException($"String at VA {virtualAddress:X8} has no terminator in the bounded read.");
             return Encoding.ASCII.GetString(bytes, 0, terminator);
         }
+        bool ImportSlotBelongsToModule(uint slotVirtualAddress, string expectedModule)
+        {
+            long importDirectoryEntry = peOffset + 24 + 96 + 8;
+            uint importDirectoryRva = ReadUInt32(importDirectoryEntry);
+            uint importDirectorySize = ReadUInt32(importDirectoryEntry + 4);
+            if (importDirectoryRva == 0 || importDirectorySize == 0)
+                return false;
+
+            long descriptorStart = VirtualAddressToFileOffset(checked(imageBase + importDirectoryRva));
+            long descriptorEnd = descriptorStart + importDirectorySize;
+            for (long descriptor = descriptorStart; descriptor + 20 <= descriptorEnd; descriptor += 20)
+            {
+                uint originalThunkRva = ReadUInt32(descriptor);
+                uint nameRva = ReadUInt32(descriptor + 12);
+                uint firstThunkRva = ReadUInt32(descriptor + 16);
+                if (originalThunkRva == 0 && nameRva == 0 && firstThunkRva == 0)
+                    return false;
+
+                string module = ReadCStringAscii(checked(imageBase + nameRva), 128);
+                for (uint index = 0; index < 0x10000; index++)
+                {
+                    uint thunkVirtualAddress = checked(imageBase + firstThunkRva + index * 4);
+                    if (ReadUInt32(VirtualAddressToFileOffset(thunkVirtualAddress)) == 0)
+                        break;
+                    if (thunkVirtualAddress == slotVirtualAddress)
+                        return string.Equals(module, expectedModule, StringComparison.OrdinalIgnoreCase);
+                    if (thunkVirtualAddress > slotVirtualAddress)
+                        break;
+                }
+            }
+            return false;
+        }
         bool DecodedAdapterLiteral(uint address, int length, int step, int direction, byte key, string expected)
         {
             byte[] bytes = ReadAt(VirtualAddressToFileOffset(address), length);
@@ -10507,5 +10539,32 @@ internal static class StartupBinaryEvidence
             && Matches(DialogApplicationDispatchNativeLayout.OpenMovieDialogEventCodeFileOffset, "68E40000008B01FF90AC000000")
             && Matches(DialogApplicationDispatchNativeLayout.PrivateDialogEventCodeFileOffset, "68E50000008B01FF90AC000000")
             && Matches(DialogApplicationDispatchNativeLayout.PublicDialogEventCodeFileOffset, "68650100008B01FF90AC000000"));
+
+        check("Binary native record-vector failure callsites match their exact CRT import names and length message",
+            imageBase == 0x400000
+            && ContainsBytes(
+                NativeRecordVectorCapacityProjectionRules.FullCapacityPathFileOffset,
+                checked((int)(NativeRecordVectorCapacityProjectionRules.LengthErrorCallSiteFileOffset
+                    - NativeRecordVectorCapacityProjectionRules.FullCapacityPathFileOffset)),
+                "6814EAC501")
+            && ReadCStringAscii(
+                NativeRecordVectorCapacityProjectionRules.LengthErrorMessageVirtualAddress, 32)
+                == NativeRecordVectorCapacityProjectionRules.LengthErrorMessage
+            && Matches(
+                NativeRecordVectorCapacityProjectionRules.LengthErrorCallSiteFileOffset, "FF15C045AC01")
+            && ImportSlotNames(
+                NativeRecordVectorCapacityProjectionRules.LengthErrorImportAddressVirtualAddress,
+                NativeRecordVectorCapacityProjectionRules.LengthErrorImportDecoratedName)
+            && ImportSlotBelongsToModule(
+                NativeRecordVectorCapacityProjectionRules.LengthErrorImportAddressVirtualAddress,
+                NativeRecordVectorCapacityProjectionRules.LengthErrorImportModule)
+            && Matches(
+                NativeRecordVectorCapacityProjectionRules.BadAllocCallSiteFileOffset, "FF152444AC01")
+            && ImportSlotNames(
+                NativeRecordVectorCapacityProjectionRules.BadAllocImportAddressVirtualAddress,
+                NativeRecordVectorCapacityProjectionRules.BadAllocImportDecoratedName)
+            && ImportSlotBelongsToModule(
+                NativeRecordVectorCapacityProjectionRules.BadAllocImportAddressVirtualAddress,
+                NativeRecordVectorCapacityProjectionRules.BadAllocImportModule));
     }
 }

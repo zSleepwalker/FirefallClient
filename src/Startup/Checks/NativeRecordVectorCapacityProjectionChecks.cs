@@ -7,8 +7,25 @@ internal static class NativeRecordVectorCapacityProjectionChecks
         check("Native record-vector append evidence records the helper, full-capacity path, stride, and maximum count",
             NativeRecordVectorCapacityProjectionRules.AppendMethodFileOffset == 0xC97380
             && NativeRecordVectorCapacityProjectionRules.FullCapacityPathFileOffset == 0xC978F0
+            && NativeRecordVectorCapacityProjectionRules.ReallocationMethodFileOffset == 0xC97FA0
+            && NativeRecordVectorCapacityProjectionRules.GrowthAllocationFunctionFileOffset == 0x12B7FB0
+            && NativeRecordVectorCapacityProjectionRules.AllocationServiceFunctionFileOffset == 0x12C8A20
             && NativeRecordVectorCapacityProjectionRules.RecordStride == 16
             && NativeRecordVectorCapacityProjectionRules.MaximumCount == 0x0FFFFFFF);
+
+        check("Native record-vector failure evidence names both CRT imports, the length message, and their callsites",
+            NativeRecordVectorCapacityProjectionRules.LengthErrorCallSiteFileOffset == 0xC9791C
+            && NativeRecordVectorCapacityProjectionRules.LengthErrorImportAddressVirtualAddress == 0x1AC45C0
+            && NativeRecordVectorCapacityProjectionRules.LengthErrorImportModule == "MSVCP120.dll"
+            && NativeRecordVectorCapacityProjectionRules.LengthErrorImportName == "std::_Xlength_error(char const*)"
+            && NativeRecordVectorCapacityProjectionRules.LengthErrorImportDecoratedName == "?_Xlength_error@std@@YAXPBD@Z"
+            && NativeRecordVectorCapacityProjectionRules.LengthErrorMessageVirtualAddress == 0x1C5EA14
+            && NativeRecordVectorCapacityProjectionRules.LengthErrorMessage == "vector<T> too long"
+            && NativeRecordVectorCapacityProjectionRules.BadAllocCallSiteFileOffset == 0xC97FFB
+            && NativeRecordVectorCapacityProjectionRules.BadAllocImportAddressVirtualAddress == 0x1AC4424
+            && NativeRecordVectorCapacityProjectionRules.BadAllocImportModule == "MSVCP120.dll"
+            && NativeRecordVectorCapacityProjectionRules.BadAllocImportName == "std::_Xbad_alloc(void)"
+            && NativeRecordVectorCapacityProjectionRules.BadAllocImportDecoratedName == "?_Xbad_alloc@std@@YAXXZ");
 
         bool smallCounts = new (uint Used, uint Capacity, uint Required, uint Projected)[]
         {
@@ -45,7 +62,7 @@ internal static class NativeRecordVectorCapacityProjectionChecks
         var maximumUsed = NativeRecordVectorCapacityProjectionRules.Project(
             NativeRecordVectorCapacityProjectionRules.MaximumCount,
             NativeRecordVectorCapacityProjectionRules.MaximumCount);
-        check("Native record-vector maximum used count reports the guard before increment without modeling its effect",
+        check("Native record-vector projection marks maximum used count at the guard without asserting a native exception or return",
             maximumUsed == new NativeRecordVectorCapacityProjection(
                 NativeRecordVectorCapacityDecision.MaximumUsedCountGuardInvoked, null, null, null));
 

@@ -11,8 +11,8 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are cursor-selection cache-marker provenance
-and reconstruction of the PE-bound vector exception guards.
+file-close path. Active boundaries are cursor-cache refresh reconstruction
+and the invalidation method's argument stores and call gates.
 UI lifecycle code/checks are committed.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
@@ -10017,6 +10017,26 @@ Only under hypothetical returning exception helpers does copy helper
 establish a normal failure-preservation guarantee. No runtime finding is
 claimed. A code task now records the verified imports and call sites
 without simulating hypothetical memory accesses or external exceptions.
+
+## Cache marker has a concrete same-class increment, not a proven frame cadence
+
+Constructor raw `0xBF80AF` initializes UI `+0x990` to zero.
+The installed table VA `0x1C73EBC` binds slot `+0x40` to raw
+`0xC02730`; it takes ECX as EDI at `0xC0275D`, increments
+`[EDI+0x990]` at `0xC02816`, and stores arguments at `+0x988/+0x98C`.
+The same table's `+0x104` entry binds selector `0xBFF930`, which
+compares that instance's `+0x990` against captured `+0x594`.
+This supports an instance-local version/invalidation interpretation, not
+a frame/time counter or proof of a particular external virtual caller.
+The successor verifies the increment's surrounding gates and arguments.
+
+The vector reconstruction now includes exact exception-import names,
+decorated names, call sites, and the length-error message.
+`StartupBinaryEvidence` verifies their PE module/name associations and
+instruction bytes, independently of the synthetic count checks.
+Coordinator integration ran Startup checks with `--binary` against the
+authorized immutable sample and passed. Method `0xC97FA0` is labeled as
+the reallocation method, not an exact guard instruction address.
 
 The report's apparent VA lookup discrepancy is not a new mapping gap:
 the IDB is raw/base-zero and a numeric runtime VA must not be used directly
