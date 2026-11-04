@@ -11766,3 +11766,15 @@ independently match the PE. New Luna modular delta code writer is
 `(d-0x100) mod 65536` unsigned against `0x7EFF`; fallthrough iff
 `0x100 <= d <= 0x7FFF`. No call-stack interpretation from the trace is
 integrated; the trace's stack-slot table was not relied on.
+
+Pushed `0c0935f` for both receive entry gates. Reliable modular gate is
+reviewed/registered and its exhaustive 65,536-residue checks plus independent
+interval predicate pass; corrected wrap fixture receiver base from
+`FFFFFFD5` to `FFFFFFD6` so +`2A` is actually zero.
+Case-three arithmetic trace corrected the earlier width claim: it masks
+DWORD EAX to `FFFF`, compares DWORD EAX with `8000`, then uses signed JGE
+at `BE5A84` to `BE5AC2`. Masked range makes this equivalent to residue
+at least `8000`; fallthrough is `BE5A86`. Luna code owner is
+`f8bf2a36-6be5-4548-b62b-7d68d14e54e6`; PE owner is
+`cdd2ca10-07ba-47e4-85b0-06959e4ec581`, preserving all pending entry/gate
+anchors. Latest ordinary pinned runner passes.
