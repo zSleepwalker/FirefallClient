@@ -7072,6 +7072,33 @@ internal static class StartupBinaryEvidence
             && Matches(0x12BB403, "FF5004FF7424186A015350FF150C49AC01")
             && Matches(0x12BB417, "83F8017523")
             && Matches(0x12BB445, "FF5014"));
+        check("Binary slBlob fread success uses wrapping 32-bit offset/remaining arithmetic and loops on nonzero remainder; failure ignores slot +14 result and returns BL",
+            ShortConditionalBranchTargets(0x12BB41A, 0x75, 0x12BB43F)
+            && Matches(0x12BB420, "03CB894C24202BFB75C6")
+            && ShortConditionalBranchTargets(0x12BB428, 0x75, 0x12BB3F0)
+            && Matches(0x12BB43F, "8B4C241C8B01FF5014FF742418E921FFFFFF")
+            && RelativeBranchTargets(0x12BB44C, 0xE9, 0x12BB372)
+            && Matches(0x12BB37B, "32DB")
+            && Matches(0x12BB438, "B301")
+            && RelativeBranchTargets(0x12BB43A, 0xE9, 0x12BB37D)
+            && Matches(0x12BB45D, "8AC3"));
+        check("Binary slBlob vtable slot +8 resolves to the non-detaching bounded offset getter, whose returning diagnostic path continues and null backing returns zero",
+            UiShaderSourceReadOnlyOffsetProjectionRules.ReadOnlyGetterRawFileOffset == 0x12CB910
+            && UiShaderSourceReadOnlyOffsetProjectionRules.WrapperVtableSlot8Offset == 0x08
+            && ReadUInt32(0x187F8C4 + 0x08) == 0x16CC510
+            && VirtualAddressToFileOffset(0x16CC510) == 0x12CB910
+            && Matches(0x12CB910, "558BEC568BF18B06FF500C394508761A")
+            && ShortConditionalBranchTargets(0x12CB91E, 0x76, 0x12CB93A)
+            && Matches(0x12CB931, "FF15A05EC10183C4108B4604")
+            && Matches(0x12CB93A, "8B46045E85C0740A8B40040345085DC20400")
+            && Matches(0x12CB94C, "33C05DC20400"));
+        check("Binary slBlob allocator zeroes two output DWORDs before the 0x800/nonzero gate branches to 0x12CBFFC",
+            Matches(0x12CBF65, "C70600000000")
+            && Matches(0x12CBF6B, "C7460400000000")
+            && Matches(0x12CBF80, "81FB000800007774837D0800756E")
+            && ShortConditionalBranchTargets(0x12CBF86, 0x77, 0x12CBFFC)
+            && ShortConditionalBranchTargets(0x12CBF8C, 0x75, 0x12CBFFC)
+            && Matches(0x12CBFFC, "6A10"));
         check("Binary slBlob append preserves current bytes, grows logical length and memcpy appends incoming bytes",
             Matches(0x12CBA1A, "FF500C8B5D0C8BF86A018BCE8D141F52E881020000")
             && Matches(0x12CBA39, "53FF750803C750E8AF1E2D00")
@@ -7087,6 +7114,20 @@ internal static class StartupBinaryEvidence
             && ShortConditionalBranchTargets(0x12CBDE1, 0x76, 0x12CBDFD)
             && Matches(0x12CBDFD, "89730C")
             && Matches(0x12CBE00, "8B5F088B4424208947088B4F048B44241C895C2420894704894C241C"));
+        check("Binary slBlob raw 12CBCB0 direct reuse edge checks control/count, first header-zero capacity, unsigned alignment remainder, and second header-zero capacity rather than old length",
+            VirtualAddressToFileOffset(0x16CC8B0) == 0x12CBCB0
+            && Matches(0x12CBCDE, "8B5F0485DB74048B03EB0233C08B4F088B750889442414")
+            && Matches(0x12CBCF5, "85C9745283790401754C3BF077488B4F0C85C9740B8B430433D2F7F185D275363B33761A")
+            && ShortConditionalBranchTargets(0x12CBCF7, 0x74, 0x12CBD4B)
+            && ShortConditionalBranchTargets(0x12CBCFD, 0x75, 0x12CBD4B)
+            && ShortConditionalBranchTargets(0x12CBD01, 0x77, 0x12CBD4B)
+            && ShortConditionalBranchTargets(0x12CBD08, 0x74, 0x12CBD15)
+            && ShortConditionalBranchTargets(0x12CBD13, 0x75, 0x12CBD4B)
+            && ShortConditionalBranchTargets(0x12CBD17, 0x76, 0x12CBD33)
+            && Matches(0x12CBD33, "89730C"));
+        check("Binary slBlob request above second header-zero capacity reaches assertion then the shared store if the assertion returns",
+            Matches(0x12CBD19, "6A0068BC0000006858EAC5016858EAC501FF15A05EC10183C410")
+            && Matches(0x12CBD33, "89730C"));
         check("Binary snapshot v14 clears with no length argument and returned snapshot helper deep-copies pair/bytes",
             Matches(0x30EEAC, "8B0383C40C8BCBFF5014")
             && Matches(0x30EDA3, "85FF750433C05FC3")
