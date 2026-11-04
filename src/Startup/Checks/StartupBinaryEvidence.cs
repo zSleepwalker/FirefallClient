@@ -7083,6 +7083,27 @@ internal static class StartupBinaryEvidence
             && Matches(0x12CC831, "EB02")
             && Matches(0x12CC864, "8970048918")
             && VirtualAddressToFileOffset(0x1C80CB0) == 0x187F8B0);
+        check("Binary nonpool control vtable maps slots +0/+4/+8 to their exact file-backed functions",
+            ReadUInt32(0x187F8B0) == 0x016CD580
+            && ReadUInt32(0x187F8B4) == 0x016CD5A0
+            && ReadUInt32(0x187F8B8) == 0x016CD5D0
+            && VirtualAddressToFileOffset(0x1C80CB0) == 0x187F8B0
+            && VirtualAddressToFileOffset(ReadUInt32(0x187F8B0)) == 0x12CC980
+            && VirtualAddressToFileOffset(ReadUInt32(0x187F8B4)) == 0x12CC9A0
+            && VirtualAddressToFileOffset(ReadUInt32(0x187F8B8)) == 0x12CC9D0);
+        check("Binary nonpool control slot +0 null-skips; otherwise subtracts header DWORDs, calls and tail-calls the helper, with no field clears in the body",
+            Matches(0x12CC980, "568B710C85F674138B4E042B4E08E8CDC3FFFF8BCE5EE9C5C3FFFF5EC3")
+            && ShortConditionalBranchTargets(0x12CC986, 0x74, 0x12CC99B)
+            && RelativeBranchTargets(0x12CC98E, 0xE8, 0x12C8D60)
+            && RelativeBranchTargets(0x12CC996, 0xE9, 0x12C8D60));
+        check("Binary nonpool control slot +4 null-guards this before calling vptr slot +8 with argument 1",
+            Matches(0x12CC9A0, "85C974078B016A01FF5008C3")
+            && ShortConditionalBranchTargets(0x12CC9A2, 0x74, 0x12CC9AB));
+        check("Binary nonpool control slot +8 replaces the vptr and conditionally calls the helper when argument bit 0 is set",
+            Matches(0x12CC9D0, "558BECF6450801568BF1C7067C07C6017405E879C3FFFF8BC65E5DC20400")
+            && ReadUInt32(0x12CC9DC) == 0x01C6077C
+            && ShortConditionalBranchTargets(0x12CC9E0, 0x74, 0x12CC9E7)
+            && RelativeBranchTargets(0x12CC9E2, 0xE8, 0x12C8D60));
         check("Binary slBlob slow zero-size branch saves wrapper+8 before clearing wrapper+8/+4 and branching to release",
             Matches(0x12CBD4B, "85F6750E8B5F08897708897704E9C7000000")
             && RelativeBranchTargets(0x12CBD58, 0xE9, 0x12CBE24));

@@ -175,6 +175,8 @@ The captured control writer supports both observed variants: pooled controls req
 
 `UiShaderSourcePoolReturnNativeLayout` records conditional diagnostics for header `+8` and capacity, then the continuation assuming reached calls return. Initial and later `+8` captures remain separate. The later value is negated for the release-helper argument; header `+4` is cleared before that call, then pool `+0x10` is atomically decremented before the header handoff. This does not substitute a presumed data pointer or emulate the handoff helper.
 
+`UiShaderSourceNonPoolReleaseProjection` keeps the distinct nonpool path: null header returns directly; otherwise the first helper call receives wrapped DWORD subtraction of header `+4 - +8`, followed by a tail jump carrying the original header pointer. A zero difference does not erase the first call from the projection. No field clears or callee effects are inferred.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves
