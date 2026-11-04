@@ -11703,3 +11703,19 @@ even when the initial nonzero comparison skips diagnostics. Getter code
 belongs to Luna `86e26c28-2cc4-4ba8-8d8d-f7ea3688e907`; caller continuation
 trace belongs to `1489fb32-5beb-4925-b96e-4042e9121b6e`. The pushed EDI
 must not be assumed consumed by those getters.
+
+Pushed `fed2c97` with reviewed header dispatch, state predicate, state entry,
+recycle tail, registrations and PE anchors. Recycle-prefix review found
+missing vtable captures could still permit later call returns, and two
+slot-4 fixtures selected the earlier skip branch; author is correcting
+these before registration. Getter immutable anchors are assigned to
+`516c98da-bd64-4e07-8c0d-03194e8b7515`, sole evidence writer.
+
+Recycle prefix sequential gates and invalid-path fixtures are corrected,
+reviewed, registered and pass the pinned runner. Getter exact body length
+is **35 bytes**, ending raw `BD5BC3` / `BD5C23` exclusive; independent
+derivation corrected the initially suggested 36-byte bound before review.
+Caller trace confirms getter EAX is copied to ECX for the next direct call
+(`BE51F0` cases 1/2, `BE5A40` case 3); the earlier pushed EDI remains on
+the stack. Luna `d22f22b0-121c-4239-82b4-e1f4c172be98` owns the bounded
+post-getter call/AL-branch projection and checks.
