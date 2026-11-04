@@ -7029,6 +7029,17 @@ internal static class StartupBinaryEvidence
             && ReadUInt32(0x187F8C4 + 0x0C) == 0x16CC5C0
             && VirtualAddressToFileOffset(0x16CC560) == 0x12CB960
             && VirtualAddressToFileOffset(0x16CC5C0) == 0x12CB9C0);
+        check("Binary slBlob slow zero-size branch saves wrapper+8 before clearing wrapper+8/+4 and branching to release",
+            Matches(0x12CBD4B, "85F6750E8B5F08897708897704E9C7000000")
+            && RelativeBranchTargets(0x12CBD58, 0xE9, 0x12CBE24));
+        check("Binary slBlob release has distinct XADD/JNZ and XADD/DEC/JNZ byte sequences with indirect calls through slots +0/+4",
+            Matches(0x12CBE28, "83CEFF8D4B048BC6F00FC10175178B038BCBFF10")
+            && Matches(0x12CBE3C, "8D4308F00FC1304E75078B038BCBFF5004"));
+        check("Binary slBlob vtable byte offset +14 maps to the two-zero-call wrapper, which calls resize helper and returns",
+            ReadUInt32(0x187F8C4 + 0x14) == 0x16CC600
+            && VirtualAddressToFileOffset(0x16CC600) == 0x12CBA00
+            && Matches(0x12CBA00, "6A006A00E8A7020000C3")
+            && RelativeBranchTargets(0x12CBA04, 0xE8, 0x12CBCB0));
         check("Binary slBlob slot +4 preserves its slot +0C call/branch and returns a zero-guarded backing data pointer; slot +0C returns the backing DWORD or zero",
             Matches(0x12CB960, "558BEC568BF1578B06FF500C8BF8397D08761A")
             && Matches(0x12CB997, "8B460485C0740C8B4004034508")
@@ -7065,6 +7076,17 @@ internal static class StartupBinaryEvidence
             Matches(0x12CBA1A, "FF500C8B5D0C8BF86A018BCE8D141F52E881020000")
             && Matches(0x12CBA39, "53FF750803C750E8AF1E2D00")
             && Matches(0x12CBA00, "6A006A00E8A7020000C3"));
+        check("Binary slBlob preserve-resize slow path calls 0x12CBF30 and reads old/new backing data fields before its copy-thunk call",
+            Matches(0x12CBD9D, "FF770C8BD38D4C2420E885010000")
+            && RelativeBranchTargets(0x12CBDA6, 0xE8, 0x12CBF30)
+            && Matches(0x12CBDC4, "8B4704528B48048B44242051FF7004E81C1B2D00")
+            && RelativeBranchTargets(0x12CBDD3, 0xE8, 0x159D8F4)
+            && Matches(0x159D8F4, "FF25D04AAC01"));
+        check("Binary slBlob preserve-resize replacement-header path loads and compares capacity before logical-length and backing-pointer writes",
+            Matches(0x12CBDDB, "8B5C241C3B33")
+            && ShortConditionalBranchTargets(0x12CBDE1, 0x76, 0x12CBDFD)
+            && Matches(0x12CBDFD, "89730C")
+            && Matches(0x12CBE00, "8B5F088B4424208947088B4F048B44241C895C2420894704894C241C"));
         check("Binary snapshot v14 clears with no length argument and returned snapshot helper deep-copies pair/bytes",
             Matches(0x30EEAC, "8B0383C40C8BCBFF5014")
             && Matches(0x30EDA3, "85FF750433C05FC3")
