@@ -11,7 +11,7 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are Login UI-manager retained-field teardown
+file-close path. Active boundaries are UI `+0x24` child storage ownership
 and evidence-backed UI lifecycle reconstruction code/checks.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
@@ -9528,6 +9528,30 @@ caller remains unresolved and is not required to establish bulk shutdown.
 The next task applies these verified lifecycle boundaries to the existing
 Startup reconstruction and focused synthetic checks, without inventing
 native ownership rules for the still-unclassified initialization pointers.
+
+## Failed UI initialization invokes shutdown, not the manager destructor
+
+At raw `0x30B200..0x30B209`, a zero UI-initialization return falls through
+to `0x30D150`; nonzero skips it via `jnz 0x30B232`.
+`0x30D150` tail-dispatches UI slot `+0x34`, bound to `0xBFA0D0`.
+That routine is gated by byte `+0x671` and clears the word at `+0x671`
+(both initialization flags) and field `+0x950` before cleanup.
+It does not invoke UI slot zero, so this failure handling is not proof
+that all startup-retained fields are destroyed.
+
+The manager's slot `+4` is getter `0xBFA0C0` for byte `+0x671`.
+Consequently `0xBFB310`'s initial nonzero check is an already-initialized
+guard, not an unidentified initialization operation.
+Destructor-style slot zero maps to `0xBF82A0`, which calls `0xBF8AC0`.
+That teardown releases copied shared-text `+0x5C8` directly and
+`+0x34` through `0x30A9D0`'s release-and-zero helper.
+
+Initialization allocates a `0x188`-byte child, initializes it with
+`0xCA6370`, and stores it at UI `+0x24`. The external argument at child
+`+4` has no observed retain/copy. The inspected parent teardown does not
+directly release `+0x24`; tracing this child's concrete ownership is the
+next bounded task. Ownership of directly stored `+0x974` and success-only
+`+0xA08` remains unresolved; absence of a direct clear is not a leak finding.
 
 The report's apparent VA lookup discrepancy is not a new mapping gap:
 the IDB is raw/base-zero and a numeric runtime VA must not be used directly
