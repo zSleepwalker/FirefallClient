@@ -11622,3 +11622,17 @@ only. Source VAs now derive from raw offsets. Pinned runner passes including
 callback replacement-to-null and old-counter 0/1/2 paths, plus all pending
 socket/context/callback immutable evidence. Deferred-control callback code
 is assigned Luna `bb5847fc-cbb8-4e40-81f2-da79bfdad3a8`.
+
+Pushed `a8826c2`: first-owner callback code and all reviewed socket/context/
+callback PE assertions. Current exclusive PE writer Luna
+`e6df34f4-4db3-4bfb-a1d2-33a9c84e7bd6` binds small-status and large-value
+entry gates. Additional bounded recycle-wrapper trace Luna
+`2967a9c9-1d8e-4568-a6bc-f3ee1911134f` covers `0xBD5C60`, stopping at the
+already reconstructed pool-push helper.
+
+Small-status and large-value gates reviewed/registered; ordinary pinned
+runner passes. Coordinator corrected four mirrored small-status VA literals,
+and author corrected the AL-zero JE anchor from the TEST at `0xBD3EE6`
+to the actual branch at `0xBD3EE8`. Large-value word test is nonzero
+`word & 0xC000`, not equality to `0xC000`; documented explicitly.
+Small-status full 93-byte capture independently matches the PE.

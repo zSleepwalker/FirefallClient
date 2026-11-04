@@ -59,6 +59,8 @@ SocketReceivedQueuePopChecks.Run(Check);
 SocketFragmentEnqueueChecks.Run(Check);
 ContextQueueAppendChecks.Run(Check);
 OwnerCallbackQueueDeliveryChecks.Run(Check);
+SocketSmallStatusChecks.Run(Check);
+SocketLargeQueueGateChecks.Run(Check);
 SharedTextPoolSingletonChecks.Run(Check);
 UiShaderSourcePoolTeardownChecks.Run(Check);
 UiShaderSourcePoolSingletonDestructorChecks.Run(Check);
