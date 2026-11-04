@@ -10645,3 +10645,11 @@ verification of the shared cleanup's selected register. Their conditional
 path claims must not be validated merely against matching constants.
 The compile framing PE checks are also delivered; the active binary
 integration agent is adding scratch/blob guards before coordinator review.
+
+The shared blob-cleanup register selection is now independently confirmed:
+the negative-compile path carries error output into common cleanup,
+while terminal-predicate failure selects code output. After this verification
+the static blob layout/check registration passed coordinator execution and
+was committed/pushed. Independent initial-loader output transfer and
+wrapper vtable binding remain active; combined PE regression integration
+is waiting for the selected-pointer guard assertions.
