@@ -11,8 +11,8 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are UI `+0x24` child storage ownership
-and evidence-backed UI lifecycle reconstruction code/checks.
+file-close path. Active boundaries are UI `+0xA08` consumers and the
+late initialization callback through `+0x974`. UI lifecycle code/checks are committed.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
 Normal native CRT return selects `exit(status)`.
@@ -9569,6 +9569,23 @@ shutdown. The code separates the byte predicate from the two-byte state
 snapshot; exhaustive combinations include the `(partial=0, ready=1)` case.
 This supersedes any wording that treats the cleared word as the guard.
 Focused Startup checks and `git diff --check` passed.
+
+## UI child has no established vptr or concrete storage-release chain
+
+The bounded `+0x24` investigation stops at an ownership gap, not a leak
+claim. Raw `0xBFB3DA` requests `0x188` bytes, conditionally invokes
+`0xCA6370`, and stores the result at UI `+0x24` at `0xBFB416`.
+`0xCA639F` stores the external dependency at child `+4`;
+`0xCA63A2` zeros child `+0`, rather than assigning a child vptr.
+The indirect call at `0xCA651E` uses the dependency's vtable.
+Direct initializer `0xCA66F0` is invoked at `0xBFB542`.
+
+Parent deleting wrapper `0xBF82A0` calls `0xBF8AC0`, then conditionally
+frees parent storage at `0xBF82B3`. This is not a child free.
+Neither that inspected destructor nor the initialization failure epilogue
+establishes release of the stored child. Child teardown remains parked;
+do not infer a destructor slot from its zero first word or conflate the
+borrowed dependency's dispatch with a child vtable.
 
 The report's apparent VA lookup discrepancy is not a new mapping gap:
 the IDB is raw/base-zero and a numeric runtime VA must not be used directly
