@@ -11,8 +11,8 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are default cursor-selection source assignments
-and the invalidation method's argument stores and call gates.
+file-close path. Active boundaries are default cursor-selection source assignments,
+ready-gated invalidation reconstruction, and the old-pair callback timing helper.
 UI lifecycle code/checks are committed.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
@@ -10050,6 +10050,26 @@ and version-load `0xBFF958` versus compare `0xBFF95E`.
 Unproven associations between setter arguments and fields `+0x988/+0x98C`
 were removed from this projection pending the separate method trace.
 The model does not execute lookup, synchronization, or version increment.
+
+## Invalidation requires ready and stores two DWORD arguments after old-state work
+
+UI table raw `0x1872AFC` (`+0x40` bytes) contains `30 33 00 01`,
+binding raw `0xC02730`. A separate global counter increments at
+`0xC02765` before ready-byte `+0x672` check at `0xC0276B..0xC02772`.
+Zero ready skips to `0xC041EC` / `retn 8`, bypassing the object
+version increment and argument stores. On the normal enabled path,
+`0xC06670` runs before writes, then the global-init branch reconverges.
+`0xC02816` increments DWORD `+0x990` modulo 2^32 once on that path.
+`0xC0281C/0xC02825` store stack DWORDs `[EBP+8]/[EBP+0xC]`
+at `+0x988/+0x98C`. These are not established cursor-key/byte fields.
+
+The earlier helper reads that old pair as a QWORD and performs a
+divide-by-1000/difference threshold calculation before callbacks.
+Its exact arithmetic helper and signedness are a bounded follow-up;
+the report's `C159DD10` target spelling is not accepted without verification.
+Post-store component `+0x974` slots `+0x40/+0x44` receive temporary-buffer
+pointers at `0xC02831/0xC0284E`, not the stored arguments directly.
+No exact clock units or external caller cadence is inferred.
 
 The report's apparent VA lookup discrepancy is not a new mapping gap:
 the IDB is raw/base-zero and a numeric runtime VA must not be used directly
