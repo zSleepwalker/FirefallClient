@@ -12,7 +12,7 @@ are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
 file-close path. Active boundaries are UI scripting-owner publication/VM creation
-and automatic heap trim/collection trigger policy.
+and exact heap trim VirtualFree operands/countdown reset arbitration.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
 Normal native CRT return selects `exit(status)`.
@@ -8947,3 +8947,24 @@ Global-heap publication remains null-guarded; a direct appinit/CRT caller,
 external callback serialization, and balanced heap teardown were not established.
 The next task follows the concrete UI-owner field rather than repeating
 an unsuccessful direct-caller search for `0xBFCA30`.
+
+## Automatic heap trim and periodic collection triggers identified
+
+In raw `0x12CA6F0`, a free merging into the top chunk grows heap `+0x0C`.
+If that size is strictly greater than threshold `+0x1C`, it calls
+`0x12C7BF0(0)` at `0x12CA8A3..0x12CA8B0`.
+Initialization `0x12C6A90` sets global **VA** `0x1EDAFC8` to
+2 MiB; `0x12CA110` copies it to heap `+0x1C`.
+Regular-bin insertion instead decrements countdown `+0x20` and calls
+`0x12C78A0` when the prior value is 1 (`0x12CAD7B..0x12CAD82`).
+Top-chunk/direct-release paths bypass that decrement.
+Factory countdown starts at `0xFFF`.
+
+Trim also invokes collection when its size argument is below `0xFFFFFFC0`
+and a top chunk exists, even if its own trim reported zero.
+Other observed trim callers `0x12C8D60/0x12C9C20/0x12CB030`
+are not expanded here.
+The new report disputes two prior details: trim VirtualFree may decommit
+rather than release, and countdown reset may be max rather than min of
+`0xFFF` and visited count. Neither conflicting interpretation is treated
+as settled until exact call arguments and cmp/cmov bytes are recorded.
