@@ -11,7 +11,7 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are startup UI-getter receiver binding
+file-close path. Active boundaries are the separate Login UI-manager startup call
 and allocator edge-case return/reporting contracts.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
@@ -9393,3 +9393,16 @@ For raw `0x12CAE30`, null old pointer delegates even n=0/oversized;
 nonnull n=0 frees/returns null, and nonnull oversized returns null before
 normalization. Offline integer checks verified these values without running
 or allocating through the target.
+
+## Login getter receiver and separately loaded UI manager must remain distinct
+
+Raw `0x30B19B` invokes global **VA** `0x1DFE970`'s slot `+0x3C`;
+`0x30B1AF` saves its return in EBX. Call `0x30B1F6`, bytes
+`FF 50 1C`, uses ECX=EBX and that returned object's table.
+The getter's concrete target/publication remains unresolved and is parked.
+Initial zero bytes in its backed pointer slot do not establish a runtime vptr.
+
+The UI-manager pointer is separately loaded at `0x30B1A9` and dispatched
+at `0x30B200`. That distinct concrete call is the next trace.
+The already verified manager table's `+0x1C -> 0xBFB310` entry does
+not bind the preceding getter-returned object merely by slot coincidence.
