@@ -159,6 +159,10 @@ The captured chunk continuation advances the cumulative DWORD offset and subtrac
 
 `UiShaderSourceReadOnlyOffsetProjectionRules` models slot `+8` without the writable getter's preserve call. It compares offset inclusively with the captured virtual-size result, then uses a separately captured later backing pointer. Null backing returns zero; otherwise data-plus-offset wraps as a DWORD. Out-of-range pointer arithmetic is conditional on the diagnostic returning. These captures do not imply a stable or atomic backing snapshot.
 
+`UiShaderSourcePreserveCopyProjectionRules` models only the replacement branch: zero request bypasses the accessor, while positive request captures the virtual-size result even when preservation is disabled. The selected count is the unsigned minimum of that result and requested size; only nonzero count and nonzero preserve byte reach the copy call. The byte is an EBP-relative argument, not an object field.
+
+`UiShaderSourcePoolControlProjectionRules` records conditional initialization of captured nonnull control storage (`+4/+8` set to one, then vtable and header), followed by unconditional output-control and output-header writes. Null captured pointers are preserved. Primary/secondary count names describe observed fields, not an established ownership abstraction.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves
