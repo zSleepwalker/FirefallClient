@@ -19,6 +19,7 @@ UiChildShaderCompileChecks.Run(Check);
 UiChildShaderBlobCleanupChecks.Run(Check);
 UiShaderSourceWrapperChecks.Run(Check);
 UiShaderSourceClearChecks.Run(Check);
+UiShaderSourceDestructorChecks.Run(Check);
 UiShaderSourceAllocationChecks.Run(Check);
 UiShaderSourceBackingAlignmentChecks.Run(Check);
 UiShaderSourcePoolControlChecks.Run(Check);

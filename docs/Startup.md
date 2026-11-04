@@ -167,6 +167,10 @@ The captured chunk continuation advances the cumulative DWORD offset and subtrac
 
 The absolute resize adapter at slot `+0x1C` forwards the requested DWORD and preservation argument one to the helper, then leaves EAX unchanged and pops four argument bytes on return. Its captured contract does not define a boolean status.
 
+The captured control writer supports both observed variants: pooled controls request `0x14` bytes with vtable VA `0x1C80C8C`, while nonpooled controls request `0x10` with vtable VA `0x1C80CB0`. Conditional count/header initialization and output-control-before-header order remain shared; neither variant requires both captured pair pointers to be nonnull.
+
+`UiShaderSourceDestructorNativeLayout` records wrapper slot-zero release gates and disposition. The first XADD/JNZ tests the post-decrement sum; only its zero edge reaches slot-zero callback and the separate second-counter XADD/DEC/JNZ sequence. Captured callback effects are not modeled. The destructor replaces its vptr, conditionally releases wrapper storage on deleting-flag bit zero, and does not directly clear wrapper backing/control fields.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves
