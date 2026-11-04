@@ -9474,8 +9474,20 @@ was found on this close path. `0xCD9870` then cleans lists at context
 Afterward `0xCD5510` frees context `+0x18`, context `+0x6C` and zeros
 its size, then, if present, VM `+0x1C` after draining its `+0x0C` chain
 via `0xCD51E0`. The outer `0x390` block is last.
-Exact instruction-level return/callback-capture details were requested
-as a bounded reporting clarification.
+Instruction-level clarification: `0xCD98A7` calls the drain; `0xCD98BB`,
+`0xCD98CA`, and `0xCD98D9` call `0xCD8F70` for the three lists above.
+The drain removes its head at `0xCD95AA`, calls `0xCD7890` at
+`0xCD96A7`, restores saved state at `0xCD96AC..0xCD96BA` without
+testing the returned status, and tests/repeats at `0xCD96C1..0xCD96C5`.
+`0xCD7890` tests the protected result at `0xCD78C7..0xCD78C9`;
+its error path returns status at `0xCD7907`, without retry.
+
+Internal buffer free calls occur at `0xCD5538`, `0xCD5547`, and
+conditional `0xCD557A`. Only afterward, `0xCD558D` loads allocator
+userdata from context `+4`, `0xCD5590` loads the callback from context
+`+0`, and `0xCD5592` invokes the final outer-block free.
+The ordinary `0xD675A0` bridge similarly loads userdata at `0xD675C5`,
+callback at `0xD675CC`, and invokes it at `0xD675CE`.
 
 The report's apparent VA lookup discrepancy is not a new mapping gap:
 the IDB is raw/base-zero and a numeric runtime VA must not be used directly
