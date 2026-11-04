@@ -11,7 +11,7 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are scripting shutdown readiness/drain gates
+file-close path. Active boundaries are scripting-manager normal-startup init binding
 and heap usable-size/copy-bound reporting.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
@@ -9302,3 +9302,24 @@ Consistency-error calls through **VA** `0x1AC4A24` are the already
 PE-verified MSVCR120 abort boundary, not the raw-IDB apparent `0x08080808`.
 The explicit normal-failure no-write observation does not generalize to
 all partially executed consistency-error branches.
+
+## Manager drain gate covers partial initialization, not only successful startup
+
+Constructor raw `0xBF7A80` writes word `this+0x670=1`,
+so byte `+0x671` starts zero, and clears byte `+0x672`.
+Init raw `0xBFB310` first invokes virtual `+4`; nonzero returns zero
+before arming cleanup. Otherwise it sets `+0x671=1` at `0xBFB350`.
+Later failure at `0xBFB668` leaves that byte set; only success sets
+`+0x672=1` at `0xBFB8DC`.
+Thus `+0x671` supports partial-initialization cleanup, not just a success flag.
+
+Shutdown helper `0x30D150` calls slot `+0x34` at `0x30D1EB`.
+Target `0xBFA0D0` skips when `+0x671` is zero; otherwise it clears
+the word at `+0x671` (both cleanup/success bytes) and drains the prefix
+registry, calling `0xC33060` at `0xBFA278`, then `0xC09D10`
+at `0xBFA29C`.
+Subsequent slot `+0x10`, raw `0xBF91B0`, invokes the object at
+manager `+0xA04`'s virtual `+0x10(1)` and clears `+0xA04`.
+Slot `+0x14`, raw `0xBF91D0`, sweeps remaining prefix/nested tracking entries.
+Neither changes the two initialization bytes.
+The normal-startup indirect binding to `0xBFB310` remains the next task.
