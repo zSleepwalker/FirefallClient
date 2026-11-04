@@ -10,8 +10,8 @@ PrivateDialog receiver identification, AES "block-size" interpretation,
 and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
-Current delegated boundaries are concrete console indentation-option bindings
-and texture pending enqueue-to-drain exception paths. Mode-16 fixed scatter and normal
+Current delegated boundaries are indentation descriptor self-alias constructors
+and allocation-failure reporter dispatch. Mode-16 fixed scatter and normal
 buffer release are resolved.
 Shutdown-request callers
 and texture writer dispatch/serialization are bounded unresolved stops,
@@ -7315,3 +7315,39 @@ Normal drain therefore remains the proven nested-buffer reclamation path;
 this unwind handler alone does not establish it.
 The next scope checks one concrete exception-capable path between enqueue
 and drain rather than inferring a throw from allocation names.
+
+## Pending growth can reach std::_Xbad_alloc if the allocation reporter returns
+
+The active-sample enqueue raw `0xE9F538` calls `0xEA9D70`;
+loop branch `0xE9F65E -> 0xE9F160` permits another iteration
+before drain. A full collection grows at `0xEA9DE4 -> 0xEAA5A8
+-> 0xEAADF0`; allocation at `0xEAAE38` is followed by null test
+and conditional call through **VA** `0x1AC4424` at
+`0xEAAE45..0xEAAE49`. PE import resolves to
+MSVCP120!std::_Xbad_alloc, not an inferred allocator name.
+EH state remains 1 through this window. Its handler releases collection
+backing only; existing records' nested-buffer cleanup is not reached.
+
+This is conditional evidence: allocator null handling first invokes reporter
+through **VA** `0x1C15EA0` at raw `0x12B8006`.
+Whether it returns to the null/_Xbad_alloc path or terminates remains open.
+The next scope resolves that reporter; no unconditional runtime throw or
+observed resource consequence is claimed.
+
+## Indentation consumer aliases are known; raw-string xrefs do not bind defaults
+
+Formatter raw `0xE5AB97..0xE5ABBB` consumes amount through alias
+**VA** `0x1E6AC44`, DWORD object `+0x3C`, multiplying depth
+and capping at 32. Character at `0xE5ABD4..0xE5ABEB` comes
+through alias **VA** `0x1E6ABD4`, text object `+0x1C`, taking
+its first byte; fallback literal is **VA** `0x1C5EA68`.
+The reported byte 0x12 at the numeric VA is not accepted as a literal
+value without raw mapping; that address is a previously verified empty string.
+
+No registration binding was found by raw-string xrefs. This is a raw-IDB
+limitation, not evidence that constructors are absent.
+The pass also miscomputed `0x17DE398+0x401400` as `0x181F798`;
+the correct stored string VA is `0x1BDF798` (and con.indentChar
+raw `0x17DE3D0` maps to VA `0x1BDF7D0`).
+The next narrow check follows self-alias object constructors and stored
+VAs, not another raw-string xref scan or adjacent-default inference.
