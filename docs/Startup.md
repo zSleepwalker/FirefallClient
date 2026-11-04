@@ -177,6 +177,8 @@ The captured control writer supports both observed variants: pooled controls req
 
 `UiShaderSourceNonPoolReleaseProjection` keeps the distinct nonpool path: null header returns directly; otherwise the first helper call receives wrapped DWORD subtraction of header `+4 - +8`, followed by a tail jump carrying the original header pointer. A zero difference does not erase the first call from the projection. No field clears or callee effects are inferred.
 
+`UiShaderSourcePoolCandidateProjectionRules` records the caller's captured acquisition result. Nonnull candidates receive data, displacement, capacity, and logical-length writes in instruction order; data-pointer addition wraps as a DWORD. The explicit null-candidate branch still calls the pair wrapper without header stores. This caller projection neither emulates acquisition retries nor guarantees that acquisition returns.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves
