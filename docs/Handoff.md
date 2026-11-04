@@ -11,7 +11,7 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are post-ready UI state-sync inputs and
+file-close path. Active boundaries are UI state-sync decision reconstruction and
 the native record producer's concrete object-iteration gates.
 UI lifecycle code/checks are committed.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
@@ -9665,6 +9665,31 @@ does not identify the same object. The focused scan's lack of another
 matching global/offset access is a bounded search result, not proof of
 absence of indirect readers. Drain ownership is parked. The next task
 traces `0xC5EF40`'s concrete iteration bounds and producer-call gates.
+
+## UI synchronization selection and callback suppression predicates
+
+Raw `0xBFFA90` requires nonzero slot-4 getter result and ready byte
+`+0x672`; otherwise it returns zero. On reached paths it returns one,
+including when it issues no component call. A 20-byte initialized helper
+record supplies two output DWORDs, here named `h0` and `h1`; their
+provider/meaning is not bound by this report.
+
+Selection starts with `+0x58C`. Unless byte `+0x590` and that value are
+both nonzero, `+0x588` replaces it. If the result is zero, `+0x584`
+is the fallback. Component `+0x974`'s slot `+0x1C` receives:
+
+| Predicate | Arguments |
+|---|---|
+| byte `+0x670 == 0`, or byte `+0x598 != 0` and (`h0 == 0` or `h1 != selected`) | `(1, selected)` |
+| byte `+0x670 != 0`, byte `+0x598 == 0`, and `h0 == 1` | `(0, 0)` |
+| Otherwise | No component call |
+
+The component return is ignored. Raw `0xBFF930`, call site `0xBFFA3F`,
+updates `+0x58C/+0x590/+0x594` and invokes UI slot `+0xB0`.
+It does not itself test ready; this is a concrete caller, not proof that
+every invocation occurs after ready publication. The callee suppresses
+dispatch before readiness. A bounded code task now projects these exact
+positional decisions without assigning speculative field semantics.
 
 The report's apparent VA lookup discrepancy is not a new mapping gap:
 the IDB is raw/base-zero and a numeric runtime VA must not be used directly
