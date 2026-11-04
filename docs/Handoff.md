@@ -12,7 +12,7 @@ are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
 file-close path. Active boundaries are exact service-deinit final-call targets
-and traceback metadata fields/special cases.
+and traceback fallback-name ownership.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
 Normal native CRT return selects `exit(status)`.
 Exit registration and its logger cleanup predicate are resolved.
@@ -8274,3 +8274,27 @@ It did not return exact displacement bytes, so the claimed post-close
 logging attempt is provisional pending immutable-byte arbitration.
 The independent `0xE5AB80 -> 0x12C2030` logging path does not by itself
 prove that this service-deinit call reaches it.
+
+## Traceback output fields and Lua/C metadata branches resolved
+
+Raw `0xC294A0` supplies short source at formatter output `+0x24`,
+current line at `+0x14`, and name at `+4` to
+`"    at %s(%d): %s"`. Raw `0xCCF500` computes
+`((nodePC - prototypeCode) >> 2) - 1` for the prototype line-table
+index; absent line table returns -1.
+
+Raw `0xCCF840` writes classification `what` at output `+0xC`,
+source at `+0x10`, and line bounds at `+0x18/+0x1C`.
+Mapped literals include `"Lua"`, `"main"`, `"C"`, `"=[C]"`, and `"=?"`.
+The native branch sets `what="C"`, source `"=[C]"`, bounds -1.
+The caller's leading-C suppression tests `what`, not the source/name;
+after the first non-C frame it emits later C frames too. This is concrete
+Lua/native classification evidence, not proof of a particular Lua version.
+
+When output name `+4` is null, the caller uses **VA** `0x1E4891C`
+if nonzero, otherwise `"~unnamed~"` (**VA** `0x1BBAE04`,
+backed raw `0x17B9A04`). Raw `0xCCFF50`'s flag-4 case returns
+`"hook"` and supplies `"?"` via its out-pointer. Native frames admitted
+after the initial filter can therefore be emitted with line -1 and a
+fallback name. The global fallback name's producer/lifetime is the next
+bounded question.
