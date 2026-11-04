@@ -10566,5 +10566,68 @@ internal static class StartupBinaryEvidence
             && ImportSlotBelongsToModule(
                 NativeRecordVectorCapacityProjectionRules.BadAllocImportAddressVirtualAddress,
                 NativeRecordVectorCapacityProjectionRules.BadAllocImportModule));
+
+        check("Binary scripting-object cleanup closes the VM before payload iteration and calls the later container helper",
+            RelativeBranchTargets(
+                StartupObjectLifecycleNativeLayout.VmCloseCallFileOffset,
+                0xE8,
+                StartupObjectLifecycleNativeLayout.VmCloseMethodFileOffset)
+            && RelativeBranchTargets(
+                StartupObjectLifecycleNativeLayout.PostPassContainer120CallFileOffset,
+                0xE8,
+                StartupObjectLifecycleNativeLayout.PostPassContainer120HelperFileOffset)
+            && StartupObjectLifecycleNativeLayout.VmCloseCallFileOffset
+                < StartupObjectLifecycleNativeLayout.ObservedPayloadDispatches[0].LoopFileOffset
+            && StartupObjectLifecycleNativeLayout.ObservedPayloadDispatches[1].LoopFileOffset
+                < StartupObjectLifecycleNativeLayout.Container118ResetBlockStartFileOffset
+            && StartupObjectLifecycleNativeLayout.Container118ResetBlockEndFileOffset
+                < StartupObjectLifecycleNativeLayout.PostPassContainer120CallFileOffset);
+
+        check("Binary UI manager shutdown checks the partial-init byte, clears both init bytes, and dispatches state sync through slot +0xB0",
+            Matches(
+                UiManagerNativeLayout.UiManagerShutdownMethodFileOffset + 0x32,
+                "80BB71060000000F84770D0000")
+            && Matches(
+                UiManagerNativeLayout.UiManagerShutdownMethodFileOffset + 0x42,
+                "66C783710600000000")
+            && UiManagerNativeLayout.UiManagerShutdownStateWordSize == 2
+            && UiManagerNativeLayout.UiManagerShutdownStateWordOffset
+                == UiManagerNativeLayout.UiManagerInitializationPartialFlagOffset
+            && VirtualAddressToFileOffset(UiManagerNativeLayout.UiManagerVtableVirtualAddress)
+                == 0x1872ABC
+            && ReadUInt32(VirtualAddressToFileOffset(UiManagerNativeLayout.UiManagerVtableVirtualAddress) + 0xB0)
+                == UiManagerNativeLayout.UiManagerStateSyncMethodFileOffset + 0x400C00
+            && VirtualAddressToFileOffset(ReadUInt32(
+                VirtualAddressToFileOffset(UiManagerNativeLayout.UiManagerVtableVirtualAddress) + 0xB0))
+                == UiManagerNativeLayout.UiManagerStateSyncMethodFileOffset
+            && Matches(UiManagerNativeLayout.UiManagerStateSyncMethodFileOffset, "558BEC83EC14568B"));
+        check("Binary UI state-sync initializes a 20-byte CURSORINFO and calls USER32.GetCursorInfo through its IAT slot",
+            UiManagerNativeLayout.UiManagerStateSyncCursorInfoSize == 20
+            && UiManagerNativeLayout.UiManagerStateSyncCursorInfoCbSizeOffset == 0
+            && UiManagerNativeLayout.UiManagerStateSyncCursorInfoFlagsOffset == 4
+            && UiManagerNativeLayout.UiManagerStateSyncCursorInfoCursorHandleOffset == 8
+            && UiManagerNativeLayout.UiManagerStateSyncCursorInfoXOffset == 12
+            && UiManagerNativeLayout.UiManagerStateSyncCursorInfoYOffset == 16
+            && Matches(
+                UiManagerNativeLayout.UiManagerStateSyncMethodFileOffset + 0x24,
+                "8D45ECC745EC140000000F57C050F30F7F45F0")
+            && Matches(UiManagerNativeLayout.UiManagerStateSyncMethodFileOffset + 0x37, "FF15244CAC01")
+            && VirtualAddressToFileOffset(UiManagerNativeLayout.UiManagerStateSyncGetCursorInfoIatVirtualAddress)
+                == UiManagerNativeLayout.UiManagerStateSyncGetCursorInfoIatFileOffset
+            && ImportSlotNames(
+                UiManagerNativeLayout.UiManagerStateSyncGetCursorInfoIatVirtualAddress,
+                "GetCursorInfo")
+            && ImportSlotBelongsToModule(
+                UiManagerNativeLayout.UiManagerStateSyncGetCursorInfoIatVirtualAddress,
+                "USER32.dll"));
+        check("Binary UI record producer reserves the record pointer then stores four MOVSS fields in source order",
+            Matches(0xC9551E, "8D45CC")
+            && Matches(
+                0xC95539,
+                "50F30F1145CCF30F1155D0F30F114DD4F30F115DD8"));
+        check("Binary legacy pair callback call, unsigned 5000 threshold, and subsequent field store match the executable",
+            RelativeBranchTargets(0xC06686, 0xE8, 0x159DD10)
+            && Matches(0xC06690, "81F9881300000F8221010000")
+            && Matches(0xC0669C, "894720"));
     }
 }

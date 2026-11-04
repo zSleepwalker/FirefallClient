@@ -36,7 +36,7 @@ public static class StartupObjectLifecycleNativeLayout
 
     public const int PostPassContainer120Offset = 0x120;
     public const uint PostPassContainer120HelperFileOffset = 0xC3FC10;
-    public const uint PostPassContainer120CallFileOffset = 0xC33C2B;
+    public const uint PostPassContainer120CallFileOffset = 0xC33C31;
     public const uint PostPassContainer118ReleaseMethodFileOffset = 0xC0BD90;
     public const uint StoredObjectReleaseBlockStartFileOffset = 0xC33C3A;
     public const uint StoredObjectReleaseBlockEndFileOffset = 0xC33C58;

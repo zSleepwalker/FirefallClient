@@ -11,8 +11,8 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are immutable UI lifecycle byte/import checks
-and concrete publication of nested list callback objects.
+file-close path. Active boundary is the nested list constructor's exact
+sentinel/backing initialization; callback-object publication remains parked.
 UI lifecycle code/checks are committed.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
@@ -10223,6 +10223,26 @@ made the evidence sequences read-only and named node `+0x10` as a key
 field, not a refcount location. Additional immutable PE checks and a
 bounded list-publication trace are active; no callback-object ownership
 is inferred from node erasure.
+
+## Immutable lifecycle checks caught a receiver-setup address mislabeled as a call
+
+The new binary checks verify shutdown's byte predicate versus word clear,
+the selector table entry, CURSORINFO import/initialization, exact MOVSS
+record order, and the old-pair divide/threshold/store. Their first run also
+caught a tightly related scripting cleanup check failure.
+Coordinator byte reads show raw `0xC33C2B` is
+`8D 8B 20 01 00 00` (LEA receiver), while the actual call is
+`0xC33C31`, bytes `E8 DA BF 00 00`, targeting `0xC3FC10`.
+The lifecycle constant and Startup documentation now use the call address.
+All Startup checks with `--binary` passed after this correction.
+Earlier references above to a call at `0xC33C2B` mean receiver setup,
+not the CALL instruction, and are superseded here.
+
+The nested-list publication search did not establish an insertion writer
+or independent owner for entry `+8`; prefix-tree publication of the outer
+script object is not proof of callback identity. That boundary is parked.
+The successor traces only initializer `0xC41670`'s concrete list state,
+not another unanchored ownership search.
 
 The report's apparent VA lookup discrepancy is not a new mapping gap:
 the IDB is raw/base-zero and a numeric runtime VA must not be used directly
