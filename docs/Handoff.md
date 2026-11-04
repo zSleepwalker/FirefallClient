@@ -11390,3 +11390,23 @@ Coordinator corrected the primary check's pop code VA to `0x16CE6E0`
 pass with primary and secondary gates, concrete callback, and storage
 replacement. Immutable evidence remains uncommitted only while its sole
 writer finishes the final gate/callback windows.
+
+Code gate/callback batch is pushed at `22a0a7b`. The evidence writer finished
+all reset/storage/wrapper additions, but the next serialized build was
+temporarily blocked by an incomplete secondary-repeat check. Queue PE writer
+`5e904995-cc62-470d-b496-78cb90799f4e` now owns that file and preserves
+all pending windows. Do not stage it during that writer's active work.
+Wrapper review requested corrected reporter/cleanup offsets (`0x12B8006`,
+`0x12B800C`) and unreached-return validation; tail review requested corrected
+callback increment offset `0x12CDDDD`.
+
+Queue cleanup raw `0x12CE280` reads receiver+8 and receiver+0 separately,
+reports `0x2D6` on mismatch, then LFENCE/later+10 reports `0x2D7`.
+It later captures receiver+0 and global pool VA `0x1E003BC` before
+null-node diagnostic `0x25A`; returning diagnostics can continue to
+pool+10 XADD -1 and tagged push. Queue pop raw `0x12CE400` is a
+separate sentinel-head CAS operation, not the pool pop `0x12CDAE0`.
+Queue projection assignments:
+`fab06ced-9924-426b-be2a-7fb923f5f6ae` cleanup;
+`827dcf37-2460-4193-900b-9b2a230b4b5e` pop-attempt trace;
+`1a24fbb4-5bab-491c-935d-925b2d416864` successful pop continuation.
