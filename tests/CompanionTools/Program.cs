@@ -2425,6 +2425,78 @@ if (args.Length == 2)
         && Red5LoggingBridgeNativeLayout.ClientApiRequestAutomaticRedirectLimitOffset == 0x3C
         && Red5LoggingBridgeNativeLayout.ClientApiRequestAutomaticRedirectLimitDefault == 5
         && Red5LoggingBridgeNativeLayout.ClientApiWinHttpSetAutomaticRedirectLimitRaw == 0xBC2F44);
+    Check("ClientApi retries selected response kinds and statuses up to the request limit",
+        client.Matches(Red5LoggingBridgeNativeLayout.ClientApiRetryResponsePolicyRaw + 0x400C00,
+            "8B410848740E48740883E802740332C0C3B001C3")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiRetryCountGateRaw + 0x400C00,
+            "3A463D0F83FAFDFFFF")
+        && client.Calls(Red5LoggingBridgeNativeLayout.ClientApiRetryEligibilityCallRaw + 0x400C00,
+            Red5LoggingBridgeNativeLayout.ClientApiRetryResponsePolicyRaw + 0x400C00)
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiRetryCountIncrementRaw + 0x400C00,
+            "FE463E")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiRetryRefreshFlagStoreRaw + 0x400C00,
+            "C6466001")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiRetryFinalCountCheckRaw + 0x400C00,
+            "8A4E3E8A463D3AC8723A")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiRequestResetRaw + 0x4D + 0x400C00,
+            "66C7473C0502C6473E00")
+        && ClientApiRetryPolicyLayout.RetryLimitOffset == 0x3D
+        && ClientApiRetryPolicyLayout.RetryCountOffset == 0x3E
+        && ClientApiRetryPolicyLayout.RefreshFlagOffset == 0x60
+        && ClientApiRetryPolicyLayout.DefaultRetryLimit == 2
+        && ClientApiRetryPolicyLayout.IsResponseRetryable(1, 408)
+        && ClientApiRetryPolicyLayout.IsResponseRetryable(1, 501)
+        && ClientApiRetryPolicyLayout.IsResponseRetryable(1, 599)
+        && !ClientApiRetryPolicyLayout.IsResponseRetryable(1, 500)
+        && !ClientApiRetryPolicyLayout.IsResponseRetryable(1, 504)
+        && !ClientApiRetryPolicyLayout.IsResponseRetryable(1, 600)
+        && ClientApiRetryPolicyLayout.IsResponseRetryable(2, 0)
+        && ClientApiRetryPolicyLayout.IsResponseRetryable(4, 0)
+        && !ClientApiRetryPolicyLayout.IsResponseRetryable(3, 503)
+        && ClientApiRetryPolicyLayout.CaptureRetryTransition(0, 2, true, 0)
+            == ((byte)1, (byte)1, true)
+        && ClientApiRetryPolicyLayout.CaptureRetryTransition(1, 2, true, 0)
+            == ((byte)2, (byte)1, true)
+        && ClientApiRetryPolicyLayout.CaptureRetryTransition(0, 2, false, 1)
+            == ((byte)0, (byte)1, false)
+        && ClientApiRetryPolicyLayout.CaptureRetryTransition(2, 2, true, 0)
+            == ((byte)2, (byte)0, false)
+        && !ClientApiRetryPolicyLayout.IsFinalRetry(1, 2)
+        && ClientApiRetryPolicyLayout.IsFinalRetry(2, 2));
+    Check("ClientApi retry scheduling uses capped exponential seconds and resets after the final retry",
+        client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiRequestTimeImportVa, "_time64")
+        && client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiRetryPowerImportVa,
+            "__libm_sse2_powf")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiRetryClockLoadRaw + 0x400C00,
+            "A1D848AC016A008985D4FBFFFF")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiRetryClockCallRaw + 0x400C00, "FFD0")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiRetryClockIndirectCallRaw + 0x400C00,
+            "FF95D4FBFFFF")
+        && client.Calls(Red5LoggingBridgeNativeLayout.ClientApiRetryBackoffPowerCallRaw + 0x400C00,
+            Red5LoggingBridgeNativeLayout.ClientApiRetryPowerStubRaw + 0x400C00)
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiRetryBackoffBaseSecondsVa, "00000040")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiRetryBackoffMaximumSecondsVa,
+            "0000F042")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiRetryDeadlineLowStoreRaw + 0x400C00,
+            "894648")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiRetryDeadlineHighStoreRaw + 0x400C00,
+            "894E4C")
+        && client.Calls(Red5LoggingBridgeNativeLayout.ClientApiRetryFinalConnectionResetRaw + 0x400C00,
+            0xBC38F0 + 0x400C00)
+        && client.Ascii(Red5LoggingBridgeNativeLayout.ClientApiRetryFinalLogFormatVa)
+            == "Queuing final retry %u, resetting connection."
+        && client.Ascii(Red5LoggingBridgeNativeLayout.ClientApiRetryLogFormatVa)
+            == "Queuing retry %u of %u."
+        && ClientApiRetryPolicyLayout.RetryDeadlineOffset == 0x48
+        && ClientApiRetryPolicyLayout.RetryDeadlineHighOffset == 0x4C
+        && ClientApiRetryPolicyLayout.RetryDeadlineSize == 8
+        && ClientApiRetryPolicyLayout.BackoffBaseSeconds == 2
+        && ClientApiRetryPolicyLayout.MaximumBackoffSeconds == 120
+        && ClientApiRetryPolicyLayout.CaptureBackoffSeconds(1) == 2
+        && ClientApiRetryPolicyLayout.CaptureBackoffSeconds(2) == 4
+        && ClientApiRetryPolicyLayout.CaptureBackoffSeconds(6) == 64
+        && ClientApiRetryPolicyLayout.CaptureBackoffSeconds(7) == 120
+        && ClientApiRetryPolicyLayout.CaptureBackoffSeconds(8) == 120);
     Check("ClientApi worker resolves per-URL proxy settings and applies proxy info",
         client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiWinHttpGetProxyForUrlImportVa,
             "WinHttpGetProxyForUrl")

@@ -339,17 +339,15 @@ Detailed ClientApi rounds moved here from [Handoff.md](Handoff.md) to keep the c
   sample IAT slot `0x1AC4D08` resolves to `WinHttpSetOption`. Microsoft's
   WinHTTP option reference names `0x59` as
   `WINHTTP_OPTION_MAX_HTTP_AUTOMATIC_REDIRECTS`; the value initialized and
-  passed by the client is 5. The upper `0x02` byte in the reset word is not
-  explained by this usage. CompanionTools checks the IAT, reset bytes,
-  complete option-setup instruction sequence, and modeled offset/default.
+  passed by the client is 5. The adjacent byte `+0x3D` is a separate retry
+  limit initialized to 2, and `+0x3E` is the retry counter cleared at reset;
+  their worker use is detailed in Round 50. CompanionTools checks the IAT,
+  reset bytes, complete option-setup instruction sequence, and modeled
+  redirect limit.
 
 ## Interpreted
 - The WinHTTP request handle is configured with a five-redirect automatic
   redirect ceiling per request.
-
-## Unresolved
-- The purpose of request byte `+0x3D` and whether another path changes the
-  limit after reset.
 
 # Round 38: ClientApi per-URL proxy configuration
 
@@ -383,8 +381,7 @@ Detailed ClientApi rounds moved here from [Handoff.md](Handoff.md) to keep the c
 
 ## Unresolved
 - Names and initialization source for the global object fields at `+0`,
-  `+4`, and `+0x10`; no meaning is assigned to the adjacent request byte
-  `+0x3D`.
+  `+4`, and `+0x10`.
 
 # Round 39: ClientApi WinHTTP session settings
 
@@ -494,7 +491,8 @@ Detailed ClientApi rounds moved here from [Handoff.md](Handoff.md) to keep the c
   nonzero; `ClientApiRequest_Reset` initializes that byte to zero. The
   `WinHttpOpenRequest` call receives null HTTP-version, referrer, and accept-
   type pointers. The C# model/test and `LoginNetwork.md` Round 31 save this
-  policy. Writers after reset and callers that enable it remain unknown.
+  policy. Round 50 identifies a retry-path writer for the byte; effective
+  cache behavior is not established.
 
 # Round 47: ClientApi route-worker timeout
 
@@ -543,3 +541,45 @@ Detailed ClientApi rounds moved here from [Handoff.md](Handoff.md) to keep the c
 - The wait timeout is not evidence of a fixed 3-second pump cadence. Field
   meanings, wait identity, active-count source, and the invocation schedule of
   the separate global-lock caller `0xE99940` remain unresolved.
+
+# Round 50: ClientApi response retry and backoff
+
+## Observed
+- Retry eligibility helper `0xBC1130` reads response kind at `+8` and status
+  at `+0xC`. It returns true for kinds 2 and 4; for kind 1 it returns true
+  for status 408 or 501-599 except 504. The other kinds/statuses return false.
+- In `ClientApi_PumpRequestWorker` (`0xBC2B30`), the retry branch at
+  `0xBC3592` compares request byte `+0x3E` with limit byte `+0x3D` using an
+  unsigned comparison, then calls the helper at `0xBC359D`. When the count is
+  below the limit and the helper returns true, it increments `+0x3E` at
+  `0xBC35AA` and stores 1 in request byte `+0x60` at `0xBC35AF`. Reset clears
+  `+0x60`, writes `0x0205` at `+0x3C` (redirect limit 5, retry limit 2), and
+  clears `+0x3E`.
+- The retry deadline uses imported `_time64` and imported
+  `__libm_sse2_powf`: the worker loads `_time64` at `0xBC2B65`, calls it at
+  `0xBC2B72`, and reuses that function pointer at `0xBC35B3`. After incrementing
+  the retry count, it computes `2^count` seconds with `powf` at `0xBC35DB`,
+  clamps the value to 120 seconds, adds it to the current `_time64` value, and
+  stores the resulting 64-bit deadline at request `+0x48/+0x4C`
+  (`0xBC35FD/0xBC360C`). At the start of a later pump, a nonzero deadline is
+  compared with `_time64`; a future deadline calls `0x12CE310` at `0xBC2BF0`
+  and skips the normal pump path.
+- After scheduling, the worker logs `Queuing retry %u of %u.` from sample VA
+  `0x1C7389C` while the count remains below the limit. When the increment
+  reaches the limit, it logs `Queuing final retry %u, resetting connection.`
+  from sample VA `0x1C7373C`, closes the handle at request `+0x20` if present,
+  and calls `0xBC38F0`. CompanionTools checks the retry policy/helper, count
+  and flag stores, reset default, time/powf imports and call sites, constants,
+  deadline stores, log strings, and final connection-reset call.
+
+## Interpreted
+- Request `+0x3D/+0x3E` act as a per-request retry limit and retry counter,
+  separate from the automatic redirect limit at `+0x3C`. Eligible retries
+  set the byte that later contributes `WINHTTP_FLAG_REFRESH` (`0x100`).
+  Backoff grows exponentially from 2 seconds per retry count and is capped at
+  120 seconds.
+
+## Unresolved
+- The semantic names of response kinds 2 and 4 and the full behavior of the
+  `0x12CE310` handoff are not established. The refresh flag argument is
+  observed; effective cache behavior is not.

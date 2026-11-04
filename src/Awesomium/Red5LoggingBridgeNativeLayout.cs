@@ -163,6 +163,44 @@ public static class ClientApiWinHttpOpenRequestFlagLayout
         | (bypassProxyCache != 0 ? RefreshFlag : 0);
 }
 
+public static class ClientApiRetryPolicyLayout
+{
+    public const uint RetryLimitOffset = 0x3D;
+    public const uint RetryCountOffset = 0x3E;
+    public const uint RetryDeadlineOffset = 0x48;
+    public const uint RetryDeadlineHighOffset = 0x4C;
+    public const uint RetryDeadlineSize = 8;
+    public const uint RefreshFlagOffset = 0x60;
+    public const byte DefaultRetryLimit = 2;
+    public const uint BackoffBaseSeconds = 2;
+    public const uint MaximumBackoffSeconds = 120;
+
+    public static bool IsResponseRetryable(uint responseKind, uint statusCode) =>
+        responseKind is 2 or 4
+        || (responseKind == 1
+            && ((statusCode >= 500 && statusCode <= 599 && statusCode is not 500 and not 504)
+                || statusCode == 408));
+
+    public static bool ShouldQueueRetry(byte retryCount, byte retryLimit, bool responseRetryable) =>
+        retryCount < retryLimit && responseRetryable;
+
+    public static (byte RetryCount, byte RefreshFlag, bool BranchTaken) CaptureRetryTransition(
+        byte retryCount, byte retryLimit, bool responseRetryable, byte refreshFlag)
+    {
+        if (!ShouldQueueRetry(retryCount, retryLimit, responseRetryable))
+            return (retryCount, refreshFlag, false);
+
+        return (unchecked((byte)(retryCount + 1)), 1, true);
+    }
+
+    public static bool IsFinalRetry(byte retryCount, byte retryLimit) => retryCount >= retryLimit;
+
+    public static uint CaptureBackoffSeconds(byte incrementedRetryCount) =>
+        (uint)System.MathF.Min(
+            System.MathF.Pow(BackoffBaseSeconds, incrementedRetryCount),
+            MaximumBackoffSeconds);
+}
+
 public static class ClientApiRouteWorkerTimeoutLayout
 {
     public const uint CompletionOffset = 0x1C;
@@ -471,6 +509,25 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint ClientApiWinHttpOpenRequestSecureFlagRaw = 0xBC2CCD;
     public const uint ClientApiWinHttpOpenRequestRefreshFlagRaw = 0xBC2CE3;
     public const uint ClientApiWinHttpOpenRequestRefreshFlagResetRaw = 0xBC131C;
+    public const uint ClientApiRetryResponsePolicyRaw = 0xBC1130;
+    public const uint ClientApiRetryCountGateRaw = 0xBC3592;
+    public const uint ClientApiRetryEligibilityCallRaw = 0xBC359D;
+    public const uint ClientApiRetryCountIncrementRaw = 0xBC35AA;
+    public const uint ClientApiRetryRefreshFlagStoreRaw = 0xBC35AF;
+    public const uint ClientApiRetryClockLoadRaw = 0xBC2B65;
+    public const uint ClientApiRetryClockCallRaw = 0xBC2B72;
+    public const uint ClientApiRetryClockIndirectCallRaw = 0xBC35B3;
+    public const uint ClientApiRetryBackoffPowerCallRaw = 0xBC35DB;
+    public const uint ClientApiRetryDeadlineLowStoreRaw = 0xBC35FD;
+    public const uint ClientApiRetryDeadlineHighStoreRaw = 0xBC360C;
+    public const uint ClientApiRetryFinalCountCheckRaw = 0xBC3617;
+    public const uint ClientApiRetryFinalConnectionResetRaw = 0xBC3654;
+    public const uint ClientApiRetryPowerStubRaw = 0x15D24BE;
+    public const uint ClientApiRetryPowerImportVa = 0x1AC468C;
+    public const uint ClientApiRetryBackoffBaseSecondsVa = 0x1C81DC8;
+    public const uint ClientApiRetryBackoffMaximumSecondsVa = 0x1C820B8;
+    public const uint ClientApiRetryFinalLogFormatVa = 0x1C7373C;
+    public const uint ClientApiRetryLogFormatVa = 0x1C7389C;
     public const uint ClientApiWinHttpOpenRequestArgumentsRaw = 0xBC2D92;
     public const uint ClientApiWinHttpOpenRequestCallRaw = 0xBC2DB7;
     public const uint ClientApiWinHttpOpenRequestImportVa = 0x1AC4CFC;

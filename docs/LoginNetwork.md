@@ -142,13 +142,10 @@
 # Round 22: ClientApi automatic redirect limit
 
 ## Observed
-- `ClientApiRequest_Reset` (`0xBC1280`) writes the word `0x0205` at request `+0x3C` (`0xBC12CD`) and clears the following byte at `+0x3E`. `ClientApi_PumpRequestWorker` (`0xBC2B30`) reads only the low byte at request `+0x3C`, zero-extends it, and passes its address with a four-byte length to `WinHttpSetOption` at `0xBC2F44`, using option `0x59`. The sample's IAT slot `0x1AC4D08` resolves to `WinHttpSetOption`; Microsoft documents option `0x59` as `WINHTTP_OPTION_MAX_HTTP_AUTOMATIC_REDIRECTS`. Thus this request's WinHTTP automatic redirect ceiling is 5. The remaining `0x02` byte in the reset word is not interpreted here.
+- `ClientApiRequest_Reset` (`0xBC1280`) writes the word `0x0205` at request `+0x3C` (`0xBC12CD`) and clears the following byte at `+0x3E`. `ClientApi_PumpRequestWorker` (`0xBC2B30`) reads only the low byte at request `+0x3C`, zero-extends it, and passes its address with a four-byte length to `WinHttpSetOption` at `0xBC2F44`, using option `0x59`. The sample's IAT slot `0x1AC4D08` resolves to `WinHttpSetOption`; Microsoft documents option `0x59` as `WINHTTP_OPTION_MAX_HTTP_AUTOMATIC_REDIRECTS`. Thus this request's WinHTTP automatic redirect ceiling is 5. Round 35 establishes that the adjacent byte `+0x3D` is a distinct retry limit of 2 and `+0x3E` is the retry counter.
 
 ## Interpreted
 - The five-redirect ceiling is copied from each request's initialized byte into a 32-bit WinHTTP option value when the worker configures the request handle.
-
-## Unresolved
-- The purpose of request byte `+0x3D` and whether any path changes the redirect limit after reset.
 
 # Round 23: ClientApi per-URL proxy configuration
 
@@ -161,7 +158,7 @@
 - When the proxy gate is enabled, the client uses a configured PAC URL to resolve a proxy separately for each request URL, then explicitly applies the resulting proxy info to the request handle. On lookup failure it preserves the handle's current proxy configuration when that value can be queried.
 
 ## Unresolved
-- The global object's field names and initialization source are unknown; the auto-proxy gate and PAC URL are recorded by offsets only. The meaning of the `0x02` byte adjacent to the redirect-limit value at request `+0x3D` remains separate and unresolved.
+- The global object's field names and initialization source are unknown; the auto-proxy gate and PAC URL are recorded by offsets only.
 
 # Round 24: ClientApi WinHTTP session settings
 
@@ -448,3 +445,37 @@
   identity, and the source of the route-active count are not established.
 - `ClientApi_PumpRoutes` also has a separately observed global-lock caller at
   `0xE99940`; its call schedule is not determined here.
+
+# Round 35: ClientApi response retry and backoff
+
+## Observed
+- Retry helper `0xBC1130` reads response kind at `+8` and status at `+0xC`.
+  It accepts kinds 2 and 4; kind 1 is accepted for status 408 or 501-599
+  except 504. Other kinds/statuses return false.
+- In `ClientApi_PumpRequestWorker` (`0xBC2B30`), request retry count `+0x3E`
+  must be below retry limit `+0x3D` before the helper is called. A true helper
+  result increments the count and sets request byte `+0x60` to 1. Reset
+  initializes `+0x3D` to 2 as the high byte of word `0x0205` at `+0x3C`,
+  while the low byte 5 remains the WinHTTP automatic-redirect limit; reset
+  clears `+0x3E` and `+0x60`.
+- After the count increments, the worker computes `2^count` seconds using
+  `__libm_sse2_powf`, clamps to 120 seconds, adds the result to `_time64()`,
+  and stores the absolute 64-bit deadline at request `+0x48/+0x4C`. A later
+  pump compares `_time64()` with that nonzero deadline and takes a separate
+  handoff through `0x12CE310` while the deadline is in the future.
+- The worker logs `Queuing retry %u of %u.` while the count remains below its
+  limit. At the limit it logs `Queuing final retry %u, resetting connection.`,
+  closes the handle at request `+0x20` if present, and calls `0xBC38F0`.
+  CompanionTools checks the retry branches, helper, flag and counter stores,
+  default, power function/constants, deadline stores, and final reset path.
+
+## Interpreted
+- Request `+0x3D/+0x3E` are the retry limit/count, independent of automatic
+  redirect limit `+0x3C`. The retry delay grows exponentially from 2 seconds
+  for the first retry and is capped at 120 seconds. Setting `+0x60` enables
+  the later `WINHTTP_FLAG_REFRESH` argument; effective cache behavior is not
+  established.
+
+## Unresolved
+- The semantic names of response kinds 2 and 4 and the full behavior of the
+  `0x12CE310` handoff are not established.
