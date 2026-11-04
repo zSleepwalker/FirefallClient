@@ -11099,5 +11099,33 @@ internal static class StartupBinaryEvidence
             && ShortConditionalBranchTargets(0xCA71A6, 0x74, 0xCA71C0)
             && ShortConditionalBranchTargets(0xCA72D7, 0x78, 0xCA72F6)
             && ShortConditionalBranchTargets(0xCA72DC, 0x74, 0xCA72F6));
+
+        check("Binary buffer replacement calls its size accessor, takes the unsigned minimum, and gates copying on preserve flag and copy count",
+            Matches(0x12CBD61, "FF500C8B5C24143BC60F47C689442418")
+            && Matches(0x12CBD68, "3BC60F47C6")
+            && Matches(0x12CBDAE, "807D0C00")
+            && ShortConditionalBranchTargets(0x12CBDBA, 0x74, 0x12CBDDB)
+            && Matches(0x12CBDBC, "8B54241885D27417")
+            && ShortConditionalBranchTargets(0x12CBDC2, 0x74, 0x12CBDDB));
+
+        check("Binary buffer constructor adds capacity and alignment as DWORDs before the allocator call and selects alignment-specific header stores",
+            Matches(0x12CB703, "8B4508568BF1578906")
+            && Matches(0x12CB732, "03C750")
+            && RelativeBranchTargets(0x12CB735, 0xE8, 0x12B8030)
+            && Matches(0x12CB73D, "8BC8894E0485FF")
+            && ShortConditionalBranchTargets(0x12CB744, 0x75, 0x12CB757)
+            && Matches(0x12CB746, "8D040F897E08894604")
+            && Matches(0x12CB757, "33D28BC1F7F72BFA897E088D040F894604"));
+
+        check("Binary buffer constructor's zero-capacity branch reaches its diagnostic sequence without asserting null-allocation behavior",
+            Matches(0x12CB713, "85C07516")
+            && ShortConditionalBranchTargets(0x12CB715, 0x75, 0x12CB72D)
+            && Matches(0x12CB717, "506A5D68CB3EB70168BF3EB701FF15A05EC101"));
+
+        check("Binary control helper conditionally initializes count fields, vptr, and header, then unconditionally writes output control and header",
+            ShortConditionalBranchTargets(0x12CC748, 0x74, 0x12CC763)
+            && Matches(0x12CC74A, "C7460401000000C7460801000000C7068C0CC801895E0C")
+            && Matches(0x12CC794, "897004")
+            && Matches(0x12CC797, "8918"));
     }
 }

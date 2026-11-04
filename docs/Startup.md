@@ -163,6 +163,8 @@ The captured chunk continuation advances the cumulative DWORD offset and subtrac
 
 `UiShaderSourcePoolControlProjectionRules` records conditional initialization of captured nonnull control storage (`+4/+8` set to one, then vtable and header), followed by unconditional output-control and output-header writes. Null captured pointers are preserved. Primary/secondary count names describe observed fields, not an established ownership abstraction.
 
+`UiShaderSourceBackingAlignmentProjectionRules` preserves header capacity and projects unchecked DWORD allocation-size and aligned-pointer arithmetic. Nonzero alignment advances by `alignment - pointer % alignment`, including a full unit for an already-aligned pointer; zero alignment leaves the pointer unchanged. Zero capacity continuation is conditional on its diagnostic returning. A captured zero allocator pointer remains an arithmetic input, not a modeled allocation success.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves
