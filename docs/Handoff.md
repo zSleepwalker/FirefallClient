@@ -11,7 +11,7 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are heap-free ownership metadata
+file-close path. Active boundaries are global-heap synchronization setup
 and virtual-memory region allocation/release.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
@@ -8834,3 +8834,21 @@ The allocator's region-growth call at raw `0x12C771A` resolves to
 A failed call returns zero with no retry/fallback observed in that path.
 This identifies one region-growth boundary, not all small-block allocation
 policy; region metadata and matching release are the next task.
+
+## Heap free coalesces chunk metadata and conditionally takes an internal lock
+
+Raw `0x12CA6F0` returns immediately for a null pointer, without locking.
+For nonnull input it uses chunk header `pointer-8`, coalesces adjacent free
+chunks, and updates boundary tags, free-list/bitmap state, and heap top fields.
+Insertion decrements heap `+0x20`, calling raw `0x12C78A0` at zero;
+the direct-release path subtracts released bytes from heap `+0x1B0`.
+Exact region-release ownership is a separate active trace.
+
+Internal synchronization tests heap flag `+0x1BC & 2` and conditionally
+enters/leaves the critical section at `+0x1C0`. The observed initializer
+clears that flag; this alone does not establish a complete concurrency policy
+or exclude outer locking/later reconfiguration.
+Raw `0xC327D0` publishes raw `0x12CA210`'s allocator-object result
+into global pointer slot **VA** `0x1E48918`; the slot is virtual-tail data,
+not the raw-IDB bytes at its numeric VA. Callers load that pointer into ECX.
+Concrete creation options and surrounding synchronization are the next check.
