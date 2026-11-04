@@ -10,7 +10,7 @@ PrivateDialog receiver identification, AES "block-size" interpretation,
 and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
-Current delegated boundaries are logger exit-cleanup registration
+Current delegated boundaries are the runtime exit helper's indirect targets
 and the distinct timed wrapper's field-8 resource ownership. Logger unwind binding is now composed
 from the recorded guard initialization and exact EH action. Assertion interception is a bounded
 unresolved stop. Mode-16 fixed scatter and normal
@@ -7808,3 +7808,14 @@ or this call confused with the verified CloseHandle for wrapper `+0xC`.
 Constructor candidate raw `0x13093E0` stores the same vptr at
 `0x13094CE`; exact field-8 creation and its cleanup import are the
 next narrow check. Concrete class name and complete caller chain remain open.
+
+## Logger ignores normalized exit-registration result; target identity still open
+
+Raw `0x12C161C..0x12C1647` sets the first-use guard, initializes
+the critical section, and passes cleanup **VA** `0x1AC23D0`
+(raw `0x16C17D0`) to the runtime-init registration helper.
+The helper normalizes its result to 0/-1; this caller ignores it and continues.
+A bootstrap state of -1 selects one indirect forwarding routine, other state
+selects another. Neither routine's identity is established by this pass,
+so no atexit/onexit/private-list or failure-branch label follows from the
+helper's existing name. The next check resolves exact operands/imports.
