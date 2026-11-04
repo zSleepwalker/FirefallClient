@@ -127,6 +127,24 @@ internal static class UiShaderSourceDestructorChecks
             && !nonDeleting.DirectlyClearsWrapperBackingPointer
             && !nonDeleting.DirectlyClearsWrapperControlPointer);
 
+        uint[] counterBoundaries = { 0, 1, 2, 0x80000000, uint.MaxValue };
+        bool counterAndFlagMatrixMatches = true;
+        foreach (uint firstCounter in counterBoundaries)
+        foreach (uint secondCounter in counterBoundaries)
+        for (uint flags = 0; flags <= byte.MaxValue; flags++)
+        {
+            UiShaderSourceDestructorProjection projection =
+                UiShaderSourceDestructorNativeLayout.Project(
+                    true, firstCounter, firstCounter == 1 ? secondCounter : null, flags);
+            counterAndFlagMatrixMatches &=
+                projection.ControlFirstCounterAfterXadd == unchecked(firstCounter - 1)
+                && projection.CallsControlVtableSlot0 == (firstCounter == 1)
+                && projection.CallsControlVtableSlot4 == (firstCounter == 1 && secondCounter == 1)
+                && projection.CallsWrapperStorageReleaseHelper == ((flags & 1) != 0);
+        }
+        check("Destructor gates preserve unsigned counter wrap and every deleting-flag byte",
+            counterAndFlagMatrixMatches);
+
         bool missingFirstCounterRejected = false;
         try
         {

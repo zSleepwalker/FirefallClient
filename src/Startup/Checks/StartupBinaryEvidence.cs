@@ -7029,6 +7029,60 @@ internal static class StartupBinaryEvidence
             && ReadUInt32(0x187F8C4 + 0x0C) == 0x16CC5C0
             && VirtualAddressToFileOffset(0x16CC560) == 0x12CB960
             && VirtualAddressToFileOffset(0x16CC5C0) == 0x12CB9C0);
+        check("Binary slBlob vtable slot 0 maps VA 0x16CC3A0 to its raw deleting-destructor body through ret 4",
+            ReadUInt32(0x187F8C4) == 0x16CC3A0
+            && VirtualAddressToFileOffset(0x16CC3A0) == 0x12CB7A0
+            && Matches(0x12CB7A0,
+                "558BEC568BF1578B7E0885FF74275383CBFF8D57048BC3F00FC10275178B078BCFFF10"
+                + "8D4708F00FC1184B75078B078BCFFF50045BF6450801C70614FCC50174078BCEE878D5FFFF"
+                + "5F8BC65E5DC20400"));
+        check("Binary slBlob destructor loads control +8 and uses the first XADD post-decrement flags for JNZ",
+            Matches(0x12CB7A7, "8B7E0885FF7427")
+            && ShortConditionalBranchTargets(0x12CB7AC, 0x74, 0x12CB7D5)
+            && Matches(0x12CB7B7, "F00FC102")
+            && ShortConditionalBranchTargets(0x12CB7BB, 0x75, 0x12CB7D4)
+            && Matches(0x12CB7BD, "8B078BCFFF10"));
+        check("Binary slBlob destructor second XADD is followed by DEC and JNZ on the decremented prior value",
+            Matches(0x12CB7C6, "F00FC1184B")
+            && ShortConditionalBranchTargets(0x12CB7CB, 0x75, 0x12CB7D4)
+            && Matches(0x12CB7CD, "8B078BCFFF5004"));
+        check("Binary slBlob destructor tests deleting bit 0, replaces the vptr, and conditionally calls 0x12C8D60",
+            Matches(0x12CB7D5, "F6450801C70614FCC501")
+            && ShortConditionalBranchTargets(0x12CB7DF, 0x74, 0x12CB7E8)
+            && Matches(0x12CB7E1, "8BCE")
+            && RelativeBranchTargets(0x12CB7E3, 0xE8, 0x12C8D60)
+            && Matches(0x12CB7ED, "C20400")
+            && ReadUInt32(0x12CB7DB) == 0x01C5FC14);
+        check("Binary slBlob vtable slot +1C maps to the exact resize adapter, which forwards EAX unchanged",
+            ReadUInt32(0x187F8C4 + 0x1C) == 0x16CC6C0
+            && VirtualAddressToFileOffset(0x16CC6C0) == 0x12CBAC0
+            && Matches(0x12CBAC0, "558BEC6A01FF7508E8E30100005DC20400")
+            && RelativeBranchTargets(0x12CBAC8, 0xE8, 0x12CBCB0));
+        check("Binary shader-source loader ignores slot +1C return and branches on the requested length instead",
+            Matches(0x12BB3D7, "8B0157FF501C33C9894C2420")
+            && Matches(0x12BB3E3, "85FF")
+            && ShortConditionalBranchTargets(0x12BB3E5, 0x74, 0x12BB42E));
+        check("Binary pool shader-source helper requests 0x14 and writes its control metadata and output pair in order",
+            Matches(0x12CC730, "6A14C745FC00000000E872B8FEFF")
+            && RelativeBranchTargets(0x12CC739, 0xE8, 0x12B7FB0)
+            && Matches(0x12CC73E, "8B5D088BF083C404")
+            && Matches(0x12CC74A,
+                "C7460401000000C7460801000000C7068C0CC801895E0C")
+            && ShortConditionalBranchTargets(0x12CC748, 0x74, 0x12CC763)
+            && Matches(0x12CC761, "EB02")
+            && Matches(0x12CC794, "8970048918")
+            && VirtualAddressToFileOffset(0x1C80C8C) == 0x187F88C);
+        check("Binary nonpool shader-source helper requests 0x10 and writes its control metadata and output pair in order",
+            Matches(0x12CC800, "6A10C745FC00000000E8A2B7FEFF")
+            && RelativeBranchTargets(0x12CC809, 0xE8, 0x12B7FB0)
+            && Matches(0x12CC80E, "8B5D088BF083C404")
+            && Matches(0x12CC816, "85F67419")
+            && ShortConditionalBranchTargets(0x12CC818, 0x74, 0x12CC833)
+            && Matches(0x12CC81A,
+                "C7460401000000C7460801000000C706B00CC801895E0C")
+            && Matches(0x12CC831, "EB02")
+            && Matches(0x12CC864, "8970048918")
+            && VirtualAddressToFileOffset(0x1C80CB0) == 0x187F8B0);
         check("Binary slBlob slow zero-size branch saves wrapper+8 before clearing wrapper+8/+4 and branching to release",
             Matches(0x12CBD4B, "85F6750E8B5F08897708897704E9C7000000")
             && RelativeBranchTargets(0x12CBD58, 0xE9, 0x12CBE24));
