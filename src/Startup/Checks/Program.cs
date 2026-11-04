@@ -673,6 +673,40 @@ Check("UI manager initialization guard rejects nonzero slot+4 getter results and
         == new UiManagerInitializationFlagSnapshot(1, 1)
     && UiManagerNativeLayout.CaptureObservedInitializationFlags(
         UiManagerInitializationOutcome.Initialized).ShutdownStateWord == 0x0101);
+Check("UI startup callback stores the getter-sourced descriptor at +A08 before setting the ready flag",
+    UiManagerNativeLayout.UiManagerDescriptorGetterCallSiteFileOffset == 0x30B1B4
+    && UiManagerNativeLayout.UiManagerDescriptorGetterResultAddressOffset == 0x48
+    && UiManagerNativeLayout.UiManagerInitializeDescriptorArgumentOrdinal == 8
+    && UiManagerNativeLayout.UiManagerInitializeDescriptorArgumentFrameOffset == 0x24
+    && UiManagerNativeLayout.UiManagerInitializeDescriptorCallbackCallSiteFileOffset == 0xBFB8C6
+    && UiManagerNativeLayout.UiManagerInitializeDescriptorCallbackReceiverOffset == 0x974
+    && UiManagerNativeLayout.UiManagerInitializeDescriptorCallbackVtableOffset == 0x30
+    && UiManagerNativeLayout.UiManagerInitializeDescriptorCallbackArgument == 1
+    && !UiManagerNativeLayout.UiManagerInitializeDescriptorCallbackReturnIsUsed
+    && UiManagerNativeLayout.UiManagerInitializeDescriptorStoreFileOffset == 0xBFB8CE
+    && UiManagerNativeLayout.UiManagerPayloadDescriptorOffset == 0xA08
+    && UiManagerNativeLayout.UiManagerInitializeReadyFlagWriteFileOffset == 0xBFB8DC);
+Check("UI payload descriptor consumer and append helper retain the observed pointer and positional-record layout",
+    UiManagerNativeLayout.UiPayloadDescriptorConsumerMethodFileOffset == 0xC95400
+    && UiManagerNativeLayout.UiPayloadDescriptorConsumerMethodVirtualAddress == 0x1096000
+    && UiManagerNativeLayout.UiPayloadDescriptorConsumerObjectFlagOffset == 0x72C
+    && UiManagerNativeLayout.UiManagerGlobalPointerVirtualAddress == 0x1E002B8
+    && UiManagerNativeLayout.UiManagerPayloadDescriptorOffset == 0xA08
+    && UiManagerNativeLayout.UiPayloadDescriptorAppendMethodFileOffset == 0xC97380
+    && UiManagerNativeLayout.UiPayloadDescriptorGrowMethodFileOffset == 0xC978F0
+    && UiManagerNativeLayout.UiPayloadDescriptorBeginPointerOffset == 0
+    && UiManagerNativeLayout.UiPayloadDescriptorEndPointerOffset == 4
+    && UiManagerNativeLayout.UiPayloadDescriptorCapacityPointerOffset == 8
+    && UiManagerNativeLayout.UiPayloadDescriptorPositionRecordByteCount == 0x10
+    && UiManagerNativeLayout.UiPayloadDescriptorPositionRecordCopiedDwordCount == 4
+    && UiManagerNativeLayout.UiPayloadDescriptorPositionRecordEndAdvance == 0x10
+    && new[]
+    {
+        UiManagerNativeLayout.UiPayloadDescriptorPositionField0Offset,
+        UiManagerNativeLayout.UiPayloadDescriptorPositionField1Offset,
+        UiManagerNativeLayout.UiPayloadDescriptorPositionField2Offset,
+        UiManagerNativeLayout.UiPayloadDescriptorPositionField3Offset
+    }.SequenceEqual([0x338, 0x33C, 0x340, 0x344]));
 Check("UI manager payload-tree drain tests byte +671 but clears both initialization bytes",
     UiManagerNativeLayout.UiManagerShutdownStateWordOffset == 0x671
     && UiManagerNativeLayout.UiManagerShutdownStateWordSize == 2

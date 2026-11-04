@@ -11,8 +11,8 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are the final UI initialization `+0xB0`
-dispatch and reconstruction of the `+0xA08` native record sink.
+file-close path. Active boundaries are post-ready UI state-sync inputs and
+the aliased native record sink's concrete drain/reset consumer.
 UI lifecycle code/checks are committed.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
@@ -9624,6 +9624,32 @@ The report's empty direct xrefs to `0xBFB310` do not negate the already
 verified virtual caller, and its numeric-VA byte observation does not
 supersede the caller's recorded global argument load. Concrete service
 implementation binding remains unresolved; it is not inferred from that load.
+
+## Final initialization dispatch is gated before the ready byte is published
+
+Raw `0xBFB8D6` calls the UI receiver's slot `+0xB0`, after `+0xA08`
+publication and before ready-byte `+0x672` write at `0xBFB8DC`.
+For constructor vptr VA `0x1C73EBC`, table raw `0x1872B6C` contains
+`90 06 00 01`, mapping VA `0x1000690` to raw `0xBFFA90`.
+The helper requires its slot-4 initialization check and ready byte.
+On the constructor-initialized path, ready is still zero at this call,
+so it returns without issuing the later component synchronization.
+The initializer ignores its return and then sets ready.
+
+When its gates pass, `0xBFFA90` can call component `+0x974`'s slot
+`+0x1C` with `(0,0)` or `(1,value)`; that return is also ignored.
+Concrete selection inputs and a post-ready caller are the next task.
+An indirect callee throwing before the ready store is not ruled out merely
+because no explicit throw was seen here. Runtime vptr substitution remains
+outside the constructor-table binding.
+
+The record sink's static constants and focused checks are now implemented
+in `UiManagerNativeLayout` and documented in `Startup.md`.
+Coordinator review corrected the eighth argument from a mistaken `+8`
+stack-offset label to ordinal 8 / frame offset `+0x24`, and corrected the
+getter source to **address addition** `getter()+0x48`, not a field load.
+Startup checks passed with those corrections; no wire format, grow policy,
+record meaning, or descriptor lifetime was inferred.
 
 The report's apparent VA lookup discrepancy is not a new mapping gap:
 the IDB is raw/base-zero and a numeric runtime VA must not be used directly
