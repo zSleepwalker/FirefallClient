@@ -11,8 +11,8 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are cursor-selection lookup-miss behavior
-and native record vector growth/publication.
+file-close path. Active boundaries are vector growth count reconstruction
+and exact allocation/max-count guard import bindings.
 UI lifecycle code/checks are committed.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
@@ -9937,6 +9937,36 @@ Cursor registration constants distinguish the registration method
 `0xBFD6D0` from an individual call site, and node payload store
 `0xC1675D` from its enclosing constructor. The delegated focused Startup
 run reported 858 passes and no failures.
+
+## Selection lookup miss shares completion; cache equality bypasses lookup
+
+Raw `0xBFF95E` compares UI `+0x990` with `+0x594`; equality bypasses
+lookup, flag updates, temporary cleanup, and synchronization.
+Otherwise the `+0x6C8` tree is searched once through
+`0xC21760/0xC21850`, with no alternate-name lookup found.
+Sentinel or zero payload reaches conditional logging at `0xBFFA0C`
+when the log threshold permits. Shared-text release at `0xBFFA21`
+precedes `+0x590` and `+0x594` updates and `0xBFFA3F`'s sync call.
+Miss is not a separate explicit-zero return. Exact zero-store/cache-return
+details are awaiting a bounded instruction clarification.
+
+## Record vector growth separates count arithmetic from failure guard behavior
+
+Raw `0xC97380` preserves an in-range source's record offset across
+`0xC978F0` growth and rebases before its four-DWORD copy.
+Growth uses `(end-begin)>>4` and `(capacity-begin)>>4`; required count
+is used plus one, guarded at maximum `0x0FFFFFFF`.
+If `max - floor(capacity/2) >= capacity`, it selects the larger of
+required and capacity plus half; otherwise it selects required.
+
+`0xC97FA0` requests count times sixteen through
+`0x12B7FB0 -> 0x12C8A20`, copies, frees old storage, then publishes
+capacity/end/begin. Null allocation reaches indirect IAT VA `0x1AC4424`;
+max-count paths also cross indirect guards. Their precise binding and
+nonreturn behavior must be resolved before claiming old-buffer failure
+preservation or continuation. A separate code task projects only bounded
+count selection, not allocation, pointer publication, or guard behavior.
+These are raw IDB addresses despite the report's VA labels.
 
 The report's apparent VA lookup discrepancy is not a new mapping gap:
 the IDB is raw/base-zero and a numeric runtime VA must not be used directly
