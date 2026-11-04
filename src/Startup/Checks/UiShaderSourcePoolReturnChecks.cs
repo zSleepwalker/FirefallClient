@@ -156,5 +156,27 @@ internal static class UiShaderSourcePoolReturnChecks
             && UiShaderSourcePoolReturnNativeLayout.Instructions.All(instruction =>
                 instruction.RawFileOffset != 0x12CCA5A
                 || instruction.TargetRawFileOffset is null));
+
+        uint[] boundaries = { 0, 1, 0x800, 0x80000000, uint.MaxValue };
+        bool independentCapturesMatch = true;
+        foreach (uint initialSpan in boundaries)
+        foreach (uint laterSpan in boundaries)
+        foreach (uint capacity in boundaries)
+        {
+            UiShaderSourcePoolReturnProjection projection =
+                UiShaderSourcePoolReturnNativeLayout.Project(
+                    0x1000, capacity, initialSpan, laterSpan, uint.MaxValue);
+            independentCapturesMatch &=
+                projection.NegatedLaterSpan == unchecked(0u - laterSpan)
+                && projection.PoolCounterAddress == 0x0F
+                && projection.Actions.Count(action =>
+                    action.Kind == UiShaderSourcePoolReturnActionKind.ReportHeaderSpanDiagnostic)
+                    == (initialSpan == 0 ? 0 : 1)
+                && projection.Actions.Count(action =>
+                    action.Kind == UiShaderSourcePoolReturnActionKind.ReportHeaderWord0Diagnostic)
+                    == (capacity == 0x800 ? 0 : 1);
+        }
+        check("Pool-return diagnostics and wrapping continuation preserve independent DWORD captures",
+            independentCapturesMatch);
     }
 }
