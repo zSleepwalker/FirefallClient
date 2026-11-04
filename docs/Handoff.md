@@ -11,7 +11,7 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are the cursor-observation reconstruction
+file-close path. Active boundaries are cursor-selection setter provenance
 and native producer helper `0xCCA190`'s exact derived arithmetic.
 UI lifecycle code/checks are committed.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
@@ -9789,6 +9789,18 @@ was identified; opaque virtual side effects remain possible.
 The report's VA `0x1696000` is arithmetic error: raw `0xC95400`
 maps to VA `0x1096000`. The successor follows only `0xCCA190`'s
 concrete output arithmetic, not the unresolved virtual targets.
+
+## Captured cursor observation is represented in reconstruction code
+
+The UI synchronization input now names the PE-verified outputs
+`CursorFlags` and `CursorHandle`, keeping the latter a 32-bit value.
+Layout constants preserve GetCursorInfo's IAT and CURSORINFO offsets.
+Focused checks retain exact zero/one comparisons, cover flags outside a
+byte and high-bit handle differences, and leave the other fields neutral.
+No WinAPI call or inferred zero-output-on-failure behavior is implemented.
+The delegated Startup checks reported 849 passes and no failures.
+The next bounded trace follows the cursor-selection setter's actual
+arguments and sources, not another pass over the resolved API binding.
 
 The report's apparent VA lookup discrepancy is not a new mapping gap:
 the IDB is raw/base-zero and a numeric runtime VA must not be used directly

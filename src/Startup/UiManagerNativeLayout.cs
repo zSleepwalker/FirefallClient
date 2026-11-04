@@ -27,8 +27,8 @@ public readonly record struct UiManagerStateSyncInput(
     uint Field588,
     uint Field584,
     byte Field598,
-    uint HelperOutput0,
-    uint HelperOutput1);
+    uint CursorFlags,
+    uint CursorHandle);
 
 public readonly record struct UiManagerStateSyncCall(byte Argument0, uint Argument1);
 
@@ -56,6 +56,14 @@ public static class UiManagerNativeLayout
     public const uint UiManagerStateSyncMethodFileOffset = 0xBFFA90;
     public const uint UiManagerStateSyncCallerMethodFileOffset = 0xBFF930;
     public const uint UiManagerStateSyncCallerCallSiteFileOffset = 0xBFFA3F;
+    public const uint UiManagerStateSyncGetCursorInfoIatVirtualAddress = 0x1AC4C24;
+    public const uint UiManagerStateSyncGetCursorInfoIatFileOffset = 0x16C3824;
+    public const int UiManagerStateSyncCursorInfoSize = 0x14;
+    public const int UiManagerStateSyncCursorInfoCbSizeOffset = 0;
+    public const int UiManagerStateSyncCursorInfoFlagsOffset = 4;
+    public const int UiManagerStateSyncCursorInfoCursorHandleOffset = 8;
+    public const int UiManagerStateSyncCursorInfoXOffset = 12;
+    public const int UiManagerStateSyncCursorInfoYOffset = 16;
     public const uint UiManagerDescriptorGetterCallSiteFileOffset = 0x30B1B4;
     public const int UiManagerInitializeDescriptorArgumentOrdinal = 8;
     public const int UiManagerInitializeDescriptorArgumentFrameOffset = 0x24;
@@ -230,10 +238,10 @@ public static class UiManagerNativeLayout
 
         if (input.Field670 == 0
             || (input.Field598 != 0
-                && (input.HelperOutput0 == 0 || input.HelperOutput1 != selected)))
+                && (input.CursorFlags == 0 || input.CursorHandle != selected)))
             return new(1, new UiManagerStateSyncCall(1, selected));
 
-        if (input.Field598 == 0 && input.HelperOutput0 == 1)
+        if (input.Field598 == 0 && input.CursorFlags == 1)
             return new(1, new UiManagerStateSyncCall(0, 0));
 
         return new(1, null);
