@@ -7157,7 +7157,7 @@ than assuming success guarantees all expected scratch bytes were produced.
 
 Raw `0xE984C0` reads the low 24 bits of the header DWORD at
 `[ECX+5]` as the declared extent and the high byte as the mode. It admits
-extents `0x7801..0x18000` and modes `0`, `1`, `15`, and `16`; other values
+extents `0x7801..0x18000` and modes `0`, `1`, `13`, `15`, and `16`; other values
 take the failure path at `0xE98881`. Mode dispatch is an indirect jump.
 
 For an admitted mode, the second stack argument is treated as an optional
@@ -7202,3 +7202,15 @@ raw `0xE41AF1`, writing descriptor `+0x5C`; publication does not
 guarantee that the original object becomes canonical.
 The next scope resolves console `+0xBC` at raw `0xE54DBA`
 and dispatch-readiness ordering before startup configuration/--cmd processing.
+
+## Console startup +0xBC target: corrected vtable arithmetic
+
+Startup raw `0xE54DBA` bytes `FF 90 BC 00 00 00` calls
+console vtable byte offset `+0xBC`, after registry registration and before
+the configuration/--cmd passes. Correct table backing is raw `0x1876AA8`;
+adding `0xBC` yields raw `0x1876B64`, containing **VA** `0x125BDC0`,
+target raw `0xE551C0`.
+The initial report used raw `0x187C564` by arithmetic error and interpreted
+unrelated bytes as an import thunk. That target/import interpretation is
+discarded; no readiness behavior follows from it.
+The next narrow scope inspects the actual target body.
