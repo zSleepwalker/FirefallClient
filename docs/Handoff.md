@@ -11,7 +11,7 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are mapped parser diagnostic operands
+file-close path. Active boundaries are PrintConfig echo-mode lifetime/output
 and protected VM catch/type routing.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
@@ -8513,3 +8513,26 @@ PE-aware string mapping before their text is assigned to these branches.
 The follow-up's unreadable-at-VA result does not establish missing strings.
 Console `+0xB0` is the previously byte-verified `0xE5AB80`, distinct
 from sink slot `+0xB4` / `0xE5AC70`; the two should not be conflated.
+
+## Parser diagnostic text and assignment feedback mapped from the PE
+
+Format **VA** `0x1BE26D4`, backed raw `0x17E12D4`, is
+`Unknown command "%s"`. Raw `0xE89E5E..0xE89E6A` supplies token 0
+after lookup failure unless the input starts `':'`.
+When global **VA** `0x1E49A59` is set, the alternate branch bypasses
+lookup and reports token 0, later tokens with `" %s"`
+(**VA** `0x1BE26EC`, raw `0x17E12EC`), then a CR-only string.
+The first token's exact format/argument forwarding and PrintConfig's mode
+lifetime are the next concrete check; do not assume literal-string escaping.
+
+Setter raw `0xE41360`, when `a4` is set, rejects metadata flag `0x200`
+with `"\"%s\" is a protected value and cannot be changed"`
+(**VA** `0x1BDDDA4`, raw `0x17DC9A4`), and flag `0x10`
+with the analogous read-only message (**VA** `0x1BDDD6C`,
+raw `0x17DC96C`). Each passes the variable name and returns before assignment.
+Mapped `%f` constants at raw `0x17DC964/0x17DC968/0x17DC99C`
+format numeric corrections.
+The deferred flag-`0x400` path stores/marks a latched value and can report
+`"The value has been latched"` (**VA** `0x1BDDD18`, raw `0x17DC918`),
+with no explicit third helper argument at that call.
+Immediate application has no explicit success message in this function.
