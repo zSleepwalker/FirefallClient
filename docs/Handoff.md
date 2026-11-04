@@ -10559,3 +10559,10 @@ report described only the final pushed value, not the full API argument
 frame. A bounded successor reconstructs the complete call arguments at
 raw `0xCA70FA/0xCA725A`; shader/key meanings remain unassigned until
 the pointer/length and literal arguments are verified.
+
+The combined immutable PE assertions for initializer AL gates, the known
+reporter-cell target and return bytes, terminal lookup predicates, and
+replacement-loop read/call/write ordering passed coordinator execution and
+are pushed. This closes their byte-regression integration, not the unresolved
+indirect targets. Active bounded work is compiler-call argument framing
+and failure-versus-shared scratch cleanup after the lookup gates.
