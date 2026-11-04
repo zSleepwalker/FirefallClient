@@ -7153,6 +7153,33 @@ The branch then performs fixed reconstruction and returns AL=1 through
 The next scope checks scratch initialization and fixed read extents rather
 than assuming success guarantees all expected scratch bytes were produced.
 
+## Mode-16 outer dispatch bounds scratch but does not initialize it
+
+Raw `0xE984C0` reads the low 24 bits of the header DWORD at
+`[ECX+5]` as the declared extent and the high byte as the mode. It admits
+extents `0x7801..0x18000` and modes `0`, `1`, `15`, and `16`; other values
+take the failure path at `0xE98881`. Mode dispatch is an indirect jump.
+
+For an admitted mode, the second stack argument is treated as an optional
+scratch pointer and the third as its available size: the function reuses the
+supplied pointer only when nonnull and the declared extent does not exceed
+that size. Otherwise it requests a buffer sized to the declared extent via
+`0x12C8A20`; a successful temporary allocation is released through
+`0x12C8D60` after dispatch. The caller-side mode-16 fixed reads are not
+identified by this outer wrapper alone.
+
+No scratch clearing is visible in raw `0xE984C0` before the mode handler.
+Its `0xE98881` failure path instead zeroes three separate output pointers,
+each for `0x4000` bytes, sets the return byte to zero, and releases a
+temporary scratch allocation if one was obtained. On a successful dispatch,
+the wrapper sets the return byte to one and frees only its temporary
+allocation; it has no produced-length equality check here. Consequently,
+this function does not establish whether bytes beyond each LZMA-produced
+prefix were preinitialized elsewhere or which bytes the mode-16
+reconstruction reads. The indirect mode-16 handler and its allocation
+helper remain the next bounded checks; do not infer fresh-allocation
+contents or a runtime outcome from this wrapper.
+
 ## Basename descriptor enters the pending list and startup console registry
 
 Constructor raw `0xDD51EB` loads pending head **VA** `0x1E48990`,
