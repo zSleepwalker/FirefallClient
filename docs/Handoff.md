@@ -12,7 +12,7 @@ are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
 file-close path. Active boundaries are PrintConfig echo-mode lifetime/output
-and protected VM catch/type routing.
+and protected VM status-specific stack/error recovery.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
 Normal native CRT return selects `exit(status)`.
@@ -8536,3 +8536,24 @@ The deferred flag-`0x400` path stores/marks a latched value and can report
 `"The value has been latched"` (**VA** `0x1BDDD18`, raw `0x17DC918`),
 with no explicit third helper argument at that call.
 Immediate application has no explicit success message in this function.
+
+## Protected VM wrapper catches C++ error transfer and returns status
+
+Raw `0xCD6C10` registers handler **VA** `0x1A508B0`,
+code raw `0x164FCB0`, which loads FuncInfo **VA** `0x1D648CC`
+and reaches MSVCR120 `__CxxFrameHandler3` via IAT `0x1AC4814`.
+The single try block covers states 0 through 0, catch-high 1, one handler.
+HandlerType **VA** `0x1D64914` has null type pointer and handler
+**VA** `0x10D786C`, raw `0xCD6C6C`: a C++ `catch(...)`.
+The catch preserves nonzero status, substitutes -1 for zero, and resumes at
+`0xCD6C7F`, the shared VM error-frame/counter restoration path.
+
+Raiser raw `0xCD6B70` calls MSVCR120 `_CxxThrowException`,
+IAT **VA** `0x1AC4770`, with ThrowInfo **VA** `0x1DB81FC`.
+Catchable type descriptors are `.PAUlua_longjmp@@` and `.PAX`,
+both 4-byte pointer types. The raiser first writes its error code to the
+installed frame's status slot. This error transfer is therefore caught and
+converted to the protected wrapper's returned status, rather than necessarily
+escaping the caller's borrowed-name interval.
+The metadata alone does not establish foreign/SEH exception translation or
+asynchronous-exception handling; those remain outside this resolved contract.
