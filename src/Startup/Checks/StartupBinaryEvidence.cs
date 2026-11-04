@@ -217,9 +217,20 @@ internal static class StartupBinaryEvidence
         }
         stream.Position = 0;
         check("Binary evidence reads the pinned FirefallClient PE sample without modifying it",
-            Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(stream))
+            stream.Length == 40197848
+            && Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(stream))
                 == "97362D668FF64778193A64759265E4AE90842043C4A15B627DF9902FD9135445");
         stream.Position = 0;
+        check("Binary shader scratch loop zeroes ESI, walks eight pairs using two ESP-indexed DWORD operands, and branches back to its first pair",
+            Matches(0xCA6F50,
+                "33F68B4CF42485C9740E8B0151FF5008C744F424000000008B4CF42885C9740E8B0151FF5008C744F428000000004683FE087CCE")
+            && Matches(0xCA6F52, "8B4CF424")
+            && Matches(0xCA6F68, "8B4CF428")
+            && ShortConditionalBranchTargets(0xCA6F82, 0x7C, 0xCA6F52));
+        check("Binary shader return-value sites set BL, clear BL, and copy BL into AL",
+            Matches(0xCA6F49, "B301")
+            && Matches(0xCA6FCF, "32DB")
+            && Matches(0xCA7061, "8AC3"));
         check("Binary UI child initializer first-helper failure clears field +0x6C and returns AL zero",
             RelativeBranchTargets(0xCA6A61, 0xE8, 0xCA6C20)
             && Matches(0xCA6A66, "84C0")
@@ -10930,5 +10941,61 @@ internal static class StartupBinaryEvidence
             && Matches(UiCursorCacheProjectionRules.VersionIncrementFileOffset, "FF8790090000")
             && Matches(UiCursorCacheProjectionRules.InvalidationWord988StoreFileOffset, "898788090000")
             && Matches(UiCursorCacheProjectionRules.InvalidationWord98CStoreFileOffset, "89878C090000"));
+
+        const uint d3dCompileIatVirtualAddress = 0x1AC40AC;
+        const uint vertexEntrypointVirtualAddress = 0x1BC45D8;
+        const uint pixelEntrypointVirtualAddress = 0x1BC45EC;
+        const uint vertexTargetVirtualAddress = 0x1BC4538;
+        const uint pixelTargetVirtualAddress = 0x1BC46A8;
+        check("Binary D3DCompile import and entrypoint/target strings map to their verified PE raw offsets",
+            VirtualAddressToFileOffset(d3dCompileIatVirtualAddress) == 0x16C2CAC
+            && IsImportSlot(d3dCompileIatVirtualAddress)
+            && ImportSlotNames(d3dCompileIatVirtualAddress, "D3DCompile")
+            && ImportSlotBelongsToModule(d3dCompileIatVirtualAddress, "D3DCOMPILER_43.dll")
+            && VirtualAddressToFileOffset(vertexEntrypointVirtualAddress) == 0x17C31D8
+            && VirtualAddressToFileOffset(pixelEntrypointVirtualAddress) == 0x17C31EC
+            && VirtualAddressToFileOffset(vertexTargetVirtualAddress) == 0x17C3138
+            && VirtualAddressToFileOffset(pixelTargetVirtualAddress) == 0x17C32A8
+            && ReadCStringAscii(vertexEntrypointVirtualAddress, 32) == "general_drawing_vs"
+            && ReadCStringAscii(pixelEntrypointVirtualAddress, 32) == "general_drawing_ps"
+            && ReadCStringAscii(vertexTargetVirtualAddress, 16) == "vs_3_0"
+            && ReadCStringAscii(pixelTargetVirtualAddress, 16) == "ps_3_0");
+        check("Binary vertex D3DCompile call passes its exact 11-argument stack layout and VS literals",
+            Matches(0xCA6D80, "5068D845BC018D44241C50E800030000")
+            && Matches(0xCA70BF,
+                "8D45108B7D0C8BCE508D45FCC745FC00000000508B066A006A00683845BC01576A006A006A00C7451000000000FF500C508B068BCE6A00FF500450FF15AC40AC01")
+            && Matches(0xCA7103, "85C07941"));
+        check("Binary pixel D3DCompile call passes its exact 11-argument stack layout and PS literals",
+            Matches(0xCA6D98, "8D4424308BCB5068EC45BC018D44241C50E842040000")
+            && Matches(0xCA721F,
+                "8D45108B7D0C8BCE508D45FCC745FC00000000508B066A006A0068A846BC01576A006A006A00C7451000000000FF500C508B068BCE6A00FF500450FF15AC40AC01")
+            && Matches(0xCA7263, "85C0793E"));
+        check("Binary vertex and pixel negative-HRESULT branches log through the error output and select it for common cleanup",
+            Matches(UiChildShaderBlobCleanupNativeLayout.VertexShaderHelperFileOffset + 0x73,
+                "85C0794185C9751B5768B046BC01686886E601E8D55365FF8B4D1083C40CE9B00000008B0151FF500C505768D446BC01686886E601E8B35365FF8B4D1083C410E98E000000")
+            && Matches(UiChildShaderBlobCleanupNativeLayout.PixelShaderHelperFileOffset + 0x73,
+                "85C0793E85C9751B57682446BC01686886E601E8755265FF8B4D1083C40CE9860000008B0151FF500C5057684846BC01686886E601E8535265FF8B4D1083C410EB67")
+            && ShortConditionalBranchTargets(0xCA7105, 0x79, 0xCA7148)
+            && ShortConditionalBranchTargets(0xCA7265, 0x79, 0xCA72A5)
+            && RelativeBranchTargets(0xCA7121, 0xE9, 0xCA71D6)
+            && RelativeBranchTargets(0xCA7143, 0xE9, 0xCA71D6)
+            && RelativeBranchTargets(0xCA7281, 0xE9, 0xCA730C)
+            && ShortConditionalBranchTargets(0xCA72A3, 0xEB, 0xCA730C));
+        check("Binary vertex and pixel nonnegative branches clean and clear the error output before code dispatch",
+            Matches(UiChildShaderBlobCleanupNativeLayout.VertexNonnegativeErrorBlobCleanupFileOffset - 7,
+                "85C9740D8B0151FF5008C74510000000008B75F8837E040074078B4DFC85C9751D6A0068F001000068F7B6B5016823B7B501FF15A05EC1018B4DFC83C4108B460453518B308B01FF500C508B45F8FF7004FF966C01000085")
+            && Matches(UiChildShaderBlobCleanupNativeLayout.PixelNonnegativeErrorBlobCleanupFileOffset - 7,
+                "85C9740D8B0151FF5008C74510000000008B45F8538B40048B308B45FC508B08FF510C508B45F8FF7004FF96A8010000")
+            && ShortConditionalBranchTargets(0xCA714A, 0x74, 0xCA7159)
+            && ShortConditionalBranchTargets(0xCA72A7, 0x74, 0xCA72B6));
+        check("Binary vertex and pixel accepted and terminal paths clean the selected code output and return AL",
+            Matches(UiChildShaderBlobCleanupNativeLayout.VertexAcceptedPredicateCodeBlobCleanupFileOffset - 0x11,
+                "781D833B0074188B4DFC85C974068B0151FF50085F5EB0015B8BE55DC20C0057688846BC01686886E601E8205365FF8B4DFC83C40C85C974068B0151FF50085F5E32C05B8BE55D")
+            && Matches(UiChildShaderBlobCleanupNativeLayout.PixelAcceptedPredicateCodeBlobCleanupFileOffset - 0x13,
+                "85C0781D833B0074188B4DFC85C974068B0151FF50085F5EB0015B8BE55DC20C0057686846BC01686886E601E8EA5165FF8B4DFC83C40C85C974068B0151FF50085F5E32C05B8BE55D")
+            && ShortConditionalBranchTargets(0xCA71A1, 0x78, 0xCA71C0)
+            && ShortConditionalBranchTargets(0xCA71A6, 0x74, 0xCA71C0)
+            && ShortConditionalBranchTargets(0xCA72D7, 0x78, 0xCA72F6)
+            && ShortConditionalBranchTargets(0xCA72DC, 0x74, 0xCA72F6));
     }
 }
