@@ -133,6 +133,8 @@ The child constructor at raw `0xCA6370` zeros fields `+0x64` and `+0x68` (`0xCA6
 
 The backing allocation continuation is projected separately by `UiChildBackingAllocationProjectionRules.ProjectAtContinuation`. A zero captured allocator result reaches the join at raw `0xCA6799` only if its diagnostic returns; without that captured return, the projection is absent. At the join, child `+0x64` receives the captured result (including zero), `+0x68` receives `0x20`, and `+0x6C` receives zero. The later diagnostic branch at `0xCA67B1` uses the comparison of child `+0x74`, not another allocation-success test. This is a captured continuation, not a native OOM implementation or a successful-initialization result.
 
+The child initializer's result is a separate captured two-helper gate in `UiChildInitializationResultProjectionRules`. A zero result from `0xCA6C20` (called at raw `0xCA6A61`) directly clears child `+0x6C`, returns zero, and skips the second helper. Otherwise it calls `0xCA6C80` at `0xCA6AA3` and normalizes its captured byte result to zero or one. Missing or impossible second-helper captures are rejected. The UI caller at `0xBFB542` tests this result: zero reaches the zero-result epilogue at `0xBFB668`, while nonzero continues initialization without yet setting ready `+0x672`. The projection does not infer indirect-helper side effects or treat continuation as full UI success.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves
