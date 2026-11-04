@@ -11247,3 +11247,32 @@ Exclusive PE writer `1c5dd201-df95-44cc-959a-9c60cd174adc` owns entry/
 callback assertions and preserves the reviewed config/loop additions.
 Actual callback instruction is raw `0x12CDDD4`, not the earlier
 stride report's `0x12CDDD3`.
+
+The entered iteration code is pushed at `ee95118`; complete registered
+and pinned checks passed immediately before the commit. Additional caller
+evidence confirms pool config triples `(12,8,1)` at raw `0x12C0254`
+with receiver `this+0x20`, and `(32,128,16)` at `0x12B9F95` with
+global receiver VA `0x1F113D8`. Shared text-pool singleton/accessor boundary
+is assigned read-only to `ec0e6602-3cd6-4eb3-85fb-9739e3de4d34`.
+
+Configuration code now separates entry args from later field reads and is
+registered. Its validation is temporarily blocked by a concurrently written
+reset-callback check syntax error, assigned back to that file's author.
+No unrelated files were changed to bypass the shared compile.
+Reset captured-pointer-array setup is the read-only next scope
+`060e2f95-a301-438e-b9ef-c58594f4f533`.
+Replenishment normal epilogue is bounded: both zero-bound skip and loop
+exhaustion reach raw `0x12CE1F5`, direct cookie call `0x12CE1FD`
+to `0x136AC96`, then RET at `0x12CE205` if the check returns.
+No normalized replenishment success result is established.
+
+Configuration and reset-entry code are reviewed, registered, and standard
+runner passes; pinned checks also passed the corrected config/loop/reset
+entry/callback PE windows. Reset finalization code is assigned to
+`2da97b87-5d7d-43c9-96b6-153b7cc2e27b`; exclusive PE writer
+`7d71eda9-f393-45b1-9785-4b3462a75925` preserves current additions and
+binds final counter clear, conditional temporary-buffer release and return.
+The normal reset return is `0x12CDE2E..0x12CDE43`; `0x12CDE54`
+is inside a separate backedge, not an epilogue.
+Reset callback projection awaits only corrected size/padding anchor labels
+and byte-slice checks before registration.
