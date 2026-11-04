@@ -393,3 +393,32 @@
   cadence is not established.
 - The teardown helper's completion-context cleanup behavior is observed, but
   cancellation guarantees for an in-flight WinHTTP operation are not proven.
+
+# Round 33: ClientApi route-worker pool growth
+
+## Observed
+- After pumping existing workers, `ClientApi_PumpRouteWorkers` considers
+  appending one worker when route field `+0x20` is nonzero, the count of workers
+  with nonzero completion field `+0x1C` is at least the current array length,
+  and that length is below
+  `*(DWORD *)(*(DWORD *)(route + 0x28) + 0x24)`.
+- The path allocates a `0x30`-byte worker, initializes it through
+  `0xBC27A0`, appends its pointer to the worker array through `0xBC55C0`, and
+  pumps it once through `ClientApi_PumpRequestWorker`. The pool gate, allocation
+  size, constructor/append/pump call targets, and modeled count boundaries are
+  checked against the original sample.
+- `ClientApi_PumpRouteWorkers` is called by `ClientApi_PumpRoutes` (`0xBC4550`),
+  which iterates route records and aggregates the per-route return values.
+  The pump-routes function has five code callers in the current IDB, including
+  `0x3813A0`, `0x388BD0`, `0xBBDB60`, `0xBDE510`, and `0xE99940`.
+
+## Interpreted
+- Growth is demand-driven and limited to one new worker per invocation of the
+  route-worker pump. The model captures only the observed gate and does not
+  assign application semantics to the route fields.
+
+## Unresolved
+- The meaning and configuration source of route `+0x20`, the object at
+  `route+0x28`, and its `+0x24` limit are unknown. The significance of a
+  nonzero worker `+0x1C` value for pool growth is recorded as a pointer/count
+  condition, not as a proven request-success state.

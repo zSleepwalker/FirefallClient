@@ -2340,6 +2340,25 @@ if (args.Length == 2)
             false, ClientApiRouteWorkerTimeoutLayout.TimeoutMicroseconds + 1, 0)
         && !ClientApiRouteWorkerTimeoutLayout.ShouldExpire(true, ulong.MaxValue, 0)
         && ClientApiRouteWorkerTimeoutLayout.ShouldExpire(false, 0, 1));
+    Check("ClientApi route pool appends one worker only when eligible and below its limit",
+        client.Matches(Red5LoggingBridgeNativeLayout.ClientApiRouteWorkerPoolGateRaw
+            + 0x400C00, "837E20000F869F0000008B4E042B0EC1F9023BD10F828F0000008B46283B48240F8383000000")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiRouteWorkerAllocationRaw
+            + 0x400C00, "6A30E8CD3E6F00")
+        && client.Calls(Red5LoggingBridgeNativeLayout.ClientApiRouteWorkerCtorCallRaw + 0x400C00,
+            Red5LoggingBridgeNativeLayout.ClientApiRouteWorkerCtorRaw + 0x400C00)
+        && client.Calls(Red5LoggingBridgeNativeLayout.ClientApiRouteWorkerAppendCallRaw + 0x400C00,
+            Red5LoggingBridgeNativeLayout.ClientApiRouteWorkerAppendRaw + 0x400C00)
+        && client.Calls(Red5LoggingBridgeNativeLayout.ClientApiRouteWorkerInitialPumpCallRaw
+            + 0x400C00, Red5LoggingBridgeNativeLayout.ClientApiPumpRequestWorkerRaw + 0x400C00)
+        && ClientApiRouteWorkerPoolLayout.EnabledOffset == 0x20
+        && ClientApiRouteWorkerPoolLayout.WorkerLimitOwnerOffset == 0x28
+        && ClientApiRouteWorkerPoolLayout.WorkerLimitOffsetFromOwner == 0x24
+        && ClientApiRouteWorkerPoolLayout.WorkerSize == 0x30
+        && ClientApiRouteWorkerPoolLayout.ShouldAppendWorker(true, 3, 3, 4)
+        && !ClientApiRouteWorkerPoolLayout.ShouldAppendWorker(true, 2, 3, 4)
+        && !ClientApiRouteWorkerPoolLayout.ShouldAppendWorker(true, 4, 4, 4)
+        && !ClientApiRouteWorkerPoolLayout.ShouldAppendWorker(false, 3, 3, 4));
     Check("Original ClientApi redirect callback cracks the target and replays stored headers once",
         client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiWinHttpCrackUrlImportVa,
             "WinHttpCrackUrl")

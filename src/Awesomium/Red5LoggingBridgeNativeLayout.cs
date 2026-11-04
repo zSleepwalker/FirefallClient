@@ -174,6 +174,18 @@ public static class ClientApiRouteWorkerTimeoutLayout
         !hasCompletion && unchecked(nowMicroseconds - startMicroseconds) > TimeoutMicroseconds;
 }
 
+public static class ClientApiRouteWorkerPoolLayout
+{
+    public const uint EnabledOffset = 0x20;
+    public const uint WorkerLimitOwnerOffset = 0x28;
+    public const uint WorkerLimitOffsetFromOwner = 0x24;
+    public const uint WorkerSize = 0x30;
+
+    public static bool ShouldAppendWorker(bool enabled, uint workersWithCompletion,
+        uint workerCount, uint workerLimit) =>
+        enabled && workersWithCompletion >= workerCount && workerCount < workerLimit;
+}
+
 /// <summary>
 /// Observed redirect header-replay gate. Host comparison models ASCII
 /// case-insensitivity; CRT locale-specific byte behavior is not simulated.
@@ -469,6 +481,13 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint ClientApiRouteWorkerPumpRaw = 0xBC3F80;
     public const uint ClientApiRouteWorkerCompletionGateRaw = 0xBC3FD0;
     public const uint ClientApiRouteWorkerTimeoutCheckRaw = 0xBC3FE2;
+    public const uint ClientApiRouteWorkerPoolGateRaw = 0xBC408C;
+    public const uint ClientApiRouteWorkerAllocationRaw = 0xBC40DC;
+    public const uint ClientApiRouteWorkerCtorCallRaw = 0xBC4101;
+    public const uint ClientApiRouteWorkerAppendCallRaw = 0xBC411A;
+    public const uint ClientApiRouteWorkerInitialPumpCallRaw = 0xBC4124;
+    public const uint ClientApiRouteWorkerCtorRaw = 0xBC27A0;
+    public const uint ClientApiRouteWorkerAppendRaw = 0xBC55C0;
     public const uint ClientApiRouteWorkerCtorTimestampSequenceRaw = 0xBC2831;
     public const uint ClientApiPumpRequestWorkerTimestampStoreRaw = 0xBC2C0F;
     public const uint ClientApiRequestResetTickOffset = 0x68;

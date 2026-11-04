@@ -513,3 +513,18 @@ Detailed ClientApi rounds moved here from [Handoff.md](Handoff.md) to keep the c
   at `0xBC2C0F`; that rewrite's cadence and the teardown helper's cancellation
   guarantees remain unresolved. Details and sample checks are in
   `LoginNetwork.md` Round 32.
+
+# Round 48: ClientApi route-worker pool growth
+
+- After pumping workers, `ClientApi_PumpRouteWorkers` considers appending one
+  when route field `+0x20` is nonzero, the count of workers with nonzero
+  completion field `+0x1C` is at least the worker-array length, and that length
+  is below `*(DWORD *)(*(DWORD *)(route + 0x28) + 0x24)`.
+- It allocates a `0x30`-byte worker, initializes it through `0xBC27A0`,
+  appends it with dynamic-array helper `0xBC55C0`, and pumps it once through
+  `ClientApi_PumpRequestWorker`. This gate allows at most one new worker in a
+  single invocation; the settings object's meaning remains unknown.
+- `ClientApi_PumpRouteWorkers` is called by `ClientApi_PumpRoutes`
+  (`0xBC4550`), which iterates route records and aggregates per-route return
+  values. The pool gate, worker allocation, and call targets are checked in
+  `LoginNetwork.md` Round 33 against the original sample.
