@@ -11327,3 +11327,13 @@ of begin, storage end, and end. Keep those cross-call reads independent.
 The current growth author must finish compile fixes before another
 serialized coordinator build; newly written incomplete check files have
 temporarily blocked otherwise ready callback/finalization integration.
+
+Pushed reviewed code batch `5bd7fc5` after serialized pinned validation:
+reset callback, reset finalization, reset alignment, sharedtext getter, and
+observed configuration caller cases. Append and growth checks are now also
+registered and pass with the pinned PE. The append compare is raw
+`0x12CDCFD`; `0x12CDCFF` is its branch, not the compare.
+Growth caller constants from unrelated raw `0x12CE575/0x12CE59B` are
+being removed before commit; append's own exact callsites are
+`0x12CDD06/0x12CDD28`. Remaining storage implementation is assigned to
+`3ddb246e-0de9-49b6-a2ee-72b0607dd814`.
