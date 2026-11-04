@@ -11578,3 +11578,27 @@ preserving an independently reloaded payload after the callback;
 `5d640a2c-fec8-4166-9283-ae0856abac8a` owns context append preparation,
 where payload+4 is a modulo-65536 cursor offset, not a length.
 Neither scope includes an entire parser or retry loop.
+
+Pushed `fb8a115`: fragment wrapper reconstruction and checks. Socket caller
+PE writer finished; coordinator removed one spurious zero byte from the
+mask instruction assertion and added actual mapping predicates to labels
+that previously only claimed a mapping. All nine new literal byte assertions
+independently match the pinned PE. Full runner is temporarily blocked by
+in-progress owner-callback mixed generic capture arguments; author notified.
+
+Additional bounded static trace Luna
+`aba1711c-0f5a-420f-97f0-c54e00223c00` covers the first branch at
+`0xBD40BF` for unsigned queue values at least 16, separate from small status
+cases assigned `a8a0a4bf-2db2-473f-ac39-f231952d61c5`.
+
+Context append preparation is reviewed/registered; 33 captured bytes match
+the sample and the pinned runner passes. Socket caller immutable assertions
+also pass after the shared callback file became compilable. Evidence is now
+exclusively assigned `ab0b788a-9380-472b-b7f6-73f85ffa1d43` for context
+and first-owner callback windows.
+
+Small-status implementation assigned Luna
+`26530961-d8b5-4a2f-a1f8-1ffa7e930ee7`. Important trace correction:
+case 3 diagnoses if predicate AL is zero **or** the independently read word
+is zero; AL zero branches directly to reporting, so that word is unreached.
+Do not copy the trace narrative's erroneous AND condition.
