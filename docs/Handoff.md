@@ -10,8 +10,9 @@ PrivateDialog receiver identification, AES "block-size" interpretation,
 and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
-Current delegated boundaries are startup formatting-depth pairing
-and assertion-exception handler registration/interception. Mode-16 fixed scatter and normal
+Current delegated boundaries are console formatting-gate activation
+and texture index-save serialization. Assertion interception is a bounded
+unresolved stop. Mode-16 fixed scatter and normal
 buffer release are resolved.
 Shutdown-request callers
 and texture writer dispatch/serialization are bounded unresolved stops,
@@ -7407,3 +7408,28 @@ Local return-capable control flow does not prove process outcome:
 vectored or outer reporting handlers can intervene. The next bounded
 scope looks for code `0x012ED502` recognition and actual registration,
 not an unconditional recovery claim.
+
+## Assertion-handler search finds only emitters and a continue-search VEH
+
+The bounded active-sample search for code bytes `02 D5 2E 01`
+found raw `0x12C36DB/0x12C396E`, both loading the exception code
+before calling `0x12C3470`, not recognizers.
+Local filter raw `0x12C350B` remains unconditional continue-execution.
+VEH registration at raw `0x125371A` supplies callback **VA**
+`0x1654570`, raw `0x1253970`; its `33 C0 C2 04 00`
+returns continue-search unconditionally.
+No code-specific interception policy is established. Computed/external
+handlers remain outside this bounded coverage; the gap is parked, not
+grounds for asserting either unconditional recovery or termination.
+
+## Startup success pairs depth increment with conditional decrement
+
+Service initialization raw `0xE54DB5..0xE54DBF` supplies the static
+console object's address and invokes +BC. Normal success calls the same
+object's +C0 at raw `0xE550F1`, targeting `0xE5B0D0`.
+Constructor raw `0xE5879A` zeros word object `+4`, while the
+decrement requires that gate nonzero. Post-increment failure exit at
+`0xE550A5` bypasses +C0; this function does not call +C4 reset.
+Thus call pairing is proven on success, not unconditional numeric balance.
+The next scope follows gate activation through the known depth reset at
+raw `0xE5D13E` and object `+4` assignment.
