@@ -236,5 +236,29 @@ internal static class UiShaderSourcePairReplacementChecks
         }
         check("The secondary count is supplied exactly when the first xadd reaches its secondary counter",
             invalidReachedCountsRejected);
+
+        UiShaderSourcePairReplacementCapture[] unreachableCaptures =
+        {
+            new(1, 2, 0, 0, 0, 1, null),
+            new(1, 2, 0, 0, 0, null, 1),
+            new(1, 2, 0, 0, 3, null, null),
+            new(1, 2, 0, 0, 3, 2, 1)
+        };
+        bool invalidCaptureMatrixRejected = true;
+        foreach (UiShaderSourcePairReplacementCapture capture in unreachableCaptures)
+        {
+            bool rejected = false;
+            try
+            {
+                UiShaderSourcePairReplacementProjectionRules.Project(capture);
+            }
+            catch (ArgumentException exception)
+            {
+                rejected = exception.ParamName == "capture";
+            }
+            invalidCaptureMatrixRejected &= rejected;
+        }
+        check("Pair replacement rejects missing reached counts and extra unreached counts",
+            invalidCaptureMatrixRejected);
     }
 }
