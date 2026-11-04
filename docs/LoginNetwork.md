@@ -435,7 +435,8 @@
   route manager at `this+116`, decrements the counter, and releases the lock.
   After the inner loop drains, it repeats while byte `this+5` remains nonzero.
 - The original sample checks cover the outer enable gate, stop check plus
-  3000-ms wait argument, and call from `0xBDE5F4` to `ClientApi_PumpRoutes`.
+  3000-ms wait argument, the `this+176` active-count compare/branch at
+  `0xBDE59A`, and the call from `0xBDE5F4` to `ClientApi_PumpRoutes`.
 
 ## Interpreted
 - The wait timeout is an argument to the event-wait call; it does not prove a

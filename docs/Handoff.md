@@ -614,8 +614,9 @@ helper calls against the original binary before committing and pushing.
   (size `0x394`), although Hex-Rays decompilation and payload semantics remain
   unresolved; this is not an unrecovered function boundary. Earlier
   `0x5536C0` / `0x5795A0` boundaries remain unresolved. See
-  `docs/MatrixConnection.md` for the complete 52-selector matrix, exact table
-  entries, constructor/vtable/RTTI snapshots, slot roles, and binary evidence.
+  `docs/MatrixSecondarySelectors.md` for the complete 52-selector matrix,
+  exact table entries, constructor/vtable/RTTI snapshots, slot roles, and
+  binary evidence.
   The keyed Character dialog dispatch is now mapped for `0x77..0x7A`:
   factory selector `0x02` is `BaseController` with `+0x04` at raw `0x540380`
   (not `0x54F4A0`); selector `0x03` is `NPCController` with `+0x04` at

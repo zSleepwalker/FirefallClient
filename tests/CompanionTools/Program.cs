@@ -2364,6 +2364,8 @@ if (args.Length == 2)
             + 0x400C00, "807E05000F84DE000000")
         && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiRoutePumpThreadStopWaitRaw
             + 0x400C00, "807E04000F859C00000068B80B0000")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiRoutePumpThreadActiveRouteGateRaw
+            + 0x400C00, "83BEB0000000007675")
         && client.Calls(Red5LoggingBridgeNativeLayout.ClientApiRoutePumpThreadPumpCallRaw
             + 0x400C00, Red5LoggingBridgeNativeLayout.ClientApiPumpRoutesRaw + 0x400C00)
         && ClientApiRoutePumpThreadLayout.EnabledOffset == 5

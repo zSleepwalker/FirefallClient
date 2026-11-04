@@ -538,6 +538,8 @@ Detailed ClientApi rounds moved here from [Handoff.md](Handoff.md) to keep the c
   `this+168`, calls `ClientApi_PumpRoutes` with the manager at `this+116`,
   decrements the counter, and unlocks. It repeats after the active count
   drains, subject to the outer enable gate.
+- CompanionTools now checks the exact active-count compare/branch bytes at
+  `0xBDE59A` as well as the surrounding gates and PumpRoutes call edge.
 - The wait timeout is not evidence of a fixed 3-second pump cadence. Field
   meanings, wait identity, active-count source, and the invocation schedule of
   the separate global-lock caller `0xE99940` remain unresolved.

@@ -502,6 +502,7 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint ClientApiRoutePumpThreadRaw = 0xBDE510;
     public const uint ClientApiRoutePumpThreadEnabledGateRaw = 0xBDE53E;
     public const uint ClientApiRoutePumpThreadStopWaitRaw = 0xBDE580;
+    public const uint ClientApiRoutePumpThreadActiveRouteGateRaw = 0xBDE59A;
     public const uint ClientApiRoutePumpThreadPumpCallRaw = 0xBDE5F4;
     public const uint ClientApiRequestResetTickOffset = 0x68;
     public const uint ClientApiRequestTrackedTickOffset = 0x6C;
