@@ -10763,3 +10763,24 @@ reads the new header's `+4` field on the positive preserve-copy path;
 `0x12CBDFD`, `0x12CBE07`, `0x12CBE15`.
 These conditional captured-null observations are being recorded as static
 access-order evidence, not a clean failure emulation or inevitable runtime fault.
+
+## Initial-zero versus cap-zero and zero-resize fast-path distinction
+
+The post-setup follow-up also found an earlier initial-size zero test at
+`0x12BB3C8`: initially zero skips the receiver setup, while a positive
+initial size capped to zero calls slot `+0x1C` before skipping the read loop.
+Both normal tails return one; setup's return is not tested.
+Thus neither blanket "zero skips setup" nor "all zero requests call setup"
+describes both paths. A captured two-input setup/read plan is assigned.
+
+The zero-resize trace similarly distinguishes branches: a unique/aligned
+in-place path can set logical length zero without detaching; only the
+replacement zero path clears wrapper `+8/+4` then releases saved control.
+Slot `+0x14` resolves to raw `0x12CBA00`, calling resize `(0,0)`.
+The reported atomic-count test is under exact verification before acceptance.
+
+The slow-preserve instruction evidence is integrated and pushed. Coordinator
+review corrected concatenated code addresses `0x12CBDFD8/0x12CBE078/
+0x12CBE158` to `0x12CBDFD/0x12CBE07/0x12CBE15`, corrected the
+compare to `0x12CBDDF`, and separated allocation call versus target names.
+Independent immutable PE checks of those anchors remain active.
