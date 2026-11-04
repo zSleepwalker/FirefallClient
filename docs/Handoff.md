@@ -10526,3 +10526,22 @@ terminal path and otherwise zero. Global `0x1AC40AC` belongs to the
 earlier query stage, not normalization of this terminal EAX result.
 The active binary integration now includes these exact tests; one bounded
 successor checks only the first-stage adapter identity and call contract.
+
+## Success pair replacement consumes scratch pairs and preserves callout ordering
+
+The bounded replacement trace establishes eight iterations, destination
+pair offsets `+0x24/+0x28` through `+0x5C/+0x60`, and stride eight.
+The new values come from sixteen consecutive scratch DWORDs, not a
+broadcast pair. Scratch pair zero remains zero from the earlier
+sixty-four-byte zeroing. Other pairs contain opaque lookup outputs and
+some repeated captured values; explicit virtual `+4` calls precede
+some scratch duplications, without establishing an ownership contract.
+
+The old first field is read and conditionally dispatched through slot `+8`
+before the second old field is read. That second read precedes the first
+new store (`0xCA6F0A`); its conditional slot `+8` call/clear precedes
+the second new store (`0xCA6F22`). Both new stores are unconditional
+within a reached iteration. An atomic snapshot of all old fields would
+erase this callout/read ordering. The active projection therefore covers
+only captured scratch values and destination writes, not native releases
+or mutation safety; exact loop byte checks are assigned separately.
