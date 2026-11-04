@@ -10671,3 +10671,22 @@ The report's numeric-VA `0x08080808` fill is not an import identity;
 a bounded immutable PE binding is assigned instead. IDA EAs here
 are raw file offsets, not RVAs despite that report's mixed label.
 No transfer semantics are inferred until the import is resolved.
+
+## Corrected wrapper binding and combined compiler PE integration
+
+The corrected wrapper trace confirms vtable VA `0x1C80CC4`
+at raw `0x187F8C4`. Slot `+4` contains VA `0x16CC560`,
+raw code `0x12CB960`; slot `+0xC` contains VA `0x16CC5C0`,
+raw code `0x12CB9C0`. The latter returns zero for null wrapper
+backing at `+4`, otherwise reads backing DWORD `+0xC`.
+The former uses that size and an explicit argument before returning
+backing data `+4` plus the argument or null; exact compile-site
+argument/default resize behavior is a bounded successor, not assumed.
+A captured size projection is assigned.
+
+The combined PE checks for compiler IAT/literals/full argument frames,
+scratch failure-loop geometry, and selected code/error blob cleanup
+all passed coordinator execution and are committed/pushed.
+This closes their regression integration. Active boundaries are wrapper
+size projection, exact virtual-`+4` argument behavior, and loader chunk
+import identity; the earlier resource-mapping gap remains rejected.
