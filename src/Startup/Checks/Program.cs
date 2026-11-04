@@ -72,6 +72,7 @@ SocketHeaderCaseContinuationChecks.Run(Check);
 ReliableReceiveEntryChecks.Run(Check);
 UnreliableReceiveEntryChecks.Run(Check);
 ReliableReceiveDeltaGateChecks.Run(Check);
+UnreliableReceiveDeltaGateChecks.Run(Check);
 SharedTextPoolSingletonChecks.Run(Check);
 UiShaderSourcePoolTeardownChecks.Run(Check);
 UiShaderSourcePoolSingletonDestructorChecks.Run(Check);

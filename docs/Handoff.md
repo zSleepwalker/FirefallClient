@@ -11778,3 +11778,14 @@ at least `8000`; fallthrough is `BE5A86`. Luna code owner is
 `f8bf2a36-6be5-4548-b62b-7d68d14e54e6`; PE owner is
 `cdd2ca10-07ba-47e4-85b0-06959e4ec581`, preserving all pending entry/gate
 anchors. Latest ordinary pinned runner passes.
+
+Pushed `bffc19a` for reliable delta code. Case-three delta is now reviewed,
+registered and passes exhaustive 65,536 residues including signed/DWORD
+comparison boundaries. Full exact delta window independently matches PE.
+All pending continuation/receive-entry/delta immutable anchors are reviewed
+and pass the pinned runner; exclusive evidence ownership is released.
+Luna `e30a7b4a-2904-4c60-b787-41573107accd` owns the next bounded helper
+projection at `BE2F50`: null arg0 skips its signed threshold compare but
+still forwards; nonnull arg0 and signed arg1 below [arg0+4] returns without
+setting EAX. Forwarding passes arg2 and the stack-tail address, not a parsed
+format. Raw `BE526C` maps to VA `FE5E6C`; ignore the trace typo `FE62EC`.

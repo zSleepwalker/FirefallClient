@@ -60,6 +60,18 @@ internal static class StartupBinaryEvidence
                 && offset + 2 + (sbyte)instruction[1] == target;
         }
 
+        bool RawCodeRangeMaps(long rawOffset, int length)
+        {
+            if (length <= 0)
+                return false;
+
+            long lastRawOffset = rawOffset + length - 1;
+            uint firstVirtualAddress = checked((uint)(rawOffset + 0x400C00));
+            uint lastVirtualAddress = checked((uint)(lastRawOffset + 0x400C00));
+            return VirtualAddressToFileOffset(firstVirtualAddress) == rawOffset
+                && VirtualAddressToFileOffset(lastVirtualAddress) == lastRawOffset;
+        }
+
         uint peOffset = ReadUInt32(0x3C);
         ushort sectionCount = BinaryPrimitives.ReadUInt16LittleEndian(ReadAt(peOffset + 6, 2));
         ushort optionalHeaderSize = BinaryPrimitives.ReadUInt16LittleEndian(ReadAt(peOffset + 20, 2));
@@ -6728,6 +6740,45 @@ internal static class StartupBinaryEvidence
             && RelativeBranchTargets(0xBD419B, 0xE8, 0xBE51F0)
             && RelativeBranchTargets(0xBD41C7, 0xE8, 0xBD5C00)
             && RelativeBranchTargets(0xBD41CE, 0xE8, 0xBE5A40));
+        check("Binary socket-header post-getter windows preserve exact bytes, call targets, and AL branches",
+            RawCodeRangeMaps(0xBD4166, 0x0F)
+            && Matches(0xBD4166, "8BC8E88310010084C00F85EBFCFFFF")
+            && RelativeBranchTargets(0xBD4168, 0xE8, 0xBE51F0)
+            && RelativeConditionalBranchTargets(0xBD416F, 0x0F, 0x85, 0xBD3E60)
+            && RawCodeRangeMaps(0xBD4199, 0x0F)
+            && Matches(0xBD4199, "8BC8E85010010084C00F85B8FCFFFF")
+            && RelativeBranchTargets(0xBD419B, 0xE8, 0xBE51F0)
+            && RelativeConditionalBranchTargets(0xBD41A2, 0x0F, 0x85, 0xBD3E60)
+            && RawCodeRangeMaps(0xBD41CC, 0x0F)
+            && Matches(0xBD41CC, "8BC8E86D18010084C00F8585FCFFFF")
+            && RelativeBranchTargets(0xBD41CE, 0xE8, 0xBE5A40)
+            && RelativeConditionalBranchTargets(0xBD41D5, 0x0F, 0x85, 0xBD3E60));
+        check("Binary header diagnostic entry has exact raw window, branch targets, and AL-only early return",
+            RawCodeRangeMaps(0xBE51F0, 0x37)
+            && Matches(0xBE51F0, "558BEC53568BF157807E0C00751A6A0068DA010000687A8BB501687B8BB501FF15A05EC10183C410807E1C00740932C05F5E5B5DC20400")
+            && Matches(0xBE51F5, "8BF1")
+            && Matches(0xBE51F8, "807E0C00")
+            && ShortConditionalBranchTargets(0xBE51FC, 0x75, 0xBE5218)
+            && Matches(0xBE520F, "FF15A05EC101")
+            && ReadUInt32(0xBE5211) == 0x01C15EA0
+            && Matches(0xBE5218, "807E1C00")
+            && ShortConditionalBranchTargets(0xBE521C, 0x74, 0xBE5227)
+            && Matches(0xBE521E, "32C0")
+            && Matches(0xBE5224, "C20400"));
+        check("Binary modular word-delta gate preserves its exact 40-byte raw window, mapped VA, operands, and unsigned branch",
+            0xBE5227 + 0x400C00 == 0xFE5E27
+            && 0xBE524F + 0x400C00 == 0xFE5E4F
+            && 0xBE524F - 0xBE5227 == 0x28
+            && RawCodeRangeMaps(0xBE5227, 0x28)
+            && Matches(0xBE5227, "8B7D080FB757028D4F020FB75E2A8BC22BC3C74508FF7E00000FB7D88D8300FFFFFF663B45087740")
+            && Matches(0xBE522A, "0FB75702")
+            && Matches(0xBE5231, "0FB75E2A")
+            && Matches(0xBE5235, "8BC22BC3")
+            && Matches(0xBE5239, "C74508FF7E0000")
+            && Matches(0xBE5240, "0FB7D88D8300FFFFFF")
+            && Matches(0xBE5249, "663B4508")
+            && 0xBE524D + 2 == 0xBE524F
+            && ShortConditionalBranchTargets(0xBE524D, 0x77, 0xBE528F));
         check("Binary internal receive-queue event tokens are produced by close, error, and sender-binding paths",
             Matches(0xBD2D59, "6A018D8E60020000")
             && RelativeBranchTargets(0xBD2D68, 0xE8, 0x12CE310)
@@ -12374,5 +12425,47 @@ internal static class StartupBinaryEvidence
             && Matches(0xBBFB5A, "89460C")
             && Matches(0xBBFB5D, "8935A8B0E401")
             && Matches(0xBBFB63, "C6460401"));
+
+        const uint rawStartupDiagnosticEntryGuardFileOffset = 0xBE5A40;
+        const uint rawStartupDiagnosticEntryGuardEndFileOffset = 0xBE5A6B;
+        const int startupDiagnosticEntryGuardLength =
+            (int)(rawStartupDiagnosticEntryGuardEndFileOffset - rawStartupDiagnosticEntryGuardFileOffset);
+        const uint startupDiagnosticEntryGuardCodeVirtualAddress =
+            rawStartupDiagnosticEntryGuardFileOffset + 0x400C00;
+        check("Binary startup diagnostic entry guard [raw 0xBE5A40, 0xBE5A6B) length 0x2B maps by raw+0x400C00 to code VA [0xFE6640, 0xFE666B), preserves every byte, skips reporting on nonzero [EDI+0x0C], and otherwise passes (0, 0x2AF, 0x1B58C2F, 0x1B58C3D) through slot 0x1C15EA0 before stack cleanup",
+            startupDiagnosticEntryGuardLength == 0x2B
+            && startupDiagnosticEntryGuardCodeVirtualAddress == 0xFE6640
+            && startupDiagnosticEntryGuardCodeVirtualAddress + startupDiagnosticEntryGuardLength == 0xFE666B
+            && RawCodeRangeMaps(rawStartupDiagnosticEntryGuardFileOffset, startupDiagnosticEntryGuardLength)
+            && VirtualAddressToFileOffset(startupDiagnosticEntryGuardCodeVirtualAddress)
+                == rawStartupDiagnosticEntryGuardFileOffset
+            && Matches(rawStartupDiagnosticEntryGuardFileOffset,
+                "558BEC83EC085356578BF9807F0C00751A6A0068AF020000682F8CB501683D8CB501FF15A05EC10183C410")
+            && Matches(rawStartupDiagnosticEntryGuardFileOffset + 0x0B, "807F0C00")
+            && ShortConditionalBranchTargets(rawStartupDiagnosticEntryGuardFileOffset + 0x0F, 0x75,
+                rawStartupDiagnosticEntryGuardEndFileOffset)
+            && Matches(rawStartupDiagnosticEntryGuardFileOffset + 0x11,
+                "6A0068AF020000682F8CB501683D8CB501")
+            && Matches(rawStartupDiagnosticEntryGuardFileOffset + 0x22, "FF15A05EC101")
+            && Matches(rawStartupDiagnosticEntryGuardFileOffset + 0x28, "83C410"));
+
+        const uint rawStartupReceiverPayloadWordDeltaFileOffset = 0xBE5A6B;
+        const int startupReceiverPayloadWordDeltaLength = 0x1B;
+        const uint startupReceiverPayloadWordDeltaCodeVirtualAddress =
+            rawStartupReceiverPayloadWordDeltaFileOffset + 0x400C00;
+        check("Binary startup receiver/payload word delta masks to 16 bits before signed JGE, equivalent to residue >= 0x8000",
+            startupReceiverPayloadWordDeltaCodeVirtualAddress == 0xFE666B
+            && startupReceiverPayloadWordDeltaCodeVirtualAddress + startupReceiverPayloadWordDeltaLength == 0xFE6686
+            && RawCodeRangeMaps(rawStartupReceiverPayloadWordDeltaFileOffset, startupReceiverPayloadWordDeltaLength)
+            && Matches(rawStartupReceiverPayloadWordDeltaFileOffset,
+                "8B5D080FB7571E8BC20FB74B022BC125FFFF00003D008000007D3C")
+            && Matches(rawStartupReceiverPayloadWordDeltaFileOffset + 0x03, "0FB7571E")
+            && Matches(rawStartupReceiverPayloadWordDeltaFileOffset + 0x09, "0FB74B02")
+            && Matches(rawStartupReceiverPayloadWordDeltaFileOffset + 0x0D, "2BC1")
+            && Matches(rawStartupReceiverPayloadWordDeltaFileOffset + 0x0F, "25FFFF0000")
+            && Matches(rawStartupReceiverPayloadWordDeltaFileOffset + 0x14, "3D00800000")
+            && ShortConditionalBranchTargets(rawStartupReceiverPayloadWordDeltaFileOffset + 0x19,
+                0x7D, 0xBE5AC2)
+            && rawStartupReceiverPayloadWordDeltaFileOffset + startupReceiverPayloadWordDeltaLength == 0xBE5A86);
     }
 }
