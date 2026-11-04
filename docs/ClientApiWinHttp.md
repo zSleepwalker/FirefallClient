@@ -528,3 +528,16 @@ Detailed ClientApi rounds moved here from [Handoff.md](Handoff.md) to keep the c
   (`0xBC4550`), which iterates route records and aggregates per-route return
   values. The pool gate, worker allocation, and call targets are checked in
   `LoginNetwork.md` Round 33 against the original sample.
+
+# Round 49: ClientApi route-pump thread loop
+
+- Routine `0xBDE510` enters its outer loop only when byte `this+5` is nonzero.
+  Each iteration calls a wait function with an event at `this+172` and timeout
+  3000 ms, then checks stop byte `this+4`.
+- While DWORD `this+176` is nonzero, it locks `this+120`, increments
+  `this+168`, calls `ClientApi_PumpRoutes` with the manager at `this+116`,
+  decrements the counter, and unlocks. It repeats after the active count
+  drains, subject to the outer enable gate.
+- The wait timeout is not evidence of a fixed 3-second pump cadence. Field
+  meanings, wait identity, active-count source, and the invocation schedule of
+  the separate global-lock caller `0xE99940` remain unresolved.

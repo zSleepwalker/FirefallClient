@@ -186,6 +186,14 @@ public static class ClientApiRouteWorkerPoolLayout
         enabled && workersWithCompletion >= workerCount && workerCount < workerLimit;
 }
 
+public static class ClientApiRoutePumpThreadLayout
+{
+    public const uint EnabledOffset = 5;
+    public const uint StopOffset = 4;
+    public const uint WaitTimeoutMilliseconds = 3000;
+    public const uint ActiveRouteCountOffset = 176;
+}
+
 /// <summary>
 /// Observed redirect header-replay gate. Host comparison models ASCII
 /// case-insensitivity; CRT locale-specific byte behavior is not simulated.
@@ -490,6 +498,11 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint ClientApiRouteWorkerAppendRaw = 0xBC55C0;
     public const uint ClientApiRouteWorkerCtorTimestampSequenceRaw = 0xBC2831;
     public const uint ClientApiPumpRequestWorkerTimestampStoreRaw = 0xBC2C0F;
+    public const uint ClientApiPumpRoutesRaw = 0xBC4550;
+    public const uint ClientApiRoutePumpThreadRaw = 0xBDE510;
+    public const uint ClientApiRoutePumpThreadEnabledGateRaw = 0xBDE53E;
+    public const uint ClientApiRoutePumpThreadStopWaitRaw = 0xBDE580;
+    public const uint ClientApiRoutePumpThreadPumpCallRaw = 0xBDE5F4;
     public const uint ClientApiRequestResetTickOffset = 0x68;
     public const uint ClientApiRequestTrackedTickOffset = 0x6C;
     public const uint ClientApiRequestOpenTickOffset = 0x70;

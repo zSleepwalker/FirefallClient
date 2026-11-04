@@ -2359,6 +2359,17 @@ if (args.Length == 2)
         && !ClientApiRouteWorkerPoolLayout.ShouldAppendWorker(true, 2, 3, 4)
         && !ClientApiRouteWorkerPoolLayout.ShouldAppendWorker(true, 4, 4, 4)
         && !ClientApiRouteWorkerPoolLayout.ShouldAppendWorker(false, 3, 3, 4));
+    Check("ClientApi route-pump thread waits and pumps routes while active",
+        client.Matches(Red5LoggingBridgeNativeLayout.ClientApiRoutePumpThreadEnabledGateRaw
+            + 0x400C00, "807E05000F84DE000000")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiRoutePumpThreadStopWaitRaw
+            + 0x400C00, "807E04000F859C00000068B80B0000")
+        && client.Calls(Red5LoggingBridgeNativeLayout.ClientApiRoutePumpThreadPumpCallRaw
+            + 0x400C00, Red5LoggingBridgeNativeLayout.ClientApiPumpRoutesRaw + 0x400C00)
+        && ClientApiRoutePumpThreadLayout.EnabledOffset == 5
+        && ClientApiRoutePumpThreadLayout.StopOffset == 4
+        && ClientApiRoutePumpThreadLayout.WaitTimeoutMilliseconds == 3000
+        && ClientApiRoutePumpThreadLayout.ActiveRouteCountOffset == 176);
     Check("Original ClientApi redirect callback cracks the target and replays stored headers once",
         client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiWinHttpCrackUrlImportVa,
             "WinHttpCrackUrl")

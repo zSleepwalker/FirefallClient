@@ -422,3 +422,28 @@
   `route+0x28`, and its `+0x24` limit are unknown. The significance of a
   nonzero worker `+0x1C` value for pool growth is recorded as a pointer/count
   condition, not as a proven request-success state.
+
+# Round 34: ClientApi route-pump thread loop
+
+## Observed
+- Worker-thread routine `0xBDE510` enters its outer loop only when byte
+  `this+5` is nonzero. Each iteration calls a wait function with an event
+  handle from `this+172` and timeout `3000` milliseconds, then exits if byte
+  `this+4` is set.
+- While DWORD `this+176` is nonzero, the routine acquires the route lock at
+  `this+120`, increments `this+168`, calls `ClientApi_PumpRoutes` with the
+  route manager at `this+116`, decrements the counter, and releases the lock.
+  After the inner loop drains, it repeats while byte `this+5` remains nonzero.
+- The original sample checks cover the outer enable gate, stop check plus
+  3000-ms wait argument, and call from `0xBDE5F4` to `ClientApi_PumpRoutes`.
+
+## Interpreted
+- The wait timeout is an argument to the event-wait call; it does not prove a
+  fixed 3-second pump interval. Route pumping occurs only while the observed
+  active-count field is nonzero, subject to the surrounding wait/stop gates.
+
+## Unresolved
+- The thread object's field meanings beyond their observed uses, wait function
+  identity, and the source of the route-active count are not established.
+- `ClientApi_PumpRoutes` also has a separately observed global-lock caller at
+  `0xE99940`; its call schedule is not determined here.
