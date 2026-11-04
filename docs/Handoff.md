@@ -11,8 +11,8 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path; the frame collection behind DumpKeyComboThread's traceback
-logging remains the active boundary.
+file-close path. Active boundaries are service/console deinitialization state
+after that close and VM-frame insertion/removal behind DumpKeyComboThread's traceback.
 Normal native CRT return selects `exit(status)`.
 Exit registration and its logger cleanup predicate are resolved.
 Generic wrapper field `+8` is a duplicated diagnostic label:
@@ -8188,3 +8188,22 @@ cleanup then continues past shutdown and returns at `0x2EB2FF`.
 position in the chain, not that the FILE globals remain null after every later
 operation. The separate service `+0x64` clearing `+0xB4` is not restoration of
 category callback slot **VA** `0x1DF96F8`.
+
+## Traceback enumerates VM frames and requests line/source/name metadata
+
+The raw `0xC294A0` traversal is a VM-context frame walk, not an OS stack
+walk. For control string `"lnS"`, formatter raw `0xCCFB20` dispatches
+`l` to raw `0xCCF500`: it computes a line-table index from node PC `+0x14`
+relative to prototype code `+0x30`, then reads prototype line table `+0x38`.
+`S` calls raw `0xCCF840` for source metadata from the value's prototype;
+`n` calls raw `0xCCFF50` under node-flag conditions.
+
+Correction to the earlier formatter summary: raw `0xCCF8C0` is gated
+by uppercase `L`, absent from `"lnS"`. Appending the value is separately
+gated by `f`, also absent here. Thus the generic tag-6/helper path is not
+evidence that this traceback requests it.
+The leading-`C` filter examines the local metadata field returned by this
+formatting path; later `C` entries are emitted after the first non-`C`.
+Exact field layout and frame insertion/removal remain separate questions.
+The concrete metadata operations support active script-frame interpretation,
+but do not by themselves establish Lua version or complete frame lifetime.
