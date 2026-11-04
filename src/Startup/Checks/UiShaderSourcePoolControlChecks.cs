@@ -134,5 +134,18 @@ internal static class UiShaderSourcePoolControlChecks
             outputPairCountsMatch && outputWriteOrderAndValuesMatch);
         check("Shader-source control projection keeps Project(header, control) Pool-compatible",
             defaultProjectPreservesPoolBehavior);
+
+        bool invalidVariantRejected = false;
+        try
+        {
+            UiShaderSourcePoolControlProjectionRules.Project(
+                0, 0, (UiShaderSourcePoolControlVariant)int.MaxValue);
+        }
+        catch (ArgumentOutOfRangeException exception)
+        {
+            invalidVariantRejected = exception.ParamName == "variant";
+        }
+        check("Control initialization rejects unobserved variants even for null captured pointers",
+            invalidVariantRejected);
     }
 }
