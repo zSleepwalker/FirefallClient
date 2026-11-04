@@ -11008,3 +11008,11 @@ anchors are pushed at `ce70d1b`; the pinned-sample runner passes.
 Pooled candidate and singleton publication code/PE remain active, alongside
 one bounded wrapper-copy trace. The PE file is now exclusively assigned
 to `d508d7b1-3120-4dd7-962a-d0628cc0f638` until its completion.
+
+Captured pool-candidate initialization is registered and pushed at
+`0354ef2`. Singleton publication code and candidate/publication PE checks
+remain active. A bounded copy-constructor trace selected raw `0x12CB7F0`:
+destination vptr and zero pair precede helper `0x12CC430`; source
+alignment is read later. Captured constructor code and the old-destination
+assignment-order trace have separate assignments; no deep backing copy
+or atomic source snapshot is inferred.
