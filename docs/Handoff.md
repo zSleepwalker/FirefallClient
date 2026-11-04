@@ -10,8 +10,8 @@ PrivateDialog receiver identification, AES "block-size" interpretation,
 and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
-Current delegated boundaries are console formatting-gate activation
-and texture index-save serialization. Assertion interception is a bounded
+Current delegated boundaries are console output-sink initialization
+and texture index extra-slot semantics. Assertion interception is a bounded
 unresolved stop. Mode-16 fixed scatter and normal
 buffer release are resolved.
 Shutdown-request callers
@@ -7433,3 +7433,44 @@ decrement requires that gate nonzero. Post-increment failure exit at
 Thus call pairing is proven on success, not unconditional numeric balance.
 The next scope follows gate activation through the known depth reset at
 raw `0xE5D13E` and object `+4` assignment.
+
+## Console activation precedes startup's formatting increment/decrement
+
+Console constructor raw `0xE5879A` zeros word **VA** `0x1E6934C`.
+Service init raw `0xE54C67` invokes console vtable slot zero,
+whose raw `0x1876AA8` bytes `90 D9 25 01` target
+**VA** `0x125D990`, raw `0xE5CD90`.
+That initializer preserves this in EBX and resets depth at `0xE5D13E`,
+then raw `0xE5D148`, bytes `C6 43 04 01`, sets object byte
+`+4` to 1 without changing its adjacent byte.
+This activation precedes startup increment `0xE54DBA`, success
+decrement `0xE550F1`, and intervening failure exits.
+Failure exit `0xE550A5` itself neither decrements nor clears the gate;
+an earlier branch can reach it before activation. Intervening indirect
+callees have not been exhaustively checked for later mutation.
+
+## Texture index save mirrors outer reads and excludes extra allocated slot
+
+Writer raw `0xE9DE10` (VA `0x129EA10`) serializes version 1,
+N=`[owner+0x184C]`, then exactly N records of `0x4C` bytes from
+`[owner+0x1848]`, without skipping a leading record.
+Reader allocates N+1 but reads N, so extra slot index N is not serialized;
+calling it a sentinel remains an inference pending its initialization/use.
+
+Seven table blocks follow in ascending level 0..6: LE DWORD compressed
+length L_i followed by L_i bytes, next position `position+4+L_i`.
+Decoded sizes are `0x1000000,0x400000,0x100000,0x40000,0x10000,0x4000,0x1000`.
+Writer allocates `S+floor(5*S/100)+66` for a decoded size S.
+Raw `0xE9E04B`, bytes `E8 90 AB 46 00`, calls compressor
+`0x1308BE0` (VA `0x17097E0`) with ECX=input, EDX=size,
+stack output. EAX becomes L_i directly, without added codec-header length.
+Reader calls matching decoder `0x13090D0`.
+
+The compressor's 32-byte literals, extended/far matches, and first-byte
+OR `0x20` at raw `0x13090B9` support a FastLZ level-2-style
+interpretation; external algorithm identity is not proven by a function name.
+Writes of version/count/records/length/payload have no result checks in the
+inspected path; flush/commit/close likewise remain unchecked.
+Rename is tested and reports failure, then returns success if reporting returns.
+Exact import identities here rely on earlier PE evidence, not fresh placeholder
+slot enumeration. The next scope follows the extra record's concrete use.
