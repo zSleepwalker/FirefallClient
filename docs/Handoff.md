@@ -10792,3 +10792,18 @@ slot `+0x14` as zero resize without preservation, and backing/control
 field geometry. Subsequent tasks must reuse those facts. The current
 source-read connection adds its captured caller gates and PE regressions,
 not a new wrapper identity or capacity-only interpretation of setup.
+
+The captured setup/read plan is now implemented and pushed in
+`UiShaderSourceReadProjectionRules.ProjectReadPlan`: setup is reached only
+when the original captured size is nonzero, while the read loop is reached
+only when the unsigned minimum of that size and the caller cap is nonzero.
+Boundary cross-products cover the two distinct zero paths. The plan does
+not emulate receiver null guards, cleanup, or allocation outcomes.
+
+The exact zero-release follow-up supersedes the earlier unaccepted
+old-count-zero wording: the first `LOCK XADD [control+4],-1` sets flags
+from the arithmetic sum, and its following JNZ gates destruction on the
+post-decrement value. The separate `control+8` sequence decrements the
+returned old value before testing it. These distinct observations do not
+establish initialization invariants or justify a shared-pointer type name.
+Immutable PE checks and a branch-specific wrapper-clear layout are assigned.
