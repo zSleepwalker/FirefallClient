@@ -5774,6 +5774,7 @@ MatrixServerMessageNativeTypeChecks.Run(Check);
 MatrixSynchronizationDispatchChecks.Run(Check);
 NativeMt19937Checks.Run(Check);
 NativeByteVectorHeapChecks.Run(Check);
+NativeRecordVectorCapacityProjectionChecks.Run(Check);
 NativeByteVectorSortChecks.Run(Check);
 NativeAdapterAddressFingerprintChecks.Run(Check);
 NativeWindowsDriveSerialFingerprintChecks.Run(Check);

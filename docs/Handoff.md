@@ -11,7 +11,7 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are vector growth count reconstruction
+file-close path. Active boundaries are cursor-selection cache-marker provenance
 and exact allocation/max-count guard import bindings.
 UI lifecycle code/checks are committed.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
@@ -9977,6 +9977,22 @@ nonreturn behavior must be resolved before claiming old-buffer failure
 preservation or continuation. A separate code task projects only bounded
 count selection, not allocation, pointer publication, or guard behavior.
 These are raw IDB addresses despite the report's VA labels.
+
+## Bounded vector count projection implemented independently of allocation
+
+`NativeRecordVectorCapacityProjection.cs` records the sixteen-byte stride,
+maximum count, guard-before-increment decision, and overflow-aware
+capacity-plus-half selection. Inputs above the established count domain
+raise argument errors; the projection does not claim native metadata
+validation or impose a `used <= capacity` invariant absent from its scope.
+Guard results have no projected count or bytes, rather than a fabricated
+successful capacity. Maximum projected byte size is `0xFFFFFFF0`.
+
+Focused checks cover small odd/even capacities, required-count precedence,
+the exact half-growth boundary, maximum-used guard, and out-of-domain
+arguments. The delegated Startup run reported 865 passes and no failures.
+Allocation outcome, source rebasing, pointer publication, and guard
+nonreturn behavior remain separate static contracts.
 
 The report's apparent VA lookup discrepancy is not a new mapping gap:
 the IDB is raw/base-zero and a numeric runtime VA must not be used directly
