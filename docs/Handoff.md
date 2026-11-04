@@ -11,8 +11,8 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are UI state-sync decision reconstruction and
-the native record producer's input-to-record transformations.
+file-close path. Active boundaries are the UI synchronization helper record
+and exact local record order in the native producer.
 UI lifecycle code/checks are committed.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
@@ -9714,6 +9714,31 @@ and `0xCF17F7`, plus tail-call `0xCF28E0`. Each invocation or duplicate
 record can repeat production; these entries do not establish frame cadence.
 The next task traces the supplied `+0x2B0` argument's effect on the four
 source floats rather than assuming an untransformed record copy.
+
+## UI synchronization projection integrated; record-order clarification pending
+
+The pure `UiManagerNativeLayout.ProjectStateSync` now models the verified
+gates, selection precedence, and optional component-call arguments, using
+neutral offset-based inputs rather than inferred field meanings. Focused
+Startup checks cover all byte values for gates/flags, exact helper-output
+zero/one comparisons, fallback precedence, and suppressed calls.
+Startup checks and `git diff --check` passed during integration.
+
+The producer follow-up confirms raw `0xC95516..0xC9554E` uses bit-preserving
+MOVSS transfers rather than arithmetic with the supplied parent argument.
+Earlier opaque callees may still modify source state. It also corrects the
+global guard: `0xC95507..0xC95514` dereferences UI global VA `0x1E002B8`
+without checking that global pointer, then checks the `+0xA08` descriptor.
+The prior `Startup.md` claim of a null-checked UI global is superseded.
+
+The report's claimed local-memory order conflicts with its own listed
+source/destination pairs, so exact record order is awaiting a bounded
+instruction clarification; no reordered code projection is accepted yet.
+Its C5/C9 addresses are raw IDB offsets, despite its mistaken VA labels.
+At `0xC5EF75..0xC5EF84`, COMISS compares global float against parent
+`+0x2C0` and JA exits for ordered global greater than field. Unordered
+flags do not take JA; an unmasked floating-point exception remains outside
+that branch-only observation.
 
 The report's apparent VA lookup discrepancy is not a new mapping gap:
 the IDB is raw/base-zero and a numeric runtime VA must not be used directly

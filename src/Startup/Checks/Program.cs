@@ -686,6 +686,118 @@ Check("UI startup callback stores the getter-sourced descriptor at +A08 before s
     && UiManagerNativeLayout.UiManagerInitializeDescriptorStoreFileOffset == 0xBFB8CE
     && UiManagerNativeLayout.UiManagerPayloadDescriptorOffset == 0xA08
     && UiManagerNativeLayout.UiManagerInitializeReadyFlagWriteFileOffset == 0xBFB8DC);
+var syncInput = new UiManagerStateSyncInput(
+    1, 1, 1, 0x58C, 1, 0x588, 0x584, 1, 1, 0x58C);
+Check("UI state-sync projection requires both raw gates and preserves the ignored callback result",
+    UiManagerNativeLayout.UiManagerStateSyncMethodFileOffset == 0xBFFA90
+    && UiManagerNativeLayout.UiManagerStateSyncCallerMethodFileOffset == 0xBFF930
+    && UiManagerNativeLayout.UiManagerStateSyncCallerCallSiteFileOffset == 0xBFFA3F
+    && UiManagerNativeLayout.UiManagerInitializationFlagGetterVtableOffset == 0x04
+    && UiManagerNativeLayout.UiManagerStateSyncComponentReceiverOffset == 0x974
+    && UiManagerNativeLayout.UiManagerStateSyncComponentVtableOffset == 0x1C
+    && !UiManagerNativeLayout.UiManagerStateSyncComponentReturnIsUsed
+    && UiManagerNativeLayout.ProjectStateSync(syncInput)
+        == new UiManagerStateSyncProjection(1, null)
+    && Enumerable.Range(0, byte.MaxValue + 1).All(value =>
+        UiManagerNativeLayout.ProjectStateSync(syncInput with { GetterResult = (byte)value }).GateResult
+            == (value == 0 ? 0 : 1)
+        && UiManagerNativeLayout.ProjectStateSync(syncInput with { ReadyFlag = (byte)value }).GateResult
+            == (value == 0 ? 0 : 1)
+        && (value != 0
+            || (UiManagerNativeLayout.ProjectStateSync(syncInput with { GetterResult = (byte)value }).ComponentCall is null
+                && UiManagerNativeLayout.ProjectStateSync(syncInput with { ReadyFlag = (byte)value }).ComponentCall is null))));
+Check("UI state-sync selection follows only the recorded +58C/+590, +588, then +584 fallback",
+    UiManagerNativeLayout.UiManagerStateSyncField58COffset == 0x58C
+    && UiManagerNativeLayout.UiManagerStateSyncField590Offset == 0x590
+    && UiManagerNativeLayout.UiManagerStateSyncField588Offset == 0x588
+    && UiManagerNativeLayout.UiManagerStateSyncField584Offset == 0x584
+    && UiManagerNativeLayout.ProjectStateSync(syncInput with { Field598 = 1, HelperOutput0 = 0 })
+        .ComponentCall == new UiManagerStateSyncCall(1, 0x58C)
+    && UiManagerNativeLayout.ProjectStateSync(syncInput with
+        {
+            Field590 = 0,
+            Field598 = 1,
+            HelperOutput0 = 0
+        }).ComponentCall == new UiManagerStateSyncCall(1, 0x588)
+    && UiManagerNativeLayout.ProjectStateSync(syncInput with
+        {
+            Field58C = 0,
+            Field598 = 1,
+            HelperOutput0 = 0
+        }).ComponentCall == new UiManagerStateSyncCall(1, 0x588)
+    && UiManagerNativeLayout.ProjectStateSync(syncInput with
+        {
+            Field590 = 0,
+            Field588 = 0,
+            Field598 = 1,
+            HelperOutput0 = 0
+        }).ComponentCall == new UiManagerStateSyncCall(1, 0x584)
+    && UiManagerNativeLayout.ProjectStateSync(syncInput with
+        {
+            Field590 = 0,
+            Field588 = 0,
+            Field584 = 0,
+            Field598 = 1,
+            HelperOutput0 = 0
+        }).ComponentCall == new UiManagerStateSyncCall(1, 0));
+Check("UI state-sync nonzero-byte branches and helper output comparisons use exact zero/one tests",
+    UiManagerNativeLayout.UiManagerStateSyncField598Offset == 0x598
+    && Enumerable.Range(0, byte.MaxValue + 1).All(value =>
+        UiManagerNativeLayout.ProjectStateSync(syncInput with { Field590 = (byte)value, Field598 = 1, HelperOutput0 = 0 })
+            .ComponentCall == new UiManagerStateSyncCall(1, value == 0 ? 0x588u : 0x58Cu)
+        && UiManagerNativeLayout.ProjectStateSync(syncInput with
+            {
+                Field670 = (byte)value,
+                Field598 = 0,
+                HelperOutput0 = 1
+            }).ComponentCall == (value == 0
+                ? new UiManagerStateSyncCall(1, 0x58Cu)
+                : new UiManagerStateSyncCall(0, 0))
+        && UiManagerNativeLayout.ProjectStateSync(syncInput with
+            {
+                Field670 = 1,
+                Field598 = (byte)value,
+                HelperOutput0 = 1,
+                HelperOutput1 = 0x58C
+            }).ComponentCall == (value == 0
+                ? new UiManagerStateSyncCall(0, 0)
+                : null)
+        && UiManagerNativeLayout.ProjectStateSync(syncInput with
+            {
+                Field670 = 1,
+                Field598 = 0,
+                HelperOutput0 = (uint)value
+            }).ComponentCall == (value == 1
+                ? new UiManagerStateSyncCall(0, 0)
+                : null))
+    && UiManagerNativeLayout.ProjectStateSync(syncInput with
+        {
+            Field670 = 1,
+            Field598 = 1,
+            HelperOutput0 = 1,
+            HelperOutput1 = 0x58C
+        }).ComponentCall is null
+    && UiManagerNativeLayout.ProjectStateSync(syncInput with
+        {
+            Field670 = 1,
+            Field598 = 1,
+            HelperOutput0 = 2,
+            HelperOutput1 = 0x58C
+        }).ComponentCall is null
+    && UiManagerNativeLayout.ProjectStateSync(syncInput with
+        {
+            Field670 = 1,
+            Field598 = 1,
+            HelperOutput0 = 2,
+            HelperOutput1 = 0x58D
+        }).ComponentCall == new UiManagerStateSyncCall(1, 0x58C)
+    && UiManagerNativeLayout.ProjectStateSync(syncInput with
+        {
+            Field670 = 1,
+            Field598 = 1,
+            HelperOutput0 = 1,
+            HelperOutput1 = 0x58D
+        }).ComponentCall == new UiManagerStateSyncCall(1, 0x58C));
 Check("UI payload descriptor consumer and append helper retain the observed pointer and positional-record layout",
     UiManagerNativeLayout.UiPayloadDescriptorConsumerMethodFileOffset == 0xC95400
     && UiManagerNativeLayout.UiPayloadDescriptorConsumerMethodVirtualAddress == 0x1096000

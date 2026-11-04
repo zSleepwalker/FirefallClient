@@ -18,6 +18,24 @@ public readonly record struct UiManagerPayloadCleanupStep(
     uint CallSiteFileOffset,
     uint TargetMethodFileOffset);
 
+public readonly record struct UiManagerStateSyncInput(
+    byte GetterResult,
+    byte ReadyFlag,
+    byte Field670,
+    uint Field58C,
+    byte Field590,
+    uint Field588,
+    uint Field584,
+    byte Field598,
+    uint HelperOutput0,
+    uint HelperOutput1);
+
+public readonly record struct UiManagerStateSyncCall(byte Argument0, uint Argument1);
+
+public readonly record struct UiManagerStateSyncProjection(
+    byte GateResult,
+    UiManagerStateSyncCall? ComponentCall);
+
 /// <summary>
 /// Static layout and lifecycle observations for the client's UI manager.
 /// This does not construct the object, dispatch application events, or perform cleanup.
@@ -35,6 +53,9 @@ public static class UiManagerNativeLayout
     public const uint UiManagerInitializeDescriptorCallbackCallSiteFileOffset = 0xBFB8C6;
     public const uint UiManagerInitializeDescriptorStoreFileOffset = 0xBFB8CE;
     public const uint UiManagerInitializeReadyFlagWriteFileOffset = 0xBFB8DC;
+    public const uint UiManagerStateSyncMethodFileOffset = 0xBFFA90;
+    public const uint UiManagerStateSyncCallerMethodFileOffset = 0xBFF930;
+    public const uint UiManagerStateSyncCallerCallSiteFileOffset = 0xBFFA3F;
     public const uint UiManagerDescriptorGetterCallSiteFileOffset = 0x30B1B4;
     public const int UiManagerInitializeDescriptorArgumentOrdinal = 8;
     public const int UiManagerInitializeDescriptorArgumentFrameOffset = 0x24;
@@ -143,6 +164,14 @@ public static class UiManagerNativeLayout
     public const int UiManagerConstructorStateWordOffset = 0x670;
     public const int UiManagerInitializationPartialFlagOffset = 0x671;
     public const int UiManagerInitializationFlagGetterVtableOffset = 0x04;
+    public const int UiManagerStateSyncComponentReceiverOffset = 0x974;
+    public const int UiManagerStateSyncComponentVtableOffset = 0x1C;
+    public const bool UiManagerStateSyncComponentReturnIsUsed = false;
+    public const int UiManagerStateSyncField58COffset = 0x58C;
+    public const int UiManagerStateSyncField590Offset = 0x590;
+    public const int UiManagerStateSyncField588Offset = 0x588;
+    public const int UiManagerStateSyncField584Offset = 0x584;
+    public const int UiManagerStateSyncField598Offset = 0x598;
     public const int UiManagerShutdownStateWordOffset = 0x671;
     public const int UiManagerShutdownStateWordSize = 2;
     public const int UiManagerConstructorStateWordValue = 1;
@@ -187,4 +216,26 @@ public static class UiManagerNativeLayout
     public static bool ShouldEnterInitialization(byte getterResult) => getterResult == 0;
 
     public static bool ShouldDrainPayloadTree(byte partialInitializationFlag) => partialInitializationFlag != 0;
+
+    public static UiManagerStateSyncProjection ProjectStateSync(UiManagerStateSyncInput input)
+    {
+        if (input.GetterResult == 0 || input.ReadyFlag == 0)
+            return new(0, null);
+
+        uint selected = input.Field58C;
+        if (input.Field590 == 0 || selected == 0)
+            selected = input.Field588;
+        if (selected == 0)
+            selected = input.Field584;
+
+        if (input.Field670 == 0
+            || (input.Field598 != 0
+                && (input.HelperOutput0 == 0 || input.HelperOutput1 != selected)))
+            return new(1, new UiManagerStateSyncCall(1, selected));
+
+        if (input.Field598 == 0 && input.HelperOutput0 == 1)
+            return new(1, new UiManagerStateSyncCall(0, 0));
+
+        return new(1, null);
+    }
 }
