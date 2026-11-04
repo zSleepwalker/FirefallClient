@@ -10,8 +10,9 @@ PrivateDialog receiver identification, AES "block-size" interpretation,
 and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
-Current delegated boundaries are the CRT exit-mode flag initialization
-and the concrete DumpKeyComboThread pre-termination logging request.
+Current delegated boundaries are application shutdown's console/sink lifetime
+and the origin/type of DumpKeyComboThread's pre-termination diagnostic list.
+Normal native CRT return selects `exit(status)`.
 Exit registration and its logger cleanup predicate are resolved.
 Generic wrapper field `+8` is a duplicated diagnostic label:
 MSVCR120.dll!_strdup/free; the earlier constructor candidate is another destructor.
@@ -8045,3 +8046,40 @@ list identity, meaning of argument 4, and concrete output are still open.
 The table/worker mapping is confirmed: **VA** `0x6EAE00` maps to
 raw `0x2EA200`. State byte `+0x70` allows repeated action on every
 continuing matching iteration after the first, not merely a rising edge.
+
+## Standalone native CRT return selects exit(status)
+
+The sample's CLR directory is `(RVA=0, size=0)`. CRT exit-mode word
+**VA** `0x1E36618` is file-backed at raw `0x1A34A18`, initially zero.
+The bounded reference pass found its comparison but no in-image writer.
+At raw `0x136AEE4`, bytes
+`83 3D 18 66 E3 01 00 75 60 50 FF 15 28 48 AC 01`
+select the fall-through `exit(EAX)` call for zero.
+This supports the normal standalone native path, not an unconditional
+claim against external modification.
+
+Word **VA** `0x1E36610` is also file-backed and initially zero.
+The observed write at raw `0x136AE4B` sets it to one only when
+CRT initialization state is already nonzero and not one.
+That state starts in the loader-zero-filled tail; first entry does not
+take that write. Nonzero mode still follows the separately recorded
+conditional `_cexit`/local-return branch.
+
+## Dump-key logging wrapper traverses a diagnostic list, not a dump file
+
+The supplied virtual target raw `0xC05FF0` conditionally forwards only if
+`this+0xA00` is nonnull, calling raw `0xC294A0` with
+`(4, *(this+0xA00+0x78))`. The latter walks a sentinel-terminated list:
+head `+0x10`, sentinel `+0x30`, node next link `+8`.
+Formatter raw `0xCCFB20` converts entries. Leading formatted entries
+starting with `'C'` are skipped; after the first non-`'C'` entry,
+subsequent entries are sent to the VIBE logger.
+The list's semantic type and producer remain open.
+
+Logging wrapper raw `0xA69E00` emits only when its numeric level is
+`>= logger[4]`; argument 4 is this level, not a worker status.
+Emitter raw `0x12C2030` dispatches through the configured callback
+referenced by logger `+0x14`, passing context from `+8`.
+This chain establishes formatted diagnostic logging, not dump-file output.
+The follow-up relied on the previously supplied virtual-target resolution;
+empty IDA data xrefs neither independently confirm nor disprove that slot.
