@@ -11,8 +11,8 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are manager callback payload disposal
-and remaining nested scripting containers `+0x118/+0x120`.
+file-close path. Active boundaries are nested teardown evidence reconstruction
+and helper `0xC3FC10`'s concrete list-release contract.
 UI lifecycle code/checks are committed.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
@@ -10175,6 +10175,32 @@ invokes slot zero with argument one. This is payload-directed cleanup
 after VM close, not only key/node erasure. Concrete slot-zero target and
 node-storage release remain unbound by this report.
 The next task follows only remaining `+0x118/+0x120` cleanup surfaces.
+
+## Manager callback-node erase does not establish successful payload destruction
+
+The manager destructor `0xBF8AC0` erases `+0x6B0` through
+`0xC0BD90`, with per-node helper `0xC0EB00`. That helper releases
+key `+0x10` then frees the node; no payload `+0x14` destruction occurs
+in this inspected path. Insertion failure separately calls `0xC64420`
+then payload slot zero with flag one. Successful-payload ownership remains
+parked; callback slot `+0x14` is not destructor evidence or a leak finding.
+
+## Nested cleanup performs ordered payload passes before container resets
+
+After VM close at raw `0xC33291`, `0xC33060` visits payload trees
+`+0xF0`, `+0xE8`, `+0xE0`, `+0xD8`, `+0x100`, `+0x110`,
+`+0x118`, then `+0x140`. The `+0x118` pass begins at `0xC336DA`
+and dispatches node `+0x14` through slot zero with argument one at
+`0xC33706..0xC33711`. The pass itself advances links, not key/node frees.
+Containers are then reset in that same order. For `+0x118`, helper
+`0xC0BE90` runs at `0xC33973..0xC33993`, followed by sentinel-link
+and count reset; its body is not established by this report.
+
+Later `+0x120` reaches `0xC3FC10` at `0xC33C2B`, before
+`+0x118` helper `0xC0BD90` and stored-object release
+(`0xC33C3A..0xC33C58`). Its exact policy is the next bounded task.
+These slot-zero cleanup passes remain distinct from `0xC376A0`'s
+slot-`+0x14` callback traversal; matching fields do not merge the operations.
 
 The report's apparent VA lookup discrepancy is not a new mapping gap:
 the IDB is raw/base-zero and a numeric runtime VA must not be used directly
