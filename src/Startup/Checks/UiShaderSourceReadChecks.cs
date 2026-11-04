@@ -10,12 +10,16 @@ internal static class UiShaderSourceReadChecks
             && UiShaderSourceReadProjectionRules.FreadImportModule == "MSVCR120.dll"
             && UiShaderSourceReadProjectionRules.FreadImportName == "fread"
             && UiShaderSourceReadProjectionRules.CapturedSizeLoadRawFileOffset == 0x12BB366
+            && UiShaderSourceReadProjectionRules.InitialSizeZeroCheckRawFileOffset == 0x12BB3C8
+            && UiShaderSourceReadProjectionRules.InitialSizeZeroBranchTargetRawFileOffset == 0x12BB42E
             && UiShaderSourceReadProjectionRules.ReceiverBufferVirtualCallRawFileOffset == 0x12BB403
             && UiShaderSourceReadProjectionRules.ReceiverBufferVirtualCallVtableSlotOffset == 0x04
             && UiShaderSourceReadProjectionRules.RequestedLengthCompareRawFileOffset == 0x12BB3D0
             && UiShaderSourceReadProjectionRules.RequestedLengthClampRawFileOffset == 0x12BB3D3
             && UiShaderSourceReadProjectionRules.RequestedLengthSlotSetupRawFileOffset == 0x12BB3DA
             && UiShaderSourceReadProjectionRules.RequestedLengthReceiverOffset == 0x1C
+            && UiShaderSourceReadProjectionRules.RequestedLengthZeroTestRawFileOffset == 0x12BB3E3
+            && UiShaderSourceReadProjectionRules.RequestedLengthZeroBranchRawFileOffset == 0x12BB3E5
             && UiShaderSourceReadProjectionRules.FreadCallRawFileOffset == 0x12BB40E
             && UiShaderSourceReadProjectionRules.FreadResultSuccessTestRawFileOffset == 0x12BB417
             && UiShaderSourceReadProjectionRules.FreadFailureCleanupVirtualCallRawFileOffset == 0x12BB445
@@ -58,6 +62,33 @@ internal static class UiShaderSourceReadChecks
 
         check("Shader-source requested length composes with the separate chunk cap",
             requestedLengthChunkCompositionIsBounded);
+
+        bool readPlanMatchesCapturedGates = true;
+        for (int capturedIndex = 0; capturedIndex < boundaryValues.Length; capturedIndex++)
+        {
+            for (int capIndex = 0; capIndex < boundaryValues.Length; capIndex++)
+            {
+                uint capturedSize = boundaryValues[capturedIndex];
+                uint cap = boundaryValues[capIndex];
+                uint expectedLength = capturedSize < cap ? capturedSize : cap;
+                UiShaderSourceReadPlan plan =
+                    UiShaderSourceReadProjectionRules.ProjectReadPlan(capturedSize, cap);
+
+                readPlanMatchesCapturedGates &=
+                    plan.RequestedLength == expectedLength
+                    && plan.SetupCallReached == (capturedSize != 0)
+                    && plan.ReadLoopReached == (expectedLength != 0);
+            }
+        }
+
+        UiShaderSourceReadPlan zeroCapturedSizeWithZeroCap =
+            UiShaderSourceReadProjectionRules.ProjectReadPlan(0, 0);
+        UiShaderSourceReadPlan positiveCapturedSizeWithZeroCap =
+            UiShaderSourceReadProjectionRules.ProjectReadPlan(1, 0);
+        check("Shader-source plan separates initial-zero setup bypass from a zero-length post-clamp read bypass",
+            readPlanMatchesCapturedGates
+            && zeroCapturedSizeWithZeroCap is { RequestedLength: 0, SetupCallReached: false, ReadLoopReached: false }
+            && positiveCapturedSizeWithZeroCap is { RequestedLength: 0, SetupCallReached: true, ReadLoopReached: false });
 
         check("fread success compares its element count to one, not its byte count",
             UiShaderSourceReadProjectionRules.FreadElementCount == 1
