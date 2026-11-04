@@ -11789,3 +11789,21 @@ projection at `BE2F50`: null arg0 skips its signed threshold compare but
 still forwards; nonnull arg0 and signed arg1 below [arg0+4] returns without
 setting EAX. Forwarding passes arg2 and the stack-tail address, not a parsed
 format. Raw `BE526C` maps to VA `FE5E6C`; ignore the trace typo `FE62EC`.
+
+Pushed `a955e53` with case-three delta and accumulated receive PE authority.
+Forwarding review found unnecessary bool+nullable arg2 allowed a missing
+DWORD to masquerade as captured null; author is simplifying to nullable
+DWORD, with native zero represented as `0`, and fixing signed fixtures
+whose argument0/argument1 positions were swapped.
+Reliable alternate trace corrected its gate interval typo (`>7FFF`, not
+`>=8100`). New code owner `553ca362-8a01-45a1-8dec-3c953bdb5834` models
+only `[BE528F,BE52A5)`: push existing ECX payload-word address, hand off with
+ECX receiver+47C to `BE6300`, then on normal return compare preserved BX
+with AX=8000 and JB to `BE52DF`. Evidence owner is
+`e2e60009-f44d-4d36-9746-57fe19de7613`, preserving forwarding anchors.
+
+Forwarding arg2 simplification and signed fixtures are corrected, reviewed,
+registered and pass the pinned runner. The helper's 35-byte slice and both
+caller cleanup slices independently match PE. Active read-only helper trace
+`a676e252-22d7-4e77-a5f7-cee8a76dfb20` starts at `BE6300`, stopping at the
+first guard/opaque handoff. No `BE2F80` parser or formatter work is assigned.

@@ -73,6 +73,7 @@ ReliableReceiveEntryChecks.Run(Check);
 UnreliableReceiveEntryChecks.Run(Check);
 ReliableReceiveDeltaGateChecks.Run(Check);
 UnreliableReceiveDeltaGateChecks.Run(Check);
+ReceiveGuardForwardingChecks.Run(Check);
 SharedTextPoolSingletonChecks.Run(Check);
 UiShaderSourcePoolTeardownChecks.Run(Check);
 UiShaderSourcePoolSingletonDestructorChecks.Run(Check);
