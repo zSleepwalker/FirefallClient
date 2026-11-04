@@ -10690,3 +10690,19 @@ all passed coordinator execution and are committed/pushed.
 This closes their regression integration. Active boundaries are wrapper
 size projection, exact virtual-`+4` argument behavior, and loader chunk
 import identity; the earlier resource-mapping gap remains rejected.
+
+The loader chunk import is now PE-bound: IAT VA `0x1AC490C`,
+raw `0x16C350C`, is `MSVCR120.dll!fread`.
+The observed call is `fread(buffer, chunk, 1, handle)`, so the
+accepted result is one complete element, not a byte count.
+The cap is `0x01000000` bytes per chunk; the receiver's slot `+4`
+receives the cumulative offset. A captured chunk-cap/result predicate
+and independent PE anchors are assigned.
+
+The compile source pointer calls explicitly pass zero to wrapper slot `+4`
+at `0xCA70F4/0xCA7254` (`6A 00 FF 50 04`).
+The latest wrapper report describes an unsigned argument/length comparison
+and a preserve-helper call, but its final size-getter expression is
+ambiguous between a field read and address arithmetic. Exact bytes and
+branch/call order are requested before accepting that refinement or
+registering the captured-size projection. No resize bypass is assumed.
