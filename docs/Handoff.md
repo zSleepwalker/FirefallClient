@@ -10,8 +10,8 @@ PrivateDialog receiver identification, AES "block-size" interpretation,
 and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
-Current delegated boundaries are the runtime exit helper's indirect targets
-and the distinct timed wrapper's field-8 allocation origin. Its cleanup import is
+Current delegated boundaries are the runtime exit helper's non-sentinel list
+helper and the distinct timed wrapper's field-8 producer/consumer semantics. Its cleanup import is
 MSVCR120.dll!free; the earlier constructor candidate is another destructor.
 Logger unwind binding is now composed
 from the recorded guard initialization and exact EH action. Assertion interception is a bounded
@@ -7861,3 +7861,35 @@ Arithmetic correction: vptr **VA** `0x1C80C5C` minus rdata mapping
 Its little-endian bytes are `5C 0C C8 01`, not `5C 0C 80 01`.
 The next pass verifies the destructor's actual immediate before searching
 its packed bytes for initialization stores. Allocation origin remains open.
+
+## Corrected vptr search locates wrapper initializer and field-8 producer
+
+The corrected `5C 0C C8 01` search finds the vptr immediate at raw
+`0x12BFE0F`, in initializer raw `0x12BFE00` (code **VA** `0x16C0A00`).
+It zeroes `this+8` at `0x12BFE1B`, then stores the return value of
+IAT **VA** `0x1AC493C(a2)` into that field at `0x12BFE5F`.
+The import's identity and argument semantics remain unresolved; the
+assignment alone is not evidence of a particular allocator.
+
+The same vptr immediate is stored at raw `0x1309907` in the previously
+traced destructor, which calls `free(this+8)`. The store at `0x13094CE`
+also belongs to teardown. This establishes a concrete producer/cleanup
+pair without yet assigning a name or resource type to the field.
+
+## Exit registration sentinel path is MSVCR120 _onexit
+
+At raw `0x136B595`, bytes `8B 35 A8 43 AC 01 FF D6` load and call
+**KERNEL32.dll!DecodePointer**, IAT **VA** `0x1AC43A8`
+(backed raw `0x16C2FA8`). The decoded first global is compared with -1
+at raw `0x136B5A0`, bytes `83 F8 FF`. The predicate is therefore not
+simply an untransformed bootstrap-state integer.
+
+For that sentinel, raw `0x136B5A8` calls
+**MSVCR120.dll!_onexit**, IAT **VA** `0x1AC479C`, with callback
+`[ebp+8]`. Otherwise the body decodes globals **VA** `0x1F1B474`
+and `0x1F1B470`, calls a helper, then re-encodes/stores the pair.
+**KERNEL32.dll!EncodePointer** is IAT **VA** `0x1AC43C4`
+(backed raw `0x16C2FC4`); it is not itself the list-registration helper.
+The follow-up did not return that helper's exact target or argument contract,
+so only the sentinel forwarding path is fully identified here.
+Import-slot file bytes are lookup RVAs, not runtime function addresses.
