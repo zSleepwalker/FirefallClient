@@ -11,8 +11,8 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are config-buffer growth allocation policy
-and the concrete VM allocator callback/userdata ownership.
+file-close path. Active boundaries are buffer allocation-failure reporting
+and the VM callback/wrapper failed-resize pointer ledger.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
 Normal native CRT return selects `exit(status)`.
@@ -8738,7 +8738,7 @@ demonstrated runtime consequence of null data.
 Creator raw `0xC347E0` calls `0xCD5720` at `0xC34834`,
 supplying allocator **VA** `0x103CCB0` and incoming `a1` as userdata.
 The creator allocates 912 bytes, storing allocator/userdata at result
-`+0x120/+0x124` (`0xCD576C/0xCD576E`).
+`+0x78/+0x7C` (`0xCD576C/0xCD576E`; the earlier 120/124 were decimal).
 These are not the separate initialization callback.
 At `0xCD577F`, **VA** `0x10D6060` (raw `0xCD5460`) is loaded
 into EDX; protected-call helper `0xCD6C10` is invoked at `0xCD58A4`
@@ -8752,3 +8752,43 @@ late-initialization/retry-eligibility gate rather than a thread identifier.
 PE mapping places that marker at raw `0x1872CF8`, whose leading byte is
 NUL; this proves neither a source-level name nor overall initialization success.
 The concrete allocator callback's implementation/userdata use is next.
+
+## Buffer growth copies capacity and can discard old storage on returned failure
+
+Raw `0xDF43F0` uses pointer `+8`, capacity `+0x10`, used length `+0x14`,
+and shrink floor `+0x0C`. Growth passes old capacity, not used length,
+to `0xDF2DC0`. Successful replacement copies
+`min(oldCapacity,newCapacity)` bytes, then frees old storage.
+If allocation returns null, that helper still frees old storage and returns null;
+reserve stores the result and updates capacity/length without a null-result branch.
+With no old pointer it returns the allocation directly; old pointer plus zero
+new size frees and returns null.
+
+Shrink at/below the floor only changes used length; otherwise it reallocates
+to `max(requestedSize,floor)` and sets capacity/length to that value.
+Allocator wrapper `0x12B8030` calls `0x12C8A20` and reports a null result
+through **VA** `0x1C15EA0` before returning zero if reporting returns.
+That reporter's continuable assertion mechanism is already documented;
+the follow-up's empty target resolution does not reopen its identity.
+Exact allocation-call flags/report arguments remain a bounded continuation.
+All null-result continuation claims are conditional on reporter return.
+
+## Concrete VM allocator uses global heap and ignores userdata on inspected paths
+
+Allocator **VA** `0x103CCB0` maps to raw `0xC3C0B0`.
+Initial creation calls `(userdata,NULL,8,912)`; callback/userdata are stored
+at allocated base `+0x78/+0x7C`, correcting the earlier decimal-offset
+misreading as hex `+0x120/+0x124`.
+Owner `0xC347E0` retains the VM at its `+0x78`.
+Initial null allocation returns null; the owner conditionally logs and returns false.
+Later initialization failure uses `0xCD5510` to release VM allocations and
+invokes `(userdata,base,912,0)` for the outer block.
+
+Callback raw `0xC3C0B0` frees zero-size requests through `0x12CA6F0`;
+nonzero goes through `0x12CAE30`, global heap **VA** `0x1E48918`,
+and `0x12CA410`. Resize tries in-place adjustment `0x12C94D0`
+before allocate/copy/free fallback. Inspected paths do not dereference
+userdata or oldSize, so selection is global rather than userdata-specific.
+A reported null-result path logs diagnostic 4528, frees a nonnull prior
+pointer, and returns null. Its exact interaction with the VM wrapper's
+same-pointer retry remains a pointer-lifetime follow-up, not a runtime finding.
