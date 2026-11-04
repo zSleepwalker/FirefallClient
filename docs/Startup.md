@@ -135,6 +135,8 @@ The backing allocation continuation is projected separately by `UiChildBackingAl
 
 The child initializer's result is a separate captured two-helper gate in `UiChildInitializationResultProjectionRules`. A zero result from `0xCA6C20` (called at raw `0xCA6A61`) directly clears child `+0x6C`, returns zero, and skips the second helper. Otherwise it calls `0xCA6C80` at `0xCA6AA3` and normalizes its captured byte result to zero or one. Missing or impossible second-helper captures are rejected. The UI caller at `0xBFB542` tests this result: zero reaches the zero-result epilogue at `0xBFB668`, while nonzero continues initialization without yet setting ready `+0x672`. The projection does not infer indirect-helper side effects or treat continuation as full UI success.
 
+The final tests in required-lookup helpers `0xCA7090` and `0xCA71F0` are captured by `UiChildRequiredLookupProjectionRules`: the signed dispatcher status must be nonnegative and the captured output DWORD nonzero. This predicate applies only after reaching that terminal stage; it does not replace earlier query gates. The helpers dispatch through dependency virtual slots `+0x16C` and `+0x1A8`, respectively. Output writes occur inside unresolved targets that receive the caller's output address; these helper bodies do not themselves initialize or clear it. No output-retention or refcount contract is inferred.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves

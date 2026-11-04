@@ -12,6 +12,7 @@ void Check(string name, bool condition)
 UiNestedChildCleanupChecks.Run(Check);
 UiChildBackingAllocationChecks.Run(Check);
 UiChildInitializationResultChecks.Run(Check);
+UiChildRequiredLookupChecks.Run(Check);
 
 var expected = new[]
 {
