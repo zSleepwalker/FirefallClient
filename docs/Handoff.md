@@ -11807,3 +11807,20 @@ registered and pass the pinned runner. The helper's 35-byte slice and both
 caller cleanup slices independently match PE. Active read-only helper trace
 `a676e252-22d7-4e77-a5f7-cee8a76dfb20` starts at `BE6300`, stopping at the
 first guard/opaque handoff. No `BE2F80` parser or formatter work is assigned.
+
+Pushed `a151b67` for guarded forwarding code. Alternate handoff is reviewed
+and registered; corrected its wrap fixture to `FFFFFB84 + 47C == 0`.
+Final runner currently waits on evidence writer's constant-to-ushort
+compile correction at `StartupBinaryEvidence.cs:6782`; no production
+behavior changes were requested there.
+
+Alternate handoff now passes the pinned runner and its 22-byte window
+independently matches PE. Removed an out-of-scope RET-4 assertion from its
+immutable check so the helper normal-return boundary remains `BE529B`,
+not the unrelated enclosing-function return at `BE52DC`.
+Luna `9130ea7a-fe62-4f1d-8bc8-8899293c9043` owns only the embedded
+word-growth guard `[BE6306,BE6325)`; PE owner is
+`d2db6ac4-cd7a-4fdd-8d31-36e582bdecc8`, preserving pending forwarding and
+alternate anchors. This guard uses wrapping DWORD arithmetic and unsigned
+comparison before the opaque `BE68A0` call; no slot allocation/copy work
+is assigned yet.
