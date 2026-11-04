@@ -11,7 +11,7 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are global-heap synchronization setup
+file-close path. Active boundaries are global-heap startup publication/lifetime
 and region-collector record retention/release ordering.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
@@ -8880,3 +8880,24 @@ PE-verified IAT VAs are `0x1AC42A8` VirtualQuery,
 `0x1AC42B4` VirtualFree, and `0x1AC42B8` VirtualAlloc.
 The linked traversal begins at `+0x1E0`; inline-seed retention,
 flag-bit gates, and partial-release failure bookkeeping remain unresolved.
+
+## Global VM heap disables its internal lock bit after creation
+
+Raw `0xC327D0` conditionally creates the heap only when global pointer
+**VA** `0x1E48918` is zero, publishing the result at
+`0xC32BF4..0xC32C01`; otherwise it reuses the pointer.
+Raw `0x12C6A90` initializes config flags to 7, and `0x12CA110`
+copies/ORs 4 into heap `+0x1BC` and initializes CS storage `+0x1C0`
+through IAT **VA** `0x1AC41BC` with `0x80001020`.
+The import's exact name remains a PE-parser continuation.
+Factory `0x12CA210` then clears mask 2, yielding flags 5,
+and sets heap `+0x1E4` to 1.
+
+Allocation/resize/free internal lock branches test mask 2 and are skipped
+for this initial flags value. The inspected VM callback has no visible outer
+heap lock. A separate factory `0x12CA280` can set/clear mask 2;
+that does not establish reconfiguration of this concrete global heap.
+No teardown/reset was established, and external serialization is unknown.
+These observations describe flag selection, not overall thread safety.
+The earlier follow-up's unresolved VirtualAlloc label does not reopen the
+already PE-verified IAT **VA** `0x1AC42B8`.
