@@ -6569,6 +6569,51 @@ internal static class StartupBinaryEvidence
             && RelativeBranchTargets(0xBD4194, 0xE8, 0xBD5BA0)
             && Matches(0xBD41C0, "578D8E740D0000E8341A0000")
             && RelativeBranchTargets(0xBD41C7, 0xE8, 0xBD5C00));
+        const uint rawFirstHeaderGetterFileOffset = 0xBD5BA0;
+        const uint rawSecondHeaderGetterFileOffset = 0xBD5C00;
+        const uint headerGetterWindowLength = 0x23;
+        const uint firstHeaderGetterCodeVirtualAddress =
+            rawFirstHeaderGetterFileOffset + 0x400C00;
+        const uint secondHeaderGetterCodeVirtualAddress =
+            rawSecondHeaderGetterFileOffset + 0x400C00;
+        const string identicalHeaderGetterBytes =
+            "568BF1833E0075176A006A5B6858EAC5016858EAC501FF15A05EC10183C4108B065EC3";
+        check("Binary identical header-getter windows [raw 0xBD5BA0, 0xBD5BC3) and [raw 0xBD5C00, 0xBD5C23) map by raw+0x400C00 to code VAs 0xFD67A0 and 0xFD6800 and preserve all 35 bytes",
+            rawFirstHeaderGetterFileOffset + headerGetterWindowLength == 0xBD5BC3
+            && rawSecondHeaderGetterFileOffset + headerGetterWindowLength == 0xBD5C23
+            && firstHeaderGetterCodeVirtualAddress == 0xFD67A0
+            && secondHeaderGetterCodeVirtualAddress == 0xFD6800
+            && VirtualAddressToFileOffset(firstHeaderGetterCodeVirtualAddress)
+                == rawFirstHeaderGetterFileOffset
+            && VirtualAddressToFileOffset(firstHeaderGetterCodeVirtualAddress
+                + headerGetterWindowLength - 1)
+                == rawFirstHeaderGetterFileOffset + headerGetterWindowLength - 1
+            && VirtualAddressToFileOffset(secondHeaderGetterCodeVirtualAddress)
+                == rawSecondHeaderGetterFileOffset
+            && VirtualAddressToFileOffset(secondHeaderGetterCodeVirtualAddress
+                + headerGetterWindowLength - 1)
+                == rawSecondHeaderGetterFileOffset + headerGetterWindowLength - 1
+            && Matches(rawFirstHeaderGetterFileOffset, identicalHeaderGetterBytes)
+            && Matches(rawSecondHeaderGetterFileOffset, identicalHeaderGetterBytes));
+        check("Binary header-getter entries initially compare [ESI], branch from JNZ at +6 to +1F, call through diagnostic slot 0x1C15EA0 at +16, then independently reload [ESI] at +1F and use plain RET",
+            Matches(rawFirstHeaderGetterFileOffset + 3, "833E00")
+            && ShortConditionalBranchTargets(rawFirstHeaderGetterFileOffset + 6, 0x75,
+                rawFirstHeaderGetterFileOffset + 0x1F)
+            && Matches(rawFirstHeaderGetterFileOffset + 0x16, "FF15A05EC101")
+            && ReadUInt32(rawFirstHeaderGetterFileOffset + 0x18) == 0x01C15EA0
+            && Matches(rawFirstHeaderGetterFileOffset + 0x1F, "8B06")
+            && Matches(rawFirstHeaderGetterFileOffset + 0x21, "5E")
+            && Matches(rawFirstHeaderGetterFileOffset + 0x22, "C3")
+            && !Matches(rawFirstHeaderGetterFileOffset + 0x22, "C20400")
+            && Matches(rawSecondHeaderGetterFileOffset + 3, "833E00")
+            && ShortConditionalBranchTargets(rawSecondHeaderGetterFileOffset + 6, 0x75,
+                rawSecondHeaderGetterFileOffset + 0x1F)
+            && Matches(rawSecondHeaderGetterFileOffset + 0x16, "FF15A05EC101")
+            && ReadUInt32(rawSecondHeaderGetterFileOffset + 0x18) == 0x01C15EA0
+            && Matches(rawSecondHeaderGetterFileOffset + 0x1F, "8B06")
+            && Matches(rawSecondHeaderGetterFileOffset + 0x21, "5E")
+            && Matches(rawSecondHeaderGetterFileOffset + 0x22, "C3")
+            && !Matches(rawSecondHeaderGetterFileOffset + 0x22, "C20400"));
         check("Binary state-entry window [raw 0xBD1B98, 0xBD1BC2) maps via raw+0x400C00 to code VA [0xFD2798, 0xFD27C2), compares EDI with [ESI+0x108], and on inequality JNZ at raw 0xBD1BA3 skips the diagnostic call through slot 0x1C15EA0 to raw 0xBD1BC2",
             0xBD1BC2 - 0xBD1B98 == 0x2A
             && 0xBD1B98 + 0x400C00 == 0xFD2798

@@ -11719,3 +11719,9 @@ Caller trace confirms getter EAX is copied to ECX for the next direct call
 (`BE51F0` cases 1/2, `BE5A40` case 3); the earlier pushed EDI remains on
 the stack. Luna `d22f22b0-121c-4239-82b4-e1f4c172be98` owns the bounded
 post-getter call/AL-branch projection and checks.
+
+Pushed `fcdb0d4` for the recycle prefix. Both 35-byte getter bodies plus
+their evidence-only trailing CC independently match the sample; getter
+registration and the ordinary pinned runner pass. Luna
+`e626e9f0-313b-4a4b-97a8-c61ac4e254a0` now traces only `BE51F0`'s initial
+guard/first opaque handoff. No broad parser expansion is assigned.
