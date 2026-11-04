@@ -5803,6 +5803,7 @@ NativeGeneratedDefaultHeaderImageChecks.Run(Check);
 MatrixServerProfilerNamesChecks.Run(Check);
 MatrixServerProfilerFrameChecks.Run(Check);
 UiPayloadProducerGateChecks.Run(Check);
+UiCursorCacheProjectionChecks.Run(Check);
 NativeProfilerSampleChecks.Run(Check);
 NativeProfilerTreeChecks.Run(Check);
 NativeProfilerFrameRefreshChecks.Run(Check);

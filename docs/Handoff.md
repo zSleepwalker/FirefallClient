@@ -11,7 +11,7 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are cursor-cache refresh reconstruction
+file-close path. Active boundaries are default cursor-selection source assignments
 and the invalidation method's argument stores and call gates.
 UI lifecycle code/checks are committed.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
@@ -10037,6 +10037,19 @@ instruction bytes, independently of the synthetic count checks.
 Coordinator integration ran Startup checks with `--binary` against the
 authorized immutable sample and passed. Method `0xC97FA0` is labeled as
 the reallocation method, not an exact guard instruction address.
+
+## Cursor-cache projection represents state availability, not native return payload
+
+`UiCursorCacheProjection.cs` projects captured version equality and completed
+lookup refreshes; a missing payload maps to the observed stored zero.
+Its cache-hit payload describes available cached state, **not** native EAX,
+which returns the loaded version on the bypass path.
+Coordinator review corrected the delegated documentation's payload-return
+claim, increment site `0xC02816` versus ECX-to-EDI instruction `0xC0275D`,
+and version-load `0xBFF958` versus compare `0xBFF95E`.
+Unproven associations between setter arguments and fields `+0x988/+0x98C`
+were removed from this projection pending the separate method trace.
+The model does not execute lookup, synchronization, or version increment.
 
 The report's apparent VA lookup discrepancy is not a new mapping gap:
 the IDB is raw/base-zero and a numeric runtime VA must not be used directly
