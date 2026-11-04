@@ -12,7 +12,7 @@ are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
 file-close path. Active boundaries are concrete parser diagnostic-mute branches
-and protected script-dispatch error handling.
+and protected VM catch/type routing.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
 Normal native CRT return selects `exit(status)`.
@@ -8463,3 +8463,30 @@ a concrete parser branch to inspect next.
 The follow-up's `0xB4E5AC70` unmapped-address observation is irrelevant:
 `+0xB4` was a vtable byte offset, not a prefix to code raw `0xE5AC70`.
 It does not invalidate the earlier independently traced sink.
+
+## Protected VM dispatch returns status and has a C++ error-transfer path
+
+At raw `0xC3B551`, caller `0xC3B3C0` invokes `0xC289C0`
+with VM state in ECX, the Boolean result of `0xC25E30` in EDX,
+and stack arguments `(1, savedTopIndex+1, 0, 0)`.
+The final zero selects protected wrapper `0xCD7890`, bypassing
+the direct `0xCD7110` branch. That wrapper invokes callback
+**VA** `0x1029540` through raw `0xCD6C10`.
+
+Raw `0xCD6C10` saves VM error-frame pointer `+0x2C`, installs
+a local frame with status `+8` zero, invokes the callback, then restores
+the prior pointer and saved VM counter. Raw `0xCD7890` handles nonzero
+status by unwinding to the call slot, placing the error value there,
+and restoring VM state. Success returns zero.
+Caller `0xC3B3C0` tests the status at `0xC3B592`, returns `status==0`,
+and populates its optional result byte from VM-top truthiness only on success.
+The output byte begins zero; `0xC278C0` restores the saved VM top.
+
+Raiser raw `0xCD6B70`, when an error frame exists, writes its status
+at frame `+8` and calls thunk raw `0x159E27A` to `_CxxThrowException`.
+Thus this error transfer is C++-based, not a demonstrated C longjmp.
+The protected wrapper's exact catch/type routing remains unbound; status
+plumbing alone does not prove which native exceptions it catches or lets escape.
+Nor does every nonzero status necessarily invoke the traceback logger.
+During the dispatch interval, the borrowed global supplies fallback names
+only for traceback frames whose own name is null.
