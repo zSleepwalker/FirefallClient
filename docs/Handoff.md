@@ -11,8 +11,8 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are scripting prefix-registry bulk teardown
-and direct-mapped chunk resize ownership.
+file-close path. Active boundaries are scripting shutdown readiness/drain gates
+and ordinary-chunk in-place resize transitions.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
 Normal native CRT return selects `exit(status)`.
@@ -9238,3 +9238,41 @@ Failed direct allocation falls through to the ordinary growth path.
 The report's final alternative raw addresses `0x12862AF/0x1286B10`
 are inconsistent with the raw-IDB basis and are not propagated.
 The next trace follows direct-chunk resize through `0x12C94D0`.
+
+## Manager shutdown drains published prefix payloads before releasing key nodes
+
+Vptr **VA** `0x1C73EBC`, raw `0x1872ABC`, contains:
+slot `+0x10` bytes `B0 9D FF 00` -> raw `0xBF91B0`;
+`+0x14` bytes `D0 9D FF 00` -> raw `0xBF91D0`;
+`+0x34` bytes `D0 AC FF 00` -> raw `0xBFA0D0`.
+Shutdown calls `+0x34` via `0x30D150` before `+0x10/+0x14`.
+
+With manager byte `+0x671` set, raw `0xBFA0D0` drains registry `+0x5E4`:
+payload cleanup `0xC33060` and release/tracking precede
+node erase `0xC09D10`. Node cleanup separately releases shared-text
+key `+0x10` and frees the tree node.
+Later `0xBF91D0` sweeps remaining entries; destructor `0xBF8AC0`
+also clears the tree via `0xC0CBF0`.
+This supplies the actual published-object bulk path missing from the
+pre-publication failure trace.
+Inside `0xC33060`, stored items receive virtual slot 0 with flag 1;
+the dynamic item types/targets remain unresolved, so deleting-destructor
+interpretation is not an established concrete deletion contract.
+The readiness byte's producer/phase meaning is next.
+
+## Direct-mapped resize is a no-write eligibility check followed by optional move
+
+Raw `0x12C94D0` routes low-two-bit-zero chunk headers through
+`0x12C6F40` at `0x12C9521..0x12C9529`.
+That helper returns the same chunk only when normalized request >=`0x100`,
+current size >=request+4, and size difference <=2*granularity.
+Otherwise it returns null, making no calls, header writes, or accounting changes.
+It does not grow/shrink the mapping itself.
+
+Outer raw `0x12CAE30` converts user pointer to header and back.
+On failed eligibility, successful fallback `0x12CA410` copies
+min(request,old usable capacity), frees old allocation, and returns new.
+Failed fallback returns null preserving old allocation in this helper;
+the separately traced VM callback can then free it.
+Ordinary chunks instead enter split/coalesce logic `0x12C953B..0x12C984B`,
+whose complete transition cases are the next task.
