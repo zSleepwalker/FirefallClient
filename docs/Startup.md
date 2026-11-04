@@ -151,6 +151,10 @@ The loader's chunk call at raw `0x12BB40E` is PE-bound to `MSVCR120.dll!fread` t
 
 The wrapper layout also records branch-specific slow-preserve instruction order: old/new backing data-pointer reads and the copy call precede logical-length and wrapper-pointer writes. `UiShaderSourceClearNativeLayout` separately records slow-zero capture of the old control, clearing wrapper `+8` then `+4`, and entry to its release path. The in-place zero path only writes backing logical length and is not an unconditional detach. These anchors are static access evidence only. A captured null allocation-output header does not acquire a clean failure result in this projection, and external allocator/reporting behavior is not executed or inferred.
 
+`UiShaderSourceAllocationProjectionRules` selects the observed pool branch only for unsigned requested size at most `0x800` and zero alignment. Its output pair records entry-time zero initialization, not the allocator's final result. Caller mapping keeps the first DWORD (header, installed at wrapper `+4`) separate from the second (control, installed at wrapper `+8`); pool selection does not imply allocation success.
+
+The captured chunk continuation advances the cumulative DWORD offset and subtracts the chunk only after a complete `fread` element. Offset addition wraps at 32 bits. A non-one result reaches slot `+0x14` cleanup without advancing either count; its return value is ignored. The projected return byte is zero on this failure, one on completion or a zero-length bypass, and absent while another iteration is required, conditional on cleanup and the stack-cookie check returning normally. It does not emulate cleanup effects.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves

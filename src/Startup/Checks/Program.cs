@@ -19,6 +19,7 @@ UiChildShaderCompileChecks.Run(Check);
 UiChildShaderBlobCleanupChecks.Run(Check);
 UiShaderSourceWrapperChecks.Run(Check);
 UiShaderSourceClearChecks.Run(Check);
+UiShaderSourceAllocationChecks.Run(Check);
 UiShaderSourceReadChecks.Run(Check);
 
 var expected = new[]
