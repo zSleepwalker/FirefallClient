@@ -86,6 +86,37 @@ internal static class StartupBinaryEvidence
             return ReadAt(VirtualAddressToFileOffset(checked(imageBase + hintNameRva)) + 2, name.Length)
                 .SequenceEqual(name);
         }
+        bool IsImportSlot(uint slotVirtualAddress)
+        {
+            long importDirectoryEntry = peOffset + 24 + 96 + 8;
+            uint importDirectoryRva = ReadUInt32(importDirectoryEntry);
+            uint importDirectorySize = ReadUInt32(importDirectoryEntry + 4);
+            if (importDirectoryRva == 0 || importDirectorySize == 0)
+                return false;
+
+            long descriptorStart = VirtualAddressToFileOffset(checked(imageBase + importDirectoryRva));
+            long descriptorEnd = descriptorStart + importDirectorySize;
+            for (long descriptor = descriptorStart; descriptor + 20 <= descriptorEnd; descriptor += 20)
+            {
+                uint originalThunkRva = ReadUInt32(descriptor);
+                uint nameRva = ReadUInt32(descriptor + 12);
+                uint firstThunkRva = ReadUInt32(descriptor + 16);
+                if (originalThunkRva == 0 && nameRva == 0 && firstThunkRva == 0)
+                    return false;
+
+                for (uint index = 0; index < 0x10000; index++)
+                {
+                    uint thunkVirtualAddress = checked(imageBase + firstThunkRva + index * 4);
+                    if (ReadUInt32(VirtualAddressToFileOffset(thunkVirtualAddress)) == 0)
+                        break;
+                    if (thunkVirtualAddress == slotVirtualAddress)
+                        return true;
+                    if (thunkVirtualAddress > slotVirtualAddress)
+                        break;
+                }
+            }
+            return false;
+        }
         string ReadCStringAscii(uint virtualAddress, int maximumLength)
         {
             byte[] bytes = ReadAt(VirtualAddressToFileOffset(virtualAddress), maximumLength);
@@ -189,6 +220,62 @@ internal static class StartupBinaryEvidence
             Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(stream))
                 == "97362D668FF64778193A64759265E4AE90842043C4A15B627DF9902FD9135445");
         stream.Position = 0;
+        check("Binary UI child initializer first-helper failure clears field +0x6C and returns AL zero",
+            RelativeBranchTargets(0xCA6A61, 0xE8, 0xCA6C20)
+            && Matches(0xCA6A66, "84C0")
+            && ShortConditionalBranchTargets(0xCA6A68, 0x75, 0xCA6AA1)
+            && Matches(0xCA6A87, "C7466C00000000")
+            && Matches(0xCA6A8E, "32C0")
+            && Matches(0xCA6AA0, "C3"));
+        check("Binary UI child initializer true branch calls its second helper and normalizes its result with setnz",
+            Matches(0xCA6AA1, "8BCE")
+            && RelativeBranchTargets(0xCA6AA3, 0xE8, 0xCA6C80)
+            && Matches(0xCA6AA8, "84C0")
+            && Matches(0xCA6AAA, "0F95C0")
+            && Matches(0xCA6ABD, "C3"));
+        check("Binary UI child initializer loop zeroes EDI and walks eight 8-byte entries from this+0x28",
+            Matches(0xCA6EEA, "33FF")
+            && Matches(0xCA6EEC, "8D7328")
+            && Matches(0xCA6F06, "8B44FC24")
+            && Matches(0xCA6F1D, "8B44FC28")
+            && Matches(0xCA6F21, "47")
+            && Matches(0xCA6F24, "83C608")
+            && Matches(0xCA6F27, "83FF08")
+            && ShortConditionalBranchTargets(0xCA6F2A, 0x7C, 0xCA6EF0));
+        check("Binary UI child initializer conditionally calls old slot-8 values, clears them, and stores replacements in observed order",
+            Matches(0xCA6EF0, "8B4EFC85C9740D")
+            && ShortConditionalBranchTargets(0xCA6EF5, 0x74, 0xCA6F04)
+            && Matches(0xCA6EF7, "8B0151FF5008")
+            && Matches(0xCA6EFD, "C746FC00000000")
+            && Matches(0xCA6F04, "8B0E")
+            && Matches(0xCA6F06, "8B44FC24")
+            && Matches(0xCA6F0A, "8946FC")
+            && Matches(0xCA6F0D, "85C9740C")
+            && ShortConditionalBranchTargets(0xCA6F0F, 0x74, 0xCA6F1D)
+            && Matches(0xCA6F11, "8B0151FF5008")
+            && Matches(0xCA6F17, "C70600000000")
+            && Matches(0xCA6F1D, "8B44FC28")
+            && Matches(0xCA6F22, "8906"));
+        check("Binary UI allocation diagnostic calls the known non-import assertion cell and its wrapper has return-capable callees",
+            Matches(0xCA6790, "FF15A05EC101")
+            && Matches(0x12B8006, "FF15A05EC101")
+            && VirtualAddressToFileOffset(0x1C15EA0) == 0x1814AA0
+            && sections.Any(section => section.Name == ".rdata"
+                && 0x1C15EA0 - imageBase >= section.Rva
+                && 0x1C15EA0 - imageBase - section.Rva < section.RawSize)
+            && ReadUInt32(VirtualAddressToFileOffset(0x1C15EA0)) == 0x016C37C0
+            && VirtualAddressToFileOffset(ReadUInt32(VirtualAddressToFileOffset(0x1C15EA0))) == 0x12C2BC0
+            && !IsImportSlot(0x1C15EA0)
+            && Matches(0x12C2BC0, "558BECFF75148B550CFF75108B4D08E80C0D000083C4085DC3")
+            && RelativeBranchTargets(0x12C2BCF, 0xE8, 0x12C38E0)
+            && Matches(0x12C2BD8, "C3")
+            && Matches(0x12C38E0, "558BEC")
+            && Matches(0x12C39A9, "C3"));
+        check("Binary caller branches a zero result to an AL-zero epilogue and returns 0x20 bytes without an epilogue call",
+            RelativeBranchTargets(0xBFB542, 0xE8, 0xCA66F0)
+            && Matches(0xBFB547, "84C0")
+            && RelativeConditionalBranchTargets(0xBFB549, 0x0F, 0x84, 0xBFB668)
+            && Matches(0xBFB668, "32C08B4C243064890D00000000595F5E5B8BE55DC22000"));
         check("Binary world scene factory resolves all three named scenes, builds and returns its root, and is stored by tfWorld",
             Matches(SceneFactoryNativeLayout.FactoryFileOffset + 0x2D, "68A0000000")
             && Matches(SceneFactoryNativeLayout.FactoryFileOffset + 0x4D, "E8AE0E0000")
@@ -10712,6 +10799,26 @@ internal static class StartupBinaryEvidence
             && Matches(0xCA6796, "83C42C")
             && Matches(0xCA6799, "837E74008D5E74897E64C7466820000000C7466C00000000")
             && ShortConditionalBranchTargets(0xCA67B1, 0x74, 0xCA67CD));
+        check("Binary first UI child required-lookup terminal tests signed EAX directly and returns success only for nonzero output",
+            UiChildRequiredLookupProjectionRules.FirstLookupDependencyVirtualSlotOffset == 0x16C
+            && Matches(0xCA7199, "FF966C010000")
+            && Matches(0xCA719F, "85C0")
+            && ShortConditionalBranchTargets(0xCA71A1, 0x78, 0xCA71C0)
+            && Matches(0xCA71A3, "833B00")
+            && ShortConditionalBranchTargets(0xCA71A6, 0x74, 0xCA71C0)
+            && Matches(0xCA71B7, "B001")
+            && Matches(0xCA71BD, "C20C00")
+            && Matches(0xCA71E2, "32C0"));
+        check("Binary second UI child required-lookup terminal tests signed EAX directly and returns success only for nonzero output",
+            UiChildRequiredLookupProjectionRules.SecondLookupDependencyVirtualSlotOffset == 0x1A8
+            && Matches(0xCA72CF, "FF96A8010000")
+            && Matches(0xCA72D5, "85C0")
+            && ShortConditionalBranchTargets(0xCA72D7, 0x78, 0xCA72F6)
+            && Matches(0xCA72D9, "833B00")
+            && ShortConditionalBranchTargets(0xCA72DC, 0x74, 0xCA72F6)
+            && Matches(0xCA72ED, "B001")
+            && Matches(0xCA72F3, "C20C00")
+            && Matches(0xCA7318, "32C0"));
 
         check("Binary UI manager shutdown checks the partial-init byte, clears both init bytes, and dispatches state sync through slot +0xB0",
             Matches(
