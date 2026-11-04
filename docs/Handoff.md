@@ -11,7 +11,7 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Current delegated boundaries are startup formatting-depth pairing
-and downstream assertion-reporter termination policy. Mode-16 fixed scatter and normal
+and assertion-exception handler registration/interception. Mode-16 fixed scatter and normal
 buffer release are resolved.
 Shutdown-request callers
 and texture writer dispatch/serialization are bounded unresolved stops,
@@ -7381,3 +7381,29 @@ The cell lies in read-only .rdata; the bounded literal-reference scan found
 calls, not publication writes.
 This proves return-capable structure only, not that downstream reporting
 returns in the selected failure scenario. The next scope is raw `0x12C3470`.
+
+## Assertion reporter uses a locally continuable exception on this path
+
+Active-sample raw `0x12C38E0` formats assertion text using sprintf_s
+through IAT **VA** `0x1AC48DC`, flushes via _flushall at
+**VA** `0x1AC46E0`, then calls `0x12C3470` at `0x12C3972`.
+Arguments include literal exception code `0x012ED502`, ASSERT text,
+message buffer, and byte flag 1. The numeric code is not an address.
+
+Raw `0x12C34FC` calls RaiseException through IAT **VA**
+`0x1AC41B0` (raw `0x16C2DB0`) with code, flags zero and four
+arguments containing string lengths/pointers. Local scope metadata at
+raw `0x19AD398` selects filter raw `0x12C350B`, bytes
+`83 C8 FF C3`, returning -1 / EXCEPTION_CONTINUE_EXECUTION.
+On this flag-1 path, code can resume, restore its frame and return at
+`0x12C3545`; its parent can log conditionally then return at
+`0x12C39A9`. Neither inspected function directly calls terminate/abort/exit
+or checks debugger presence.
+
+Flag zero takes a different RaiseException call at `0x12C3524`,
+with EXCEPTION_NONCONTINUABLE and no local try; that is not this
+allocator reporter's selected call.
+Local return-capable control flow does not prove process outcome:
+vectored or outer reporting handlers can intervene. The next bounded
+scope looks for code `0x012ED502` recognition and actual registration,
+not an unconditional recovery claim.
