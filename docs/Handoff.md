@@ -11891,3 +11891,11 @@ precedes frame-10 store and unsigned JA to `BE69A7`.
 Postcopy branch-body trace was read but not assigned: the fallthrough
 call pushes a frame-10 RELOAD (not an assumed retained pointer), while
 the taken branch pushes retained EDX. Keep those observations independent.
+
+First-copy pushed as `f08987c`. Postcopy gate reviewed/registered and passes
+the pinned runner, with corrected missing-frame fixture EDX `100`, not zero.
+Next branch-copy code owner is Luna
+`18869950-8206-425d-ae36-867cf091600a` for `[BE6960,BE6984)` and
+`[BE69A7,BE69BD)`; immutable owner
+`0e7f8d4c-c6ed-4c24-8fae-aa82e11df0e6` preserves pending gate anchors.
+Do not stage evidence until writer completion.

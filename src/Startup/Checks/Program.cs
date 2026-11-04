@@ -9,6 +9,7 @@ PayloadWordGrowthDoublingChecks.Run(Check);
 PayloadGrowthBufferAllocationChecks.Run(Check);
 PayloadWordAppendChecks.Run(Check);
 PayloadGrowthFirstCopyChecks.Run(Check);
+PayloadGrowthPostCopyGateChecks.Run(Check);
 
 void Check(string name, bool condition)
 {
