@@ -8083,3 +8083,21 @@ referenced by logger `+0x14`, passing context from `+8`.
 This chain establishes formatted diagnostic logging, not dump-file output.
 The follow-up relied on the previously supplied virtual-target resolution;
 empty IDA data xrefs neither independently confirm nor disprove that slot.
+
+## Application shutdown entry resolved; console close ordering remains open
+
+Call raw `0x2EB1F9` has bytes `E8 D2 E3 01 00`, resolving to
+ClientApplicationShutdown raw `0x3095D0`.
+The inspected body drains queued objects before subsystem cleanup.
+Concrete edges include call raw `0x309678 -> 0x30D150`,
+virtual slots `+0x10/+0x14` through global **VA** `0x1E002B8`,
+and call raw `0x309804 -> 0x10D8E30`; it returns at `0x3098BA`.
+
+No direct console-object reference or callback-slot restoration was found
+in that body. This does not establish transitive absence through its callees.
+Console close raw `0xE5EEE0` itself does not restore callback slot
+**VA** `0x1DF96F8`, but its actual shutdown caller and ordering relative
+to application return remain unresolved. Consequently a blanket claim that
+the inspected shutdown leaves the callback unchanged after file close would
+overstate the evidence. The successor follows the concrete service teardown
+edges rather than repeating direct-reference scans.
