@@ -12,7 +12,7 @@ are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
 file-close path. Active boundaries are shutdown-message gates/sink fallback
-and traceback fallback-name ownership.
+and traceback fallback-name exceptional restoration.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
 Normal native CRT return selects `exit(status)`.
 Exit registration and its logger cleanup predicate are resolved.
@@ -8324,3 +8324,30 @@ Console slot `+0xC0` at raw `0x1876B68` contains
 `D0 BC 25 01`, target **VA** `0x125BCD0`, raw `0xE5B0D0`.
 It returns when receiver byte `+4` is zero; otherwise it decrements/clamps
 indentation depth **VA** `0x1E49A10`. This resolves that final virtual edge.
+
+## Traceback fallback name is borrowed per-dispatch state with normal save/restore
+
+Raw `0xC3B3C0` takes original argument `a2` into EBX.
+At `0xC3B50A` it saves global **VA** `0x1E4891C` in ESI;
+at `0xC3B514` it installs EBX in that global.
+After dispatch raw `0xC289C0` and helper `0xBF7860`, raw `0xC3B582`
+restores the saved pointer. This is a temporary borrowed-pointer override,
+not an allocation/copy or clear-to-zero. Normal nested/reentrant returns
+restore the prior value; exceptional restoration remains unverified.
+
+The global lies in `.data`'s virtual tail at delta `0x8391C`,
+beyond raw size `0x71800` and within VirtualSize `0x15647C`.
+Its loader initial value is zero; raw-IDB apparent bytes are not initialization.
+Traceback consumers raw `0xC294A0` and `0xC2C767` select the global
+when nonzero, otherwise a `"~unnamed~"` literal (the latter at
+**VA** `0x1BBB50C`, backed raw `0x17BA10C`).
+
+Caller raw `0xC38CA0` supplies `a2` from per-entry field `v8[2]`
+with a default when null, separately from `*v8`.
+Format **VA** `0x1BBD77C` is `"%s - %s"`: the object's `+0x70`
+label is first, this argument second. The argument also reaches string-cache/
+push calls `0xC281A0 -> 0xCD5020` and callback dispatch.
+The supported interpretation is a per-entry name/source used during dispatch,
+not a proven application-specific script/command identifier.
+Five explicit address references cover the two readers and save/install/restore;
+this bounded scan does not exclude computed or aliased writes.
