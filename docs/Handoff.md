@@ -10604,3 +10604,10 @@ The shader-frame implementation initially reported completion without the
 requested files appearing in this worktree. A same-task delivery correction
 is pending; it is not integrated or committed. Independent active scopes
 are compile import/literal PE assertions and code/error blob cleanup.
+
+The shader-frame files were subsequently delivered to this worktree.
+Coordinator review added separate raw helper anchors for both variants,
+registered their focused checks, and pushed the verified capture-only
+projection. It preserves all eleven arguments and does not compile code.
+Independent source-object provenance, blob cleanup, and failure-loop byte
+geometry traces are active alongside the compile-frame PE integration.
