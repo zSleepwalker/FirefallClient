@@ -12,7 +12,7 @@ are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
 file-close path. Active boundaries are scripting-owner post-creation failure cleanup
-and exact heap trim VirtualFree operands/countdown reset arbitration.
+and the additional heap region-release helper's role.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
 Normal native CRT return selects `exit(status)`.
@@ -8994,3 +8994,27 @@ Caller `0xBFCA30` consumes its created object's `+0x70` label and a
 collection at its own `+0x5E4`, not a proven `+0xA00` publication.
 The missing UI-context identity edge remains a bounded stop; these objects
 must not be merged solely from their shared VM field offset.
+
+## Exact heap release operands and signed countdown reset supersede prior conflicts
+
+The immutable-byte arbitration finds three IAT `0x1AC42B4` calls,
+all `FF 15 B4 42 AC 01`, with these arguments:
+
+| Raw call | Pushes immediately before call | Arguments |
+|---|---|---|
+| `0x12C7A91` | `68 00 80 00 00 6A 00 57` | `(EDI,0,0x8000)` |
+| `0x12C7CC1` | `68 00 80 00 00 6A 00 56` | `(ESI,0,0x8000)` |
+| `0x12C7DB5` | `68 00 80 00 00 6A 00 56` | `(ESI,0,0x8000)` |
+
+The previously PE-verified VirtualFree import therefore receives MEM_RELEASE,
+not MEM_DECOMMIT, including in the disputed trim path.
+The third call belongs to raw `0x12C7D30..0x12C83A0`, whose role is
+a new bounded continuation. No fixed 4096-byte RegionSize is inferred from
+the reported `0x1000` query check without decoding its structure field.
+
+At raw `0x12C7B4E..0x12C7B5C`, bytes
+`B9 FF 0F 00 00 8B C6 3B F9 0F 4F CF 89 4B 20`
+load ECX=`0xFFF`, compare EDI with ECX, select EDI with signed CMOVG,
+and store ECX at heap `+0x20`.
+Thus reset is `max(0xFFF, (int32_t)visitedCount)`, not a cap/minimum.
+Earlier capped-count statements are superseded by these exact instructions.
