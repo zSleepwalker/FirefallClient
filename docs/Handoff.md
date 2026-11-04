@@ -10807,3 +10807,35 @@ post-decrement value. The separate `control+8` sequence decrements the
 returned old value before testing it. These distinct observations do not
 establish initialization invariants or justify a shared-pointer type name.
 Immutable PE checks and a branch-specific wrapper-clear layout are assigned.
+
+Those checks and the wrapper-clear layout are now integrated: the focused
+runner registers `UiShaderSourceClearChecks`, and immutable sample checks
+bind the clear sequence, both atomic flag sequences, slot `+0x14` dispatch,
+and slow-preserve access order. The release address `0x12CBE24` is named
+as an entry target, not as the address of the zero-branch instruction
+(`0x12CBD58`). The latest pushed evidence commit is `1dbe58f`.
+
+Active follow-ups are the exact in-place predicate, bounded allocator
+output-pair contract, captured read-tail continuation, and non-detaching
+slot `+8` offset projection. A first read-tail custom-agent attempt lacked
+MCP access and produced no fresh sample evidence; its successor must use
+available MCP discovery or immutable local byte disassembly, not promote
+the predecessor's repository-only observations to verified instructions.
+
+## Capacity reuse predicate correction
+
+The bounded fast-path trace resolves the size comparison as **capacity at
+backing `+0`**, not old logical length at `+0xC`. Any earlier shorthand
+that required requested size to be no greater than old length is superseded.
+At raw `0x12CBCF5..0x12CBD13`, the gates test nonnull control,
+control `+4 == 1`, unsigned requested size no greater than an earlier
+capacity capture, and zero alignment or zero unsigned data-pointer modulo
+alignment. Raw `0x12CBD15/0x12CBD17` re-reads capacity and takes JBE to
+the length write `0x12CBD33`. The above-capacity alternative enters an
+assertion block and can reach that write if the diagnostic returns;
+the direct-edge projection must not classify every alternative as failure.
+Separate capacity captures are required; no atomic snapshot is established.
+
+The fast-path agent's reported entry VA `0x16DCCB0` was arithmetic error:
+raw `0x12CBCB0 + 0x400C00 = VA 0x16CC8B0`. Raw anchors remain the
+evidence basis. Capacity predicate code and immutable PE gates are assigned.
