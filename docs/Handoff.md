@@ -11,9 +11,10 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are exact nested-container backing-slot fill
-and arithmetic/import binary regression evidence; callback publication remains parked.
-UI lifecycle code/checks are committed.
+file-close path. Active boundaries are nested-container initializer PE anchors
+and UI child `+0x24` destructor release; callback publication and composite
+container semantic identity remain parked. UI lifecycle, arithmetic/import
+regressions, and immutable backing-slot projection code/checks are committed.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
 Normal native CRT return selects `exit(status)`.
@@ -10294,3 +10295,13 @@ version increment, and both full-DWORD invalidation stores. Coordinator
 execution of the focused Startup checks against the immutable sample passed.
 This validates captured instruction evidence, not native execution or x87
 emulation.
+
+The structural reconstruction is now implemented as an immutable sixteen-slot
+captured-sentinel projection with focused geometry, high-bit-pointer, and
+field-value checks. Coordinator review removed an unsupported stack-operand
+constant and corrected the documentation: count sixteen is distinct from the
+address of the local source pointer. No native allocator is emulated.
+The bounded lookup-shape search found no anchored key/bucket operation;
+semantic container identity remains parked, not disproved.
+Active successors verify initializer PE anchors and separately trace UI child
+`+0x24` release from the concrete manager destructor.
