@@ -10,8 +10,8 @@ PrivateDialog receiver identification, AES "block-size" interpretation,
 and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
-Current delegated boundaries are the logger's exact unwind cleanup action
-and heartbeat vtable startup/worker targets. Assertion interception is a bounded
+Current delegated boundaries are the logger cleanup tail-jump target/effect
+and heartbeat startup-hook return. Assertion interception is a bounded
 unresolved stop. Mode-16 fixed scatter and normal
 buffer release are resolved.
 Shutdown-request callers
@@ -7682,3 +7682,23 @@ Unwind map **VA** `0x1DAE694` (raw `0x19AD294`) has state
 0->-1 cleanup **VA** `0x1A954D0`, raw `0x16948D0`.
 This identifies the action but does not yet prove its instructions decrement
 depth or leave the critical section; the next bounded task decodes that action.
+
+## Lock vtable confirms heartbeat worker and identifies startup-hook target
+
+Constructor raw `0x130930A` stores vptr **VA** `0x1C812B0`,
+raw `0x187FEB0`. Slot `+0xC` contains **VA** `0x170A480`,
+raw `0x1309880`, closing the _beginthreadex thunk-to-worker chain.
+Slot `+4` contains **VA** `0x6EC4D0`, raw `0x2EB8D0`.
+Raw `0x13095D7` is the already-known virtual-call site, not a proposed
+hook implementation; the follow-on's wording to the contrary adds no gap.
+The next narrow check decodes the actual slot-4 target.
+
+## Logger cleanup selects a stack guard and tail-jumps
+
+Raw `0x16948D0` bytes `8D 8D 7C F9 FF FF E9 F5 85 C5 FE`
+select `[ebp-0x684]` in ECX and jump onward.
+The report did not resolve that target; its numeric target requires an
+exact rel32 arithmetic check before integration.
+Absence of a direct LeaveCriticalSection in this small thunk neither proves
+nor refutes exceptional release. Security-cookie calls in the main handler
+do not resolve the guard cleanup and are not followed as a substitute.
