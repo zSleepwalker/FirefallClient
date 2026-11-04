@@ -11,7 +11,7 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are cursor-selection setter provenance
+file-close path. Active boundaries are the cursor-selection tree payload publisher
 and derived-angle normalization's import, constants, and exceptional comparisons.
 UI lifecycle code/checks are committed.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
@@ -9834,6 +9834,23 @@ constant mapping, and unusual sign/unordered branch report are a separate
 bounded follow-up before accepting a complete arithmetic projection.
 Earlier virtual calls remain unresolved, so this derived-state trace does
 not prove absence of indirect writes to the later record source fields.
+
+## Selection setter copies a shared-key tree payload and a separate byte flag
+
+Raw `0xBFF930` receives a pointer whose first DWORD supplies a shared-text
+lookup key. Lookup resolves a tree node; when it differs from UI `+0x6C8`
+sentinel, the node's `+0x14` DWORD is read at `0xBFF9ED` and copied
+to UI `+0x58C` at `0xBFFA14`. Argument two's byte is copied to
+`+0x590` at `0xBFFA2B`; `+0x594` is copied from UI `+0x990`
+at `0xBFFA37`. Constructor `0xBF7A80` initializes `+0x584/+0x588`
+to zero at `0xBF7C54/0xBF7C5E`, not to proven nonzero cursor handles.
+
+No WinAPI call in this setter proves the tree payload's origin. Its use
+in the cursor comparison is evidence of consumption, not independent
+proof that every payload is a cursor handle. The successor follows the
+tree's concrete publisher. The report's unresolved label for final
+`0xBFFA3F` does not reopen the already composed UI vtable binding to
+`0xBFFA90`; runtime replacement remains the existing qualification.
 
 The report's apparent VA lookup discrepancy is not a new mapping gap:
 the IDB is raw/base-zero and a numeric runtime VA must not be used directly
