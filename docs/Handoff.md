@@ -12,7 +12,7 @@ are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
 file-close path. Active boundaries are scripting prefix-registry bulk teardown
-and direct-mapped allocation selection/fallback policy.
+and exact direct-mapping Windows allocation flags/size arithmetic.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
 Normal native CRT return selects `exit(status)`.
@@ -9198,3 +9198,22 @@ Absence of prefix-tree erase in that failure cleanup does not establish
 missing erase for successfully published objects.
 Repeated tracing of that path is parked. The next task follows actual
 manager shutdown/destructor and bulk prefix-container cleanup.
+
+## Direct mapping is threshold gated and falls back to normal region growth
+
+Raw `0x12C6A90` initializes **VA** `0x1EDAFC4` to `0x40000`
+(256 KiB), trim threshold `0x1EDAFC8` to `0x200000`,
+and flags `0x1EDAFCC/0x1EDAF84` to 7.
+Raw `0x12C7690` attempts direct mapping when heap flags `+0x1BC`
+include mask 1, normalized request meets the threshold, and top-size
+field `+0x0C` is nonzero. Factory flags 5 preserve that direct-map mask.
+The prior report's `0x12C327D0` publication address was a typo for
+the previously verified raw `0xC327D0`.
+
+Raw `0x12CA410` searches bins/available chunks first. A failed direct
+attempt in `0x12C7690` falls through to normal region growth, not a new
+bin search. Both paths account the full region extent at `+0x1B0`
+and update peak `+0x1B4`; direct mapping also updates minimum base `+0x10`.
+The new report gives direct VirtualAlloc flags `0x103000`, versus normal
+`0x3000`; exact operands and its inconsistent round-up notation require
+a narrow byte-backed follow-up before assigning further flag semantics.
