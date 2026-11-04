@@ -11,7 +11,7 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are PrintConfig echo-mode lifetime/output
+file-close path. Active boundaries are PrintConfig echo-mode unwind cleanup
 and protected VM status-specific stack/error recovery.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
@@ -8557,3 +8557,27 @@ converted to the protected wrapper's returned status, rather than necessarily
 escaping the caller's borrowed-name interval.
 The metadata alone does not establish foreign/SEH exception translation or
 asynchronous-exception handling; those remain outside this resolved contract.
+
+## PrintConfig echo formatting and normal mode lifetime resolved
+
+Addresses here remain raw IDB/file offsets: the follow-up's subtraction
+of the code bias from `0xE8A9F0` was incorrect.
+At raw `0xE8AB23..0xE8AB45`, the successful setup path invokes console
+`+0xF4(1)`, pumps its local buffer via `0xE89EC0` with flag 1,
+then invokes `+0xF4(0)`. Setter raw `0xE89EB0` stores the low argument
+byte into **VA** `0x1E49A59` at `0xE89EB3..0xE89EBB`.
+The ordinary sequence does not preserve prior mode; exceptional restoration
+remains an EH-map continuation.
+
+In raw `0xE89C50`, nonzero token count and that mode select echo instead
+of lookup. At `0xE89CCA..0xE89CD8`, token 0 is supplied directly as
+the format to console `+0xB0`, severity 2, null varargs pointer.
+There is no caller-side `"%s"` wrapper for this token.
+Later tokens use raw `0x322C40` with the already PE-verified `" %s"`
+format; the final output fragment is CR-only at `0xE89D2F..0xE89D3C`.
+Each path applies console enabled/suppression/threshold gates.
+This describes forwarding only, not a demonstrated runtime outcome.
+
+Pump flag 1 bypasses wait/deadline checks but not ExecSkip's positive-count
+segment consumption (`0xE89F70..0xE89F91`). Consequently PrintConfig
+mode does not guarantee every parsed segment reaches the echo branch.
