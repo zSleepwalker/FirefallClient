@@ -11230,3 +11230,20 @@ standard runner passes. Config/iteration PE review found two mapping typos
 (`0x12CDB40` maps to `0x16CE740`; `0x12CE1AD` to `0x16CEDAD`)
 and windows ending inside instructions. The evidence author is correcting
 the full RET4 config end and half-open loop boundary before pinned validation.
+
+The corrected config return is RET `0x0C`, not RET4; its full function
+is raw `[0x12CDB40,0x12CDC1E)`. Corrected config/loop/base-alignment
+PE checks and registered iteration code pass the pinned runner.
+Result/base-alignment code is pushed at `139243d`.
+
+Configuration code review requires independent field captures across
+reporting calls (later count, alignment checks, and padding size/alignment
+reads); the author is correcting this before registration.
+Reset `0x12CDC50` supplies the nearest other stride consumer and is split:
+entry gate code `7241208e-7ce8-4b92-a830-7436861ea6be`,
+candidate membership/callback code `3a675c98-1f00-4cc0-8262-da2ab5d8c18d`,
+finalization trace `f1c4a86f-b092-4e98-b251-9caf1a669665`.
+Exclusive PE writer `1c5dd201-df95-44cc-959a-9c60cd174adc` owns entry/
+callback assertions and preserves the reviewed config/loop additions.
+Actual callback instruction is raw `0x12CDDD4`, not the earlier
+stride report's `0x12CDDD3`.

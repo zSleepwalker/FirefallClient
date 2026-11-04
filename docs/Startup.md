@@ -209,6 +209,8 @@ Its separate entry projection reports `0x76` when the captured global readiness 
 
 `UiShaderSourcePoolReplenishmentAlignmentProjectionRules` starts after that push returns. It captures the divisor once from `+0x18`, rounds wrapping `block+4` upward when its remainder is nonzero, and checks the resulting candidate with a second unsigned division. Zero divisor stops at the first divide-error boundary. Wrapping with a non-power-of-two divisor can still reach diagnostic `0x2BA`; the projection does not repair that candidate or infer valid allocation storage.
 
+`UiShaderSourcePoolReplenishmentIterationProjectionRules` records one already-entered loop iteration, computing a wrapping entry address from the captured index, base, size, and padding. It distinguishes divide error, nonreturning diagnostic `0x2C0`, and nonreturning primary-push boundaries. Only normal continuation requires the separately captured later base and fresh `+0x20` bound; unsigned comparison of the incremented index selects the next-iteration boundary. The entry predicate is separate, and no whole-loop execution or helper effects are simulated.
+
 `SingletonTeardownWalkerProjectionRules` records the surrounding list walker at raw `0x12C3AF0`: after any returning entry diagnostic, capture the initial global head, clear byte VA `0x1E4B096`, and set guard byte VA `0x1E4B095`. A nonnull head receives one slot-eight dispatch, followed by an independent global-head capture. A null initial or later head selects the final guard clear; a nonnull later head stops at the repeat boundary. The walker itself reads no next link and supplies no explicit dispatch arguments. This is not a virtual-callback or complete-shutdown simulation.
 
 ## Sorted adapter-address MD5 (offline projection)
