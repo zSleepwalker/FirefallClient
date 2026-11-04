@@ -11,7 +11,7 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are scripting-object success publication
+file-close path. Active boundaries are scripting prefix-registry removal/lifetime
 and allocator chunk-header encoding/alignment metadata.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
@@ -9135,3 +9135,26 @@ With internal locking enabled, this branch precedes normal LeaveCriticalSection
 at `0x12C9CF8` and has no local unlock. This is the external CRT abort
 boundary, not an inference from the following INT3 padding.
 The header's first-word interpretation remains a producer-side follow-up.
+
+## Scripting success publishes into distinct prefix tree and pointer hash set
+
+Raw `0xBFCA30` indexes manager `+0x5E4` by the created object's
+shared-text prefix at `+0x70`. Helper `0xC07380` returns its mapped-value
+slot; `0xBFCC05` stores the object pointer there. Insertion helpers
+`0xC09C10 -> 0xC173D0/0xC17480` use node shared-text key `+0x10`
+and pointer value `+0x14`, retaining the key and initially nulling the value.
+The stored object pointer has no visible AddRef in this path.
+
+Duplicate-prefix precheck at `0xBFCBAE` reports/asserts. If reporting
+returns, lookup reuses the existing node and replaces its pointer value;
+this is not duplicate-node insertion. Prior-object lifetime in that case
+was not established.
+Success path `0xC38400 -> 0xC53B90` separately inserts the raw object
+pointer into hash set `+0x5EC`, distinct from the prefix-keyed tree.
+No direct success-path assignment to selection slot `+0x574` was found
+in the inspected routines; its removal-time equality clear does not prove one.
+
+Raw `0xBFCF30` removes pointer-set/array entries but does not yet establish
+prefix-tree removal. The next bounded trace follows that tree's lifetime
+relative to object destruction. The containers' raw-pointer storage alone
+does not establish the manager's complete ownership/refcount policy.
