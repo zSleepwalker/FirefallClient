@@ -10889,3 +10889,12 @@ nonzero input capacity, and the control helper used an unestablished
 "weak reference count" name for field `+8`. Both are assigned back for
 correction before staging. Passing mirrored constant checks alone does
 not validate either claim; retain independent PE evidence.
+
+Copy preservation and pooled control capture code are registered and
+pushed at `ca56d6a`. Coordinator review also renamed the preserve-byte
+offset to an EBP-relative argument, not an object field. The positive
+replacement projection requires its accessor capture before testing any
+preserve byte, and preserves all byte values' zero/nonzero behavior.
+Primary/secondary control count names avoid unsupported ownership labels.
+Alignment capacity correction remains pending; do not stage that pair
+until its native capacity store and corrected focused checks are reviewed.
