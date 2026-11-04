@@ -11,8 +11,8 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are service/console deinitialization state
-after that close and traceback metadata fields/special cases.
+file-close path. Active boundaries are exact service-deinit final-call targets
+and traceback metadata fields/special cases.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
 Normal native CRT return selects `exit(status)`.
 Exit registration and its logger cleanup predicate are resolved.
@@ -8247,3 +8247,30 @@ No insertion/pop or sentinel initialization was established by the bounded
 follow-up. Therefore current-to-parent interpretation remains conditional
 on the head being the active frame. Further repeated producer scans are
 parked; the next task addresses concrete formatter fields and special cases.
+
+## Callback reference is slot indirection; deinit path unlinks rather than reopens
+
+Raw `0x12C1A4D` is inside the immediate of instruction `0x12C1A4A`,
+`mov [ebx+0x14], offset 0x1DF96F8`, in constructor raw `0x12C1A20`.
+It stores the address of the callback slot in a category object, not a new
+callback into that slot. Emitter raw `0x12C2030` checks both that pointer
+and the pointed-to callback before invocation. Setter raw `0x12C19F0`
+changes the slot; exact selection of its fallback remains distinct from
+the constructor's late-bound indirection.
+
+Immutable PE parsing resolves IAT **VA** `0x1AC471C` as
+**MSVCR120.dll!_wunlink**. Path processing at raw `0xE5F4A9`
+converts UTF-8 via MultiByteToWideChar at `0xE5F4D9`
+(code page `0xFDE9`, source length -1, buffer capacity `0x400` wide chars).
+Call `0xE5F4EE` unlinks that path; results 0 and -1 pass the local check.
+This is not a reopen/rename. At `0xE5EF78`, the receiver is the separately
+loaded global **VA** `0x1E69348`, rather than merely the current
+receiver's field. Later raw `0xE6F7C0` releases list `+0x48` entries'
+shared-text members `+0x14` and resets list state.
+
+The latest follow-up disputes the previously reported final-call target:
+raw `0xE55565` was reported as `0x321C40`, not `0x322C40`.
+It did not return exact displacement bytes, so the claimed post-close
+logging attempt is provisional pending immutable-byte arbitration.
+The independent `0xE5AB80 -> 0x12C2030` logging path does not by itself
+prove that this service-deinit call reaches it.
