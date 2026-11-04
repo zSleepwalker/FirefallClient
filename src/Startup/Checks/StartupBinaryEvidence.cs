@@ -7034,6 +7034,23 @@ internal static class StartupBinaryEvidence
             && Matches(0x12CB997, "8B460485C0740C8B4004034508")
             && Matches(0x12CB9AA, "5F33C05E5DC20400")
             && Matches(0x12CB9C0, "8B410485C074048B400CC333C0C3"));
+        check("Binary shader-source requested length loads captured size and applies the unsigned caller-cap minimum",
+            UiShaderSourceReadProjectionRules.CapturedSizeLoadRawFileOffset == 0x12BB366
+            && UiShaderSourceReadProjectionRules.RequestedLengthCompareRawFileOffset == 0x12BB3D0
+            && UiShaderSourceReadProjectionRules.RequestedLengthClampRawFileOffset == 0x12BB3D3
+            && Matches(UiShaderSourceReadProjectionRules.CapturedSizeLoadRawFileOffset, "8B7C2444")
+            && Matches(UiShaderSourceReadProjectionRules.RequestedLengthCompareRawFileOffset, "3B7D0C")
+            && Matches(UiShaderSourceReadProjectionRules.RequestedLengthClampRawFileOffset, "0F477D0C")
+            && UiShaderSourceReadProjectionRules.SelectRequestedLength(0x80000000, 0x7FFFFFFF)
+                == 0x7FFFFFFF
+            && UiShaderSourceReadProjectionRules.SelectRequestedLength(0x7FFFFFFF, 0x80000000)
+                == 0x7FFFFFFF);
+        check("Binary shader-source receiver slot +0x1C call precedes the zero test and its branch",
+            UiShaderSourceReadProjectionRules.RequestedLengthSlotSetupRawFileOffset == 0x12BB3DA
+            && UiShaderSourceReadProjectionRules.RequestedLengthReceiverOffset == 0x1C
+            && Matches(UiShaderSourceReadProjectionRules.RequestedLengthSlotSetupRawFileOffset, "FF501C")
+            && Matches(0x12BB3E3, "85FF")
+            && ShortConditionalBranchTargets(0x12BB3E5, 0x74, 0x12BB42E));
         check("Binary slBlob read loop maps MSVCR120 fread and verifies its capped arguments, slot +4 call, result comparison, and failure slot +14 call",
             VirtualAddressToFileOffset(0x1AC490C) == 0x16C350C
             && IsImportSlot(0x1AC490C)

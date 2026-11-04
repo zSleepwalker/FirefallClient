@@ -35,9 +35,6 @@ public static class UiShaderSourceReadProjectionRules
             ? capturedSize
             : callerCap;
 
-    public static bool IsRequestedLengthSetupNeeded(uint requestedLength) =>
-        requestedLength != 0;
-
     public static bool IsCompleteChunkRead(uint capturedFreadElementCount) =>
         capturedFreadElementCount == FreadElementCount;
 }

@@ -56,10 +56,8 @@ internal static class UiShaderSourceReadChecks
             && UiShaderSourceReadProjectionRules.SelectRequestedLength(0x80000000, 0x7FFFFFFF) == 0x7FFFFFFF
             && UiShaderSourceReadProjectionRules.SelectRequestedLength(0x7FFFFFFF, 0x80000000) == 0x7FFFFFFF);
 
-        check("Shader-source requested length composes with the chunk cap and skips zero-length setup",
-            requestedLengthChunkCompositionIsBounded
-            && UiShaderSourceReadProjectionRules.IsRequestedLengthSetupNeeded(0) == false
-            && UiShaderSourceReadProjectionRules.IsRequestedLengthSetupNeeded(1));
+        check("Shader-source requested length composes with the separate chunk cap",
+            requestedLengthChunkCompositionIsBounded);
 
         check("fread success compares its element count to one, not its byte count",
             UiShaderSourceReadProjectionRules.FreadElementCount == 1
