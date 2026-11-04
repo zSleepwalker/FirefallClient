@@ -143,6 +143,8 @@ The eleven required lookup gates in `0xCA6C80` share a failure target at `0xCA6F
 
 The earlier calls through IAT VA `0x1AC40AC` are `D3DCOMPILER_43.dll!D3DCompile`, not generic status adapters. `UiChildShaderCompileProjectionRules` records the eleven captured arguments for raw calls `0xCA70FA` and `0xCA725A`: source pointer from virtual `+4`, source size from virtual `+0xC`, null source-name/defines/include pointers, entry/profile `general_drawing_vs`/`vs_3_0` or `general_drawing_ps`/`ps_3_0`, zero flags, and captured local code/error blob output addresses. The pure projection does not invoke compilation, validate pointers, identify the virtual implementations, or infer blob ownership.
 
+The compiler blob cleanup paths remain distinct in `UiChildShaderBlobCleanupNativeLayout`. Negative compile status selects the error blob for diagnostic use and conditional virtual `+8` cleanup; this branch does not read the code-output local. Nonnegative status conditionally cleans and clears the error output before using the code blob through virtual `+0xC`. The code blob is conditionally cleaned after either terminal predicate outcome. Shared failure cleanup therefore handles the path-selected pointer, not both outputs unconditionally. These observations neither prove what an external compiler may output on failure nor assign cleanup to the source object.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves

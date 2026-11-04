@@ -16,6 +16,7 @@ UiChildRequiredLookupChecks.Run(Check);
 UiChildPairReplacementChecks.Run(Check);
 UiChildScratchCleanupChecks.Run(Check);
 UiChildShaderCompileChecks.Run(Check);
+UiChildShaderBlobCleanupChecks.Run(Check);
 
 var expected = new[]
 {
