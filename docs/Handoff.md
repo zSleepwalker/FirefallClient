@@ -11,7 +11,7 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Current delegated boundaries are logger exit-cleanup registration
-and timed-join caller object identity. Logger unwind binding is now composed
+and the distinct timed wrapper's field-8 resource ownership. Logger unwind binding is now composed
 from the recorded guard initialization and exact EH action. Assertion interception is a bounded
 unresolved stop. Mode-16 fixed scatter and normal
 buffer release are resolved.
@@ -7794,3 +7794,17 @@ IAT **VA** `0x1AC4388` is RVA `0x16C4388`, raw `0x16C2F88`;
 hint/name RVA is `0x19BF84E`, hint `0x52`.
 This supplies direct import evidence for the previously traced handle cleanup,
 separate from whether waiting succeeded or the worker actually terminated.
+
+## Ten-second join belongs to a distinct wrapper, not the heartbeat lock
+
+Raw `0x1309900` resets this vptr to **VA** `0x1C80C5C`,
+distinct from heartbeat lock **VA** `0x1C812B0`.
+Its started-byte check gates a join at raw `0x1309933`,
+bytes `E8 38 66 FB FF`, with timeout 10000 pushed at `0x130992C`.
+Regardless of that condition, raw `0x1309938/0x130993A` pushes
+field `+8` and calls IAT **VA** `0x1AC4940`.
+That separate resource's type must not be inferred as a thread HANDLE
+or this call confused with the verified CloseHandle for wrapper `+0xC`.
+Constructor candidate raw `0x13093E0` stores the same vptr at
+`0x13094CE`; exact field-8 creation and its cleanup import are the
+next narrow check. Concrete class name and complete caller chain remain open.
