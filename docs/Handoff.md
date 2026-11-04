@@ -10716,3 +10716,17 @@ The captured size and chunk predicates are now registered, passed focused
 checks, and pushed. Active successors trace only the preserve helper's
 equal-size/null-backing behavior and the loader's requested-length clamp.
 Independent PE checks cover the wrapper mapping/getter and fread anchors.
+
+The wrapper/fread PE groups passed coordinator execution and are pushed.
+Existing binary evidence already names this wrapper `slBlob`; subsequent
+preserve-helper analysis must reuse that prior art rather than reopen its
+identity. The bounded preserve trace reports equal-size access may take a
+slow allocation/copy path when uniqueness/alignment conditions fail, and
+zero requested length clears wrapper backing/control fields. The immediate
+allocation-failure behavior is still under exact verification before projection.
+
+The loader request is an unsigned minimum of the captured size and caller
+stack cap at `0x12BB3D0/0x12BB3D3`; zero skips slot `+0x1C`.
+A small extension of the existing read projection is active, separate from
+the chunk-size cap. No file-size semantic provenance or overflow contract
+is inferred beyond the observed captured arithmetic.
