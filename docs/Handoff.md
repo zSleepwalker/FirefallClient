@@ -11,8 +11,8 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are shared config-file loader size/capacity
-handling and the VM allocator context's creation/initialization marker.
+file-close path. Active boundaries are config-buffer growth allocation policy
+and the concrete VM allocator callback/userdata ownership.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
 Normal native CRT return selects `exit(status)`.
@@ -8710,3 +8710,45 @@ read without mapping that VA and are not accepted as its contents.
 Its exact object/type and the allocator/userdata producer remain unresolved.
 No static xrefs to setup were found by this pass; callback/indirect setup
 remains possible and is the next concrete continuation.
+
+## Shared loader truncates stat size to DWORD and has no reserve-result check
+
+Immutable PE parsing identifies loader imports `_fileno` at **VA**
+`0x1AC4A8C`, `_fstat64` at `0x1AC4700`, `fread` at `0x1AC490C`,
+and `fclose` at `0x1AC49A8`, all MSVCR120.
+The stat buffer is `[ebp-0x48]`; size read `[ebp-0x30]` is offset `+0x18`.
+No upper-DWORD read/validation occurs. A zero low DWORD succeeds as empty;
+nonzero uses 32-bit `length+1` via LEA without an overflow branch,
+then `fread` count equal to that low DWORD.
+Exact read appends NUL at data+returnedCount; short read resets the buffer.
+Stat/read failures close and return false; close result is ignored.
+The import proves `_fstat64`, not a target-local complete structure declaration.
+
+Both caller facades use vptr **VA** `0x1C77A30`, raw `0x1876630`.
+Slot `+0x1C` resolves to raw `0xDF47A0 -> 0xDF43F0`;
+accessor `+4` is `0xDF47F0`, returning backing pointer plus offset;
+reset `+0x14` is `0xDF4350`, clearing length fields and first byte.
+Growth uses raw `0xDF2DC0`; the observed reserve caller stores its result
+and updates capacity/length without a failure result checked by the loader.
+The exact underlying allocation/reporting policy is a follow-up, not a
+demonstrated runtime consequence of null data.
+
+## Concrete VM creation installs allocator/userdata before protected initialization
+
+Creator raw `0xC347E0` calls `0xCD5720` at `0xC34834`,
+supplying allocator **VA** `0x103CCB0` and incoming `a1` as userdata.
+The creator allocates 912 bytes, storing allocator/userdata at result
+`+0x120/+0x124` (`0xCD576C/0xCD576E`).
+These are not the separate initialization callback.
+At `0xCD577F`, **VA** `0x10D6060` (raw `0xCD5460`) is loaded
+into EDX; protected-call helper `0xCD6C10` is invoked at `0xCD58A4`
+and dispatches that callback at `0xCD6C65`.
+
+Initializer `0xCD5460` reads the context from argument `+0x0C`.
+After helper `0xD67690`, raw `0xCD5492..0xCD5496` sets context byte
+`+0x3F` to 1 and `+0x8C` to **VA** `0x1C740F8`.
+Creation initially zeroes `+0x8C` at `0xCD57C7`, supporting a
+late-initialization/retry-eligibility gate rather than a thread identifier.
+PE mapping places that marker at raw `0x1872CF8`, whose leading byte is
+NUL; this proves neither a source-level name nor overall initialization success.
+The concrete allocator callback's implementation/userdata use is next.
