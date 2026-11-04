@@ -12,7 +12,7 @@ are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
 file-close path. Active boundaries are scripting shutdown readiness/drain gates
-and ordinary-chunk in-place resize transitions.
+and heap usable-size/copy-bound reporting.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
 Normal native CRT return selects `exit(status)`.
@@ -9276,3 +9276,29 @@ Failed fallback returns null preserving old allocation in this helper;
 the separately traced VM callback can then free it.
 Ordinary chunks instead enter split/coalesce logic `0x12C953B..0x12C984B`,
 whose complete transition cases are the next task.
+
+## Ordinary in-place resize splits at 16 bytes except for positive top remainder
+
+Raw `0x12C94D0` accepts ordinary header low bits 2/3 after validation.
+Shrink retains the whole chunk for slack <16; otherwise it splits a tail
+and sends it to `0x12C7D30` (`0x12C9538..0x12C9580`).
+Growing into top requires combined size strictly greater than request,
+then moves heap top pointer/size `+0x18/+0x0C`.
+Unlike other split paths, this branch has no 16-byte remainder check;
+positive aligned slack can be 8 (`0x12C9581..0x12C95C0`).
+
+Growing into last remainder updates `+0x14/+8` for slack >=16,
+or absorbs the whole remainder and clears those fields for smaller slack
+(`0x12C95C1..0x12C963A`).
+Other adjacent free chunks are unlinked from small bins (<`0x100`) or
+tree bins, then absorbed for slack <16 or split/coalesced for larger slack
+(`0x12C963B..0x12C9853`).
+Busy/insufficient neighbors return null before the observed resize writes;
+the outer fallback can allocate/copy/free while preserving old storage
+if allocation itself fails.
+
+These in-place transitions do not write region-byte accounting `+0x1B0`.
+Consistency-error calls through **VA** `0x1AC4A24` are the already
+PE-verified MSVCR120 abort boundary, not the raw-IDB apparent `0x08080808`.
+The explicit normal-failure no-write observation does not generalize to
+all partially executed consistency-error branches.
