@@ -145,6 +145,10 @@ The earlier calls through IAT VA `0x1AC40AC` are `D3DCOMPILER_43.dll!D3DCompile`
 
 The compiler blob cleanup paths remain distinct in `UiChildShaderBlobCleanupNativeLayout`. Negative compile status selects the error blob for diagnostic use and conditional virtual `+8` cleanup; this branch does not read the code-output local. Nonnegative status conditionally cleans and clears the error output before using the code blob through virtual `+0xC`. The code blob is conditionally cleaned after either terminal predicate outcome. Shared failure cleanup therefore handles the path-selected pointer, not both outputs unconditionally. These observations neither prove what an external compiler may output on failure nor assign cleanup to the source object.
 
+The local source wrapper uses vtable VA `0x1C80CC4` (raw `0x187F8C4`). Slot `+0xC` resolves to raw `0x12CB9C0`: it returns zero when wrapper backing `+4` is null, otherwise the DWORD stored at backing `+0xC`. `UiShaderSourceWrapperSizeProjectionRules` preserves that captured DWORD and rejects inconsistent backing/field captures. Slot `+4` is raw `0x12CB960`; the compiler callers pass offset zero, but this path still calls the preserve helper before returning a data pointer or null. Resize-helper effects are not projected.
+
+The loader's chunk call at raw `0x12BB40E` is PE-bound to `MSVCR120.dll!fread` through IAT VA `0x1AC490C` (raw `0x16C350C`). `UiShaderSourceReadProjectionRules` captures the `0x01000000`-byte chunk cap and accepts only returned element count one for `fread(buffer, chunk, 1, handle)`. It does not confuse byte count with element count, execute reads, advance receiver state, or emulate failure cleanup.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves
