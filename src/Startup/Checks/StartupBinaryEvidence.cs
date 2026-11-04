@@ -10629,5 +10629,49 @@ internal static class StartupBinaryEvidence
             RelativeBranchTargets(0xC06686, 0xE8, 0x159DD10)
             && Matches(0xC06690, "81F9881300000F8221010000")
             && Matches(0xC0669C, "894720"));
+
+        check("Binary UI angle-correction method calls the MSVCR120 _CIfmod import thunk and uses the captured two-pi float",
+            UiManagerAngleCorrectionProjectionRules.DerivedStateMethodFileOffset == 0xCCA190
+            && UiManagerAngleCorrectionProjectionRules.AngleCorrectionStubFileOffset == 0x159DD00
+            && UiManagerAngleCorrectionProjectionRules.AngleCorrectionStubBytes == "FF 25 20 48 AC 01"
+            && UiManagerAngleCorrectionProjectionRules.AngleCorrectionIatVirtualAddress == 0x1AC4820
+            && UiManagerAngleCorrectionProjectionRules.AngleCorrectionIatFileOffset == 0x16C3420
+            && UiManagerAngleCorrectionProjectionRules.AngleCorrectionImport == "MSVCR120.dll!_CIfmod"
+            && UiManagerAngleCorrectionProjectionRules.TwoPiConstantVirtualAddress == 0x1C5E1C4
+            && UiManagerAngleCorrectionProjectionRules.TwoPiConstantFileOffset == 0x185CDC4
+            && UiManagerAngleCorrectionProjectionRules.TwoPiConstantBits == 0x40C90FDB
+            && Matches(UiManagerAngleCorrectionProjectionRules.DerivedStateMethodFileOffset,
+                "558BEC83EC1C538B5D088BD3568BF18D4DE457E8A8010000")
+            && Matches(UiManagerAngleCorrectionProjectionRules.AngleCorrectionStubFileOffset,
+                "FF252048AC01")
+            && RelativeBranchTargets(0xCCA2A8, 0xE8,
+                UiManagerAngleCorrectionProjectionRules.AngleCorrectionStubFileOffset)
+            && VirtualAddressToFileOffset(UiManagerAngleCorrectionProjectionRules.AngleCorrectionIatVirtualAddress)
+                == UiManagerAngleCorrectionProjectionRules.AngleCorrectionIatFileOffset
+            && ImportSlotNames(UiManagerAngleCorrectionProjectionRules.AngleCorrectionIatVirtualAddress, "_CIfmod")
+            && ImportSlotBelongsToModule(
+                UiManagerAngleCorrectionProjectionRules.AngleCorrectionIatVirtualAddress, "MSVCR120.dll")
+            && Matches(UiManagerAngleCorrectionProjectionRules.TwoPiConstantFileOffset, "DB0FC940")
+            && ReadUInt32(UiManagerAngleCorrectionProjectionRules.TwoPiConstantFileOffset)
+                == UiManagerAngleCorrectionProjectionRules.TwoPiConstantBits);
+
+        check("Binary UI angle correction tests the original sum sign and leaves an exact-zero remainder uncorrected",
+            Matches(0xCCA2BA,
+                "0F2FD0D95D0C0F97C133C00F2F55080F97C03BC17507F30F10450CEB17F30F104D0C0F2ECA9FF6C4447B06F30F58C1EB"));
+
+        check("Binary UI invalidation tests the ready byte, increments its version, and stores both callback words",
+            UiCursorCacheProjectionRules.InvalidationReadyByteOffset == 0x672
+            && UiCursorCacheProjectionRules.VersionUpdateGlobalCounterIncrementFileOffset == 0xC02765
+            && UiCursorCacheProjectionRules.InvalidationReadyCheckFileOffset == 0xC0276B
+            && UiCursorCacheProjectionRules.VersionIncrementFileOffset == 0xC02816
+            && UiCursorCacheProjectionRules.InvalidationWord988StoreFileOffset == 0xC0281C
+            && UiCursorCacheProjectionRules.InvalidationWord98CStoreFileOffset == 0xC02825
+            && Matches(UiCursorCacheProjectionRules.VersionUpdateGlobalCounterIncrementFileOffset, "FF053089E401")
+            && Matches(UiCursorCacheProjectionRules.InvalidationReadyCheckFileOffset, "80BF7206000000")
+            && RelativeConditionalBranchTargets(0xC02772, 0x0F, 0x84,
+                UiCursorCacheProjectionRules.InvalidationNotReadyEpilogueFileOffset)
+            && Matches(UiCursorCacheProjectionRules.VersionIncrementFileOffset, "FF8790090000")
+            && Matches(UiCursorCacheProjectionRules.InvalidationWord988StoreFileOffset, "898788090000")
+            && Matches(UiCursorCacheProjectionRules.InvalidationWord98CStoreFileOffset, "89878C090000"));
     }
 }

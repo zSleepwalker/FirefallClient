@@ -10276,3 +10276,21 @@ The report's apparent VA lookup discrepancy is not a new mapping gap:
 the IDB is raw/base-zero and a numeric runtime VA must not be used directly
 as an IDB address. Raw `0xCD5510 + 0x400C00 = VA 0x10D6110`,
 not the report's `0x10D6120`; the callback arithmetic above is consistent.
+
+## Backing-slot fill and arithmetic regression continuation
+
+The bounded raw-IDB slot trace reports `0xC416E2` supplies a local sentinel
+pointer to `0xC53290` with count `0x10`. Capacity helper `0xC52D10`
+multiplies by four at `0xC52D23`; fill helper `0xC52E50`, called at
+`0xC5333E`, fills the sixteen DWORD slots with that captured sentinel pointer.
+The initializer also stores `7` at `+0x14`, `8` at `+0x18`, and float bits
+`0x3F800000` at `+0x1C`. These are structural observations, not yet proof
+of hash-key semantics or ownership. A structural projection and focused
+checks are assigned separately from one bounded key/bucket operation trace.
+
+Immutable PE checks now bind the angle import thunk and two-pi constant,
+the original-sum sign/exact-zero correction predicate, and the ready gate,
+version increment, and both full-DWORD invalidation stores. Coordinator
+execution of the focused Startup checks against the immutable sample passed.
+This validates captured instruction evidence, not native execution or x87
+emulation.
