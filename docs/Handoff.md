@@ -11002,3 +11002,9 @@ through global VA `0x1E4B0A8` and sets receiver byte `+4`.
 The observed null-allocation continuation can publish null while setting
 the flag; callers do not immediately recheck readiness. Captured candidate
 and publication projections are assigned separately from acquisition internals.
+
+Nonpool release projection, registered checks, and exact vtable/body PE
+anchors are pushed at `ce70d1b`; the pinned-sample runner passes.
+Pooled candidate and singleton publication code/PE remain active, alongside
+one bounded wrapper-copy trace. The PE file is now exclusively assigned
+to `d508d7b1-3120-4dd7-962a-d0628cc0f638` until its completion.
