@@ -11,8 +11,8 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are UI child `+0x24` shutdown release byte
-verification and its bounded structural projection; callback publication and composite
+file-close path. Active boundaries are UI child pre-release reset structural
+integration/PE anchors and nested `+0x150` cleanup reconstruction; callback publication and composite
 container semantic identity remain parked. UI lifecycle, arithmetic/import
 regressions, and immutable backing-slot projection code/checks are committed.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
@@ -10347,3 +10347,44 @@ dependency target and its ownership contract remain unresolved.
 The earlier report's first-stack-argument receiver and missing-child-free
 interpretations are superseded. A bounded successor traces only the
 preceding `0xCA7330` phase; the structural code integration is active.
+
+## Child reset phase and shutdown naming correction
+
+The `0xCA7330` bounded trace reports eight pairs of child DWORD pointer
+fields spanning `+0x24..+0x60`. Each nonzero field dispatches virtual slot
+`+8` and is cleared. The first pair calls at `0xCA734A/0xCA735D`
+are followed by zero stores at `0xCA734D/0xCA7360`.
+Additional conditional dispatch/clear fields are `+8,+0x14,+0xC,+0x10,+0x74`.
+The child `+8` store at `0xCA7379` uses EBX after its loop count reaches
+zero. A conditional diagnostic reads `+0x13C`; `0xCA73F2`
+calls native free with child `+0x64`, then `0xCA73F7` clears `+0x68`,
+not `+0x64`. The method returns with plain RET at `0xCA7401`.
+No EDX argument semantics follow from the decompiler's fastcall label.
+Its direct accesses do not include child `+4/+0x150`; untraced called
+targets may have side effects.
+
+The first structural integration mislabeled the `0xBFAD2A` sequence
+as a destructor path. This is incorrect: it is inside gated shutdown
+`0xBFA0D0`, not destructor `0xBF8AC0`. That code/docs correction is
+assigned with the reset-phase integration before committing it.
+The child release PE byte checks have independently passed and are pushed.
+An independent successor traces only nested-child helper `0xCA6070`.
+
+## Nested child cleanup remains distinct from outer child dependency
+
+The bounded `0xCA6070` trace operates on the nested object captured from
+outer child `+0x150`. It conditionally dispatches nested `+0x1C` through
+vtable slot `+8` at `0xCA60AA`, then clears that field at `0xCA60AD`.
+When nested `+0x10` is nonzero, native free at `0xCA60BB`
+is followed by zeros at `+0x10/+0x14/+0x18` (`0xCA60C0/C7/CE`).
+When nested `+4` is nonzero, native free at `0xCA60DC` is
+followed by zeros at `+4/+8/+0xC` (`0xCA60E1/E8/EF`).
+The plain RET is at `0xCA6105`. These conditional groups do not
+establish field clears when their initial pointer is zero.
+
+Nested-object storage is released later by caller `0xBFAF57`;
+outer-child storage is released at `0xBFAF87`. Nested `+4`
+must not be merged with outer-child `+4`, whose virtual dispatch remains
+unresolved. Likewise a structure field at `+8` is not a vtable slot.
+A bounded static layout/check implementation is assigned; no native
+cleanup execution or inferred alias/refcount contract is introduced.
