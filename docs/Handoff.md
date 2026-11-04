@@ -11050,3 +11050,16 @@ Copy code review found a fresh-destination path mismatch: its null-old-
 control branch targets stores `0x12CC491/0x12CC495`, not callback-path
 stores `0x12CC485/0x12CC489`. The copy agent is correcting those
 uncommitted instruction anchors before registration and staging.
+
+Copy and pair replacement projections are corrected, registered and
+pushed at `83ce28e`, together with initializer entry PE gates. The pinned
+sample runner passes. Copy uses direct stores `0x12CC491/0x12CC495`.
+
+The nearest singleton teardown callback is raw `0x12CC1D0`, dispatched
+through singleton vtable VA `0x1C80CA0` slot eight. It captures pool
+and next link, advances the global list head, clears receiver `+C`
+then `+10`, and drains/releases captured pool without directly clearing
+receiver flag `+4`. Entry detach layout, later drain trace, source-copy
+constructor projection, and a serialized PE writer are active.
+The nearby `0x12CB830` method is source initialization with preserve
+zero and backing-pointer-gated byte copying, not a proven alignment setter.
