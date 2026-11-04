@@ -5,6 +5,9 @@ PayloadWordGrowthGateChecks.Run(Check);
 PayloadWordSlotIndexChecks.Run(Check);
 PayloadWordSlotAllocationChecks.Run(Check);
 PayloadWordCopyTailChecks.Run(Check);
+PayloadWordGrowthDoublingChecks.Run(Check);
+PayloadGrowthBufferAllocationChecks.Run(Check);
+PayloadWordAppendChecks.Run(Check);
 
 void Check(string name, bool condition)
 {

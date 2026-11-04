@@ -12598,6 +12598,123 @@ internal static class StartupBinaryEvidence
             && RelativeBranchTargets(startupReceiverByteAlignmentCallFileOffset, 0xE8,
                 startupReceiverByteAlignmentHelperFileOffset));
 
+        const uint rawStartupReceiverCountLoopFileOffset = 0xBE68B3;
+        const uint rawStartupReceiverCountLoopEndFileOffset = 0xBE68E1;
+        const int startupReceiverCountLoopLength =
+            (int)(rawStartupReceiverCountLoopEndFileOffset - rawStartupReceiverCountLoopFileOffset);
+        const uint startupReceiverCountLoopCodeVirtualAddress =
+            rawStartupReceiverCountLoopFileOffset + 0x400C00;
+        check("Binary pinned-sample receiver count loop preserves raw [0xBE68B3, 0xBE68E1) (46 bytes), mapped by raw+0x400C00 to code VA [0xFE74B3, 0xFE74E1): DWORD count read at [EBX+8], unsigned branches at 0xBE68C7/CC/D7, short loop jump 0xBE68DF back to 0xBE68C0, and initial ESI=1 anchor at 0xBE68AA; records wrapping DWORD arithmetic without asserting a semantic capacity guard or expanding the error callee",
+            startupReceiverCountLoopLength == 0x2E
+            && startupReceiverCountLoopCodeVirtualAddress == 0xFE74B3
+            && startupReceiverCountLoopCodeVirtualAddress + startupReceiverCountLoopLength
+                == 0xFE74E1
+            && RawCodeRangeMaps(rawStartupReceiverCountLoopFileOffset,
+                startupReceiverCountLoopLength)
+            && VirtualAddressToFileOffset(startupReceiverCountLoopCodeVirtualAddress)
+                == rawStartupReceiverCountLoopFileOffset
+            && VirtualAddressToFileOffset(startupReceiverCountLoopCodeVirtualAddress
+                + startupReceiverCountLoopLength) == rawStartupReceiverCountLoopEndFileOffset
+            && Matches(0xBE68AA, "BE01000000")
+            && Matches(rawStartupReceiverCountLoopFileOffset,
+                "8B530885D20F45F2EB038D49008BC62BC283F801720583FE087313B8FFFFFF0F2BC63BC60F823301000003F6EBDF")
+            && Matches(rawStartupReceiverCountLoopFileOffset, "8B5308")
+            && Matches(rawStartupReceiverCountLoopFileOffset + 0x08, "EB03")
+            && rawStartupReceiverCountLoopFileOffset + 0x08 + 2 + 3
+                == 0xBE68C0
+            && ShortConditionalBranchTargets(rawStartupReceiverCountLoopFileOffset + 0x14, 0x72,
+                0xBE68CE)
+            && ShortConditionalBranchTargets(rawStartupReceiverCountLoopFileOffset + 0x19, 0x73,
+                rawStartupReceiverCountLoopEndFileOffset)
+            && RelativeConditionalBranchTargets(rawStartupReceiverCountLoopFileOffset + 0x24,
+                0x0F, 0x82, 0xBE6A10)
+            && Matches(rawStartupReceiverCountLoopFileOffset + 0x2A, "03F6")
+            && Matches(rawStartupReceiverCountLoopFileOffset + 0x2C, "EBDF")
+            && rawStartupReceiverCountLoopFileOffset + 0x2C + 2
+                + (sbyte)ReadAt(rawStartupReceiverCountLoopFileOffset + 0x2D, 1)[0] == 0xBE68C0);
+
+        const uint rawStartupReceiverCountHandoffFileOffset = 0xBE68E1;
+        const uint rawStartupReceiverCountHandoffEndFileOffset = 0xBE691A;
+        const int startupReceiverCountHandoffLength =
+            (int)(rawStartupReceiverCountHandoffEndFileOffset - rawStartupReceiverCountHandoffFileOffset);
+        const uint startupReceiverCountHandoffCodeVirtualAddress =
+            rawStartupReceiverCountHandoffFileOffset + 0x400C00;
+        const uint startupReceiverCountHandoffIndirectCallFileOffset =
+            rawStartupReceiverCountHandoffFileOffset + 0x33;
+        check("Binary pinned-sample receiver count handoff preserves exact raw [0xBE68E1, 0xBE691A) (57 bytes), mapped by raw+0x400C00 to code VA [0xFE74E1, 0xFE751A): DWORD [EBX+0xC] read, wrapping ESI/EDX arithmetic, JZ and unsigned JA targets, relative helper call with normal cleanup, EAX frame store and JNZ, and indirect call through absolute cell VA 0x01AC4424 returning at 0xBE691A; does not assert capacity/success guarantees or identify the indirect target",
+            startupReceiverCountHandoffLength == 0x39
+            && startupReceiverCountHandoffCodeVirtualAddress == 0xFE74E1
+            && startupReceiverCountHandoffCodeVirtualAddress + startupReceiverCountHandoffLength
+                == 0xFE751A
+            && RawCodeRangeMaps(rawStartupReceiverCountHandoffFileOffset,
+                startupReceiverCountHandoffLength)
+            && VirtualAddressToFileOffset(startupReceiverCountHandoffCodeVirtualAddress)
+                == rawStartupReceiverCountHandoffFileOffset
+            && VirtualAddressToFileOffset(startupReceiverCountHandoffCodeVirtualAddress
+                + startupReceiverCountHandoffLength) == rawStartupReceiverCountHandoffEndFileOffset
+            && Matches(rawStartupReceiverCountHandoffFileOffset,
+                "8B7B0C2BF2C1EF03897DF8C745FC000000008D043285C074203DFFFFFF3F7713C1E00250E8A6166D0083C4048945FC85C07506FF152444AC01")
+            && Matches(rawStartupReceiverCountHandoffFileOffset, "8B7B0C")
+            && Matches(rawStartupReceiverCountHandoffFileOffset + 3, "2BF2")
+            && Matches(rawStartupReceiverCountHandoffFileOffset + 5, "C1EF03")
+            && Matches(rawStartupReceiverCountHandoffFileOffset + 8, "897DF8")
+            && Matches(rawStartupReceiverCountHandoffFileOffset + 0x0B,
+                "C745FC00000000")
+            && Matches(rawStartupReceiverCountHandoffFileOffset + 0x12, "8D0432")
+            && ShortConditionalBranchTargets(rawStartupReceiverCountHandoffFileOffset + 0x17, 0x74,
+                rawStartupReceiverCountHandoffEndFileOffset)
+            && ShortConditionalBranchTargets(rawStartupReceiverCountHandoffFileOffset + 0x1E, 0x77,
+                startupReceiverCountHandoffIndirectCallFileOffset)
+            && Matches(rawStartupReceiverCountHandoffFileOffset + 0x20, "C1E00250")
+            && RelativeBranchTargets(rawStartupReceiverCountHandoffFileOffset + 0x24, 0xE8,
+                0x12B7FB0)
+            && Matches(rawStartupReceiverCountHandoffFileOffset + 0x29, "83C404")
+            && Matches(rawStartupReceiverCountHandoffFileOffset + 0x2C, "8945FC")
+            && ShortConditionalBranchTargets(rawStartupReceiverCountHandoffFileOffset + 0x31, 0x75,
+                rawStartupReceiverCountHandoffEndFileOffset)
+            && startupReceiverCountHandoffIndirectCallFileOffset == 0xBE6914
+            && Matches(startupReceiverCountHandoffIndirectCallFileOffset, "FF152444AC01")
+            && startupReceiverCountHandoffIndirectCallFileOffset + 6
+                == rawStartupReceiverCountHandoffEndFileOffset);
+
+        const uint rawStartupReceiverAllocationAnchorFileOffset = 0xBE691A;
+        const uint rawStartupReceiverAllocationAnchorEndFileOffset = 0xBE694D;
+        const int startupReceiverAllocationAnchorLength =
+            (int)(rawStartupReceiverAllocationAnchorEndFileOffset
+                - rawStartupReceiverAllocationAnchorFileOffset);
+        const uint startupReceiverAllocationAnchorCodeVirtualAddress =
+            rawStartupReceiverAllocationAnchorFileOffset + 0x400C00;
+        const uint startupReceiverAllocationAnchorIndirectCallFileOffset =
+            rawStartupReceiverAllocationAnchorFileOffset + 0x2D;
+        check("Binary pinned-sample receiver/allocation anchor preserves raw [0xBE691A, 0xBE694D) (51 bytes), mapped by raw+0x400C00 to code VA [0xFE751A, 0xFE754D): independent [EBX+4]/[EBX+8] reads, frame -0xC store at 0xBE6924 and frame -4/-0xC reads, SAR at 0xBE6934, EDI/EDX/EAX pushes at 0xBE6944-0xBE6946, indirect CALL through absolute slot VA 0x01AC489C at 0xBE6947 returning at 0xBE694D; identifies neither the call target nor copy-access validity",
+            startupReceiverAllocationAnchorLength == 0x33
+            && startupReceiverAllocationAnchorCodeVirtualAddress == 0xFE751A
+            && startupReceiverAllocationAnchorCodeVirtualAddress
+                + startupReceiverAllocationAnchorLength == 0xFE754D
+            && RawCodeRangeMaps(rawStartupReceiverAllocationAnchorFileOffset,
+                startupReceiverAllocationAnchorLength)
+            && VirtualAddressToFileOffset(startupReceiverAllocationAnchorCodeVirtualAddress)
+                == rawStartupReceiverAllocationAnchorFileOffset
+            && VirtualAddressToFileOffset(startupReceiverAllocationAnchorCodeVirtualAddress
+                + startupReceiverAllocationAnchorLength)
+                == rawStartupReceiverAllocationAnchorEndFileOffset
+            && Matches(rawStartupReceiverAllocationAnchorFileOffset,
+                "8B4B048D04BD000000008945F48D14088B4308C1E0022BC203C1C1F8028D3C85000000008B45FC0345F4575250FF159C48AC01")
+            && Matches(rawStartupReceiverAllocationAnchorFileOffset, "8B4B04")
+            && Matches(rawStartupReceiverAllocationAnchorFileOffset + 0x10, "8B4308")
+            && Matches(rawStartupReceiverAllocationAnchorFileOffset + 0x0A, "8945F4")
+            && Matches(rawStartupReceiverAllocationAnchorFileOffset + 0x24, "8B45FC")
+            && Matches(rawStartupReceiverAllocationAnchorFileOffset + 0x27, "0345F4")
+            && Matches(rawStartupReceiverAllocationAnchorFileOffset + 0x1A, "C1F802")
+            && Matches(rawStartupReceiverAllocationAnchorFileOffset + 0x2A, "575250")
+            && startupReceiverAllocationAnchorIndirectCallFileOffset == 0xBE6947
+            && Matches(startupReceiverAllocationAnchorIndirectCallFileOffset,
+                "FF159C48AC01")
+            && ReadUInt32(startupReceiverAllocationAnchorIndirectCallFileOffset + 2)
+                == 0x01AC489C
+            && startupReceiverAllocationAnchorIndirectCallFileOffset + 6
+                == rawStartupReceiverAllocationAnchorEndFileOffset);
+
         const uint rawStartupReceiverCopySetupFileOffset = 0xBE6352;
         const uint rawStartupReceiverCopySetupEndFileOffset = 0xBE636E;
         const int startupReceiverCopySetupLength =

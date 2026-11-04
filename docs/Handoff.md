@@ -11849,3 +11849,33 @@ Allocation agent's reported IDA mismatch came from querying mapped VA rather
 than raw IDB EA; coordinator raw `BE6300` disassembly agrees with local PE.
 Luna `a2ef1bc7-b3d5-499c-9753-a86d98770dd9` remains read-only owner of the
 first guard/handoff trace at raw `BE68A0`.
+
+Slot lifecycle pushed as `b15ab87`. Reviewed doubling loop and growth buffer
+allocation; corrected requested `10000000` fixture typo, allocator argument
+from erroneous shift-by-four to multiply-by-four, and invalid-entry fixtures
+which accidentally supplied the receiver read. Loop oracle independently
+confirms count `80000000` cycles at zero; this is not a native reachability claim.
+Composition author `2e71f010-e1cd-421e-b85b-198dc5e7a051` is correcting a
+major integration error: BOTH guard skips reach index stage `BE6325`, not
+terminal append completion. Do not register/commit composition until reviewed.
+`97420018-4f6a-42f5-b5a9-d8918aa02252` owns first-copy projection/checks
+`[BE691A,BE694D)`; `4dae6c7c-0e29-41b1-b0b5-3946dca9b05f` owns immutable
+anchors, preserving pending loop/allocation anchors. No stage after first
+copy has been assigned. Runner currently catches composition files mid-edit;
+wait for author ready before next serialized run.
+
+Composition correction returned: both skips continue index, and invalid gate
+outcomes cannot pass solely on a boundary route. Registered pending runner.
+First-copy review found wrong indirect opcode operand bytes and a return-value
+capture conflating missing return with nonreturn; author is correcting those
+two files. Immutable first-copy window is reviewed and matches the independent
+51-byte PE capture. Read-only successor
+`8391880f-d83e-473f-ba21-bed9f5a2efe5` traces `[BE694D,...]` to the first
+opaque call on each unsigned branch path. No code for that successor yet.
+
+Pinned runner now passes append composition, doubling, buffer allocation,
+and accumulated immutable anchors. Corrected the composition's zero-candidate
+fixture to slot `FFFFFFF8` with retained EDI `1234` (masked index four):
+slot zero would instead produce candidate eight and require a WORD capture.
+First-copy production/check files remain pending author correction and are
+not registered or included in the next commit.
