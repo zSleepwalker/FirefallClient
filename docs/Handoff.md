@@ -11725,3 +11725,18 @@ their evidence-only trailing CC independently match the sample; getter
 registration and the ordinary pinned runner pass. Luna
 `e626e9f0-313b-4a4b-97a8-c61ac4e254a0` now traces only `BE51F0`'s initial
 guard/first opaque handoff. No broad parser expansion is assigned.
+
+Pushed `eeffa75` for the getter pair and immutable anchors. Reliable receive
+entry trace found byte receiver+C diagnostic followed by an independent
+byte receiver+1C early-return gate. The early return clears AL only, not
+full EAX, and uses RET 4. Luna `d92b68c2-8daf-4482-ab9f-d4f933246bee` owns
+only that entry projection/checks, stopping before argument load `BE5227`.
+Luna `6d4ba6c7-5da1-4fd7-b965-49918b2ba883` owns immutable PE anchors for
+that entry and the post-getter case continuation. Existing continuation
+code owner remains `d22f22b0-121c-4239-82b4-e1f4c172be98`.
+
+Post-getter continuation is reviewed, registered, and passes the ordinary
+pinned runner, including all 256 AL values on all three routes. Its immutable
+anchors remain with the active evidence writer. Luna
+`eb01b0b6-4311-4e57-9baf-0869ee389c02` traces only case-three receiver
+entry `BE5A40`'s initial guards and first opaque handoff.
