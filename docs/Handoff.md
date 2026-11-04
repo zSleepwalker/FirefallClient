@@ -12,7 +12,7 @@ are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
 file-close path. Active boundaries are scripting prefix-registry removal/lifetime
-and allocator chunk-header encoding/alignment metadata.
+and direct-mapped allocation selection/fallback policy.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
 Normal native CRT return selects `exit(status)`.
@@ -9158,3 +9158,29 @@ Raw `0xBFCF30` removes pointer-set/array entries but does not yet establish
 prefix-tree removal. The next bounded trace follows that tree's lifetime
 relative to object destruction. The containers' raw-pointer storage alone
 does not establish the manager's complete ownership/refcount policy.
+
+## Chunk first-word meaning differs between direct mappings and boundary-tag chunks
+
+Direct-mapping helper raw `0x12C6E70` computes
+`R=(granularity+request+30)&~(granularity-1)`, obtains a region,
+sets `pad=(-base)&7`, header `h=base+pad`, and stores pad at h,
+size `S=R-pad-16` at h+4 with low flags clear.
+It writes fence values 7 at h+S+4 and 0 at h+S+8, returning h+8
+(`0x12C6EB9..0x12C6F2B`). Paired raw `0x12C8D60`
+recovers base by subtracting pad and extent `pad+S+16`.
+Here the first word is mapping-base padding, not previous-chunk size.
+
+Ordinary allocation raw `0x12CA410` uses chunk size
+`max(16,(request+11)&~7)`, returns h+8, and stores allocated size|3.
+For ordinary chunks with previous-in-use clear, h holds previous-size
+boundary metadata; free/coalescing writes size into the following chunk's
+first word while clearing that flag (`0x12C8218..0x12C8226`).
+Thus the first word must not be universally labeled alignment adjustment.
+
+Aligned helper raw `0x12C9860` rounds alignment to a power of two,
+requests need+alignment+12, aligns the user pointer, and releases a large
+enough prefix through ordinary coalescing. Its header uses
+remainingSize|oldPreviousInUse|2 (`0x12C994D..0x12C996B`).
+Alignment/remaining-size checks can reach abort.
+Direct-mapping selection in `0x12C7690` is flag/threshold gated;
+exact configuration/fallback is the next bounded question.
