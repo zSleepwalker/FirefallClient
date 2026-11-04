@@ -134,6 +134,25 @@ internal static class UiShaderSourcePoolResetFinalizationChecks
             && changedReadback.PoolCounterReadbackValue == 0x12345678
             && changedReadback.ReturnedEax == 7);
 
+        var emptyGate = UiShaderSourcePoolResetSecondaryGateProjectionRules.Project(
+            new UiShaderSourcePoolResetSecondaryGateCapture(0x1000, 0));
+        var emptyFinalization = UiShaderSourcePoolResetFinalizationProjectionRules.Project(
+            nonAlias.Capture with
+            {
+                ReturnedCountEdi = emptyGate.ReturnedCountEdiAtBoundary,
+                Entry = UiShaderSourcePoolResetFinalizationEntry.InitialSecondaryPopWasEmpty
+            });
+        check("The initial empty-secondary finalization edge retains zero EDI instead of loading a later count",
+            emptyGate.StopRawFileOffset
+                == UiShaderSourcePoolResetFinalizationProjectionRules.PoolCounterPointerLoadRawFileOffset
+            && emptyFinalization.ReturnedEax == 0
+            && ThrowsArgumentException(() =>
+                UiShaderSourcePoolResetFinalizationProjectionRules.Project(
+                    nonAlias.Capture with
+                    {
+                        Entry = UiShaderSourcePoolResetFinalizationEntry.InitialSecondaryPopWasEmpty
+                    })));
+
         bool skippedHelperCannotHaveNonreturnOutcome = ThrowsArgumentException(() =>
             UiShaderSourcePoolResetFinalizationProjectionRules.Project(
                 new UiShaderSourcePoolResetFinalizationCapture(

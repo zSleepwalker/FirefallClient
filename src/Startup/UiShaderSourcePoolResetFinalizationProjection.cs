@@ -1,5 +1,11 @@
 namespace Firefall.Reconstruction.Startup;
 
+public enum UiShaderSourcePoolResetFinalizationEntry
+{
+    SecondaryDrainCompleted,
+    InitialSecondaryPopWasEmpty
+}
+
 public readonly record struct UiShaderSourcePoolResetFinalizationCapture(
     uint ReturnedCountEdi,
     uint ReceiverPointer,
@@ -7,7 +13,9 @@ public readonly record struct UiShaderSourcePoolResetFinalizationCapture(
     uint PoolCounterPointer,
     uint LocalZeroAddress,
     uint PoolCounterReadbackValue,
-    bool ReleaseHelperReturnedNormally = true);
+    bool ReleaseHelperReturnedNormally = true,
+    UiShaderSourcePoolResetFinalizationEntry Entry =
+        UiShaderSourcePoolResetFinalizationEntry.SecondaryDrainCompleted);
 
 public enum UiShaderSourcePoolResetFinalizationBoundary
 {
@@ -39,7 +47,8 @@ public readonly record struct UiShaderSourcePoolResetFinalizationInstructionEvid
     uint? CallTargetRawFileOffset = null);
 
 /// <summary>
-/// Projects only the already-reached post-secondary-drain finalization. The
+/// Projects the reached finalization after a secondary drain or initial empty
+/// secondary pop. The latter skips the count load and retains zero EDI. The
 /// receiver, temp-begin pointer, returned count, pool-cell address, and local
 /// zero address are independent captures. No secondary traversal, callback,
 /// helper side effects, or OS deallocation is modeled.
@@ -192,6 +201,21 @@ public static class UiShaderSourcePoolResetFinalizationProjectionRules
     public static UiShaderSourcePoolResetFinalizationProjection Project(
         UiShaderSourcePoolResetFinalizationCapture capture)
     {
+        if (capture.Entry is not (
+            UiShaderSourcePoolResetFinalizationEntry.SecondaryDrainCompleted
+            or UiShaderSourcePoolResetFinalizationEntry.InitialSecondaryPopWasEmpty))
+        {
+            throw new ArgumentOutOfRangeException(nameof(capture), "Unknown finalization entry.");
+        }
+
+        if (capture.Entry == UiShaderSourcePoolResetFinalizationEntry.InitialSecondaryPopWasEmpty
+            && capture.ReturnedCountEdi != 0)
+        {
+            throw new ArgumentException(
+                "The initial empty-secondary edge skips the count load and retains zero EDI.",
+                nameof(capture));
+        }
+
         bool releaseHelperCallReached = capture.TempBeginPointer != 0;
         if (!releaseHelperCallReached && !capture.ReleaseHelperReturnedNormally)
         {
