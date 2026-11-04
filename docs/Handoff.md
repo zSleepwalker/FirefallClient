@@ -11166,3 +11166,67 @@ Post-allocation diagnostics through first secondary-stack push are
 read-only scope `7c4a049a-3547-457a-9767-e0e0838f1276`.
 Do not infer a clean allocation-failure return: the observed null-result
 path reports `0xDA` then falls through to the push if its calls return.
+
+Request arithmetic and immutable entry/result bytes are pushed at
+`855aac7`; registered/pinned runner passes. Generic drain `0x12CC2B0`
+has no direct pointer/caller binding found by the bounded full-file scans.
+Its owning type remains unresolved; do not broaden that scan without new
+evidence. The known singleton table instead has RTTI
+`.?AV?$slSingleton@V?$slByteBucketPool@$0IAA@$0CA@@@@@` and slots
+`0x12CC280/0x12CC110/0x12CC1D0`.
+
+Current code assignment is replenishment result continuation
+`33d8ad5a-314b-4981-9e48-9c4000a7c83a`. Read-only followups:
+base alignment `8ccfebb6-d355-48ae-bfc2-4d30d8959599` and single entry
+iteration `f138e29e-eef3-488d-a2a8-84809ad44685`. The evidence file
+currently has no writer. Preserve the true sample hash above: one result
+report transcribed it incorrectly; raw `0x12CE11E` maps to VA
+`0x16CED1E`, not that report's `0x16DCD1E`.
+
+Base-alignment trace confirms one captured divisor from pool `+0x18`,
+wrapping block-plus-four, conditional round-up by `D-remainder`, and a
+second remainder check with diagnostic `0x2BA` (698). Code is assigned
+to `22718043-17af-45fa-9df2-a7365bb1510e`; exclusive PE writer
+`4c9f4ccf-4912-4d97-91e6-abcfc84b8c80` binds that block.
+The entered per-entry loop separately reads fields `+0x14/+0x1C/+0x18`,
+pushes to the primary pair, increments its index, and rereads bound `+0x20`.
+Its one-iteration code is assigned to
+`88824771-7e52-452b-9cb1-4e7b3c609115`.
+Pool configuration `0x12CDB40` field writes are the read-only next trace
+`e35aa672-0ad8-4cbd-849c-ff45db668293`. No agents run shared builds;
+the coordinator serializes registration and pinned-sample validation.
+
+Pool configuration trace confirms `+0x14=size`, `+0x18=alignment`,
+`+0x20=count`, and `+0x1C=padding` computed with wrapping DWORD
+`((size-1+alignment)&~(alignment-1))-size`. Code is assigned to
+`fdd16d57-9b2d-4873-a5ad-743a7095fe21`; config/iteration PE writer
+`7d081a1d-7606-4707-ae50-97743f8de933` now owns the evidence file.
+Other padding consumers are read-only scope
+`54915460-32b6-4b8b-b7bf-7c58e00d054b`.
+
+Result-continuation review found several one-byte anchor errors despite
+mirrored checks: formatter call is raw `0x12CE13F`, ID push `0x12CE149`,
+reporter `0x12CE158`, and pool-plus-eight LEA `0x12CE162`.
+The author is correcting those and adding byte-slice checks before
+registration. Base-alignment terminology must call field `+0x18` a
+divisor/alignment, not an element size.
+
+Pre-integration review also caught a wrong alignment test: DWORD max is
+divisible by three, so the intended wrapping diagnostic counterexample
+must use divisor seven (remainder three, adjustment four, wrapped candidate
+three). The alignment author is correcting this and adding instruction
+byte-slice assertions. The iteration author is separating the later base
+reload from the earlier base capture, and making later base/bound captures
+required only on reached post-push continuation. Neither scope is registered
+yet. Result-continuation anchor corrections are likewise still pending.
+
+A separate bounded reset/accounting trace near pop caller `0x12CDD55`
+is assigned to `05be7256-0a53-4c7a-b936-12bef6ed1c69`.
+Latest pushed code remains `855aac7`; active agents' new files and current
+handoff/evidence changes are intentionally not staged until reviewed.
+
+Result and base-alignment corrections are reviewed, registered, and the
+standard runner passes. Config/iteration PE review found two mapping typos
+(`0x12CDB40` maps to `0x16CE740`; `0x12CE1AD` to `0x16CEDAD`)
+and windows ending inside instructions. The evidence author is correcting
+the full RET4 config end and half-open loop boundary before pinned validation.

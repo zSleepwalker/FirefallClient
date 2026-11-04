@@ -205,6 +205,10 @@ Its separate entry projection reports `0x76` when the captured global readiness 
 
 `UiShaderSourcePoolReplenishmentProjectionRules` stops at the allocator call in raw `0x12CE0F0`. Separate captures at receiver `+0x14`, `+0x1C`, `+0x20`, and `+0x18` produce `((field14 + field1C) * field20) + field18 + 3`, retaining only 32 bits at each arithmetic step. This models neither overflow rejection nor allocation success; post-allocation publication and later alignment remain separate boundaries.
 
+`UiShaderSourcePoolReplenishmentResultProjectionRules` keeps a null allocator result on the diagnostic path. Only captured normal returns from that path allow the first tagged-push call with receiver `pool+8`, preserving the allocator result, including zero, as its argument. Nonnull results bypass those diagnostics; neither case establishes push success.
+
+`UiShaderSourcePoolReplenishmentAlignmentProjectionRules` starts after that push returns. It captures the divisor once from `+0x18`, rounds wrapping `block+4` upward when its remainder is nonzero, and checks the resulting candidate with a second unsigned division. Zero divisor stops at the first divide-error boundary. Wrapping with a non-power-of-two divisor can still reach diagnostic `0x2BA`; the projection does not repair that candidate or infer valid allocation storage.
+
 `SingletonTeardownWalkerProjectionRules` records the surrounding list walker at raw `0x12C3AF0`: after any returning entry diagnostic, capture the initial global head, clear byte VA `0x1E4B096`, and set guard byte VA `0x1E4B095`. A nonnull head receives one slot-eight dispatch, followed by an independent global-head capture. A null initial or later head selects the final guard clear; a nonnull later head stops at the repeat boundary. The walker itself reads no next link and supplies no explicit dispatch arguments. This is not a virtual-callback or complete-shutdown simulation.
 
 ## Sorted adapter-address MD5 (offline projection)
