@@ -7022,6 +7022,28 @@ internal static class StartupBinaryEvidence
             && ReadUInt32(0x187F8C4 + 0x14) == 0x16CC600
             && ReadUInt32(0x187F8C4 + 0x0C) == 0x16CC5C0
             && ReadUInt32(0x187F8C4 + 4) == 0x16CC560);
+        check("Binary slBlob vtable VA maps to its raw bytes and slots +4/+0C resolve to their verified code offsets",
+            VirtualAddressToFileOffset(0x1C80CC4) == 0x187F8C4
+            && Matches(0x187F8C4, "A0C36C0160C56C0110C56C01C0C56C01D0C56C0100C66C0110C66C01C0C66C01")
+            && ReadUInt32(0x187F8C4 + 4) == 0x16CC560
+            && ReadUInt32(0x187F8C4 + 0x0C) == 0x16CC5C0
+            && VirtualAddressToFileOffset(0x16CC560) == 0x12CB960
+            && VirtualAddressToFileOffset(0x16CC5C0) == 0x12CB9C0);
+        check("Binary slBlob slot +4 preserves its slot +0C call/branch and returns a zero-guarded backing data pointer; slot +0C returns the backing DWORD or zero",
+            Matches(0x12CB960, "558BEC568BF1578B06FF500C8BF8397D08761A")
+            && Matches(0x12CB997, "8B460485C0740C8B4004034508")
+            && Matches(0x12CB9AA, "5F33C05E5DC20400")
+            && Matches(0x12CB9C0, "8B410485C074048B400CC333C0C3"));
+        check("Binary slBlob read loop maps MSVCR120 fread and verifies its capped arguments, slot +4 call, result comparison, and failure slot +14 call",
+            VirtualAddressToFileOffset(0x1AC490C) == 0x16C350C
+            && IsImportSlot(0x1AC490C)
+            && ImportSlotNames(0x1AC490C, "fread")
+            && ImportSlotBelongsToModule(0x1AC490C, "MSVCR120.dll")
+            && Matches(0x12BB3F4, "BB00000001")
+            && Matches(0x12BB3FC, "8BCA0F42DF8B02FF5004")
+            && Matches(0x12BB403, "FF5004FF7424186A015350FF150C49AC01")
+            && Matches(0x12BB417, "83F8017523")
+            && Matches(0x12BB445, "FF5014"));
         check("Binary slBlob append preserves current bytes, grows logical length and memcpy appends incoming bytes",
             Matches(0x12CBA1A, "FF500C8B5D0C8BF86A018BCE8D141F52E881020000")
             && Matches(0x12CBA39, "53FF750803C750E8AF1E2D00")
