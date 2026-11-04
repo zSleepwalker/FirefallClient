@@ -10928,3 +10928,18 @@ the requested DWORD and preserve argument one to `0x12CBCB0`, leaves
 ECX unchanged, and returns EAX unchanged with RET four. This adapter does
 not define a boolean result; the source loader ignores its result. An
 immutable PE writer owns these adapter, destructor, and nonpool anchors.
+
+Wrapper destructor and nonpool control variant code are pushed at
+`4a031e3`. The corrected first XADD/JNZ predicate uses the post-decrement
+sum; its nonzero branch bypasses both control callbacks. The second count
+capture is required only on the first zero edge, after slot-zero callback.
+Wrapper disposition is conditional on reached callbacks returning.
+
+Pooled header return raw `0x12CCA10..0x12CCA7D` reports on initial
+header `+8 != 0` (ID `0x3F`) and capacity `!= 0x800` (ID `0x40`).
+If those diagnostics return, it separately rereads `+8`, clears header
+`+4`, calls `0x12C8D60` with the negated later `+8` value in ECX,
+atomically decrements pool `+0x10`, then hands the header to `0x12CDA60`.
+Do not silently substitute the data pointer for that unusual negated
+displacement argument. The bounded entry shows no heap fallback; its
+callee effects are unresolved. A branch-specific layout is assigned.
