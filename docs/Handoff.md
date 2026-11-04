@@ -12,7 +12,7 @@ are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
 file-close path. Active boundaries are Login UI-manager startup argument retention
-and VM-close finalizer ordering/error handling.
+and published scripting-object native storage ownership after VM close.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
 Normal native CRT return selects `exit(status)`.
@@ -9454,3 +9454,30 @@ at `0x637043`. One input flag comes from
 zero; Login then logs and returns zero. Success branches to `0x63706C`.
 The next bounded investigation follows the eight inputs' retained fields
 and ownership, without reopening the unidentified getter receiver.
+
+## VM close finalizer phases precede internal and outer storage release
+
+For the same active sample, raw `0xCD5510` calls `0xCD5AB0`, then
+`0xCD9870`, releases internal buffers, and finally invokes the allocator
+for `(VM - 4, 0x390, 0)`. This is the VM close reached from scripting
+object `0xC33060`; freeing the VM is not proof of freeing that native object.
+
+`0xCD9870` transfers context `+0x48`'s list to the tail of `+0x60`.
+Helper `0xCD9580` drains `+0x60`, moving entries to `+0x40` and,
+for qualifying tag-6 values, making the protected callback through
+`0xCD7890`/`0xCD6C10`. Callback literal VA `0x10D9E50` maps to raw
+`0xCD9250`, which calls `0xCD7410` and dispatches through `0xCD7110`.
+The drain does not check the protected-call status and continues; no retry
+was found on this close path. `0xCD9870` then cleans lists at context
+`+0x48`, `+0x40`, and `+0x64`.
+
+Afterward `0xCD5510` frees context `+0x18`, context `+0x6C` and zeros
+its size, then, if present, VM `+0x1C` after draining its `+0x0C` chain
+via `0xCD51E0`. The outer `0x390` block is last.
+Exact instruction-level return/callback-capture details were requested
+as a bounded reporting clarification.
+
+The report's apparent VA lookup discrepancy is not a new mapping gap:
+the IDB is raw/base-zero and a numeric runtime VA must not be used directly
+as an IDB address. Raw `0xCD5510 + 0x400C00 = VA 0x10D6110`,
+not the report's `0x10D6120`; the callback arithmetic above is consistent.
