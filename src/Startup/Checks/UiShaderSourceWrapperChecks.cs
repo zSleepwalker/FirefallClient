@@ -23,6 +23,14 @@ internal static class UiShaderSourceWrapperChecks
             && UiShaderSourceWrapperNativeLayout.PreserveSlowPathAllocationCallRawFileOffset == 0x12CBDA6
             && UiShaderSourceWrapperNativeLayout.PreserveSlowPathAllocationTargetRawFileOffset == 0x12CBF30);
 
+        check("Absolute preserving resize forwards its helper result without defining a boolean status",
+            UiShaderSourceWrapperNativeLayout.PreservingResizeVtableSlotOffset == 0x1C
+            && UiShaderSourceWrapperNativeLayout.PreservingResizeEntryRawFileOffset == 0x12CBAC0
+            && UiShaderSourceWrapperNativeLayout.PreservingResizeEntryVirtualAddress == 0x16CC6C0
+            && UiShaderSourceWrapperNativeLayout.PreservingResizePreserveArgument == 1
+            && UiShaderSourceWrapperNativeLayout.PreservingResizeReturnStackPopByteCount == 4
+            && UiShaderSourceWrapperNativeLayout.PreservingResizeForwardsEaxUnchanged);
+
         check("Preserve copy-path header reads precede the copy call",
             UiShaderSourceWrapperNativeLayout.PreserveCopyPathInstructions.SequenceEqual(new[]
             {

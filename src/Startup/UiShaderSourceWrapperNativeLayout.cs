@@ -17,6 +17,12 @@ public static class UiShaderSourceWrapperNativeLayout
     public const uint WrapperVtableSlot4EntryRawFileOffset = 0x12CB960;
     public const uint WrapperVtableSlotCEntryVirtualAddress = 0x16CC5C0;
     public const uint WrapperVtableSlotCEntryRawFileOffset = 0x12CB9C0;
+    public const int PreservingResizeVtableSlotOffset = 0x1C;
+    public const uint PreservingResizeEntryRawFileOffset = 0x12CBAC0;
+    public const uint PreservingResizeEntryVirtualAddress = 0x16CC6C0;
+    public const uint PreservingResizePreserveArgument = 1;
+    public const int PreservingResizeReturnStackPopByteCount = 4;
+    public const bool PreservingResizeForwardsEaxUnchanged = true;
 
     public const int WrapperVtableSlot4Offset = 0x04;
     public const int WrapperVtableSlotCOffset = 0x0C;

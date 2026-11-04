@@ -165,6 +165,8 @@ The captured chunk continuation advances the cumulative DWORD offset and subtrac
 
 `UiShaderSourceBackingAlignmentProjectionRules` preserves header capacity and projects unchecked DWORD allocation-size and aligned-pointer arithmetic. Nonzero alignment advances by `alignment - pointer % alignment`, including a full unit for an already-aligned pointer; zero alignment leaves the pointer unchanged. Zero capacity continuation is conditional on its diagnostic returning. A captured zero allocator pointer remains an arithmetic input, not a modeled allocation success.
 
+The absolute resize adapter at slot `+0x1C` forwards the requested DWORD and preservation argument one to the helper, then leaves EAX unchanged and pops four argument bytes on return. Its captured contract does not define a boolean status.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves
