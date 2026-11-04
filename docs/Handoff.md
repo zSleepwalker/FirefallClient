@@ -10706,3 +10706,13 @@ and a preserve-helper call, but its final size-getter expression is
 ambiguous between a field read and address arithmetic. Exact bytes and
 branch/call order are requested before accepting that refinement or
 registering the captured-size projection. No resize bypass is assumed.
+
+The clarification confirms the size getter returns DWORD `[backing+0xC]`,
+not its address. In slot `+4`, CMP at `0x12CB96E` and unsigned JBE
+at `0x12CB971` select `0x12CB98D`; even offset zero calls
+`0x12CBCB0` at `0x12CB992` with preserve flag one and current length.
+Thus no helper-call bypass is implied by zero offset.
+The captured size and chunk predicates are now registered, passed focused
+checks, and pushed. Active successors trace only the preserve helper's
+equal-size/null-backing behavior and the loader's requested-length clamp.
+Independent PE checks cover the wrapper mapping/getter and fread anchors.
