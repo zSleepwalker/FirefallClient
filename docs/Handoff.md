@@ -10,7 +10,7 @@ PrivateDialog receiver identification, AES "block-size" interpretation,
 and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
-Current delegated boundaries are log-callback startup publication/order
+Current delegated boundaries are the preinitialization default logging callback
 and texture lock-heartbeat thread ownership/failure cleanup. Assertion interception is a bounded
 unresolved stop. Mode-16 fixed scatter and normal
 buffer release are resolved.
@@ -7579,3 +7579,20 @@ PE evidence verifies `_wrename` IAT **VA** `0x1AC4720`,
 `_time64` `0x1AC48D8`, Sleep `0x1AC4374`.
 This is pathname claiming plus heartbeat/stale reclamation, not universal
 writer exclusion or a proven same-owner thread mutex.
+
+## Logging callback replacement is a direct store, not a helper return
+
+The active-sample instruction correction at raw `0x3041AD..0x3041CA`
+finds no registration-helper call: immediate callback **VA** `0x14D9440`
+is selected and directly stored to **VA** `0x1DF96F8`.
+The earlier returned-EAX caveat is resolved; that EAX is directly formed.
+Slot initial backing raw `0x19F7AF8` contains `B0 21 6C 01`,
+default **VA** `0x16C21B0`, raw `0x12C15B0`.
+Four direct stores found at raw `0x3041CA`, `0x10D8A34`,
+`0x10D8ADE`, `0x12C1A08` install `0x14D9440`; no fallback
+reset was established.
+Console shutdown `0xE5EEE0..0xE5EF1A` closes/nulls two FILE
+cells, not this callback slot. No slot synchronization was observed.
+The report did not resolve console-open ordering, but its suggested
+initializer/open chain is already documented above and is not rescanned.
+The next independent scope identifies the concrete default callback behavior.
