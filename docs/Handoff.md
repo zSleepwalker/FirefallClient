@@ -10515,3 +10515,14 @@ Initializer AL-return PE checks are awaiting final combined integration;
 coordinator review corrected their label to say that failure clears child
 field `+0x6C`, not the whole child. The success pair-replacement trace
 and exact required-lookup predicate bytes remain separate bounded tasks.
+
+The terminal predicate bytes are now independently verified:
+`0xCA7199` dispatches `[ESI+0x16C]`, then `0xCA719F` tests EAX
+directly, `0xCA71A1` branches on sign, and `0xCA71A3/0xCA71A6`
+test the output DWORD for zero. The second helper uses `[ESI+0x1A8]`
+at `0xCA72CF` with corresponding tests at `0xCA72D5/0xCA72D7`
+and `0xCA72D9/0xCA72DC`. Both return one only on the accepted
+terminal path and otherwise zero. Global `0x1AC40AC` belongs to the
+earlier query stage, not normalization of this terminal EAX result.
+The active binary integration now includes these exact tests; one bounded
+successor checks only the first-stage adapter identity and call contract.
