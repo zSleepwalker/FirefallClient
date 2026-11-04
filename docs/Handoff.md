@@ -11,7 +11,7 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are shutdown-message gates/sink fallback
+file-close path. Active boundaries are console emission-control producers
 and traceback fallback-name exceptional restoration.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
 Normal native CRT return selects `exit(status)`.
@@ -8351,3 +8351,25 @@ The supported interpretation is a per-entry name/source used during dispatch,
 not a proven application-specific script/command identifier.
 Five explicit address references cover the two readers and save/install/restore;
 this bounded scan does not exclude computed or aliased writes.
+
+## Console deinit disables the final shutdown-message dispatch gate
+
+Raw `0x322C40` forwards severity 2 only when console byte `+4` is nonzero,
+byte `+5` is zero, and mutable threshold **VA** `0x1E6B5E8 <= 2`.
+It otherwise returns without calling console `+0xB0`.
+Therefore the earlier clear of `+4` at raw `0xE5F597` disables not just
+indentation decrement but this message's own logging dispatch as well.
+The final `"--- Shutdown Finished ---"` helper call remains present;
+on the established state path it is gated off, absent intervening re-enabling.
+This refines the earlier conditional-attempt description rather than claiming
+an actual post-close sink invocation.
+
+Category emitter raw `0x12C2030` invokes the current callback through the
+slot pointer and does not itself choose a default sink.
+Setter raw `0x12C19F0` selects **VA** `0x14D9440`, or default
+**VA** `0x16C21B0` if the former address is null. The former is a fixed
+nonnull image address here, so the alternate branch is not a normal
+default-restore path. Separate routines inline the assignment; absent direct
+xrefs to this setter do not prove the callback cannot change elsewhere.
+Threshold initialization and byte `+5` producers remain a bounded continuation;
+neither is inferred from arbitrary raw-IDB bytes.
