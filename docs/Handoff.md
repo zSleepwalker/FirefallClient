@@ -11,8 +11,8 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are corrected raw cursor-method inspection
-and immediate callback traversal ordering.
+file-close path. Active boundaries are callback-traversal reconstruction
+and concrete publication into the manager callback trees.
 UI lifecycle code/checks are committed.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
@@ -10110,6 +10110,33 @@ raw `0xBF9D80` begins `55 8B EC 83 E4 F8 6A FF`.
 These preserve the prior selector binding and disprove that report's
 claimed raw function boundary. A narrowly corrected candidate task uses
 those exact IDB offsets; default cursor sources remain unresolved meanwhile.
+
+## Callback walks advance live tree nodes after receiver-only dispatch
+
+After raw `0xC0669C` stores field `+0x20`, `0xC06670` visits trees
+`+0x6B0`, `+0x6D8`, then `+0x5E4`.
+The first two use node `+0x14` as ECX and invoke slot `+0x14`
+without explicit stack arguments at `0xC066B0..0xC066B5` and
+`0xC06710..0xC06715`. The third invokes `0xC376A0` on node
+`+0x14` at `0xC06770..0xC06773`.
+For the first two, successor is not captured before dispatch: after return,
+the code examines current-node byte `+0x0D`, follows links `+8/+0/+4`,
+then compares against a freshly read head. No snapshot/refcount operation
+was observed; this does not establish mutation or thread safety.
+
+`0xC376A0` then walks its own `+0xE8`, `+0x118`, and `+0x120`
+containers, in order. The first pair dispatches node `+0x14`, the third
+entry `+8`, all through receiver-only slot `+0x14`.
+The next tasks record this static order and trace a concrete manager
+registry publisher, rather than simulating tree mutation.
+
+Corrected candidate `0xBF9D80` is a real raw function, unlike the rejected
+earlier report: it gates on ready, works through fields `+0x6F0/+0x71C`,
+and releases temporary references. Its reported negative search for
+"584/588" used decimal offsets `0x248/0x24C`, so it does not resolve
+the requested **hexadecimal** `+0x584/+0x588` default sources.
+Its supplied converted VA was also incorrect. No default-source conclusion
+is accepted from that mismatch; the default-source boundary is parked.
 
 The report's apparent VA lookup discrepancy is not a new mapping gap:
 the IDB is raw/base-zero and a numeric runtime VA must not be used directly
