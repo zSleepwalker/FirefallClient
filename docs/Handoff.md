@@ -10545,3 +10545,17 @@ within a reached iteration. An atomic snapshot of all old fields would
 erase this callout/read ordering. The active projection therefore covers
 only captured scratch values and destination writes, not native releases
 or mutation safety; exact loop byte checks are assigned separately.
+
+The captured write projection is now registered, passes focused checks,
+and is pushed. Coordinator review corrected misleading register labels:
+EDI is the zero-based loop index, not the scratch base; ESI is the
+destination cursor at child `+0x28`, not the original `this` pointer.
+The projection copies values directly into immutable write records.
+
+The first-stage slot VA `0x1AC40AC` is PE-bound to
+`D3DCOMPILER_43.dll!D3DCompile` (IAT raw `0x16C2CAC`).
+Calling it a status adapter is therefore misleading. The earlier helper
+report described only the final pushed value, not the full API argument
+frame. A bounded successor reconstructs the complete call arguments at
+raw `0xCA70FA/0xCA725A`; shader/key meanings remain unassigned until
+the pointer/length and literal arguments are verified.
