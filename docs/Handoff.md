@@ -11,7 +11,7 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are exact service-deinit final-call targets
+file-close path. Active boundaries are shutdown-message gates/sink fallback
 and traceback fallback-name ownership.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
 Normal native CRT return selects `exit(status)`.
@@ -8298,3 +8298,29 @@ backed raw `0x17B9A04`). Raw `0xCCFF50`'s flag-4 case returns
 after the initial filter can therefore be emitted with line -1 and a
 fallback name. The global fallback name's producer/lifetime is the next
 bounded question.
+
+## Immutable rel32 arbitration confirms post-close Shutdown Finished attempt
+
+Python signed-rel32 decoding and IDA instruction-length checks agree:
+
+| Raw call | Exact bytes | Raw target | Code VA |
+|---|---|---|---|
+| `0xE553FE` | `E8 3D D8 4C FF` | `0x322C40` | `0x723840` |
+| `0xE55546` | `E8 75 A2 01 00` | `0xE6F7C0` | `0x12703C0` |
+| `0xE55565` | `E8 D6 D6 4C FF` | `0x322C40` | `0x723840` |
+
+This supersedes the disputed `0x321C40` target. That address is inside
+an instruction beginning at `0x321C3F`, whereas `0x322C40` starts
+`55 8B EC` and implements the object/threshold-gated logging helper.
+The early message is `"--- Shutting Down ---"`; the final call passes
+console **VA** `0x1E69348` and **VA** `0x1BDF628`,
+`"--- Shutdown Finished ---"`, with severity 2.
+Console slot `+0xB0` at raw `0x1876B58` contains
+`80 B7 25 01`, target **VA** `0x125B780`, raw `0xE5AB80`.
+Thus a conditional post-close logging attempt is established, not withdrawn.
+Actual runtime emission still depends on helper/logger gates and current sink.
+
+Console slot `+0xC0` at raw `0x1876B68` contains
+`D0 BC 25 01`, target **VA** `0x125BCD0`, raw `0xE5B0D0`.
+It returns when receiver byte `+4` is zero; otherwise it decrements/clamps
+indentation depth **VA** `0x1E49A10`. This resolves that final virtual edge.
