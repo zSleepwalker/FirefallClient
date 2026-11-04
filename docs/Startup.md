@@ -137,6 +137,8 @@ The child initializer's result is a separate captured two-helper gate in `UiChil
 
 The final tests in required-lookup helpers `0xCA7090` and `0xCA71F0` are captured by `UiChildRequiredLookupProjectionRules`: the signed dispatcher status must be nonnegative and the captured output DWORD nonzero. This predicate applies only after reaching that terminal stage; it does not replace earlier query gates. The helpers dispatch through dependency virtual slots `+0x16C` and `+0x1A8`, respectively. Output writes occur inside unresolved targets that receive the caller's output address; these helper bodies do not themselves initialize or clear it. No output-retention or refcount contract is inferred.
 
+The success replacement loop in `0xCA6C80` writes eight captured scratch pairs to child offsets `+0x24/+0x28` through `+0x5C/+0x60`. `UiChildPairReplacementProjectionRules` copies exactly sixteen captured DWORDs into an immutable ordered destination-write list; it neither broadcasts a pair nor models old fields. Native callout order remains a separate boundary: the old second field is read after the first old-field virtual `+8` call, but before the first new-value store at `0xCA6F0A`; its own virtual call precedes the second new-value store at `0xCA6F22`. Thus the projection is not an atomic old-state snapshot or a native cleanup emulator.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves
