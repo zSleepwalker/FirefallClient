@@ -11558,3 +11558,23 @@ Received-queue pop gate and new immutable initializer authority pass the
 ordinary pinned runner. Fragment wrapper review found its diagnostic return
 was a nonnullable bool conflating skipped, unavailable, and nonreturn paths;
 author is adding nullable capture and explicit outcome boundaries.
+
+Pushed `ab649bf`: global initializer publication, received/status queue gate,
+and immutable global-initializer evidence. Socket caller PE authority is now
+exclusively assigned to Luna `f4bc6001-515e-4df2-a33e-fbe76d48258a`.
+Context payload producer trace is Luna
+`862e8b27-c3e8-46b6-8702-40d23398a0e3`, bounded before append `0xBD346E`;
+do not overlap it with callback delivery or fragment enqueue work.
+
+Fragment wrapper is reviewed and registered: 74 bytes independently match
+the PE; nullable diagnostic and append returns now preserve missing/nonreturn/
+unreached distinctions. Corrected its mirrored append target VA to `0x16CEF10`.
+The ordinary pinned runner passes. Caller PE authority remains with
+`f4bc6001-515e-4df2-a33e-fbe76d48258a`.
+
+Trace successors implemented by Luna:
+`7acba39f-de70-473c-b203-f70e781ad44f` owns first-owner callback continuation,
+preserving an independently reloaded payload after the callback;
+`5d640a2c-fec8-4166-9283-ae0856abac8a` owns context append preparation,
+where payload+4 is a modulo-65536 cursor offset, not a length.
+Neither scope includes an entire parser or retry loop.
