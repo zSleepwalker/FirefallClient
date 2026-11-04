@@ -11909,3 +11909,37 @@ PE windows independently match 36 and 22 bytes.
 Luna `e0af090c-c85b-43de-a2ee-f16f39166049` owns a read-only exact trace
 of zero-fill instructions after `BE6984` and `BE69DF` through join `BE69F2`.
 Require explicit direction-flag semantics before any REP STOS projection.
+
+Branch-copy pushed as `f721e5d`. Independent PE captures for successors:
+`[BE6984,BE69A7)` 35 bytes, `[BE69BD,BE69DF)` 34 bytes,
+`[BE69DF,BE69F2)` 19 bytes, publication `[BE69F2,BE6A10)` 30 bytes.
+Luna `2a839f54-7688-4a20-b429-df84091d1b80` owns second-copy
+production/checks; `022391ce-233d-4c7d-9b46-9ab5355ac52d` immutable
+anchors. Luna `a5c902f7-2fac-43aa-8e79-9f9da34b434f` independently owns
+publication production/checks; no publication evidence writer assigned yet.
+Read-only `c6423e2e-c302-4db6-89b9-a47d383c4928` checks whether the enclosing
+helper actually reads its stack argument; do not infer that role from RET 4.
+
+Stack-argument trace confirms no incoming DWORD argument read anywhere in
+`[BE68A0,BE6A1B)`; RET 4 only purges it. Normal epilogue restores EBX/ESI;
+error indirect call at `BE6A15` has unresolved return/preservation behavior.
+Zero-fill exact trace confirms conditional frame-8 reload: first fall REP
+count zero skips that reload and retains incoming EDI for the later test.
+DF is not established by these windows. Luna
+`9cc8553a-578d-4067-b263-f31064da9410` owns symbolic zero-fill code/checks,
+with explicit DF and separate completion captures per reached REP.
+Agent byte dump included the next instruction's first byte; authoritative
+exclusive windows remain coordinator's 35 and 19 bytes above.
+
+Second-copy immutable writer completed; its 34-byte window matches the
+independent capture and is reviewed pending production/checks readiness.
+New sole evidence writer `9aada2cb-22d1-40cb-a5f6-4636601525a6` preserves
+that pending anchor while pinning zero-fill/publication windows.
+Read-only Luna `7a4fadd3-a8a7-4568-897c-6060db6fc1e1` independently traces
+reliable receive alternate continuation at `BE52DF`; no code assigned there.
+
+Second-copy and publication production/checks reviewed and registered;
+pinned runner passes. Publication review corrected helper argument names,
+the missing receiver+4 stop at `BE69F5`, and `FFFFFFFF+1==0` fixture.
+No inferred publication occurs before independently captured counter read.
+Finalization immutable writer remains active; do not stage its file yet.

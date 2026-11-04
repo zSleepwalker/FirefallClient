@@ -11,6 +11,8 @@ PayloadWordAppendChecks.Run(Check);
 PayloadGrowthFirstCopyChecks.Run(Check);
 PayloadGrowthPostCopyGateChecks.Run(Check);
 PayloadGrowthBranchCopyChecks.Run(Check);
+PayloadGrowthTakenSecondCopyChecks.Run(Check);
+PayloadGrowthPublicationChecks.Run(Check);
 
 void Check(string name, bool condition)
 {
