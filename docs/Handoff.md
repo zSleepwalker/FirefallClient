@@ -12,7 +12,7 @@ are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
 file-close path. Active boundaries are the separate Login UI-manager startup call
-and allocator edge-case return/reporting contracts.
+and VM-close finalizer ordering/error handling.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
 Normal native CRT return selects `exit(status)`.
@@ -9406,3 +9406,25 @@ The UI-manager pointer is separately loaded at `0x30B1A9` and dispatched
 at `0x30B200`. That distinct concrete call is the next trace.
 The already verified manager table's `+0x1C -> 0xBFB310` entry does
 not bind the preceding getter-returned object merely by slot coincidence.
+
+## Allocator edge-case return contract complete within valid chunk-state assumptions
+
+Oversized requests select internal size `0xFFFFFFFF`, not an immediate-null
+branch. Raw `0x12C8A20` traverses its large-bin/top path, whereas
+`0x12CA410` skips bins for that sentinel and checks top before growth.
+Growth `0x12C7690` and direct helper `0x12C6E70` reject their wrapped
+size before VirtualAlloc. For valid aligned chunk metadata the request fails;
+the raw top checks do not independently rule out a stored impossible
+`0xFFFFFFFF` top size. This is a static precondition, not a runtime finding.
+
+Zero-byte raw allocation normalizes to chunk size 16 and may succeed or fail.
+Null-pointer realloc delegates even zero/oversized requests; nonnull zero
+frees, while nonnull oversized returns null before freeing.
+Ordinary positive realloc failure preserves the old pointer in `0x12CAE30`.
+VM callback `0xC3C0B0` instead reports failure then frees its original pointer
+if reporting returns. Public allocation wrapper `0x12B8030` similarly reports
+null before returning it. Both use the previously bound project reporter;
+the follow-up's unresolved-indirect label does not reopen that mechanism.
+No explicit errno assignment was found in the inspected oversized branches.
+The allocator edge investigation is closed at these boundaries; the next
+independent task follows VM finalization, not another allocation micro-case.
