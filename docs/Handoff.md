@@ -11,8 +11,8 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundary is the nested list constructor's exact
-sentinel/backing initialization; callback-object publication remains parked.
+file-close path. Active boundaries are corrected raw nested-container initialization
+and arithmetic/import binary regression evidence; callback publication remains parked.
 UI lifecycle code/checks are committed.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
@@ -10243,6 +10243,18 @@ or independent owner for entry `+8`; prefix-tree publication of the outer
 script object is not proof of callback identity. That boundary is parked.
 The successor traces only initializer `0xC41670`'s concrete list state,
 not another unanchored ownership search.
+
+## Constructor report requires raw-address correction before integration
+
+The `0xC41670` report incorrectly labels requested raw offsets as VAs
+and subtracts the code delta, including for the allocator and cleanup
+helpers. It also treats caller's `this+0x120` receiver address as a
+stack argument value. Its new initializer/allocation assertions are not
+accepted pending a narrowly corrected raw-IDB verification.
+The existing separation between container `+8` backing and node `+8`
+callback remains supported by the earlier exact cleanup instructions.
+IAT VA `0x1AC4424` remains PE-bound to standard `_Xbad_alloc`;
+another empty import query does not reopen it.
 
 The report's apparent VA lookup discrepancy is not a new mapping gap:
 the IDB is raw/base-zero and a numeric runtime VA must not be used directly
