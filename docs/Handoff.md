@@ -10,8 +10,9 @@ PrivateDialog receiver identification, AES "block-size" interpretation,
 and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
-Current delegated boundaries are startup basename-variable assignment gates
-and texture LZMA consumed-length/termination semantics. Shutdown-request callers
+Current delegated boundaries are console startup dispatch-readiness ordering
+and mode-16 scratch initialization/fixed reconstruction after short output.
+Shutdown-request callers
 and texture writer dispatch/serialization are bounded unresolved stops,
 not ongoing broad scans.
 Descriptor `+0x24/+0x28` are structure pointers, both nonnull on normal
@@ -7098,3 +7099,79 @@ normal logging state. The offset clarification confirms 28 decimal means
 hex `+0x1C`, not `+0x28`: raw `0xE4E237` bytes
 `A1 84 A6 E6 01` load the alias, and `0xE4E243` bytes
 `8B 40 1C` read its object's current text.
+
+## LZMA wrapper publishes consumed input separately from produced output
+
+The active-sample wrapper raw `0x12ABBD0` starts
+`55 8B EC 81 EC A0 00 00 00` (VA `0x16AC7D0`).
+It saves output capacity from *a2 and available input from *a4, clears
+both counts, rejects input budgets below five, then restores input budget
+before decoder dispatch. Decoder updates input consumption while reducing
+its local remaining budget. Returned *a2 is output produced; *a4 is
+input consumed, not the original available budget.
+The bounded report examined a separate caller `0xEB3840/0xEB388C`;
+that caller's produced-length equality and missing consumed-length equality
+must not be attributed to mode 16. Its exact mode-16 call/status/end-marker
+checks remain the next narrower scope.
+
+## Basename flags allow immediate updates; exact registry publication still open
+
+Registration raw `0x2D2EEB`, bytes `6A 00`, supplies flags zero
+for eng.autoSaveConfigName. Constructor `0xDD513E` stores them at
+descriptor `+0xC`. Canonical `0x200`, variable `0x10`, and latch
+`0x400` gates at `0xE413CF/0xE413FD/0xE414C3` are all clear;
+assignment at `0xE41555..0xE41558` changes current text `+0x1C`.
+Fallback lookup `0xE4098F..0xE409C7` compares the unique suffix
+autoSaveConfigName after the first dot; full-name lookup uses registry
+**VA** `0x1E692CC`. Publication of this exact descriptor to that
+registry remains unproved by this pass.
+
+Logging-only byte **VA** `0x1E49A59` is loader-zeroed virtual-tail
+.data, not the unrelated raw-mapped byte 05. Its initial zero selects
+normal dispatch at `0xE89CAA`; setter `0xE89EB6` writes it.
+PrintConfig brackets its work with 1/0 at `0xE8AB2B/0xE8AB45`.
+Once lookup resolves the descriptor, --cmd can therefore change the
+basename before pass two; flags do not block it. Exact registry insertion
+and startup ordering are the next check, not assumed lookup success.
+
+## Mode-16 accepts zero-error decoder completion without exact produced lengths
+
+The active-sample mode-16 calls to raw `0x12ABBD0` are:
+raw `0xE98AD1` bytes `E8 FA 30 41 00`,
+`0xE98B2F` bytes `E8 9C 30 41 00`, and
+`0xE98B8D` bytes `E8 3E 30 41 00`.
+Capacities are `0x3000/0x4800/0x4800`; nonzero EAX goes to
+`0xE98881`, clearing all three outputs and returning AL=0.
+No exact-produced-length comparison appears between calls.
+
+Core raw `0x12AB350` reports status 1 for terminal marker with zero code,
+2 at capacity, 3 for insufficient input, and 4 for capacity with zero pending
+length/code. Wrapper `0x12ABCDD..0x12ABCE5` converts otherwise
+successful status 3 to error 6; statuses 1/2/4 remain successful.
+The branch then performs fixed reconstruction and returns AL=1 through
+`0xE988BD..0xE988E6`.
+The next scope checks scratch initialization and fixed read extents rather
+than assuming success guarantees all expected scratch bytes were produced.
+
+## Basename descriptor enters the pending list and startup console registry
+
+Constructor raw `0xDD51EB` loads pending head **VA** `0x1E48990`,
+stores it at descriptor `+0x14`, then replaces the head with this descriptor.
+Flag-4 exclusion is clear for eng.autoSaveConfigName.
+Service startup raw `0xE54C73/0xE54C79` supplies that pending head
+to console virtual `+0x10`, **VA** `0x1242B00`.
+The walker follows `+0x14`; this descriptor's type method raw
+`0xDD5E70` returns 1, selecting console `+0x18`, **VA** `0x12426B0`.
+Raw `0xE41BBC..0xE41BC6` passes name/descriptor to registry
+**VA** `0x1E692CC` helper **VA** `0x11F3770`.
+Raw `0xDF2BFB` publishes its bucket node and `0xDF2C19`
+stores the descriptor payload.
+
+Initializer-table **VA** `0x1AC7874` contains registry initializer
+`0x6D2B20`; descriptor initializer `0x6D3AD0` occurs later at
+table **VA** `0x1AC78E8`.
+An existing non-placeholder same-name descriptor instead takes alias branch
+raw `0xE41AF1`, writing descriptor `+0x5C`; publication does not
+guarantee that the original object becomes canonical.
+The next scope resolves console `+0xBC` at raw `0xE54DBA`
+and dispatch-readiness ordering before startup configuration/--cmd processing.
