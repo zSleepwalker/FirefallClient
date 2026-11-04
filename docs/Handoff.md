@@ -11153,3 +11153,16 @@ tail transfer. Identity/vtable binding is assigned read-only to
 `d68c81f5-e192-47a0-9852-8702f667df36`; no generalization is integrated yet.
 Replenishment entry at raw `0x12CE0F0` is assigned read-only to
 `2504b159-8bb3-4d39-82bd-25aeb40d431d`.
+
+The preceding lifecycle integrations are pushed at `9a8ea5c`.
+Replenishment entry raw `0x12CE0F0` maps to VA `0x16CECF0`; its
+trace's `0x16CE1CF0` was another arithmetic typo and is rejected.
+The bounded request is DWORD wrapping arithmetic
+`((field14 + field1C) * field20) + field18 + 3`.
+Request code/checks are assigned to
+`536430c4-87ab-41bd-b41f-afd78e26a5df`; exclusive immutable PE writer
+`bc3c7f42-927c-46fe-8c12-ea4e0219290b` binds entry and first push.
+Post-allocation diagnostics through first secondary-stack push are
+read-only scope `7c4a049a-3547-457a-9767-e0e0838f1276`.
+Do not infer a clean allocation-failure return: the observed null-result
+path reports `0xDA` then falls through to the push if its calls return.

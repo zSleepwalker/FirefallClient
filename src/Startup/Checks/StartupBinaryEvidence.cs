@@ -11435,5 +11435,24 @@ internal static class StartupBinaryEvidence
             && Matches(0x12CC2A5, "8BC65E5DC20400")
             && Matches(0x12CC2AC, "CCCC")
             && Matches(0x12CC2B0, "56578BF9"));
+
+        const uint rawPoolReplenishmentFileOffset = 0x12CE0F0;
+        const uint poolReplenishmentCodeVirtualAddress = 0x16CECF0;
+        check("Binary raw pool replenishment entry 0x12CE0F0 maps to code VA 0x16CECF0, not 0x16CE1CF0, and preserves its entry/request bytes through the direct allocation call and captured result",
+            poolReplenishmentCodeVirtualAddress == rawPoolReplenishmentFileOffset + 0x400C00
+            && VirtualAddressToFileOffset(poolReplenishmentCodeVirtualAddress) == rawPoolReplenishmentFileOffset
+            && Matches(rawPoolReplenishmentFileOffset,
+                "558BEC83EC34A10050DC0133C58945FC5356578BF98B571403571C0FAF57208B771883C60303F28BCEE802A9FFFF8BD8")
+            && RelativeBranchTargets(0x12CE119, 0xE8, 0x12C8A20)
+            && Matches(0x12CE11E, "8BD885DB")
+            && ShortConditionalBranchTargets(0x12CE122, 0x75, 0x12CE161));
+        check("Binary raw pool replenishment null-result path pushes diagnostic ID 0xDA (218), calls the reporter slot, cleans its arguments, then converges on push(pool+8, result) at raw 0x12CE165",
+            Matches(0x12CE124,
+                "6A27508845D48D45D550E8C7F72C005668B8EBC5018D45D46A2750FF157048AC018D45D45068DA0000006858EAC5016858EAC501FF15A05EC10183C42C")
+            && Matches(0x12CE149, "68DA000000")
+            && Matches(0x12CE158, "FF15A05EC101")
+            && Matches(0x12CE15E, "83C42C")
+            && Matches(0x12CE161, "538D4F08")
+            && RelativeBranchTargets(0x12CE165, 0xE8, 0x12CDA60));
     }
 }

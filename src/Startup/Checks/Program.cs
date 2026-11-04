@@ -35,6 +35,7 @@ UiShaderSourcePoolDrainChecks.Run(Check);
 UiShaderSourcePoolPopChecks.Run(Check);
 UiShaderSourcePoolPushChecks.Run(Check);
 UiShaderSourcePoolAcquisitionChecks.Run(Check);
+UiShaderSourcePoolReplenishmentChecks.Run(Check);
 SingletonTeardownWalkerChecks.Run(Check);
 UiShaderSourceBackingAlignmentChecks.Run(Check);
 UiShaderSourcePoolControlChecks.Run(Check);
