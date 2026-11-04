@@ -11,8 +11,8 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are the cursor-selection tree payload publisher
-and derived-state byte/float gates before the record append.
+file-close path. Active boundaries are registered cursor-tree cleanup
+and reconstruction of derived-state byte/float gates before the record append.
 UI lifecycle code/checks are committed.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
@@ -9891,6 +9891,33 @@ import stub `0x159DD00`, and represented float bits as `0x40C90FDB`
 rather than a misleading integer named as byte order.
 The next task traces which producer pre-work these derived gates suppress,
 without assuming the derived helper has a meaningful scalar return.
+
+## A concrete cursor registration publishes LoadCursorA's result
+
+Raw `0xBFD6D0` calls IAT VA `0x1AC4C2C`, PE-bound to
+`USER32.dll!LoadCursorA`, with `(NULL, 0x7F8A)`. Its result is passed
+with a shared-text key and UI tree `+0x6C8` to `0xC06D40`.
+That helper inserts only for an absent key. Allocator `0xC166E0`
+stores key at node `+0x10` and value at `+0x14` (`0xC1675D`);
+`0xC16790` links via `0xC1A450`.
+This proves one registration's payload source, not that every selector
+lookup must return such a handle. The successor follows tree cleanup.
+
+## Derived state rejects producer work before the append flag is reached
+
+Raw `0xC9544D`'s virtual `+0x34` call occurs before testing derived
+byte `+0x300`. Zero at `0xC95456..0xC95458` returns zero.
+COMISS/JA at `0xC9545E..0xC9546D` likewise rejects ordered global
+threshold greater than derived float `+0x2EC`. Equality passes;
+unordered branch flags do not take JA if the comparison completes.
+Rejecting either gate skips virtual `+0x20/+0x28`, conditional `+0x74`
+selectors two/one, and subsequent append work.
+
+Thus append also depends on these earlier gates, not just `+0x72C`
+and descriptor nonnull. UI global itself remains unchecked before its
+`+0xA08` dereference. The report's C9-address VA labels are erroneous;
+these are raw IDB offsets. A code task now projects captured branch
+outcomes without emulating FP exceptions or unresolved virtual side effects.
 
 The report's apparent VA lookup discrepancy is not a new mapping gap:
 the IDB is raw/base-zero and a numeric runtime VA must not be used directly
