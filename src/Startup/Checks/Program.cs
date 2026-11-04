@@ -14,6 +14,7 @@ UiChildBackingAllocationChecks.Run(Check);
 UiChildInitializationResultChecks.Run(Check);
 UiChildRequiredLookupChecks.Run(Check);
 UiChildPairReplacementChecks.Run(Check);
+UiChildScratchCleanupChecks.Run(Check);
 
 var expected = new[]
 {

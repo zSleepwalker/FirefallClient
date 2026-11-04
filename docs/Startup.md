@@ -139,6 +139,8 @@ The final tests in required-lookup helpers `0xCA7090` and `0xCA71F0` are capture
 
 The success replacement loop in `0xCA6C80` writes eight captured scratch pairs to child offsets `+0x24/+0x28` through `+0x5C/+0x60`. `UiChildPairReplacementProjectionRules` copies exactly sixteen captured DWORDs into an immutable ordered destination-write list; it neither broadcasts a pair nor models old fields. Native callout order remains a separate boundary: the old second field is read after the first old-field virtual `+8` call, but before the first new-value store at `0xCA6F0A`; its own virtual call precedes the second new-value store at `0xCA6F22`. Thus the projection is not an atomic old-state snapshot or a native cleanup emulator.
 
+The eleven required lookup gates in `0xCA6C80` share a failure target at `0xCA6F50`, before the destination replacement loop. This path conditionally dispatches each nonzero pointer in eight scratch pairs through virtual slot `+8`, then clears that scratch field. The initial direct-call failure bypasses this scratch cleanup. Failure sets BL to zero at `0xCA6FCF`, success sets BL to one at `0xCA6F49`, and the common tail transfers BL to AL at `0xCA7061`. `UiChildScratchCleanupNativeLayout` records these static boundaries without assigning virtual-call ownership semantics or ruling out called-target side effects.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves
