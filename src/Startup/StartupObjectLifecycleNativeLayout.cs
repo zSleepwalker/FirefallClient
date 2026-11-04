@@ -37,6 +37,43 @@ public static class StartupObjectLifecycleNativeLayout
     public const int PostPassContainer120Offset = 0x120;
     public const uint PostPassContainer120HelperFileOffset = 0xC3FC10;
     public const uint PostPassContainer120CallFileOffset = 0xC33C31;
+    public const uint Container120InitializerCallerSetupFileOffset = 0xC32A73;
+    public const uint Container120InitializerCallFileOffset = 0xC32A79;
+    public const uint Container120InitializerMethodFileOffset = 0xC41670;
+    public const uint Container120SentinelAllocationFileOffset = 0xC52A10;
+    public const uint Container120BackingAllocationFileOffset = 0xC53290;
+    public const uint Container120BackingCapacityReadFileOffset = 0xC52D10;
+    public const uint Container120BackingCapacityMultiplyFileOffset = 0xC52D23;
+    public const uint Container120BackingFillFileOffset = 0xC52E50;
+    public const uint Container120SentinelPointerCaptureFileOffset = 0xC416E2;
+    public const uint Container120BackingFillSentinelFileOffset = 0xC5333E;
+
+    public const int Container120HeadOffset = 0;
+    public const int Container120CountOffset = 4;
+    public const int Container120BackingBeginOffset = 8;
+    public const int Container120BackingEndOffset = 0xC;
+    public const int Container120BackingCapacityOffset = 0x10;
+    public const int Container120Field14Offset = 0x14;
+    public const int Container120Field18Offset = 0x18;
+    public const int Container120Field1COffset = 0x1C;
+    public const int Container120Field14Value = 7;
+    public const int Container120Field18Value = 8;
+    public const uint Container120Field1CValueBits = 0x3F800000;
+
+    public const int Container120SentinelSize = 0xC;
+    public const int Container120SentinelNextOffset = 0;
+    public const int Container120SentinelPreviousOffset = 4;
+    public const int Container120ListNodeField8Offset = 8;
+    public const int Container120InitialBackingSlotCount = 16;
+    public const int Container120BackingSlotSize = 4;
+    public const int Container120InitialBackingByteCount =
+        Container120InitialBackingSlotCount * Container120BackingSlotSize;
+
+    public static IReadOnlyList<uint> ProjectContainer120InitialBackingSlots(
+        uint capturedSentinelRuntimePointer) =>
+        Array.AsReadOnly(Enumerable.Repeat(
+            capturedSentinelRuntimePointer, Container120InitialBackingSlotCount).ToArray());
+
     public const uint PostPassContainer118ReleaseMethodFileOffset = 0xC0BD90;
     public const uint StoredObjectReleaseBlockStartFileOffset = 0xC33C3A;
     public const uint StoredObjectReleaseBlockEndFileOffset = 0xC33C58;

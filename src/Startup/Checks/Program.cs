@@ -7134,6 +7134,41 @@ Check("Cleanup callback payload offsets, virtual slots, and explicit arguments r
     && StartupObjectLifecycleNativeLayout.CallbackWalkerVirtualSlotOffset == 0x14
     && StartupObjectLifecycleNativeLayout.ObservedPayloadDispatches.All(dispatch =>
         dispatch.VirtualSlotOffset != dispatch.ExplicitArgumentValue));
+Check("Nested container +0x120 keeps its observed fields and backing-array geometry separate from node-relative fields",
+    StartupObjectLifecycleNativeLayout.Container120InitializerCallerSetupFileOffset == 0xC32A73
+    && StartupObjectLifecycleNativeLayout.Container120InitializerCallFileOffset == 0xC32A79
+    && StartupObjectLifecycleNativeLayout.Container120InitializerMethodFileOffset == 0xC41670
+    && StartupObjectLifecycleNativeLayout.Container120HeadOffset == 0
+    && StartupObjectLifecycleNativeLayout.Container120CountOffset == 4
+    && StartupObjectLifecycleNativeLayout.Container120BackingBeginOffset == 8
+    && StartupObjectLifecycleNativeLayout.Container120BackingEndOffset == 0xC
+    && StartupObjectLifecycleNativeLayout.Container120BackingCapacityOffset == 0x10
+    && StartupObjectLifecycleNativeLayout.Container120Field14Offset == 0x14
+    && StartupObjectLifecycleNativeLayout.Container120Field14Value == 7
+    && StartupObjectLifecycleNativeLayout.Container120Field18Offset == 0x18
+    && StartupObjectLifecycleNativeLayout.Container120Field18Value == 8
+    && StartupObjectLifecycleNativeLayout.Container120Field1COffset == 0x1C
+    && StartupObjectLifecycleNativeLayout.Container120Field1CValueBits == 0x3F800000
+    && StartupObjectLifecycleNativeLayout.Container120SentinelSize == 0xC
+    && StartupObjectLifecycleNativeLayout.Container120SentinelNextOffset == 0
+    && StartupObjectLifecycleNativeLayout.Container120SentinelPreviousOffset == 4
+    && StartupObjectLifecycleNativeLayout.Container120InitialBackingSlotCount == 16
+    && StartupObjectLifecycleNativeLayout.Container120BackingSlotSize == 4
+    && StartupObjectLifecycleNativeLayout.Container120InitialBackingByteCount == 0x40
+    && StartupObjectLifecycleNativeLayout.Container120ListNodeField8Offset == 8
+    && StartupObjectLifecycleNativeLayout.PostPassContainer120Offset
+        + StartupObjectLifecycleNativeLayout.Container120BackingBeginOffset == 0x128
+    && StartupObjectLifecycleNativeLayout.Container120ListNodeField8Offset == 8);
+Check("Nested container initial backing projection repeats the captured sentinel pointer in sixteen immutable slots",
+    new uint[] { 0, 0x81234567, uint.MaxValue }.All(capturedSentinel =>
+    {
+        var slots = StartupObjectLifecycleNativeLayout.ProjectContainer120InitialBackingSlots(
+            capturedSentinel);
+        return slots.Count == 16
+            && slots.All(slot => slot == capturedSentinel)
+            && slots is IList<uint> readOnlySlots
+            && readOnlySlots.IsReadOnly;
+    }));
 Check("Manager destruction and insertion-failure anchors record only observed release actions",
     StartupObjectLifecycleNativeLayout.Manager6B0DestructorFileOffset == 0xBF8AC0
     && StartupObjectLifecycleNativeLayout.ManagerKeyCleanupMethodFileOffset == 0xC0BD90
