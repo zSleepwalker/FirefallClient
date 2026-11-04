@@ -7966,3 +7966,39 @@ Destructor raw `0x2EA520` restores the base vptr and joins with 10000 ms.
 Join raw `0x12BFF70` requests stop through byte `+4`, waits, then
 closes the handle and clears started state even on WAIT_TIMEOUT (258).
 Consequently this teardown ordering does not prove worker termination.
+
+## Dump-key arming byte and indirect action sequence
+
+Worker raw `0x2EA200` tests the high bit of each GetAsyncKeyState result.
+Constructor raw `0x2EA330` clears `this+0x70`; a failed chord test clears
+it again. A matching poll with zero arms it without action; a matching
+poll with it already set takes the action. If that action returns, the byte
+is set to 1 again. These branches do not alone establish a rising-edge-only
+trigger: subsequent matching polls can repeat the action if control returns.
+
+Raw `0x2EA259..0x2EA28D` calls global **VA** `0x1E002B8`'s virtual
+slot `+0xFC` with argument 4, then the previously identified assertion
+reporter through **VA** `0x1C15EA0` with arguments
+`(0, 0x1C5EA58, 203, 0x1C5E950)`, then IAT **VA** `0x1AC43A4`
+with `(-1, -2)`. The import identity, assertion strings, and virtual target
+remain pending. A target name inferred solely from the last arguments
+would not establish termination or dump output.
+
+The follow-up incorrectly reported `0x2EA200 + 0x400C00 = 0x6FAE00`;
+the sum is `0x6EAE00`, consistent with the previously recorded table entry.
+Its inability to resolve the thunk as an IDA function does not invalidate
+the earlier byte-backed virtual dispatch evidence.
+
+## CRT return-path targets pending PE verification
+
+A bounded exit-list reference pass found registration references but no
+concrete client-side drain. This is not proof that no computed drain exists.
+After application return, the inspected CRT wrapper conditionally calls
+IAT **VA** `0x1AC4828` and `0x1AC47E4`; exact names and branch ordering
+are pending immutable PE parsing.
+
+The pass also reported apparent `0x05050505` bytes for globals
+**VA** `0x1F1B474/0x1F1B470`, without establishing file backing.
+Those are not accepted as loader initial values until the PE section's
+raw-size/virtual-size bounds are checked. Do not extrapolate raw-IDB
+contents into virtual-only globals.
