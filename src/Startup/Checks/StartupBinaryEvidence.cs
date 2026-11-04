@@ -10648,6 +10648,29 @@ internal static class StartupBinaryEvidence
             && RelativeBranchTargets(0xC3FC52, 0xE8, 0x12C8D60)
             && RelativeBranchTargets(0xC3FC61, 0xE9, 0x12C8D60));
 
+        check("Binary UI child teardown caller gates, calls 0xCA7330 and its helper, then clears the child slot",
+            Matches(0xBFAD2A, "8B4B24")
+            && Matches(0xBFAD37, "85C97419")
+            && RelativeBranchTargets(0xBFAD3B, 0xE8, 0xCA7330)
+            && Matches(0xBFAD40, "8B4B2485C9740651")
+            && RelativeBranchTargets(0xBFAD48, 0xE8, 0xBFAF40)
+            && Matches(0xBFAD4D, "C7432400000000"));
+        check("Binary UI child teardown helper captures this and child+0x150, then calls the recorded cleanup targets",
+            Matches(0xBFAF40, "568BF1578BBE50010000")
+            && Matches(0xBFAF4A, "85FF740E")
+            && Matches(0xBFAF4E, "8BCF")
+            && RelativeBranchTargets(0xBFAF50, 0xE8, 0xCA6070)
+            && Matches(0xBFAF55, "8BCF")
+            && RelativeBranchTargets(0xBFAF57, 0xE8, 0x12C8D60));
+        check("Binary UI child teardown helper checks dependency+4, dispatches dependency vtable slot+8, then frees the child",
+            Matches(0xBFAF5C, "837E0400751A")
+            && Matches(0xBFAF7C, "8B460450")
+            && Matches(0xBFAF80, "8B08")
+            && Matches(0xBFAF82, "FF5108")
+            && Matches(0xBFAF85, "8BCE")
+            && RelativeBranchTargets(0xBFAF87, 0xE8, 0x12C8D60)
+            && Matches(0xBFAF8C, "5F8BC65EC20400"));
+
         check("Binary UI manager shutdown checks the partial-init byte, clears both init bytes, and dispatches state sync through slot +0xB0",
             Matches(
                 UiManagerNativeLayout.UiManagerShutdownMethodFileOffset + 0x32,
