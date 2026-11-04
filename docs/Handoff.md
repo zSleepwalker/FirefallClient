@@ -12,7 +12,7 @@ are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
 file-close path. Active boundaries are UI state-sync decision reconstruction and
-the native record producer's concrete object-iteration gates.
+the native record producer's input-to-record transformations.
 UI lifecycle code/checks are committed.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
@@ -9690,6 +9690,30 @@ It does not itself test ready; this is a concrete caller, not proof that
 every invocation occurs after ready publication. The callee suppresses
 dispatch before readiness. A bounded code task now projects these exact
 positional decisions without assigning speculative field semantics.
+
+## Record producer iteration uses eight-byte entries and independent call gates
+
+Raw `0xC5EF40` tests byte `+0x2D4` and compares its float `+0x2C0`
+against VA `0x1C818E8` at `0xC5EF7D`. For ordered finite values,
+the observed path proceeds at or above the threshold. Unordered behavior
+and operand order require instruction-level clarification before a projection.
+
+The loop starts at parent `+0x5C`, ends on equality with `+0x60`,
+and advances eight bytes at `0xC5F026`. Each record's first DWORD
+is an object pointer; its second DWORD is not read here.
+A qualifying object has its `+0x1C` pointee's byte `+0x7F` set,
+object byte `+0x40` set, and DWORD `+0x70 != 2`
+(`0xC5EFF2..0xC5F005`). Call `0xC5F01D` passes the object as ECX
+and parent `+0x2B0` as argument to `0xC95400`.
+Coordinate change gates an earlier virtual `+0x30` call, not this producer.
+
+Matching initializer `0xC5CFE0` sets `+0x2D4=1` at `0xC5D116`,
+zeros `+0x5C/+0x60`, and initializes `+0x2C0` to float one.
+Concrete calls include `0xC88495`, `0xCC18A7`, guarded `0xCEE4A9`,
+and `0xCF17F7`, plus tail-call `0xCF28E0`. Each invocation or duplicate
+record can repeat production; these entries do not establish frame cadence.
+The next task traces the supplied `+0x2B0` argument's effect on the four
+source floats rather than assuming an untransformed record copy.
 
 The report's apparent VA lookup discrepancy is not a new mapping gap:
 the IDB is raw/base-zero and a numeric runtime VA must not be used directly
