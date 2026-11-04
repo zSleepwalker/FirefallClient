@@ -11,7 +11,9 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Current delegated boundaries are the runtime exit helper's indirect targets
-and the distinct timed wrapper's field-8 resource ownership. Logger unwind binding is now composed
+and the distinct timed wrapper's field-8 allocation origin. Its cleanup import is
+MSVCR120.dll!free; the earlier constructor candidate is another destructor.
+Logger unwind binding is now composed
 from the recorded guard initialization and exact EH action. Assertion interception is a bounded
 unresolved stop. Mode-16 fixed scatter and normal
 buffer release are resolved.
@@ -7819,3 +7821,25 @@ A bootstrap state of -1 selects one indirect forwarding routine, other state
 selects another. Neither routine's identity is established by this pass,
 so no atexit/onexit/private-list or failure-branch label follows from the
 helper's existing name. The next check resolves exact operands/imports.
+
+## Timed wrapper field +8 is CRT-freed; initializer remains open
+
+Read-only inspection of the active sample identifies IAT **VA** `0x1AC4940`
+as **MSVCR120.dll!free**. Its backed raw slot is `0x16C3540`,
+containing bytes `E2 0E 9C 01`. At raw `0x1309938`, bytes
+`FF 76 08 FF 15 40 49 AC 01` push `[this+8]` and call that import.
+This is heap deallocation, not CloseHandle, and does not identify the
+allocation routine or concrete resource type.
+
+Raw `0x13093E0` is another destructor: it releases reference-counted fields
+before the conditional join and `free(this+8)`. Its shared vptr store is
+not evidence of construction. The shared vptr **VA** `0x1C80C5C` maps to
+backed raw `0x188F85C`; it remains distinct from heartbeat vptr
+`0x1C812B0`. A bounded successor searches actual initialization stores
+and one field-8 producer; no heartbeat allocation ownership follows yet.
+
+The parallel logger follow-up only reconfirmed adjacent critical-section
+imports, not the requested helper's forwarding targets. Those imports
+do not resolve or refute exit registration. The next check starts from
+the direct E8 displacement at raw `0x12C1642`, rather than the neighboring
+indirect calls.
