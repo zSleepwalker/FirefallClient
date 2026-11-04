@@ -12,7 +12,7 @@ are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
 file-close path. Active boundaries are cursor-selection setter provenance
-and native producer helper `0xCCA190`'s exact derived arithmetic.
+and derived-angle normalization's import, constants, and exceptional comparisons.
 UI lifecycle code/checks are committed.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
@@ -9801,6 +9801,39 @@ No WinAPI call or inferred zero-output-on-failure behavior is implemented.
 The delegated Startup checks reported 849 passes and no failures.
 The next bounded trace follows the cursor-selection setter's actual
 arguments and sources, not another pass over the resolved API binding.
+
+## Derived producer state is nine float slots followed by an independent byte
+
+Raw `0xC95430..0xC95443` passes output `this+0x2DC`, input
+`this+0x98`, and the parent's `+0x2B0` argument to `0xCCA190`.
+Its output is nine floats at relative `+0..+0x20` and a byte at
+`+0x24` (object `+0x300`), not a proven matrix or rectangle type.
+The byte is one iff input byte `+1` and parent byte `+0x24` are nonzero.
+This stored byte must remain distinct from the helper's scalar return.
+
+Direct helper `0xCCA350` derives a pair using input offsets `+8`,
+`+0x1FC/+0x200`, and `+0x20C..+0x218`, including FSINCOS and
+single-precision stores. `0xCCA190` may rotate/translate that pair
+using parent angle `+0x14` and coordinates `+0/+4`.
+Other output slots are anchored as follows:
+
+| Output | Observed operands |
+|---|---|
+| `+8` | parent `+8` plus input `+0x204` |
+| `+0xC` | parent `+0xC` plus input `+0x208` |
+| `+0x10` | input `+4` times parent `+0x10` |
+| `+0x14` | Angle-path result, import/branch clarification pending |
+| `+0x18` | input `+0xC` times parent `+0x18` |
+| `+0x1C` | input `+0x10` times parent `+0x1C` |
+| `+0x20` | input `+0x18` plus parent `+0x20` |
+
+Ordered-equality tests at `0xCCA1AE..0xCCA1BA` and
+`0xCCA35B..0xCCA369` select the direct pair branches; NaN does not.
+Angle normalization crosses IAT VA `0x1AC4820`. Its exact import,
+constant mapping, and unusual sign/unordered branch report are a separate
+bounded follow-up before accepting a complete arithmetic projection.
+Earlier virtual calls remain unresolved, so this derived-state trace does
+not prove absence of indirect writes to the later record source fields.
 
 The report's apparent VA lookup discrepancy is not a new mapping gap:
 the IDB is raw/base-zero and a numeric runtime VA must not be used directly
