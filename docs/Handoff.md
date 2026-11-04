@@ -11,7 +11,7 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Current delegated boundaries are the logger cleanup tail-jump target/effect
-and heartbeat startup-hook return. Assertion interception is a bounded
+and thread-join timeout/result handling. Assertion interception is a bounded
 unresolved stop. Mode-16 fixed scatter and normal
 buffer release are resolved.
 Shutdown-request callers
@@ -7702,3 +7702,15 @@ exact rel32 arithmetic check before integration.
 Absence of a direct LeaveCriticalSection in this small thunk neither proves
 nor refutes exceptional release. Security-cookie calls in the main handler
 do not resolve the guard cleanup and are not followed as a substitute.
+
+## Heartbeat startup hook always succeeds for the concrete lock vtable
+
+Raw `0x2EB8D0` (VA `0x6EC4D0`) consists of `B0 01 C3`,
+mov al,1; ret, followed by padding.
+The callsite raw `0x13095D7` loads slot +4, calls at `0x13095DA`,
+and tests AL before the false branch to `0x130960B`.
+For the proven lock vtable this gate therefore succeeds unconditionally;
+the generic false-hook failure described earlier is not reachable with
+this exact slot target. Thread creation can still fail independently.
+The next scope checks wait-result handling in `0x12BFF70`, including
+the timed join caller versus final owner's INFINITE wait.
