@@ -10632,3 +10632,16 @@ zeroed before code use. Code output is then cleaned on either terminal
 lookup result. The shared failure cleanup therefore handles a selected
 pointer, not an unconditional list of both outputs.
 A bounded static path layout and immutable PE checks are active.
+
+The source provenance trace identifies the helpers' first explicit argument
+as CA6C80's local wrapper `v28`, initialized with vptr VA `0x1C80CC4`
+and zero, not the EDI input. The initial `0x12BB2A0` call also
+receives a formatted-text value via another local. The bounded trace did
+not establish the wrapper's buffer writer or justify calling that routine
+a parser. A concrete wrapper-vtable check is active.
+
+The blob layout files are delivered but remain unregistered pending exact
+verification of the shared cleanup's selected register. Their conditional
+path claims must not be validated merely against matching constants.
+The compile framing PE checks are also delivered; the active binary
+integration agent is adding scratch/blob guards before coordinator review.
