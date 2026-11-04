@@ -10468,3 +10468,29 @@ pairs at offsets `+0x24..+0x60`. Success sets BL=1 at `0xCA6F49`;
 failure sets BL=0 at `0xCA6FCF`; `0xCA7061` transfers BL to AL.
 The key addresses remain opaque and indirect object targets unresolved.
 A separate bounded lookup-helper contract trace is active.
+
+## Captured initializer gates integrated; required lookup terminal predicate
+
+The captured two-helper result projection is registered, passes focused
+checks, and is pushed. Coordinator review removed an unsupported caller
+continuation address and named the `+0x6C` flag as a direct clear action,
+not a claim about all indirect helper side effects. Optional second-helper
+capture consistency is validated; nonzero bytes normalize to one.
+
+The lookup-helper trace reports both `0xCA7090/0xCA71F0`
+pass an output address through a local object's virtual slot `+0xC`,
+then dispatch a returned value through child dependency `+4`.
+Their dependency slots differ: `+0x16C` versus `+0x1A8`.
+The terminal success predicate is signed dispatcher status nonnegative
+and captured output DWORD nonzero. These helpers do not themselves
+write or clear the output DWORD; unresolved called targets receive it.
+Temporary virtual cleanup does not establish a refcount contract.
+A terminal captured-predicate projection is assigned.
+
+The allocation-null diagnostic formats via PE-bound `memset`
+(raw stub `0x159D8FA`, IAT VA `0x1AC4AD4`) and `_snprintf`
+(IAT VA `0x1AC4870`). The actual report call at `0xCA6790`
+uses shared non-import global VA `0x1C15EA0`. Its exact callee
+and return contract remain unresolved; the static return continuation
+does not prove the diagnostic returns. A single initializer/writer
+check is assigned, not another broad logger investigation.
