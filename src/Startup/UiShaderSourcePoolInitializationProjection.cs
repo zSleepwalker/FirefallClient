@@ -50,6 +50,16 @@ public static class UiShaderSourcePoolInitializationProjectionRules
 
     public const uint CodeVirtualAddressDeltaFromRawFileOffset = 0x00400C00;
     public const uint InitializerRawFileOffset = 0x12CC110;
+    public const uint GlobalReadinessTestRawFileOffset = 0x12CC137;
+    public const uint GlobalReadinessBranchRawFileOffset = 0x12CC13E;
+    public const uint GlobalReadinessDiagnosticIdPushRawFileOffset = 0x12CC142;
+    public const uint GlobalReadinessDiagnosticCallRawFileOffset = 0x12CC14E;
+    public const uint ReceiverFlagTestRawFileOffset = 0x12CC157;
+    public const uint ReceiverFlagBranchRawFileOffset = 0x12CC15B;
+    public const uint ReceiverFlagDiagnosticIdPushRawFileOffset = 0x12CC162;
+    public const uint ReceiverFlagDiagnosticCallRawFileOffset = 0x12CC16E;
+    public const uint ReceiverFlagDiagnosticCleanupRawFileOffset = 0x12CC174;
+    public const uint EntryDiagnosticsAllocatorArgumentRawFileOffset = 0x12CC177;
     public const uint AllocatorCallRawFileOffset = 0x12CC179;
     public const uint AllocatorResultCaptureRawFileOffset = 0x12CC17E;
     public const uint ConfigurationNullTestRawFileOffset = 0x12CC18D;
@@ -63,8 +73,14 @@ public static class UiShaderSourcePoolInitializationProjectionRules
     public const uint InitializedFlagStoreRawFileOffset = 0x12CC1B6;
 
     public const uint AllocatorConfigurationFunctionRawFileOffset = 0x12CDB40;
+    public const uint GlobalReadinessByteVirtualAddress = 0x1E4B095;
+    public const uint DiagnosticCallbackPointerGlobalVirtualAddress = 0x1C15EA0;
     public const uint SingletonHeadGlobalVirtualAddress = 0x1E4B0A8;
     public const uint PoolPointerGlobalVirtualAddress = 0x1E00510;
+
+    public const int ReceiverFlagOffset = 0x04;
+    public const uint GlobalReadinessDiagnosticId = 0x68;
+    public const uint ReceiverFlagDiagnosticId = 0x69;
 
     public const uint ConfigurationArgument0 = 0x810;
     public const uint ConfigurationArgument1 = 0x20;
@@ -146,6 +162,81 @@ public static class UiShaderSourcePoolInitializationProjectionRules
                 "C6 46 04 01",
                 ThisRelativeOffset: InitializedFlagOffset)
         });
+
+    public static IReadOnlyList<UiShaderSourcePoolInitializationInstructionEvidence>
+        EntryDiagnosticInstructions { get; } =
+        Array.AsReadOnly(new[]
+        {
+            new UiShaderSourcePoolInitializationInstructionEvidence(
+                "Test the captured global readiness byte",
+                GlobalReadinessTestRawFileOffset,
+                "80 3D 95 B0 E4 01 00",
+                TargetVirtualAddress: GlobalReadinessByteVirtualAddress),
+            new UiShaderSourcePoolInitializationInstructionEvidence(
+                "Skip the first diagnostic when the global readiness byte is nonzero",
+                GlobalReadinessBranchRawFileOffset,
+                "75 17"),
+            new UiShaderSourcePoolInitializationInstructionEvidence(
+                "Push diagnostic ID 0x68 when global readiness is zero",
+                GlobalReadinessDiagnosticIdPushRawFileOffset,
+                "6A 68"),
+            new UiShaderSourcePoolInitializationInstructionEvidence(
+                "Call the indirect diagnostic callback",
+                GlobalReadinessDiagnosticCallRawFileOffset,
+                "FF 15 A0 5E C1 01",
+                TargetVirtualAddress: DiagnosticCallbackPointerGlobalVirtualAddress),
+            new UiShaderSourcePoolInitializationInstructionEvidence(
+                "Test the captured prior receiver flag byte at this + 0x04",
+                ReceiverFlagTestRawFileOffset,
+                "80 7E 04 00",
+                ThisRelativeOffset: ReceiverFlagOffset),
+            new UiShaderSourcePoolInitializationInstructionEvidence(
+                "Skip the second diagnostic when the prior receiver flag is zero",
+                ReceiverFlagBranchRawFileOffset,
+                "74 1A"),
+            new UiShaderSourcePoolInitializationInstructionEvidence(
+                "Push diagnostic ID 0x69 when the prior receiver flag is nonzero",
+                ReceiverFlagDiagnosticIdPushRawFileOffset,
+                "6A 69"),
+            new UiShaderSourcePoolInitializationInstructionEvidence(
+                "Call the indirect diagnostic callback",
+                ReceiverFlagDiagnosticCallRawFileOffset,
+                "FF 15 A0 5E C1 01",
+                TargetVirtualAddress: DiagnosticCallbackPointerGlobalVirtualAddress),
+            new UiShaderSourcePoolInitializationInstructionEvidence(
+                "Clean up diagnostic arguments and continue toward allocation",
+                ReceiverFlagDiagnosticCleanupRawFileOffset,
+                "83 C4 10"),
+            new UiShaderSourcePoolInitializationInstructionEvidence(
+                "Begin the allocator request after the diagnostic gates",
+                EntryDiagnosticsAllocatorArgumentRawFileOffset,
+                "6A 28")
+        });
+
+    /// <summary>
+    /// Returns only the diagnostic IDs selected by the two captured entry gates.
+    /// Reaching allocation after a selected diagnostic is conditional on its
+    /// indirect reporter returning. Neither gate blocks allocation on return, and
+    /// this helper exposes no lock or thread-safety guarantee.
+    /// </summary>
+    public static ImmutableArray<uint> ProjectEntryDiagnosticIds(
+        byte globalReadinessByte,
+        byte priorReceiverFlagByte)
+    {
+        var diagnosticIds = ImmutableArray.CreateBuilder<uint>(2);
+
+        if (globalReadinessByte == 0)
+        {
+            diagnosticIds.Add(GlobalReadinessDiagnosticId);
+        }
+
+        if (priorReceiverFlagByte != 0)
+        {
+            diagnosticIds.Add(ReceiverFlagDiagnosticId);
+        }
+
+        return diagnosticIds.ToImmutable();
+    }
 
     /// <summary>
     /// Projects the observed continuation after the allocator returns. A nonzero

@@ -181,6 +181,8 @@ The captured control writer supports both observed variants: pooled controls req
 
 `UiShaderSourcePoolInitializationProjectionRules` records only the post-allocation continuation: nonnull allocator capture selects configuration with `(2064, 32, 1)`, then the allocator pointer and separately captured prior list head are published before setting byte `+4`. Null allocation still reaches those writes if preceding calls return; the flag does not imply pool readiness. With receiver VA `0x1E00500`, the `+0x10` store targets pool global VA `0x1E00510`.
 
+Its separate entry-gate projection reports ID `0x68` for zero captured global readiness byte and ID `0x69` for nonzero receiver flag, in that order. The receiver flag is captured at its later native read, after any first diagnostic call. Returning reporters allow allocation to continue; these gates do not implement idempotency, locking, or readiness guarantees.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves

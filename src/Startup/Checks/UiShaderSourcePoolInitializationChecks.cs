@@ -4,6 +4,85 @@ internal static class UiShaderSourcePoolInitializationChecks
 {
     public static void Run(Action<string, bool> check)
     {
+        check("Entry diagnostic gates anchor the exact captured bytes and continuation targets",
+            UiShaderSourcePoolInitializationProjectionRules.EntryDiagnosticInstructions
+                .Select(instruction =>
+                    (instruction.RawFileOffset, instruction.Bytes, instruction.TargetVirtualAddress))
+                .SequenceEqual(new (uint RawFileOffset, string Bytes, uint? TargetVirtualAddress)[]
+                {
+                    (0x12CC137, "80 3D 95 B0 E4 01 00", 0x1E4B095),
+                    (0x12CC13E, "75 17", null),
+                    (0x12CC142, "6A 68", null),
+                    (0x12CC14E, "FF 15 A0 5E C1 01", 0x1C15EA0),
+                    (0x12CC157, "80 7E 04 00", null),
+                    (0x12CC15B, "74 1A", null),
+                    (0x12CC162, "6A 69", null),
+                    (0x12CC16E, "FF 15 A0 5E C1 01", 0x1C15EA0),
+                    (0x12CC174, "83 C4 10", null),
+                    (0x12CC177, "6A 28", null)
+                })
+            && UiShaderSourcePoolInitializationProjectionRules.GlobalReadinessBranchRawFileOffset
+                + 2 + 0x17
+                == UiShaderSourcePoolInitializationProjectionRules.ReceiverFlagTestRawFileOffset
+            && UiShaderSourcePoolInitializationProjectionRules.ReceiverFlagBranchRawFileOffset
+                + 2 + 0x1A
+                == UiShaderSourcePoolInitializationProjectionRules.EntryDiagnosticsAllocatorArgumentRawFileOffset
+            && UiShaderSourcePoolInitializationProjectionRules.ReceiverFlagDiagnosticCallRawFileOffset
+                + 6
+                == UiShaderSourcePoolInitializationProjectionRules.ReceiverFlagDiagnosticCleanupRawFileOffset
+            && UiShaderSourcePoolInitializationProjectionRules.ReceiverFlagDiagnosticCleanupRawFileOffset
+                + 3
+                == UiShaderSourcePoolInitializationProjectionRules.EntryDiagnosticsAllocatorArgumentRawFileOffset
+            && UiShaderSourcePoolInitializationProjectionRules.GlobalReadinessDiagnosticId == 0x68
+            && UiShaderSourcePoolInitializationProjectionRules.ReceiverFlagDiagnosticId == 0x69
+            && UiShaderSourcePoolInitializationProjectionRules.ReceiverFlagOffset == 0x04
+            && UiShaderSourcePoolInitializationProjectionRules.DiagnosticCallbackPointerGlobalVirtualAddress
+                == 0x1C15EA0);
+
+        bool entryDiagnosticMatrixIsExact = true;
+        for (int globalReadiness = byte.MinValue;
+             globalReadiness <= byte.MaxValue && entryDiagnosticMatrixIsExact;
+             globalReadiness++)
+        {
+            for (int priorReceiverFlag = byte.MinValue;
+                 priorReceiverFlag <= byte.MaxValue;
+                 priorReceiverFlag++)
+            {
+                var expected = new List<uint>(2);
+                if (globalReadiness == 0)
+                {
+                    expected.Add(0x68);
+                }
+
+                if (priorReceiverFlag != 0)
+                {
+                    expected.Add(0x69);
+                }
+
+                var actual =
+                    UiShaderSourcePoolInitializationProjectionRules.ProjectEntryDiagnosticIds(
+                        (byte)globalReadiness,
+                        (byte)priorReceiverFlag);
+                if (actual.IsDefault || !actual.SequenceEqual(expected))
+                {
+                    entryDiagnosticMatrixIsExact = false;
+                    break;
+                }
+            }
+        }
+
+        check("Entry diagnostic projection matches all 65,536 readiness/receiver-byte pairs in order",
+            entryDiagnosticMatrixIsExact);
+
+        check("Entry diagnostic projection leaves allocation continuation conditional on reporter return",
+            UiShaderSourcePoolInitializationProjectionRules.ProjectEntryDiagnosticIds(0, 1)
+                    .SequenceEqual(new uint[] { 0x68, 0x69 })
+            && UiShaderSourcePoolInitializationProjectionRules.ProjectEntryDiagnosticIds(1, 0)
+                .IsEmpty
+            && UiShaderSourcePoolInitializationProjectionRules.EntryDiagnosticsAllocatorArgumentRawFileOffset
+                == 0x12CC177
+            && UiShaderSourcePoolInitializationProjectionRules.AllocatorCallRawFileOffset == 0x12CC179);
+
         check("Pool initialization anchors the pinned sample, publication fields, and configuration arguments",
             UiShaderSourcePoolInitializationProjectionRules.SampleSha256
                 == "97362d668ff64778193a64759265e4ae90842043c4a15b627df9902fd9135445"
