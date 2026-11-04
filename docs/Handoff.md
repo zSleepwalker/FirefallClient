@@ -11,7 +11,7 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Current delegated boundaries are the CRT exit-mode flag initialization
-and the concrete DumpKeyComboThread chord state/action.
+and the concrete DumpKeyComboThread pre-termination logging request.
 Exit registration and its logger cleanup predicate are resolved.
 Generic wrapper field `+8` is a duplicated diagnostic label:
 MSVCR120.dll!_strdup/free; the earlier constructor candidate is another destructor.
@@ -8025,3 +8025,23 @@ List globals **VA** `0x1F1B470/0x1F1B474` have RVAs
 `0x1B1B470/0x1B1B474`: inside its virtual range but beyond raw backing.
 Their loader initial values are zero, not the previously observed
 raw-IDB `0x05050505`. They have no corresponding backed raw file offsets.
+
+## Dump-key action reaches TerminateProcess if assertion reporting returns
+
+Immutable PE parsing resolves IAT **VA** `0x1AC43A4` to
+**KERNEL32.dll!TerminateProcess**. The worker passes pseudo-handle -1
+and exit code -2 after the assertion-reporting call.
+The fourth reporter argument **VA** `0x1C5E950` is
+`"Dump key pressed"`; its second argument **VA** `0x1C5EA58`
+points to zero-initialized data in the inspected mapping.
+This identifies a termination request, not a proven dump-file write.
+The continuable reporter can divert control; neither reaching the
+TerminateProcess call nor returning from it is unconditional.
+
+The worker's first virtual action, global **VA** `0x1E002B8` slot `+0xFC`
+with argument 4, resolves to **VA** `0x1006BF0`, code raw `0xC05FF0`.
+That wrapper conditionally forwards to a list-logging routine; the
+list identity, meaning of argument 4, and concrete output are still open.
+The table/worker mapping is confirmed: **VA** `0x6EAE00` maps to
+raw `0x2EA200`. State byte `+0x70` allows repeated action on every
+continuing matching iteration after the first, not merely a rising edge.
