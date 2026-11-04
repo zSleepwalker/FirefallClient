@@ -10,8 +10,8 @@ PrivateDialog receiver identification, AES "block-size" interpretation,
 and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
-Current delegated boundaries are application shutdown's console/sink lifetime
-and the origin/type of DumpKeyComboThread's pre-termination diagnostic list.
+Current delegated boundaries are application shutdown's service-owner virtual
+dispatch and the frame collection behind DumpKeyComboThread's traceback logging.
 Normal native CRT return selects `exit(status)`.
 Exit registration and its logger cleanup predicate are resolved.
 Generic wrapper field `+8` is a duplicated diagnostic label:
@@ -8122,3 +8122,34 @@ conditional on dispatch to that wrapper.
 Formatter constants **VA** `0x1BBAD6C/0x1BBAEC4` also require
 PE-aware string mapping before declaring them unreadable. The successor
 checks those two concrete mapping-sensitive points.
+
+## UI traceback virtual binding and format strings confirmed
+
+PE mapping places uiManager vptr **VA** `0x1C73EBC` at raw `0x1872ABC`.
+Slot `+0xFC`, **VA** `0x1C73FB8`, raw `0x1872BB8`, contains
+`F0 6B 00 01`, namely **VA** `0x1006BF0`, code raw `0xC05FF0`.
+Initializer store raw `0xBF7ABB` is `C7 03 BC 3E C7 01`;
+another store occurs at `0xBF8AED`. This closes the provisional virtual edge.
+
+Mapped format **VA** `0x1BBAEC4` is `"    at %s(%d): %s"`;
+formatter control string **VA** `0x1BBAD6C` is `"lnS"`.
+Together with the traversal this establishes stack-frame/traceback-style
+logging. The earlier unreadable-string result arose from failing to map
+VA constants before inspection. A nearby Lua 5.3 marker alone does not
+identify the node type; exact frame enumeration/field semantics remain open.
+
+## Shutdown clears service +B4; final owner dispatch still needs receiver binding
+
+Helper raw `0x30D150` tail-calls uiManager virtual `+0x34`;
+shutdown's subsequent calls are slots `+0x10/+0x14` at
+`0x309685/0x309690`. At `0x30979A`, service virtual `+0x64(0)`
+resolves to raw `0xE4FB00`, storing zero into service `+0xB4`.
+This is not a store to the separate category callback slot.
+
+Near raw `0x10D8E30`'s end, call `0x10D8F6F` dispatches virtual `+4`
+through alias **VA** `0x1E60EA4`. Its receiver/dereference levels must
+be verified before calling it static-owner destruction: prior alias evidence
+identifies an address of the service cell, not automatically the owner object.
+Shutdown later invokes generic nested-container drain raw `0x12DB320`
+at `0x309883`. Bootstrap cleanup continues after shutdown and returns at
+`0x2EB2FF`. No actual console-close call ordering follows from these edges yet.
