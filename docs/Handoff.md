@@ -11,8 +11,8 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are console emission-control producers
-and traceback fallback-name exceptional restoration.
+file-close path. Active boundaries are config-loader emission-guard cleanup
+and exact EH state/action routing for traceback fallback-name restoration.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
 Normal native CRT return selects `exit(status)`.
 Exit registration and its logger cleanup predicate are resolved.
@@ -8373,3 +8373,30 @@ default-restore path. Separate routines inline the assignment; absent direct
 xrefs to this setter do not prove the callback cannot change elsewhere.
 Threshold initialization and byte `+5` producers remain a bounded continuation;
 neither is inferred from arbitrary raw-IDB bytes.
+
+## Console emission guard and logger threshold producers identified
+
+Console constructor zeroes the `+4/+5` word. Config loader raw `0xE4E210`
+sets byte `+5` at `0xE4E263`, then clears it at `0xE4E32D`;
+the interval includes config dispatch and callbacks. This is scoped emission
+suppression, not a threshold update. Calling it a reentrancy guard requires
+more than these writes; exact failure/nesting behavior is the next check.
+
+Raw `0x12C1F90` updates logger-state **VA** `0x1E6B5D8` field `+0x10`,
+the threshold **VA** `0x1E6B5E8`, and can log a change message.
+Other helpers temporarily assign 4 and restore a saved threshold.
+The field is in `.data`'s virtual tail, initially loader-zero-filled;
+0 is its loader initial value, not a claim about later runtime state.
+No console-variable registry/config-key identity was established.
+
+## Dispatch unwind funclet observed; state-to-action binding still required
+
+The bounded EH follow-up reported pushed **VA** `0x1A4AA4B`
+(code raw `0x1609E4B`) leading to local-wrapper cleanup via
+raw `0x60C960` with `[ebp-0xA8]`, not an observed global-name restore.
+It also identified state 0/-1 writes at `0xC3B544/0xC3B56F`.
+However, it did not decode the exact handler/FuncInfo/unwind-map routing
+or establish whether that pushed target is a handler versus a cleanup funclet.
+Therefore normal-path restoration is proven, but a blanket exceptional
+non-restoration conclusion remains provisional pending that binding.
+Absence of IDA-decoded EH maps does not prevent reading their underlying bytes.
