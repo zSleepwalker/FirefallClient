@@ -11,8 +11,8 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are scripting registry removal after object
-release and heap batch-free pointer-slot ownership.
+file-close path. Active boundaries are registry range-erase sentinel comparisons
+and heap batch-free validation/error policy.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
 Normal native CRT return selects `exit(status)`.
@@ -9061,3 +9061,40 @@ No object `+0x78` clear is needed to describe this observed sequence:
 the enclosing object is freed next, not shown reused.
 The later `0xBFCF30` registry pointer usage remains a separate bounded check;
 the order alone does not establish a stale-pointer dereference.
+
+## Batch free consumes pointer slots in array order and may merge adjacent entries
+
+Raw `0x12C9C20` receives heap in ECX, pointer array in EDX, count on stack;
+veneer `0x12CB020` tail-jumps without changing those arguments.
+The plain return leaves stack cleanup to the caller.
+Null entries are skipped; nonnull entries are cleared at `0x12C9C65`
+before header validation and handoff to `0x12C7D30` at `0x12C9CC4`.
+Exactly adjacent next entries can be merged, updating the header and replacing
+the next slot with the merged pointer for its subsequent iteration.
+The routine does not sort the array.
+
+Normal completion returns zero, not a released-byte/failed-entry count.
+It conditionally trims at `0x12C9CDD..0x12C9CE3` when top size
+exceeds threshold, then releases the optional lock.
+The validation branch `0x12C9C6E..0x12C9C80` follows slot clearing;
+its error call at `0x12C9D06` remains unidentified. INT3 padding alone
+does not establish the external error callee's return/termination contract.
+No higher-level direct caller beyond the veneer was established.
+
+## Registry cleanup uses pointer identity; missing-key erase claim needs exact range binding
+
+Raw `0xBFCF30` conditionally clears manager `+0x574` when equal to
+the supplied pointer, removes the first matching pointer from array
+`[+0x68C,+0x690)` by shifting the tail, then processes hash container `+0x5EC`.
+Lookup `0xC0A2A0` receives a stack copy of the pointer, hashes its four bytes
+through `0xC1F4D0`, and compares node `+8` keys.
+This does not dereference the released target object's fields.
+Range erase `0xC0A1B0` disposes registry nodes through `0x12C8D60`.
+
+The follow-up reported sentinel/sentinel lookup results on miss and interpreted
+an erase optimization as unconditional full clear via `0xC07560`.
+Exact first/last versus head/begin comparisons were not returned; that
+surprising miss behavior remains provisional until range arguments and branch
+bytes are bound. Do not equate empty range with full range from symbol names.
+Zero input reaches assertions (caller line 2392, cleanup line 1491) before
+continuation if reporting returns; the known reporter is not newly unresolved.
