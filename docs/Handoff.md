@@ -10,8 +10,8 @@ PrivateDialog receiver identification, AES "block-size" interpretation,
 and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
-Current delegated boundaries are console output-sink initialization
-and texture index extra-slot semantics. Assertion interception is a bounded
+Current delegated boundaries are console writer callback linkage
+and texture repeated-append capacity transitions. Assertion interception is a bounded
 unresolved stop. Mode-16 fixed scatter and normal
 buffer release are resolved.
 Shutdown-request callers
@@ -7474,3 +7474,34 @@ inspected path; flush/commit/close likewise remain unchecked.
 Rename is tested and reports failure, then returns success if reporting returns.
 Exact import identities here rely on earlier PE evidence, not fresh placeholder
 slot enumeration. The next scope follows the extra record's concrete use.
+
+## Extra index record is zeroed append capacity in the traced path
+
+Allocator raw `0xEB35E2..0xEB35E9` multiplies dimensions;
+`0xEB3643..0xEB3647` invokes verified MSVCR120!memset over
+all `0x4C*(N+1)` bytes, including slot N.
+Lookup raw `0xE9E466..0xE9E4ED` scans strictly `[0,N)` and
+returns null on miss; it does not use a search sentinel.
+Append raw `0xE9F81D..0xE9F833` computes base+N*`0x4C`,
+increments owner count, then `0xE9F839..0xE9F8D3` fully populates
+that record before save at `0xE9F8D8`.
+This establishes slot N as append capacity in this path, not a search
+sentinel. Alternate consumers are not exhausted. The next check follows
+array resizing across repeated appends rather than assuming permanent spare
+capacity after count increments.
+
+## Console initializes a text log sink and tolerates open failure
+
+Console initializer raw `0xE5D2CF` invokes virtual `+0xCC`,
+target `0xE5EA00` (VA `0x125F600`).
+At `0xE5EA7A`, helper `0x12BA030` converts UTF-8 path to wide
+and calls _wfopen through **VA** `0x1AC4704`, mode wt.
+Path is object `+0x10`, default console.log; FILE* is stored at
+global **VA** `0x1E49A18`.
+Writer raw `0xE5AF48` calls fprintf through **VA** `0x1AC48B0`
+with format %s; null handle skips output, and `0xE5AF5D` conditionally
+flushes. Open failure reports `Could not open %s for logging` through
+`0x2FC4F0`, severity 5, then continues without propagated failure.
+Shutdown virtual `+0xD0 -> 0xE5EEE0` closes/clears the handle.
+The next scope resolves callback linkage into writer `0xE5AC70`,
+not an assumed connection from arbitrary log calls.
