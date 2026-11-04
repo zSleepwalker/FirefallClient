@@ -819,6 +819,59 @@ Check("UI state-sync nonzero-byte branches and captured cursor comparisons use e
             CursorFlags = 2,
             CursorHandle = 0x8000058C
         }).ComponentCall == new UiManagerStateSyncCall(1, 0x58C));
+var angleCorrection = UiManagerAngleCorrectionProjectionRules.Project(
+    new UiManagerAngleCorrectionInput(-1f, -1f, 1, 1));
+var negativeZeroAngleCorrection = UiManagerAngleCorrectionProjectionRules.Project(
+    new UiManagerAngleCorrectionInput(-0f, -0f, 0, 1));
+var negativeMultipleAngleCorrection = UiManagerAngleCorrectionProjectionRules.Project(
+    new UiManagerAngleCorrectionInput(-UiManagerAngleCorrectionProjectionRules.TwoPi, -0f, 1, 0));
+var nanSumAngleCorrection = UiManagerAngleCorrectionProjectionRules.Project(
+    new UiManagerAngleCorrectionInput(float.NaN, 0.25f, 1, 1));
+var nanRemainderAngleCorrection = UiManagerAngleCorrectionProjectionRules.Project(
+    new UiManagerAngleCorrectionInput(-1f, float.NaN, 1, 1));
+Check("UI angle correction uses captured fmod results, preserves zero, and keeps the separate byte flag gate",
+    UiManagerAngleCorrectionProjectionRules.DerivedStateMethodFileOffset == 0xCCA190
+    && UiManagerAngleCorrectionProjectionRules.AngleCorrectionStubFileOffset == 0x159DD00
+    && UiManagerAngleCorrectionProjectionRules.AngleCorrectionStubBytes == "FF 25 20 48 AC 01"
+    && UiManagerAngleCorrectionProjectionRules.AngleCorrectionIatVirtualAddress == 0x1AC4820
+    && UiManagerAngleCorrectionProjectionRules.AngleCorrectionIatFileOffset == 0x16C3420
+    && UiManagerAngleCorrectionProjectionRules.AngleCorrectionImport == "MSVCR120.dll!_CIfmod"
+    && UiManagerAngleCorrectionProjectionRules.TwoPiConstantVirtualAddress == 0x1C5E1C4
+    && UiManagerAngleCorrectionProjectionRules.TwoPiConstantFileOffset == 0x185CDC4
+    && UiManagerAngleCorrectionProjectionRules.TwoPiConstantBits == 0x40C90FDB
+    && BitConverter.SingleToUInt32Bits(UiManagerAngleCorrectionProjectionRules.TwoPi) == 0x40C90FDB
+    && UiManagerAngleCorrectionProjectionRules.ZeroConstantVirtualAddress == 0x1C817A4
+    && UiManagerAngleCorrectionProjectionRules.ZeroConstantFileOffset == 0x18803A4
+    && UiManagerAngleCorrectionProjectionRules.OneConstantVirtualAddress == 0x1C81BE8
+    && UiManagerAngleCorrectionProjectionRules.OneConstantFileOffset == 0x18807E8
+    && UiManagerAngleCorrectionProjectionRules.FirstValueInputOffset == 8
+    && UiManagerAngleCorrectionProjectionRules.ParentValueInputOffset == 0x14
+    && UiManagerAngleCorrectionProjectionRules.ProjectedValueOffset == 0x14
+    && UiManagerAngleCorrectionProjectionRules.InputFlagOffset == 1
+    && UiManagerAngleCorrectionProjectionRules.ParentFlagOffset == 0x24
+    && UiManagerAngleCorrectionProjectionRules.ProjectedFlagOffset == 0x24
+    && BitConverter.SingleToUInt32Bits(angleCorrection.ProjectedValue)
+        == BitConverter.SingleToUInt32Bits(-1f + UiManagerAngleCorrectionProjectionRules.TwoPi)
+    && angleCorrection.ProjectedFlag
+    && BitConverter.SingleToUInt32Bits(negativeZeroAngleCorrection.ProjectedValue)
+        == 0x80000000
+    && !negativeZeroAngleCorrection.ProjectedFlag
+    && BitConverter.SingleToUInt32Bits(negativeMultipleAngleCorrection.ProjectedValue)
+        == 0x80000000
+    && !negativeMultipleAngleCorrection.ProjectedFlag
+    && UiManagerAngleCorrectionProjectionRules.Project(
+        new UiManagerAngleCorrectionInput(1f, -0.5f, 1, 1)).ProjectedValue == -0.5f
+    && nanSumAngleCorrection.ProjectedValue == 0.25f
+    && nanSumAngleCorrection.ProjectedFlag
+    && float.IsNaN(nanRemainderAngleCorrection.ProjectedValue)
+    && nanRemainderAngleCorrection.ProjectedFlag
+    && Enumerable.Range(0, byte.MaxValue + 1).All(value =>
+        UiManagerAngleCorrectionProjectionRules.Project(
+           new UiManagerAngleCorrectionInput(1f, 0f, (byte)value, 1)).ProjectedFlag
+               == (value != 0)
+        && UiManagerAngleCorrectionProjectionRules.Project(
+           new UiManagerAngleCorrectionInput(1f, 0f, 1, (byte)value)).ProjectedFlag
+               == (value != 0)));
 Check("UI payload descriptor consumer and append helper retain the observed pointer and positional-record layout",
     UiManagerNativeLayout.UiPayloadDescriptorConsumerMethodFileOffset == 0xC95400
     && UiManagerNativeLayout.UiPayloadDescriptorConsumerMethodVirtualAddress == 0x1096000

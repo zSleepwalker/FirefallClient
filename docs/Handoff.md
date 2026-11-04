@@ -12,7 +12,7 @@ are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
 file-close path. Active boundaries are the cursor-selection tree payload publisher
-and a captured-remainder projection of the verified derived-angle correction.
+and derived-state byte/float gates before the record append.
 UI lifecycle code/checks are committed.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
@@ -9877,6 +9877,20 @@ passes unchanged. Output float `+0x14` is distinct from output byte
 `+0x24`; the epilogue does not establish a meaningful EAX boolean return.
 The next code task projects only correction of a captured CRT remainder,
 not an unverified managed emulation of x87 `_CIfmod`.
+
+## Captured-remainder correction implemented without emulating the native CRT
+
+`UiManagerAngleCorrectionProjection.cs` projects the observed correction
+from an original sum and captured remainder, preserving either signed zero
+unchanged and treating the derived output byte independently.
+Focused checks cover negative sums, exact multiples, NaN, zero signs,
+positive sums, and all byte values for each flag input.
+Coordinator review corrected hexadecimal `+0x14/+0x24` offsets that had
+been transcribed as decimal 14/24, distinguished helper `0xCCA190` from
+import stub `0x159DD00`, and represented float bits as `0x40C90FDB`
+rather than a misleading integer named as byte order.
+The next task traces which producer pre-work these derived gates suppress,
+without assuming the derived helper has a meaningful scalar return.
 
 The report's apparent VA lookup discrepancy is not a new mapping gap:
 the IDB is raw/base-zero and a numeric runtime VA must not be used directly
