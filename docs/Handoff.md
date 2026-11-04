@@ -11,7 +11,7 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Current delegated boundaries are log-callback startup publication/order
-and texture filesystem-lock acquisition/release semantics. Assertion interception is a bounded
+and texture lock-heartbeat thread ownership/failure cleanup. Assertion interception is a bounded
 unresolved stop. Mode-16 fixed scatter and normal
 buffer release are resolved.
 Shutdown-request callers
@@ -7543,3 +7543,39 @@ and conditional file output.
 The calls are synchronous and pass stack-local text; exclusive thread ownership
 is not established. Enable/context gates and nonnull FILE still govern output.
 The next scope checks callback-slot initialization/replacement and startup order.
+
+## Texture lock uses rename claim, heartbeat and stale-name reclamation
+
+Owner entry raw `0xE9E22A..0xE9E293` increments ordinary nesting
+count; only previous-zero entry acquires object `+0x1998`, ignoring
+its return. Lock constructor formats `%s_tmp_lock_file` from the already
+traced owner `+0x19A0` virtual-texture location prefix.
+Helper `0x12BC5A0` generates a candidate in current directory using
+`XXXX-XXXX-XXXX-XXXX.tmp`, seeded by timeGetTime XOR thread ID.
+Stat rejection of existing nondirectory candidates is not exclusive creation.
+Acquisition raw `0x1309695..0x13096B0` fopen wb creates the
+candidate; null fails, fclose result is ignored.
+UTF-8/wide conversion helper `0x12B7610` then `_wrename`s candidate
+to lockname; exactly zero return succeeds.
+
+On failed rename, the algorithm samples lock mtime, zero on stat failure.
+A changed mtime records `{mtime,current_time}` in object `+0x28/+0x30`.
+Unchanged nonzero mtime triggers unlink/retry if elapsed high DWORD is
+nonzero or low DWORD exceeds 120 seconds. Unlink result is ignored;
+one further rename failure deletes the candidate and returns false.
+Outer raw `0x1309570..0x13095A4` logs failed attempts and sleeps
+5000 ms, retrying indefinitely without overall timeout.
+
+Success sets held byte `+0x38`, clears observation fields and starts a
+heartbeat thread. Worker raw `0x1309880` polls stop after Sleep(100)
+and roughly every 30,000 accumulated milliseconds opens lockname wb,
+closes it, and ignores failures. Thread-create failure does not release
+the claimed name; exact wrapper ownership is the next scope.
+Final owner release flushes data, stops/joins heartbeat with INFINITE wait,
+unlinks lockname unchecked, clears held, destroys the object and nulls `+0x1998`.
+
+PE evidence verifies `_wrename` IAT **VA** `0x1AC4720`,
+`_wunlink` `0x1AC471C`, `_wstat64` `0x1AC472C`,
+`_time64` `0x1AC48D8`, Sleep `0x1AC4374`.
+This is pathname claiming plus heartbeat/stale reclamation, not universal
+writer exclusion or a proven same-owner thread mutex.
