@@ -10839,3 +10839,17 @@ Separate capacity captures are required; no atomic snapshot is established.
 The fast-path agent's reported entry VA `0x16DCCB0` was arithmetic error:
 raw `0x12CBCB0 + 0x400C00 = VA 0x16CC8B0`. Raw anchors remain the
 evidence basis. Capacity predicate code and immutable PE gates are assigned.
+
+The read-tail and allocator-branch projections are integrated and pushed at
+`5e295d9`. Chunk success updates offset/count and may continue; any
+non-one `fread` result enters receiver clear and conditional normal return
+zero. Completed or bypassed reads return one when cleanup/cookie checking
+returns. A zero remaining-count capture is rejected as not an entered loop.
+The allocator projection represents only its branch and initially zero pair,
+not the eventual allocation result. Its checks are registered in Program.
+
+The read-only slot `+8` getter review found another snapshot hazard:
+virtual size is obtained before the later wrapper backing-pointer load.
+The pending implementation must accept those as independent captures,
+including nonzero earlier size and later null backing. It must not infer
+the earlier size from the later pointer's nullness.

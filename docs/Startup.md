@@ -155,6 +155,10 @@ The wrapper layout also records branch-specific slow-preserve instruction order:
 
 The captured chunk continuation advances the cumulative DWORD offset and subtracts the chunk only after a complete `fread` element. Offset addition wraps at 32 bits. A non-one result reaches slot `+0x14` cleanup without advancing either count; its return value is ignored. The projected return byte is zero on this failure, one on completion or a zero-length bypass, and absent while another iteration is required, conditional on cleanup and the stack-cookie check returning normally. It does not emulate cleanup effects.
 
+`UiShaderSourceReuseProjectionRules` selects only the direct, non-assertion length-store edge: nonnull control, count exactly one, two separate unsigned capacity comparisons, and zero alignment or zero data-pointer remainder. The comparisons use backing capacity `+0`, not logical length `+0xC`. Rejection does not imply overall resize failure; an assertion-return path can also reach the length store.
+
+`UiShaderSourceReadOnlyOffsetProjectionRules` models slot `+8` without the writable getter's preserve call. It compares offset inclusively with the captured virtual-size result, then uses a separately captured later backing pointer. Null backing returns zero; otherwise data-plus-offset wraps as a DWORD. Out-of-range pointer arithmetic is conditional on the diagnostic returning. These captures do not imply a stable or atomic backing snapshot.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves
