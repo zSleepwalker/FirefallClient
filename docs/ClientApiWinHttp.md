@@ -524,9 +524,10 @@ Detailed ClientApi rounds moved here from [Handoff.md](Handoff.md) to keep the c
   single invocation; the settings object's meaning remains unknown.
 - The `0x38`-byte tracker constructor `0xBC3AE0` initializes the worker array
   at `+0x10`, stores its manager pointer at `+0x28`, and stores route text/value
-  at `+0x2C/+0x30`. It does not write `+0x20`. The pump returns
-  `tracker+0x20` plus the count of workers with nonzero completion pointers
-  (`0xBC413B`); thus `+0x20` is not established as a boolean enable flag.
+  at `+0x2C/+0x30`. Its vector initialization helper zeroes tracker `+0x20`;
+  the pump returns that field plus the count of workers with nonzero completion
+  pointers (`0xBC413B`). Thus `+0x20` is not established as a boolean enable
+  flag, and the source of any later nonzero value remains unknown.
 - `ClientApi_PumpRouteWorkers` is called by `ClientApi_PumpRoutes`
   (`0xBC4550`), which iterates route records and aggregates per-route return
   values. The pool gate, worker allocation, and call targets are checked in

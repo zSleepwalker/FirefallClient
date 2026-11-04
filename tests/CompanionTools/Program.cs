@@ -2353,7 +2353,12 @@ if (args.Length == 2)
             + 0x400C00, Red5LoggingBridgeNativeLayout.ClientApiPumpRequestWorkerRaw + 0x400C00)
         && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiRouteWorkerPumpCountRaw
             + 0x400C00, "8B462003C1")
+        && client.Calls(Red5LoggingBridgeNativeLayout.ClientApiRouteTrackerVectorInitCallRaw
+            + 0x400C00, 0x12CE210 + 0x400C00)
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiRouteTrackerVectorZeroStoreRaw
+            + 0x400C00, "C7431000000000")
         && ClientApiRouteWorkerPoolLayout.PumpCountBaseOffset == 0x20
+        && ClientApiRouteWorkerPoolLayout.InitialPumpCountBase == 0
         && ClientApiRouteWorkerPoolLayout.WorkerLimitOwnerOffset == 0x28
         && ClientApiRouteWorkerPoolLayout.WorkerLimitOffsetFromOwner == 0x24
         && ClientApiRouteWorkerPoolLayout.WorkerSize == 0x30
