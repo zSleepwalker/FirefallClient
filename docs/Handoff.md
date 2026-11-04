@@ -11,8 +11,8 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are default cursor-selection source assignments,
-ready-gated invalidation reconstruction, and the old-pair callback timing helper.
+file-close path. Active boundaries are one concrete adjacent cursor-method candidate
+and reconstruction of the old-pair unsigned callback gate.
 UI lifecycle code/checks are committed.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
@@ -10070,6 +10070,27 @@ the report's `C159DD10` target spelling is not accepted without verification.
 Post-store component `+0x974` slots `+0x40/+0x44` receive temporary-buffer
 pointers at `0xC02831/0xC0284E`, not the stored arguments directly.
 No exact clock units or external caller cadence is inferred.
+
+## Old-pair callback gate uses unsigned quotient truncation and modular subtraction
+
+Raw `0xC06686` calls local helper `0x159DD10`, not an import and not
+the earlier misspelled `C159DD10`. Bytes `E8 85 76 99 00` bind that call.
+Arguments form the old `+0x988/+0x98C` unsigned QWORD and divisor 1000;
+the helper uses unsigned DIV, and the caller retains only quotient EAX.
+It computes unsigned modular `quotient_low32 - [this+0x20]`,
+skips below 5000, otherwise stores the quotient at `+0x20` before callbacks.
+Lists `+0x6B0/+0x6D8` dispatch entry slot `+0x14`; list `+0x5E4`
+uses `0xC376A0`. Units and invocation cadence remain unproven.
+The report's final VA example for helper `0x159DD10` is arithmetic error:
+its code VA under the established mapping is `0x199E910`.
+
+The ready-gated invalidation projection is integrated with all-byte and
+uint-wrap checks, preserving prior state when ready is zero and projecting
+the full two-DWORD stores only on the normal enabled write path.
+It does not execute the preceding old-pair callbacks or guarantee completion.
+Default `+0x584/+0x588` nonzero provenance remains unresolved after its
+bounded search; only candidate `0xBF9D80` is being checked next, without
+restarting a broad offset scan.
 
 The report's apparent VA lookup discrepancy is not a new mapping gap:
 the IDB is raw/base-zero and a numeric runtime VA must not be used directly
