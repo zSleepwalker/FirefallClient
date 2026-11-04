@@ -11036,3 +11036,10 @@ instruction sequences separate in captured projections.
 The pair-order report's base-zero-equals-RVA wording is rejected:
 the established flat IDB uses raw file EAs, while mapped PE RVAs differ.
 Do not propagate that address-basis claim into code or documentation.
+
+Initializer entry checks are diagnostic-only, not an idempotency guard:
+global byte VA `0x1E4B095 == 0` reports `0x68`; receiver byte `+4 != 0`
+reports `0x69`. If reporters return, allocation/publication continues even
+on repeat calls. No interlocked instruction or lock is visible in the
+bounded entry gates; external serialization remains unresolved. Entry-gate
+capture support is assigned separately from the already-pushed continuation.
