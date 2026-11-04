@@ -2,6 +2,9 @@ using Firefall.Reconstruction.Startup;
 
 int failures = 0;
 PayloadWordGrowthGateChecks.Run(Check);
+PayloadWordSlotIndexChecks.Run(Check);
+PayloadWordSlotAllocationChecks.Run(Check);
+PayloadWordCopyTailChecks.Run(Check);
 
 void Check(string name, bool condition)
 {

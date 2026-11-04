@@ -11836,3 +11836,16 @@ obtained IDA disassembly directly. Luna
 projection/checks `[BE6325,BE6352)`, not allocation/copy.
 The prior trace's epilogue addresses were off: IDA shows INC at `BE6389`,
 POP ESI `BE638C`, POP EBP `BE638D`, RET 4 at `BE638E` (ends `BE6391`).
+
+Growth guard pushed as `0ee07c3`. Slot index, zero-slot allocation, and
+conditional WORD-copy tail are now registered and pass the pinned runner,
+including exact PE windows of 45, 28, and 35 bytes respectively.
+Index review corrected test addresses (`2004`, not `2000`; zero index
+retains base `FFFFFFFF`). Allocation review keeps missing EAX stopped before
+cleanup and models post-indirect-call ECX independently. Copy review fixed
+undefined local references, one misplaced argument, and wrapped slot fixture.
+Immutable review corrected FF15 absolute operand decoding (no PC addition).
+Allocation agent's reported IDA mismatch came from querying mapped VA rather
+than raw IDB EA; coordinator raw `BE6300` disassembly agrees with local PE.
+Luna `a2ef1bc7-b3d5-499c-9753-a86d98770dd9` remains read-only owner of the
+first guard/handoff trace at raw `BE68A0`.

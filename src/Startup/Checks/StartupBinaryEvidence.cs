@@ -249,6 +249,12 @@ internal static class StartupBinaryEvidence
             && Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(stream))
                 == "97362D668FF64778193A64759265E4AE90842043C4A15B627DF9902FD9135445");
         stream.Position = 0;
+        check("Binary pinned-sample raw code [0xBE6325,0xBE6352) maps to VA 0x00FE6F25 and preserves its JNZ target",
+            imageBase == 0x400000
+            && Matches(0xBE6325, "8B4E0853578B7E108D04CDFFFFFFFF4921460C037E0C8BC7C1E80323C88B46048D1C8D00000000833C0300751C")
+            && RawCodeRangeMaps(0xBE6325, 0x2D)
+            && VirtualAddressToFileOffset(0x00FE6F25) == 0xBE6325
+            && ShortConditionalBranchTargets(0xBE6350, 0x75, 0xBE636E));
         check("Binary shader scratch loop zeroes ESI, walks eight pairs using two ESP-indexed DWORD operands, and branches back to its first pair",
             Matches(0xCA6F50,
                 "33F68B4CF42485C9740E8B0151FF5008C744F424000000008B4CF42885C9740E8B0151FF5008C744F428000000004683FE087CCE")
@@ -12591,5 +12597,78 @@ internal static class StartupBinaryEvidence
             && Matches(rawStartupReceiverByteAlignmentFileOffset + 0x17, "518BCE")
             && RelativeBranchTargets(startupReceiverByteAlignmentCallFileOffset, 0xE8,
                 startupReceiverByteAlignmentHelperFileOffset));
+
+        const uint rawStartupReceiverCopySetupFileOffset = 0xBE6352;
+        const uint rawStartupReceiverCopySetupEndFileOffset = 0xBE636E;
+        const int startupReceiverCopySetupLength =
+            (int)(rawStartupReceiverCopySetupEndFileOffset - rawStartupReceiverCopySetupFileOffset);
+        const uint startupReceiverCopySetupCodeVirtualAddress =
+            rawStartupReceiverCopySetupFileOffset + 0x400C00;
+        const uint startupReceiverCopySetupCallFileOffset =
+            rawStartupReceiverCopySetupFileOffset + 2;
+        const uint startupReceiverCopySetupRelativeCallTarget = 0x12B7FB0;
+        const uint startupReceiverCopySetupIndirectCallFileOffset =
+            rawStartupReceiverCopySetupFileOffset + 0x10;
+        check("Binary pinned-sample receiver-copy setup preserves raw [0xBE6352, 0xBE636E) (28 bytes) at code VA [0xFE6F52, 0xFE6F6E) by raw+0x400C00: CALL 0xBE6354 targets 0x12B7FB0 and returns at 0xBE6359 before ESP cleanup at 0xBE635B; JNZ 0xBE6360 targets 0xBE6368; indirect CALL 0xBE6362 reads slot VA 0x01AC4424 and returns at 0xBE6368; slot write is at 0xBE636B",
+            startupReceiverCopySetupLength == 0x1C
+            && startupReceiverCopySetupCodeVirtualAddress == 0xFE6F52
+            && startupReceiverCopySetupCodeVirtualAddress + startupReceiverCopySetupLength
+                == 0xFE6F6E
+            && startupReceiverCopySetupCallFileOffset == 0xBE6354
+            && startupReceiverCopySetupCallFileOffset + 5 == 0xBE6359
+            && rawStartupReceiverCopySetupFileOffset + 9 == 0xBE635B
+            && startupReceiverCopySetupIndirectCallFileOffset == 0xBE6362
+            && startupReceiverCopySetupIndirectCallFileOffset + 6 == 0xBE6368
+            && rawStartupReceiverCopySetupFileOffset + 0x19 == 0xBE636B
+            && RawCodeRangeMaps(rawStartupReceiverCopySetupFileOffset,
+                startupReceiverCopySetupLength)
+            && VirtualAddressToFileOffset(startupReceiverCopySetupCodeVirtualAddress)
+                == rawStartupReceiverCopySetupFileOffset
+            && Matches(rawStartupReceiverCopySetupFileOffset,
+                "6A10E8571C6D008BC883C40485C97506FF152444AC018B4604890C03")
+            && RelativeBranchTargets(startupReceiverCopySetupCallFileOffset, 0xE8,
+                startupReceiverCopySetupRelativeCallTarget)
+            && ShortConditionalBranchTargets(rawStartupReceiverCopySetupFileOffset + 0x0E, 0x75,
+                0xBE6368)
+            && Matches(startupReceiverCopySetupIndirectCallFileOffset, "FF152444AC01")
+            && ReadUInt32(startupReceiverCopySetupIndirectCallFileOffset + 2) == 0x01AC4424
+            && Matches(rawStartupReceiverCopySetupFileOffset + 0x19, "890C03"));
+
+        const uint rawStartupReceiverCopyTailFileOffset = 0xBE636E;
+        const uint rawStartupReceiverCopyTailEndFileOffset = 0xBE6391;
+        const int startupReceiverCopyTailLength =
+            (int)(rawStartupReceiverCopyTailEndFileOffset - rawStartupReceiverCopyTailFileOffset);
+        const uint startupReceiverCopyTailCodeVirtualAddress =
+            rawStartupReceiverCopyTailFileOffset + 0x400C00;
+        check("Binary pinned-sample receiver-copy tail preserves raw [0xBE636E, 0xBE6391) (35 bytes) at code VA [0xFE6F6E, 0xFE6F91) by raw+0x400C00: receiver DWORD reload at 0xBE636E, slot reload at 0xBE6374, candidate LEA at 0xBE6377, JZ 0xBE637E to 0xBE6389, argument pointer at 0xBE6380, WORD load/store at 0xBE6383/0xBE6386, DWORD increment at 0xBE6389, and RET 4 at 0xBE638E ending at 0xBE6391; makes no ECX-preservation, capacity-success, or ownership claim",
+            startupReceiverCopyTailLength == 0x23
+            && startupReceiverCopyTailCodeVirtualAddress == 0xFE6F6E
+            && startupReceiverCopyTailCodeVirtualAddress + startupReceiverCopyTailLength
+                == 0xFE6F91
+            && rawStartupReceiverCopyTailFileOffset + 3 == 0xBE6371
+            && rawStartupReceiverCopyTailFileOffset + 6 == 0xBE6374
+            && rawStartupReceiverCopyTailFileOffset + 9 == 0xBE6377
+            && rawStartupReceiverCopyTailFileOffset + 0x10 == 0xBE637E
+            && rawStartupReceiverCopyTailFileOffset + 0x12 == 0xBE6380
+            && rawStartupReceiverCopyTailFileOffset + 0x15 == 0xBE6383
+            && rawStartupReceiverCopyTailFileOffset + 0x18 == 0xBE6386
+            && rawStartupReceiverCopyTailFileOffset + 0x1B == 0xBE6389
+            && rawStartupReceiverCopyTailFileOffset + 0x20 == 0xBE638E
+            && RawCodeRangeMaps(rawStartupReceiverCopyTailFileOffset,
+                startupReceiverCopyTailLength)
+            && VirtualAddressToFileOffset(startupReceiverCopyTailCodeVirtualAddress)
+                == rawStartupReceiverCopyTailFileOffset
+            && Matches(rawStartupReceiverCopyTailFileOffset,
+                "8B460483E7078B04188D0C785F5B85C974098B4508668B00668901FF46105E5DC20400")
+            && Matches(rawStartupReceiverCopyTailFileOffset, "8B4604")
+            && Matches(rawStartupReceiverCopyTailFileOffset + 6, "8B0418")
+            && Matches(rawStartupReceiverCopyTailFileOffset + 9, "8D0C78")
+            && ShortConditionalBranchTargets(rawStartupReceiverCopyTailFileOffset + 0x10, 0x74,
+                0xBE6389)
+            && Matches(rawStartupReceiverCopyTailFileOffset + 0x12, "8B4508")
+            && Matches(rawStartupReceiverCopyTailFileOffset + 0x15, "668B00")
+            && Matches(rawStartupReceiverCopyTailFileOffset + 0x18, "668901")
+            && Matches(rawStartupReceiverCopyTailFileOffset + 0x1B, "FF4610")
+            && Matches(rawStartupReceiverCopyTailFileOffset + 0x20, "C20400"));
     }
 }
