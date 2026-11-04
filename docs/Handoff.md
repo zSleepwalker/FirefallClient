@@ -10,8 +10,8 @@ PrivateDialog receiver identification, AES "block-size" interpretation,
 and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
-Current delegated boundaries are the logger cleanup tail-jump target/effect
-and thread-join timeout/result handling. Assertion interception is a bounded
+Current delegated boundaries are logger unwind guard-to-global binding
+and thread wait/close PE import verification. Assertion interception is a bounded
 unresolved stop. Mode-16 fixed scatter and normal
 buffer release are resolved.
 Shutdown-request callers
@@ -7714,3 +7714,38 @@ the generic false-hook failure described earlier is not reachable with
 this exact slot target. Thread creation can still fail independently.
 The next scope checks wait-result handling in `0x12BFF70`, including
 the timed join caller versus final owner's INFINITE wait.
+
+## Logger cleanup relative-jump arithmetic resolves to raw 2ECED0
+
+For the recorded cleanup bytes, E9 is at raw `0x16948D6`, next IP
+`0x16948DB`; signed displacement `F5 85 C5 FE` is
+`-0x13A7A0B`. The target is consequently raw `0x2ECED0`,
+VA `0x6EDAD0`, not the earlier reported `0x2F6ECB`.
+The follow-on mistakenly inspected a different numeric address and supplies
+no target-body evidence. The final narrow read uses IDB raw `0x2ECED0`
+directly; exceptional release is still unproven pending that read.
+
+## Logger cleanup conditionally decrements its guarded object's counter
+
+Correct raw target `0x2ECED0` tests guard byte `[ecx+4]`, returning
+if zero; otherwise it loads object `[ecx]`, pushes it, decrements
+`[object+0x30]` and calls LeaveCriticalSection through **VA** `0x1AC427C`.
+The guard is stack `[ebp-0x684]`. This resolves the cleanup implementation.
+The report's claim that it cannot decrement global `0x1F11444` is not
+supported: if its object is `0x1F11414`, object+0x30 is precisely that
+global. The next check verifies the guard's initialization/activation.
+
+## Timed thread join clears ownership even after timeout or wait failure
+
+Raw `0x12BFFB8..0x12BFFC5` maps timeout zero to `0xFFFFFFFF`
+and calls IAT **VA** `0x1AC42C8`. Result `0x102` is treated
+as timeout; other nonzero results take a diagnostic path.
+With nonzero handle, the wrapper subsequently closes/nulls `+0xC` and
+clears started byte `+5`, including after timeout/failure.
+It returns close result, not wait status; without a handle it returns the
+initial virtual-call result.
+Caller raw `0x1309900` uses timeout 10000 if started, then closes
+separate field `+8`; worker termination is not established by that timed path.
+Import names need direct PE verification, not empty IDA import enumeration.
+The report's VA for raw `0x12BFF70` was arithmetically wrong:
+correct text VA is `0x16C0B70`, not `0x16CCB70`.
