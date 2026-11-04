@@ -7775,3 +7775,13 @@ The next check parses the immutable local PE with a normal inspection
 script, avoiding repeated IDA helper-scope failures.
 Separately, timed caller `0x1309900`'s concrete object identity is checked
 before assigning its ten-second behavior to the heartbeat lock itself.
+
+## Immutable PE inspection verifies WaitForSingleObject
+
+Local standard-library PE parsing confirms **KERNEL32.dll!WaitForSingleObject**:
+IAT RVA `0x16C42C8`, VA `0x1AC42C8`, raw `0x16C2EC8`,
+bytes `DA FB 9B 01`, pointing to import-name RVA `0x19BFBDA`
+(raw `0x19BE7DA`). This independently resolves call bytes at raw
+`0x12BFFC5` without relying on raw-IDB import enumeration.
+The first inspected window did not contain the later CloseHandle call;
+that final import operand is checked with a narrowly extended window.
