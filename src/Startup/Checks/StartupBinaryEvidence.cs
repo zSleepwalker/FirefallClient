@@ -7201,6 +7201,15 @@ internal static class StartupBinaryEvidence
             && Matches(0x12CC47B, "8B038BCBFF5004")
             && Matches(0x12CC482, "8B4508897E045F89065E5B5DC20400")
             && Matches(0x12CC491, "897E045F89165E5B5DC20400"));
+        check("Binary pool initializer reports diagnostic 0x68 when VA 0x1E4B095 is zero and 0x69 when receiver +4 is nonzero; returning reports continue to allocation",
+            Matches(0x12CC137, "803D95B0E4010075176A006A68")
+            && ShortConditionalBranchTargets(0x12CC13E, 0x75, 0x12CC157)
+            && Matches(0x12CC144, "6858EAC5016858EAC501FF15A05EC10183C410")
+            && Matches(0x12CC157, "807E0400741A")
+            && ShortConditionalBranchTargets(0x12CC15B, 0x74, 0x12CC177)
+            && Matches(0x12CC15D, "68C8E9C5016A696858EAC5016858EAC501FF15A05EC10183C410")
+            && Matches(0x12CC177, "6A28E832BEFEFF")
+            && RelativeBranchTargets(0x12CC179, 0xE8, 0x12B7FB0));
         check("Binary fixed-block singleton requests 0x28 and configures a non-null allocation with (2064, 32, 1); null allocation still publishes this, links VA 0x1E4B0A8, and sets flag +4",
             Matches(0x12CC135, "8BF1")
             && Matches(0x12CC177, "6A28E832BEFEFF")

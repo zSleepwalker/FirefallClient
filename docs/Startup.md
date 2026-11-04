@@ -183,6 +183,10 @@ The captured control writer supports both observed variants: pooled controls req
 
 Its separate entry-gate projection reports ID `0x68` for zero captured global readiness byte and ID `0x69` for nonzero receiver flag, in that order. The receiver flag is captured at its later native read, after any first diagnostic call. Returning reporters allow allocation to continue; these gates do not implement idempotency, locking, or readiness guarantees.
 
+`UiShaderSourceCopyProjectionRules` records fresh-destination constructor order: install vptr, zero the pair, capture source control before backing, conditionally increment control `+4`, publish control before backing, then copy the independently captured trailing DWORD. Its stores use the null-old-control branch, not the callback branch.
+
+`UiShaderSourcePairReplacementProjectionRules` separately handles captured old destination control. Incoming control increment precedes old-control capture; reached counter decrements gate indirect callbacks before the captured new pair is published. Both decrements in this helper use immediate XADD/JNZ flags. Neither projection emulates callback effects, backing-byte copies, an atomic source snapshot, or alias safety.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves
