@@ -11181,5 +11181,26 @@ internal static class StartupBinaryEvidence
             && Matches(0x12CC74A, "C7460401000000C7460801000000C7068C0CC801895E0C")
             && Matches(0x12CC794, "897004")
             && Matches(0x12CC797, "8918"));
+
+        check("Binary control vtable slots zero, four, and eight map to their exact return windows",
+            VirtualAddressToFileOffset(0x1C80C8C) == 0x187F88C
+            && ReadUInt32(0x187F88C) == 0x016CD530
+            && ReadUInt32(0x187F890) == 0x016CD540
+            && ReadUInt32(0x187F894) == 0x016CD5B0
+            && Matches(0x12CC930, "8B490C85C90F85D5000000C3")
+            && RelativeConditionalBranchTargets(0x12CC935, 0x0F, 0x85, 0x12CCA10)
+            && Matches(0x12CC940, "85C974078B016A01FF5008C3")
+            && ShortConditionalBranchTargets(0x12CC942, 0x74, 0x12CC94B)
+            && Matches(0x12CC9B0, "558BECF6450801568BF1C7067C07C6017405E899C3FFFF8BC65E5DC20400")
+            && ShortConditionalBranchTargets(0x12CC9C0, 0x74, 0x12CC9C7)
+            && RelativeBranchTargets(0x12CC9C2, 0xE8, 0x12C8D60));
+
+        check("Binary pooled-header return preserves its exact capacity diagnostics and handoff window",
+            Matches(0x12CCA10,
+                "5156578BF9837F080074176A006A3F6858EAC5016858EAC501FF15A05EC10183C410813F0008000074176A006A406858EAC5016858EAC501FF15A05EC10183C4108B4F088B351005E001F7D9C7470400000000E8F8C2FFFF83CAFF8D4610F00FC110578BCEE8E60F00005F5E59C3")
+            && ShortConditionalBranchTargets(0x12CCA19, 0x74, 0x12CCA32)
+            && ShortConditionalBranchTargets(0x12CCA38, 0x74, 0x12CCA51)
+            && RelativeBranchTargets(0x12CCA63, 0xE8, 0x12C8D60)
+            && RelativeBranchTargets(0x12CCA75, 0xE8, 0x12CDA60));
     }
 }
