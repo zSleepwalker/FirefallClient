@@ -10983,3 +10983,22 @@ Active successor IDs: `44e52414-d931-4053-8077-7324cc9ed841`
 (pooled acquisition interface), `7611a4ab-2088-4915-a104-fecce5b46f3d`
 (nonpool immutable PE owner), and `84ff872f-2b85-44a8-b7d2-185110613bf7`
 (nearest pool singleton writer). Keep their scopes separate.
+
+## Pooled acquisition and singleton publication boundaries
+
+The acquisition interface `0x12CDE60` calls `0x12CDAE0`, invokes
+`0x12CE0F0` and retries on zero, then increments pool `+0x10` before
+checking acquired-pointer modulo pool `+0x18`. The latter diagnostic has
+identifier `0x254`. No ordinary zero return was observed, but this is not
+a termination or allocation-success guarantee. The caller's explicit
+zero-result branch remains distinct from the helper's ordinary return.
+
+The six observed initialization guards call `0x12CC110` when global
+VA `0x1E00510` is zero. With receiver VA `0x1E00500`, the helper
+requests `0x28` bytes and conditionally configures the allocation through
+`0x12CDB40` with literals 2064, 32, and one. Alias-derived publication
+at raw `0x12CC1AA` writes receiver `+0x10`, then links the receiver
+through global VA `0x1E4B0A8` and sets receiver byte `+4`.
+The observed null-allocation continuation can publish null while setting
+the flag; callers do not immediately recheck readiness. Captured candidate
+and publication projections are assigned separately from acquisition internals.
