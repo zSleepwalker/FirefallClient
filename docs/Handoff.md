@@ -11,8 +11,8 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are captured shader-compile argument framing,
-its PE import/literal checks, and scratch failure-cleanup structural integration; callback publication and composite
+file-close path. Active boundaries are exact preserve-helper failure anchors
+and unsigned loader-request clamp PE assertions; callback publication and composite
 container semantic identity remain parked. UI lifecycle, arithmetic/import
 regressions, and immutable backing-slot projection code/checks are committed.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
@@ -10730,3 +10730,15 @@ stack cap at `0x12BB3D0/0x12BB3D3`; zero skips slot `+0x1C`.
 A small extension of the existing read projection is active, separate from
 the chunk-size cap. No file-size semantic provenance or overflow contract
 is inferred beyond the observed captured arithmetic.
+
+The unsigned requested-length extension passed coordinator focused checks
+and is pushed. Its boundary matrix includes both sides of the signed high
+bit and composes the total request with the separate chunk cap.
+Exact CMOVA/zero-skip PE assertions are active.
+
+The preserve failure report conditionally reaches an unguarded new-backing
+read before wrapper pointer replacement when the allocator-output header is
+null, but includes malformed address `0x12CBDDDF`. No failure projection
+or runtime inevitability claim is accepted from that typo. A narrow caller
+instruction-byte verification is active; lower allocator failure/reporting
+contracts remain as previously documented.
