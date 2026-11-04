@@ -11,8 +11,9 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are UI `+0xA08` consumers and the
-late initialization callback through `+0x974`. UI lifecycle code/checks are committed.
+file-close path. Active boundaries are the final UI initialization `+0xB0`
+dispatch and reconstruction of the `+0xA08` native record sink.
+UI lifecycle code/checks are committed.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
 Normal native CRT return selects `exit(status)`.
@@ -9586,6 +9587,43 @@ Neither that inspected destructor nor the initialization failure epilogue
 establishes release of the stored child. Child teardown remains parked;
 do not infer a destructor slot from its zero first word or conflate the
 borrowed dependency's dispatch with a child vtable.
+
+## UI success pointer aliases a mutable sixteen-byte record sequence
+
+Raw `0xC95400` (VA `0x1096000`) checks its object's `+0x72C` flag,
+loads UI global VA `0x1E002B8`, and reads UI `+0xA08`.
+When nonnull, the descriptor becomes ECX for `0xC97380`, with a
+16-byte record assembled from float fields `+0x338..+0x344`.
+`0xC97380` uses descriptor begin/end/capacity pointers at `+0/+4/+8`,
+copies four DWORDs at end, and advances end by `0x10`; full storage
+reaches grow helper `0xC978F0`. This is a mutable alias, not a copied
+container, and does not establish semantic record names or wire encoding.
+
+Initializer `0xBFB8CE` stores its eighth argument verbatim at UI `+0xA08`
+after the earlier failure checks. Caller `0x30B1B4`'s indirect getter
+result plus `0x48` supplies that argument; the containing object's concrete
+identity/lifetime is unresolved. A reconstruction task now records the
+verified layout without implementing speculative ownership or allocation.
+
+## Late service callback has no checked return; final UI dispatch remains separate
+
+Raw `0xBFB518..0xBFB51A` stores explicit argument three at UI `+0x974`.
+At `0xBFB8BC..0xBFB8C6`, the initializer reloads it as ECX, pushes
+one, and invokes vtable `+0x30`. Its return is not tested: the next
+operation loads argument eight and stores it at UI `+0xA08`. A later
+UI virtual `+0xB0` call precedes ready-byte `+0x672` publication.
+Thus this service callback is non-gating in the observed return-value
+control flow, not proof of a notification's semantic purpose.
+
+Helper `0xBFEEC0` returning false is not itself an initialization failure:
+the branch at `0xBFB8A0` logs on true, while false falls through.
+The callback receiver has no null guard at the dispatch; normal completion
+still depends on a valid receiver. Earlier checks at `0xBFB532`,
+`0xBFB542`, or `0xBFB642` can return through `0xBFB668`.
+The report's empty direct xrefs to `0xBFB310` do not negate the already
+verified virtual caller, and its numeric-VA byte observation does not
+supersede the caller's recorded global argument load. Concrete service
+implementation binding remains unresolved; it is not inferred from that load.
 
 The report's apparent VA lookup discrepancy is not a new mapping gap:
 the IDB is raw/base-zero and a numeric runtime VA must not be used directly
