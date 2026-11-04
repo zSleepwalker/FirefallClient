@@ -10943,3 +10943,31 @@ atomically decrements pool `+0x10`, then hands the header to `0x12CDA60`.
 Do not silently substitute the data pointer for that unusual negated
 displacement argument. The bounded entry shows no heap fallback; its
 callee effects are unresolved. A branch-specific layout is assigned.
+
+Destructor counter-boundary matrices and immutable PE gates for wrapper
+destruction, preserving adapter forwarding, and both control variants are
+pushed at `cf5b3a6`. First/second counter values zero, one, two, high-bit,
+and maximum DWORD are crossed with every deleting-flag byte. The sample
+checks pass without executing the target.
+
+The pooled deleting slot is mapped separately: vtable `+8` points to
+raw `0x12CC9B0`, which replaces the vptr with VA `0x1C6077C` and
+conditionally calls the allocator-release backend on flag bit zero.
+This does not itself release header `+C`. Control dispatch/layout and
+pooled return PE anchoring are active; the nonpool header-release trace
+is also active and should not be duplicated.
+
+Nonpool control vtable VA `0x1C80CB0` / raw `0x187F8B0` maps
+slots zero/four/eight to raw `0x12CC980/0x12CC9A0/0x12CC9D0`.
+Slot zero returns for null header; otherwise it calls `0x12C8D60`
+with DWORD `(header data +4) - (displacement +8)`, then tail-calls
+the same backend with the header pointer. This differs from the pooled
+return's negated displacement. A zero computed first argument remains
+an observed call, even if the backend null guard returns immediately.
+No fields are directly cleared in that bounded nonpool body.
+Captured nonpool release code and independent PE checks are assigned.
+
+Pooled return/control dispatch PE windows are pushed at `425a649`.
+Active work also includes pool-return and control-deleting layouts and
+the immediate pooled acquisition interface; their implementations remain
+uncommitted until their completion reports and coordinator review.
