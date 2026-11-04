@@ -493,7 +493,11 @@ It does not require a socket backpointer in the operation record.
 PumpThread method `0xBBC860` calls `GetQueuedCompletionStatus` at
 `0xBBC911` and drains up to100 completions per inner pass. Timeout begins
 at zero, uses500ms after an empty dequeue, then returns to zero while
-draining; the outer loop ends when thread byte `+4` is set. Successful
+draining; the outer loop ends when thread byte `+4` is set. The November 4
+active-sample trace bounds each inner pass to one 500-ms wait and 100
+dequeue attempts before another stop read. The join hook is a bare return,
+not a stop post; quiet-stop observation requires no external completion,
+but callbacks/maintenance can still delay progress. Successful
 completions invoke key-object slot `+0x18` for nonnull OVERLAPPED and
 slot `+0x1C` for null OVERLAPPED (close notification). On failed dequeue
 with a nonnull operation, error995 skips callback; other errors use slot
@@ -552,7 +556,93 @@ shutdown-mode-2/close sequence and stores `-1`. Thus the GameSocket owns the
 socket field; Network's close path also closes a socket supplied by pointer.
 The Network destructor vtable slot `0` (`0xBBCD00` -> `0xBBCD30`) tears down
 its embedded pump thread and owned buffers, but the eventual close of its
-IOCP handle at `+0xDC` is not established by this trace.
+IOCP handle at `+0xDC` was not established by that destructor trace.
+The later active-sample final-release trace resolves a separate path:
+`0xBBD570` destroys HTTP manager first, pumps its independently owned
+socket vector for the supplied timeout, joins the worker with INFINITE
+timeout, deletes residual socket entries, closes IOCP at `0xBBD6CA`,
+then calls WSACleanup at `0xBBD6DA`. It runs only for the last network
+reference; nonfinal release merely decrements the owner-thread-affine count.
+
+For concrete ManagedUDP, vtable VA `0x1C73D78` slot `+0x1C`
+resolves to `0xBED590`, which queues sentinel 1; `0xBEDAA0` consumes
+it to finish state 4 to 5 and permit vector-owned deletion. The close key
+is a borrowed socket pointer, not an added socket reference. Network close's
+post BOOL is ignored by `0xBED0F0`; no local failed-post retry/rollback
+was found, and close-request byte `+0x81` suppresses another attempt.
+Inspected maintenance either skips work for argument one or processes only
+states 1/2 for argument zero; empty-queue state 4 remains retained. Sentinel
+2 calls the already-suppressed close helper, while sentinel 1 completes
+4 to 5. Other sentinel producers remain under investigation. Exact state,
+ownership, and shutdown callsites are in `Handoff.md`.
+
+ManagedUDP's receive path is distinct from GameSocket's. It owns a persistent
+`0xA0`-byte operation at socket `+0x98` and receive buffer `+0x50`
+(capacity `+0x4C`, default `0x4000`). Only successful result retrieval
+reposts at `0xBED8F5`; nonempty results first enqueue a separate packet.
+At the IOCP layer, error 995 skips callbacks, while other nonnull-operation
+failures reach slot `+0x20`. Inside ManagedUDP result retrieval, error 996
+instead suppresses callback/repost and 995/10038 become zero. Error slot
+`0xBED5F0` always queues close token 2; zero suppresses logging only.
+Persistent receive storage is freed by destruction, not those error paths.
+Queued `0x38`-byte packets contain independent blob byte snapshots before
+receive-buffer reuse. States 1/2 synchronously lend packet blob/endpoint and
+timestamp through owner slot `+4`; the SimpleSocketReplayReader interface
+target is `0xBE1450`, forwarding matching endpoints to `0xBE0110`.
+Packet/blob ownership is released immediately afterward or without delivery
+in closing states. Downstream retention is not implied by that borrowed
+pointer. Owner presence is assertion-checked, not a null-safe delivery guard.
+The discriminator-1 branch inside `0xBE0110` appends remaining bytes into
+reader-owned blob storage with an explicit copy, not retained packet backing.
+That branch's lifetime is independent of the immediate packet release;
+other discriminators remain separate scope.
+Outer framing at `0xBE0110` recognizes one-byte discriminators 0 and 1.
+Case 0 copies 24 bytes, then reads an LE16 length and supplies that many
+bytes to its embedded destination; it consumes `27+L` bytes and ignores
+trailing input here. Case 1 appends remaining input. Unknown discriminators
+log after consuming one byte. Shortages throw through the borrowed cursor
+handler; case 0's fixed-field write precedes its later length checks and
+is not transactional. Zero length leaves the embedded destination unchanged.
+The embedded destination at reader `+0xC8` is slBlob initialized by
+`0xBDFBC0`; its slot `+0x10` replaces bytes, not appends. Request entry
+`0xBDFD80` arms propagation flag `+0xD8`, cleared by successful case 0.
+The fixed record remains opaque. The concrete forwarded slot `+8` target
+`0xBE1600` is diagnostic-only and receives no request arguments/bytes;
+the arming entry is not established as a wire request operation. Owner
+record/ready-byte consumers remain follow-on scope.
+Endpoint matching at `0xBE1450` uses common family bits rather than full
+flag equality, preferring IPv4 over IPv6 when both are common; address bytes
+and port are compared directly without swapping there. No common family
+succeeds only for zero packet flags, still subject to the port comparison.
+Mismatch logs without forwarding to `0xBE0110`; initialization of the fixed
+configured endpoint remains separate from the known endpoint-list insertion.
+The fixed fields are ManagedUDP's remote peer, copied by `0xBECF50`
+after successful connect. Bind with port zero instead obtains its assigned
+local port through getsockname and stores it at state `+0x58`, not peer
+port `+0x78`. Constructor zero inputs therefore do not establish persistent
+zero-peer matching. Exact setup calls and family-mode mapping are in
+`Handoff.md`.
+
+The concrete SimpleSocketReplayReader constructor returns allocation even
+when connect fails; its peer-based readiness slot is separate. Its wrapping
+`nl::SocketReplayReader` exposes inverted readiness at slot `+0x14`,
+raw `0xBE00E0`. Worker `0xBD62F0` consumes it with another guard byte
+to update status/timing fields `+0x54/+0x55`, not a demonstrated error
+return. Constructor-pointer checks alone do not prove connection success.
+One status consumer sets app `+0xB78` under additional worker/count
+conditions. The run loop clears that byte and zeroes one iteration's timing
+scale; it is not the loop-exit flag. Worker EOF/error meanings remain
+unestablished. The timing callback is
+the app `+0xB98` object's primary-vtable `+8` target: vtable VA
+`0x1C6781C`, entry VA `0xA5CDF0` (raw `0x65C1F0`).
+App dispatch raw `0x30A009` invokes it when `+0xB98` is nonnull
+and app `+0xB94` is clear. The later handoff closes its invocation chain:
+PE startup -> wrapper raw `0x2E9630` -> bootstrap `0x2EAE70` ->
+runloop `0x3098C0` -> renderer service vtable index 8 (byte offset
+`+0x20`, raw `0xE55990`) -> retained callback raw `0x302A30`.
+The callback runs synchronously on that startup thread. Renderer service
+byte `+0x12C` is a distinct shutdown-request latch; app `+0xB78`
+only clears the iteration-local multiplier, not persistent app `+0xB70`.
 
 The requested helpers `0xBC3970` and `0xBC3990` have no direct `E8`/`E9`
 caller or `.rdata` VA/vtable pointer in the original-file scans. Their code calls the imported
@@ -1620,8 +1710,66 @@ instance: `0xBF9C40` visits the dynamically registered listener bucket and
 optionally compares a listener name at `+0x70`; it calls `0xC38400` for a
 match. That routine looks up the listener's per-event callback map at `+0x168`,
 updates its pending-dispatch structure at `+0x4C4`, and adds a record to the
-manager-side delivery structure at `+0x5EC`. The later consumer/function invocation and
-which runtime listener receives these three codes remain unresolved.
+manager-side delivery structure at `+0x5EC`. The November 4 active-sample
+trace resolves later consumption: manager `0xC02730` snapshots/clears scheduled
+listeners and calls `0xC38CA0` at `0xC0357B`. Drain reads the borrowed
+registration record and invokes `0xC3B3C0`, then releases queued payload
+ownership and removes the entry. Invocation enters the protected VM path;
+the concrete runtime native target at `0xCD728C` remains unresolved.
+This is deferred delivery, not inline execution by `0xC38400`.
+
+The registration record is `{+0 event text, +4 event ID, +8 callback text}`
+(`0xC53E50`). Queue entries retain payload ownership, not a callback-text
+snapshot; replacement updates record `+8` in place, so queued deliveries
+read replacement text if it changes before draining. Script
+`Component.UnbindEvent` reaches immediate record removal through
+`0xC4DC80 -> 0xC32680 -> 0xC35D10`. That inspected removal path does
+not invalidate pending queue entries; concrete script/queue reachability
+and runtime consequences remain unresolved, not established vulnerabilities.
+
+Null payload selects the zero pair at PE VA `0x1E68660`, in the virtual-only
+tail of `.data`, not bytes at that raw offset. Conversion makes a fresh VM
+table per callback and inserts `"event"` with registration event text
+(`0xC25E89 -> 0xCD4550`, `0xC25F43..0xC25F95`); this default is
+neither nil nor a shared mutable payload object. Exact callsites and ownership
+boundaries are recorded in `Handoff.md`. Runtime listeners and names for
+these numeric event codes, including logout event 83, remain unresolved.
+
+Nonnull payload conversion `0xC25E30` reads begin/end pointers and
+eight-byte `{name,value}` entries, rather than a virtual interface.
+Named fields use shared-text lengths; unnamed fields receive consecutive
+integer keys starting at one. Value tags 0 through 8 select strings,
+raw DWORD VM values, widened floats, booleans, object-registry wrappers,
+two QWORD userdata subtypes, nested payloads, and a permissive JSON-like
+text parser (`0xC25790`). The latter parses one value without requiring
+trailing-input exhaustion, accepts single quotes and comma skipping, and
+has optional extensions. Failure returns zero and the caller pushes nil;
+some malformed/extension inputs instead successfully produce nil, so these
+outcomes must not be conflated. Exact grammar, numeric threshold, offsets,
+and internal VM tags are tabulated in `Handoff.md`;
+these are in-memory layouts, not reconstructed wire framing.
+Payload entries precede the reserved `"event"` insertion, so nonnull
+event text overrides a payload field with that key.
+Extension mode recognizes `0x` handles and `sdb` table/ID lookups;
+`sdb` scans `%127[^:]:%u` from its next lexeme. The `mat` extension
+pushes its next lexeme as text, not an established material wrapper.
+These format strings require PE-VA mapping before raw inspection.
+`LocalizedString` SDB references instead reach `tfGlobalizationManager`,
+whose unsigned-ID lookup selects one of six text pointers and falls back
+to English for missing/empty selected text. Missing ID returns false/null;
+existing records return true even if fallback text is empty. The parser
+ultimately pushes NUL-terminated text rather than userdata; its encoding
+is not established. Exact service/provider and language-field mapping is
+in `Handoff.md`.
+
+Parser failure does not locally restore VM top. A traced malformed Unicode
+escape inside a partial array leaves extra slots and can redirect the next
+relative-index insertion into that partial array. The actual event path
+then writes reserved event text into the partial array and can select the
+stranded key as callable rather than the intended handler. Returned protected
+calls restore entry top, so this is not evidence of unbounded live-stack
+growth. Exact static stack ledgers and guards are in `Handoff.md`; runtime
+occurrence and concrete eventual callable remain unobserved.
 
 The application-dispatch records built immediately before the virtual call
 have these verified fields (offsets are from the receiver method's input

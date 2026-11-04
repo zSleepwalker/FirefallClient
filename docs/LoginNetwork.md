@@ -1,11 +1,47 @@
 # Login / network notes (round 12)
 
+## November 4 continuation pointers
+
+The latest active-sample evidence is indexed in `Handoff.md`. It distinguishes
+signing readiness from request-manager admission: one Login caller ignores
+signing-preparation failure, while the selected auto-login path reestablishes
+readiness before queuing but ignores the queue result. Normal startup already
+enabled the manager, so conditional rejection alone is not a demonstrated
+startup failure. GUI logout's event 83 is distinct from application shutdown's
+HTTP pump/drain and final network release.
+
+The globalization path now resolves `Config.ForceLanguage`, selector
+validation/availability, and updates to console variable `SavedLanguage`.
+That variable qualifies for `settings.con` export; `eng.autoSaveConfig`
+defaults to zero, so export capability is not unconditional persistence.
+Shutdown conditionally invokes the exporter; the normal inspected application
+initialization explicitly sets descriptor byte `+0x11`, enabling its autosave
+command despite the registration default zero. Later variable state and
+file-operation success still govern actual persistence.
+The writer defaults to `<captured-CWD>\localassets\settings.con` unless
+startup overrides its write prefix.
+The inspected normal app descriptor leaves that override null;
+`Development.InstallDir` populates a distinct field, not the write prefix.
+Final open failure logs and returns false; short writes instead invoke a
+diagnostic and report success if it returns.
+The read path independently resolves the same default physical prefix.
+`eng.autoSaveConfigName` defaults to `settings`; initialization attempts
+configuration load/console processing twice, around intervening --cmd and
+debug-menu initialization. Each pass rereads the basename. A leading `!`
+on the already-prefixed path bypasses root-list searching, not prefixing.
+`Development.InstallDir` instead expands `%INSTALLDIR%` in virtual-texture
+locations; their index files use `_idx` and data files decimal level suffixes.
+No actual file writes were performed during this investigation.
+Provider lookup, six language-field offsets, English fallback, table reset,
+and unresolved row-order origin are recorded with exact addresses in the
+handoff rather than inferred from configuration names.
+
 ## Observed
 - `0x304F30` (thiscall, this=App) is the `firefall://` URI handler. Prefix cached from string `firefall://`. Non-matching URIs go to `0x306050` (looking-glass queue). Matching paths tested in order: `matches/`, `replays/`, `adventure/`, `devspectate/`, `devjoingame/`, `operator/` (remainder validated by `0x2FCD00`; empty -> log `URI missing operator host`; else stored at App+0x2900). Unmatched -> `0x3054F9`. Query `?k=v&k=v` parsed into a map first.
 - User agent `firefall/%s (%s)` has one xref: `0xCBCA50` (Awesomium WebCore init), formatted with `prod-1962` (string at VA 0x1C15EAC) and `byte_1E4AC90`. Only the embedded browser is proven to use it.
 - Oracle ticket: `0x494E30` (callers `0x494CA0` BeginConnection, `0x495460`) posts `%s/api/v1/oracle/ticket`; response parsed at `0x4956C0` (`matrix_url`, `ticket`). Login zone record JSON decoded at `0x635BE0`. Details: MatrixConnection.md.
 - Session-ticket header names and error strings exist (X-*-Session-Ticket; hotfix/vtex/AssetStream dl.firefall.com URLs) but were not xref-traced.
-- imports_query for winhttp/wininet/WSAStartup returned no hits (imports appear resolved via dword_1AC* tables; scope: import-name filter only).
+- imports_query for winhttp/wininet/WSAStartup returned no hits (scope: import-name filter only). The raw-image IDB's empty enumeration does not establish dynamic resolution; absolute `dword_1AC*` operands must be mapped as PE VAs before inspecting their IAT slots.
 
 ## Interpreted
 - Matrix transport is UDP/IOCP per MatrixConnection.md; the HTTP oracle request is the only HTTP step in login.
@@ -16,7 +52,7 @@
 # Round 13: networking layers
 
 ## Observed
-- The import table is empty to `imports`/`imports_query` (all modules, 0 rows): imports are resolved at runtime (dword_1AC*/1C15E* pointers), so import-based searches cannot show networking. Strings do exist: `WSAStartup failed.`, `(Windows)WSAStartup failed with error!`, `WinHttpWriteData`, `WinHttpReceiveResponse`, `WinHttpAddRequestHeaders`, `WINHTTP_CALLBACK_STATUS_*`. I did not search for libcurl strings beyond `curl_easy|libcurl` (no hits in the first 20 matches, which were all WinHTTP/WSA; scope: that page only).
+- `imports`/`imports_query` return zero rows for all modules in this raw-image IDB. This is an IDA enumeration limitation, not evidence that the PE import directory is empty or that application code dynamically resolves these pointers. The November 4 [handoff correction](Handoff.md#cryptoapi-imports-correct-the-raw-address-interpretation) independently verifies ordinary ADVAPI32 imports through the PE descriptors. Strings do exist: `WSAStartup failed.`, `(Windows)WSAStartup failed with error!`, `WinHttpWriteData`, `WinHttpReceiveResponse`, `WinHttpAddRequestHeaders`, `WINHTTP_CALLBACK_STATUS_*`. I did not search for libcurl strings beyond `curl_easy|libcurl` (no hits in the first 20 matches, which were all WinHTTP/WSA; scope: that page only).
 - `0xBBD110` (called from ClientApplicationInitialize at 0x307208 and from 0xE9BE03): ref-counted network-subsystem init (this+8 refcount). On first use it calls a resolved `WSAStartup(0x202)`-shaped pointer (dword_1AC4DA8(514,buf); `WSAStartup failed.` string 0x1BB4C70 is its error log), then a resolved call `(−1,0,0,1)` stored at this+0xDC (matches CreateIoCompletionPort; consistent with the IOCP receive dispatch in MatrixConnection.md), builds a 0x28-byte object (`0xBC4190`) at this+0xA0, derives a 32-bit id from a resolved pointer calls, and logs. Failure path runs `0xBBD570` with 3000.
 - `ClientApi_DispatchWinHttpStatus` (0xBC1DA0) is the only xref of `WinHttpWriteData` string; its sole caller is `ClientApi_WinHttpStatusCallback` (0xBC26E0), which has no code xref (callback pointer registered indirectly). So WinHTTP is the ClientApi HTTP layer, distinct from the Matrix UDP transport.
 - `0x494CA0` MatrixConnection_BeginConnection: if state==2 does nothing; state 6/7 builds a message-24 descriptor and sends via `0x498350`; otherwise runs `0x490050`, sets state=2, stores the text arg at this+2976 unless `0x2FCD00` says it is empty-ish, and calls `0x494E30`.
@@ -82,7 +118,7 @@
 - `0xBC1680`, called by `ClientApi_PumpRequestWorker` at `0xBC338D`, learns and updates the same per-host clock-offset tree. The worker looks up the HTTP response header named `"date"` and passes its value to parser `0xBCB5A0`. That parser uses `sscanf` format `"%3s, %d %3s %d %d:%d:%d %3s"`, compares month abbreviations with `_strnicmp`, and converts the parsed UTC fields with `_mkgmtime64`. The worker subtracts current `_time64()` from the parsed server timestamp and supplies that difference to `0xBC1680`. The updater stores/replaces that offset in seconds under lowercase `host:port`; for default HTTP/HTTPS ports it also creates or updates dot-prefixed suffix keys with the same offset. `0xBC4CB0` returns the value slot for an existing key or inserts a new node; `0xBC7A10` performs ordered-tree insertion and balancing. Tree node key/value fields are at `+0x10/+0x14`. Sample-mapped strings, import slots, and call sites confirm the clock-offset path. `CaptureClientApiServerClockOffsetEntries` and `CaptureClientApiAdjustedTimestamp` model these operations; application policy remains unknown.
 - Builder `0x12E4100` uses the adjusted timestamp from `0xBC1460` as the `tc` field in an inner query string. The PE-mapped VA `0x1C57568` is `ver=%d&tc=%u&nonce=%04x%04x%04x%04x&uid=%s&host=%s&path=%s&hbody=%s&cid=%llu`: version is constant `2`; `tc` receives the adjusted timestamp; four calls to the imported `rand()` supply 16-bit nonce words rendered as four-digit lowercase hex; the named string fields are inserted in `uid`, `host`, `path`, and `hbody` order; and `cid` receives a 64-bit unsigned value from two adjacent object words. The builder computes two optional HMAC-SHA1 values over this same query using distinct object-held keys; each 20-byte digest is rendered as 40 lowercase hex digits. It places these as the first and third fields of a `"Red5 %s %s %s"` wrapper at VA `0x1C576D0`, with the query in the middle. `CaptureClientApiRequestQuery` and `CaptureClientApiRequestSignature` model query formatting and the byte-level signature operation. The native text encoding and semantic roles of some input fields remain unresolved.
 - Auto-login setup `Login_StartAutoLogin` at `0x63DE80` calls `0x12E3960` with a non-empty input string on its accepted branches. `0x12E3960` retains that string in fields at `+0x3C` and `+0x48` and clears `+0x40`; these offsets align with the first HMAC key, `uid`, and optional second HMAC key consumed by `0x12E4100`, although the cross-path object identity is not yet proven. The initializer also hashes two distinct suffixed forms of its input with CryptoAPI SHA-1, imports the second digest's first 16 bytes as a `PLAINTEXTKEYBLOB` AES-128 key (`0x660E`), and sets the first digest as `KP_IV` (parameter 1). The embedded suffix values are not copied into the reconstruction. The downstream encryption operation and the precise lifetime/ownership of this key object remain unresolved.
-- Cipher helper `0x12E4680` uses the key object at `this+0x58` and delegates buffer decryption to `0x12EF0D0`, which calls imported `CryptDecrypt`; it conditionally resizes the stream buffer based on the configured block-size field. `0x12EF1E0` contains a corresponding `CryptEncrypt` wrapper, but no direct code xrefs to it were found. Call-through dispatch and the AES mode/consumer remain unresolved.
+- Cipher helper `0x12E4680` uses the key object at `this+0x58` and delegates blob decryption to `0x12EF0D0`, which calls imported `CryptDecrypt`. The November 4 active-sample trace corrects the former block-size interpretation: after successful reference-counted backing assignment, it optionally realigns data by preserve-resizing to the same logical length. `0x12EF1E0` contains a corresponding `CryptEncrypt` wrapper, but no direct code xrefs to it were found. Call-through dispatch and the application consumer remain unresolved; explicit mode/padding setters were not found in the scoped paths. Exact slBlob fields and provider-default caveats are in `Handoff.md`.
 - Request timing fields use the imported `timeGetTime` at four observed points: reset (`ClientApiRequest_Reset`, `0xBC1280`) stores the tick at request `+0x68` and tick-minus-one at `+0x6C/+0x70/+0x74`; request tracking (`0xBC43C0`) stores a fresh tick at `+0x6C` after linking the request; `ClientApi_PumpRequestWorker` (`0xBC2B30`) stores a tick at `+0x70` after its WinHTTP-open-request branch; and its response-completion path stores a tick at `+0x74` immediately before callback acquisition/dispatch. These are millisecond tick samples, distinct from the `_time64` seconds timestamp used for the `tc` query field. The meanings of the four marks beyond their observed lifecycle positions remain unproven.
 - `0x3823F0` default (type > 4, incl. type 5 `sock://`): VA 0x78331A jumps to an assertion call `dword_1C15EA0` with line 0x15C (348) then returns - no handler.
 

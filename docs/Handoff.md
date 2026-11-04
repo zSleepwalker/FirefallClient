@@ -2,6 +2,49 @@
 
 ClientApi/WinHTTP details are in [ClientApiWinHttp.md](ClientApiWinHttp.md).
 
+## Latest continuation navigation (November 4)
+
+The [verified import and receiver mappings](#november-4-continuation-verified-import-and-receiver-mappings)
+and subsequent sections supersede earlier dynamic-import assumptions,
+PrivateDialog receiver identification, AES "block-size" interpretation,
+and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
+are recorded there; do not merge evidence from `.original` without comparison.
+
+Current delegated boundaries are startup basename-variable assignment gates
+and texture LZMA consumed-length/termination semantics. Shutdown-request callers
+and texture writer dispatch/serialization are bounded unresolved stops,
+not ongoing broad scans.
+Descriptor `+0x24/+0x28` are structure pointers, both nonnull on normal
+startup, not boolean configuration fields.
+Replay timing callback `0x65C1F0` is bound through the object's vtable `+8`.
+App `+0xB78` is a one-iteration timing override, not a stop flag.
+The worker's queue-work guard and normal null write-prefix override are resolved.
+The normal application startup descriptor explicitly enables shutdown autosave;
+constructor allocation/readiness and conditional shutdown-export trigger are resolved.
+Local bind port and remote-peer
+endpoint are distinguished; SavedLanguage qualifies for settings.con export,
+but automatic persistence remains conditional on the documented shutdown path.
+Endpoint matching and language selector default/setter/availability are resolved. Reader nonnull `+4`
+attachment and localization row ordering are unresolved bounded stops,
+not ongoing broad scans. Reset sample
+identity is confirmed and the exact triples clear before holder destruction.
+Publication owner identity/consumers remain unresolved; the constructor's reciprocal link
+is distinct. Arming
+`0xBDFD80` forwards no request bytes to its concrete diagnostic-only target;
+the loader's success/reset callback order is resolved.
+Case-0 destination replacement, borrowed metadata ownership,
+outer discriminator framing, type-1 byte copying, metadata-binding hashes,
+and localization missing-ID/language fallback are resolved. ManagedUDP packet byte snapshots and provider identity
+`tfGlobalizationManager` are resolved. Inspected closing-state maintenance
+has no independent timeout; sentinel producers, localization accessor,
+field assignment, and service allocation are resolved in bounded scope.
+IOCP stop observation,
+keyed-close ownership, and extension format-operand mapping are now
+resolved in the later sections. Completed traces distinguish GUI logout event 83
+from application HTTP drain, readiness from manager admission, and returned
+VM-stack cleanup from the earlier partial-parse callable-selection effect.
+All remain static evidence, not observed runtime behavior.
+
 ## Resume here (route0 nested selector-0x5E consumer traced)
 
 The bounded continuation traced route0's nested `Character::PublicCombatLog`
@@ -4016,8 +4059,10 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
 
 ## Observed
 - `0x12E4680` passes the AES key object at parent offset `+0x58` to
-  `0x12EF0D0`. That helper calls CryptoAPI `CryptDecrypt` on a mutable stream
-  buffer and can resize it according to a configured block-size field.
+  `0x12EF0D0`. That helper calls CryptoAPI `CryptDecrypt` on mutable blob
+  storage. The former "configured block-size" interpretation is superseded:
+  the later verified publication trace below identifies address alignment,
+  not cipher block size.
 - `0x12EF1E0` contains a corresponding `CryptEncrypt` call on the same key
   wrapper type. Neither `0x12E4680` nor `0x12EF1E0` has direct code xrefs in
   the current IDB; their higher-level callers may be indirect or unrecognized.
@@ -4026,3 +4071,3030 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
 - The AES mode, the encryption/decryption dispatch path, and the application
   data protected by these wrappers are not established. Do not model cipher
   output until the stream contract and dispatch caller are resolved.
+
+# November 4 continuation: verified import and receiver mappings
+
+The following checks used the active `FirefallClient.exe` image, 40,197,848
+bytes, SHA-256
+`97362D668FF64778193A64759265E4AE90842043C4A15B627DF9902FD9135445`.
+They did not use `FirefallClient.exe.original`. Analysis was read-only; no
+executable execution, patches, or IDB changes were made.
+
+## CryptoAPI imports: correct the raw-address interpretation
+
+The absolute operands `0x1AC4004` through `0x1AC406C` are PE virtual
+addresses, not raw offsets. Reading raw `0x1AC4000` samples `.rsrc`, not the
+IAT. Its repeated `07`/`06` bytes do not establish unresolved or dynamically
+resolved imports. The empty IDA import enumeration is also not evidence that
+the PE import table is empty.
+
+The PE header is at raw `0x170`, image base is `0x400000`, and `.rdata`
+starts at RVA `0x16C4000`, raw `0x16C2C00`. The six slots are ordinary
+`ADVAPI32.dll` imports:
+
+| IAT VA | RVA | Raw offset | Import |
+| --- | --- | --- | --- |
+| `0x1AC4004` | `0x16C4004` | `0x16C2C04` | `CryptDecrypt` |
+| `0x1AC4008` | `0x16C4008` | `0x16C2C08` | `CryptDuplicateKey` |
+| `0x1AC400C` | `0x16C400C` | `0x16C2C0C` | `CryptSetKeyParam` |
+| `0x1AC4014` | `0x16C4014` | `0x16C2C14` | `CryptAcquireContextA` |
+| `0x1AC403C` | `0x16C403C` | `0x16C2C3C` | `CryptImportKey` |
+| `0x1AC406C` | `0x16C406C` | `0x16C2C6C` | `CryptEncrypt` |
+
+The import directory is RVA `0x19BCDCC`, raw `0x19BB9CC`, size `0x280`.
+Its ADVAPI32 descriptor at raw `0x19BBB20` has OriginalFirstThunk RVA
+`0x19BD04C`, DLL-name RVA `0x19C0A32` (raw `0x19BF632`), and FirstThunk
+RVA `0x16C4000`. The DLL name is `ADVAPI32.dll`; its 31 imports end with
+a null thunk. This does not exclude unrelated dynamic resolution or runtime
+IAT replacement elsewhere.
+
+Exact six-byte call starts, all raw offsets:
+
+| Callsite | Instruction bytes | API |
+| --- | --- | --- |
+| `0x12EF15A` | `FF 15 04 40 AC 01` | `CryptDecrypt` |
+| `0x12EF103` / `0x12EF238` | `FF 15 08 40 AC 01` | `CryptDuplicateKey` |
+| `0x12EF0A0` | `FF 15 0C 40 AC 01` | `CryptSetKeyParam` |
+| `0x12EEF8E` | `FF 15 14 40 AC 01` | `CryptAcquireContextA` |
+| `0x12EEFBE` | `FF 15 3C 40 AC 01` | `CryptImportKey` |
+| `0x12EF298` | `FF 15 6C 40 AC 01` | `CryptEncrypt` |
+
+The bounded mode/lifetime continuation verified the following:
+
+- Constructor `0x12EEF20` imports `CALG_AES_128` (`0x660E`) with a 16-byte
+  key. In constructor, IV setter, encrypt/decrypt, and inspected parent
+  construction/replacement paths, no explicit `KP_MODE=4` or padding setter
+  was observed. Setter `0x12EF0A0` uses `KP_IV=1` (`6A 01` at
+  `0x12EF09B`). A whole-image literal-call scan additionally found import
+  jump thunk `0x15A0CD0` (`FF 25 0C 40 AC 01`), with no recorded IDA xrefs.
+  These checks do not exclude arbitrary indirect callers. CBC/default
+  padding remains a provider-default interpretation, not an observed
+  application setting.
+- Decrypt duplicates the key at `0x12EF103` and passes that duplicate to
+  `CryptDecrypt` (`FF 75 FC` at `0x12EF157`). Encrypt duplicates at
+  `0x12EF238`, but reloads the original wrapper at `0x12EF28B`
+  (`8B 45 F4`) and passes its original key at `0x12EF295` (`FF 70 04`).
+  Both paths destroy their duplicates on success and failure. Both crypto
+  calls use `Final=TRUE`; original-key encryption alone therefore does not
+  establish cross-message CBC chaining.
+- Parent `+0x58` is a pointer to an allocated eight-byte key/provider
+  wrapper, not inline handles. Replacement calls destructor `0x12EF000`
+  at `0x12E3B14`, frees the old allocation at `0x12E3B1B`, stores the new
+  pointer at `0x12E3B23`, then sets its IV at `0x12E3B29`. Other replacement
+  paths occur at `0x12E4089..0x12E40A1` and through `0x12E4EA0`.
+- Explicit reset `0x12E37A0` destroys/frees the wrapper at
+  `0x12E386E/0x12E3875` and clears the pointer at `0x12E387A`
+  (`C7 46 58 00 00 00 00`). Owner teardown `0x31C3A0` destroys/frees it at
+  `0x31C438/0x31C43F`. Wrapper destructor `0x12EF000` destroys its key
+  handle at `0x12EF00B`, clears wrapper `+4`, releases the provider at
+  `0x12EF039`, and clears wrapper `+0`.
+
+Next bounded task: establish the parent type and actual instance provenance
+between auto-login key setup and ClientApi signing. Cipher consumers remain
+unresolved.
+
+## PrivateDialog receiver identity and numeric event 229
+
+Keep selector `0x79` separate from selector `0x59`. For the former,
+dispatcher entry VA `0xC1D840` / raw `0x81CC40` points to VA `0xC1D663` /
+raw `0x81CA63`. The call at raw `0x81CA82` is
+`FF 90 68 01 00 00` (receiver slot `+0x168`). Its vtable entry VA
+`0x1C72028` / raw `0x1870C28` contains VA `0xECEF00`, raw `0xACE300`.
+Bytes `E9 0B 32 EC FF` there tail-jump to raw `0x991510`.
+
+Selector `0x59` instead calls slot `+0xE8` at raw `0x81C522` and reaches
+raw `0xACA9D0`. That method clears/resets the tree at context `+0x43C8`
+and sets state byte `+8`; it does not read the dispatched message argument.
+The earlier coordinator assignment naming it as the PrivateDialog receiver
+was incorrect.
+
+At raw `0x991662`, `FF 90 AC 00 00 00` calls the `uiManager` loaded from
+VA `0x1E002B8`, with arguments `(229, &stack_record, 0)`. The preceding
+pushes at raw `0x991658` are `6A 00 52 68 E5 00 00 00`. Its vtable slot
+`+0xAC` resolves to raw `0xBF9D80`. No event name is inferred.
+
+The consumer reads byte `+0x28`, DWORD `+0x40`, QWORDs `+0x30/+0x34`
+and `+0x38/+0x3C`, and a NUL-scanned pointer at `+0x44`. The record-building
+path uses keys `success`, `vendor_id`, `product_id`, `price_id`, and `code`.
+On the successful empty-code path, it passes address `message+0x44` to a
+fallback helper with literal `PURCHASE_SUCCESSFUL`. These observations do
+not resolve the previously documented parser/consumer representation
+mismatch. Next bounded task: check constructor/parser `0x5EE900` provenance
+for fields `+0x3C/+0x40/+0x44` and any intermediate transform.
+
+The subsequent bounded check reconfirmed parser `0x5EE900` writes only
+DWORD `+0x28`, QWORD `+0x30`, and DWORD `+0x38`, ending at exclusive
+`+0x3C`. Consumer DWORD `+0x40` is read at `0x9915EA` (`FF 76 40`);
+pointer `+0x44` is loaded at `0x99154E` (`8B 46 44`). Direct xref/pointer
+searches did not locate the parser constructor/caller in that pass, so no
+initializing transform was established. This is not proof that no indirect
+initializer exists, nor a demonstration of runtime out-of-bounds behavior.
+Next check starts at the known parser factory `0x81CC50` and its actual
+selector-`0x79` branch rather than repeating the negative reference scans.
+
+That factory linkage is now established. Route0 subtracts `0x53` at raw
+`0x81CCAD`; selector `0x79`'s entry at raw `0x8218DC` / VA `0xC224DC`
+contains `9E E3 C1 00`, selecting raw `0x81D79E`. That branch requests
+`0x40` bytes (`6A 40`) and calls constructor `0x526840` at `0x81D7BF`.
+The constructor passes the unadjusted allocation to base `0x5A1510`,
+installs vptr VA `0x1C67018`, zeros payload `+0x30/+0x34`, and returns
+the same pointer (`8B C6` at `0x526863`). Neither constructor initializes
+`+0x3C/+0x40/+0x44`.
+
+The factory moves EAX to ESI at `0x81D7C4`, pushes that pointer at
+`0x81D7CA`, and calls reader `0x5EE900` at `0x81D7D5`
+(`E8 26 11 DD FF`), without adjustment. The factory returns the same
+pointer. Separately, dispatcher `0x81CA81` pushes its incoming message
+pointer unchanged before the slot-`+0x168` call. Therefore the constructors
+do not reconcile the mismatch: `+0x3C` is inside the requested allocation
+but unwritten on this path; `+0x40/+0x44` are beyond the request. Actual
+allocator usable size and runtime effects remain unknown. The next narrow
+check is pointer identity or transformation between parser return and
+consumer invocation, rather than another constructor scan.
+
+## Signing-parent ownership and pending instance alias
+
+The signing/crypto parent is a `0xB0`-byte object constructed at raw
+`0x12E36F0` and owned at `tfApplication+0xA28`. Its constructor installs
+no vtable; no native parent-type name was established. Application RTTI
+names `.?AVtfApplication@@`.
+
+| Raw address | Observed pointer flow |
+| --- | --- |
+| `0x3031B4` | `89 87 28 0A 00 00`: store constructed parent at application `+0xA28` |
+| `0x30DC12` | `FF B6 28 0A 00 00`: pass application's parent to Login constructor |
+| `0x636654/0x636657` | Load second argument; store at Login `+0x24` |
+| `0x63DF0B/0x63DF13` | Load `[Login+0x24]` into ECX; call setup `0x12E3960` |
+| `0x636579` | Load application global from PE VA `0x1DFFD98`, raw `0x19FE198` |
+| `0x63659F` | Load that application's `+0xA28` into EDX before tail-transfer to `0xBC1990` |
+| `0xBC1A5D/0xBC1A6D` | Restore parent into ECX; call signing builder `0x12E4100` |
+
+These are concrete owner/member paths, not yet proof that Login creation's
+application instance equals the global application's instance. Shared
+synchronization helpers and nesting counter `+0x30` do not establish that
+alias either. The next bounded task traces the application global writer
+and mode-construction receiver provenance; do not claim the shared instance
+until that edge is verified.
+
+The bootstrap-path alias is now established. Wrapper receiver VA
+`0x1DFFD88` owns the global slot at `+0x10`, VA `0x1DFFD98`.
+Initializer `0x2EC530` preserves its wrapper receiver in ESI at
+`0x2EC534`, constructs the allocated application through `0x303080`
+at `0x2EC593`, and stores the returned application at `[ESI+0x10]`
+at `0x2EC59C` (`89 46 10`). Constructor `0x303080` returns its
+unchanged receiver. The initializer's observed callers at
+`0x33402B`, `0x335A7E`, and `0x480568` test the global for zero
+and supply wrapper VA `0x1DFFD88`.
+
+Bootstrap loads `[VA 0x1DFFD98]` into ECX at `0x2EB184` and calls
+application initialization `0x3063D0` at `0x2EB18F`. That receiver is
+preserved through local `[EBP-0x40]`, restored at `0x30788F`, and passed
+to mode creation by the call at `0x30798E`. Mode creation preserves the
+receiver at `0x30D87E` and passes `[application+0xA28]` to Login at
+`0x30DC12`, where the previously verified constructor stores it at
+Login `+0x24`. Thus bootstrap-created Login and request preparation
+reference the same application slot and signing parent, not just matching
+types. This is path-scoped: raw `0x2EC6A4` also explicitly zeros the
+global. Permanent uniqueness, concurrent reinitialization, and lifetime
+immutability were not proven. The global is in `.data`, whose VA/raw
+delta is `0x401C00`.
+
+## PrivateDialog parsed-pointer delivery, ReplayReader branch
+
+The parsed-pointer continuation establishes a concrete conditional
+ReplayReader path, not every live Matrix owner path:
+
+- Raw `0x821D87` calls parser `0x81CC50` and preserves its EAX result
+  through return. The registered parser call at `0xBD6D3C` returns
+  pointer P, which is moved to EDI at `0xBD6D41`, stored in local record
+  `+8` at `0xBD6D63`, and enqueued through `0xBD8B80` at `0xBD6D66`.
+- Queue helper `0xBD8B80` copies the pointer DWORD unchanged at
+  `0xBD8BE7..0xBD8BEA`. Transfer at `0xBD6612..0xBD661B` invokes the
+  same record-copy helper for queue `+0xC8`. Iterator helper `0xBD8AD0`
+  and record-pointer-storage growth `0xBD8DB0` do not reconstruct messages.
+- Delivery loads record `+8` into EDI at `0xBD6699` and into local
+  `var_54` at `0xBD669C`. Routing byte 2 or 3 passes `&var_54` to
+  context vtable slot `+8`, with selector 1 or 0 respectively.
+- On the previously established ReplayReader callback binding,
+  `0x7FDC4F..0x7FDC52` forwards the reference argument to `0x7FDC60`.
+  That method dereferences it into EBX at `0x7FDC6E`. Its zero-key-byte,
+  non-nested-sentinel, non-null-receiver branch pushes P unchanged at
+  `0x7FDD4E` into dispatcher `0x81BB90` at `0x7FDD4F`.
+
+No adjustment, replacement allocation, or reparse appears on this specific
+branch between parser result and receiver. Nested-message child parsing is
+a different branch and excluded. Callback arguments permit replacement:
+`0xBD6713` reloads the possibly changed local pointer after the call.
+Callbacks or other aliases can also mutate contents. The evidence therefore
+does not prove receiver-only fields are globally untouched, nor establish
+runtime consequences of the static representation mismatch.
+
+## AES destination is slBlob, not a cursor stream
+
+The concrete vtable at VA `0x1C80CC4` / raw `0x187F8C4` has RTTI
+`.?AVslBlob@@`, with `slBufferInterface` in its hierarchy. Its
+TypeDescriptor is VA `0x1E35F90`, raw `0x1A34390`.
+
+| Slot | Target raw offset | Observed operation |
+| --- | --- | --- |
+| `+0x04` | `0x12CB960` | Writable pointer at supplied offset; may detach backing |
+| `+0x08` | `0x12CB910` | Pointer at offset without writable-detachment step |
+| `+0x0C` | `0x12CB9C0` | Return backing header `+0x0C`, or zero: logical length |
+| `+0x10` | `0x12CB9D0` | Resize without preservation, then copy replacement bytes |
+| `+0x14` | `0x12CBA00` | Resize to zero without preservation |
+| `+0x18` | `0x12CBA10` | Append bytes |
+| `+0x1C` | `0x12CBAC0` | Absolute resize with preservation |
+| `+0x20` | `0x12CBA80` | Grow by increment and return old-end pointer |
+| `+0x24` | `0x12CBA50` | Append nonempty C string without its terminator |
+
+Slot `+0x1C` immediately changes logical length, not just capacity.
+Its helper `0x12CBCB0` either reuses suitable unique backing and writes
+header `+0x0C` at `0x12CBD33`, or allocates/preserves
+`min(oldLength,newLength)` bytes and writes the new length at `0x12CBDFD`.
+Capacity is separate at header `+0`; pooled backing explicitly has
+capacity `0x800` and initial length zero. Slot `+4(0)` may detach the backing
+even without changing length, then returns its data pointer without a
+cursor advance.
+
+The AES helpers therefore save the old logical length, enlarge it, obtain
+writable storage, and copy input to `base+oldLength`. On success they
+resize to old length plus reported output length; on failure they resize
+back to old length. This restores logical contents/length, not necessarily
+allocation identity, capacity, or discarded-tail bytes; no wiping was
+established. Wrapper `0x12E4680` uses a fresh empty destination and publishes
+its backing only after decrypt success. Generic source/backing alias safety
+and wrapping length arithmetic were not established. The next check is the
+wrapper's exact backing-header/object fields and post-publication size logic.
+
+## Signing reset and GUI-logout entry
+
+Reset `0x12E37A0` releases/zeros parent shared-text fields `+0x44`,
+`+0x48`, `+0x3C`, and `+0x40` at raw `0x12E380D`, `0x12E3834`,
+`0x12E385B`, and `0x12E38BB`. It destroys/frees wrapper `+0x58`,
+clears readiness byte `+0x34` at `0x12E3881`, and clears DWORDs
+`+0x38/+0x50/+0x54` at `0x12E3885/0x12E388C/0x12E3893`.
+Nesting counter `+0x30` brackets the operation.
+
+Observed direct reset callers:
+
+| Callsite | Condition |
+| --- | --- |
+| `0x30D718` in `0x30D6E0` | Second argument nonzero; parent is application `+0xA28` |
+| `0x63AA08` in `0x63A9B0` | Login parent `+0x24` reports readiness nonzero |
+| `0x12E3D61` in `0x12E3B80` | Either of its first two text inputs is empty; returns false |
+| `0x12E40C5` in code at `0x12E3DA0` | Corresponding empty-input branch; returns false |
+
+The last code entry is not defined as a function in the current IDB;
+its instructions, not a recovered function declaration, establish that path.
+Function `0x63F5C0` calls cleanup `0x63A9B0` at `0x63F5CB`, then logs
+`GUI Requested logout` at `0x63F5DA` (text VA `0x1B62944`, raw
+`0x1761544`). This is concrete logout evidence, not a semantic guess from
+the reset helper's name.
+
+Preparation `0xBC1990` rejects null parent or false readiness before
+signing builder `0x12E4100`, returning `AL=0` at `0xBC1AF9`.
+Builder `0x12E4100` separately tests readiness at `0x12E4195` and calls
+diagnostic handler `[VA 0x1C15EA0]` at `0x12E41AC` if false, but has no
+explicit failure return there if the diagnostic returns. Diagnostic
+termination behavior is unresolved. Cached/prepared/in-flight requests and
+concurrent interleavings were not examined; this does not establish
+cancellation. The next bounded trace follows immediate GUI-logout cleanup
+to any actual request drain/cancel boundary.
+
+## AES publication fields and realignment correction
+
+The bounded instruction trace of `0x12E4680` resolves its object/header
+layout. These offsets are structure-relative; instruction addresses are raw
+offsets in the active sample identified above.
+
+| Structure | Offset | Observed meaning |
+| --- | --- | --- |
+| slBlob | `+0` | Vtable |
+| slBlob | `+4` | Backing header pointer |
+| slBlob | `+8` | Ownership/control pointer |
+| slBlob | `+0xC` | Byte-address alignment requirement |
+| Backing header | `+0` | Capacity |
+| Backing header | `+4` | Data pointer, not byte count |
+| Backing header | `+8` | Allocation-to-data displacement |
+| Backing header | `+0xC` | Logical byte length |
+
+Constructor `0x12CB700..0x12CB765` allocates capacity plus alignment;
+for nonzero alignment its displacement is
+`alignment - (allocationAddress % alignment)`. Even an already aligned
+allocation advances by a full alignment unit. Pool initialization at
+`0x12CBF9D..0x12CBFBA` sets capacity `0x800`, data pointer `header+0x10`,
+and zero displacement/length.
+
+At `0x12E4739..0x12E4767`, the decrypt call receives backing data pointer,
+virtual logical length, and fresh empty destination. Copy instructions
+`0x12EF13A..0x12EF144` establish pointer/count ordering. Reading backing
+`+4` as a length would invert those arguments.
+
+Success `0x12E4776..0x12E477E` publishes by reference-counted pair
+assignment, **not swap**: `0x12CC439..0x12CC44F` acquires incoming
+ownership, and `0x12CBECA..0x12CBED0` replaces object `+8/+4`, releasing
+prior ownership. The destination object's alignment remains unchanged.
+Then `0x12E4783..0x12E47A3` checks nonzero alignment, nonnull header, and
+`unsigned(dataPointer) % alignment != 0`. Only if misaligned does it
+preserve-resize to the **same logical length**. Resize rejects misaligned
+reuse at `0x12CBD03..0x12CBD13`, allocates using object alignment at
+`0x12CBD9D..0x12CBDA6`, preserves bytes at `0x12CBDBC..0x12CBDD3`,
+and restores the same length at `0x12CBDFD`.
+
+This is publication followed by optional realignment, not padding removal
+or cipher-block length normalization. Decrypt failure bypasses publication.
+Allocation exceptions, generic aliasing, and overflow behavior remain
+unproven.
+
+## Logout cleanup: established effects and remaining indirect edge
+
+The bounded GUI-logout trace found more than signing reset, but no concrete
+ClientApi cancellation boundary. Call `0x63A9C3 -> 0x490090` destroys/nulls
+connection field `+0x820` and sets connection state `+0xC=1`.
+Virtual destructor call `0x63A9D3` was reported as reaching
+`0x48F290 -> 0x48F360`, using original-file vtable evidence; that target
+needs active-sample verification before treating the mapping as definitive.
+Within that candidate destructor, `0x48F43C -> 0x308500(1)` clears
+application tree `+0xA50` and count `+0xA54`; these fields are **not**
+established as ClientApi request storage. Call `0x63F61D -> 0x30D790`
+performs the mode transition/enqueue.
+
+Requests that subsequently reach `0xBC1990` face the established readiness
+rejection. Already-prepared/in-flight requests remain unresolved. In
+particular, callback `0x48F41C` and indirect owned-object cleanup prevent a
+global "logout never cancels requests" conclusion. Follow-on work is scoped
+to that callback/active-sample mapping and to one concrete caller's handling
+of preparation failure.
+
+## Logout callback verified against the active sample
+
+The candidate destructor mapping above is no longer dependent solely on
+`.original`: the relevant constructor, vtable, callback, and callee bytes
+match the active sample, although the two files differ globally. Callback
+raw `0x48F41C` resolves to raw `0xBF9D80`, VA `0xFFA980`.
+Initializer `0x3EE8CA` uses wrapper VA `0x1E002A8`;
+`0x3E4573` constructs `0xBF7A80`, and `0x3E457C` stores its result
+at wrapper `+0x10`, the uiManager global VA `0x1E002B8`.
+Constructor `0xBF7ABB` installs vtable VA `0x1C73EBC`; slot `+0xAC`
+at raw `0x1872B68` contains VA `0xFFA980`.
+
+Logout supplies event arguments `(83,0,0)`. Dispatcher `0xBF9D80`
+checks receiver byte `+0x672` at `0xBF9DBA`. If enabled, it uses event
+container `+0x6F0`; the null-payload branch selects shared payload at
+`0xBF9E21`. Call `0xBF9F2D -> 0xBF9C40` iterates recipients, invoking
+`0xC38400` at `0xBF9D5B`. This establishes a gated event notification,
+not cancellation. Registered event-83 handlers remain the next boundary.
+
+## Login ignores failed signing preparation before manager submission
+
+One concrete caller contradicts a stronger reading of "readiness rejection":
+`0xBC1990` rejects **signing preparation**, not necessarily request
+admission. `Login_QueueLoginRequest` at raw `0x63B550` allocates
+`0x78` bytes at `0x63B5D9`, constructs the request at `0x63B5FE`
+(URL parsing at `0x384487`), sets type `2` at `0x63B60D`, and copies
+callback pair `+0x50/+0x54` at `0x63B653..0x63B659`.
+
+Call `0x63B65C -> 0x636550` first prepares request collection `+0x20`
+at `0x636571..0x636574`, then loads app global VA `0x1DFFD98`,
+reads app `+0xA28`, and tail-jumps to `0xBC1990`
+(`0x636579..0x6365A9`). The caller does **not** test its returned
+`AL`; it immediately submits the request at `0x63B663`.
+
+Submission `0x6499F0 -> 0xBC43C0` instead checks manager byte
+`+0x21` enabled, `+0x20` clear, and validation `0xBC1380`.
+Accepted requests use a per-route tracker, pass through `0xBC3F40`,
+and receive timestamp field `+0x6C`. Manager success makes login set
+in-flight byte `+0x9E0` and option `+0x9E2`
+(`0x63B668..0x63B69F`). Manager failure, not signing failure, instead
+destroys the request via slot zero with flag one, logs, and returns zero
+(`0x63B66C..0x63B68F`).
+
+Thus a request may enter tracker storage after signature construction was
+skipped. This does not establish immediate WinHTTP handle creation, actual
+network transmission, or a feasible concurrent logout/login interleaving.
+The next trace follows one tracker worker and any later readiness/header
+gate. Earlier references to queued requests encountering `0xBC1990`
+must not be read as proof of end-to-end admission failure.
+
+## Event 83 registration remains dynamic; delivery queues callbacks
+
+The bounded recipient trace did not identify a concrete event-83 handler.
+`0xC38438..0xC38446` requires the event entry in listener collection
+`+0x168`; `0xC3847C` queues its callback record/payload at listener
+`+0x4C4`, and `0xC384D3` inserts the listener into manager `+0x5EC`.
+Zero name filter bypasses recipient-name matching at the dispatcher.
+Registration paths include XML `0xC35AD8` and script `0xC35CF0`.
+Name IDs derive from first-seen-name count at `0xBF9AE6..0xBF9AFE`;
+recovering numeric 83 therefore needs registration order, not a string
+guess. No concrete cancellation or request effect was established. The
+next independent question is callback queue draining/lifetime, not another
+unbounded search for a guessed logout event name.
+
+## Admitted login request can reach WinHTTP construction conditionally
+
+The tracker trace extends the ignored signing-preparation result to an
+actual static network-construction path. Code addresses below are raw
+offsets in the active sample; API operand addresses, where used, are PE
+VAs, not raw IDB addresses.
+
+`0xBC3F40` clears request `+0x64` at `0xBC3F6C` and enqueues it
+through `0x12CE310` with tracker `+0x10` at `0xBC3F73`.
+Enqueue increments queue `+0x10` at `0x12CE32A`, so tracker `+0x20`
+is the pending queue count. It stores the request in node `+4` at
+`0x12CE3E5`, then publishes the next-node pointer at `0x12CE3ED`.
+
+Pump `0xBC3F80` calls existing workers at `0xBC3FCB`. Its growth branch
+requires positive pending count, completion count at least worker count,
+and worker count below manager `+0x24` (`0xBC408C..0xBC40AC`).
+Construction at `0xBC4101` supplies tracker `+0x10`; worker stores the
+queue at `+0` at `0xBC27CE`. Constructor call
+`0xBC2846 -> 0xBC38F0` reaches `WinHttpConnect` at `0xBC392A`
+and stores its result in worker `+0x20`.
+
+Worker `0xBC2B30` requires a nonempty queue and completion `+0x1C=0`,
+then dequeues at `0xBC2BBC`. Helper `0x12CE400` decrements queue count
+at `0x12CE47D`, extracts node `+4` at `0x12CE485`, and recycles the
+queue node, not the request. Response `+4` receives the request at
+`0xBC2C77`; callback context `+0x18` receives the response at
+`0xBC2D47`. A future retry deadline instead requeues at `0xBC2BF0`.
+Otherwise, nonzero worker connection handle (`0xBC2D7A`) permits
+`WinHttpOpenRequest` at `0xBC2DB7`; type 2 selects UTF-16 `POST`.
+
+No signing-context readiness or named-signature-header requirement was
+found along this selected route before request construction. Generic header
+serialization follows construction and is skipped when request `+0x24=0`
+at `0xBC2F65`. Setup-error context `+0x14` gates the eventual
+`WinHttpSendRequest` branch at `0xBC31D8`, call `0xBC3213`.
+This is conditional static reachability, not observed traffic, successful
+handle creation, absent/preexisting signature contents, server acceptance,
+or exploitability. Next work follows failed-handle/setup-error completion
+and ownership after dequeue.
+
+## UI event delivery is deferred and retains payload ownership
+
+`0xC38400` does not invoke registered callback code inline.
+It obtains the registration pointer at `0xC3844C`, copies/retains the
+payload pair through `0xC22760` at `0xC38466` (atomic control-block
+`+4` increment at `0xC2277F`), then queues through `0xC42180`.
+That helper allocates/reuses a 12-byte slot, copies the registration pointer
+unchanged at `0xC421DF..0xC421E1`, and retains payload ownership at
+`0xC421F7`. The caller releases its temporary pair at
+`0xC38488..0xC384B1`. The queue owns a payload reference but only
+borrows the registration-record pointer; record lifetime across unregister
+or replacement is unresolved.
+
+Scheduling at `0xC384D3` inserts the listener into manager `+0x5EC`;
+`0xC53B90` suppresses duplicate listener-pointer entries.
+Manager routine raw `0xC02730` is vtable slot `+0x40` (raw table
+entry `0x1872AFC`, value VA `0x1003330`).
+It requires manager `+0x672 != 0` at `0xC0276B..0xC02772`,
+snapshots scheduled listeners at `0xC034B0..0xC034CF`, clears the
+scheduling collection at `0xC034D7..0xC0353F`, and calls listener
+drain `0xC38CA0` at `0xC0357B`.
+
+Drain loads registration fields `+0/+8` and payload at
+`0xC38D38..0xC38D59`, calling `0xC3B3C0` at `0xC38D5C`.
+That requires listener `+0x7C` nonzero, context `+0x78` nonnull,
+and nonempty callback text (`0xC3B40F..0xC3B42F`). Its path through
+`0xC289C0`, `0xCD7890`, `0xCD6C10`, thunk `0xC28940`, and
+`0xCD7110` ends at unresolved runtime-selected `call edi` at
+`0xCD728C`. No concrete script/event-83 identity is established.
+
+After the invocation attempt, `0xC38D88..0xC38DA6` decrements payload
+ownership counters and conditionally calls virtual cleanup; then
+`0xC38DA9..0xC38DB7` removes the front queue entry. Continuation
+requires processed count at most manager `+0x50` and a nonempty queue
+(`0xC38DBB..0xC38DC8`). Listener destruction instead calls
+`0xC422C0` at `0xC33ABE`, releasing pending payloads and freeing queue
+storage without invoking callbacks.
+
+Delivery thus needs a subsequent manager-processing pass. Its frame-call
+provenance, execution success, registration lifetime, and concrete callback
+target remain unresolved; none establishes request cancellation.
+
+## Failed HTTP construction: retry versus terminal completion
+
+All code addresses here are raw offsets. API operands `0x1AC4CFC`
+(`WinHttpOpenRequest`) and `0x1AC4CF8` (`WinHttpCloseHandle`) are
+PE IAT VAs; names follow the existing subsystem documentation.
+After a null open result, `test esi,esi` at `0xBC2DE4` branches to
+`0xBC3236`. Context `+0` remains its initialized zero.
+At `0xBC3264`, context `+0x14` receives `0xBC1C40`'s normalized
+negative error: positive codes become `0x8007xxxx`, and other nonnegative
+results become `0x80004005`. Context `+0x18` receives the response at
+`0xBC3270`, response `+8=4` at `0xBC3273`, and worker `+0x1C`
+receives context at `0xBC3280`.
+
+A nonzero setup error at `0xBC31D8` instead branches to `0xBC321B`,
+closes/zeros context handle `+0`, and joins the same response-kind-4
+completion setup. In the same worker call, the dequeue loop exits on
+nonzero completion (`0xBC2BB0`). `0xBC32A4..0xBC32BE` processes
+only an existing context whose handle is zero and clears worker `+0x1C`;
+negative context error leads to logging via `0xBC33CD`.
+
+Retry guard `0xBC358F` requires request counter `+0x3E` below limit
+`+0x3D` and `0xBC1130(response)` true. That helper accepts response
+kinds 2 and 4, so the failed-open response satisfies its kind predicate,
+but retry still depends on the counter. Retry increments `+0x3E`,
+sets request `+0x60=1`, and writes a backoff deadline at `+0x48/+0x4C`.
+Call `0xBC3612 -> 0x12CE310` puts the same request back on the worker's
+queue. If the count has now reached the limit, the path closes/zeros
+worker connection `+0x20` and calls reconnect helper `0xBC38F0`.
+It clears response `+4` at `0xBC367B`, returns the response to the
+worker reuse list through `0xBC5250`, and frees context through
+`0x12C8D60`, without invoking the request callback.
+
+When the counter is already at the limit (`0xBC3595`), terminal completion
+records a tick at request `+0x74` (`0xBC37D5`), acquires the callback
+at `0xBC37E2`, and calls its slot `+4(response)` at `0xBC37FC`.
+Request slot zero with flag one follows at `0xBC380C`. Constructor
+`0x3843F0` installs vtable VA `0x1C60A78` (raw `0x185F678`);
+its slot zero points to VA `0x723D00`, raw `0x323100`, which runs
+destructor `0x322FF0` and frees via `0x12C8D60`. The terminal path
+also clears response `+4`, returns response to the reuse list
+(`0xBC3866`), frees context (`0xBC386A`), and releases the callback pair.
+Thus responses are recycled, contexts freed, and requests either requeued
+or destroyed after terminal callback. Login callback identity and its
+response-kind-4 handling are the next bounded check.
+
+## Login response callback is weakly acquired and translates kind 4
+
+The concrete callback wrapper is built at raw `0x636743..0x63679D`,
+size `0x20`, owner `+4=tfLogin`, target `+0x10=VA 0xA3C3C0`,
+adjustment `+0x14=0`. RTTI descriptor raw `0x1A10C78` (name
+`0x1A10C80`) identifies
+`sl::member_callback<tfLogin, HTTP::Client::Response const &>`.
+Vtable VA `0x1C674A8`, raw `0x18660A8`, slot `+4` contains
+VA `0xA43F80`, raw `0x643380`. Its trampoline preserves the response
+argument and tail-jumps to raw `0x63B7C0`.
+
+Control-block setup `0x6456FA..0x64570E` initializes counters
+`+4/+8=1`, wrapper at `+0xC`; `0x645744..0x645747` installs the
+Login-owned pair at `+0x9D8/+0x9DC`. Request preparation increments
+control-block `+8` at `0x63B632` before copying the pair at
+`0x63B653/0x63B659`: this request reference is weak, not ownership of
+Login. Terminal completion `0xBC37E2 -> 0xBC4A80 -> 0x327730`
+acquires only while strong count `+4` remains nonzero.
+Null/expired callbacks skip invocation at `0xBC37F4..0xBC37F6`;
+request destruction still follows. Acquired-pair release is at
+`0xBC3876..0xBC38A2`.
+
+Response-kind switch `0x63B864..0x63B88B`, table raw `0x63C5C4`,
+maps kind 4 to `0x63B8A7`, loading `WinHTTP Error` (raw text
+`0x17B3EE0`). Formatting at `0x63B8B3..0x63B8C0` produces
+`Connection failure: type=WinHTTP Error`. The non-HTTP/error flag
+skips body-error parsing at `0x63BF4D..0x63BF54`; metadata gets
+`error`, request `url`, and `status=0` at `0x63BF32..0x63BF48`.
+The path dispatches event `0x145` at `0x63C1EE..0x63C1F5`, clears
+Login `+0x9E0` at `0x63C20D` and `+0x9E1` at `0x63C405`.
+Nonempty error prevents state `+0xA48` advancing from 1 to 2.
+
+If option `+0x9E2` is set, the path decrements `+0x9E4`; a positive
+remainder waits 500 ms then calls the auto-login entry
+(`0x63C460..0x63C480`), otherwise it calls `0x63E1E0`.
+Finally it clears `+0x9E2` at `0x63C4C6`. Actual callback execution,
+UI interpretation, and retry eligibility after logout remain unproven;
+the weak acquisition is a concrete lifetime gate, not evidence that every
+logout has already expired the callback.
+
+## Registration removal: record release without local queue invalidation
+
+The worker corrected its initial VA label: all code addresses in this
+trace are raw-file/rawbasezero IDB offsets, not runtime VAs. PE metadata
+gives image base `0x400000`, `.text` RVA `0x1000`, raw start `0x400`;
+raw `0xC35D10` has prologue `55 8B EC 83 EC 10` and maps to
+VA `0x1036910`.
+
+Script removal entry `0xC32680` calls `0xC35D10` at `0xC32764`.
+The helper resolves the dynamic ID through manager `+0x6E8`, rejects
+`-1` at `0xC35D55..0xC35D58`, and exits if listener registration
+collection `+0x168` lacks an entry (`0xC35D62..0xC35D76`).
+For an existing entry it unsubscribes through `0xBF9BD0` at
+`0xC35D80`, destroys the record at `0xC35D8E`, frees through
+`0x12C8D60` at `0xC35D95`, nulls the node's record pointer at
+`0xC35D9E`, then erases the node at `0xC35DAC`.
+
+Inspected unsubscribe `0xBF9BD0` only unlinks matching listener pointers
+and frees manager `+0x6F0` subscriber-list nodes
+(`0xBF9C00..0xBF9C27`); destructor `0xC33E60` releases record
+text fields `+0/+8`. Neither inspected helper clears listener queue
+`+0x4C4`, and no drain intervenes in this local removal path.
+Replacement through `0xC35BB0` instead updates the existing record's
+`+8` in place (`0xC35C29..0xC35C5D`).
+
+Outstanding-queue reachability and script-call scheduling remain unresolved;
+no runtime safety or vulnerability conclusion follows. Follow-on work
+traces scheduling, not merely the presence of a borrowed pointer.
+
+## Script unbind is immediate; callback execution precedes queue removal
+
+The scheduling trace identifies the binding rather than assuming a
+script API name: raw `0xC3AE3B..0xC3AE57` registers
+`Component.UnbindEvent` with target VA `0x104E880`, raw `0xC4DC80`.
+Its wrapper reaches `0xC32680`, which calls removal `0xC35D10`
+immediately at `0xC32764`; no defer/isolated-phase guard was found on
+this path. Drain invokes the VM synchronously at `0xC38D5C`;
+protected thunk `0xC28940` enters `0xCD7110`, whose native dispatch
+calls at `0xCD728C`. Queue removal at `0xC38DA9` follows callback
+return. Thus native unbind is statically callable during callback
+execution, not established as restricted to a separate phase. Concrete
+script invocation, actual outstanding registrations, and runtime outcomes
+remain unobserved. This does not establish a concurrency scenario.
+
+## Signing reset alone does not disable callback-level login retry
+
+Cleanup `0x63A9B0` cleans Login `+0x1C` and conditionally resets
+signing at `0x63AA08`; the inspected path does not clear retry eligibility.
+Auto-login entry `0x63DE80` resets signing again before selecting
+credentials. Queue entry `0x63B550` checks in-flight byte `+0x9E0`
+and endpoint availability, not a logout-state predicate on that path.
+Mode replacement logic `0x30D850`, comparison at `0x30D93F`, skips
+replacement when requested mode equals current mode; requesting Login
+mode therefore does not necessarily destroy a current Login object.
+
+Actual destruction releases callback control at
+`0x636EC2..0x636EEC`; weak acquisition
+`0xBC4A80 -> 0x327730` rejects zero strong count, but the inspected
+control block demonstrably protects the callback wrapper, not independent
+ownership of Login. A surviving eligible callback has a static retry
+path after reset. Scheduler ordering/interleaving and concrete runtime
+occurrence remain unproven. Next work follows credential selection and
+whether signing is reestablished before queuing that retry.
+
+## Bind replacement affects already-queued deliveries
+
+Record constructor raw `0xC53E50` sets `{+0 event text, +4 event ID,
++8 callback text}`, retaining each nonnull shared text through its
+`[text-4]` counter. Existing-record replacement at
+`0xC35C29..0xC35C5D` releases old callback text `+8`, assigns/retains
+the replacement, and preserves record identity.
+Queue copy `0xC421DF..0xC421F7` stores only the record pointer and
+retained payload pair, not a callback-text snapshot.
+Drain `0xC38D38..0xC38D5C` rereads record `+0/+8` at delivery.
+Therefore replacement before drain changes which callback text an already
+queued delivery uses. Entry `0xC32460` identifies
+`Component.BindEvent(event, function)`; callback strings remain dynamic,
+not identified concrete script handlers.
+
+## Auto-login restores readiness before its selected queue invocation
+
+Raw `0x63DEAE -> 0x63A9B0` performs the previously described
+readiness-gated reset. Credential selection then follows this order:
+
+| Branch | Acquisition guard | Setup call and return guard |
+| --- | --- | --- |
+| Steam | Virtual `+0x0C` true at `0x63DED0/0x63DED2`, virtual `+0x1C` nonzero 64-bit ID at `0x63DEE5/0x63DEE7`, ticket from virtual `+0x24` succeeds at `0x63DF04/0x63DF06` | `0x63DF13 -> 0x12E3960`, selector 1; false at `0x63DF18/0x63DF1A` goes to branch failure |
+| Youxi | Otherwise nonempty shared text at global VA `0x1E4B2DC`, copied through `0x2FCB30`, acquisition guarded at `0x63DF99/0x63DF9B` | `0x63DFA8 -> 0x12E3960`, selector 2; false at `0x63DFAD/0x63DFAF` fails |
+| 369 | Otherwise global byte VA `0x1E4B2E1` nonzero; `0x2FD5A0` obtains text from global VA `0x1E4B2E4`, acquisition guarded at `0x63E017/0x63E019` | `0x63E026 -> 0x12E3960`, selector 3; false at `0x63E02B/0x63E02D` fails |
+| Reboot/cache | Otherwise `0x635E00` succeeds; `0x63B700` reads `LoginName`, overridden by nonempty Login `+0xA10`; empty account rejected at `0x63E146/0x63E148` | `0x63E167 -> 0x63AEF0(account, empty, empty, 1)`; false at `0x63E16C/0x63E16E` leaves success unset |
+
+A selected ticket branch's acquisition/setup failure does not fall through
+to another provider. Provider-specific diagnostics identify these branch
+names; nonempty error text reaches `0x63E0C1 -> 0x63E1E0`.
+
+Ticket setup rejects null/empty input at `0x12E39B5/0x12E39B7` and
+`0x12E39BD/0x12E39C0`. After derivation and wrapper initialization,
+`0x12E3B3D` stores parent readiness `+0x34=1` and `0x12E3B41`
+stores selector `+0x38`; the false path is `0x12E3B46`.
+Cache setup `0x63AEF0` attempts file recovery; `0x12E4AC0` calls
+`CryptUnprotectData`. Nonempty recovered secret reaches
+`0x63B102 -> 0x12E3B80`, guarded at `0x63B107/0x63B109`;
+`0x12E3D50` sets readiness and `0x12E3D56` selector zero.
+This is a DPAPI-protected cached secret; specifically calling it a password
+or token is not established.
+
+Missing/empty recovered secret takes `0x63B1BE -> 0x12E3DA0`,
+guarded at `0x63B1C3/0x63B1C5`. That setup requires nonempty account
+and second text input; this auto-login path supplies empty second input,
+so it reaches reset `0x12E40C5` and returns false. The setup's general
+successful path would set readiness at `0x12E40B4`.
+
+Successful setup sets `BL=1`; `0x63E1A1/0x63E1A3` gates
+`0x63E1AD -> 0x63B550(1)`. Unlike the earlier generic ignored-prep
+case, this selected auto-login route restores readiness before queue
+invocation. It nevertheless ignores the queue call's return and sets
+success at `0x63E1B2`: that is not proof of manager admission or login
+success. Follow-on work traces its caller-visible result/state.
+
+## Null event payload produces a fresh callback table with event text
+
+The shared default at **PE VA** `0x1E68660` is a zero-initialized
+`{object,control}` pair in `.data`'s virtual-only tail, not an allocated
+payload. No constructor/writer xrefs were found within the bounded trace.
+Raw file offset `0x1E68660` is unrelated; its bytes must not be interpreted
+as this global's initializer.
+
+Raw `0xBF9E21` copies the default pair. Retain `0xC2277F` acts only
+on nonnull controls, as does the queued copy at `0xC421F7`; the zero
+default therefore retains nothing. Conversion at
+`0xC25E89 -> 0xCD4550` allocates a fresh table per callback, and
+`0xC25F43..0xC25F95` inserts `"event"` with the registration's
+event text. Thus the default callback argument is not nil or empty.
+Table mutations are not shared across recipients through this default:
+there is no shared default payload object. Event 83's text is still
+unresolved; arbitrary nonnull payload conversion is a separate next trace.
+
+## Auto-login return reports setup/attempt, not manager acceptance
+
+The bounded queue-result report confirms that submission failure
+(`0x63B668..0x63B66A`) destroys the request at `0x63B672`, logs at
+`0x63B687`, returns zero, and bypasses the in-flight/retry-option
+writes at `0x63B698/0x63B69F`. Auto-login ignores that result at
+`0x63E1AD`, sets `BL=1` at `0x63E1B2`, and returns it in `AL`
+at `0x63E10E` or `0x63E1C5`; shared-text cleanup preserves it.
+
+Update routine raw `0x6385C0` is a direct caller gated by
+Login `+0xA4C` nonzero (`0x638BCD`), parent readiness false
+(`0x638BEE..0x638BFD`), global flag **VA** `0x1E4B0B0` clear
+(`0x638BFF`), and helper `0x63DDC0` true (`0x638C07..0x638C0E`).
+A returned one branches at `0x638C19`, bypassing error dispatch
+`0x638C35`. The worker corrected its initial VA label: code addresses
+are raw offsets. Bytes `38 1D B0 B0 E4 01` at raw `0x638BFF`
+independently establish that `0x1E4B0B0` is an absolute PE VA operand.
+No new callback retry is armed by failed submission: `+0x9E2` remains
+unchanged and no newly in-flight request is established. Later update
+eligibility cannot be inferred merely from unchanged `+0xA4C`, because
+the successful setup also restored readiness, another update guard.
+The next task traces that guard and helper explicitly.
+
+## Successful preparation blocks later update attempts after queue rejection
+
+The update eligibility helper raw `0x63DDC0` returns true for any of:
+the object at **VA** `0x1E46774` has virtual `+0x0C` true and virtual
+`+0x1C` nonzero 64-bit result (`0x63DDC0..0x63DDE0`); shared text
+at **VA** `0x1E4B2DC` has nonzero length
+(`0x63DDE2..0x63DDFD`); or byte at **VA** `0x1E4B2E1` is
+nonzero (`0x63DDFF..0x63DE0D`). Shared-text length uses DWORD
+`[p-0xC]` when WORD `[p-8]==0`, otherwise unsigned WORD `[p-6]`.
+
+Login constructor clears its `+0xA4C` at `0x63691A`, then calls
+`0x63DE10` at `0x636AB0`. That helper enables only if Login
+`+0xA4C==0`, application byte `+0xA45!=0`, and application DWORD
+`+0xA4C!=0`, using app global **VA** `0x1DFFD98`.
+It sets Login `+0xA4C=1` at `0x63DE39` before testing parent
+readiness. If readiness is false, `0x63DE6A` tail-calls auto-login
+without the update caller's eligibility/global guards. No subsequent
+explicit clear of Login `+0xA4C` was found in the inspected displacement
+references; this is a bounded search result.
+
+Successful credential setup sets readiness at `0x12E3B3D` before queue
+submission. Submission rejection does not roll that back. Later updates
+exit at readiness guard `0x638BFD`, so they do not reach the setup/reset
+entry again even if Login `+0xA4C` remains set. The update auto branch
+also requires cached Login `+0x1C==0` at `0x6388D2`.
+External resets can re-enable attempts. No fixed retry timer or update
+frequency was established; the conditional update path is not a proven
+repeated-attempt loop.
+
+## Nonnull event payload layout and VM conversion
+
+This is an in-memory x86 layout, not established wire framing. All code
+addresses below are raw offsets in the identified active sample.
+Converter `0xC25E30` reads payload `{+0 begin, +4 end}` directly,
+iterating eight-byte `{name_pointer,value_pointer}` entries
+(`0xC25EA6..0xC25EB3`, `0xC25F0C..0xC25F28`), not a payload
+vtable. Nonempty names use explicit shared-text header lengths as above;
+null/empty names receive integer keys 1, 2, ... counting only unnamed
+entries (`0xC25EF7..0xC25F08`).
+
+Value pointer `+0` selects tags 0 through 8 via table raw `0xC25AB8`,
+whose entries are PE VAs. Null value pointers take a diagnostic/assertion
+path and are still dereferenced if it returns; they are not ordinary null
+encodings. The following are observed internal VM tags, not assumed
+version-specific Lua constants.
+
+| Input tag | Raw target | Observed conversion |
+| --- | --- | --- |
+| 0 | `0xC258DD` | String pointer `value+4`, or fallback VA `0x1C5EA68`; NUL-terminated push through `0xC27FE0` |
+| 1 | `0xC25906` | Copy DWORD at `value+0x10`, VM tag 19; no floating conversion |
+| 2 | `0xC25930` | Widen binary32 at `value+0x14` to binary64 with `CVTPS2PD`, VM tag 3 |
+| 3 | `0xC2594E` | Normalize byte `value+0x18` to 0/1, VM tag 1 |
+| 4 | `0xC2597D` | QWORD at `value+8` through object-registry lookup `0xC54160`; wrapper or VM null, not numeric conversion |
+| 5 | `0xC259A2` | QWORD at `value+8` through `0xC549A0`; zero gives VM tag 0, otherwise userdata tag 71/subtype 1, exact QWORD at userdata `+0x20` |
+| 6 | `0xC259C7` | Recurse through `0xC25E30(vm,[value+0x1C],0)` |
+| 7 | `0xC259EB` | Stream from `value+0x20`, parsed through `0xC25790`, forwarding normalized byte `+0x18`; format/result unresolved |
+| 8 | `0xC25A6C` | QWORD conversion through `0xC548C0`, like tag 5 but userdata subtype 2 |
+| >8 | `0xC25A91` | VM tag 0 |
+
+Fresh table allocation `0xCD4550` is pushed with VM tag 69 at
+`0xC25E91..0xC25E9A`. Payload entries are inserted first.
+If event text is nonnull, the subsequent reserved `"event"` insertion
+at `0xC25F43..0xC25F95` uses `0xC285C0(vm,-3)`, overwriting
+the entire existing 16-byte value and popping key/value
+(`0xC285D6..0xC285F7`, `0xC2862B`). Short strings are
+content-interned by `0xCD4E50`; thus reserved event text wins over a
+payload `"event"` entry. With null event text this insertion is skipped.
+Duplicate payload keys are last-write-wins. No runtime samples or malformed
+payload execution were used; recursive/cyclic bounds and tag-7 parsing
+remain separate unresolved questions.
+
+## Submission rejection gates do not establish normal-startup failure
+
+Wrapper raw `0x6499F0` gets manager from
+`*(global at VA 0x1DFFF70 + 0xA0)`. Submission `0xBC43C0`
+returns zero before route lookup/enqueue for manager `+0x21==0`
+(`0xBC440E..0xBC4412`), manager `+0x20!=0`
+(`0xBC4418..0xBC441C`), or validation `0xBC1380` false at
+`0xBC4424`. Accepted linking is at `0xBC4503`.
+
+Validation calls URL predicate `0xBCDF20(request+0xC)`. It requires
+nonnull/nonempty host at request `+0x10`
+(`0xBCDF20..0xBCDF39`), signed port `+0x14` in 1..65535
+(`0xBCDF3B..0xBCDF47`), and nonempty path `+0x18` whose first byte
+is `/` (`0xBCDF4F..0xBCDF63`). Content-type text at `+0x28`
+and body logical length must agree on emptiness. Body length comes from
+request stream `+0x2C`, slot `+0xC`, at
+`0xBC13B4/0xBC13DC`; slBlob slot maps to `0x12CB9C0`.
+These validators do not check method `+8`, scheme `+0xC`, or a literal
+MIME value. Type 2 alone is not a rejection predicate.
+
+Manager constructor `0xBC4190` clears both flag bytes at `0xBC4222`
+(`66 C7 46 20 00 00`). Initializer `0xBC39B0` enables `+0x21`
+at `0xBC3AB2` only after successful `WinHttpOpen`.
+Global setup `0xBBD110` constructs at `0xBBD37B`, publishes at
+`0xBBD38D`, initializes at `0xBBD393`, and succeeds only if
+initialization succeeds. Normal app startup call `0x307208` takes a
+failure branch on zero rather than continuing to mode construction.
+Manager `+0x20` is set as drain-in-progress at `0xBC4673` in
+`0xBC4620`, with observed caller application shutdown `0x3097B7`;
+it is cleared after drain completion/timeout.
+
+Neither flag establishes a normal-startup constructor rejection: enable is
+already set after successful startup and drain begins clear. Validation
+failure depends on actual request fields, not just auto-login invocation.
+Malformed URL/body or shutdown-reentrant constructor reachability was not
+established. The ignored submission result remains a precise code fact,
+not a demonstrated startup failure.
+
+## Tag 7 is permissive JSON-like text parsing, not binary framing
+
+Raw `0xC259EB..0xC25A14` wraps the stream at value `+0x20`;
+byte `+0x18!=0` enables extensions. Parser wrapper
+`0xC257C5..0xC2581D` obtains stream length, appends a NUL if empty
+or unterminated, then supplies adjusted length minus one to its parser.
+There is no length prefix. It parses one value without checking exhaustion
+of trailing input.
+
+Dispatcher table raw `0xC256F8`, selector `0xC2570C`, handles
+NUL as nil, either quote byte (`0x22/0x27`) as string,
+`[` as array, `{` as object, and other input as scalar token.
+Whitespace and commas (`0x20/0x09/0x0D/0x0A/0x2C`) are skipped;
+commas are not strictly enforced. Object keys require colon and collections
+use `]`/`}`; nesting limit is 32 (helpers `0x12E6250`,
+`0x322F50`, `0x384040`).
+
+String parser `0x12E6841..0x12E69DD` accepts both quote styles,
+copies unescaped bytes without UTF-8 validation, and supports
+`b/f/n/r/t/v`, octal-like escapes, `x` plus two hex digits, and `u`
+plus four. Hex/Unicode escapes use UTF-8-style encoder `0x12CFEA0`;
+surrogate-pair combination was not shown. Reaching NUL without a closing
+quote is accepted by the inspected loop
+(`0x12E6822..0x12E69F2`).
+
+Bare tokens admit alphanumerics and `_ + - .`, with buffer at most 255
+characters; exact `true/false/null` literals were verified in raw rdata.
+Numeric-looking tokens become float32-rounded VM numbers only if absolute
+converted value is strictly below 4,194,304
+(`0xC2567F..0xC256C6`); larger values remain strings. Full-token
+numeric validation was not established. Extension mode enables `0x...`,
+`sdb`, and `mat` branches; some invalid/unresolved extension values yield
+successful nil.
+
+Normal return is one with a 16-byte VM value: nil tag 0, Boolean 1,
+number 3, table `0x45`, and one-based integer array keys tag `0x13`.
+EH metadata verifies exception handler `0xC25837`: it logs
+`JSON error: %s`, resumes at `0xC25856`, and returns zero.
+Caller `0xC25A3D..0xC25A4B` then appends nil; rollback was not
+visible in this bounded trace and is the next explicit stack-contract
+check. Empty input fails, whereas embedded NUL can select successful nil.
+Malformed input is not uniformly failure, and failure-nil must remain
+distinct from successful nil.
+
+## Application shutdown drain pumps; timeout does not itself cancel
+
+Raw `0x3097B7` passes 3000 ms to `0xBC4620`, ignores its Boolean
+result, then calls `0xBBD570(3000)` at `0x3097C7`. This is application
+shutdown, not GUI logout `0x63F5C0`.
+Drain sets manager `+0x20=1` at `0xBC4673`, blocking new submissions.
+After sampling `timeGetTime` at `0xBC467E`, each iteration aggregates
+route pending count `+0x20` and workers with nonzero completion pointer
+`+0x1C` (`0xBC46AD..0xBC46D8`).
+Empty route tree (`0xBC46A1`) or aggregate zero (`0xBC4720`)
+returns one and clears the drain flag at `0xBC476C`: accounting drained,
+not proof that HTTP operations succeeded.
+
+Nonzero aggregate calls `0xBC4728 -> 0xBBDB60`, reaching route pump
+at `0xBBDD98`. It then calls IAT **VA** `0x1AC4188` at
+`0xBC472D`; zero triggers `Sleep(1)` at `0xBC4736`. Import identity
+of the former remains unresolved pending direct PE import parsing.
+Negative timeout loops indefinitely (`0xBC4741`); otherwise unsigned
+32-bit elapsed ticks must be strictly less than timeout to continue
+(`0xBC474F`). Equality expires, returns zero, and clears the flag at
+`0xBC475A`. There is no recount after pumping and before this deadline
+test, so work finishing in that pump can still yield timeout return zero.
+
+Drain itself neither dequeues/destroys requests nor closes HTTP handles
+on exit. Normal worker completion follows the previously traced callbacks,
+request destruction, response recycling, and context free.
+On shutdown's final-release arm, `0xBBD602 -> 0xBC4280` destroys the
+manager, then its global field is zeroed at `0xBBD60E`.
+Manager destructor closes session handle at `0xBC42BB`. Route
+destructor `0xBC3B80` tears down workers and dequeues pending requests,
+calling indirect deleting-destructor slot zero at
+`0xBC3C1A..0xBC3C29`, without visible ordinary completion callbacks.
+Worker teardown marks active context `+0x11=1` at `0xBC28CB`,
+closes connection `+0x20` at `0xBC28D7`, and destroys queued
+requests/pooled responses.
+
+Detached context/response destruction belongs to the previously traced
+HANDLE_CLOSING callback. No direct close of completion request handle
+`+0` was visible in this teardown scope; descendant-handle closure and
+indirect destructor guarantees remain unresolved. Timeout therefore leaves
+residual work to subsequent teardown, not an internal cancellation branch.
+
+## Parser exception restores machine frame, not output-stack cursor
+
+Raw `0xC257BE` saves machine ESP at `[ebp-0x10]`; this is distinct
+from output cursor `[a1+8]`, advanced by 16 bytes by parser value writes.
+Handler `0xC25837` logs and returns continuation **VA**
+`0x1026456` at `0xC25850`, mapping to raw `0xC25856`.
+There `xor eax,eax` produces status zero before common frame epilogue.
+No output-cursor restoration was found in that handler.
+
+Tag-7 caller `0xC25A14` consumes the EAX status, logs if greater than
+one, and for nonpositive status appends a nil at the current output cursor
+(`0xC25A3B..0xC25A49`). Positive status skips the fallback write.
+Thus any values appended before an exception remain before fallback nil;
+the nil is not rollback. The exact outer table insertion/stack effect of
+a concrete partial parse remains the next bounded check. Machine-stack
+exception unwinding must not be conflated with VM output-stack cleanup.
+
+## Drain scheduling call is SwitchToThread, not a message pump
+
+Direct PE import/OFT parsing resolves the previously unnamed drain call.
+All three entries are named imports, not ordinals:
+
+| DLL / import | Hint | OFT RVA / raw offset | IAT VA / raw offset |
+| --- | --- | --- | --- |
+| KERNEL32.dll / SwitchToThread | 1212 | `0x19BD1D4 / 0x19BBDD4` | `0x1AC4188 / 0x16C2D88` |
+| KERNEL32.dll / Sleep | 1202 | `0x19BD3C0 / 0x19BBFC0` | `0x1AC4374 / 0x16C2F74` |
+| WINMM.dll / timeGetTime | 148 | `0x19BDD70 / 0x19BC970` | `0x1AC4D24 / 0x16C3924` |
+
+Raw `0xBC472D` (PE VA `0xFC532D`) has bytes
+`FF 55 F0 85 C0 75 05 6A 01 FF 55 EC`: the saved SwitchToThread
+pointer is called, its nonzero result skips Sleep, and zero calls Sleep(1).
+This is thread scheduling, not application-message pumping. The distinct
+preceding `0xBBDB60` call is the established route-pump path.
+
+## Partial tag-7 failure can redirect the immediate table insertion
+
+A concrete static path refines the previous "extra values plus fallback
+nil" finding. Consider one payload entry with key `K`, tag-7 text bytes
+`5B 22 5C 75 00` (array opening, quote, backslash, `u`, NUL), and no
+event-text insertion (`a3=0`). This is a hypothetical byte fixture traced
+through instructions, not an executed sample.
+
+Array parsing pushes table `A` at raw `0xC252BE..0xC252CC`,
+rejects the immediate closing-bracket probe at
+`0xC252E0..0xC252ED`, then pushes index 1 and recurses at
+`0xC252EF..0xC25313`. Quoted parsing consumes its opening quote
+at `0x12E67DC..0x12E67E3`, finds insufficient bytes for the Unicode
+escape at `0x12E6838..0x12E686D`, and constructs/throws at
+`0x12E6AF4..0x12E6B3B`, before pushing a string value.
+The exception bypasses normal array insertion and the two-slot removal
+at `0xC25318..0xC25333`.
+
+Let VM top before outer conversion be `T`; each slot is `0x10` bytes:
+
+| Point | Stack suffix | Top |
+| --- | --- | --- |
+| Outer table push `0xC25E91..0xC25E9A` | `O` | `T+0x10` |
+| Outer key push | `O,K` | `T+0x20` |
+| Partial array push | `O,K,A` | `T+0x30` |
+| Array index push | `O,K,A,1` | `T+0x40` |
+| Throw/catch returning status zero | unchanged | `T+0x40` |
+| Tag-7 fallback nil `0xC25A41..0xC25A4B` | `O,K,A,1,nil` | `T+0x50` |
+| Outer insertion returns | `O,K,A` | `T+0x30` |
+
+Outer `0xC25F15` supplies index -3. Resolver
+`0xC27730..0xC27736` uses the current top, making `A` the target;
+`0xC285CA..0xC285D6` selects integer key 1, and
+`0xC285EF..0xC285F7` selects nil value. Cleanup at `0xC2862B`
+pops exactly two slots. This performs `A[1]=nil`, not `O[K]=nil`
+or `O[K]=A`; the outer key remains stranded.
+
+With one entry and `a3=0`, local conversion returns success with three
+slots `O,K,A` instead of one. Its epilogue and immediate wrapper
+`0xC25FB0..0xC25FC8` do not restore VM top. This is bounded to the
+established catch behavior and normal insertion return. Higher callback
+argument construction/protected-call restoration is the next explicit
+check; no observed runtime outcome or end-to-end vulnerability is claimed.
+
+## Final network release destroys the manager before its timed pump
+
+The bounded final-release trace corrects any implication that the
+`BBD570(3000)` timeout gates manager destruction: the final-release arm
+destroys/frees the manager and clears network owner `+0xA0` **before**
+its timed tracking-vector pump. The worker corrected its initial label:
+all code addresses in this trace are raw offsets. Instruction raw
+`0x307200` encodes global operand VA `0x1DFFF70`, not a raw offset.
+
+Network count is owner `+8`, reached through global **VA** `0x1DFFF70`.
+First acquisition sets owner-thread ID `+0xBC` and count one.
+Subsequent acquisition uses an ordinary non-atomic increment; acquisition
+and release assert current-thread ID equals the owner rather than guarding
+the count with a mutex. Zero count release returns; count greater than one
+decrements and returns without teardown. At exactly one, teardown runs
+while count remains one, then stores zero at the end. The release function
+does not return a success/failure Boolean.
+
+After manager destruction it pumps while tracking vector `+0xA4/+0xA8`
+is nonempty, sleeping 10 ms between attempts while unsigned elapsed ticks
+are at most the supplied 3000 ms. Expiration proceeds to cleanup, not
+failure; pump/sleep duration is not a strict wall-clock bound.
+The subsequent thread helper receives timeout zero, which it translates
+to INFINITE for WaitForSingleObject. Thus 3000 ms does not bound the join.
+
+Normal startup acquires once with flag one; another observed direct caller
+acquires only when count was zero. This supports an ordinary single-ref
+path, not an unconditional guarantee: app shutdown does not force/check
+count one before release, and only the final-reference arm tears down.
+The next task identifies tracking-vector elements and removal after manager
+destruction.
+
+Exact final-release sites: first acquisition sets owner ID at `0xBBD1BC`
+and count one at `0xBBD1C2`; later acquisition increments at `0xBBD1AE`.
+Release zero check is `0xBBD578`; decrement-only path
+`0xBBD5AD..0xBBD5BA`; final zero store `0xBBD6E0`.
+Manager destruction is `0xBBD602 -> 0xBC4280`, global-owner `+0xA0`
+clear at `0xBBD60E`. Tracking pump call is `0xBBD642`, elapsed
+comparison `0xBBD669`. Join `0xBBD670 -> 0x12BFF70(owner+0x48,0)`
+maps zero to INFINITE at `0x12BFFC0`, calls WaitForSingleObject at
+`0x12BFFC5`, and converges on handle/running cleanup at
+`0x12C003B..0x12C0048`, including diagnostic paths.
+
+## Enclosing callback restores top but does not repair partial-parse selection
+
+The bounded higher-caller trace uses the stipulated one-entry fixture with
+null event-text parameter (`a5=0`); the actual nonnull-event branch remains
+the next check. Let entry VM top be `T0` and each slot occupy 16 bytes.
+Lookup at raw `0xC3B46C` pushes handler `H` and nonnil result `F`.
+Conversion at `0xC3B4C1` leaves `H,F,O,K,A` on the previously traced
+failure path. Its Boolean success becomes argument count **one** at
+`0xC3B4CD`, not the actual three-slot growth.
+
+Protected call `0xC3B551` requests one result and uses saved-top-plus-one
+as error-handler index (selecting `H`). Selection at `0xC289F1`
+uses current top minus `16*(nargs+1)`, selecting `K` as the callable
+with argument `A`, not intended `F(O)`.
+On a returned success (`0xCD7370`) or protected failure
+(`0xCD7890 -> 0xCD6B00`), top becomes K-slot plus 16,
+leaving `H,F,O,result-or-error`. Cleanup
+`0xC3B5BC -> 0xC278F3` resets top exactly to `T0`.
+
+Thus returned-path cleanup bounds leftover live slots; it does not repair
+the earlier callable selection. The runtime `__call` target for `K`
+through `0xCD7080` remains unresolved; this trace does not establish
+reaching native indirect `0xCD728C`, actual execution, or an end-to-end
+vulnerability.
+
+## Post-manager tracking vector owns socket handlers, not HTTP contexts
+
+The network owner's `+0xA4/+0xA8/+0xAC` are pointer-vector
+begin/end/capacity. Representative producer raw `0xBE1040` allocates
+`0xA0` bytes, constructs via `0xBEC2E0`, and registers through
+`0xBE10CE -> 0xBBD730`. Constructor logging identifies UDP with
+label `SimpleSocketReplayReader`; the vector also includes Matrix game
+UDP sockets. Append `0xBBD7E3 -> 0xBBF410` stores the pointer at
+`0xBBF467` and advances end four bytes at `0xBBF469`.
+
+Registration calls virtual `+8`, resolved to `0xBEC280`, storing network
+back-pointer at socket `+0x3C`; it does not AddRef the socket.
+Vtable **VA** `0x1C73D78`, raw `0x1872978`, slot `+0xC` resolves
+to `0xBEC2B0`: nonnull `this` invokes deleting-destructor slot zero
+with flag one. This is owning polymorphic deletion, not refcount release.
+
+Reader destruction `0xBED1C0` clears socket owner `+0x40` and changes
+open states to 4, requesting close through `0xBED0F0`.
+Close completion `0xBED590` enqueues sentinel 1; pump virtual `+0x14`,
+raw `0xBEDAA0`, consumes it, changes state 4 to 5, clears queues, and
+returns false. Network pump destroys at `0xBBDD39`, compacts the vector
+and decrements end at `0xBBDD55..0xBBDD5B`.
+
+Post-manager pumping explicitly skips HTTP manager work if `+0xA0==0`
+at `0xBBDD8E..0xBBDD98`, while socket handlers/network state remain.
+This establishes structural separation, not complete callback-lifetime
+safety: owner callbacks and virtual network close operations remain
+indirect. Remaining-vector cleanup after timeout and ordering against the
+infinite thread join are the next bounded questions.
+
+## Actual event callback also redirects partial-parse insertion
+
+The actual drain at raw `0xC38D38..0xC38D5C` calls
+`0xC3B3C0(handler=record[8] or "", payload=entry[4], result=NULL,
+eventtext=record[0] or "")`. Fallback is a verified NUL string;
+event text is nonnull even when empty. It is forwarded into
+`0xC25E30` at `0xC3B4B9..0xC3B4C1`.
+
+On normal conversion the suffix is `H,F,O`, and reserved insertion
+sets `O.event=eventtext`; the protected call selects `F(O)`.
+On the established partial-parse fixture the suffix is `H,F,O,K,A`.
+Reserved insertion pushes `"event"` and event text, then resolves
+`-3` relative to current top; it sets **`A.event=eventtext`**, pops
+those two slots, and leaves `H,F,O,K,A`. Conversion still reports true
+and the caller supplies nargs one, selecting **`K(A)`**.
+
+This path requires dispatcher enabled, VM/context present, nonempty handler,
+nonnil callback lookup, and successful conversion stack reservation.
+Protected returned paths still restore entry top through
+`0xC3B5BC -> 0xC278F3`. The actual native target and runtime occurrence
+remain unresolved; static wrong-selection bookkeeping alone is not an
+end-to-end security claim.
+
+## Residual socket deletion follows the worker join
+
+Raw `0xBBD670 -> 0x12BFF70` first calls thread virtual `+8`,
+resolved here to bare-return `0x2EB8C0`, sets network owner stop byte
+`+0x4C=1`, and waits INFINITE. Returned join closes thread handle
+`+0x54` and clears running byte `+0x4D`.
+Only afterward does `0xBBD690..0xBBD6B0` invoke virtual `+0xC`
+on each residual socket-vector entry; `0xBBD6B8` resets end to begin,
+retaining capacity.
+
+Representative deleting chain is `0xBEC2B0 -> slot0(1) ->
+0xBEC440 -> 0xBEC480`. Call `0xBEC4FF -> 0xBE36B0` performs
+`shutdown(socket,2)`, `closesocket`, and handle invalidation before
+object cleanup/free. Then final release closes IOCP at `0xBBD6CA`
+and calls WSACleanup at `0xBBD6DA`.
+
+No explicit pre-join close-all was found in this path. Worker `0xBBDE6C`
+can request socket virtual `+0x10(1)`, but universal pre-join closure is
+unproven. A blocking-join conclusion cannot be inferred merely from that
+ordering; the next task traces stop-byte reads, IOCP wait timeout, and wake
+mechanisms.
+
+## Extension dispatch: numeric handles and table lookup, format mapping pending
+
+Raw `0xC25790` forwards its third-argument extension flag to
+`0xC25190` at `0xC25822..0xC2582D`. Standard true/false/null
+handling precedes the extension gate; false flag skips these branches.
+The bounded extension report establishes:
+
+- `0xC2548D..0xC254EE` tests case-sensitive prefix `0x`, scans one
+  64-bit value initialized to zero, logs on scan failure but continues.
+  `0xC549A0` yields userdata VM tag 71 for nonzero or nil tag 0 for zero.
+- `0xC254F3..0xC25616` matches whole token `sdb`, then scans its next
+  lexeme into a 128-byte text buffer and DWORD, requiring two conversions.
+  Failed conversion or unknown table key in a 52-entry lookup yields nil
+  (`0xC2557C..0xC25597`). A normal nonzero result yields userdata;
+  zero yields nil. Key index 14 uses a separate string/node path.
+- `0xC25621..0xC256D0` matches whole token `mat` and passes its next
+  lexeme through `0xC27FE0`.
+
+The worker read operands `0x1BBACAC/0x1BBACD0` as nontext without
+establishing their raw mapping. Their format strings and the `mat`
+helper interpretation remain withheld pending a focused VA-to-raw check;
+the latter report conflicts with the earlier NUL-string-push identification.
+Do not treat this partial report as exact extension delimiters or confirmed
+material-object semantics.
+
+## Extension formats resolved; mat is text, not a material wrapper
+
+Direct PE mapping corrects the unresolved reads above. Image base is
+`0x400000`, `.rdata` RVA/raw `0x16C4000/0x16C2C00`.
+Format operand **VA** `0x1BBACAC` maps to raw `0x17B98AC`,
+bytes `%127[^:]:%u\0`; **VA** `0x1BBACD0` maps to raw
+`0x17B98D0`, bytes `0x%llx\0`. Both parser calls target imported
+cdecl `sscanf`. Reading the operands as raw offsets caused the earlier
+nontext result; it was not missing/dynamically decoded format data.
+
+Case-sensitive `0x` scans a zero-initialized uint64, logs scan failure but
+continues, and passes the result to `0xC549A0` for nil or userdata
+tag `0x47`. Exact `sdb` consumes another lexeme, scans a table name
+up to 127 bytes before colon and an unsigned ID, and requires two
+conversions. A form such as `sdb "ItemType:123"` is needed because
+the unquoted token alphabet excludes colon. The 52-name lookup is
+case-sensitive; index 14 is `LocalizedString`, whose special output path
+is the next bounded trace.
+
+Exact `mat` consumes another lexeme and pushes its text through
+`0xC27FE0` (ECX=VM, EDX=C string). That helper produces string tags
+`0x44/0x54`, or nil for null. The previous material-derived-object
+interpretation is superseded; no material lookup was established.
+
+## IOCP worker observes stop through finite dequeue passes
+
+Let network owner be `N`, embedded PumpThread `T=N+0x48`.
+Join writes `T+4=N+0x4C`; worker reads the same byte at raw
+`0xBBC878` and `0xBBC9CE`. Thread handle is `T+0xC=N+0x54`,
+running byte `T+5=N+0x4D`.
+Dequeue at `0xBBC911` calls GetQueuedCompletionStatus through
+IAT **VA** `0x1AC432C`, raw `0x16C2F2C`, using IOCP from
+`[global VA 0x1DFFF70]+0xDC`.
+
+Each outer pass sets `EBX=500` at `0xBBC8B6` and initial timeout zero
+at `0xBBC8DB` (pushed `0xBBC8F0`). A failed dequeue with null
+OVERLAPPED enters `0xBBC949`: first occurrence schedules 500 ms and
+clears EBX; another such failure exits the inner pass. Any dispatched
+completion resets next timeout to zero at `0xBBC9BB`.
+Inner passes cap at 100 dequeue attempts (`0xBBC9C1..0xBBC9C5`),
+then reread stop at `0xBBC9CE`. Thus at most one 500-ms dequeue wait
+occurs per pass, not 100 times 500 ms; a quiet worker needs no external
+completion to observe stop.
+
+PumpThread vtable **VA** `0x1C734D4`, slot `+8`, contains
+**VA** `0x6EC4C0`, raw `0x2EB8C0`, a bare return. Join calls it
+before setting stop (`0x12BFF99..0x12BFF9F`); it posts nothing.
+A real post at `0xBBDA03..0xBBDA10`, after socket closure in
+`0xBBD940`, sends `(port,0,key,NULL)` and dispatches key virtual
+`+0x1C`: a close notification, not stop sentinel.
+
+Finite waits establish a path to stop observation, not a universal bound
+on the infinite join: maintenance takes critical section `N+0x6C` and
+calls socket virtual `+0x10(1)` at `0xBBDE6C`; completion callbacks
+can also delay progress. Intervening work returning and scheduling/visibility
+remain assumptions. The next trace follows keyed-close ownership and
+failed-post behavior, rather than claiming deadlock from the join alone.
+
+## LocalizedString extension returns text through unresolved service slots
+
+Raw `0xC255B5..0xC25603` handles lookup index 14 through singleton
+virtual `+0xD0`, then returned-object virtual
+`+0x108(this,&temporary,uint32_id)`. Concrete targets remain unresolved.
+The result object's first DWORD supplies a NUL-terminated byte string;
+null selects verified empty string **VA** `0x1C5EA58`, raw
+`0x185D658`. `0xC27FE0 -> 0xCD5020` interns through strlen/strcmp:
+the output is text, not userdata, but its Unicode encoding is unproven.
+Scan failure/unknown key yields nil at `0xC25608` while reporting parse
+success. Ordinary SDB references produce subtype-2 userdata; the separate
+`0xC549A0` handle path produces subtype 1. Zero handles yield nil.
+Missing-row/localization fallback semantics require resolving service slots.
+
+## Keyed close notification borrows the vector-owned socket pointer
+
+Reader RTTI is `nl::SimpleSocketReplayReader`; destructor callsites
+raw `0xBE1214/0xBE12A4` load socket from reader `+0xC` and call
+`0xBED1C0`. That helper locks socket `+0x88`, clears owner `+0x40`,
+and branches on state `+0x54`: states 1/2 become 4 at `0xBED241`
+and request close; state 3 becomes 5 and drains through `0xBEC5B0`
+(diagnosing a noninvalid handle); state 0 becomes 5 directly. Other states
+reach diagnostic `0xBED29B`, without a retry branch.
+
+Close `0xBED0F0` acts only if socket byte `+0x81==0`; it sets the
+byte **before** calling network virtual `+8(socket,&handle)` at
+`0xBED16F`. It diagnoses missing network back-pointer `+0x3C` and
+handle remaining valid afterward. The network target `0xBBD940`
+diagnoses invalid inputs/port, closes the handle, stores -1, then posts
+`(port,0,socket,NULL)` at `0xBBDA10`.
+The key is the socket pointer with no extra AddRef; lifetime comes from
+the owning network vector.
+
+Successful dequeue invokes socket slot `+0x1C` at `0xBBC9B8`.
+ManagedUDP vtable **VA** `0x1C73D78` resolves it to `0xBED590`,
+which diagnoses valid handle or already-set byte `+0x80`, sets that
+byte, and enqueues sentinel 1. `0xBEDAA0` consumes 1, changes
+state 4 to 5, drains, and returns false; vector pump deletes at
+`0xBBDD39` through `0xBEC2B0 -> slot0(0xBEC440,1) ->
+0xBEC480 -> free`.
+
+Post return BOOL propagates out of `0xBBD940`, but `0xBED0F0`
+ignores it. No result-based diagnostic, retry, rollback, reference
+adjustment, or fallback was found in that local path; the pre-post port
+diagnostic is not failure handling. Without another event, state 4 remains
+retained and `+0x81` suppresses another close/post. Alternative maintenance
+or pump transitions are the next bounded check; diagnostic termination and
+global absence of recovery remain unresolved.
+
+## ManagedUDP maintenance does not resolve closing state in inspected paths
+
+Vtable raw `0x1872978` resolves slot `+0x10` to `0xBED960`
+and `+0x14` to `0xBEDAA0`. Network maintenance passes one at
+`0xBBDE6A..0xBBDE6C`; that argument immediately skips work at
+`0xBED98E..0xBED992`. Argument zero processes only states 1/2
+(`0xBED9B6..0xBED9C1`), excluding closing state 4.
+
+In the socket pump, empty queue with state 4 returns true at
+`0xBEDC84..0xBEDC93`, retaining the handler. Ordinary packets skip
+delivery outside states 1/2. Sentinel 2 calls close helper `0xBED0F0`,
+whose already-set `+0x81` suppresses another post
+(`0xBED135..0xBED142`). Sentinel 1 diagnoses a noninvalid handle,
+then changes 4 to 5 (`0xBEDBF8..0xBEDC20`).
+Neither inspected maintenance nor empty-queue branch supplies independent
+timeout/fallback completion after failed posting. Other sentinel producers
+remain the next bounded question, not a basis for a universal no-recovery
+claim.
+
+## Localization accessor is uiManager +0x974
+
+The parser singleton is the established uiManager global **VA**
+`0x1E002B8`, not a separate unknown singleton. Its vtable
+**VA** `0x1C73EBC`, slot `+0xD0` at raw `0x1872B8C`,
+contains **VA** `0x1024560`, raw `0xC23960`.
+That function returns `[this+0x974]` with a null diagnostic guard.
+The bounded trace did not resolve assignment/type of `+0x974`,
+service slot `+0x108`, or missing-ID behavior. Follow-on scope is those
+field stores, not repeating the already verified singleton bootstrap.
+
+## ManagedUDP sentinel producers narrowed
+
+The queue at socket `+8` uses raw helper `0x12CE310`.
+Close callback `0xBED590` checks handle `+0x44==-1` and flag
+`+0x80==0` diagnostically, sets the flag, and enqueues 1 at
+`0xBED5E2`. Error callback `0xBED5F0` optionally logs a nonzero
+error then unconditionally enqueues 2 at `0xBED66D`; receive-error
+dispatch uses virtual `+0x20`. Ordinary receive allocations enqueue at
+`0xBED839`.
+
+Forced state-5 stores `0xBED255/0xBED281` in `0xBED1C0` lie in a
+switch restricted to incoming states 0..3, not a state-4 fallback.
+No additional sentinel-1 producer was found in the inspected references;
+indirect coverage is incomplete. This narrows the no-fallback result
+without converting it into a global absence claim. Next work follows
+ManagedUDP's distinct receive/error path rather than extrapolating
+GameSocket semantics.
+
+## Localization field assignment and service allocation
+
+Raw `0xBFB51A` (PE VA `0xFFC11A`) stores `ESI` into
+`[EDI+0x974]`, sourced from uiManager initializer's third argument.
+Caller `0x30B1EE` pushes service global **VA** `0x1DFFFC0`;
+`0x30B200` calls uiManager slot `+0x1C`.
+Service creation requests `0xA5C` bytes at `0x310C76`, invokes
+constructor raw `0x3DA9D0` (VA `0x7DB5D0`) at `0x310C93`,
+and stores its result into wrapper `+0x10` at `0x310C9C`, backing
+that global.
+
+Concrete service vptr and slot `+0x108` remain unresolved. The next
+check is constructor `0x3DA9D0`'s vptr stores and any this adjustment,
+not uiManager bootstrap again.
+
+## ManagedUDP error suppression differs by failure layer
+
+The active-sample instruction trace separates these cases:
+
+| Failure layer / raw range | Observed handling |
+| --- | --- |
+| IOCP dequeue with nonnull OVERLAPPED, `0xBBC973..0xBBC983` | Error 995 skips callback entirely; all others, including 996 and 10038, reach slot `+0x20` unchanged |
+| Receive WSAGetOverlappedResult(FALSE), `0xBED738..0xBED766` | Error 996 returns without callback/repost; 995/10038 become zero before slot `+0x20`; others pass unchanged |
+| ManagedUDP slot `+0x20`, `0xBED5F0` | Nonzero logs, zero suppresses logging only; both enqueue sentinel 2 at `0xBED66D` |
+
+Socket `+0x98` owns persistent `0xA0`-byte receive operation with
+zero-initialized first `0x14` bytes OVERLAPPED, sockaddr at operation
+`+0x18`, and address length `+0x98`, reset to `0x80`.
+Socket `+0x50` is receive buffer and `+0x4C` its capacity, default
+`0x4000`. Receive `0xBED690` locks socket `+0x88` and skips
+everything if closing byte `+0x81` is set.
+
+Only successful result retrieval reaches WSARecvFrom repost at
+`0xBED8F5`, reusing the operation/buffer even for zero-byte success.
+Nonempty data first enqueues a separate `0x38`-byte packet at
+`0xBED839`; its payload ownership is the next check before assuming
+independence from the reused receive buffer. Neither error layer frees or
+replaces persistent receive storage; destructor `0xBEC480` frees it.
+Socket `+0x48` is a distinct retained send item, not this operation.
+These are ManagedUDP-specific findings, not inherited GameSocket behavior.
+
+## Localization service slot +0x108 resolves to 0x3E0620
+
+Constructor raw `0x3DA9D0` stores its primary vptr at `0x3DAA03`:
+**VA** `0x1C63014`, raw `0x1861C14`. Slot `+0x108` at raw
+`0x1861D1C` / **VA** `0x1C6311C` points directly to raw
+`0x3E0620`, **VA** `0x7E1220`, not a this-adjusting thunk.
+Constructor returns its original pointer.
+
+Target `0x3E0620` calls provider global **VA** `0x1E00100`,
+virtual `+0(out,id,0)`, at raw `0x3E065C`.
+Null returned text selects empty **VA** `0x1C5EA68`, raw
+`0x185D668`. This fallback is distinct from the parser's outer empty
+string address. Missing-ID-to-null behavior remains unproven until provider
+dispatch is resolved; the next scope is that global's assignment/slot zero,
+not the already resolved service/bootstrap chain.
+
+## ManagedUDP queued packets snapshot receive bytes and lend the blob
+
+Raw `0xBED796..0xBED839` allocates `0x38`-byte packet records:
+
+| Offset | Observed field |
+| --- | --- |
+| `+0` | 64-bit timestamp |
+| `+8` | Endpoint: flags `+8`, IPv4 `+0xC`, IPv6 `+0x10..+0x1F`, port `+0x20` |
+| `+0x28` | Blob vptr |
+| `+0x2C/+0x30` | Backing descriptor / ownership control |
+| `+0x34` | Alignment, initially zero |
+
+`0xBED7E6` calls blob slot `+0x1C(0)`; `0xBED7F6` calls slot
+`+0x10(socket.recvBuffer,receivedLength)`, target `0x12CB9D0`.
+That helper resizes fresh backing and copies exactly receivedLength bytes
+to descriptor data at `0x12CB9F0`. This is a byte snapshot, not an alias
+of the persistent receive buffer. Queue `0xBED839 -> 0x12CE310`
+stores the packet pointer without cloning/AddRef; only then does
+`0xBED8F5` rearm reception.
+
+Dequeue `0xBEDAF9 -> 0x12CE400` recycles the queue node and returns
+the packet. States 1/2 deliver through owner slot `+4` at
+`0xBEDB3C..0xBEDB4E` with borrowed blob pointer, endpoint pointer,
+and timestamp low/high. Reader construction installs reader `+8` as owner
+at `0xBE110F`; interface vtable **VA** `0x1C73C88`, slot `+4`,
+resolves to `0xBE1450`. Matching endpoint forwards the borrowed blob
+synchronously to `0xBE0110`; mismatches only log. Retention beyond that
+call is the next explicit check.
+
+After callback, or immediately outside states 1/2,
+`0xBEDB51..0xBEDB86` decrements packet control strong `+4`;
+zero calls control slot zero, then weak `+8` is decremented and slot
+`+4` called on zero. Packet storage is freed afterward.
+Queue drain `0xBEC674..0xBEC6BC` applies the same release/free without
+callbacks. Owner `+0x40` is assertion-checked, not safely null-guarded;
+delivery has no explicit surrounding lock in this inspected path.
+Concurrent shutdown/callback safety remains unresolved rather than inferred
+from the assertion.
+
+## Localization provider is tfGlobalizationManager
+
+Provider global **VA** `0x1E00100`, raw `0x19FE500`, is singleton
+wrapper **VA** `0x1E000F0` plus `0x10`.
+Assignment raw `0x312799` / VA `0x713399` stores the constructed
+`0x24`-byte provider through wrapper `+0x10`.
+RTTI identifies `tfGlobalizationManager`; constructor raw `0x38FC50`,
+VA `0x790850`, writes vptr at `0x38FC58`:
+**VA** `0x1C629B8`, raw `0x18615B8`.
+
+Slot zero points to **VA** `0x7912F0`, raw `0x3906F0`, leading
+through `0x3909C0` to `0x6A8AB0`.
+ID zero bypasses lookup with initial verified empty text.
+Raw `0x6A8B3C` tests null lookup output, and
+`0x6A8B5E..0x6A8B6D` checks selector/AL before capacity handling.
+Lookup `0x6A8BE0`, actual missing-ID outcome, and language/fallback
+selection remain unresolved. The next scope is that lookup's internals,
+not the now-complete provider bootstrap.
+
+## ReplayReader discriminator 1 copies into reader-owned blob storage
+
+Raw `0xBE1508 -> 0xBE0110` enters the parser synchronously.
+At `0xBE0140..0xBE0192`, packet bytes become a stack-local borrowed
+cursor and the discriminator is consumed. The discriminator-1 branch
+`0xBE01F9..0xBE023F` selects a reader-owned blob through `0xBDFA90`
+(container at reader `+0xC`), grows it, gets writable data plus old
+length, and copies remaining packet bytes. Explicit memcpy occurs at
+`0x336B72..0x336B79` through `0x159D8F4`.
+
+Destination helper `0x12CBCB0` reuses suitable unique backing or allocates
+and installs new backing at `0x12CBE07/0x12CBE15`.
+No packet-control increment or persistent packet-pointer store was found
+on this path. Its stored bytes therefore survive independently of immediate
+packet release. Other discriminators, their length checks, and their
+ownership behavior remain separate follow-on scope.
+
+## Localization ID remap, language fields, and English fallback
+
+All code addresses below are raw offsets; table addresses are explicitly
+PE VAs in runtime storage, not file-backed strings.
+Lookup `0x6A6B00` uses unsigned 32-bit ID against records at **VA**
+`0x1E55E48`, count **VA** `0x1E55E4C`, stride `0x1C`, key
+at record `+0x18`. Lower-bound helper `0x6AA040` compares unsigned;
+`0x6A6B60..0x6A6B69` rejects end/nonmatching keys.
+
+Optional remap `0x6A8BEE..0x6A8C1F` runs only when the flag's low
+byte is zero, using pointer/count **VA** `0x1E55DD8/0x1E55DDC`,
+stride 8, original ID `+4`, replacement ID `+0`. No match preserves
+the original ID.
+Manager `+4` supplies language selector at `0x3909D9`; byte-verified
+language table **VA** `0x1DE0868` establishes:
+
+| Selector | Language | Text pointer offset in record |
+| --- | --- | --- |
+| 0 | en | `+0x10` |
+| 1 | ko | `+0xC` |
+| 2 | de | `+0` |
+| 3 | fr | `+4` |
+| 4 | zh | `+0x14` |
+| 5 | ru | `+8` |
+
+Null/empty selected text falls back to English `+0x10` at
+`0x6A8C6F..0x6A8C84`; out-of-range selectors directly select English.
+Missing ID sets `*out=0`, returns `AL=0`. Existing record returns
+`AL=1` even if English fallback is null/empty, so result existence and
+nonempty translated text are distinct.
+Actual IDs/text depend on loaded runtime data. Producer/loading, remap
+ordering, and table ownership are the next bounded questions.
+
+## ReplayReader outer discriminator and truncation ledger
+
+Raw `0xBE018C` reads one unsigned discriminator byte after shortage
+check `0xBE0170..0xBE0180`; cursor advances at
+`0xBE018E..0xBE0192` and remaining length decrements at
+`0xBE01C0..0xBE01C3`. Comparisons `0xBE01C6..0xBE01D0`
+recognize only 0 and 1. Let supplied byte length be N.
+
+| Discriminator | Raw branch | Reads / effects | Successful consumption |
+| --- | --- | --- | --- |
+| 0 | `0xBE0258` | Copy 24 bytes into `this+0xB0..0xC7` via `0x336B50`; `0x12EE170` reads LE16 L and supplies L bytes to embedded destination `this+0xC8`, slot `+0x10` | `27+L`; trailing bytes ignored here |
+| 1 | `0xBE01F9` | `0xBDFA90` selects reader-owned blob with argument N-1; nonnull destination follows established append/copy at `0xBE023F` | N; null result logs and consumes only discriminator |
+| 2..255 | `0xBE01D2` | Log unsigned discriminator at `0xBE01DD`, return through `0xBE01E5` | 1; no further owner-field writes observed |
+
+Borrowed cursor shortage slot at raw `0x1860D2C` resolves to
+`0x3570F0 -> 0x159E27A -> _CxxThrowException`: shortage is not
+a clean unknown-case return. Fixed 24-byte check
+`0x336B5D..0x336B70`, missing LE16 check
+`0x12EE17E..0x12EE18F`, and missing L-byte payload check
+`0x12EE1CD..0x12EE1DA` invoke it before their respective reads/call.
+Case 0 is not transactional: its fixed 24-byte write precedes later
+length/payload checks. L zero skips destination invocation at
+`0x12EE1C8..0x12EE1CB`, leaving prior destination bytes unchanged.
+
+After case-0 success, nonzero `this+0xD8` is cleared at `0xBE0288`;
+the 24 bytes propagate to `[[this+4]+0x90..+0xA7]` and owner
+byte `+0x8E=1` at `0xBE02C3..0xBE02E4`.
+Zero `+0xD8` skips propagation. Destination type and enable-state
+meaning are the next bounded check; field semantics remain unassigned.
+
+## Localization metadata initializer found; row source/order unresolved
+
+Raw `0x32C070` resolves fields from a generic DWORD-pointer object
+through hash lookup `0x1310670`, then stores table owner/data/count.
+Remap metadata assignment `0x32C191..0x32C1A0` uses hash
+`0xD1ACBFD5`; primary metadata assignment
+`0x32C462..0x32C481` uses hash `0x97DFAFF9`.
+This is evidence of generic object-backed metadata binding, not a proven
+SDB-specific row loader.
+
+Consumer `0x669090` uses primary count/stride `0x1C`, performs key
+lookup, and copies selected text. It is not the producer. Small assignment
+helpers `0x7403D0/0x740450` have no direct xrefs in the bounded IDA
+search. Row origins, copying, sort validation, and owner-retain/release
+remain unresolved; lower-bound lookup alone does not establish that a
+loader enforces ordering. Next work verifies exact owner fields and their
+replacement/lifetime mechanism.
+
+## Replay case-0 destination replaces bytes; request arms propagation
+
+Raw constructor `0xBDFBC0` installs slBlob vptr **VA**
+`0x1C80CC4` at reader `+0xC8`, zeros `+0xCC..+0xD7`,
+and clears `+0xD8`. Slot `+0x10`, **VA** `0x16CC5D0`
+(raw `0x12CB9D0`), resizes to L then copies at offset zero:
+case-0 payload handling is replacement, not append. Destructor
+`0xBDFCB0` releases its reference-counted backing.
+
+Entry `0xBDFD80` arms `+0xD8` before forwarding through
+`[this+8]` slot `+8`; case-0 success clears it before publishing to
+the owner. Concrete forwarded operation/caller is the next scope.
+The fixed `+0xB0..+0xC7` remains an opaque 24-byte record.
+Zero-length destination preservation and nontransactional earlier writes
+remain as previously established.
+
+## Localization globals borrow their containing table object's storage
+
+The verified metadata layout is:
+
+| Table | Context VA | Rows VA | Count VA |
+| --- | --- | --- | --- |
+| Remap | `0x1E55DD4` | `0x1E55DD8` | `0x1E55DDC` |
+| Primary | `0x1E55E44` | `0x1E55E48` | `0x1E55E4C` |
+
+These are zero-initialized `.data` virtual-tail globals, **without
+file-backed raw offsets**. Mechanical section-delta subtraction would
+identify unrelated bytes in another section.
+Raw `0x32C187..0x32C1A0` and `0x32C457..0x32C481` store
+lookup result rows, incoming `this` (saved as ESI at `0x32C07F`),
+and count. Lookup `0x1310670` searches the tree at object `+0x34`;
+node `+0x14` points to a holder. Success returns holder `+0xC`
+and writes holder `+4` to count. Missing key explicitly returns zero
+and count zero at `0x13106B5..0x13106C5`, still storing context.
+
+The global triple stores do not retain/release anything. Alternate setters
+`0x7403D0/0x740450` likewise overwrite three DWORDs; inspected
+context-global references are assignments only.
+Containing-object reset `0x1312030` supplies actual cleanup:
+optional catalog-entry callback `+0x24` gets rows/count at
+`0x1312091..0x13120A2`; holder `+0x18` provides ownership handle.
+Atomic decrement of handle strong `+4` invokes slot zero on resulting
+zero, then weak `+8` invokes slot `+4` on resulting zero.
+Holder cleanup/free helper is `0x12C8D60` at `0x13120E5`.
+Instruction `lock xadd` plus branch tests the updated count; misleading
+decompiler old-count comparisons must not substitute for it.
+The corresponding retain site remains unverified.
+
+Loading entry `0x130FF0A..0x130FF10` resets an already-loaded object
+before replacement; app `0x309331` calls it with context **VA**
+`0x1E4BAB0`. Metadata callback `0x32C070` has no discovered direct
+call; its actual **VA** `0x72CC70` appears at raw `0x1860980`,
+**VA** `0x1C61D80`, reported slot `+4` of that context's table.
+The precise indirect trigger and global-rebinding order remain the next
+check. Row source format and sorted-order validation remain unestablished.
+
+## Metadata callback is invoked after successful decoded-block parsing
+
+Raw constructor `0x32C028` installs vtable **VA** `0x1C61D7C`
+into context **VA** `0x1E4BAB0`. Raw table bytes at `0x186097C`
+are `40 CC 72 00 70 CC 72 00 00 0F 73 00`: slot `+4`
+is **VA** `0x72CC70`, raw `0x32C070`; slot `+8` is **VA**
+`0x730F00`, raw `0x330300`.
+Exact success invocation is `0x13104B7: mov eax,[edi]`,
+`0x13104B9: mov ecx,edi`, `0x13104BB: FF 50 04`.
+
+On inspected normal success, decoded-block parsing completes, context
+loaded byte `+9=1` is stored at `0x13104A7`, temporary text is
+released, then slot `+4` binds metadata before success return.
+Already-loaded replacement resets at `0x130FF10`; reset invokes slot
+`+8` at `0x1312065` **before** clearing loaded byte and destroying
+holders/backing. Open failures return false without success callback;
+parser-false calls reset at `0x131047A`, then returns false.
+Exception unwinding is outside this bounded result.
+
+One separate metadata triple, **VA** `0x1E4ED14/0x1E4ED18/0x1E4ED1C`,
+is cleared by reset helper `0x7129A0` and rebound through
+`0x712A00` at `0x32C0AE`. This does **not** by itself establish
+clear/reset coverage of localization/remap triples `0x1E55DD4...`
+and `0x1E55E44...`; those exact slot-`+8` helper paths are the next
+check rather than extrapolating from another table.
+
+## Replay propagation arming forwards no request bytes
+
+The prior "header request" label is not established by its implementation.
+Raw `0xBDFD80` sets `this+0xD8=1`, loads interface `this+8`,
+and tail-jumps slot `+8` without stack arguments or serialized bytes.
+SimpleSocketReplayReader constructor `0xBE1040` installs interface
+vtable **VA** `0x1C73C88`; its slot `+8` contains **VA**
+`0xFE2200`, raw `0xBE1600`.
+
+That target only checks `[interface-4]` (owner `+4`), diagnoses zero
+with code `0x3D`, then returns. It is not a request writer.
+Separate successful case-0 publication still clears armed `+0xD8`,
+copies the opaque 24-byte record to owner `+0x90..+0xA7`, and sets
+owner `+0x8E=1`. Bounded xref/direct-call searches found no callers
+of the arming entry; no specific request frame or record semantics were
+established. Next work follows owner construction and concrete consumption
+of the published record/byte.
+
+## Replay reader reciprocal link is not its publication owner
+
+The bounded owner-consumer search did not identify a concrete publication
+owner type or a consumer of owner `+0x8E/+0x90..+0xA7`.
+Constructor raw `0xBDFBC0` initializes reader `+4` to null, stores its
+second argument at reader `+8`, and writes the reader pointer to that
+argument's `+4`. Destructor `0xBDFCB0` verifies/clears that reciprocal
+link. These are distinct fields; constructor argument two does not by
+itself establish reader `+4`'s later owner.
+
+Case-0 publication, when armed, diagnoses null reader `+4` but continues
+to dereference it, locks through owner `+0x58`, copies the 24 bytes to
+owner `+0x90..+0xA7`, sets `+0x8E=1`, and unlocks.
+Parser callers include wrapper `0xBDF820` and callback `0xBE1450`.
+Actual nonnull assignment to reader `+4` is the next scope before
+guessing owner semantics from offset coincidences.
+
+## Reset clears localization/remap triples before holder destruction
+
+The worker's reported SHA ending `544a` was a transcription error.
+Fresh file hashing and IDA server health confirm the active sample ending
+`5445`. Its reset-byte observations therefore apply to the identified sample.
+Raw `0x330300` directly stores immediate zero to all six globals:
+
+| Triple | Rows clear raw | Context clear raw | Count clear raw |
+| --- | --- | --- | --- |
+| Remap, VAs `0x1E55DD4/0x1E55DD8/0x1E55DDC` | `0x330346` | `0x330350` | `0x33035A` |
+| Primary, VAs `0x1E55E44/0x1E55E48/0x1E55E4C` | `0x330495` | `0x33049F` | `0x3304A9` |
+
+These are straight-line `C7 05 [global] 00 00 00 00` stores, with
+no helper between either triple's stores. Separate setters
+`0x7403D0/0x740450` are not called here; success callback
+`0x32C070` directly rebinds the triples at the previously recorded sites.
+
+The earlier missing-direct-xref reachability caveat is retracted:
+raw table `0x186097C` slot `+8` bytes `00 0F 73 00` resolve to
+VA `0x730F00`, raw `0x330300`; raw `0x1312065` bytes
+`FF 50 08` invoke that slot. Together with the established constructor
+table assignment, this supplies the indirect reset path. It clears the
+borrowed global triples before containing-holder destruction on inspected
+normal reset paths. Exception/concurrent-reader behavior is not established.
+
+## Bounded stops: reader attachment and localization row ordering
+
+The attachment investigation did not resolve a nonnull writer to reader
+`+4`. Helper raw `0xBDF9E0` receives reader `+0xC`, so its
+`[this+4]=0` initializes reader `+0x10`, not the publication-owner
+field. A broad field scan returned tens of thousands of unrelated matches;
+it supplies no defensible attach site and was not promoted to evidence.
+The worker's separate claim of invalid vtable bytes at operand
+`0x1C73CC0` is withheld pending the correct PE-VA-to-raw read.
+
+The row-order investigation likewise found no new producer proof.
+Lower-bound `0x6AA040` assumes primary rows sorted by unsigned key
+`+0x18`, stride `0x1C`; it neither sorts nor validates them.
+Checked catalog lookup `0x1310670` returns holder payload fields but
+does not establish an ordering flag/source-order contract. Row construction
+and sort validation remain unresolved, not evidence that validation is
+globally absent.
+
+Further broad rechecks of those two gaps are paused. New independent
+scopes are the ReplayReader endpoint comparison and the globalization
+language selector's setter/default, both with concrete entry points.
+
+The vtable-byte concern is corrected: constructor raw `0xBDFBFF`
+encodes **VA** `0x1C73CC0`; its raw `.rdata` location is
+`0x18728C0` and contains pointer-like entries. The earlier nonpointer
+claim read VA as raw. Reported first DWORDs `0xFE0890/0xFE0980`
+are stored VA values, not yet-converted raw targets; they must not be used
+as raw code offsets. Full method boundary/remaining table entries were not
+established by merely reading adjacent DWORDs. This does not resolve the
+attachment writer.
+
+The worker confirmed the first two stored values are **VAs**
+`0xFE0890/0xFE0980`, mapping to raw `0xBDFC90/0xBDFD80`.
+Only those two targets are confirmed; adjacent RTTI/data must not be
+classified wholesale as method slots.
+
+## Replay endpoint comparison uses common family bits and exact port
+
+Raw `0xBE1450` builds its configured endpoint from `[this+4]` fields
+`+0x60..+0x79` and compares it with the packet endpoint (packet `+8`).
+
+| Field | Packet offset | Configured owner offset |
+| --- | --- | --- |
+| Family flags | `+8` | `+0x60` |
+| IPv4 bytes | `+0xC..+0xF` | `+0x64..+0x67` |
+| IPv6 bytes | `+0x10..+0x1F` | `+0x68..+0x77` |
+| Port | `+0x20..+0x21` | `+0x78..+0x79` |
+
+Helper `0xBCC440`, called at `0xBE14D6`, compares address bytes as
+one DWORD for IPv4 or four DWORDs for IPv6 without swapping them.
+It selects by intersection of family bits, not whole-byte equality:
+common bit 1 selects IPv4 before common bit 2/IPv6. With no common bits,
+it succeeds only when packet flags are zero. Port is separately compared
+as 16 bits at `0xBE14DF` in every case.
+Mismatch formats/logs endpoints and does not forward the blob; match
+calls `0xBE0110` at `0xBE1508`. Connection closure is not established
+by the mismatch branch.
+
+Related `0xBE1890` discriminator 2 with nonnull receiver calls
+`0xBE0D60(endpoint,10000)`. That helper compares 40-byte endpoint-list
+records and appends fields/metadata if no match and capacity allows.
+This is not proof that the list initializes fixed owner `+0x60` fields.
+Their concrete writer is the next bounded check.
+
+## Globalization selector defaults and availability policy
+
+Raw constructor `0x38FC61` sets manager `+4=0`, English.
+Numeric setter `0x390550` accepts only unsigned selector <=5 and
+availability predicate `0x390640` before writing. Availability accepts
+English/German/French/Chinese, rejects Korean, and requires boolean
+`Globalization.RussianEnabled` (default false) for Russian.
+
+String setter `0x3905D0` uses mapper `0x10DB480`, exact
+case-sensitive `en/ko/de/fr/zh/ru`; unknown strings, including empty or
+null-backed text, map to English before availability validation.
+Invalid numeric selectors instead leave state unchanged.
+App raw `0x307153` reads `Config.ForceLanguage`: present calls the
+string setter at `0x307182`; absent uses `0x390530`, applying config
+state `+0x3C` only when unsigned <=5.
+
+After a write, differing config-state `+0x3C` causes indirect slot
+`+0x88` call at `0x390597` (string equivalent `0x39062A`), with
+arguments `(VA 0x1E4C310,language,0,0)`. Concrete target and persistence
+remain unresolved; next work follows this notification.
+Language table **VA** `0x1DE0868`, raw `0x19DEC68`, is in `.data`,
+not `.rdata`. Codes are four-byte-spaced literals at **VA**
+`0x1C03878..0x1C0388C`, raw `0x1802478..0x180248C`.
+
+## Language setter updates SavedLanguage through oConsoleSystem
+
+The indirect receiver is **VA** `0x1E69348`, RTTI `oConsoleSystem`.
+Constructor raw `0xE58770` writes vptr **VA** `0x1C77EA8`
+at `0xE587A3`. Slot `+0x88` targets **VA** `0x1242360`,
+raw `0xE41760`, formats language with `%i`, and forwards through
+slots `+0x98` then `+0x80` to raw `0xE41360`
+(VA `0x1241F60`).
+
+Argument **VA** `0x1E4C310` is console variable `SavedLanguage`,
+description `Current Language`, default -1, bounds -1..5, flags `0x8C0`,
+constructed at raw `0x2B3320`. Constructor `0xDD5158` writes
+`[variable+0x5C]=variable`, so **VA** `0x1E4C36C` aliases this
+variable. The call updates its text/numeric state including `+0x3C`,
+not merely a notification. Disk persistence is not established by the
+variable name; save/export filtering is the next explicit check.
+
+## Fixed ManagedUDP endpoint writer found; interpretation pending
+
+The fixed fields consumed by `0xBE1450` are written in `0xBEC830`,
+called from constructor `0xBE1040` with `(0,0)` after ManagedUDP
+state construction and callback-interface attachment.
+Reported stores set flags at state `+0x60`, copy **VA**
+`0x1E6853C` into IPv4 `+0x64` when bit 1 applies, copy
+**VA** `0x1E68540..0x1E6854C` into IPv6 `+0x68..0x74` when
+bit 2 applies, and set port `+0x78=0`.
+Constructor `0xBEC2E0` also initializes flags and port zero.
+
+The worker corrected its labels: these are raw-zero code offsets.
+Raw `0xBECAB2` references absolute operand **VA** `0x1E6853C`.
+Constructor `0xBE1074` computes interface `outer+8` and
+`0xBE10D3` stores state at `outer+0xC`; callback
+`0xBE147E` reads `[callback_this+4]`, the same state slot after
+the +8 interface adjustment. This is separate from the publication-owner
+field `reader+4` in the other base object.
+Runtime values and local-bind versus remote-peer meaning are unresolved.
+In particular, zero initial port does not prove a packet
+matching failure: later bind/getsockname-related field writes must be traced.
+Endpoint-list insertion `0xBE0D60` remains a separate path.
+
+## SavedLanguage qualifies for config export, not unconditional autosave
+
+Raw exporter `0xE426B0` requires variable flags `+0xC & 0x40`
+at `0xE42711`; SavedLanguage flags `0x8C0` qualify.
+Without flag `0x400`, it reads current string `+0x1C`, omits unchanged
+defaults, and emits `SetSave SavedLanguage "<value>"`
+(`0xE427C7..0xE42874`).
+Routine `0xE8AEB0` invokes exporter through console slot `+0x48`,
+builds `%s.con`, and writes through `0x12BB0B0` with verified mode
+`wb`. Automatic export checks `eng.autoSaveConfig`, default zero;
+config-name default is `settings` at `0xE55416..0xE5543E`.
+
+Thus `settings.con` export capability is established, not unconditional
+disk persistence after language changes. Absolute directory, trigger
+timing, and flag `0x800` semantics remain unresolved. Next scope follows
+one actual automatic-export caller and its guard.
+
+## ManagedUDP peer endpoint is distinct from assigned local bind port
+
+Raw `0xBEC830` builds a bind address through
+`0xBE3990 -> 0xBE3B50` from network owner `+0x30`, port zero.
+Bind is at `0xBEC9A9`, getsockname at `0xBECA23`, decode through
+`0xBE3A00` at `0xBECA75`. The assigned local port is stored at
+**state `+0x58`** at `0xBECA7E`, not remote port `+0x78`.
+
+Connect routine `0xBECF50` calls `0xBE35D0`; only successful connect
+reaches `0xBED064 -> 0x483640`, copying peer flags/address/port to
+**state `+0x60..+0x79`**. Those are the fields compared by
+`0xBE1450`, so zero constructor input does not establish a zero peer
+comparison after connection.
+Network family mode `+0x2C` is selected by `0xBBD110`;
+`0xBE3510` maps 1 to AF_INET(2), 2 to AF_INET6(23).
+Endpoint bits 1/2 represent IPv4/IPv6 presence.
+PE imports/local export verification resolves WSOCK32 ordinals
+2/4/6 as bind/connect/getsockname. Relevant PE globals are zero-fill;
+raw-IDB `0B` bytes at their VA numbers are not initialized address values.
+Next work follows the concrete ReplayReader connect wrapper and state.
+
+## Replay peer connect occurs during reader construction
+
+Raw caller `0x38262B` supplies a new `0x18`-byte reader in ECX and
+endpoint pointer on stack to constructor `0xBE1040`.
+Endpoint text comes from caller-object `+0xC`, parsed at
+`0x382608 -> 0xBCBF90` as `host:port` or `[host]:port`,
+with endpoint port at `+0x18`.
+
+Constructor binds at `0xBE1120 -> 0xBEC830(0,0)`, then copies a
+`0x20`-byte endpoint by value onto the stack at
+`0xBE1129..0xBE1137` and calls `0xBECF50` with socket state
+from reader `+0xC`. An extra decompiler EDI parameter is not an
+established stack argument.
+Connect returns AL zero for invalid address, zero port, state `+0x54`
+not one, or connect failure. Success copies peer endpoint at `0xBED064`,
+changes state to two, returns AL one.
+
+The constructor nevertheless returns the reader pointer on connection
+failure. Primary slot `+4`, raw `0xBE12D0`, checks stored peer address
+and nonzero port, not socket state. RTTI confirms
+`nl::SimpleSocketReplayReader`; the concrete caller's readiness/fallback
+handling is the next question before inferring its success result.
+
+## Autosave is shutdown-conditional, with an initialization enable option
+
+Raw `0xE553F0` logs `Shutting Down`; guard
+`0xE55416..0xE5541F` skips export when autosave variable `+0x40`
+is zero. Call `0xE5543E` uses console slot `+0xEC`, resolved through
+raw entry `0x1876B94` to `0xE8AEB0`. Variable registrations
+`0x2D2EB7..0x2D2EBC` and `0x2D2EF7..0x2D2EFC` supply
+defaults zero and `settings`.
+
+Initialization raw `0x10D8CCA..0x10D8CDB` executes command
+`eng.autoSaveConfig 1` only if its first argument byte `+0x11`
+is nonzero. Producer/default of that option remains the next bounded
+check. Persistence is conditional on shutdown, not immediate or guaranteed;
+final output directory remains unresolved.
+
+## Reader construction stores allocation; wrapper exposes inverted readiness
+
+Raw `0x382634..0x382642` stores the constructed reader at owner
+`+0x1A4`; `0x382662..0x382681` creates/stores wrapper `+0x1A0`,
+borrowing the reader through wrapper `+8`.
+Check `0x382686` tests wrapper existence, not connected readiness.
+No connect-failure-based fallback/release was found in that construction
+path. Constructor returning a pointer proves allocation, not connection.
+
+Wrapper raw `0xBE00E0..0xBE00F3` loads the borrowed reader, invokes
+slot `+4 -> 0xBE12D0`, and returns logical **not ready**.
+Actual consumer of that predicate is the next bounded check.
+Owner reset `0x382760` clears fields and deletes wrapper first at
+`0x382806`, then reader at `0x382822`, each via slot zero with flag one.
+
+## Normal application initialization enables shutdown autosave
+
+`ClientApplicationInitialize`, raw `0x3063D0`, constructs descriptor
+at `[ebp-0x12C]` with `0x306D82 -> 0x3248F0`.
+Constructor `0x32490C` zeros descriptor word `+0x10`, including
+byte `+0x11`. Application initialization then unconditionally sets that
+byte one within this block at raw `0x306E1C` (`var_11B`).
+Call `0x30705A` passes the descriptor to `0x10D8A40`, whose guard
+at `0x10D8CC6` tests that same `+0x11` before the command call
+at `0x10D8CCC`.
+
+Thus the normal inspected initialization path explicitly enables
+`eng.autoSaveConfig`, despite the console variable's registration default
+zero. The descriptor field is left unnamed; no symbolic option name was
+established. Export remains conditional on its later shutdown guard, current
+variable state, and successful file operations, not immediate persistence
+on each language setter. Output path and write-error propagation are the
+next bounded questions.
+
+## Wrapper readiness affects worker status/timing, not a proven error return
+
+RTTI identifies wrapper `nl::SocketReplayReader`; vtable **VA**
+`0x1C73CC0`, slot `+0x14` at raw `0x18728D4`, contains
+**VA** `0xFE0CE0`, raw `0xBE00E0`.
+Worker raw `0xBD62F0` holds it at `+0x24` and calls this slot at
+`0xBD6756..0xBD675E`.
+The guard at `0xBD6760..0xBD676D` requires nonzero inverted
+readiness and stack byte `[esp+0x17]==0`. True sets worker `+0x54=1`
+at `0xBD6782`, adjusts timing, then stores wrapper virtual `+0x18`
+result into `+0x55` at `0xBD67F6`; otherwise both bytes clear at
+`0xBD67FE`. This establishes status/timing behavior, not an error return.
+The guard byte's producer and status consumers are the next scope;
+worker/outer-owner RTTI remains unverified.
+
+## Config export write prefix and nonuniform write failures
+
+Raw `0xE8B02B -> 0x13192D0` selects write-directory field `+4`;
+`0x3A5910` extracts the prefixed path.
+Initialization `0x10D8BDA -> 0x1317970` uses descriptor `+0x18`,
+otherwise default `localassets` (**VA** `0x1C0357C`, raw
+`0x180217C`). Relative prefixes resolve against captured process CWD,
+`0x13178B0 -> 0x12B6E90`, using GetCurrentDirectoryW.
+Thus the default is `<captured-CWD>\localassets\settings.con`;
+the normal application descriptor's override is the next explicit check,
+and no actual absolute user directory is asserted.
+
+Writer `0x12BB0B0 -> 0x12BA030` uses `_wfopen("wb")`.
+Failed open attempts directory creation and retries; there is no mount
+lookup on this inspected path. Final failure returns false and exporter
+logs `Couldn't open %s.con for writing` at `0xE8B07C`.
+Short fwrite invokes a diagnostic callback, then returns true if it returns;
+fclose errors are ignored. These are distinct from cleanly propagated
+open failure, not proof every export succeeded. No writes were executed.
+
+## Worker readiness guard marks queue work; status has an app consumer
+
+Raw worker `0xBD62F0` initializes stack guard byte zero at
+`0xBD64EF`, sets it one at `0xBD656E` after nonzero worker
+`+0xC4`, and processes its queue-like `+0xB4` structure.
+At `0xBD6768..0xBD676D`, set guard prevents the inverted-readiness
+timing path and clears `+0x54/+0x55` at
+`0xBD67FB..0xBD6804`, even when virtual return is true.
+This is a per-call work/queue-path guard, not established EOF/error.
+
+Concrete caller raw `0x65C1F0` tests worker `+0x54` at `0x65C28E`;
+with zero input count and `0x384390(worker)` false, it sets an
+application field `+0xB78` at `0x65C295..0x65C2A3`.
+Worker also sets `+0x54` on an earlier state-flag path at `0xBD63E6`
+that returns false, so the byte must not be interpreted as a simple error
+or EOF. No `+0x55` consumer or semantic label was verified.
+Next scope follows the application flag and its consumer, not guessing
+semantics from readiness inversion alone.
+
+## Normal application leaves write-prefix override null
+
+Raw descriptor constructor `0x324919` initializes `+0x18=null`.
+No write to that field was found between normal app descriptor construction
+at `0x306D82` and dispatch at `0x30705A`; the inspected null/empty
+guard therefore selects `localassets` as write prefix.
+At `0x306EE3`, app config `+0xA6C` looks up
+`Development -> InstallDir`; `0x306EF6` stores it at
+`[EBP-0x110]`, descriptor **`+0x1C`, not +0x18**.
+Verified literals are **VA** `0x1B40774/0x1B40780`,
+raw `0x173F374/0x173F380`.
+
+Config lookup supports parent fallback and recursion-depth guarding.
+The installed-directory field is a distinct option whose consumer remains
+the next scope. The static result still names no absolute user path:
+relative write-prefix resolution uses runtime captured CWD.
+
+## Application +0xB78 requests a one-iteration timing override
+
+Raw bootstrap `0x2EAE70` loads app global **VA** `0x1DFFD98`
+for initialization (`0x2EB184`), run loop (`0x2EB198`), and shutdown
+(`0x2EB1F9`), establishing the same app base for this writer/consumer.
+Writer `0x65C1F0` sets app byte `+0xB78` at `0x65C2A3`
+only after successful `0xBD62F0`, zero argument a2, worker `+0x54`
+nonzero, and `0x384390(worker)` false.
+That helper is true for `+0x55` or `+0xB1` set, or both
+`+0x8C/+0x8D` clear. Its false case therefore requires `+0x55`
+and `+0xB1` clear and at least one of `+0x8C/+0x8D` set.
+Branch/store bytes were checked at `0x65C28E..0x65C2AA`.
+
+Run loop `0x3098C0` reads app `+0xB78` at `0x309955`,
+clears it at `0x30996C`, and sets its iteration-local timing scale zero
+at `0x309973`. Adjacent code converts time using that scale and passes
+the result to virtual `+0x20`. Continuation uses separate global byte
+**VA** `0x1E4B0B0`, not `+0xB78`.
+Thus this is a one-iteration timing override, not an exit/stop flag or
+proof of worker EOF/error. Invocation binding of `0x65C1F0` remains
+the next scope because no direct xrefs were reported.
+
+## InstallDir field has two separately gated initialization consumers
+
+Raw `0x10D8A40` loads descriptor `+0x1C` at `0x10D8D57`.
+Nonnull text passes to `0xE9BDA0` at `0x10D8D7F` if descriptor
+`+0x24` allows it; another guarded path passes the field to
+`0xEBA0E0` at `0x10D8DC9` if `+0x28` allows it.
+Null keeps a sentinel fallback. Separate write-prefix `+0x18` handling
+remains independent. Null descriptor uses a different initialization path
+at `0x10D8DD3`; exit records descriptor presence in `this+5` at
+`0x10D8E04..0x10D8E10`.
+
+The bounded pass supports a resource/path-prefix input, not a proven
+physical read root. Actual default/app values of gates `+0x24/+0x28`
+and concrete consumer roles are the next check; it did not trace those
+helpers to file opens or independently reconfirm constructor defaults.
+
+## Replay timing callback is the app-owned object's virtual tick
+
+For the identified active sample, constructor raw `0x65A190`
+(VA `0xA5AD90`) stores primary vptr **VA** `0x1C6781C` at
+raw `0x65A204`. Vtable entry `+8`, **VA** `0x1C67824`
+(raw `0x1866424`), contains **VA** `0xA5CDF0`
+(raw `0x65C1F0`). This dispatch has no this-adjustment.
+The constructor result is stored in app `+0xB98` at raw `0x30DB84`.
+
+App tick dispatch at raw `0x30A009` invokes this object's virtual `+8`
+with `(mode, tickArgument)` when app `+0xB98` is nonnull and
+`+0xB94` is zero. Wrapper raw `0x302A30` (VA `0x703630`)
+supplies global app **VA** `0x1DFFD98`; startup stores that wrapper
+address at raw `0x306E55`.
+This resolves concrete indirect invocation despite absent direct function
+xrefs. Scheduler registration ownership, invocation ordering, and thread
+remain unproven and are the narrower follow-on scope.
+
+## InstallDir consumer gates are pointers populated by normal startup
+
+The active-sample follow-on resolves the earlier gate-value uncertainty.
+All code addresses in this section are raw offsets.
+App initialization `0x3063D0` calls descriptor constructor `0x3248F0`
+at `0x306D82`; construction zeroes `+0x24/+0x28`, but startup
+replaces both before `0x30705A` calls `0x10D8A40`.
+At `0x306FC6`, descriptor `+0x24` (`var_108`) receives
+`&var_138`, a local three-DWORD structure. At `0x307048`,
+`+0x28` (`var_104`) receives `&var_14C`, another local structure.
+Both are nonnull pointer gates, not booleans. The second consumer reads
+fields through at least pointee `+0x10`; complete pointee semantics
+remain unresolved.
+
+The `+0x24` test at `0x10D8D50` guards `0xE9BDA0`
+at `0x10D8D7F`, which receives selected InstallDir text as a3.
+An initial follow-on incorrectly reported forwarding that text to
+`0xBBD110` at `0xE9BE03`; the instruction-level correction below
+shows a separate networking initialization call with argument 1 instead.
+The other consumer `0xEBA0E0` receives the text as a6 and passes
+it to `0xEC2D60` at `0xEBA1EE` while building/registering
+configuration state. These are concrete initialization routes, not proof
+of a physical read root or write destination. Descriptor `+0x18` and
+its independent `localassets` write-prefix default are unchanged.
+The next bounded scope follows the first sink `0xBBD110`.
+
+## Replay tick registration enters a service through descriptor +0x48
+
+Startup raw `0x306E55` (VA `0x707A55`) stores callback
+**VA** `0x703630` at descriptor `+0x48`: stack `[ebp-0xE4]`
+relative to descriptor `[ebp-0x12C]`.
+Raw `0x30705A` passes that descriptor to `0x10D8A40`.
+At raw `0x10D8C58..0x10D8C83`, a nonnull descriptor is
+forwarded through service virtual slot zero; false return aborts initialization.
+The service is reached through the global at **VA** `0x1E60EA4`.
+Raw `0x2D2D60/0x2D2D70` establish aliases involving **VAs**
+`0x1DFC82C`, `0x1E60E3C`, and `0x1E60EA4`.
+Their exact indirection levels and originating object initialization are the
+next narrow check, not grounds for naming a scheduler owner.
+
+This proves descriptor handoff, not retention or invocation of `+0x48`.
+Concrete service vptr/slot-zero target, callback ordering, and thread remain
+unresolved; no scheduler ownership claim is yet justified.
+
+## InstallDir expands virtual-texture location strings; BBD110 is separate
+
+The active-sample instruction check corrects the earlier claimed InstallDir
+forwarding to `0xBBD110`. All instruction addresses here are raw.
+At `0xE9BDD6`, EDI preserves InstallDir from `[ebp+8]`, the
+third logical argument after ECX/EDX. At `0xE9BDF5`, ECX instead
+loads network object `[VA 0x1DFFF70]`; `0xE9BDFB` compares
+its DWORD `+8` with zero, and `0xE9BE01` pushes **1** before
+`0xE9BE03` calls `0xBBD110`. This is a zero initialization-count
+test, not a null field, and InstallDir is not passed.
+`0xBBD110` increments existing count at `0xBBD1AE` or initializes
+it to 1 at `0xBBD1C2`; literals `NetLib starting up...` and
+`WSAStartup failed.` corroborate networking initialization.
+
+Actual InstallDir use occurs at `0xE9BEE9..0xE9BEF4` and
+`0xE9BF6F..0xE9BF7A`: `0x12B8E70` receives EDI and
+literal `%INSTALLDIR%` (**VA** `0x1BE7B58`, raw `0x17E6758`)
+to replace occurrences in local strings `[ebp-0x44]` and `[ebp-0x3C]`.
+Replacement helper `0x12B9170` ensures capacity and copies bytes at
+`0x12B91E6..0x12B91EF`, rather than retaining the InstallDir pointer.
+At `0xE9C504`, the expanded strings pass to `0xEA1330`;
+`0xEA13CB..0xEA13DC` copies them into string objects at **VAs**
+`0x1E70D68/0x1E70D6C`. Helper `0x2FCC90` confirms allocation
+and byte-copy behavior; local string references are released during cleanup.
+
+The literals `Opening virtual texture` and `Installed textures: %s`
+support installed/alternate virtual-texture location semantics. The input is
+borrowed for expansion and the expanded results are copied; original upstream
+InstallDir ownership and exact backing-store opening remain unresolved.
+The next scope follows a reader of global string **VA** `0x1E70D68`.
+
+## Descriptor service aliases point to a backed pointer cell
+
+The bounded service-target pass resolves indirection, not the concrete object.
+With `.data VA = raw + 0x401C00`, **VA** `0x1DFC82C` is
+file-backed at raw `0x19FAC2C`, containing `70 04 E0 01`:
+the address of cell **VA** `0x1E00470` (raw `0x19FE870`,
+initially zero). These specific cells must not be classified as virtual-only.
+Accessor raw `0xE4E630` (VA `0x124F230`) is
+`B8 70 04 E0 01; C3`, returning the cell address.
+
+Raw `0x2D2D60/0x2D2D65` loads `[VA 0x1DFC82C]` and stores
+it to `[VA 0x1E60E3C]`; `0x2D2D70/0x2D2D75` copies that
+to `[VA 0x1E60EA4]`. Thus these aliases carry the cell address,
+not the service object. Raw `0x10D8C6D..0x10D8C7F` executes
+`eax=[alias]; ecx=[eax]; eax=[ecx]; eax=[eax]; call eax`.
+Concrete object publication, constructor/vptr, and slot-zero target remain
+unresolved. The final attempted inspection failed with a Python helper-scope
+NameError, not evidence that the object lacks a writer.
+The next narrow check is the cell/accessor's concrete write references.
+
+## Expanded virtual-texture locations open index files in primary/fallback order
+
+Reader raw `0xE9D960` (VA `0x129E560`) is called at raw
+`0xEA156D` after ECX receives **VA** `0x1E6F3C8`.
+Its fields `+0x19A0/+0x19A4` are consequently the string globals
+**VA** `0x1E70D68/0x1E70D6C`. These globals are virtual-only.
+Raw `0xE9D9D7` loads the first string; a null pointer substitutes
+empty literal **VA** `0x1C5EA68`.
+Formatting via `0xDD89B0` uses `%s_idx` at **VA**
+`0x1BE7DDC` (raw `0x17E69DC`), then converts UTF-8 path/mode
+with `MultiByteToWideChar(65001,0,...,-1,...)`.
+
+Raw `0xE9DA4D` calls IAT **VA** `0x1AC4704`
+(raw `0x16C3304`), verified PE import `MSVCR120!_wfopen`,
+with mode `rb`. Nonnull result branches at `0xE9DA60` directly
+to `0xE9DB17`, bypassing fallback.
+Only a null first result loads the second location at `0xE9DA66`,
+formats it with the other `%s_idx` literal **VA** `0x1BE7DB0`
+(raw `0x17E69B0`), and opens at `0xE9DAD3`, also `rb`.
+This proves primary/fallback **index-file** opening, not texture-payload
+or archive opening. Managed strings own copied characters; this reader
+borrows their pointers. The next scope starts at successful-open branch
+`0xE9DB17` to reconstruct the index's actual reads.
+
+## Service pointer publication path and concrete object vptr
+
+For the same active sample, initializer raw `0xE4F630`
+(VA `0x1250230`) installs vptr **VA** `0x1C77C1C` at static
+owner **VA** `0x1E00460`, clearing its `+0x10` pointer cell
+`0x1E00470`. Owner vtable slot `+4` contains **VA** `0x124F260`.
+In that method, raw `0xE4E6EC` (VA `0x124F2EC`) bytes
+`89 46 10` publish constructor-returned EAX to `[esi+0x10]`.
+Constructor raw `0xE4DFA0` (VA `0x124EBA0`) installs object
+vptr **VA** `0x1C77C2C` at raw `0xE4DFDE`.
+This supplies a concrete construction/publication path for the service
+cell; actual invocation with this static owner remains unverified.
+The next scope resolves object slot zero and descriptor `+0x48` handling.
+
+## Virtual-texture index outer layout and read/cleanup boundaries
+
+Successful file opening reaches raw `0xE9DB17` with EBX=`FILE*`.
+IAT **VA** `0x1AC490C` (raw `0x16C350C`) is `fread`;
+**VA** `0x1AC49A8` (raw `0x16C35A8`) is `fclose`.
+Assuming complete preceding reads, native little-endian x86 fields are:
+
+| File offset | Width | Observed use |
+|---|---|---|
+| `0` | DWORD | Compared with 1 at raw `0xE9DB2E`; preceding fread count unchecked. |
+| `4` | DWORD N | Read to object `+0x184C` at `0xE9DB5D..0xE9DB69`; count unchecked. |
+| `8` | N records of `0x4C` bytes | Read at `0xE9DB9E..0xE9DBAF`; returned item count compared with N. |
+| `8+0x4C*N` onward | Seven DWORD lengths L_i, each followed by L_i bytes | Reads/loop at `0xE9DC45..0xE9DD22`. |
+
+Raw `0xE9DB6B..0xE9DB82` allocates `(N+1)*0x4C` bytes into
+object `+0x1848`; helper `0xEB35D0` uses 32-bit multiplication
+and zeroes successful allocations. No range/overflow guard was observed.
+For i=0..6, destination sizes are `((0x400 >> i)^2) << 4`:
+`0x1000000,0x400000,0x100000,0x40000,0x10000,0x4000,0x1000`.
+Pointers occupy object `+0x1850+4*i`. Raw `0xE9DCFA` calls
+`0x13090D0` (VA `0x1709CD0`) with ECX=payload, EDX=L_i
+and stack `(destination,size)`; its return value is ignored.
+Byte-copy/back-reference processing is observed, but codec identity is
+the next scope. Raw `0xE9DD2E` calls `0xE9DD50`, which walks
+`0x4C` records and passes DWORDs `+0x38/+0x3C/+0x40/+0x44`
+to `0xE9C990`; semantic field names remain unresolved.
+
+Version mismatch or record-allocation failure logs conditionally and closes
+at `0xE9DB55`, then reaches `0xE9DAFF` to attempt a zeroed
+one-record allocation and returns AL=1, not false.
+Short record/length reads invoke callback **VA** `0x1C15EA0`;
+if it returns, processing continues. Payload fread count is unchecked.
+Payload allocation failure also invokes that callback, without a dedicated
+close branch if it returns. Normal completion closes at `0xE9DD34`
+and returns AL=1 at `0xE9DD42`.
+No file-length, trailing-data, or N/L_i range validation was observed in
+this bounded pass. Callback termination/throwing behavior and cleanup after
+non-returning callbacks remain unestablished; no malformed file was executed.
+
+## Concrete service retains descriptor callback at object +0x100
+
+Object vtable **VA** `0x1C77C2C` (raw `0x187682C`) begins
+with bytes `F0 57 25 01`, slot-zero target **VA** `0x12557F0`
+(raw `0xE54BF0`). Raw `0xE54C33` computes object `+0xB8`
+and calls `0xE551F0` to copy the descriptor.
+At raw `0xE55317` (VA `0x1255F17`), bytes
+`8B 47 48 89 46 48` copy descriptor `+0x48` to that retained
+descriptor's `+0x48`, hence service object **+0x100**.
+This proves callback retention, not invocation, thread affinity, or actual
+initialization through the static-owner publication path.
+The next scope follows this specific implementation's `+0x100` reads/calls.
+
+## Index block decoder grammar: literals and extended backreferences
+
+Raw `0x13090D0` takes 32-bit source pointer/length in ECX/EDX
+and destination pointer/capacity on stack. EAX is a 32-bit output byte
+count, not the pointer type inferred by the decompiler.
+All instruction addresses below are raw; code VA adds `0x400C00`.
+No standard-codec identity or signature check has been established.
+
+| Item | Observed decoding |
+|---|---|
+| Initial control | `c=*src++ & 31`; upper three bits discarded, so first item is literal (`0x13090E4..0x1309101`). |
+| Literal, c less than 32 | Copy c+1 source bytes, range 1..32 (`0x1309231..0x1309257`). |
+| Match, h=c>>5 in 1..6 | Length h+2, range 3..8; q=c&31 (`0x130911C..0x1309175`). |
+| Match, h=7 | Length 9 plus sum of extension bytes; read another extension while previous byte is 255, including the terminating non-255 byte. |
+| Ordinary distance | Read b; distance=256*q+b+1. |
+| Far distance | If q=31 and b=255, read u,v; distance=8192+256*u+v, range 8192..73727. This two-byte extension is big-endian. |
+
+Matches copy from output-distance with forward advancement, supporting overlap;
+distance one has a repeated-byte optimization (`0x13091A1..0x130922F`).
+Source length zero returns zero before reading. Literal input-span checking
+precedes output truncation; insufficient literal input returns zero.
+Match extension, offset, and far-distance bytes have no preceding source-end
+checks in the inspected code. Unsigned backreference-start comparison against
+destination start rejects an earlier source with return zero.
+Pointer arithmetic is 32-bit, without explicit overflow checks observed.
+
+After match metadata, source cursor greater than or equal to end finishes
+after that match; equality is not required. Otherwise the next control is
+prefetched. Literals finish when copied input reaches end; there is no
+explicit terminator token (`0x1309181..0x1309192`,
+`0x1309259..0x1309268`).
+Normal completion returns produced bytes. An item exceeding output capacity
+writes only the remaining capacity and immediately returns capacity, without
+validating the remaining stream. Exact fill alone does not terminate decoding.
+The truncated-match branch calls imported memcpy, so the explicit loop's
+overlap semantics must not be assumed for that branch.
+No actual compressed block was decoded or sample altered; checking a real
+block's first two items remains a possible separate format-validation step.
+
+## Index record rectangle fields reserve a separate occupancy bitmap
+
+The bounded active-sample trace resolves record DWORDs
+`+0x38/+0x3C/+0x40/+0x44` as x/y/width/height in the
+separate occupancy structure, not decompressed-table indices.
+Raw `0xE9DDA9` calls `0xE9C990` (VA `0x129D590`).
+That routine tests rectangle bits with base `x+2016*y`, then index
+`base+2016*r+c`; byte addressing uses arithmetic shift right by 3
+and mask `1 << (index & 7)`. Any occupied bit returns false before
+writes; otherwise it sets every tested bit.
+Nonpositive dimensions succeed without writes; no coordinate bounds checks
+were observed in this routine.
+
+At raw `0xE9ED35`, `0xE9CA60` searches y-major/x-minor for
+free space and reserves it. Decompressed tables independently use
+`table[i]+16*j`: raw `0xE9E652` reads a QWORD and `0xEA05C6`
+writes one. The record-to-table mapping is not yet resolved.
+The next scope connects coordinate conversion at `0xE9EE17..0xE9F2D9`
+to table index j rather than inferring a direct correspondence.
+
+## Retained replay tick callback is invoked synchronously by service slot +8
+
+Concrete service vtable **index 8 (byte offset +0x20)** targets **VA** `0x1256590`,
+raw `0xE55990`, with EBX=this.
+Raw `0xE55B5C` bytes `8B 83 00 01 00 00` load `[this+0x100]`.
+A test/null branch gates the call; `0xE55B66` pushes unchanged
+`[ebp+8]`, `0xE55B69` bytes `FF D0` call it, and `add esp,4`
+performs caller cleanup. The callback receives one 32-bit argument,
+with no explicit context argument.
+
+Earlier nonzero service `+0x12C` returns before this callback.
+Observed order is a global-service virtual `+0xF8` call, retained
+callback, then raw `0xE4FE10`.
+This is synchronous on the service method's invoking thread; thread
+identity remains unproven. No direct parent calls were found in the
+bounded pass, so the next scope resolves an external indirect slot-8 caller.
+
+## Texture coordinates map to row-major 16-byte entries by level
+
+The active-sample trace establishes `j=(1024 >> L)*ty+tx`.
+All instruction addresses here are raw.
+At `0xE9EE17..0xE9EFAD`, placement coordinates become signed
+32-bit `X=(placementX<<6) SAR L`, `Y=(placementY<<6) SAR L`;
+tile starts truncate X/126 and Y/126 toward zero.
+Division uses signed high-product multiplication by `0x82082083`,
+addition, arithmetic shift by 6 and sign correction, not unsigned division.
+Counts are `trunc((end+125)/126)-start`.
+Level progression is L=6,5,...,0, giving widths 16,32,...,1024;
+the inner loop increments tx and outer loop ty.
+
+Raw `0xE9F2B6..0xE9F2E1` computes the row-major j and stores
+it at a working object's `+0x20`. Alternate call path
+`0xE9F333..0xE9F359 -> 0xEA0430` passes `(L,tx,ty)`;
+`0xEA0451..0xEA046B` checks signed coordinates against zero and
+`1024 SAR L`, branching separately for invalid values.
+Table pointer is `[owner+0x1850+4*L]`, entry address table+16*j.
+Raw `0xE9E64F..0xE9E65F` reads entry QWORD `+0`;
+`0xEA05BD..0xEA05D3` writes it.
+Raw `0xEA0352` compares DWORD `+8` with an XOR-derived value;
+`0xEA0126` reads DWORD `+0xC` for allocation/read length.
+No further semantic field names are established.
+Arithmetic wraps at 32 bits and shifts use CL. The next check follows
+the writer of entry `+8` to determine its stored-value construction.
+
+## Run loop calls service vtable index 8, not byte offset +8
+
+The preceding service callback section's original "slot +8" wording was
+ambiguous: the resolved entry is **index 8, byte offset +0x20**.
+Table **VA** `0x1C77C4C` contains **VA** `0x1256590`
+(raw `0xE55990`). Run-loop raw `0x3099CD..0x3099DB`
+loads alias **VA** `0x1E60EA4`, dereferences the object, loads its
+vptr, and selects `[vptr+0x20]`; raw `0x3099DE` calls it.
+Raw `0x3099DA` pushes one rounded/scaled timestep, subsequently
+forwarded unchanged to the retained callback.
+This closes the synchronous runloop -> service -> callback chain,
+but does not by itself prove a main-thread identity.
+The exact bootstrap callsite and timing-zero destination are undergoing a
+narrow operand check; the prior local-only B78 interpretation remains the
+authority until that check, not an asserted write to persistent app `+0xB70`.
+
+## Startup-thread chain and precise timing operand corrections
+
+The narrow operand check confirms bootstrap **call opcode** raw `0x2EB19E`
+(VA `0x6EBD9E`), bytes `E8 1D E7 01 00`, targeting raw
+`0x3098C0` (VA `0x70A4C0`). Earlier raw `0x2EB198`
+denotes the preceding `mov ecx,[VA 0x1DFFD98]`, not the call.
+At raw `0x309973`, `movss [esp+0x14],xmm2` zeros the
+iteration-local stack multiplier. It does **not** modify persistent app
+`+0xB70`. Raw `0x30996C` separately clears app byte `+0xB78`.
+Service table entry **VA** `0x1C77C4C` is base `0x1C77C2C`
+plus byte offset `0x20`, zero-based index 8.
+
+The independently traced PE entry raw `0x136ADB0`
+(VA `0x176B9B0`) calls initialization then jumps into CRT startup
+raw `0x136ADBA`. CRT pushes four WinMain-shaped arguments and
+calls wrapper raw `0x2E9630` (VA `0x6EA230`) at raw
+`0x136AEDA`. Wrapper bytes `E8 3B 18 00 00 C2 10 00`
+prove `call bootstrap; ret 0x10`, targeting raw `0x2EAE70`.
+Together these checks join PE startup -> wrapper -> bootstrap -> runloop
+-> service index-8 tick -> retained app callback synchronously on the
+PE startup thread. Numeric thread identity is not known.
+
+## Virtual-texture entry +8 stores XOR of three CRC32 results
+
+For the active sample, raw `0xEA0560` receives ECX=request and
+stack owner argument; L is sign-extended request byte `+0x24`,
+j is request DWORD `+0x20`, and table is `[owner+0x1850+4*L]`.
+Raw `0xEA073F` (VA `0x12A133F`) stores ESI to entry
+`table+16*j+8`. Its exact construction is:
+CRC32(buffer at request `+0x14`, `0x4000` bytes) XOR
+CRC32(buffer at request `+0x18`, `0x4000` bytes) XOR
+CRC32(buffer at request `+0x1C`, `0x4000` bytes).
+The helper's 256 table entries match reflected IEEE CRC32, with
+initialization and final XOR `0xFFFFFFFF`; table **VA** `0x1C788D0`
+maps to raw `0x18774D0`.
+
+Raw `0xEA0352` (VA `0x12A0F52`) compares the identical
+32-bit construction against entry `+8`; equality succeeds.
+This identifies a stored content-check value, without assigning further
+buffer/channel semantics. The producer-address clarification resolves a typo:
+raw `0xEA01E3`, bytes `E8 D8 82 FF FF`, calls raw `0xE984C0`
+(VA `0x12990C0`) with `&request[0x14]` for the three buffer pointers;
+the earlier `EA984C0` spelling is invalid. Current independent scope follows the
+entry's QWORD `+0` and DWORD `+0xC` storage instead.
+
+## Texture entries store data-file byte offsets and encoded byte lengths
+
+The active-sample trace resolves entry QWORD `+0` as an absolute byte
+offset into the per-level data file, not a file-pointer position.
+Raw `0xEA05A6` (VA `0x12A11A6`) calls GetFileSizeEx on
+handle `[owner+0xF58+0x48*L]`; its QWORD result is stored at
+entry `+0` at raw `0xEA05CD/0xEA05D3`.
+Raw `0xEA05DF` invokes the encoder, obtaining payload pointer/length;
+`0xEA075D` passes them to `0xE97C40`. Actual WriteFile at
+`0xE97CD9` uses OVERLAPPED low/high offsets both `0xFFFFFFFF`,
+requesting append at EOF. Raw `0xEA0793` stores the unmasked DWORD
+encoded byte count directly at entry `+0xC`.
+
+The reader loads that count at raw `0xEA0126`, allocates exactly it,
+and calls its read wrapper at `0xEA01C9`. ReadFile at `0xE97EC7`
+receives entry `+0` as OVERLAPPED low/high byte offsets.
+File object is owner `+0xF48+0x48*L`, handle at object `+0x10`.
+Setup formats `%s%i` at raw `0xEA15A3` and opens at `0xEA1610`;
+maintenance uses owner `+0x19A0` as prefix. Data files are therefore
+prefix-plus-decimal-level, distinct from `%s_idx` index files.
+
+Observed publication order is offset, CRC, append, length, size assertion,
+then `[owner+0x19B0+8*L]=offset+length`.
+EOF sampling precedes the append wrapper's lock. Same-owner concurrent-writer
+exclusion and durable index publication remain unproved; the next scope
+follows caller serialization and index-save order rather than assuming atomicity.
+
+## Service +0x12C is a byte shutdown-request latch
+
+The active sample's constructor raw `0xE4E058` and initialization
+`0xE54C50` clear one byte at service `+0x12C`.
+Vtable **index 2, byte offset +8**, target raw `0xE55580`
+(VA `0x1256180`), sets it to 1 with
+`C6 81 2C 01 00 00 01; C3`.
+Tick raw `0xE559C0` tests the same byte; nonzero skips tick work
+and returns AL=1. Application caller at `0x3099DE` interprets this
+as `Offset renderer requested application shutdown.`
+This supports shutdown-request semantics, not an ordinary pause flag.
+Initialization clearing is proven; successful in-place resumption is not.
+The next scope resolves conditions of callers of this specific object's
+byte-offset-8 setter, distinct from its byte-offset-0x20 tick method.
+
+## Texture caller saves the index before outermost data-file flush
+
+Active-sample raw `0xEA95F0` (VA `0x12AA1F0`) calls owner-begin
+`0xE9E200`, appends at `0xEA968F`, saves at `0xEA972E`,
+then calls owner-end at `0xEA9757`.
+Begin increments non-atomic owner DWORD `+0x1994`, acquiring the
+filesystem lock at `+0x1998` only on transition 0->1.
+Acquisition at raw `0xE9E293` retries `_wrename` to
+`%s_tmp_lock_file`. This is not demonstrated same-owner thread exclusion.
+
+The index save orders fflush at raw `0xE9E0A2`, _commit at
+`0xE9E0B0`, fclose, destination _wunlink, then _wrename at
+`0xE9E15A`. Write/flush/commit/close results are unchecked in the
+inspected path; rename failure invokes the assertion callback then returns
+success if it returns.
+Data-file FlushFileBuffers happens at `0xE9E366`, only on outermost
+owner-end and **after index publication**; its results are unchecked.
+These observations do not establish crash-atomic publication or an exclusive
+same-owner writer. The next scope follows dispatch into `0xEA95F0`
+for concrete thread/mutex discipline.
+
+## Renderer shutdown-request caller remains a bounded unresolved stop
+
+The setter entry is confirmed at raw `0x1876834`, containing **VA**
+`0x1256180`, vtable index 2 / byte offset 8.
+No direct E8/E9 reference was found in raw `[0,0x1700000)`.
+A bounded scan of 478 alias-immediate occurrences with limited linear
+provenance (at most 150 instructions/512 bytes each) found no confirmed
+same-object byte-offset-8 call. Branch/interprocedural coverage is incomplete,
+so absence of a caller is not established.
+The reported alias chain repeats already-resolved cell-address forwarding
+and supplies no new concrete requester. This gap is parked; the next
+independent lifecycle scope resolves the known virtual `+0xF8` phase before
+the retained app callback in `0xE55990`, not another broad alias scan.
+
+## Texture writer dispatch remains unproven after bounded reference checks
+
+Raw `0xEA95F0..0xEA975F` has no IDA incoming references,
+no direct .text E8/E9 calls/jumps into its body, and no exact raw/RVA/VA
+pointer found in the inspected file-wide scan. An interior-VA match at
+raw `0x2F362E` is another call's rel32 operand, not callback evidence.
+This negative coverage does not establish unreachability.
+Incoming ECX is saved at `0xEA95F9/0xEA9600` and reused as
+owner for begin `0xEA960E`, save `0xEA972E`, end `0xEA9757`.
+Counter updates at `0xE9E22A..0xE9E233` and `0xE9E32F`
+are ordinary increment/decrement; same-thread or mutex exclusion remains
+unproved. The dispatch gap is parked rather than repeating broad scans.
+The next independent format scope starts at concrete decoder `0xE984C0`.
+
+## Pre-callback global phase services oConsoleSystem
+
+The global at **VA** `0x1E69348` is RTTI `oConsoleSystem`,
+zero-filled virtual-tail .data without a raw file offset.
+Constructor raw `0xE587A3`, bytes `C7 05 48 93 E6 01 A8 7E C7 01`,
+installs vptr **VA** `0x1C77EA8` (raw `0x1876AA8`).
+Vtable byte offset `+0xF8`, raw `0x1876BA0`, contains
+**VA** `0x128AD80`, raw `0xE8A180`.
+Renderer tick raw `0xE55B56`, bytes `FF 90 F8 00 00 00`,
+invokes it before the retained callback at `0xE55B69`.
+
+The method is reentrancy-guarded console servicing. It conditionally uses
+timeGetTime and an elapsed interval before virtual `+0xDC`, then calls
+raw `0xE89EC0` with buffer **VA** `0x1DFCAC4`.
+Queued-console-command processing is an interpretation, not yet a complete
+buffer/dispatch proof. The next scope resolves the helper's `+0x98`
+dispatch and concrete buffer consumption.
+
+## Texture payload decoder header, modes, and three-buffer ownership
+
+Raw `0xE984C0` (VA `0x12990C0`) receives encoded pointer/byte
+count N in ECX/EDX and stack arguments: three-output-pointer array,
+optional scratch, scratch capacity. Reader call raw `0xEA01E3`
+passes `&request[0x14],NULL,0`. It previously allocates/zeroes three
+separate `0x4000` buffers at `0xEA0060..0xEA00C9`.
+Decoder does not allocate or replace these output buffers.
+
+| Encoded offset | Width | Observed use |
+|---|---|---|
+| `0` | byte | LZMA property for compressed modes. |
+| `1` | LE DWORD | LZMA dictionary size. |
+| `5` | LE 3-byte integer S | Scratch/output-size field. |
+| `8` | byte | Outer mode. |
+| `9` onward | variable | Payload; mode 16 first has three property bytes here, then payload at 12. |
+
+Raw `0xE984FF..0xE98523` checks unsigned
+`S-0x7801 <= 0x107FF`, hence `0x7801..0x18000`.
+No explicit N>=9 guard precedes header access/N-9, and no mode-specific
+equality with reconstructed output size was observed.
+Dispatch table raw `0xE98D40` selects:
+mode 0 (`0xE985F2`), LZMA to scratch then scatter/postprocess;
+modes 1/15 (`0xE988E7/0xE989B3`), LZMA then three consecutive
+`0x4000` copies; mode 13 (`0xE98970`), direct copies from encoded
+offsets `9,0x4009,0x8009`; mode 16 (`0xE989D0`), three LZMA
+streams to scratch offsets `0,0x3000,0x7800` with capacities
+`0x3000,0x4800,0x4800`, then scatter. Other modes fail.
+
+First codec call raw `0xE9862E` targets `0x12ABBD0`
+(VA `0x16AC7D0`). Property parser `0x12ABA30` proves LZMA:
+property p<225, lc=p%9, lp=(p/9)%5, pb=p/45, dictionary minimum
+`0x1000`. This is distinct from index decoder `0x13090D0`.
+Compressed modes reuse sufficiently large supplied scratch or allocate
+exactly S; owned scratch is released at `0xE988BD..0xE988CB`.
+Failure zeroes all three outputs and returns AL=0; success AL=1.
+Reader releases encoded input at `0xEA03B3`; outputs remain attached
+to the request, with eventual destructor not yet traced.
+
+## Console helper consumes statements and updates the last-value variable
+
+Raw `0xE8A044..0xE8A058` loads the **vptr** from static object
+**VA** `0x1E69348`, then sets ECX to that object's address.
+It does not load an object pointer from a pointer global.
+Virtual byte offset `+0x98` at table **VA** `0x1C77EA8`
+targets raw `0xE41660` (VA `0x1242260`), which tail-dispatches
+through byte offset `+0x80` to raw `0xE41360`.
+This updates a console-variable descriptor, including text/numeric values,
+modification counters, and optional descriptor `+0x54` callback.
+It is **not an event-queue dispatch**.
+
+Here arguments are `(descriptor VA 0x1E6B670, output-or-empty,0,0)`.
+Constructor raw `0x2D4870` identifies variable `_`, described as
+`Last value returned from a console statement.` Pointer-identical normalized
+output/current value skips the update.
+Parser raw `0xE89C50` returns parserEnd-inputStart, retained in EDI.
+At `0xE8A075..0xE8A0B7`, if `0<consumed<=buffer length`,
+memmove shifts the remaining suffix to the front, cursor `+0x18` is
+adjusted, `+0x1C` conditionally cleared, and the buffer resized.
+Nonzero wait/deadline state preserves the tail; exhaustion or zero consumed
+clears the buffer. Temporary output text is reference-count released at
+`0xE8A11F`. The next scope resolves concrete wait/deadline producers.
+
+## Texture mode zero fully writes three 32x32 grids of 16-byte records
+
+For the active sample, mode-zero scatter raw `0xE98690..0xE9871E`
+operates on decompressed buffer B and three output buffers O[j].
+Each output is 1024 records of 16 bytes, exactly `0x4000` bytes.
+No color-channel interpretation is established.
+
+| Record bytes, i=0..1023 | Source/write |
+|---|---|
+| `0` | Reconstructed fourth residual sequence for output j. |
+| `1` | Reconstructed third sequence. |
+| `2..7` | Six bytes from `B+0x3000+j*0x1800+i*6`. |
+| `8..9` | LE16 reconstructed from second sequence. |
+| `0xA..0xB` | LE16 reconstructed from first sequence. |
+| `0xC..0xF` | Four bytes from `B+j*0x1000+i*4`. |
+
+Scatter consumes B offsets `0..0x77FF`. Destination advances by 16,
+four-byte source by four, six-byte source by six; final record begins
+at output `0x3FF0` and its last DWORD ends at `0x3FFF`.
+At raw `0xE9873E`, a residual reader starts at B+`0x7800`,
+bit position zero, persisting across twelve reads in output order 0,1,2.
+Per output it decodes `0xC00` signed words for helper `0xE981F0`
+at record `+0xA`, then `0xC00` for `+8`, then `0x400`
+for helper `0xE983A0` at `+1`, then `0x400` for `+0`.
+
+Both helpers reconstruct 32x32 grids, record stride `0x10`, row stride
+`0x200`: first row predicts from left, later first columns from above.
+Interior selects left if `(top-left-left) > (top-left-above)`, else above.
+Triplet helper uses signed 16-bit differences and word-wrapping additions;
+for signed triplet (a,b,c), it computes
+`s=a-(c SAR 1)`, `t=s-(b SAR 1)`, then stores
+`LE16(((b+t)<<11)|((c+s)<<5)|t)`, without separate component masks.
+Byte helper adds signed residuals to prediction and clamps to 0..255.
+
+Successful mode zero writes every byte of all three outputs; none depends
+on omitted-write prezeroing. Residual failures accumulate even though later
+helpers may still execute; final failure at raw `0xE98881` clears every
+output and returns AL=0. Residual scratch is filled by its reader, not
+explicitly initialized here. Bounds use returned decoded length
+`[ebp-0x184C]-0x7800`; equality with header S and exact residual
+bit grammar remain the next bounded check. Final bit-cursor exhaustion is
+not required in the observed path.
+
+## Console wait state is shared countdown/deadline storage; setters unresolved
+
+The bounded active-sample check identifies shared globals, not console-object
+fields: **VA** `0x1E49A74` is a signed pump-count countdown, used
+at raw `0xE89EF8..0xE89F19`; **VA** `0x1E49A78` is a
+deadline, used at raw `0xE89F1C..0xE89F4B`.
+Unsigned `low32(clock64/1000) < deadline` blocks continuation;
+equality resumes and clears the deadline. The comparison is not wrap-safe;
+milliseconds are not yet proven as the clock unit.
+Raw `0xE8A0BC..0xE8A0D2` preserves the compacted remaining
+buffer if either state is nonzero and arg_4 is zero.
+
+No nonzero setter/address-taking occurrence was found in the bounded pass;
+computed/indirect writes were not exhaustively covered. This producer gap
+is parked rather than assigning a guessed wait-command binding.
+Adjacent verified `ExecSkip` registration at raw `0x2D4992/0x2D49AD`
+targets **VA** `0x128A2E0`, raw `0xE896E0`, and writes
+different global **VA** `0x1E49A70`, not either wait field.
+The next concrete scope follows that handler and its actual consumer.
+
+## Residual symbols use gamma-like codes with signed-16 truncation
+
+Active-sample helper raw `0x1308A80` (VA `0x1709680`) is called
+at raw `0xE9877E`, bytes `E8 FD 02 47 00`.
+ECX points to `{tail,bitpos}`, EDX is actual decoded length L minus
+`0x7800`, and stack arguments are word destination/count.
+Physical bits are consumed LSB-first within bytes.
+Each symbol reads k zeroes then 1, followed by k payload bits accumulated
+most-significant first with initial accumulator 1, yielding positive integer U.
+At raw `0x1308B44`, CWDE sign-extends **16-bit U-1** to s;
+even s maps to s/2, odd s to `-((s+1)/2)`.
+Ordinary logical codes `1,010,011` yield `0,-1,+1`.
+This truncation must not be replaced with assumed full-range zigzag semantics.
+No encoded-width cap is enforced; accumulation wraps at 32 bits.
+
+Raw `0x1308AB0..0x1308ABE` checks the byte index only before
+a complete symbol, with no further unary/payload-loop bounds checks.
+Success means the requested word count was produced, not that every
+internal bit read was bounded. Updated bit position is always stored.
+LZMA wrapper raw `0x12ABCF3` writes actual decoded length L back
+through `[ebp-0x184C]`. Header S is capacity: success does not require
+L=S. Residual bounds use L-`0x7800`, not S-`0x7800`.
+The next check follows the matching writer from the known texture encoder
+to establish intended signed mapping and maximum width.
+
+## ExecSkip skips parsed segments, not only executable commands
+
+The concrete active-sample chain is registration raw `0x2D4992/0x2D49AD`
+-> handler `0xE896E0` -> shared global **VA** `0x1E49A70`
+-> queue consumer raw `0xE89F70`.
+Handler requires argument count at least two; missing count prints syntax
+without assignment. Helper `0xDD5C00(0)` converts the first argument
+using verified MSVCR120!atoi; extra arguments are ignored.
+Raw `0xE896FA` replaces the shared count, not adds to it.
+Only signed-positive values activate skipping.
+
+Each skip still calls parser raw `0xE89790`, decrements the count at
+`0xE89F8B`, bypasses dispatcher `0xE89C50`, and consumes the
+parsed prefix. Unquoted semicolon/newline terminates a segment; leading
+`//` consumes its line. Parsing/substitution still happens.
+Thus "next N buffered parser segments" is more precise than "N commands."
+The tail executes normally once the count reaches zero.
+Buffer exhaustion clears surplus count at raw `0xE8A0F0`, rather
+than carrying it into subsequently supplied text. Wait-tail exit and early
+wait returns bypass that clear and preserve state.
+The next scope identifies concrete `0xE89EC0` callers and their buffers
+to bound shared-state interleaving; no concurrent runtime occurrence is claimed.
+
+## Inverse residual writer exists; predictor pairing remains unproved
+
+Raw `0x1308970` (VA `0x1709570`) is a concrete inverse bit writer.
+At `0x13089A0..0x13089B8` it loads/sign-extends a word d,
+computes m=2*d for nonnegative d or m=-1-2*d for negative d, then
+U=m+1. Raw `0x13089D0..0x1308A53` emits k zeroes, one,
+and k MSB-first suffix bits, with physical byte bits advanced LSB-first.
+Full signed-16 inputs permit k<=16 and at most 33 bits per symbol;
+no destination-capacity checking was observed.
+
+The decoder's DEC/TEST/CWDE/SAR-or-NEG at raw
+`0x1308B41..0x1308B4E` means exact arithmetic round-trip only
+for d in [-16384,16383], at most 31 bits. Exhaustive local arithmetic
+verification reported 32,768 mismatches outside that interval. This is
+not proof that texture predictors constrain residuals to that range, nor
+proof that this writer is the texture predictor's producer.
+No direct calls or literal pointers to the writer were found in the
+bounded pass. Known texture call raw `0xEA05DF -> 0xE993B0`
+reaches indirect thunk `0x15D2614` at `0xE9942E`.
+The next scope resolves that thunk/import or callback before asserting
+an encoder-to-predictor linkage.
+
+## Console file buffers share skip state but bypass waits
+
+The active-sample mapped-byte CALL-rel32 scan found three direct callers
+of raw `0xE89EC0`; IDA xrefs missed two undefined-code sites.
+
+| Caller / callsite (raw) | Buffer | arg4 |
+|---|---|---|
+| `0xE8A180 / 0xE8A1EB` | Global **VA** `0x1DFCAC4`. | 0 |
+| `0xE8A850 / 0xE8A994` | Invocation-local pre-push ESP+0x20, label `ProcessFile` (corrected below). | 1 |
+| `0xE8A9F0 / 0xE8AB3A` | Separate invocation-local pre-push ESP+0x20, label `PrintConfig`. | 1 |
+
+First local caller allocates storage at `0xE8A8A2`, stores it at
+buffer `+8`, and calls loader `0x12BB660` at `0xE8A928`.
+The loader uses _fileno, _fstat64, fread, fclose. Buffer vtable **VA**
+`0x1C77A30` (raw `0x1876630`) accessor `0xDF47F0`
+returns backing pointer plus offset. Cleanup releases backing storage at
+`0xE8A9AE`. Second caller independently allocates at `0xE8AA43`,
+loads at `0xE8AAC9`, releases at `0xE8AB5E`.
+
+All three use absolute-global skip check `0xE89F70` and decrement
+**VA** `0x1E49A70`; no caller saves/restores it. Preserved skip
+state can therefore affect another buffer on a subsequent invocation.
+arg4=1 bypasses wait entry checks and wait-tail suspension, but not skipping.
+Normal exhaustion clears skip, potentially clearing another buffer's
+preserved remainder count.
+This proves shared state, not actual interleaving/concurrency.
+Normal caller's non-atomic guard does not establish mutual exclusion with
+either local caller. The next scope resolves their registrations/invocation.
+
+## Texture encoder thunk is the ordinary VCOMP120 _vcomp_fork import
+
+In the active sample, raw `0xE9942E` bytes `E8 E1 91 73 00`
+call raw `0x15D2614`; following `83 C4 24` cleans 36 stack bytes.
+Thunk bytes `FF 25 B0 4C AC 01` jump through IAT **VA**
+`0x1AC4CB0`, raw `0x16C38B0`.
+The PE descriptor for VCOMP120.DLL has FirstThunk RVA `0x16C4C94`;
+entry 7 names `_vcomp_fork`. This is a normal PE import, not dynamic
+resolution or raw numeric `0x1AC4CB0` file backing.
+
+Assembly supplies nine 32-bit stack arguments; the decompiler rendered only
+eight, so its call signature is not authoritative. Reported leading values
+are 1 and 6, followed by an outlined callback and six data arguments.
+The callback/data labels require exact raw/VA operand clarification before
+assigning their target or roles. Local pointers refer to stack storage;
+no ownership transfer is visible, and retention beyond the call is not
+established by that observation alone.
+The next scope resolves the actual outlined callback and one encoder operation,
+not an assumed connection to residual writer `0x1308970`.
+
+## OpenMP callback maps to raw 15A1BA0 and copies three planes for selector zero
+
+Raw `0xE99425`, bytes `68 A0 27 9A 01`, pushes callback
+**VA** `0x19A27A0`, hence raw `0x15A1BA0`, not raw `0x19A27A0`.
+The fork's nine arguments are
+`(1,6,callback,&var_5C,&var_50,0x1C9DB,&var_38,incomingEDX,stackArg0)`.
+The outlined callback consumes six stack parameters; inferred decompiler
+signatures are unreliable here.
+Selector zero copies three `0x4000`-byte planes to contiguous scratch;
+calls at raw `0x15A1CD2/0x15A1CE9/0x15A1D00` resolve to
+imported memcpy. Raw `0x15A1D86` then calls `0x12A9E30`.
+No direct callback call to residual writer `0x1308970` was found;
+transitive pairing and selector-to-outer-mode identity remain unproved.
+The next scope follows output encoding through `0x12A9D70 -> 0x12A9BD0`.
+
+## PrintConfig binds to immediate local execution; ProcessFile label corrected
+
+Active-sample console vptr **VA** `0x1C77EA8` has byte-offset
+`+0xE8` at raw `0x1876B90`, containing **VA** `0x128B450`
+(raw `0xE8A850`), and `+0xF0` at raw `0x1876B98`,
+containing **VA** `0x128B5F0` (raw `0xE8A9F0`).
+The earlier BufferFile label for `0xE8A850` was incorrect:
+raw `0xE8A8E3` references `ProcessFile`, **VA** `0x1BE26C4`.
+BufferFile is instead raw `0xE8A6C0`, byte-offset `+0xE4`.
+
+PrintConfig registration raw `0x2D4C92` supplies its name at **VA**
+`0x1BE278C`; `0x2D4CAD` stores callback **VA** `0x128BD00`
+(raw `0xE8B100`), and `0x2D4D09` links its descriptor into head
+**VA** `0x1E48990`.
+Callback requires `[args+0x208]>=2`, obtaining filename from base
+`[args+0x20C]` plus the second argument offset from `[args+0x204]`.
+Raw `0xE8B13C` pushes that pointer; `0xE8B147` invokes console
+virtual byte-offset `+0xF0`, reaching `0xE8A9F0`.
+It forwards the filename to path helper `0x1318870`, loads through
+`0x12BB660`, then calls `0xE89EC0` at `0xE8AB3A` with
+local buffer and flag 1. This is the concrete immediate-execution chain.
+Filename normalization and thread identity remain unverified.
+
+No concrete registration/caller of ProcessFile was established. That gap
+does not justify attributing unrelated `+0xE8` calls to this object.
+The next concrete scope follows BufferFile at `0xE8A6C0` instead.
+
+## BufferFile copies loaded text into the global console queue
+
+The active sample supplies a concrete caller at raw `0xE4E2BB`,
+bytes `FF 96 E4 00 00 00`, on static console object **VA**
+`0x1E69348`. Raw `0xE4E210` formats `!%s.con` (literal raw
+`0x17DD31C`) before that call and ignores its result.
+BufferFile byte-offset `+0xE4` targets raw `0xE8A6C0`;
+at `0xE8A7F8` it invokes console byte-offset `+0xE0`,
+target `0xE8A580`, which selects global buffer **VA** `0x1DFCAC4`.
+
+BufferFile owns a temporary loaded by `0x12BB660` in rb mode.
+Complete nonempty reads add a trailing NUL; empty input keeps its initial NUL.
+Queueing copies strlen(temp) bytes, so an embedded NUL truncates queued text.
+The temporary is released at raw `0xE8A813`.
+Helper `0xDF3210` writes at the queue's current cursor without resetting it;
+ordinary mode appends LF at `0xE8A616`, NUL at `0xE8A62C`,
+then backs the cursor onto the terminator. Text mode may add indentation.
+Path rejection, open/status failure, or short read returns false without
+queueing. After invoking the queue, BufferFile returns true without checking
+queue errors; that success does not prove allocation/write success.
+The next scope resolves the formatted filename's startup source and ordering,
+without guessing the meaning of its leading exclamation mark.
+
+## Encoder helper writes a five-byte property/dictionary prefix
+
+Active-sample raw `0x12A9CD0` (VA `0x16AA8D0`) requires
+prefix capacity at least five, sets it to five, writes property
+`b0+9*(b1+5*b2)` from object bytes `+0x32598/+0x3259C/+0x325A0`,
+then an unaligned DWORD at output+1. The dictionary-like DWORD derives
+from object `+0x3BD08`, minimum 4096, rounded to a 2x/3x power-of-two
+bucket. Five is the prefix length, not total decoded output size.
+Raw `0x12A9E30` initializes a processing object, writes this prefix,
+then invokes `0x12A9D70` and releases the object. Prefix failure skips
+processing. Its fallback `0x12A9D70 -> 0x12A9BD0` subtracts
+consumed input from the input-count pointer; it is not the prefix's output
+length publication. The optional processing callback is null here.
+Selector zero is proven as a staging branch only, not outer mode zero.
+Codec implementation identity and outer publication remain unproved by this
+pass; the next scope follows status/count pointers from raw `0x15A1D86`
+into candidate selection.
+
+## Startup attempts console configuration twice, with processing inside init
+
+Raw `0xE4E210` takes no parameters. Its filename source is
+`[VA 0x1E6A684]+0x1C`, transformed by `0x13192D0 -> 0x3A5910`,
+not a caller-supplied filename.
+Formatting `!%s.con` occurs at raw `0xE4E2AD`, then BufferFile
+at `0xE4E2BB`; raw `0xE4E327` immediately invokes console
+virtual `+0xF8`, raw `0xE8A180`, which attempts queue processing.
+Execution is therefore not necessarily deferred until the main loop, though
+reentrancy/wait/countdown gates can postpone it.
+
+Service initialization raw `0xE54BF0` orders:
+callback(0), conditional configuration load/process, `0xE4E350`
+command-line --cmd execution, `0xE52650` (Initializing Debug Menus),
+conditional configuration load/process again, callback(1).
+Both config gates use service byte `+0xC9`, copied from descriptor
+`+0x11`; normal startup sets it to 1 at raw `0x306E1C`.
+Each pass rereads the global source, so identical filenames are not guaranteed.
+Concrete basename and leading-! semantics remain unresolved.
+Literal settings at raw `0x17DD9E4` (VA `0x1BDEDE4`) is not
+yet bound to this source. The next check follows registration around raw
+`0x2D2EF3..0x2D2EF8` to global **VA** `0x1E6A684`.
+
+## Texture selector zero publishes outer mode one and enters minimum-size selection
+
+Raw `0x15A1D2C` initializes candidate count to capacity.
+At `0x15A1D86`, `0x12A9E30` receives payload destination buffer+9,
+count pointer, staged `0xC000` input, properties, prefix destination
+buffer, and prefix-length pointer initially 5.
+Output callback raw `0x12A9A50` copies/advances bytes and decreases
+remaining capacity; `0x12A9E0D` publishes capacity-minus-remaining.
+Overflow sets status 7; allocation failure returns 2.
+Raw `0x15A1D8E` reports nonzero status, but if the reporting function
+returns, header/count publication still proceeds.
+
+Raw `0x15A1DB2` writes DWORD `[buffer+5]=0x0100C000`,
+proving LE24 size `0xC000` and mode byte **1**.
+Raw `0x15A1DB9` adds nine header bytes to payload count.
+The dispatch table maps selector zero to this branch: **selector 0 produces
+outer mode 1, not mode 0**.
+Raw `0xE99454` compares three candidate lengths signed, selecting strict
+improvements and preserving earlier ties, without separate status filtering
+observed. Raw `0xE99756` frees staging buffers; `0xE9976B` frees
+losing encoded buffers. `0xE99861..0xE9986B` transfers winning
+pointer/count to the incoming destination pair.
+Raw `0xEA075D` passes it to the already-traced append wrapper;
+`0xEA0793` records count and `0xEA0797` releases the winning buffer.
+The next scope resolves selector 1/2 header/mode construction.
+
+## Startup basename is registered as eng.autoSaveConfigName, default settings
+
+Raw `0x2D2ED7`, bytes `B9 28 A6 E6 01`, selects console-variable
+object **VA** `0x1E6A628`.
+Raw `0x2D2EF2` pushes default settings at **VA** `0x1BDEDE4`;
+`0x2D2EF7` pushes name eng.autoSaveConfigName at **VA**
+`0x1BDEDF0`. Constructor raw `0xDD5158` stores self to object
+`+0x5C`, the alias cell **VA** `0x1E6A684`; `0xDD5166`
+copies the default into object `+0x1C`.
+This binds settings to the filename source rather than merely locating a literal.
+Raw `0xE54E10` pushes the same object and `0xE54E15` invokes
+console byte-offset `+0x98`, reaching `0xE41360`; `0xE41555..0xE41558`
+copies replacement text into `+0x1C`.
+Whether transformation `0x13192D0 -> 0x3A5910` changes that basename
+and what leading ! means remain the next concrete path-resolution scope.
+
+## Configuration path transform prepends manager prefix; ! bypasses root search
+
+Active-sample raw `0x1319350` normalizes slash to backslash.
+For ordinary input, raw `0x1319488..0x131948E` concatenates
+path-manager `+4` prefix and input into result `+4`; result `+0`
+retains normalized input. Raw `0x3A5926/0x3A5934` copies result
+`+4` without another transformation.
+Thus settings is not renamed, but the formatted source is prefix+settings,
+not necessarily the bare basename.
+
+In BufferFile path helper, raw `0x131892F` recognizes leading `!`;
+`0x1318938` skips exactly that character, retaining the remaining
+normalized path at result `+4`. Root-list searching belongs to the non-!
+branch. Prefix matching may populate result `+0` but does not replace `+4`.
+Raw `0xE8A7C0` copies result `+4` for loading.
+This proves bypass semantics, not a particular directory. The next scope
+resolves manager `+4` initialization before joining it to earlier write-prefix
+evidence. The final import probe in this bounded pass failed; no import
+conclusion relies on that failed probe.
+
+## Candidate ordinals one/two use selectors 15/16, with distinct layouts
+
+Worker tables raw `0x15A23B8/0x15A23CC` (VAs
+`0x19A2FB8/0x19A2FCC`) map candidate ordinals 1/2 to selectors
+15/16, not literal selectors 1/2 (which dispatch to default).
+Mode 15 compresses `0xC000` bytes at raw `0x15A1EFC` into B+9;
+`0x15A1F28` stores `[B+5]=0x0F00C000`, count=payload+9.
+
+Mode 16 scatter at raw `0x15A2080..0x15A213F` separates each
+16-byte block into source fields `+12:4`, `+2:6`, `+8:4`, `+0:2`.
+Across three `0x4000` inputs, scratch regions are
+`0..0x3000`, `0x3000..0x7800`, `0x7800..0xA800`,
+`0xA800..0xC000`. Calls at `0x15A21D2/0x15A2273/0x15A2314`
+compress lengths `0x3000/0x4800/0x4800` contiguously from B+12.
+Raw `0x15A234F/0x15A2351` copies first-stream five property bytes;
+`0x15A235A` stores `[B+5]=0x1000C000`; per-stream first property
+bytes go to B+9/+0xA/+0xB at `0x15A2364/0x15A2370/0x15A237A`.
+The reported returned count is sum(compressed lengths)+24, while
+constructed data ends at B+12+sum. This discrepancy requires the next
+producer/consumer operand check, not an assumed padding explanation.
+
+Both alternate candidates conditionally preprocess when the worker's final
+argument is less than 3. Helper raw `0xE98D70` applies index-DWORD
+replacement via `0xEABE8D` and six-byte index replacement via
+`0xEAC612/0xEAC615`, preserving endpoint fields.
+Color/alpha-index interpretation was reported; exact transform semantics
+and residual-writer linkage remain unproved beyond the observed field writes.
+
+## Ordinary configuration read prefix is captured-CWD\localassets\
+
+The active-sample trace joins the read-path prefix to concrete startup stores.
+Raw `0x13178EA` (VA `0x17184EA`), bytes `E8 A1 F5 F9 FF`,
+captures CWD through `0x12B6E90`; IAT **VA** `0x1AC431C`
+is verified GetCurrentDirectoryW.
+Normal setup raw `0x10D8BCE`, bytes `B9 7C 35 C0 01`,
+selects localassets. Raw `0x13179FE` concatenates that relative
+directory with the captured root; `0x1317A06/0x1317A10`
+assign manager `+4`, with normalization adding a trailing backslash.
+Raw `0x1319488` supplies that prefix for basename transformation.
+
+Thus the ordinary/default settings input resolves to
+`<captured-CWD>\localassets\settings.con`, matching the independently
+traced write-prefix behavior. The leading ! bypasses root-list searching,
+not this already-prepended physical prefix. Actual launch CWD remains
+unknown, and changed basename/descriptor configuration is not asserted
+to take the default path. Normal descriptor `+0x18` null is already
+documented; the next concrete scope is intervening --cmd execution.
+
+## Mode-16 count overstatement and per-stream budget are instruction-confirmed
+
+The follow-on initially mislabeled raw IDB addresses as VAs. Correct locations:
+raw `0x15A237D/0x15A2383/0x15A2386` map to VAs
+`0x19A2F7D/0x19A2F83/0x19A2F86`; raw `0xE989DB`
+maps to VA `0x12995DB`. Subtracted locations `0x11A177D/0xA97DB`
+contain unrelated bytes and must not be used.
+At the correct producer locations, `2B 34 FA` subtracts B from the
+final cursor, `83 C6 0C` adds 12, and `89 74 FA 04` stores
+the result. This confirms count=sum(compressed lengths)+24 while
+constructed extent is B+12+sum, a 12-byte overstatement.
+No padding-initialization or runtime consequence is established here.
+
+Consumer raw `0xE989DB` adds 12 to skip its header. Each stream
+advances the input cursor by the decoder-updated input count.
+The available budget is saved as incoming EDX-9 at
+`0xE984DA/0xE984F3`; raw `0xE98A97/0xE98AF0/0xE98B4E`
+reuse that same budget without subtracting prior consumption.
+No final input-end equality check was observed after stream three.
+The current scope resolves wrapper/internal termination semantics before
+assigning meaning to unused trailing bytes.
+
+## Startup --cmd dispatches the first statement of each matching option directly
+
+Raw `0xE4E350` calls `0x12BE760` to collect exact case-sensitive
+cmd entries from argument-pair vector **VA** `0x1E004FC`, in order.
+Option parser `0x12BD190` requires `--name=value`, splitting at
+the first equals sign; matching outer single/double quotes are removed,
+mismatched quotes retained. Bare --cmd does not consume the next argument.
+Raw `0xE4E3CD..0xE4E3E9` passes each value with format `%s\n`
+to console byte-offset `+0xD4`, raw `0xE8A200 -> 0xE89C50`.
+
+Tokenizer `0xE89790` separates unquoted whitespace; either quote
+toggles the same quoting state, backslash escapes quote/backslash, and
+unquoted semicolon or any LF terminates parsing. This chain dispatches
+only the first statement, not its remainder; repeated --cmd options dispatch
+separately. Callbacks run directly at raw `0xE89D97`.
+Variable assignments invoke console `+0x98` at `0xE89E1A`
+with `(variable,value,1,0)`. Flags can reject or latch writes; shared
+**VA** `0x1E49A59` selects logging-only behavior.
+Thus changing eng.autoSaveConfigName before pass two is structurally possible,
+not yet unconditional. Current scope resolves its concrete flags/lookup and
+normal logging state. The offset clarification confirms 28 decimal means
+hex `+0x1C`, not `+0x28`: raw `0xE4E237` bytes
+`A1 84 A6 E6 01` load the alias, and `0xE4E243` bytes
+`8B 40 1C` read its object's current text.
