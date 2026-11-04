@@ -10910,3 +10910,21 @@ writer, absolute resize adapter, and wrapper destructor layout. The
 destructor's first report repeated the XADD prior-zero interpretation;
 it has been returned for exact flag verification before any integration.
 Do not accept that wording without inspecting XADD/JNZ versus XADD/DEC/JNZ.
+
+The pool control vtable at VA `0x1C80C8C` / raw `0x187F88C`
+maps slot zero to raw `0x12CC930` (load header `+C`, null guard,
+tail to `0x12CCA10`) and slot four to `0x12CC940` (nonnull receiver
+dispatches slot eight with deleting argument one). Neither bounded entry
+directly clears header `+C`. Immediate tail/deleting-target traces are assigned.
+
+Nonpool allocation follows `0x12CBFFC` to a separate header constructor
+and pair helper `0x12CC7D0`; its control request is `0x10`, with vptr
+VA `0x1C80CB0`, versus pooled request `0x14`/vptr `0x1C80C8C`.
+The observed pair members may independently be null. Captured variant
+support is assigned without inventing allocation success.
+
+Absolute preserving resize slot `+0x1C`, raw `0x12CBAC0`, forwards
+the requested DWORD and preserve argument one to `0x12CBCB0`, leaves
+ECX unchanged, and returns EAX unchanged with RET four. This adapter does
+not define a boolean result; the source loader ignores its result. An
+immutable PE writer owns these adapter, destructor, and nonpool anchors.
