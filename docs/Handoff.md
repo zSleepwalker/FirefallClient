@@ -10,7 +10,7 @@ PrivateDialog receiver identification, AES "block-size" interpretation,
 and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
-Current delegated boundaries are the preinitialization default logging callback
+Current delegated boundaries are default-logger synchronization primitives
 and texture lock-heartbeat thread ownership/failure cleanup. Assertion interception is a bounded
 unresolved stop. Mode-16 fixed scatter and normal
 buffer release are resolved.
@@ -7596,3 +7596,25 @@ cells, not this callback slot. No slot synchronization was observed.
 The report did not resolve console-open ordering, but its suggested
 initializer/open chain is already documented above and is not rescanned.
 The next independent scope identifies the concrete default callback behavior.
+
+## Default logging callback writes and flushes CRT streams synchronously
+
+Initial callback raw `0x12C15B0` reaches fprintf at `0x12C18F9`
+through IAT **VA** `0x1AC48B0`, raw `0x16C34B0`; PE
+hint/name evidence identifies fprintf.
+Format **VA** `0x1C15D20` (raw `0x1814920`) is
+`%5s %s %7s (%05u) %s\n`, containing severity label, timestamp,
+category, numeric identifier and message.
+Severity 5 selects `__iob_func()+0x40`, otherwise `+0x20`,
+consistent with CRT stderr/stdout. Both converge on fflush at raw
+`0x12C1984`, IAT **VA** `0x1AC48B4`.
+
+Null fourth argument takes direct fprintf; nonnull builds a `0x600`-byte
+stack format, forcibly terminates it, then calls vfprintf using its va-list.
+Category byte `[arg_4+7]!=0` substitutes BAD MEM rather than discarding
+the message. No normal severity-discard path was found; absent console
+handle skips coloring only. Formatting/write/flush results are unchecked.
+Normal return is raw `0x12C19CF`.
+Arguments are borrowed, formatting stack-local, with no thread handoff or
+ownership transfer observed. Lock-shaped initialization/acquire/release is
+the next scope; first-use concurrency safety is not assumed.
