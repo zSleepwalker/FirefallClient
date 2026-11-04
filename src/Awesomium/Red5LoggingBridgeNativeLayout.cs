@@ -163,6 +163,17 @@ public static class ClientApiWinHttpOpenRequestFlagLayout
         | (bypassProxyCache != 0 ? RefreshFlag : 0);
 }
 
+public static class ClientApiRouteWorkerTimeoutLayout
+{
+    public const uint CompletionOffset = 0x1C;
+    public const uint TimestampOffset = 0x28;
+    public const uint TimestampSize = 8;
+    public const ulong TimeoutMicroseconds = 120_000_000;
+
+    public static bool ShouldExpire(bool hasCompletion, ulong nowMicroseconds, ulong startMicroseconds) =>
+        !hasCompletion && unchecked(nowMicroseconds - startMicroseconds) > TimeoutMicroseconds;
+}
+
 /// <summary>
 /// Observed redirect header-replay gate. Host comparison models ASCII
 /// case-insensitivity; CRT locale-specific byte behavior is not simulated.
@@ -455,6 +466,11 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint ClientApiRequestSubmitTickStoreRaw = 0xBC4512;
     public const uint ClientApiRequestOpenTickStoreRaw = 0xBC2DE1;
     public const uint ClientApiRequestCallbackTickStoreRaw = 0xBC37D5;
+    public const uint ClientApiRouteWorkerPumpRaw = 0xBC3F80;
+    public const uint ClientApiRouteWorkerCompletionGateRaw = 0xBC3FD0;
+    public const uint ClientApiRouteWorkerTimeoutCheckRaw = 0xBC3FE2;
+    public const uint ClientApiRouteWorkerCtorTimestampSequenceRaw = 0xBC2831;
+    public const uint ClientApiPumpRequestWorkerTimestampStoreRaw = 0xBC2C0F;
     public const uint ClientApiRequestResetTickOffset = 0x68;
     public const uint ClientApiRequestTrackedTickOffset = 0x6C;
     public const uint ClientApiRequestOpenTickOffset = 0x70;

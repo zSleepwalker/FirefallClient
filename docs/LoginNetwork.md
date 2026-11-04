@@ -359,3 +359,37 @@
 ## Unresolved
 - Writer provenance for request byte `+0x60` beyond reset has not yet been
   located. No caller behavior is inferred from this field alone.
+
+# Round 32: ClientApi route-worker timeout
+
+## Observed
+- `ClientApi_PumpRouteWorkers` (`0xBC3F80`) calls
+  `ClientApi_PumpRequestWorker` for each route worker. A nonzero worker field
+  at `+0x1C` counts as active completion and bypasses timeout evaluation.
+- Otherwise it calls the `timeGetTime` import at IAT VA `0x1AC4D24`, converts
+  the millisecond tick to microseconds through helper `0x159DC30` with
+  multiplier 1000, and subtracts the worker's 64-bit timestamp at `+0x28`.
+  The code removes the worker only when elapsed time is strictly greater than
+  `0x07270E00` microseconds (120 seconds); equality is retained.
+- The timeout path logs, swap-removes the worker from the route-worker array,
+  calls `ClientApi_WorkerDetachCompletionOnTeardown` (`0xBC2890`), then
+  destroys the worker. The teardown helper marks callback-context byte `+0x11`
+  when present, closes the worker's WinHTTP handle at `+0x20`, and clears it.
+- Worker constructor `0xBC27A0` seeds `+0x28/+0x2C` with
+  `timeGetTime()*1000` at `0xBC2831`. `ClientApi_PumpRequestWorker` also
+  overwrites that timestamp on the observed path at `0xBC2C0F`.
+  CompanionTools checks the original sample bytes for the active-completion
+  gate, 64-bit timeout comparison, constructor seed, and pump-path store.
+
+## Interpreted
+- The route loop's timeout arithmetic is unsigned 64-bit, and the threshold
+  comparison is strict. No wrap correction is present between the sampled
+  32-bit `timeGetTime` value and the stored 64-bit microsecond timestamp; a
+  tick wrap can therefore make the subtraction underflow and satisfy the
+  timeout check.
+
+## Unresolved
+- The pump-path timestamp rewrite is branch-dependent; its precise renewal
+  cadence is not established.
+- The teardown helper's completion-context cleanup behavior is observed, but
+  cancellation guarantees for an in-flight WinHTTP operation are not proven.

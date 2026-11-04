@@ -4517,3 +4517,21 @@ Latest pass: engine-system slot callers (cells 1DFC82C/1E60EA4; slot 0 caller un
   `WinHttpOpenRequest` call receives null HTTP-version, referrer, and accept-
   type pointers. The C# model/test and `LoginNetwork.md` Round 31 save this
   policy. Writers after reset and callers that enable it remain unknown.
+
+# Round 47: ClientApi route-worker timeout
+
+- `ClientApi_PumpRouteWorkers` at `0xBC3F80` pumps each worker. A nonzero
+  completion pointer at worker `+0x1C` bypasses timeout evaluation; otherwise
+  it computes unsigned 64-bit elapsed microseconds from `timeGetTime()*1000`
+  and the worker timestamp at `+0x28/+0x2C`. Elapsed time must be strictly
+  greater than `0x07270E00` (120 seconds) to remove the worker.
+- Removal logs, swap-removes the array entry, calls
+  `ClientApi_WorkerDetachCompletionOnTeardown` (`0xBC2890`), then destroys
+  the worker. That helper marks callback-context byte `+0x11` if present,
+  closes and clears the WinHTTP handle at worker `+0x20`.
+- No correction for `timeGetTime` wrap is visible before the unsigned
+  subtraction; the C# model records the resulting underflow behavior. The
+  constructor seeds the timestamp at `0xBC2831`, and the pump path rewrites it
+  at `0xBC2C0F`; that rewrite's cadence and the teardown helper's cancellation
+  guarantees remain unresolved. Details and sample checks are in
+  `LoginNetwork.md` Round 32.

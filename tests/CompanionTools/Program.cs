@@ -2319,6 +2319,27 @@ if (args.Length == 2)
         && ClientApiWinHttpOpenRequestFlagLayout.HttpsSchemeOffset
             == Red5LoggingBridgeNativeLayout.ClientApiRequestUrlSchemeOffset
         && ClientApiWinHttpOpenRequestFlagLayout.BypassProxyCacheOffset == 0x60);
+    Check("ClientApi route worker strictly times out idle workers after 120 seconds",
+        client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiRequestTimerImportVa,
+            "timeGetTime")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiRouteWorkerCompletionGateRaw
+            + 0x400C00, "837F1C00740C")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiRouteWorkerTimeoutCheckRaw
+            + 0x400C00, "FF15244DAC016A0068E80300006A0050E8399C9D002B47288945EC1B572C75073D000E2707766A")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiRouteWorkerCtorTimestampSequenceRaw
+            + 0x400C00, "FF15244DAC01B9E8030000F7E18BCE89462889562C")
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiPumpRequestWorkerTimestampStoreRaw
+            + 0x400C00, "89472889572C")
+        && ClientApiRouteWorkerTimeoutLayout.CompletionOffset == 0x1C
+        && ClientApiRouteWorkerTimeoutLayout.TimestampOffset == 0x28
+        && ClientApiRouteWorkerTimeoutLayout.TimestampSize == 8
+        && ClientApiRouteWorkerTimeoutLayout.TimeoutMicroseconds == 120_000_000
+        && !ClientApiRouteWorkerTimeoutLayout.ShouldExpire(
+            false, ClientApiRouteWorkerTimeoutLayout.TimeoutMicroseconds, 0)
+        && ClientApiRouteWorkerTimeoutLayout.ShouldExpire(
+            false, ClientApiRouteWorkerTimeoutLayout.TimeoutMicroseconds + 1, 0)
+        && !ClientApiRouteWorkerTimeoutLayout.ShouldExpire(true, ulong.MaxValue, 0)
+        && ClientApiRouteWorkerTimeoutLayout.ShouldExpire(false, 0, 1));
     Check("Original ClientApi redirect callback cracks the target and replays stored headers once",
         client.ImportSlotNames(Red5LoggingBridgeNativeLayout.ClientApiWinHttpCrackUrlImportVa,
             "WinHttpCrackUrl")
