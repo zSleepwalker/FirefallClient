@@ -10,8 +10,8 @@ PrivateDialog receiver identification, AES "block-size" interpretation,
 and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
-Current delegated boundaries are console writer callback linkage
-and texture repeated-append capacity transitions. Assertion interception is a bounded
+Current delegated boundaries are log-callback startup publication/order
+and texture filesystem-lock acquisition/release semantics. Assertion interception is a bounded
 unresolved stop. Mode-16 fixed scatter and normal
 buffer release are resolved.
 Shutdown-request callers
@@ -7505,3 +7505,41 @@ flushes. Open failure reports `Could not open %s for logging` through
 Shutdown virtual `+0xD0 -> 0xE5EEE0` closes/clears the handle.
 The next scope resolves callback linkage into writer `0xE5AC70`,
 not an assumed connection from arbitrary log calls.
+
+## Texture misses restore spare capacity by reloading before append
+
+Raw `0xE9EAC2` enters owner transaction `0xE9E200`, then
+`0xE9EACD` reloads the index through `0xE9D960`.
+Reload frees previous record storage at `0xE9D98C`, clears its pointer
+at `0xE9D991`, loads persisted N, and allocates zeroed `(N+1)*0x4C`
+at `0xE9DB7A`, publishing it at `0xE9DB82`.
+Append consumes the spare and publishes count N+1, then saves.
+No subsequent array reallocation was found before this operation returns.
+Successful repeated misses therefore reload persisted N, allocate N+1,
+append/save N+1, then on the next miss reload and allocate N+2.
+This is not permanent spare capacity after every append.
+Owner-end `0xE9E300` follows save at `0xE9F904`.
+The next scope resolves the known filesystem helpers `0x1309560/0x1309650`;
+non-atomic owner nesting does not itself prove cross-thread/process exclusion.
+
+## Category logging reaches the console writer through a callback slot
+
+Console vtable byte-offset `+0xB4`, raw `0x1876B5C`, contains
+**VA** `0x125B870`, writer raw `0xE5AC70`.
+Raw `0x3041AD` selects callback **VA** `0x14D9440`,
+raw `0x10D8840`; raw `0x3041CA` stores EAX to callback slot
+**VA** `0x1DF96F8`. The registration helper's exact returned-value
+contract remains the next check before equating every stored EAX with
+that selected callback.
+Category constructor raw `0x12C1A4A` stores this slot's address at
+category `+0x14`; generic emitter `0x12C208F` invokes the callback.
+Callback raw `0x10D89F6` dispatches console `+0xB4`.
+
+Concrete emission raw `0xE5EA9D` logs `Logging to %s` through
+`0x325A90`, severity 2, category **VA** `0x1E6B5D8`.
+Its initializer `0x2D3B38..0x2D3B41` invokes category constructor
+`0x12C1A20`. This joins emission, generic emitter, callback, writer,
+and conditional file output.
+The calls are synchronous and pass stack-local text; exclusive thread ownership
+is not established. Enable/context gates and nonnull FILE still govern output.
+The next scope checks callback-slot initialization/replacement and startup order.
