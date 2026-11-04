@@ -10742,3 +10742,24 @@ null, but includes malformed address `0x12CBDDDF`. No failure projection
 or runtime inevitability claim is accepted from that typo. A narrow caller
 instruction-byte verification is active; lower allocator failure/reporting
 contracts remain as previously documented.
+
+## Immutable clamp checks correct zero-length setup claim
+
+Exact PE bytes contradict the earlier trace's cap displacement and
+setup ordering. `0x12BB3D0` is `3B 7D 0C` and `0x12BB3D3`
+is `0F 47 7D 0C`: the cap is `[EBP+0xC]`, not `[EBP+8]`.
+Receiver slot `+0x1C` is called at `0x12BB3DA` before
+`0x12BB3E3` tests EDI for zero. Thus earlier statements here
+that zero skips receiver setup are superseded. Coordinator removed
+`IsRequestedLengthSetupNeeded`, corrected documentation, and pushed
+the code plus exact CMOVA/setup/test regression checks after a combined
+immutable-binary run. The unsigned minimum itself remains valid.
+A bounded successor verifies only the post-setup zero branch and return.
+
+The preserve caller anchors are also corrected: `0x12CBDD0`
+reads the new header's `+4` field on the positive preserve-copy path;
+`0x12CBDDF` is the no-copy path's `CMP ESI,[EBX]`, not the malformed
+`0x12CBDDDF`. Later logical-length and wrapper field writes are
+`0x12CBDFD`, `0x12CBE07`, `0x12CBE15`.
+These conditional captured-null observations are being recorded as static
+access-order evidence, not a clean failure emulation or inevitable runtime fault.
