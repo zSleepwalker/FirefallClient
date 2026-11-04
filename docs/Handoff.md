@@ -12,7 +12,7 @@ are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
 file-close path. Active boundaries are the cursor-selection tree payload publisher
-and derived-angle normalization's import, constants, and exceptional comparisons.
+and a captured-remainder projection of the verified derived-angle correction.
 UI lifecycle code/checks are committed.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
@@ -9851,6 +9851,32 @@ proof that every payload is a cursor handle. The successor follows the
 tree's concrete publisher. The report's unresolved label for final
 `0xBFFA3F` does not reopen the already composed UI vtable binding to
 `0xBFFA90`; runtime replacement remains the existing qualification.
+
+## Derived angle uses CRT fmod; correction applies to negative nonzero remainders
+
+Read-only PE mapping resolves stub raw `0x159DD00`, bytes
+`FF 25 20 48 AC 01`, through IAT VA `0x1AC4820` / raw `0x16C3420`
+to `MSVCR120.dll!_CIfmod`. The on-disk IAT points at import-name data,
+not a resolved runtime target; no bound-import directory is present.
+Empty raw-IDB import enumeration is not a dynamic-resolver finding.
+
+Mapped float constants: VA `0x1C5E1C4` / raw `0x185CDC4` contains
+`DB 0F C9 40` (bits `0x40C90FDB`, float two-pi); VA `0x1C817A4` /
+raw `0x18803A4` is zero, and VA `0x1C81BE8` / raw `0x18807E8` is one.
+VA `0x1EDB020` is virtual-tail loader-zero data, not a file-backed pair;
+later runtime writes are not excluded.
+
+Raw `0xCCA29F..0xCCA2A8` supplies the sum and two-pi to the CRT stub.
+At `0xCCA2BA..0xCCA2CC`, SETNBE predicates select correction for an
+ordered negative original sum. In that branch, UCOMISS remainder/zero,
+LAHF, TEST AH/0x44, and JNP skip addition only for exact zero.
+Otherwise two-pi is added, including for unordered remainder (still NaN).
+This supersedes the earlier incorrect "add only if unordered" interpretation.
+Exact zero includes either sign, so a captured signed-zero remainder
+passes unchanged. Output float `+0x14` is distinct from output byte
+`+0x24`; the epilogue does not establish a meaningful EAX boolean return.
+The next code task projects only correction of a captured CRT remainder,
+not an unverified managed emulation of x87 `_CIfmod`.
 
 The report's apparent VA lookup discrepancy is not a new mapping gap:
 the IDB is raw/base-zero and a numeric runtime VA must not be used directly
