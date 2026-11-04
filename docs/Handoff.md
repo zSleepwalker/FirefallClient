@@ -11043,3 +11043,10 @@ reports `0x69`. If reporters return, allocation/publication continues even
 on repeat calls. No interlocked instruction or lock is visible in the
 bounded entry gates; external serialization remains unresolved. Entry-gate
 capture support is assigned separately from the already-pushed continuation.
+
+Copy-constructor/pair-helper immutable PE anchors are pushed at `786b56b`;
+initializer entry diagnostic captures and all-byte matrix at `1bbcfd8`.
+Copy code review found a fresh-destination path mismatch: its null-old-
+control branch targets stores `0x12CC491/0x12CC495`, not callback-path
+stores `0x12CC485/0x12CC489`. The copy agent is correcting those
+uncommitted instruction anchors before registration and staging.
