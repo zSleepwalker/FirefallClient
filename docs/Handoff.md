@@ -12,7 +12,7 @@ are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
 file-close path. Active boundaries are PrintConfig echo-mode unwind cleanup
-and protected VM status-specific stack/error recovery.
+and protected VM fixed-error value ownership.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
 Normal native CRT return selects `exit(status)`.
@@ -8581,3 +8581,24 @@ This describes forwarding only, not a demonstrated runtime outcome.
 Pump flag 1 bypasses wait/deadline checks but not ExecSkip's positive-count
 segment consumption (`0xE89F70..0xE89F91`). Consequently PrintConfig
 mode does not guarantee every parsed segment reaches the echo branch.
+
+## Protected VM error recovery normalizes one error slot and restores call state
+
+Raw `0xCD6B00..0xCD6B5A` selects error values by status: 4 uses
+the value at `[VM+0x0C]+0x90`; 6 interns 23 bytes from
+**VA** `0x1BC7E6C`; other nonzero statuses copy the 16-byte value at
+`[VM+8]-16`. All branches leave top `[VM+8]` at error slot +16.
+The reported control-byte contents at `0x1BC7E6C` came from reading a VA
+as raw and are not accepted as that message. Exact message and cached-value
+ownership are the next check. Raw `0xCD5AB0` processes open entries at or
+above the error slot before normalization.
+
+For the one-argument protected call, the function slot is `[VM+8]-32`.
+The saved index +1 resolves to a stack-relative slot temporarily installed
+at `[VM+0x58]`; raw `0xCD7890` restores the prior field.
+Failure restores `[VM+0x10]`, byte `+0x6D`, word `+0x68`,
+and invokes `0xCD6EB0`, leaving the normalized error as the top value.
+The outer `0xC278C0(state,savedIndex)` restores the original entry top;
+nonzero status makes `0xC3B3C0` return false.
+The shared catch cleanup at `0xCD6C7F` restores error-frame pointer
+`[VM+0x2C]` and word `+0x6A` before returning status.
