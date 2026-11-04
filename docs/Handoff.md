@@ -11,7 +11,7 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are config-loader emission-guard cleanup
+file-close path. Active boundaries are concrete config-command output routes
 and exact EH state/action routing for traceback fallback-name restoration.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
 Normal native CRT return selects `exit(status)`.
@@ -8400,3 +8400,24 @@ or establish whether that pushed target is a handler versus a cleanup funclet.
 Therefore normal-path restoration is proven, but a blanket exceptional
 non-restoration conclusion remains provisional pending that binding.
 Absence of IDA-decoded EH maps does not prevent reading their underlying bytes.
+
+## Config-load suppression is unconditional normal-path mute, not a nesting barrier
+
+Raw `0xE4E210` calls its severity-2 helper at `0xE4E256`,
+then sets console byte `+5` at `0xE4E263`, before path construction
+and BufferFile at `0xE4E2BB`. It does not test BufferFile's return.
+A normal false return still reaches buffer cleanup, the pump at
+`0xE4E327`, and the clear at `0xE4E32D`; no ordinary early return
+bypasses that clear.
+
+The code saves no previous byte value: it assigns 1 then 0.
+Consequently nested calls could clear an outer suppression interval;
+this is not a reentrancy barrier or nesting-preserving guard.
+The inspected EH entry **VA** `0x1A5F460`, raw `0x165E860`,
+and nearby cleanup stubs yielded no guard-reset action. Normal clear is
+proven; exceptional restoration was not established by that bounded inspection.
+
+Sampled helpers raw `0x322C40` and `0x6E1A80` test `+5`,
+but sink raw `0xE5AC70` has no corresponding entry check.
+Therefore suppression cannot be generalized to all output routes without
+following a concrete command/caller; that is the next bounded task.
