@@ -12,7 +12,8 @@ are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
 file-close path. Active boundaries are service/console deinitialization state
-after that close and VM-frame insertion/removal behind DumpKeyComboThread's traceback.
+after that close and traceback metadata fields/special cases.
+VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
 Normal native CRT return selects `exit(status)`.
 Exit registration and its logger cleanup predicate are resolved.
 Generic wrapper field `+8` is a duplicated diagnostic label:
@@ -8207,3 +8208,42 @@ formatting path; later `C` entries are emitted after the first non-`C`.
 Exact field layout and frame insertion/removal remain separate questions.
 The concrete metadata operations support active script-frame interpretation,
 but do not by themselves establish Lua version or complete frame lifetime.
+
+## Service deinitialization includes a conditional post-close logging attempt
+
+Raw `0xE553F0..0xE55571` begins with logger helper `0x322C40`
+at `0xE553FE`, console `+0xBC` at `0xE55410`, conditional console
+`+0xEC` at `0xE5543E`, and entry `+0x7C` callbacks at
+`0xE55444..0xE55480`. Registry/list cleanup includes `0xE54AB0`
+and `0xDE12B0`, followed by console `+0x14` at `0xE55534`
+and console `+8` at `0xE55541`.
+
+Console deinit raw `0xE5EF20` closes/nulls the two FILE globals through
+`+0xD0` at `0xE5EF68`, then calls console `+0xC` at `0xE5EF78`.
+Later path processing invokes IAT **VA** `0x1AC471C` and conditionally
+reports a result neither zero nor -1 (`0xE5F4A9..0xE5F511`).
+Its import identity is pending; this is not evidence of reopening a log.
+It clears byte `this+4` at `0xE5F597`.
+
+After console deinit returns, service shutdown calls `0xE6F7C0`
+at `0xE55546`, console `+0xC0` at `0xE55555`, then `0x322C40`
+at `0xE55565`. That helper conditionally emits through console `+0xB0`
+(raw `0xE5AB80`) with severity 2 when object/threshold checks pass.
+Emitter `0x12C2030` uses the current category callback.
+This proves an attempted post-close logging path, not unconditional output.
+The sink's file writer is conditional on a FILE being nonnull.
+
+An unclassified reference to callback slot **VA** `0x1DF96F8`
+at raw `0x12C1A4D` is the next concrete check; do not conclude that
+the four known setter sites exhaust possible callback changes.
+
+## VM frame traversal verified; producer/pop remains a bounded stop
+
+Raw `0xC05FF3/0xC05FFC/0xC06005` gates/loads the manager's `+0xA00`
+object and its `+0x78` context. Raw `0xC294C6` starts from context
+`+0x10`, `0xC294CB..0xC294E5` tests context `+0x30` sentinel,
+and `0xC294D4` advances through node `+8`.
+No insertion/pop or sentinel initialization was established by the bounded
+follow-up. Therefore current-to-parent interpretation remains conditional
+on the head being the active frame. Further repeated producer scans are
+parked; the next task addresses concrete formatter fields and special cases.
