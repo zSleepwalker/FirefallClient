@@ -11276,3 +11276,54 @@ The normal reset return is `0x12CDE2E..0x12CDE43`; `0x12CDE54`
 is inside a separate backedge, not an epilogue.
 Reset callback projection awaits only corrected size/padding anchor labels
 and byte-slice checks before registration.
+
+Configuration/reset-entry code is pushed at `c6bc62c`.
+Reset temporary primary-pop collection is a DWORD buffer descriptor
+`begin/current-end/storage-end`, not a sorted pointer array in the bounded
+setup. Append/growth boundary code is assigned to
+`b14b936c-0ef0-4881-8bf7-9c79fc8f0760`.
+Shared text-pool singleton getter `0x12B9F70` sets the ordinary guard low
+bit before configuring global VA `0x1F113D8` with `(32,128,16)`.
+Both it and guard VA `0x1F113D0` lie in zero-filled virtual data with no
+file-backed global bytes. Captured getter code is assigned to
+`71b6acc7-4b2b-4b5f-aa7a-cb378b4d5880`; no atomic-once/readiness claim
+is established.
+
+Pre-commit pinned validation found a failing reset-finalization PE assertion;
+the exclusive evidence writer is comparing its literal/targets against the
+sample before integration. Other pending windows pass. Callback check review
+also corrected raw `0x12CDDB2` mapping to VA `0x16CE9B2` and a scan
+slice length mismatch; its author is finishing that follow-up.
+Reset secondary-block alignment is a distinct read-only scope
+`e115f0f8-9e99-4fa4-8959-7c0362587b70`; do not reuse replenishment
+anchors for that reset block without exact evidence.
+
+The finalization PE mismatch was `85 09` versus actual `85 C9`
+(`test ecx,ecx`) at raw `0x12CDE25`, not a branch-target error.
+The evidence writer corrected it and is still adding singleton/append windows.
+Raw helper `0x6A5500` is DWORD capacity selection: descriptor spare space,
+used count and capacity use wrapped subtraction followed by arithmetic
+right shift two; unsigned comparisons govern the branches. Tail transfer is
+to raw `0x6A5900`, not a sorting operation. Bounded code/check reconstruction
+is assigned to `1a88b91f-46e8-4925-94f0-f3a83ef159e1`, preserving an
+explicit unresolved indirect-call continuation boundary.
+
+Coordinator independently matched callback's 62 bytes, finalization's 67
+bytes, and all 20 singleton getter instructions against the pinned PE.
+Singleton raw `0x12B9F70` maps to VA `0x16BAB70`; both source checks
+and PE assertions needed independently transcribed VA corrections.
+The matched-candidate branch copies the last DWORD over the match and
+shrinks saved end by four, then skips callback/count increment. It does
+not preserve order. Code is assigned to
+`866951b4-bfa5-4c6a-8b48-68bf63148bd1`.
+New alignment/growth PE assertions are exclusively assigned to
+`f8e951f9-3345-4c1b-becc-2532ea73028e`.
+
+Raw `0x6A5900` storage replacement is not yet implemented: allocation is
+requested count times four (limit `0x3FFFFFFF`), then opaque copy arguments
+use descriptor reads after allocation; retained count uses separate reads
+after copy. Conditional old-begin release precedes ordered publication
+of begin, storage end, and end. Keep those cross-call reads independent.
+The current growth author must finish compile fixes before another
+serialized coordinator build; newly written incomplete check files have
+temporarily blocked otherwise ready callback/finalization integration.

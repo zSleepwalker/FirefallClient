@@ -166,6 +166,23 @@ internal static class UiShaderSourcePoolConfigurationChecks
             powerOfTwo.DiagnosticIds.IsEmpty
             && powerOfTwo.PaddingBytes == 0);
 
+        var callerConfigurations = new (uint Size, uint Count, uint Alignment)[]
+        {
+            (12, 8, 1),
+            (32, 128, 16)
+        };
+        check("The other observed caller argument triples preserve zero padding without diagnostics",
+            callerConfigurations.All(arguments =>
+            {
+                var projection = UiShaderSourcePoolConfigurationProjectionRules.Project(
+                    CaptureRepeatedValues(arguments.Size, arguments.Count, arguments.Alignment));
+                return projection.DiagnosticIds.IsEmpty
+                    && projection.PaddingBytes == 0
+                    && projection.FieldWrites[5].Value == arguments.Alignment
+                    && projection.FieldWrites[6].Value == arguments.Size
+                    && projection.FieldWrites[8].Value == arguments.Count;
+            }));
+
         UiShaderSourcePoolConfigurationProjection changingCaptures =
             UiShaderSourcePoolConfigurationProjectionRules.Project(
                 new UiShaderSourcePoolConfigurationCapture(
