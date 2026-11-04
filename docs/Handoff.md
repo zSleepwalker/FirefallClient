@@ -12,7 +12,7 @@ are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
 file-close path. Active boundaries are global-heap synchronization setup
-and virtual-memory region allocation/release.
+and region-collector record retention/release ordering.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
 Normal native CRT return selects `exit(status)`.
@@ -8852,3 +8852,31 @@ Raw `0xC327D0` publishes raw `0x12CA210`'s allocator-object result
 into global pointer slot **VA** `0x1E48918`; the slot is virtual-tail data,
 not the raw-IDB bytes at its numeric VA. Callers load that pointer into ECX.
 Concrete creation options and surrounding synchronization are the next check.
+
+## Heap region growth publishes metadata only after successful VirtualAlloc
+
+Addresses here are raw IDB/file offsets. The follow-up incorrectly treated
+raw `0x12C771A` as a VA and subtracted the code bias; that alternative
+`0xEC6B1A` is not accepted as the call site.
+Allocation raw `0x12C8A20` first searches existing bins/free space.
+Its request normalization uses 16 for n<11, otherwise `(n+11)&~7`,
+rejecting requests at or above `0xFFFFFFC0`.
+This is not a VirtualAlloc call for every allocation.
+
+Initialization raw `0x12C6A90` obtains GetSystemInfo and uses allocation
+granularity **VA** `0x1EDAFC0`, checked as a power of two.
+Region helper raw `0x12C7690` computes
+`(internalRequest + granularity + 0x2F) & ~(granularity-1)`,
+checks wrap and configured heap limit `+0x1B8`, then requests reserve+commit,
+read/write. Successful allocation updates total `+0x1B0` and high-water
+`+0x1B4`; failure precedes those updates and metadata publication.
+
+Inline region record `+0x1D8` contains base, size, next, flags.
+Raw `0x12C7400` copies the prior 16-byte record near the old top region's
+end and publishes the new inline record. Free-side trim raw `0x12C7BF0`
+and collection raw `0x12C78A0` use VirtualQuery validation and
+`VirtualFree(address,0,0x8000)` release.
+PE-verified IAT VAs are `0x1AC42A8` VirtualQuery,
+`0x1AC42B4` VirtualFree, and `0x1AC42B8` VirtualAlloc.
+The linked traversal begins at `+0x1E0`; inline-seed retention,
+flag-bit gates, and partial-release failure bookkeeping remain unresolved.
