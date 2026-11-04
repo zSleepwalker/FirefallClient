@@ -11,8 +11,8 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are the UI synchronization helper record
-and the native producer's pre-append helper effects.
+file-close path. Active boundaries are the cursor-observation reconstruction
+and native producer helper `0xCCA190`'s exact derived arithmetic.
 UI lifecycle code/checks are committed.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
@@ -9756,6 +9756,39 @@ check now use this exact order, superseding the earlier ascending-source
 assumption. The code still does not assign semantic names or wire meaning.
 The successor task follows only pre-append calls and their possible source
 state updates, not another scan of the now-resolved copy instructions.
+
+## Synchronization helper record is USER32 CURSORINFO
+
+Read-only PE import parsing binds IAT VA `0x1AC4C24` (raw `0x16C3824`)
+to `USER32.dll!GetCursorInfo`. Raw `0xBFFA90` initializes a twenty-byte
+record with `cbSize=20`, zeroes its remaining sixteen bytes, and passes
+it to that import. Thus previously neutral `h0` is CURSORINFO flags
+at `+4`, and `h1` is the PE32 cursor handle at `+8`; point coordinates
+occupy `+12/+16`. This resolves the record provider without guessing
+from its size. The existing exact-zero/exact-one predicates remain unchanged.
+
+The API return is ignored; failure does not select a separate branch.
+Pre-zeroing does not prove output remains zero if the API returns failure.
+A code task now updates captured-input naming and layout evidence without
+calling WinAPI or introducing a success-shaped failure fallback.
+
+## Pre-append helper writes derived fields, not the four record source fields
+
+At raw `0xC95428..0xC95443`, producer `0xC95400` passes output
+`this+0x2DC`, input `this+0x98`, and its argument to `0xCCA190`.
+That helper writes derived fields `+0x2DC..+0x2FF` and a boolean
+at `+0x300` (`0xCCA24A..0xCCA32C`). The boolean and a comparison
+against `+0x2EC` gate subsequent work at `0xC95450`.
+Indirect slots `+0x34/+0x20/+0x28/+0x74` remain unresolved.
+The `+0x74` call requires the `+0x1C` pointee's byte `+0x80`;
+its return feeds helpers including `0xC225E0` and `0xCA90B0`.
+
+The parent `+0x2B0` is the caller's supplied argument, not necessarily
+`this+0x2B0` in the producer. No local write to source `+0x338..+0x344`
+was identified; opaque virtual side effects remain possible.
+The report's VA `0x1696000` is arithmetic error: raw `0xC95400`
+maps to VA `0x1096000`. The successor follows only `0xCCA190`'s
+concrete output arithmetic, not the unresolved virtual targets.
 
 The report's apparent VA lookup discrepancy is not a new mapping gap:
 the IDB is raw/base-zero and a numeric runtime VA must not be used directly
