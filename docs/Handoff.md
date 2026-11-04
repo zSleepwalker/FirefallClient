@@ -10660,3 +10660,14 @@ Its resulting `.rsrc`/fill-byte interpretation is rejected.
 The established `.rdata` mapping instead gives raw `0x187F8C4`;
 a narrowly corrected slot `+4/+0xC` trace is requested. This is
 not a new sample-layout gap or evidence that the wrapper lacks a vtable.
+
+The loader output trace reports the wrapper receiver saved from EDX at
+raw `0x12BB2D7`. Its slot `+0x1C` is called at `0x12BB3DA`,
+then slot `+4` supplies the buffer at `0x12BB403`.
+The chunk call at `0x12BB40E` uses IAT VA `0x1AC490C`
+with pointer, length, one, and handle; a result other than one
+selects receiver slot `+0x14` and failure.
+The report's numeric-VA `0x08080808` fill is not an import identity;
+a bounded immutable PE binding is assigned instead. IDA EAs here
+are raw file offsets, not RVAs despite that report's mixed label.
+No transfer semantics are inferred until the import is resolved.
