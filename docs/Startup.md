@@ -179,6 +179,8 @@ The captured control writer supports both observed variants: pooled controls req
 
 `UiShaderSourcePoolCandidateProjectionRules` records the caller's captured acquisition result. Nonnull candidates receive data, displacement, capacity, and logical-length writes in instruction order; data-pointer addition wraps as a DWORD. The explicit null-candidate branch still calls the pair wrapper without header stores. This caller projection neither emulates acquisition retries nor guarantees that acquisition returns.
 
+`UiShaderSourcePoolInitializationProjectionRules` records only the post-allocation continuation: nonnull allocator capture selects configuration with `(2064, 32, 1)`, then the allocator pointer and separately captured prior list head are published before setting byte `+4`. Null allocation still reaches those writes if preceding calls return; the flag does not imply pool readiness. With receiver VA `0x1E00500`, the `+0x10` store targets pool global VA `0x1E00510`.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves

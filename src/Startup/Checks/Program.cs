@@ -25,6 +25,7 @@ UiShaderSourcePoolReturnChecks.Run(Check);
 UiShaderSourceNonPoolReleaseChecks.Run(Check);
 UiShaderSourceAllocationChecks.Run(Check);
 UiShaderSourcePoolCandidateChecks.Run(Check);
+UiShaderSourcePoolInitializationChecks.Run(Check);
 UiShaderSourceBackingAlignmentChecks.Run(Check);
 UiShaderSourcePoolControlChecks.Run(Check);
 UiShaderSourcePreserveCopyChecks.Run(Check);

@@ -7174,6 +7174,23 @@ internal static class StartupBinaryEvidence
             && ShortConditionalBranchTargets(0x12CBF86, 0x77, 0x12CBFFC)
             && ShortConditionalBranchTargets(0x12CBF8C, 0x75, 0x12CBFFC)
             && Matches(0x12CBFFC, "6A10"));
+        check("Binary slBlob pooled candidate null branch passes zero to the wrapper; non-null initializes the 0x10 header and passes it to the same wrapper",
+            RelativeBranchTargets(0x12CBF94, 0xE8, 0x12CDE60)
+            && Matches(0x12CBF94, "E8C71E000085C0743C8D4810C645EC00FF75EC8948048BCE50C7400800000000C70000080000C7400C00000000E8DA040000")
+            && ShortConditionalBranchTargets(0x12CBF9B, 0x74, 0x12CBFD9)
+            && RelativeBranchTargets(0x12CBFC1, 0xE8, 0x12CC4A0)
+            && Matches(0x12CBFD9, "33C08BCE8845ECFF75EC50E8B7040000")
+            && RelativeBranchTargets(0x12CBFE4, 0xE8, 0x12CC4A0));
+        check("Binary fixed-block singleton requests 0x28 and configures a non-null allocation with (2064, 32, 1); null allocation still publishes this, links VA 0x1E4B0A8, and sets flag +4",
+            Matches(0x12CC135, "8BF1")
+            && Matches(0x12CC177, "6A28E832BEFEFF")
+            && RelativeBranchTargets(0x12CC179, 0xE8, 0x12B7FB0)
+            && Matches(0x12CC18D, "85FF7412")
+            && ShortConditionalBranchTargets(0x12CC18F, 0x74, 0x12CC1A3)
+            && Matches(0x12CC191, "6A016A2068100800008BCFE89F190000EB02")
+            && RelativeBranchTargets(0x12CC19C, 0xE8, 0x12CDB40)
+            && Matches(0x12CC1A3, "33FF")
+            && Matches(0x12CC1A5, "A1A8B0E401897E1089460C8935A8B0E401C6460401"));
         check("Binary slBlob append preserves current bytes, grows logical length and memcpy appends incoming bytes",
             Matches(0x12CBA1A, "FF500C8B5D0C8BF86A018BCE8D141F52E881020000")
             && Matches(0x12CBA39, "53FF750803C750E8AF1E2D00")
