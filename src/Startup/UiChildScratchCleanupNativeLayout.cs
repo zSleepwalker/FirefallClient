@@ -11,6 +11,11 @@ public static class UiChildScratchCleanupNativeLayout
     public const int ScratchInitializationByteCount = 0x40;
 
     public const uint LookupFailureTargetAddress = 0xCA6F50;
+    public const uint CleanupLoopPointerLoadFileOffset = 0xCA6F52;
+    public const uint CleanupLoopBackBranchFileOffset = 0xCA6F82;
+    public const int CleanupFirstEspDisplacement = 0x24;
+    public const int CleanupSecondEspDisplacement = 0x28;
+    public const int CleanupEspIndexScale = 8;
     public const uint DestinationReplacementLoopAddress = 0xCA6EF0;
     public const int CleanupPairCount = 8;
     public const int ScratchDwordCount = 16;

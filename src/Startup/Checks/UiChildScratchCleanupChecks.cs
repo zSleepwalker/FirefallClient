@@ -20,6 +20,11 @@ internal static class UiChildScratchCleanupChecks
 
         check("UI child lookup failure reaches the separate eight-pair cleanup boundary",
             UiChildScratchCleanupNativeLayout.LookupFailureTargetAddress == 0xCA6F50
+            && UiChildScratchCleanupNativeLayout.CleanupLoopPointerLoadFileOffset == 0xCA6F52
+            && UiChildScratchCleanupNativeLayout.CleanupLoopBackBranchFileOffset == 0xCA6F82
+            && UiChildScratchCleanupNativeLayout.CleanupFirstEspDisplacement == 0x24
+            && UiChildScratchCleanupNativeLayout.CleanupSecondEspDisplacement == 0x28
+            && UiChildScratchCleanupNativeLayout.CleanupEspIndexScale == 8
             && UiChildScratchCleanupNativeLayout.DestinationReplacementLoopAddress == 0xCA6EF0
             && UiChildScratchCleanupNativeLayout.CleanupPairCount == 8
             && UiChildScratchCleanupNativeLayout.ScratchDwordCount == 16);
