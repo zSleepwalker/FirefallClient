@@ -23,6 +23,13 @@ public readonly record struct UiManagerChild24ShutdownStep(
     uint CallSiteFileOffset,
     uint? TargetMethodFileOffset);
 
+public readonly record struct UiManagerChildBackingInitializationStep(
+    string Operation,
+    uint FileOffset,
+    uint? TargetMethodFileOffset,
+    int? FieldOffset,
+    uint? Value);
+
 public readonly record struct UiManagerStateSyncInput(
     byte GetterResult,
     byte ReadyFlag,
@@ -106,6 +113,21 @@ public static class UiManagerNativeLayout
     public const uint UiManagerChild24ShutdownResetReturnFileOffset = 0xCA7401;
     public const int UiManagerChildShutdownResetPairLoopCount = 8;
     public const int UiManagerChildShutdownResetLoopPointerFieldCount = 16;
+    public const uint UiManagerChildBackingConstructorFileOffset = 0xCA6370;
+    public const uint UiManagerChildBackingConstructorField64ZeroFileOffset = 0xCA63D9;
+    public const uint UiManagerChildBackingConstructorField68ZeroFileOffset = 0xCA63E0;
+    public const uint UiManagerChildBackingInitializeMethodFileOffset = 0xCA66F0;
+    public const uint UiManagerChildBackingAllocationSizeArgumentFileOffset = 0xCA6748;
+    public const uint UiManagerChildBackingAllocatorCallFileOffset = 0xCA674D;
+    public const uint UiManagerChildBackingAllocatorMethodFileOffset = 0x12C8A20;
+    public const uint UiManagerChildBackingPointerStoreFileOffset = 0xCA67A0;
+    public const uint UiManagerChildBackingField68ValueStoreFileOffset = 0xCA67A3;
+    public const uint UiManagerChildBackingField6CZeroStoreFileOffset = 0xCA67AA;
+    public const int UiManagerChildBackingPointerFieldOffset = 0x64;
+    public const int UiManagerChildBackingField68Offset = 0x68;
+    public const int UiManagerChildBackingField6COffset = 0x6C;
+    public const uint UiManagerChildBackingAllocationRequestSize = 0x800;
+    public const uint UiManagerChildBackingField68InitializedValue = 0x20;
     public static IReadOnlyList<int> UiManagerChildShutdownResetLoopPointerOffsets { get; } =
         Array.AsReadOnly(Enumerable.Range(0, UiManagerChildShutdownResetLoopPointerFieldCount)
             .Select(index => 0x24 + index * 4)
@@ -297,6 +319,53 @@ public static class UiManagerNativeLayout
                 "ChildObjectNativeFree",
                 UiManagerChildObjectNativeFreeCallSiteFileOffset,
                 UiManagerChildObjectNativeFreeMethodFileOffset)
+        });
+
+    public static IReadOnlyList<UiManagerChildBackingInitializationStep> ChildBackingInitializationSequence { get; } =
+        Array.AsReadOnly(new[]
+        {
+            new UiManagerChildBackingInitializationStep(
+                "ConstructorField64Zero",
+                UiManagerChildBackingConstructorField64ZeroFileOffset,
+                null,
+                UiManagerChildBackingPointerFieldOffset,
+                0),
+            new UiManagerChildBackingInitializationStep(
+                "ConstructorField68Zero",
+                UiManagerChildBackingConstructorField68ZeroFileOffset,
+                null,
+                UiManagerChildBackingField68Offset,
+                0),
+            new UiManagerChildBackingInitializationStep(
+                "AllocationSizeArgument",
+                UiManagerChildBackingAllocationSizeArgumentFileOffset,
+                null,
+                null,
+                UiManagerChildBackingAllocationRequestSize),
+            new UiManagerChildBackingInitializationStep(
+                "AllocatorCall",
+                UiManagerChildBackingAllocatorCallFileOffset,
+                UiManagerChildBackingAllocatorMethodFileOffset,
+                null,
+                null),
+            new UiManagerChildBackingInitializationStep(
+                "BackingPointerStore",
+                UiManagerChildBackingPointerStoreFileOffset,
+                null,
+                UiManagerChildBackingPointerFieldOffset,
+                null),
+            new UiManagerChildBackingInitializationStep(
+                "Field68ValueStore",
+                UiManagerChildBackingField68ValueStoreFileOffset,
+                null,
+                UiManagerChildBackingField68Offset,
+                UiManagerChildBackingField68InitializedValue),
+            new UiManagerChildBackingInitializationStep(
+                "Field6CZeroStore",
+                UiManagerChildBackingField6CZeroStoreFileOffset,
+                null,
+                UiManagerChildBackingField6COffset,
+                0)
         });
 
     public static UiManagerInitializationFlagSnapshot CaptureObservedInitializationFlags(

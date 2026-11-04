@@ -53,6 +53,13 @@ internal static class StartupBinaryEvidence
                 && offset + 6 + BinaryPrimitives.ReadInt32LittleEndian(instruction.AsSpan(2)) == target;
         }
 
+        bool ShortConditionalBranchTargets(long offset, byte opcode, long target)
+        {
+            byte[] instruction = ReadAt(offset, 2);
+            return instruction[0] == opcode
+                && offset + 2 + (sbyte)instruction[1] == target;
+        }
+
         uint peOffset = ReadUInt32(0x3C);
         ushort sectionCount = BinaryPrimitives.ReadUInt16LittleEndian(ReadAt(peOffset + 6, 2));
         ushort optionalHeaderSize = BinaryPrimitives.ReadUInt16LittleEndian(ReadAt(peOffset + 20, 2));
@@ -177,6 +184,11 @@ internal static class StartupBinaryEvidence
             uint typeDescriptor = ReadUInt32(VirtualAddressToFileOffset(completeObjectLocator) + 12);
             return ReadCStringAscii(checked(typeDescriptor + 8), maximumNameLength);
         }
+        stream.Position = 0;
+        check("Binary evidence reads the pinned FirefallClient PE sample without modifying it",
+            Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(stream))
+                == "97362D668FF64778193A64759265E4AE90842043C4A15B627DF9902FD9135445");
+        stream.Position = 0;
         check("Binary world scene factory resolves all three named scenes, builds and returns its root, and is stored by tfWorld",
             Matches(SceneFactoryNativeLayout.FactoryFileOffset + 0x2D, "68A0000000")
             && Matches(SceneFactoryNativeLayout.FactoryFileOffset + 0x4D, "E8AE0E0000")
@@ -10671,6 +10683,25 @@ internal static class StartupBinaryEvidence
             && RelativeBranchTargets(0xBFAF87, 0xE8, 0x12C8D60)
             && Matches(0xBFAF8C, "5F8BC65EC20400"));
 
+        check("Binary nested cleanup null-guards +0x1C before vtable slot+8 dispatch and clears +0x1C",
+            Matches(0xCA60A0, "8B4E1C85C9740D8B0151FF5008C7461C00000000")
+            && ShortConditionalBranchTargets(0xCA60A5, 0x74, 0xCA60B4));
+        check("Binary nested cleanup guards and clears +0x10/+0x14/+0x18 and +4/+8/+0xC around allocator calls; caller frees child after return",
+            Matches(0xCA60B4, "8B4E1085C9741AE8A02C6200C7461000000000C7461400000000C7461800000000")
+            && ShortConditionalBranchTargets(0xCA60B9, 0x74, 0xCA60D5)
+            && RelativeBranchTargets(0xCA60BB, 0xE8, 0x12C8D60)
+            && Matches(0xCA60D5, "8B4E0485C9741AE87F2C6200C7460400000000C7460800000000C7460C00000000")
+            && ShortConditionalBranchTargets(0xCA60DA, 0x74, 0xCA60F6)
+            && RelativeBranchTargets(0xCA60DC, 0xE8, 0x12C8D60)
+            && Matches(0xCA6100, "595E8BE55DC3")
+            && RelativeBranchTargets(0xBFAF50, 0xE8, 0xCA6070)
+            && RelativeBranchTargets(0xBFAF57, 0xE8, 0x12C8D60));
+        check("Binary nested backing constructors clear +0x64/+0x68 and allocate 0x800 bytes before storing +0x64/+0x68/+0x6C",
+            Matches(0xCA63D9, "C7466400000000C7466800000000")
+            && Matches(0xCA6748, "B900080000")
+            && RelativeBranchTargets(0xCA674D, 0xE8, 0x12C8A20)
+            && Matches(0xCA67A0, "897E64C7466820000000C7466C00000000"));
+
         check("Binary UI manager shutdown checks the partial-init byte, clears both init bytes, and dispatches state sync through slot +0xB0",
             Matches(
                 UiManagerNativeLayout.UiManagerShutdownMethodFileOffset + 0x32,
@@ -10717,6 +10748,26 @@ internal static class StartupBinaryEvidence
             RelativeBranchTargets(0xC06686, 0xE8, 0x159DD10)
             && Matches(0xC06690, "81F9881300000F8221010000")
             && Matches(0xC0669C, "894720"));
+
+        check("Binary UI child reset walks eight two-pointer pairs from +0x24 through +0x60, conditionally dispatches vtable slot +8, zeroes each slot, and terminates at counter zero",
+            Matches(0xCA7330, "5356578BF9BB080000008D77288D4900")
+            && Matches(0xCA7340, "8B4EFC85C9740D8B0151FF5008C746FC00000000")
+            && Matches(0xCA7354, "8B0E85C9740C8B0151FF5008C70600000000")
+            && Matches(0xCA7366, "83C6084B75D4"));
+        check("Binary UI child reset conditionally dispatches and clears the later +8/+14/+0C/+10/+74 slots while the +0x13C diagnostic gate skips to +0x64",
+            Matches(0xCA736C, "8B4F0885C974098B0151FF5008895F08")
+            && Matches(0xCA737C, "8B4F1485C9740D8B0151FF5008C7471400000000")
+            && Matches(0xCA7390, "8B4F0C85C9740D8B0151FF5008C7470C00000000")
+            && Matches(0xCA73A4, "8B4F1085C9740D8B0151FF5008C7471000000000")
+            && Matches(0xCA73B8, "8B4F7485C9740D8B0151FF5008C7477400000000")
+            && Matches(0xCA73CC, "83BF3C01000000")
+            && ShortConditionalBranchTargets(0xCA73D3, 0x74, 0xCA73EF)
+            && Matches(0xCA73D3, "741A6A00683B020000687BB6B5016822B6B501FF15A05EC10183C410"));
+        check("Binary UI child reset frees child +0x64 through 0x12C8D60, then zeroes +0x68 and returns",
+            Matches(0xCA73EF, "8B4F64")
+            && RelativeBranchTargets(0xCA73F2, 0xE8, 0x12C8D60)
+            && Matches(0xCA73F7, "C7476800000000")
+            && Matches(0xCA7401, "C3"));
 
         check("Binary UI angle-correction method calls the MSVCR120 _CIfmod import thunk and uses the captured two-pi float",
             UiManagerAngleCorrectionProjectionRules.DerivedStateMethodFileOffset == 0xCCA190

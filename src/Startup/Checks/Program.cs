@@ -9,6 +9,8 @@ void Check(string name, bool condition)
         failures++;
 }
 
+UiNestedChildCleanupChecks.Run(Check);
+
 var expected = new[]
 {
     new AppModeSnapshot(ClientAppModeId.Login, "tfLogin", 0xA58, 0x6365B0, 0x1C676C0, 0x1E128C4, 0x1A10CC4),
@@ -958,6 +960,24 @@ Check("UI manager gated shutdown records the null-gated child +0x24 trace",
     && UiManagerNativeLayout.UiManagerChildDependencyVtableOffset == 8
     && UiManagerNativeLayout.UiManagerChildObjectNativeFreeCallSiteFileOffset == 0xBFAF87
     && UiManagerNativeLayout.UiManagerChildReleaseHelperReturnFileOffset == 0xBFAF90);
+Check("UI child backing initialization records the constructor zeros and ordered 0x800-byte allocation stores",
+    UiManagerNativeLayout.UiManagerChildBackingConstructorFileOffset == 0xCA6370
+    && UiManagerNativeLayout.UiManagerChildBackingInitializeMethodFileOffset == 0xCA66F0
+    && UiManagerNativeLayout.UiManagerChildBackingPointerFieldOffset == 0x64
+    && UiManagerNativeLayout.UiManagerChildBackingField68Offset == 0x68
+    && UiManagerNativeLayout.UiManagerChildBackingField6COffset == 0x6C
+    && UiManagerNativeLayout.UiManagerChildBackingAllocationRequestSize == 0x800
+    && UiManagerNativeLayout.UiManagerChildBackingField68InitializedValue == 0x20
+    && UiManagerNativeLayout.ChildBackingInitializationSequence.SequenceEqual(
+    [
+        new UiManagerChildBackingInitializationStep("ConstructorField64Zero", 0xCA63D9, null, 0x64, 0),
+        new UiManagerChildBackingInitializationStep("ConstructorField68Zero", 0xCA63E0, null, 0x68, 0),
+        new UiManagerChildBackingInitializationStep("AllocationSizeArgument", 0xCA6748, null, null, 0x800),
+        new UiManagerChildBackingInitializationStep("AllocatorCall", 0xCA674D, 0x12C8A20, null, null),
+        new UiManagerChildBackingInitializationStep("BackingPointerStore", 0xCA67A0, null, 0x64, null),
+        new UiManagerChildBackingInitializationStep("Field68ValueStore", 0xCA67A3, null, 0x68, 0x20),
+        new UiManagerChildBackingInitializationStep("Field6CZeroStore", 0xCA67AA, null, 0x6C, 0)
+    ]));
 Check("UI-set folder traversal and native file-enumeration imports are recorded",
     UiComponentLoadingNativeLayout.UiSetXmlLoaderFileOffset == 0x30AF50
     && UiComponentLoadingNativeLayout.FolderPathLoaderFileOffset == 0x30AB90
