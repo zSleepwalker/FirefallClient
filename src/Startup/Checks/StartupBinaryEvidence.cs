@@ -11269,5 +11269,104 @@ internal static class StartupBinaryEvidence
             && ShortConditionalBranchTargets(0x12CCA38, 0x74, 0x12CCA51)
             && RelativeBranchTargets(0x12CCA63, 0xE8, 0x12C8D60)
             && RelativeBranchTargets(0x12CCA75, 0xE8, 0x12CDA60));
+
+        const uint pooledControlSingletonVtableVirtualAddress = 0x1C80CA0;
+        const uint pooledControlSingletonVtableFileOffset = 0x187F8A0;
+        const uint pooledControlSingletonSlot8TargetVirtualAddress = 0x016CCDD0;
+        const uint pooledControlSingletonSlot8TargetFileOffset = 0x12CC1D0;
+        check("Binary pooled-control singleton vtable VA maps to raw 0x187F8A0 and slot +8 targets raw 0x12CC1D0",
+            VirtualAddressToFileOffset(pooledControlSingletonVtableVirtualAddress)
+                == pooledControlSingletonVtableFileOffset
+                && ReadUInt32(pooledControlSingletonVtableFileOffset + 8)
+                    == pooledControlSingletonSlot8TargetVirtualAddress
+                && VirtualAddressToFileOffset(pooledControlSingletonSlot8TargetVirtualAddress)
+                    == pooledControlSingletonSlot8TargetFileOffset
+                && Matches(pooledControlSingletonVtableFileOffset, "80CE6C0110CD6C01D0CD6C01")
+                && Matches(pooledControlSingletonSlot8TargetFileOffset, "803D95B0E40100"));
+        check("Binary pooled-control singleton captures +0x10 and +0x0C, publishes the latter to VA 0x1E4B0A8, then clears +0x0C before +0x10",
+            Matches(0x12CC236, "8B7E108B460CA3A8B0E401C7460C00000000C7461000000000")
+            && !ContainsBytes(0x12CC1D0, 0xAF, "C6460400")
+            && !ContainsBytes(0x12CC1D0, 0xAF, "C7460400000000"));
+        check("Binary pooled-control singleton drain loop calls 0x12CDAE0 and 0x12C8D60, then tail-jumps with the captured +0x10 value",
+            Matches(0x12CC253, "8D4F08")
+            && RelativeBranchTargets(0x12CC256, 0xE8, 0x12CDAE0)
+            && Matches(0x12CC25B, "85C07414")
+            && RelativeBranchTargets(0x12CC262, 0xE8, 0x12C8D60)
+            && Matches(0x12CC267, "8D4F08")
+            && RelativeBranchTargets(0x12CC26A, 0xE8, 0x12CDAE0)
+            && ShortConditionalBranchTargets(0x12CC271, 0x75, 0x12CC260)
+            && Matches(0x12CC273, "8BCF5F5EE9E4CAFFFF")
+            && RelativeBranchTargets(0x12CC277, 0xE9, 0x12C8D60));
+        check("Binary buffer copy-constructor stores its vptr, zeros +4/+8/+0x0C, resizes with preserve zero and the requested size, then gates copying on backing",
+            Matches(0x12CB860, "C706C40CC801C7460400000000C74608000000006A00FF750CC645FC01C7460C00000000")
+            && Matches(0x12CB884, "E827040000")
+            && RelativeBranchTargets(0x12CB884, 0xE8, 0x12CBCB0)
+            && Matches(0x12CB889, "8B460485C07411")
+            && ShortConditionalBranchTargets(0x12CB88E, 0x74, 0x12CB8A1)
+            && Matches(0x12CB890, "FF750CFF7508FF7004")
+            && RelativeBranchTargets(0x12CB899, 0xE8, 0x159D8F4));
+
+        check("Binary pooled-control singleton teardown gates diagnostic 76 on the separate global byte at VA 0x1E4B095",
+            Matches(0x12CC1D0, "803D95B0E4010056578BF1")
+            && ShortConditionalBranchTargets(0x12CC1DB, 0x75, 0x12CC1F4)
+            && Matches(0x12CC1DD, "6A006A766858EAC5016858EAC501FF15A05EC10183C410"));
+        check("Binary pooled-control teardown diagnostic calls use the non-import reporting cell VA 0x1C15EA0 and its mapped reporter body",
+            Matches(0x12CC1EB, "FF15A05EC101")
+            && Matches(0x12CC20E, "FF15A05EC101")
+            && Matches(0x12CC22D, "FF15A05EC101")
+            && VirtualAddressToFileOffset(0x1C15EA0) == 0x1814AA0
+            && ReadUInt32(VirtualAddressToFileOffset(0x1C15EA0)) == 0x016C37C0
+            && VirtualAddressToFileOffset(ReadUInt32(VirtualAddressToFileOffset(0x1C15EA0))) == 0x12C2BC0
+            && !IsImportSlot(0x1C15EA0));
+        check("Binary pooled-control teardown diagnostic 77 tests receiver byte +4 separately, then tests pool DWORD +0x10 only on the nonzero-byte path",
+            Matches(0x12CC1F4, "807E0400")
+            && ShortConditionalBranchTargets(0x12CC1F8, 0x74, 0x12CC200)
+            && Matches(0x12CC1FA, "837E1000")
+            && ShortConditionalBranchTargets(0x12CC1FE, 0x75, 0x12CC217)
+            && Matches(0x12CC200, "6A006A776858EAC5016858EAC501FF15A05EC10183C410"));
+        check("Binary pooled-control teardown diagnostic 78 compares the listhead DWORD at VA 0x1E4B0A8 with the receiver",
+            Matches(0x12CC217, "3935A8B0E401")
+            && ShortConditionalBranchTargets(0x12CC21D, 0x74, 0x12CC236)
+            && Matches(0x12CC21F, "6A006A786858EAC5016858EAC501FF15A05EC10183C410"));
+        check("Binary pooled-control teardown reports that return continue through stack cleanup and converge on the detach entry at raw 0x12CC236",
+            Matches(0x12CC1EB, "FF15A05EC10183C410807E0400")
+            && Matches(0x12CC20E, "FF15A05EC10183C4103935A8B0E401")
+            && Matches(0x12CC22D, "FF15A05EC10183C4108B7E108B460CA3A8B0E401C7460C00000000C7461000000000")
+            && Matches(0x12CC236, "8B7E108B460CA3A8B0E401C7460C00000000C7461000000000"));
+
+        const uint rawSingletonWalkerFileOffset = 0x12C3AF0;
+        const uint singletonWalkerCodeVirtualAddress = rawSingletonWalkerFileOffset + 0x400C00;
+        check("Binary raw singleton walker maps raw 0x12C3AF0 to code VA 0x16C46F0 and preserves its complete function bytes",
+            VirtualAddressToFileOffset(singletonWalkerCodeVirtualAddress) == rawSingletonWalkerFileOffset
+            && Matches(rawSingletonWalkerFileOffset,
+                "803D96B0E4010075176A006A1C68F33DB70168DB3DB701FF15A05EC10183C4108B0DA8B0E401C60596B0E40100C60595B0E4010185C9740F8B01FF50088B0DA8B0E40185C975F1C60595B0E40100C3"));
+        check("Binary raw singleton walker reports only when byte VA 0x1E4B096 is clear and reports through the non-import cell VA 0x1C15EA0",
+            ShortConditionalBranchTargets(rawSingletonWalkerFileOffset + 7, 0x75, 0x12C3B10)
+            && Matches(0x12C3B07, "FF15A05EC101")
+            && VirtualAddressToFileOffset(0x1C15EA0) == 0x1814AA0
+            && ReadUInt32(VirtualAddressToFileOffset(0x1C15EA0)) == 0x016C37C0
+            && VirtualAddressToFileOffset(ReadUInt32(VirtualAddressToFileOffset(0x1C15EA0))) == 0x12C2BC0
+            && !IsImportSlot(0x1C15EA0));
+        check("Binary raw singleton walker loads the head at 0x12C3B10, clears byte VA 0x1E4B096, sets byte VA 0x1E4B095, then gates the head",
+            Matches(0x12C3B10, "8B0DA8B0E401C60596B0E40100C60595B0E4010185C9")
+            && ShortConditionalBranchTargets(0x12C3B26, 0x74, 0x12C3B37));
+        check("Binary raw singleton walker calls head vslot +8, reloads the global head, loops to the virtual call, and clears byte VA 0x1E4B095",
+            Matches(0x12C3B28, "8B01FF50088B0DA8B0E40185C975F1C60595B0E40100C3")
+            && ShortConditionalBranchTargets(0x12C3B35, 0x75, 0x12C3B28));
+
+        const uint rawTaggedPoolPopFileOffset = 0x12CDAE0;
+        const uint taggedPoolPopCodeVirtualAddress = rawTaggedPoolPopFileOffset + 0x400C00;
+        check("Binary tagged-pool pop maps raw 0x12CDAE0 to code VA 0x16CE6E0 and loads the exact pair halves before the null-head test",
+            VirtualAddressToFileOffset(taggedPoolPopCodeVirtualAddress) == rawTaggedPoolPopFileOffset
+            && Matches(rawTaggedPoolPopFileOffset,
+                "558BEC83E4F883EC0C53568BC1578944240C8B48048B308974241085F674368B0633FF8BD133DB0BFE895424140BD8418BC78B74240CF00FC70E8B7424103BC78B44240C75CC3B54241475C68BC65F5E5B8BE55DC35F5E33C05B8BE55DC3")
+            && Matches(0x12CDAF2, "8B48048B308974241085F6")
+            && ShortConditionalBranchTargets(0x12CDAFD, 0x74, 0x12CDB35));
+        check("Binary tagged-pool pop loads the node link, increments the second pair half, and uses LOCK CMPXCHG8B on the pair",
+            Matches(0x12CDAFF, "8B0633FF8BD133DB0BFE895424140BD8418BC78B74240CF00FC70E"));
+        check("Binary tagged-pool pop explicitly compares both returned CMPXCHG8B halves and retries to the pair reload on either mismatch",
+            Matches(0x12CDB1A, "8B7424103BC78B44240C75CC3B54241475C6")
+            && ShortConditionalBranchTargets(0x12CDB24, 0x75, 0x12CDAF2)
+            && ShortConditionalBranchTargets(0x12CDB2A, 0x75, 0x12CDAF2));
     }
 }

@@ -11092,3 +11092,19 @@ Active next scopes are singleton list walker
 The pop trace's reported VA `0x16DDAE0` was arithmetic error: raw
 `0x12CDAE0` maps to code VA `0x16CE6E0`. Its pair-relative fields must
 not be confused with the containing pool: the teardown passes `pool+8`.
+
+The one-attempt tagged pop is reviewed and registered; pinned binary checks
+pass with exact singleton teardown diagnostics, source constructor, walker,
+and tagged pop windows. The reporter cell VA `0x1C15EA0` is NOT a PE
+import: its mapped DWORD points to VA `0x16C37C0`, raw `0x12C2BC0`.
+Returning diagnostic IDs `0x76/0x77/0x78` continue to detach.
+
+The walker projection is not yet accepted: review found systematic raw/VA
+conversion errors and unrelated entry bytes. Its author is correcting all
+anchors against immutable raw `0x12C3AF0..0x12C3B3E`, VA
+`0x16C46F0..0x16C473E`. Do not register its checks until corrected.
+Other active scopes: teardown entry captures
+`fe7189e8-85ac-42ae-aed1-0fddd47a2257`, push trace
+`8200e808-cd08-4fff-bc28-4d7d9404d805`, and acquisition continuation
+`57dca23a-a9a0-4649-aac9-3f70d64147a8`. The immutable evidence file
+has no active writer after `db06904f-7a37-42a9-98a8-3e848a5c34f9`.

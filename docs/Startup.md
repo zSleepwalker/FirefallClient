@@ -193,6 +193,8 @@ Its separate entry-gate projection reports ID `0x68` for zero captured global re
 
 `UiShaderSourcePoolDrainProjection` distinguishes a null captured pool (no helper calls) from a nonnull pool whose first pop returns zero (tail transfer of the pool to the allocator backend). A nonzero captured pop is passed to the same backend before another pop with receiver `pool+8`; that next result and subsequent loop iterations remain unmodeled. The projection neither guarantees termination nor treats the backend as an operating-system free routine.
 
+`UiShaderSourcePoolPopProjection` records one attempt against a receiver-relative head/tag pair. A null captured head returns zero without an exchange. Otherwise, the proposed pair contains the captured node link and wrapping tag increment; the explicit comparisons of returned low and high DWORDs select return versus an unmodeled recapture boundary. It does not mutate memory or simulate contention. These offsets are relative to the pair receiver, which the teardown supplies as `pool+8`, not to every containing pool object.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves
