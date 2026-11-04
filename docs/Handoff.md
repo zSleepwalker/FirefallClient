@@ -11,8 +11,8 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are global-heap startup publication/lifetime
-and region-collector record retention/release ordering.
+file-close path. Active boundaries are UI scripting-owner publication/VM creation
+and automatic heap trim/collection trigger policy.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
 Normal native CRT return selects `exit(status)`.
@@ -8901,3 +8901,49 @@ No teardown/reset was established, and external serialization is unknown.
 These observations describe flag selection, not overall thread safety.
 The earlier follow-up's unresolved VirtualAlloc label does not reopen the
 already PE-verified IAT **VA** `0x1AC42B8`.
+
+## Region collector retains the inline root and commits accounting after full release
+
+Raw `0x12C78A0` starts candidates at heap `+0x1E0`, with predecessor
+record at `+0x1D8`: the inline record is the root, not itself traversed.
+Raw `0x12C7400` copies the prior 16-byte root record into region metadata
+before replacing the inline base/size/link/flags; the growth caller supplies
+flags 1. Eligible linked records require bit 0 set, bit 3 clear, and the
+observed free-block/boundary checks. No broader flag names follow yet.
+
+Each release requires VirtualQuery success, BaseAddress and AllocationBase
+equal to the query address, committed state `0x1000`, and RegionSize no
+larger than remaining bytes, then VirtualFree(address,0,0x8000).
+Only complete record release adds to returned bytes, subtracts heap `+0x1B0`,
+and unlinks via predecessor `+8` (`0x12C7AB2..0x12C7ABF`).
+On query/free failure, the record/counter remain, free-block metadata is
+reinserted (`0x12C7AC4`), and traversal continues.
+Heap `+0x20` becomes visited-record count capped at `0xFFF`, not released count.
+
+Trim raw `0x12C7BF0` selects the top-containing record and avoids trimming
+one containing the inline-root address. It uses the same flag gate and releases
+an aligned tail. Record-size/counter/top updates occur only after the full
+requested trim succeeds (`0x12C7CE0..0x12C7CE6`).
+If a later span fails after earlier OS releases, no rollback of those releases
+or partial bookkeeping update was observed. The separate collector can still
+release other records; outer success reflects a nonzero reported released total.
+This is static branch/bookkeeping evidence, not an observed partial failure.
+
+## Global heap lock initialization import and construction chain identified
+
+Immutable PE parsing resolves IAT **VA** `0x1AC41BC`
+(raw `0x16C2DBC`) as **KERNEL32.dll!InitializeCriticalSectionAndSpinCount**.
+Global allocator config setup raw `0x12C6A90`, call `0x12C6B14`,
+passes CS **VA** `0x1EDAF88` and `0x80001020`;
+heap initialization separately initializes its `+0x1C0` CS.
+The internal heap lock mask is **2** (bit index 1), not mask 4:
+factory clearing that mask leaves flags 5.
+
+Observed construction chain is raw
+`0xBFCA30 -> 0xC34100 -> 0xC327D0 -> 0x12CA210`.
+Raw `0xC34100` allocates `0x500` bytes and calls the owner constructor
+at `0xC3414D..0xC3416B`.
+Global-heap publication remains null-guarded; a direct appinit/CRT caller,
+external callback serialization, and balanced heap teardown were not established.
+The next task follows the concrete UI-owner field rather than repeating
+an unsuccessful direct-caller search for `0xBFCA30`.
