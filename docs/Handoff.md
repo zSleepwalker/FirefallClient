@@ -11,7 +11,7 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are concrete config-command output routes
+file-close path. Active boundaries are concrete parser diagnostic-mute branches
 and protected script-dispatch error handling.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
@@ -8448,3 +8448,18 @@ The map's state-0 action performs that local cleanup, not restoration of
 global **VA** `0x1E4891C`; the explicit normal restore is `0xC3B582`.
 This resolves that specific unwind action, not every possible exception path
 or whether ordinary VM errors escape through C++ unwinding.
+
+## Print command binding parked; parser dispatch and mute are distinct
+
+A bounded command search found `"PrintLn"` and `"Print"` candidates
+but did not bind their registration/callbacks. Their output behavior is
+unresolved; further identical string/reference scans are parked.
+The pass observed console `+5` checks around selected diagnostic calls
+in raw `0xE89C50`, while indirect command-dispatch calls
+`0xE89DE1/0xE89E1A` have no such check at those sites.
+This does not prove a specific command bypasses suppression, but provides
+a concrete parser branch to inspect next.
+
+The follow-up's `0xB4E5AC70` unmapped-address observation is irrelevant:
+`+0xB4` was a vtable byte offset, not a prefix to code raw `0xE5AC70`.
+It does not invalidate the earlier independently traced sink.
