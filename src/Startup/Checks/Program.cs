@@ -37,6 +37,7 @@ UiShaderSourcePoolResetAlignmentChecks.Run(Check);
 UiShaderSourcePoolResetAppendChecks.Run(Check);
 UiShaderSourcePoolResetGrowthChecks.Run(Check);
 UiShaderSourcePoolResetRemovalChecks.Run(Check);
+UiShaderSourcePoolResetStorageChecks.Run(Check);
 SharedTextPoolSingletonChecks.Run(Check);
 UiShaderSourcePoolTeardownChecks.Run(Check);
 UiShaderSourcePoolSingletonDestructorChecks.Run(Check);

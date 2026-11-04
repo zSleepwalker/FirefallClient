@@ -11337,3 +11337,40 @@ Growth caller constants from unrelated raw `0x12CE575/0x12CE59B` are
 being removed before commit; append's own exact callsites are
 `0x12CDD06/0x12CDD28`. Remaining storage implementation is assigned to
 `3ddb246e-0de9-49b6-a2ee-72b0607dd814`.
+
+Pushed append/growth/removal code at `a0c1d47`; registered checks plus
+pending immutable PE assertions pass. Storage/wrapper PE writer
+`c0124069-f05c-494e-a5de-22802f7154fc` owns the evidence file.
+Static reset secondary gate at raw `0x12CDD4D` zeroes EDI and local
+callback count, pops receiver+8, and on zero branches to `0x12CDE04`,
+skipping the count load at `0x12CDE01`. Do not normalize these two
+finalization entry edges. Gate projection is assigned to
+`c2577844-95d7-4d7f-bfc1-4d783000e289`.
+Stack allocation wrapper raw `0x12B7FB0` forwards requested bytes to
+`0x12C8A20`, preserves its result in ESI across returning OOM diagnostics
+`0xDA`, and restores zero EAX before the common cookie/RET path.
+Wrapper code is assigned to `8e570df0-e0d6-455e-986f-8050e0b653f5`.
+
+The primary repeat-pop bytes omitted by IDA's current function enumeration
+remain readable without redefining code: raw `0x12CDD39` has
+`8B4DE483C6048975D0E899FDFFFF8BF885FF7596`.
+Repeat call `0x12CDD42` targets pop `0x12CDAE0`, and JNZ
+`0x12CDD4B` targets append entry `0x12CDCE3`. Initial/repeat primary
+gate code is assigned to `b8983307-26ba-437e-8713-a299399860d8`.
+
+One concrete reset caller raw `0x12C02F0` passes receiver this+`0x20`
+and callback VA `0x16C1520` at raw `0x12C0340`. That callback maps
+to raw `0x12C0920`: one cdecl stack argument, test its first DWORD,
+null skips all clears; nonnull calls opaque backend `0x12C8D60`, then
+clears offsets 0/4/8 only if it returns. IDA's inferred multiargument
+prototype is not evidence. Callback projection is assigned to
+`c0cef6fb-3e75-4454-b998-5eae06071d57`.
+
+Storage replacement code is reviewed and registered; serialized pinned checks
+pass with its separate pre-copy/post-copy reads and opaque failure boundaries.
+Iteration-tail implementation is assigned to
+`bd460456-0ba9-4f47-8bf0-15885f10b8ed`: callback return at
+`0x12CDDD7` reloads begin, cleans the argument, increments callback count,
+then item index. Removal instead enters at `0x12CDDE0`, increments only
+item index, and uses the fresh unsigned bound comparison. Keep these
+entry modes distinct.
