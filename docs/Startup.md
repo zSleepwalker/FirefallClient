@@ -141,6 +141,8 @@ The success replacement loop in `0xCA6C80` writes eight captured scratch pairs t
 
 The eleven required lookup gates in `0xCA6C80` share a failure target at `0xCA6F50`, before the destination replacement loop. This path conditionally dispatches each nonzero pointer in eight scratch pairs through virtual slot `+8`, then clears that scratch field. The initial direct-call failure bypasses this scratch cleanup. Failure sets BL to zero at `0xCA6FCF`, success sets BL to one at `0xCA6F49`, and the common tail transfers BL to AL at `0xCA7061`. `UiChildScratchCleanupNativeLayout` records these static boundaries without assigning virtual-call ownership semantics or ruling out called-target side effects.
 
+The earlier calls through IAT VA `0x1AC40AC` are `D3DCOMPILER_43.dll!D3DCompile`, not generic status adapters. `UiChildShaderCompileProjectionRules` records the eleven captured arguments for raw calls `0xCA70FA` and `0xCA725A`: source pointer from virtual `+4`, source size from virtual `+0xC`, null source-name/defines/include pointers, entry/profile `general_drawing_vs`/`vs_3_0` or `general_drawing_ps`/`ps_3_0`, zero flags, and captured local code/error blob output addresses. The pure projection does not invoke compilation, validate pointers, identify the virtual implementations, or infer blob ownership.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves
