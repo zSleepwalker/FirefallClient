@@ -11636,3 +11636,28 @@ and author corrected the AL-zero JE anchor from the TEST at `0xBD3EE6`
 to the actual branch at `0xBD3EE8`. Large-value word test is nonzero
 `word & 0xC000`, not equality to `0xC000`; documented explicitly.
 Small-status full 93-byte capture independently matches the PE.
+
+Pushed `9089c0f`: small-status and large-value entry gates. All eleven
+large-gate instruction windows independently match the sample, including
+nonzero top-bit TEST bytes. Header-dispatch table trace is assigned Luna
+`3f1e40c4-4eb3-4a2b-bff7-15a5dd836f43`, bounded to WORD>>14 table and
+first opaque case handoffs only.
+
+Deferred callback is reviewed/registered; byte-value sweep passes, but author
+is fixing three missing-capture fixtures whose helper defaults accidentally
+supplied later values. Predicate code is Luna
+`fcddd56b-72b7-428e-813b-200f642896d5`. Predicate trace correction:
+the first pair `this+8 | this+0x0C` short-circuits on nonzero, skipping
+`this+0x10 | this+0x14`; preserve unreached captures. Zero status returns
+AL zero without clearing upper EAX. New exclusive PE writer
+`b3739e21-1d39-4d03-b929-7e5b1bad446b` binds predicate and deferred callback.
+
+Callback fixture correction is complete and the ordinary pinned PE runner
+passes with callback registration. Small/large status immutable additions
+also passed; the exclusive PE writer still owns that file for the next pair
+of anchors, so it is intentionally excluded from the callback commit.
+Luna successors: `ae2c5fd8-37dc-43f9-bcc4-11166cc48dcf` owns header dispatch
+production/check files, bounded at the first case call; table VA `0xFD4E2C`
+maps to raw `0xBD422C`, four targets `BD4141/BD415A/BD418D/BD41C0`.
+`1eeac3d1-4b5f-417b-b5b4-333d4c08bf6e` owns recycle-tail files,
+starting at the late node+8 write and stopping at wrapper return.
