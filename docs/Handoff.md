@@ -10653,3 +10653,10 @@ the static blob layout/check registration passed coordinator execution and
 was committed/pushed. Independent initial-loader output transfer and
 wrapper vtable binding remain active; combined PE regression integration
 is waiting for the selected-pointer guard assertions.
+
+The first wrapper-binding report contains a PE arithmetic error:
+`0x1C80CC4 - 0x400000 = 0x1880CC4`, not `0x1C40CC4`.
+Its resulting `.rsrc`/fill-byte interpretation is rejected.
+The established `.rdata` mapping instead gives raw `0x187F8C4`;
+a narrowly corrected slot `+4/+0xC` trace is requested. This is
+not a new sample-layout gap or evidence that the wrapper lacks a vtable.
