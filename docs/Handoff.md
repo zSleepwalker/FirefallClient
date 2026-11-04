@@ -11,7 +11,7 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are concrete parser diagnostic-mute branches
+file-close path. Active boundaries are mapped parser diagnostic operands
 and protected VM catch/type routing.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
@@ -8490,3 +8490,26 @@ plumbing alone does not prove which native exceptions it catches or lets escape.
 Nor does every nonzero status necessarily invoke the traceback logger.
 During the dispatch interval, the borrowed global supplies fallback names
 only for traceback frames whose own name is null.
+
+## Parser diagnostic suppression does not gate matched command callbacks
+
+The follow-up addresses here are raw IDB offsets, despite its report's
+generic VA label. In raw `0xE89C50`, the clear
+**VA** `0x1E49A59` branch looks up variables through slot `+0x50`;
+a match invokes callback field `+0x1C`. Otherwise command lookup uses
+slot `+0x4C`. Single-token dispatch invokes `+0x38` at `0xE89DE1`;
+multi-token dispatch invokes `+0x98` at `0xE89E1A` with parsed arguments.
+Neither dispatch-site call is guarded by console byte `+5`.
+On failed command lookup, a leading `':'` suppresses the diagnostic call
+at `0xE89E53..0xE89E6A`; otherwise its helper applies the emission gates.
+Assignment-related diagnostics in `0xE41360` use the same helper;
+independent flag branches can still bypass assignment handling.
+
+Raw `0xE89C50` returns consumed input length; its caller `0xE89EC0`
+separately updates `_` through console `+0x98` when the statement value
+changes. ExecSkip remains a distinct dispatch-bypass mechanism.
+Diagnostic format operands **VA** `0x1BE26D4/0x1BE26EC` require
+PE-aware string mapping before their text is assigned to these branches.
+The follow-up's unreadable-at-VA result does not establish missing strings.
+Console `+0xB0` is the previously byte-verified `0xE5AB80`, distinct
+from sink slot `+0xB4` / `0xE5AC70`; the two should not be conflated.
