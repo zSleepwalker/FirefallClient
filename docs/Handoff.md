@@ -10874,3 +10874,18 @@ full alignment unit when already aligned. Zero alignment avoids division.
 The constructor report's claimed raw `0xECB100` was an address-basis
 error: the IDB EA is already raw `0x12CB700` (VA `0x16CC300`).
 No allocator-return null guard or runtime-fault guarantee is inferred.
+
+Immutable PE anchors for the read tail, non-detaching getter, allocator
+entry zeroing/pool gate, and direct capacity reuse are pushed at `cee5160`.
+The pinned-sample runner passes with all registered projection checks.
+The next coherent integration owns three new projection/check pairs
+(preservation copy, backing alignment arithmetic, and pool control output)
+plus one serialized BinaryEvidence writer; no other writer should touch
+that evidence file until its current assignment completes.
+
+Coordinator review caught two pre-integration defects in pending code:
+the alignment projection incorrectly returned header capacity zero for
+nonzero input capacity, and the control helper used an unestablished
+"weak reference count" name for field `+8`. Both are assigned back for
+correction before staging. Passing mirrored constant checks alone does
+not validate either claim; retain independent PE evidence.
