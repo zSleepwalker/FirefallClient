@@ -7,6 +7,13 @@ public readonly record struct UiShaderSourcePoolTeardownCapture(
     uint CapturedPoolPointer,
     uint CapturedNextPointer);
 
+public readonly record struct UiShaderSourcePoolTeardownEntryDiagnosticCapture(
+    uint ThisPointer,
+    byte CapturedGlobalReadinessByte,
+    byte CapturedReceiverFlagByte,
+    uint? CapturedPoolPointerAfterNonzeroReceiverFlag,
+    uint CapturedLaterSingletonListHead);
+
 public enum UiShaderSourcePoolTeardownWriteTarget
 {
     GlobalSingletonListHead,
@@ -62,6 +69,28 @@ public static class UiShaderSourcePoolTeardownNativeLayout
     public const uint EntryVirtualAddress =
         EntryRawFileOffset + CodeVirtualAddressDeltaFromRawFileOffset;
 
+    public const uint GlobalReadinessTestRawFileOffset = 0x12CC1D0;
+    public const uint GlobalReadinessBranchRawFileOffset = 0x12CC1DB;
+    public const uint GlobalReadinessDiagnosticIdPushRawFileOffset = 0x12CC1DF;
+    public const uint GlobalReadinessDiagnosticCallRawFileOffset = 0x12CC1EB;
+    public const uint GlobalReadinessDiagnosticCleanupRawFileOffset = 0x12CC1F1;
+    public const uint ReceiverFlagTestRawFileOffset = 0x12CC1F4;
+    public const uint ReceiverFlagBranchRawFileOffset = 0x12CC1F8;
+    public const uint PoolPointerDiagnosticTestRawFileOffset = 0x12CC1FA;
+    public const uint PoolPointerDiagnosticBranchRawFileOffset = 0x12CC1FE;
+    public const uint ReceiverFlagDiagnosticSetupRawFileOffset = 0x12CC200;
+    public const uint ReceiverFlagDiagnosticIdPushRawFileOffset = 0x12CC202;
+    public const uint ReceiverFlagDiagnosticCallRawFileOffset = 0x12CC20E;
+    public const uint ReceiverFlagDiagnosticCleanupRawFileOffset = 0x12CC214;
+    public const uint SingletonListHeadDiagnosticCompareRawFileOffset = 0x12CC217;
+    public const uint SingletonListHeadDiagnosticBranchRawFileOffset = 0x12CC21D;
+    public const uint SingletonListHeadDiagnosticIdPushRawFileOffset = 0x12CC221;
+    public const uint SingletonListHeadDiagnosticCallRawFileOffset = 0x12CC22D;
+    public const uint SingletonListHeadDiagnosticCleanupRawFileOffset = 0x12CC233;
+    public const uint DetachContinuationRawFileOffset = 0x12CC236;
+
+    public const uint GlobalReadinessByteVirtualAddress = 0x1E4B095;
+    public const uint DiagnosticReporterCellVirtualAddress = 0x1C15EA0;
     public const uint SingletonVtableVirtualAddress = 0x1C80CA0;
     public const uint SingletonVtableRawFileOffset = 0x187F8A0;
     public const uint SingletonVtableSlotRawFileOffset = 0x187F8A8;
@@ -79,6 +108,10 @@ public static class UiShaderSourcePoolTeardownNativeLayout
     public const int ThisNextPointerOffset = 0x0C;
     public const int ThisPoolPointerOffset = 0x10;
 
+    public const uint GlobalReadinessDiagnosticId = 0x76;
+    public const uint ReceiverFlagOrPoolDiagnosticId = 0x77;
+    public const uint SingletonListHeadDiagnosticId = 0x78;
+
     public const uint ThisFlagCompareRawFileOffset = 0x12CC1F4;
     public const uint SingletonListHeadCompareRawFileOffset = 0x12CC217;
     public const uint PoolPointerCaptureRawFileOffset = 0x12CC236;
@@ -93,6 +126,93 @@ public static class UiShaderSourcePoolTeardownNativeLayout
     public const uint DrainHelperReleaseAnchorRawFileOffset = 0x12C8D60;
     public const uint DrainHelperAcquireCallRawFileOffset = 0x12CC256;
     public const uint DrainHelperReleaseCallRawFileOffset = 0x12CC262;
+
+    public static IReadOnlyList<UiShaderSourcePoolTeardownInstructionEvidence>
+        EntryDiagnosticInstructions { get; } =
+        Array.AsReadOnly(new[]
+        {
+            new UiShaderSourcePoolTeardownInstructionEvidence(
+                "Test the separately captured global readiness byte",
+                GlobalReadinessTestRawFileOffset,
+                "80 3D 95 B0 E4 01 00",
+                TargetVirtualAddress: GlobalReadinessByteVirtualAddress),
+            new UiShaderSourcePoolTeardownInstructionEvidence(
+                "Skip diagnostic 0x76 when the global readiness byte is nonzero",
+                GlobalReadinessBranchRawFileOffset,
+                "75 17"),
+            new UiShaderSourcePoolTeardownInstructionEvidence(
+                "Push diagnostic ID 0x76 when the global readiness byte is zero",
+                GlobalReadinessDiagnosticIdPushRawFileOffset,
+                "6A 76"),
+            new UiShaderSourcePoolTeardownInstructionEvidence(
+                "Call the diagnostic reporter for ID 0x76",
+                GlobalReadinessDiagnosticCallRawFileOffset,
+                "FF 15 A0 5E C1 01",
+                TargetVirtualAddress: DiagnosticReporterCellVirtualAddress),
+            new UiShaderSourcePoolTeardownInstructionEvidence(
+                "Clean up diagnostic arguments and continue to the receiver-byte gate",
+                GlobalReadinessDiagnosticCleanupRawFileOffset,
+                "83 C4 10"),
+            new UiShaderSourcePoolTeardownInstructionEvidence(
+                "Test the separately captured receiver byte at this + 0x04",
+                ReceiverFlagTestRawFileOffset,
+                "80 7E 04 00",
+                ThisRelativeOffset: ThisFlagReadOffset),
+            new UiShaderSourcePoolTeardownInstructionEvidence(
+                "Select diagnostic 0x77 without reading this + 0x10 when the receiver byte is zero",
+                ReceiverFlagBranchRawFileOffset,
+                "74 06"),
+            new UiShaderSourcePoolTeardownInstructionEvidence(
+                "Test this + 0x10 only after a nonzero receiver byte",
+                PoolPointerDiagnosticTestRawFileOffset,
+                "83 7E 10 00",
+                ThisRelativeOffset: ThisPoolPointerOffset),
+            new UiShaderSourcePoolTeardownInstructionEvidence(
+                "Skip diagnostic 0x77 when the later pool pointer is nonzero",
+                PoolPointerDiagnosticBranchRawFileOffset,
+                "75 17"),
+            new UiShaderSourcePoolTeardownInstructionEvidence(
+                "Push diagnostic ID 0x77 on the zero-receiver or zero-pool path",
+                ReceiverFlagDiagnosticIdPushRawFileOffset,
+                "6A 77"),
+            new UiShaderSourcePoolTeardownInstructionEvidence(
+                "Call the diagnostic reporter for ID 0x77",
+                ReceiverFlagDiagnosticCallRawFileOffset,
+                "FF 15 A0 5E C1 01",
+                TargetVirtualAddress: DiagnosticReporterCellVirtualAddress),
+            new UiShaderSourcePoolTeardownInstructionEvidence(
+                "Clean up diagnostic arguments and continue to the later list-head compare",
+                ReceiverFlagDiagnosticCleanupRawFileOffset,
+                "83 C4 10"),
+            new UiShaderSourcePoolTeardownInstructionEvidence(
+                "Compare the later singleton-list head with this",
+                SingletonListHeadDiagnosticCompareRawFileOffset,
+                "39 35 A8 B0 E4 01",
+                TargetVirtualAddress: SingletonListHeadGlobalVirtualAddress),
+            new UiShaderSourcePoolTeardownInstructionEvidence(
+                "Skip diagnostic 0x78 when the later singleton-list head equals this",
+                SingletonListHeadDiagnosticBranchRawFileOffset,
+                "74 17"),
+            new UiShaderSourcePoolTeardownInstructionEvidence(
+                "Push diagnostic ID 0x78 when the later singleton-list head differs from this",
+                SingletonListHeadDiagnosticIdPushRawFileOffset,
+                "6A 78"),
+            new UiShaderSourcePoolTeardownInstructionEvidence(
+                "Call the diagnostic reporter for ID 0x78",
+                SingletonListHeadDiagnosticCallRawFileOffset,
+                "FF 15 A0 5E C1 01",
+                TargetVirtualAddress: DiagnosticReporterCellVirtualAddress),
+            new UiShaderSourcePoolTeardownInstructionEvidence(
+                "Clean up diagnostic arguments and continue at the detach captures",
+                SingletonListHeadDiagnosticCleanupRawFileOffset,
+                "83 C4 10"),
+            new UiShaderSourcePoolTeardownInstructionEvidence(
+                "Continue at the detach captures after the diagnostics return",
+                DetachContinuationRawFileOffset,
+                "8B 7E 10 8B 46 0C A3 A8 B0 E4 01",
+                ThisRelativeOffset: ThisPoolPointerOffset,
+                TargetVirtualAddress: SingletonListHeadGlobalVirtualAddress)
+        });
 
     public static IReadOnlyList<UiShaderSourcePoolTeardownInstructionEvidence>
         Instructions { get; } =
@@ -158,6 +278,45 @@ public static class UiShaderSourcePoolTeardownNativeLayout
                 "E8 F9 CA FF FF",
                 DrainHelperReleaseAnchorRawFileOffset)
         });
+
+    /// <summary>
+    /// Projects diagnostic IDs from distinct values captured at their respective
+    /// reads. The pool-pointer read is required only after a nonzero receiver byte;
+    /// a missing or unexpected pool capture is rejected. Each reporting call is
+    /// indirect and, if it returns, execution continues toward the detach captures
+    /// at raw 0x12CC236. This does not imply reporter behavior, abort/readiness,
+    /// idempotence, or a coherent snapshot across the separate reads.
+    /// </summary>
+    public static ImmutableArray<uint> ProjectEntryDiagnosticIds(
+        UiShaderSourcePoolTeardownEntryDiagnosticCapture capture)
+    {
+        if ((capture.CapturedReceiverFlagByte != 0)
+                != capture.CapturedPoolPointerAfterNonzeroReceiverFlag.HasValue)
+        {
+            throw new ArgumentException(
+                "A pool-pointer capture is required exactly when the receiver flag is nonzero.",
+                nameof(capture));
+        }
+
+        var diagnosticIds = ImmutableArray.CreateBuilder<uint>(3);
+        if (capture.CapturedGlobalReadinessByte == 0)
+        {
+            diagnosticIds.Add(GlobalReadinessDiagnosticId);
+        }
+
+        if (capture.CapturedReceiverFlagByte == 0
+            || capture.CapturedPoolPointerAfterNonzeroReceiverFlag == 0)
+        {
+            diagnosticIds.Add(ReceiverFlagOrPoolDiagnosticId);
+        }
+
+        if (capture.CapturedLaterSingletonListHead != capture.ThisPointer)
+        {
+            diagnosticIds.Add(SingletonListHeadDiagnosticId);
+        }
+
+        return diagnosticIds.ToImmutable();
+    }
 
     /// <summary>
     /// Projects the ordered global-head publication and two field clears from

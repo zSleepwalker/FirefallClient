@@ -4,6 +4,149 @@ internal static class UiShaderSourcePoolTeardownChecks
 {
     public static void Run(Action<string, bool> check)
     {
+        check("Teardown entry diagnostic gates retain their independent raw reads and reporter cell",
+            UiShaderSourcePoolTeardownNativeLayout.EntryDiagnosticInstructions
+                .Select(instruction =>
+                    (instruction.RawFileOffset, instruction.Bytes, instruction.ThisRelativeOffset,
+                        instruction.TargetVirtualAddress))
+                .SequenceEqual(new
+                    (uint RawFileOffset, string Bytes, int? ThisRelativeOffset, uint? TargetVirtualAddress)[]
+                {
+                    (0x12CC1D0, "80 3D 95 B0 E4 01 00", null, 0x1E4B095),
+                    (0x12CC1DB, "75 17", null, null),
+                    (0x12CC1DF, "6A 76", null, null),
+                    (0x12CC1EB, "FF 15 A0 5E C1 01", null, 0x1C15EA0),
+                    (0x12CC1F1, "83 C4 10", null, null),
+                    (0x12CC1F4, "80 7E 04 00", 0x04, null),
+                    (0x12CC1F8, "74 06", null, null),
+                    (0x12CC1FA, "83 7E 10 00", 0x10, null),
+                    (0x12CC1FE, "75 17", null, null),
+                    (0x12CC202, "6A 77", null, null),
+                    (0x12CC20E, "FF 15 A0 5E C1 01", null, 0x1C15EA0),
+                    (0x12CC214, "83 C4 10", null, null),
+                    (0x12CC217, "39 35 A8 B0 E4 01", null, 0x1E4B0A8),
+                    (0x12CC21D, "74 17", null, null),
+                    (0x12CC221, "6A 78", null, null),
+                    (0x12CC22D, "FF 15 A0 5E C1 01", null, 0x1C15EA0),
+                    (0x12CC233, "83 C4 10", null, null),
+                    (0x12CC236, "8B 7E 10 8B 46 0C A3 A8 B0 E4 01", 0x10, 0x1E4B0A8)
+                })
+            && UiShaderSourcePoolTeardownNativeLayout.GlobalReadinessDiagnosticId == 0x76
+            && UiShaderSourcePoolTeardownNativeLayout.ReceiverFlagOrPoolDiagnosticId == 0x77
+            && UiShaderSourcePoolTeardownNativeLayout.SingletonListHeadDiagnosticId == 0x78
+            && UiShaderSourcePoolTeardownNativeLayout.GlobalReadinessByteVirtualAddress == 0x1E4B095
+            && UiShaderSourcePoolTeardownNativeLayout.DiagnosticReporterCellVirtualAddress == 0x1C15EA0
+            && UiShaderSourcePoolTeardownNativeLayout.GlobalReadinessBranchRawFileOffset + 2 + 0x17
+                == UiShaderSourcePoolTeardownNativeLayout.ReceiverFlagTestRawFileOffset
+            && UiShaderSourcePoolTeardownNativeLayout.ReceiverFlagBranchRawFileOffset + 2 + 0x06
+                == UiShaderSourcePoolTeardownNativeLayout.ReceiverFlagDiagnosticSetupRawFileOffset
+            && UiShaderSourcePoolTeardownNativeLayout.ReceiverFlagDiagnosticSetupRawFileOffset + 2
+                == UiShaderSourcePoolTeardownNativeLayout.ReceiverFlagDiagnosticIdPushRawFileOffset
+            && UiShaderSourcePoolTeardownNativeLayout.GlobalReadinessDiagnosticIdPushRawFileOffset + 12
+                == UiShaderSourcePoolTeardownNativeLayout.GlobalReadinessDiagnosticCallRawFileOffset
+            && UiShaderSourcePoolTeardownNativeLayout.ReceiverFlagDiagnosticIdPushRawFileOffset + 12
+                == UiShaderSourcePoolTeardownNativeLayout.ReceiverFlagDiagnosticCallRawFileOffset
+            && UiShaderSourcePoolTeardownNativeLayout.SingletonListHeadDiagnosticIdPushRawFileOffset + 12
+                == UiShaderSourcePoolTeardownNativeLayout.SingletonListHeadDiagnosticCallRawFileOffset
+            && UiShaderSourcePoolTeardownNativeLayout.GlobalReadinessDiagnosticCallRawFileOffset + 6
+                == UiShaderSourcePoolTeardownNativeLayout.GlobalReadinessDiagnosticCleanupRawFileOffset
+            && UiShaderSourcePoolTeardownNativeLayout.GlobalReadinessDiagnosticCleanupRawFileOffset + 3
+                == UiShaderSourcePoolTeardownNativeLayout.ReceiverFlagTestRawFileOffset
+            && UiShaderSourcePoolTeardownNativeLayout.ReceiverFlagDiagnosticCallRawFileOffset + 6
+                == UiShaderSourcePoolTeardownNativeLayout.ReceiverFlagDiagnosticCleanupRawFileOffset
+            && UiShaderSourcePoolTeardownNativeLayout.ReceiverFlagDiagnosticCleanupRawFileOffset + 3
+                == UiShaderSourcePoolTeardownNativeLayout.SingletonListHeadDiagnosticCompareRawFileOffset
+            && UiShaderSourcePoolTeardownNativeLayout.SingletonListHeadDiagnosticCallRawFileOffset + 6
+                == UiShaderSourcePoolTeardownNativeLayout.SingletonListHeadDiagnosticCleanupRawFileOffset
+            && UiShaderSourcePoolTeardownNativeLayout.SingletonListHeadDiagnosticCleanupRawFileOffset + 3
+                == UiShaderSourcePoolTeardownNativeLayout.DetachContinuationRawFileOffset
+            && UiShaderSourcePoolTeardownNativeLayout.PoolPointerDiagnosticBranchRawFileOffset + 2 + 0x17
+                == UiShaderSourcePoolTeardownNativeLayout.SingletonListHeadDiagnosticCompareRawFileOffset
+            && UiShaderSourcePoolTeardownNativeLayout.SingletonListHeadDiagnosticBranchRawFileOffset + 2 + 0x17
+                == UiShaderSourcePoolTeardownNativeLayout.DetachContinuationRawFileOffset
+            && UiShaderSourcePoolTeardownNativeLayout.EntryRawFileOffset
+                + UiShaderSourcePoolTeardownNativeLayout.CodeVirtualAddressDeltaFromRawFileOffset
+                == 0x16CCDD0);
+
+        bool entryDiagnosticTruthTableIsExact = true;
+        for (int globalReadiness = byte.MinValue;
+             globalReadiness <= byte.MaxValue && entryDiagnosticTruthTableIsExact;
+             globalReadiness++)
+        {
+            for (int receiverFlag = byte.MinValue;
+                 receiverFlag <= byte.MaxValue && entryDiagnosticTruthTableIsExact;
+                 receiverFlag++)
+            {
+                int poolCases = receiverFlag == 0 ? 1 : 2;
+                for (int poolCase = 0; poolCase < poolCases && entryDiagnosticTruthTableIsExact; poolCase++)
+                {
+                    bool poolIsZero = poolCase == 0;
+                    for (int headCase = 0; headCase < 2; headCase++)
+                    {
+                        bool headsMatch = headCase == 0;
+                        var capture = new UiShaderSourcePoolTeardownEntryDiagnosticCapture(
+                            ThisPointer: 0x1000,
+                            CapturedGlobalReadinessByte: (byte)globalReadiness,
+                            CapturedReceiverFlagByte: (byte)receiverFlag,
+                            CapturedPoolPointerAfterNonzeroReceiverFlag:
+                                receiverFlag == 0 ? (uint?)null : poolIsZero ? 0u : 0x2000u,
+                            CapturedLaterSingletonListHead: headsMatch ? 0x1000u : 0x2000u);
+
+                        var expected = new List<uint>(3);
+                        if (globalReadiness == 0)
+                        {
+                            expected.Add(0x76);
+                        }
+
+                        if (receiverFlag == 0 || poolIsZero)
+                        {
+                            expected.Add(0x77);
+                        }
+
+                        if (!headsMatch)
+                        {
+                            expected.Add(0x78);
+                        }
+
+                        if (!UiShaderSourcePoolTeardownNativeLayout.ProjectEntryDiagnosticIds(capture)
+                            .SequenceEqual(expected))
+                        {
+                            entryDiagnosticTruthTableIsExact = false;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        check("Diagnostic projection exhausts all byte pairs and independently crosses reached pool/head gates",
+            entryDiagnosticTruthTableIsExact);
+
+        bool rejectsMissingPoolRead = false;
+        bool rejectsUnreachedPoolRead = false;
+        try
+        {
+            UiShaderSourcePoolTeardownNativeLayout.ProjectEntryDiagnosticIds(
+                new UiShaderSourcePoolTeardownEntryDiagnosticCapture(0x1000, 1, 1, null, 0x1000));
+        }
+        catch (ArgumentException)
+        {
+            rejectsMissingPoolRead = true;
+        }
+
+        try
+        {
+            UiShaderSourcePoolTeardownNativeLayout.ProjectEntryDiagnosticIds(
+                new UiShaderSourcePoolTeardownEntryDiagnosticCapture(0x1000, 1, 0, 0, 0x1000));
+        }
+        catch (ArgumentException)
+        {
+            rejectsUnreachedPoolRead = true;
+        }
+
+        check("Diagnostic capture rejects a missing reached pool read and an extra short-circuited pool read",
+            rejectsMissingPoolRead && rejectsUnreachedPoolRead);
+
         check("Shader-source pool teardown anchors match the pinned sample and raw/VA mapping",
             UiShaderSourcePoolTeardownNativeLayout.SampleSha256
                 == "97362d668ff64778193a64759265e4ae90842043c4a15b627df9902fd9135445"
