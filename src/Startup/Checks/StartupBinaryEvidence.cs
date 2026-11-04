@@ -11557,6 +11557,142 @@ internal static class StartupBinaryEvidence
             Matches(0x12CE1EC, "8B4DD0433B5F2072BF")
             && ShortConditionalBranchTargets(0x12CE1F3, 0x72, 0x12CE1B4));
 
+        const uint rawQueueInitializerFileOffset = 0x12CE210;
+        const uint queueInitializerCodeVirtualAddress = rawQueueInitializerFileOffset + 0x400C00;
+        check("Binary queue initializer window [raw 0x12CE210, 0x12CE280) maps raw+0x400C00 to code VA 0x16CEE10 and preserves all 0x70 bytes through RET and padding",
+            queueInitializerCodeVirtualAddress == 0x16CEE10
+            && VirtualAddressToFileOffset(queueInitializerCodeVirtualAddress) == rawQueueInitializerFileOffset
+            && Matches(rawQueueInitializerFileOffset,
+                "538BD9C7431000000000833DBC03E00100750AB9AC03E001E893188FFFF6C303741A6A0068CD02000068AB43B70168C343B701FF15A05EC10183C4108B0DBC03E001E809FCFFFF85C074090F57C0660FD600EB0233C089430889038BC3C7430C00000000C74304000000005BC3CCCCCC")
+            && Matches(0x12CE27B, "5BC3CCCCCC")
+            && 0x12CE280 == rawQueueInitializerFileOffset + 0x70
+            && Matches(0x12CE280, "51568B"));
+        check("Binary queue initializer conditionally runs the shared-global setup, diagnoses nonzero receiver low two bits as 0x2CD, then reloads the global independently for acquisition",
+            Matches(0x12CE21A, "833DBC03E00100")
+            && ShortConditionalBranchTargets(0x12CE221, 0x75, 0x12CE22D)
+            && Matches(0x12CE223, "B9AC03E001")
+            && RelativeBranchTargets(0x12CE228, 0xE8, 0xBBFAC0)
+            && Matches(0x12CE22D, "F6C303")
+            && ShortConditionalBranchTargets(0x12CE230, 0x74, 0x12CE24C)
+            && Matches(0x12CE234, "68CD020000")
+            && Matches(0x12CE243, "FF15A05EC101")
+            && Matches(0x12CE24C, "8B0DBC03E001")
+            && RelativeBranchTargets(0x12CE252, 0xE8, 0x12CDE60));
+        check("Binary queue initializer zeroes the acquired qword only on the non-null branch, publishes null or the acquired pointer to both head slots, then clears the remaining fields",
+            Matches(0x12CE257, "85C07409")
+            && ShortConditionalBranchTargets(0x12CE259, 0x74, 0x12CE264)
+            && Matches(0x12CE25B, "0F57C0660FD600")
+            && ShortConditionalBranchTargets(0x12CE262, 0xEB, 0x12CE266)
+            && Matches(0x12CE264, "33C08943088903")
+            && Matches(0x12CE266, "89430889038BC3C7430C00000000C74304000000005BC3"));
+
+        const uint rawAppendEntryFileOffset = 0x12CE310;
+        const uint appendEntryCodeVirtualAddress = rawAppendEntryFileOffset + 0x400C00;
+        check("Binary append entry window [raw 0x12CE310, 0x12CE3F7) maps raw+0x400C00 to code VA 0x16CEF10 and preserves all 0xE7 bytes through RET 4",
+            appendEntryCodeVirtualAddress == 0x16CEF10
+            && VirtualAddressToFileOffset(appendEntryCodeVirtualAddress) == rawAppendEntryFileOffset
+            && Matches(rawAppendEntryFileOffset,
+                "558BEC83E4F883EC14538BD9BA010000005657895C24148D4310F00FC1108B0DBC03E001E827FBFFFF8944240C85C074090F57C0660FD600EB0633C08944240C8D4B08C70000000000C7400400000000894C24108B5B0C8B318974241885F6751D5668EC02000068DF42B701680343B701FF15A05EC1018B44241C83C4108BD38D4B0133FF8954241C33DB0BFE0BD88BC78B742410F00FC70E8B7424183BC78B44240C8B5C24148B4C241075A73B54241C75A1833E00741A6A0068F002000068F742B701684B43B701FF15A05EC10183C4108B45088946048B44240C5F89065E5B8BE55DC20400")
+            && Matches(0x12CE3F4, "C20400")
+            && Matches(0x12CE3F7, "CC")
+            && 0x12CE3F7 == rawAppendEntryFileOffset + 0xE7);
+        check("Binary append increments receiver +0x10 by LOCK XADD 1 before calling acquisition and reloads the shared global separately from queue initialization",
+            Matches(0x12CE323, "895C24148D4310F00FC110")
+            && Matches(0x12CE32E, "8B0DBC03E001")
+            && RelativeBranchTargets(0x12CE334, 0xE8, 0x12CDE60));
+        check("Binary append null acquisition branches to zero EAX but still falls through the unconditional two-DWORD zero stores through EAX",
+            Matches(0x12CE339, "8944240C85C07409")
+            && ShortConditionalBranchTargets(0x12CE33F, 0x74, 0x12CE34A)
+            && Matches(0x12CE341, "0F57C0660FD600EB06")
+            && Matches(0x12CE34A, "33C08944240C")
+            && Matches(0x12CE350, "8D4B08C70000000000C7400400000000"));
+        check("Binary append retries the tail-pair CMPXCHG8B loop when either returned half mismatches and reports post-CAS diagnostic 0x2F0 before publishing payload then link",
+            Matches(0x12CE364, "8B5B0C8B318974241885F6751D")
+            && ShortConditionalBranchTargets(0x12CE36F, 0x75, 0x12CE38E)
+            && Matches(0x12CE3A5, "F00FC70E")
+            && Matches(0x12CE3AD, "3BC78B44240C8B5C24148B4C241075A73B54241C75A1")
+            && ShortConditionalBranchTargets(0x12CE3BB, 0x75, 0x12CE364)
+            && ShortConditionalBranchTargets(0x12CE3C1, 0x75, 0x12CE364)
+            && Matches(0x12CE3C3, "833E00741A6A0068F002000068F742B701684B43B701FF15A05EC10183C410")
+            && ShortConditionalBranchTargets(0x12CE3C6, 0x74, 0x12CE3E2)
+            && Matches(0x12CE3E2, "8B45088946048B44240C5F89065E5B8BE55DC20400"));
+
+        const uint rawCleanupEmptyAttemptFileOffset = 0x12C0348;
+        const uint cleanupEmptyAttemptCodeVirtualAddress = rawCleanupEmptyAttemptFileOffset + 0x400C00;
+        check("Binary cleanup empty-attempt window [raw 0x12C0348, 0x12C0382) maps raw+0x400C00 to code VA 0x16C0F48 and preserves all 0x3A bytes through its backedge",
+            cleanupEmptyAttemptCodeVirtualAddress == 0x16C0F48
+            && VirtualAddressToFileOffset(cleanupEmptyAttemptCodeVirtualAddress) == rawCleanupEmptyAttemptFileOffset
+            && Matches(rawCleanupEmptyAttemptFileOffset,
+                "8B5E048B3E85FF7519576824030000685743B701683343B701FF15A05EC10183C410833F000F94C03B5E0475D384C075098BCEE880E00000EBC6")
+            && Matches(0x12C0380, "EBC6")
+            && 0x12C0382 == rawCleanupEmptyAttemptFileOffset + 0x3A
+            && Matches(0x12C0382, "8B7DF0"));
+        check("Binary cleanup empty-attempt diagnostic 0x324 may return into the head-link check; changed tag retries, nonempty link calls 0x12CE400, and the backedge returns to raw 0x12C0348",
+            ShortConditionalBranchTargets(0x12C034F, 0x75, 0x12C036A)
+            && Matches(0x12C0352, "6824030000")
+            && Matches(0x12C036A, "833F000F94C0")
+            && ShortConditionalBranchTargets(0x12C0373, 0x75, 0x12C0348)
+            && ShortConditionalBranchTargets(0x12C0377, 0x75, 0x12C0382)
+            && RelativeBranchTargets(0x12C037B, 0xE8, 0x12CE400)
+            && ShortConditionalBranchTargets(0x12C0380, 0xEB, 0x12C0348));
+        const uint rawEmbeddedPoolDrainFileOffset = 0x12C0382;
+        const uint embeddedPoolDrainEndFileOffset = 0x12C03AF;
+        const uint embeddedPoolDrainCodeVirtualAddress =
+            rawEmbeddedPoolDrainFileOffset + 0x400C00;
+        check("Binary embedded-pool drain window [raw 0x12C0382, 0x12C03AF) maps raw+0x400C00 to code VA 0x16C0F82 and preserves all 0x2D bytes through cleanup call",
+            embeddedPoolDrainCodeVirtualAddress == 0x16C0F82
+            && VirtualAddressToFileOffset(embeddedPoolDrainCodeVirtualAddress)
+                == rawEmbeddedPoolDrainFileOffset
+            && embeddedPoolDrainEndFileOffset - rawEmbeddedPoolDrainFileOffset == 0x2D
+            && Matches(rawEmbeddedPoolDrainFileOffset,
+                "8B7DF08D4F08E853D7000085C074138BC8E8C88900008D4F08E840D7000085C075ED8BCEC645FC00E8D1DE0000")
+            && Matches(0x12C03AF, "8B45EC"));
+        check("Binary embedded-pool drain pops at 0x12CDAE0 twice, releases at 0x12C8D60, routes initial zero to cleanup and next nonzero back to release, then cleans the separate queue at 0x12CE280",
+            Matches(0x12C0382, "8B7DF08D4F08")
+            && RelativeBranchTargets(0x12C0388, 0xE8, 0x12CDAE0)
+            && Matches(0x12C038D, "85C07413")
+            && ShortConditionalBranchTargets(0x12C038F, 0x74, 0x12C03A4)
+            && Matches(0x12C0391, "8BC8")
+            && RelativeBranchTargets(0x12C0393, 0xE8, 0x12C8D60)
+            && Matches(0x12C0398, "8D4F08")
+            && RelativeBranchTargets(0x12C039B, 0xE8, 0x12CDAE0)
+            && Matches(0x12C03A0, "85C075ED")
+            && ShortConditionalBranchTargets(0x12C03A2, 0x75, 0x12C0391)
+            && Matches(0x12C03A4, "8BCEC645FC00")
+            && RelativeBranchTargets(0x12C03AA, 0xE8, 0x12CE280));
+        const uint rawOrdinaryDestructorTailFileOffset = 0x12C03AF;
+        const uint ordinaryDestructorTailEndFileOffset = 0x12C03CA;
+        const uint ordinaryDestructorTailCodeVirtualAddress =
+            rawOrdinaryDestructorTailFileOffset + 0x400C00;
+        check("Binary ordinary destructor tail [raw 0x12C03AF, 0x12C03CA) maps raw+0x400C00 to code VA 0x16C0FAF and preserves all 0x1B bytes through ordinary RET",
+            ordinaryDestructorTailCodeVirtualAddress == 0x16C0FAF
+            && VirtualAddressToFileOffset(ordinaryDestructorTailCodeVirtualAddress)
+                == rawOrdinaryDestructorTailFileOffset
+            && ordinaryDestructorTailEndFileOffset - rawOrdinaryDestructorTailFileOffset == 0x1B
+            && Matches(rawOrdinaryDestructorTailFileOffset,
+                "8B45ECC700CC34C7018B4DF464890D00000000595F5E5B8BE55DC3"));
+        check("Binary ordinary destructor tail reloads saved receiver from EBP-0x14, stores DWORD 0x1C734CC, reloads saved exception chain from EBP-0x0C to FS:[0], and uses ordinary RET",
+            Matches(rawOrdinaryDestructorTailFileOffset, "8B45EC")
+            && Matches(rawOrdinaryDestructorTailFileOffset + 3, "C700CC34C701")
+            && ReadUInt32(rawOrdinaryDestructorTailFileOffset + 5) == 0x01C734CC
+            && Matches(rawOrdinaryDestructorTailFileOffset + 9, "8B4DF4")
+            && Matches(rawOrdinaryDestructorTailFileOffset + 12, "64890D00000000")
+            && Matches(rawOrdinaryDestructorTailFileOffset + 19, "595F5E5B8BE55DC3")
+            && Matches(rawOrdinaryDestructorTailFileOffset + 26, "C3"));
+        check("Binary ordinary destructor first-DWORD target VA 0x1C734CC maps to its file-backed identity bytes",
+            VirtualAddressToFileOffset(0x01C734CC) == 0x18720CC
+            && Matches(0x18720CC, "001CFC0094D9CC01"));
+
+        const uint rawNarrowConstructorCallFileOffset = 0x12C0242;
+        const uint narrowConstructorCodeVirtualAddress = rawNarrowConstructorCallFileOffset + 0x400C00;
+        check("Binary narrow constructor binds this+8 to queue initialization at raw 0x12C0242 and passes embedded config arguments (12, 8, 1) to this+0x20",
+            narrowConstructorCodeVirtualAddress == 0x16C0E42
+            && VirtualAddressToFileOffset(narrowConstructorCodeVirtualAddress) == rawNarrowConstructorCallFileOffset
+            && Matches(0x12C0239, "8D4E08C706540CC801E8C9DF0000")
+            && RelativeBranchTargets(rawNarrowConstructorCallFileOffset, 0xE8, 0x12CE210)
+            && Matches(0x12C0247, "6A016A088D4E20C645FC016A0C")
+            && RelativeBranchTargets(0x12C0254, 0xE8, 0x12CDB40));
+
         const uint rawPoolResetEntryFileOffset = 0x12CDC50;
         const uint poolResetEntryCodeVirtualAddress = 0x16CE850;
         check("Binary raw pool reset entry 0x12CDC50 maps to code VA 0x16CE850 by raw+0x400C00 and preserves the null-callback diagnostic 0x215 (533), fence, and early zero-counter return",
@@ -11623,6 +11759,14 @@ internal static class StartupBinaryEvidence
             && ReadUInt32(0x12C0337) == poolResetCallbackCodeVirtualAddress
             && RelativeBranchTargets(0x12C0340, 0xE8, 0x12CDC50)
             && Matches(0x12C0345, "8D7308"));
+        check("Binary pool reset caller keeps the embedded pool in saved local -0x10 independently from the queue captured at this+8 in ESI",
+            Matches(0x12C0333, "8D43206820156C018BC88945F0")
+            && Matches(0x12C033D, "8945F0")
+            && RelativeBranchTargets(0x12C0340, 0xE8, 0x12CDC50)
+            && Matches(0x12C0345, "8D7308")
+            && Matches(0x12C0379, "8BCE")
+            && Matches(0x12C0382, "8B7DF0")
+            && Matches(0x12C0385, "8D4F08"));
         check("Binary pool reset callback [raw 0x12C0920, 0x12C0949) maps by raw+0x400C00; null first DWORD skips every clear store, nonnull calls backend 0x12C8D60 then zeros +0/+4/+8, and both paths end at plain RET",
             poolResetCallbackCodeVirtualAddress == 0x16C1520
             && VirtualAddressToFileOffset(poolResetCallbackCodeVirtualAddress)
@@ -11786,7 +11930,8 @@ internal static class StartupBinaryEvidence
             && RelativeBranchTargets(0x6A5556, 0xE9, 0x6A5900)
             && Matches(0x6A5568, "E993030000")
             && RelativeBranchTargets(0x6A5568, 0xE9, 0x6A5900)
-            && Matches(0x6A5570, "C20400"));
+            && Matches(0x6A5570, "C20400")
+            && ImportSlotNames(0x1AC45C0, "?_Xlength_error@std@@YAXPBD@Z"));
 
         const uint rawPoolResetStorageReplacementFileOffset = 0x6A5900;
         const uint poolResetStorageReplacementCodeVirtualAddress =
@@ -11817,7 +11962,9 @@ internal static class StartupBinaryEvidence
             && Matches(0x6A592F, "FF152444AC01")
             && Matches(0x6A5942, "FF159C48AC01")
             && IsImportSlot(0x01AC4424)
-            && IsImportSlot(0x01AC489C));
+            && IsImportSlot(0x01AC489C)
+            && ImportSlotNames(0x1AC4424, "?_Xbad_alloc@std@@YAXXZ")
+            && ImportSlotNames(0x1AC489C, "memmove"));
 
         const uint rawStackAllocatorWrapperFileOffset = 0x12B7FB0;
         const uint stackAllocatorWrapperCodeVirtualAddress =
@@ -11849,7 +11996,8 @@ internal static class StartupBinaryEvidence
             && Matches(0x12B7FB6, "A10050DC0133C58945FC")
             && Matches(0x12B8011, "8B4DFC5F33CD5EE8792C0B00")
             && RelativeBranchTargets(0x12B8018, 0xE8, 0x136AC96)
-            && Matches(0x12B801D, "8BE55DC3"));
+            && Matches(0x12B801D, "8BE55DC3")
+            && ImportSlotNames(0x1AC4870, "_snprintf"));
 
         const uint rawQueueCleanupFileOffset = 0x12CE280;
         const uint rawQueueCleanupEndFileOffset = 0x12CE30A;

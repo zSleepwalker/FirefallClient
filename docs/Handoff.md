@@ -11522,3 +11522,19 @@ pop `0x16CE6E0`, release `0x16C9960`, queue cleanup `0x16CEE80`.
 Global singleton initialization and ordinary destructor finalization are
 successor code assignments; a fresh evidence agent exclusively owns the PE
 authority for the final 27-byte destructor tail.
+
+Pushed `7ad8401`: eight queue projections and focused checks plus their
+documentation are persistent on the feature branch. The PE evidence file
+remains unstaged while the final-tail evidence writer finishes. Caller trace
+found distinct contracts: fragment enqueue uses receiver `this+0x38` and
+forwards the append result; received/status queue uses `this+0x260` and
+tests small integer pop results; owner callback queues use independently
+loaded owners plus `0x60` and pointer-like callback/refcount operations.
+Do not conflate these payload contracts.
+
+New Luna code scopes: fragment wrapper
+`76f5e272-dab3-4380-a912-38a5dca06e23`; received-queue pop gate
+`9066607d-b4a2-4e34-81ef-f6d8e70d14ae`. Global initializer code
+`e6eebd15-10d8-4ecc-9396-92fd3a7cf05c` and destructor finalization code
+`2c2fbcd5-3a74-4215-81f7-3b52d200ffca` remain active. Evidence exclusive
+writer is `3bdbc6f7-fd23-4c03-8563-a3271c6bba6a`.

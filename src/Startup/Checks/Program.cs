@@ -53,6 +53,7 @@ QueueSentinelReturnChecks.Run(Check);
 QueueEmbeddedPoolDrainChecks.Run(Check);
 QueueSentinelInitializationChecks.Run(Check);
 QueueAppendAcquisitionChecks.Run(Check);
+QueueDestructorFinalizationChecks.Run(Check);
 SharedTextPoolSingletonChecks.Run(Check);
 UiShaderSourcePoolTeardownChecks.Run(Check);
 UiShaderSourcePoolSingletonDestructorChecks.Run(Check);
