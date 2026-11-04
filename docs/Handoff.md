@@ -11023,3 +11023,16 @@ runner passes. The projection deliberately starts after allocator return;
 own-entry guards and nearest teardown remain separate active traces.
 The PE file is now assigned to
 `330036bf-8b4d-421e-9e0d-a5306d064a8c` for copy-constructor/pair order.
+
+Pair helper `0x12CC430` reads incoming control before backing and
+increments incoming control `+4` before reading old destination control.
+After conditional old-control callbacks, it stores captured incoming
+control before saved backing. No explicit source/destination equality
+test appears in this bounded body; no alias-safety conclusion follows.
+Unlike the wrapper destructor's second XADD/DEC/JNZ, this helper's
+second-counter decrement is followed directly by JNZ. Keep those
+instruction sequences separate in captured projections.
+
+The pair-order report's base-zero-equals-RVA wording is rejected:
+the established flat IDB uses raw file EAs, while mapped PE RVAs differ.
+Do not propagate that address-basis claim into code or documentation.
