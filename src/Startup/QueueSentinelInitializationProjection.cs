@@ -318,10 +318,6 @@ public static class QueueSentinelInitializationProjection
                 "8D 4E 08",
                 ReceiverRelativeOffset: ConstructorQueueReceiverOffset),
             new QueueSentinelInitializationInstructionEvidence(
-                "Install the constructor vtable between receiver setup and queue initialization",
-                0x12C023C,
-                "C7 06 54 0C 80 01"),
-            new QueueSentinelInitializationInstructionEvidence(
                 "Call queue initialization from the constructor",
                 ConstructorQueueInitializationCallRawFileOffset,
                 "E8 C9 DF 00 00",

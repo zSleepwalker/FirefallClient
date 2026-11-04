@@ -12061,5 +12061,42 @@ internal static class StartupBinaryEvidence
             && RelativeBranchTargets(0x12C037B, 0xE8, 0x12CE400)
             && Matches(0x12C03A4, "8BCEC645FC00")
             && RelativeBranchTargets(0x12C03AA, 0xE8, 0x12CE280));
+
+        const uint rawSharedSentinelGlobalInitializerSliceFileOffset = 0xBBFAE7;
+        const uint rawSharedSentinelGlobalInitializerSliceEndFileOffset = 0xBBFB67;
+        const uint sharedSentinelGlobalInitializerSliceCodeVirtualAddress =
+            rawSharedSentinelGlobalInitializerSliceFileOffset + 0x400C00;
+        check("Binary shared sentinel-global initializer slice [raw 0xBBFAE7, 0xBBFB67) maps raw+0x400C00 to code VA 0xFC06E7 and preserves all 0x80 bytes",
+            sharedSentinelGlobalInitializerSliceCodeVirtualAddress == 0xFC06E7
+            && VirtualAddressToFileOffset(sharedSentinelGlobalInitializerSliceCodeVirtualAddress)
+                == rawSharedSentinelGlobalInitializerSliceFileOffset
+            && rawSharedSentinelGlobalInitializerSliceEndFileOffset
+                - rawSharedSentinelGlobalInitializerSliceFileOffset == 0x80
+            && Matches(rawSharedSentinelGlobalInitializerSliceFileOffset,
+                "803D95B0E4010075176A006A686858EAC5016858EAC501FF15A05EC10183C410807E0400741A68C8E9C5016A696858EAC5016858EAC501FF15A05EC10183C4106A28E882846F008BF883C404897DF0C745FC0000000085FF740F6A086A206A088BCFE8F2DF7000EB0233FFA1A8B0E401897E1089460C8935A8B0E401C6460401")
+            && rawSharedSentinelGlobalInitializerSliceEndFileOffset
+                == rawSharedSentinelGlobalInitializerSliceFileOffset + 0x80);
+        check("Binary shared sentinel-global initializer conditionally reports 104 for zero guard byte VA 0x1E4B095 and reports 105 for nonzero receiver byte +4",
+            Matches(0xBBFAE5, "8BF1")
+            && Matches(0xBBFAE7, "803D95B0E401007517")
+            && ShortConditionalBranchTargets(0xBBFAEE, 0x75, 0xBBFB07)
+            && Matches(0xBBFAF0, "6A006A686858EAC5016858EAC501FF15A05EC101")
+            && Matches(0xBBFB07, "807E0400741A")
+            && ShortConditionalBranchTargets(0xBBFB0B, 0x74, 0xBBFB27)
+            && Matches(0xBBFB0D, "68C8E9C5016A69")
+            && Matches(0xBBFB1E, "FF15A05EC101"));
+        check("Binary shared sentinel-global initializer passes 0x28 to raw call target 0x12B7FB0, calls raw 0x12CDB40 only on nonzero result with arguments (8, 32, 8), then independently reads and publishes the global head",
+            Matches(0xBBFB27, "6A28")
+            && RelativeBranchTargets(0xBBFB29, 0xE8, 0x12B7FB0)
+            && Matches(0xBBFB3D, "85FF")
+            && ShortConditionalBranchTargets(0xBBFB3F, 0x74, 0xBBFB50)
+            && Matches(0xBBFB41, "6A086A206A088BCF")
+            && RelativeBranchTargets(0xBBFB49, 0xE8, 0x12CDB40)
+            && Matches(0xBBFB50, "33FFA1A8B0E401")
+            && Matches(0xBBFB52, "A1A8B0E401897E1089460C8935A8B0E401C6460401")
+            && Matches(0xBBFB57, "897E10")
+            && Matches(0xBBFB5A, "89460C")
+            && Matches(0xBBFB5D, "8935A8B0E401")
+            && Matches(0xBBFB63, "C6460401"));
     }
 }

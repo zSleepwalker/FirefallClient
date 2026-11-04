@@ -11538,3 +11538,23 @@ New Luna code scopes: fragment wrapper
 `e6eebd15-10d8-4ecc-9396-92fd3a7cf05c` and destructor finalization code
 `2c2fbcd5-3a74-4215-81f7-3b52d200ffca` remain active. Evidence exclusive
 writer is `3bdbc6f7-fd23-4c03-8563-a3271c6bba6a`.
+
+Pushed `3e88041`: immutable queue lifecycle/drain/import-name evidence and
+ordinary destructor finalization are persistent. Registered successor global
+initializer (128-byte slice) and received-queue pop gate (26 bytes); both full
+byte captures independently match the pinned PE and their behavioral checks
+pass. The initializer author is correcting an individual instruction assertion;
+new initializer PE assertions remain under exclusive writer
+`bb247a66-2730-4086-888e-c3c0e2a71f8d` and are not yet ready.
+
+First-owner callback delivery trace assigned Luna
+`548427d4-5e04-4193-99e6-d892c867a1ef`, bounded to the first queue around
+pop `0xBD5239`, not the second owner queue.
+
+Global initializer checks now pass after correcting two mirrored helper-VA
+literals, allocation `0x16B8BB0` and configuration `0x16CE740`; all 36
+instruction anchors and the full 128-byte slice were already correct.
+Received-queue pop gate and new immutable initializer authority pass the
+ordinary pinned runner. Fragment wrapper review found its diagnostic return
+was a nonnullable bool conflating skipped, unavailable, and nonreturn paths;
+author is adding nullable capture and explicit outcome boundaries.
