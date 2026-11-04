@@ -11067,3 +11067,28 @@ receiver flag `+4`. Entry detach layout, later drain trace, source-copy
 constructor projection, and a serialized PE writer are active.
 The nearby `0x12CB830` method is source initialization with preserve
 zero and backing-pointer-gated byte copying, not a proven alignment setter.
+
+The bounded read-only drain trace reports no direct drain counter update.
+After detaching, captured pool zero returns; a nonzero pool is popped through
+`0x12CDAE0` with receiver `pool+8`. Each nonzero pop result is passed to
+allocator backend `0x12C8D60`; an empty pop reaches the final tail release
+of the captured pool. This establishes neither termination nor effects
+inside either helper. A captured drain-step projection is assigned to
+`35ccbcb1-d865-45a2-9245-cf02b88264ee`; immutable PE confirmation remains
+with the current serialized evidence writer. Addresses here are raw file
+offsets / flat IDB EAs, not PE RVAs.
+
+Source initialization, singleton detach, and one-pop drain projections are
+registered. Review corrected the constructor action sequence: requested-size
+push `0x12CB890` and source push `0x12CB893` precede backing-data capture/push
+at `0x12CB896`. The registered pinned-sample runner passes after that change.
+Builds must be serialized: concurrent agent builds briefly locked the shared
+Startup.Checks output; agents now leave final build/run to the coordinator.
+
+Active next scopes are singleton list walker
+(`d4da370d-ecde-417d-a96b-90c5c92489b1`), one-attempt tagged pop code
+(`f6bc3de8-e947-496a-be73-2a63372b1738`), and teardown diagnostic PE
+(`6d6af571-ce74-4918-bb1f-c54c7088ae90`, exclusive evidence-file writer).
+The pop trace's reported VA `0x16DDAE0` was arithmetic error: raw
+`0x12CDAE0` maps to code VA `0x16CE6E0`. Its pair-relative fields must
+not be confused with the containing pool: the teardown passes `pool+8`.

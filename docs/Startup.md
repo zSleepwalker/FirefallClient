@@ -187,6 +187,12 @@ Its separate entry-gate projection reports ID `0x68` for zero captured global re
 
 `UiShaderSourcePairReplacementProjectionRules` separately handles captured old destination control. Incoming control increment precedes old-control capture; reached counter decrements gate indirect callbacks before the captured new pair is published. Both decrements in this helper use immediate XADD/JNZ flags. Neither projection emulates callback effects, backing-byte copies, an atomic source snapshot, or alias safety.
 
+`UiShaderSourceInitialCopyProjectionRules` records the separate source-byte constructor: install the wrapper vptr, zero backing/control/alignment fields, and request resizing with preserve zero. After that call returns, the later backing capture alone gates the copy-thunk path. A nonnull backing reaches the call even for captured size zero, source zero, or data zero; those observations are not memory-safety or allocation-success guarantees. An absent backing capture represents a projection ending before that read.
+
+`UiShaderSourcePoolTeardownNativeLayout` starts after the entry diagnostics return. It captures pool and next-link fields separately, publishes the captured next link to the singleton-list head, then clears receiver `+0xC` before `+0x10`. It does not directly clear receiver flag `+4`. Only the captured pool pointer selects the later drain; the layout stops at that boundary rather than modeling allocator effects or shutdown completion.
+
+`UiShaderSourcePoolDrainProjection` distinguishes a null captured pool (no helper calls) from a nonnull pool whose first pop returns zero (tail transfer of the pool to the allocator backend). A nonzero captured pop is passed to the same backend before another pop with receiver `pool+8`; that next result and subsequent loop iterations remain unmodeled. The projection neither guarantees termination nor treats the backend as an operating-system free routine.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves
