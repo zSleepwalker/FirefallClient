@@ -11,7 +11,7 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are Login UI-manager startup argument retention
+file-close path. Active boundaries are Login UI-manager retained-field teardown
 and published scripting-object native storage ownership after VM close.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
@@ -9488,6 +9488,28 @@ userdata from context `+4`, `0xCD5590` loads the callback from context
 `+0`, and `0xCD5592` invokes the final outer-block free.
 The ordinary `0xD675A0` bridge similarly loads userdata at `0xD675C5`,
 callback at `0xD675CC`, and invokes it at `0xD675CE`.
+
+## UI initialization retains a mixture of copied text and unclassified pointers
+
+The eight positional arguments to raw `0xBFB310` have these observed
+uses in the active sample; pointer stores alone do not prove ownership:
+
+| Argument | Handling |
+|---|---|
+| 1: preceding virtual-call result | Passed to `0xCA6370`; stored at child `+4` at `0xCA639F`. Child pointer stored at UI `+0x24` at `0xBFB416`; no refcount acquisition identified. |
+| 2: zero | No read found in this bounded trace. |
+| 3: global VA `0x1DFFFC0` value | Stored at UI `+0x974` at `0xBFB51A`; virtual call through it at `0xBFB8C6`. Ownership unresolved. |
+| 4: indexed global value | Copied into shared-text UI `+0x34` at `0xBFB48C..0xBFB4CB` through byte-copy helper `0x2FCC90`, not retained as the source pointer. |
+| 5: EDI | Copied to shared-text UI `+0x5C8` at `0xBFB403..0xBFB419`, then path-normalized. |
+| 6: outer caller `arg_0` | Passed to formatter `0xBFDE80` at `0xBFB748..0xBFB74D`; no direct field store identified here. |
+| 7: outer caller `arg_8` | Conditional mode flag at `0xBFB84B..0xBFB864`, not stored. |
+| 8: second getter result plus `0x48` | Stored at UI `+0xA08` only near success, `0xBFB8C9..0xBFB8CE`; ownership unresolved. |
+
+Late initialization failures converge on `0xBFB668` and return zero via
+`retn 0x20` without clearing these retained fields in that epilogue.
+The caller's subsequent `0x30D150` call site is `0x30B204..0x30B209`;
+its exact predicate and concrete retained-field cleanup are the next task,
+not evidence that those resources have already been released.
 
 The report's apparent VA lookup discrepancy is not a new mapping gap:
 the IDB is raw/base-zero and a numeric runtime VA must not be used directly
