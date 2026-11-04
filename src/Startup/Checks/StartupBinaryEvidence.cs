@@ -11368,5 +11368,72 @@ internal static class StartupBinaryEvidence
             Matches(0x12CDB1A, "8B7424103BC78B44240C75CC3B54241475C6")
             && ShortConditionalBranchTargets(0x12CDB24, 0x75, 0x12CDAF2)
             && ShortConditionalBranchTargets(0x12CDB2A, 0x75, 0x12CDAF2));
+
+        const uint rawTaggedPoolPushFileOffset = 0x12CDA60;
+        const uint taggedPoolPushCodeVirtualAddress = rawTaggedPoolPushFileOffset + 0x400C00;
+        check("Binary tagged-pool push maps raw 0x12CDA60 to code VA 0x16CE660 and preserves all 0x76 function bytes",
+            VirtualAddressToFileOffset(taggedPoolPushCodeVirtualAddress) == rawTaggedPoolPushFileOffset
+            && Matches(rawTaggedPoolPushFileOffset,
+                "558BEC83E4F883EC0C837D08008BC153565789442410751E6A0068B601000068A741B701686B41B701FF15A05EC1018B44242083C4108B550833FF8B480433DB8B008BF10BDA897424148902418B020BF88BC78BD68B742410F00FC70E8B7424143BC78B44241075CD3BD675C95F5E5B8BE55DC20400"));
+        check("Binary tagged-pool push lets a null-node diagnostic return fall into the attempt, separately loads head/tag, links the node, wraps the tag increment, then uses LOCK CMPXCHG8B",
+            ShortConditionalBranchTargets(0x12CDA76, 0x75, 0x12CDA96)
+            && Matches(0x12CDA78, "6A0068B601000068A741B701686B41B701FF15A05EC1018B44242083C410")
+            && Matches(0x12CDA9B, "8B480433DB8B008BF1")
+            && Matches(0x12CDAAA, "890241")
+            && Matches(0x12CDAB9, "F00FC70E")
+            && Matches(0x12CDAAC, "41"));
+        check("Binary tagged-pool push compares both returned CMPXCHG8B halves and retries to the pair loads on either mismatch, then returns the receiver with RET 4",
+            Matches(0x12CDABD, "8B7424143BC78B44241075CD3BD675C9")
+            && ShortConditionalBranchTargets(0x12CDAC7, 0x75, 0x12CDA96)
+            && ShortConditionalBranchTargets(0x12CDACB, 0x75, 0x12CDA96)
+            && Matches(0x12CDAC3, "8B44241075CD3BD675C95F5E5B8BE55DC20400"));
+
+        const uint rawTaggedPoolAcquireFileOffset = 0x12CDE60;
+        const uint taggedPoolAcquireCodeVirtualAddress = rawTaggedPoolAcquireFileOffset + 0x400C00;
+        check("Binary tagged-pool acquisition maps raw 0x12CDE60 to code VA 0x16CEA60 and preserves all 0x5B function bytes",
+            VirtualAddressToFileOffset(taggedPoolAcquireCodeVirtualAddress) == rawTaggedPoolAcquireFileOffset
+            && Matches(rawTaggedPoolAcquireFileOffset,
+                "5156578BF9E876FCFFFF8BF085F675148BCFE8790200008BCFE862FCFFFF8BF085F674ECB9010000008D4710F00FC10833D28BC6F7771885D2741A6A006854020000687B43B701689F43B701FF15A05EC10183C4105F8BC65E59C3"));
+        check("Binary tagged-pool acquisition pops from the original receiver, replenishes through 0x12CE0F0 when empty, then retries the same pop",
+            Matches(0x12CDE60, "5156578BF9")
+            && Matches(0x12CDE70, "8BCFE8790200008BCFE862FCFFFF")
+            && RelativeBranchTargets(0x12CDE65, 0xE8, 0x12CDAE0)
+            && ShortConditionalBranchTargets(0x12CDE6E, 0x75, 0x12CDE84)
+            && RelativeBranchTargets(0x12CDE72, 0xE8, 0x12CE0F0)
+            && RelativeBranchTargets(0x12CDE79, 0xE8, 0x12CDAE0)
+            && ShortConditionalBranchTargets(0x12CDE82, 0x74, 0x12CDE70));
+        check("Binary tagged-pool acquisition LOCK XADDs one to receiver +0x10, performs unsigned division by receiver +0x18, reports nonzero remainder with diagnostic ID 0x254 (596 decimal), and returns the acquired pointer",
+            Matches(0x12CDE84, "B9010000008D4710F00FC10833D28BC6F7771885D2741A")
+            && ShortConditionalBranchTargets(0x12CDE99, 0x74, 0x12CDEB5)
+            && Matches(0x12CDE9B, "6A006854020000687B43B701689F43B701FF15A05EC10183C410")
+            && Matches(0x12CDEB5, "5F8BC65E59C3"));
+        check("Binary tagged-pool diagnostics resolve through the checked non-import reporter cell at VA 0x1C15EA0",
+            Matches(0x12CDA89, "FF15A05EC101")
+            && Matches(0x12CDEAC, "FF15A05EC101")
+            && VirtualAddressToFileOffset(0x1C15EA0) == 0x1814AA0
+            && ReadUInt32(VirtualAddressToFileOffset(0x1C15EA0)) == 0x016C37C0
+            && VirtualAddressToFileOffset(ReadUInt32(VirtualAddressToFileOffset(0x1C15EA0))) == 0x12C2BC0
+            && !IsImportSlot(0x1C15EA0));
+
+        const uint rawSingletonVtableFileOffset = 0x187F8A0;
+        const uint singletonSlotZeroCodeVirtualAddress = 0x16CCE80;
+        const uint rawSingletonDeletingDispositionFileOffset = 0x12CC280;
+        const uint singletonDeletingDispositionCodeVirtualAddress = rawSingletonDeletingDispositionFileOffset + 0x400C00;
+        check("Binary singleton vtable VA 0x1C80CA0 maps to raw 0x187F8A0 and slot 0 points to deleting disposition VA 0x16CCE80/raw 0x12CC280",
+            VirtualAddressToFileOffset(0x1C80CA0) == rawSingletonVtableFileOffset
+            && ReadUInt32(rawSingletonVtableFileOffset) == singletonSlotZeroCodeVirtualAddress
+            && singletonSlotZeroCodeVirtualAddress == singletonDeletingDispositionCodeVirtualAddress
+            && VirtualAddressToFileOffset(singletonSlotZeroCodeVirtualAddress) == rawSingletonDeletingDispositionFileOffset);
+        check("Binary singleton slot-0 deleting disposition at raw 0x12CC280 preserves its complete 0x2C-byte body: stores vptr 0x1C5E9BC, clears this+8/+C, gates allocator backend 0x12C8D60(this) on deleting bit 0, and returns with RET 4 before helper 0x12CC2B0",
+            Matches(rawSingletonDeletingDispositionFileOffset,
+                "558BECF6450801568BF1C706BCE9C501C7460800000000C7460C000000007405E8BBCAFFFF8BC65E5DC20400")
+            && Matches(0x12CC283, "F6450801")
+            && Matches(0x12CC28A, "C706BCE9C501")
+            && Matches(0x12CC290, "C7460800000000C7460C00000000")
+            && ShortConditionalBranchTargets(0x12CC29E, 0x74, 0x12CC2A5)
+            && RelativeBranchTargets(0x12CC2A0, 0xE8, 0x12C8D60)
+            && Matches(0x12CC2A5, "8BC65E5DC20400")
+            && Matches(0x12CC2AC, "CCCC")
+            && Matches(0x12CC2B0, "56578BF9"));
     }
 }

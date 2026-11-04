@@ -16,7 +16,8 @@ lifecycle: read gates/tails, capacity reuse, preservation copy, pooled/nonpool
 allocation and release, and wrapper copy/destruction have captured code and
 immutable PE anchors. See the latest appended sections for corrections and
 active assignments. Singleton teardown and source-initialization copy are
-active; callback publication and composite container semantic identity remain
+complete; current active scopes are tagged-pool replenishment and adjacent
+drain identity. Callback publication and composite container semantic identity remain
 parked. UI lifecycle, arithmetic/import regressions, and immutable backing-slot
 projection code/checks are committed.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
@@ -11120,3 +11121,35 @@ New active code scopes: tagged push
 `6be31f83-b449-424d-9c1c-170bef4fc379` binds both. Adjacent singleton
 callback identity/differences are read-only scope
 `cc1189e2-11b8-422d-ba0e-4382bccf569a`.
+
+Walker integration is pushed at `888de6c`; the pinned runner passes.
+Adjacent raw `0x12CC280` is the same singleton vtable's slot-zero
+deleting disposition, not a drain callback or new pool variant.
+Its separate reconstruction is assigned to
+`c49a0d04-2036-4a59-9f87-f7cd54c43141`, with PE assertions owned by
+`8afc3aa0-7d68-4c63-81d9-28725d6f76ce`.
+The helper starting `0x12CC2B0` has a distinct read-only drain trace
+assigned to `50c24a1d-ecba-4ad8-94b7-8a068c6832fe`.
+
+Acquisition review caught a hexadecimal diagnostic-ID mistake:
+`68 54 02 00 00` pushes `0x254` (596 decimal), NOT decimal 254.
+The acquisition author is correcting code/checks and adding explicit
+receiver-relative counter/divisor target addresses before registration.
+Push review also requires the diagnostic cell `0x1C15EA0` to be labeled
+VA, never raw file offset. Its later node-link reread is an independent
+capture, not automatically identical to the preceding attempted store.
+
+Push, acquisition continuation, and singleton slot-zero disposition are
+registered and the complete pinned-sample runner passes. Full push-window
+validation caught a transcription error at raw `0x12CDAAF`: opcode `0B`
+was mistakenly recorded as `8B`; corrected before integration.
+The later node-link reread remains independently captured in the code.
+Acquisition now uses `0x254` and receiver-relative wrapped targets.
+
+The separate helper at raw `0x12CC2B0` drains `this+8`, calls the backend
+for each popped item and finally `this`, then returns `this` with RET4.
+Unlike the inline singleton drain, it has no null-receiver gate and no
+tail transfer. Identity/vtable binding is assigned read-only to
+`d68c81f5-e192-47a0-9852-8702f667df36`; no generalization is integrated yet.
+Replenishment entry at raw `0x12CE0F0` is assigned read-only to
+`2504b159-8bb3-4d39-82bd-25aeb40d431d`.
