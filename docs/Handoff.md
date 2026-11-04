@@ -12,7 +12,7 @@ are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
 file-close path. Active boundaries are startup UI-getter receiver binding
-and exact request-normalization boundary arithmetic.
+and allocator edge-case return/reporting contracts.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
 Normal native CRT return selects `exit(status)`.
@@ -9374,3 +9374,22 @@ with ECX=EBX, obtained from global **VA** `0x1DFE970`'s virtual
 `+0x3C` getter. The receiver's vptr was not established; matching slot
 offset alone does not bind this startup call to the manager's init.
 The next trace follows that getter's concrete target/publication and return.
+
+## Request normalization boundaries verified by unsigned branches and offline arithmetic
+
+Raw `0x12C8A20/0x12CA410` use unsigned n<11 for chunk size 16;
+n>=11 uses `(n+11)&0xFFFFFFF8`. Representative exact values:
+n=0..12 gives C=16; n=13..20 gives C=24.
+Ordinary usable C-4 therefore covers each request, with zero slack at
+n=12/20. For n>=11, slack is `7-((n+11) mod 8)`, from 0 through 7.
+This corrects the earlier ceil/slack claim without changing the boundary-tag
+ownership evidence.
+
+Unsigned cutoff n>=`0xFFFFFFC0` is checked before addition.
+Last formula-normalized input `0xFFFFFFBF` gives `0xFFFFFFC8`;
+larger inputs select internal `0xFFFFFFFF` sentinel, whose downstream
+return behavior is the next check, not an allocation-success guarantee.
+For raw `0x12CAE30`, null old pointer delegates even n=0/oversized;
+nonnull n=0 frees/returns null, and nonnull oversized returns null before
+normalization. Offline integer checks verified these values without running
+or allocating through the target.
