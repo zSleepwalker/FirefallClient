@@ -214,14 +214,17 @@ public static class ClientApiRouteWorkerTimeoutLayout
 
 public static class ClientApiRouteWorkerPoolLayout
 {
-    public const uint EnabledOffset = 0x20;
+    public const uint PumpCountBaseOffset = 0x20;
     public const uint WorkerLimitOwnerOffset = 0x28;
     public const uint WorkerLimitOffsetFromOwner = 0x24;
     public const uint WorkerSize = 0x30;
 
-    public static bool ShouldAppendWorker(bool enabled, uint workersWithCompletion,
+    public static bool ShouldAppendWorker(uint pumpCountBase, uint workersWithCompletion,
         uint workerCount, uint workerLimit) =>
-        enabled && workersWithCompletion >= workerCount && workerCount < workerLimit;
+        pumpCountBase != 0 && workersWithCompletion >= workerCount && workerCount < workerLimit;
+
+    public static uint CapturePumpCount(uint pumpCountBase, uint workersWithCompletion) =>
+        unchecked(pumpCountBase + workersWithCompletion);
 }
 
 public static class ClientApiRoutePumpThreadLayout
@@ -547,6 +550,7 @@ public static class Red5LoggingBridgeNativeLayout
     public const uint ClientApiRouteWorkerCompletionGateRaw = 0xBC3FD0;
     public const uint ClientApiRouteWorkerTimeoutCheckRaw = 0xBC3FE2;
     public const uint ClientApiRouteWorkerPoolGateRaw = 0xBC408C;
+    public const uint ClientApiRouteWorkerPumpCountRaw = 0xBC413B;
     public const uint ClientApiRouteWorkerAllocationRaw = 0xBC40DC;
     public const uint ClientApiRouteWorkerCtorCallRaw = 0xBC4101;
     public const uint ClientApiRouteWorkerAppendCallRaw = 0xBC411A;

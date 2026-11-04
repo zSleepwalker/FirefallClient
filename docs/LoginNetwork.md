@@ -394,11 +394,15 @@
 # Round 33: ClientApi route-worker pool growth
 
 ## Observed
+- `dispatch_control_routine_BC43C0` allocates a `0x38`-byte per-route tracker
+  and initializes it through `helper_multicall_BC3AE0`. The constructor
+  initializes the worker-array storage beginning at `+0x10`, stores the route
+  manager pointer at `+0x28`, and stores route text/value at `+0x2C/+0x30`.
 - After pumping existing workers, `ClientApi_PumpRouteWorkers` considers
-  appending one worker when route field `+0x20` is nonzero, the count of workers
-  with nonzero completion field `+0x1C` is at least the current array length,
-  and that length is below
-  `*(DWORD *)(*(DWORD *)(route + 0x28) + 0x24)`.
+  appending one worker when the DWORD at tracker `+0x20` is nonzero, the count
+  of workers with nonzero completion field `+0x1C` is at least the current
+  array length, and that length is below
+  `*(DWORD *)(*(DWORD *)(tracker + 0x28) + 0x24)`.
 - The path allocates a `0x30`-byte worker, initializes it through
   `0xBC27A0`, appends its pointer to the worker array through `0xBC55C0`, and
   pumps it once through `ClientApi_PumpRequestWorker`. The pool gate, allocation
@@ -408,17 +412,22 @@
   which iterates route records and aggregates the per-route return values.
   The pump-routes function has five code callers in the current IDB, including
   `0x3813A0`, `0x388BD0`, `0xBBDB60`, `0xBDE510`, and `0xE99940`.
+- After the optional new-worker pump, the route pump returns the DWORD at
+  tracker `+0x20` plus the number of workers whose completion pointer is
+  nonzero (`0xBC413B`). The constructor does not write `+0x20`; its initial
+  value source has not been traced.
 
 ## Interpreted
 - Growth is demand-driven and limited to one new worker per invocation of the
-  route-worker pump. The model captures only the observed gate and does not
-  assign application semantics to the route fields.
+  route-worker pump. The `+0x20` value acts as a nonzero gate and as the base
+  added to the completion count returned to `ClientApi_PumpRoutes`; it is not
+  established as a boolean enabled flag.
 
 ## Unresolved
-- The meaning and configuration source of route `+0x20`, the object at
-  `route+0x28`, and its `+0x24` limit are unknown. The significance of a
-  nonzero worker `+0x1C` value for pool growth is recorded as a pointer/count
-  condition, not as a proven request-success state.
+- The source and intended meaning of tracker `+0x20`, the configuration
+  meaning/source of the object at `tracker+0x28` and its `+0x24` limit remain
+  unknown. A nonzero worker `+0x1C` is only established as a pointer/count
+  condition here, not as a proven request-success state.
 
 # Round 34: ClientApi route-pump thread loop
 

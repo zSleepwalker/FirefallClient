@@ -2351,14 +2351,18 @@ if (args.Length == 2)
             Red5LoggingBridgeNativeLayout.ClientApiRouteWorkerAppendRaw + 0x400C00)
         && client.Calls(Red5LoggingBridgeNativeLayout.ClientApiRouteWorkerInitialPumpCallRaw
             + 0x400C00, Red5LoggingBridgeNativeLayout.ClientApiPumpRequestWorkerRaw + 0x400C00)
-        && ClientApiRouteWorkerPoolLayout.EnabledOffset == 0x20
+        && client.Matches(Red5LoggingBridgeNativeLayout.ClientApiRouteWorkerPumpCountRaw
+            + 0x400C00, "8B462003C1")
+        && ClientApiRouteWorkerPoolLayout.PumpCountBaseOffset == 0x20
         && ClientApiRouteWorkerPoolLayout.WorkerLimitOwnerOffset == 0x28
         && ClientApiRouteWorkerPoolLayout.WorkerLimitOffsetFromOwner == 0x24
         && ClientApiRouteWorkerPoolLayout.WorkerSize == 0x30
-        && ClientApiRouteWorkerPoolLayout.ShouldAppendWorker(true, 3, 3, 4)
-        && !ClientApiRouteWorkerPoolLayout.ShouldAppendWorker(true, 2, 3, 4)
-        && !ClientApiRouteWorkerPoolLayout.ShouldAppendWorker(true, 4, 4, 4)
-        && !ClientApiRouteWorkerPoolLayout.ShouldAppendWorker(false, 3, 3, 4));
+        && ClientApiRouteWorkerPoolLayout.ShouldAppendWorker(1, 3, 3, 4)
+        && !ClientApiRouteWorkerPoolLayout.ShouldAppendWorker(1, 2, 3, 4)
+        && !ClientApiRouteWorkerPoolLayout.ShouldAppendWorker(1, 4, 4, 4)
+        && !ClientApiRouteWorkerPoolLayout.ShouldAppendWorker(0, 3, 3, 4)
+        && ClientApiRouteWorkerPoolLayout.CapturePumpCount(2, 3) == 5
+        && ClientApiRouteWorkerPoolLayout.CapturePumpCount(uint.MaxValue, 1) == 0);
     Check("ClientApi route-pump thread waits and pumps routes while active",
         client.Matches(Red5LoggingBridgeNativeLayout.ClientApiRoutePumpThreadEnabledGateRaw
             + 0x400C00, "807E05000F84DE000000")

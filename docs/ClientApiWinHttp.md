@@ -515,13 +515,18 @@ Detailed ClientApi rounds moved here from [Handoff.md](Handoff.md) to keep the c
 # Round 48: ClientApi route-worker pool growth
 
 - After pumping workers, `ClientApi_PumpRouteWorkers` considers appending one
-  when route field `+0x20` is nonzero, the count of workers with nonzero
+  when tracker field `+0x20` is nonzero, the count of workers with nonzero
   completion field `+0x1C` is at least the worker-array length, and that length
-  is below `*(DWORD *)(*(DWORD *)(route + 0x28) + 0x24)`.
+  is below `*(DWORD *)(*(DWORD *)(tracker + 0x28) + 0x24)`.
 - It allocates a `0x30`-byte worker, initializes it through `0xBC27A0`,
   appends it with dynamic-array helper `0xBC55C0`, and pumps it once through
   `ClientApi_PumpRequestWorker`. This gate allows at most one new worker in a
   single invocation; the settings object's meaning remains unknown.
+- The `0x38`-byte tracker constructor `0xBC3AE0` initializes the worker array
+  at `+0x10`, stores its manager pointer at `+0x28`, and stores route text/value
+  at `+0x2C/+0x30`. It does not write `+0x20`. The pump returns
+  `tracker+0x20` plus the count of workers with nonzero completion pointers
+  (`0xBC413B`); thus `+0x20` is not established as a boolean enable flag.
 - `ClientApi_PumpRouteWorkers` is called by `ClientApi_PumpRoutes`
   (`0xBC4550`), which iterates route records and aggregates per-route return
   values. The pool gate, worker allocation, and call targets are checked in
