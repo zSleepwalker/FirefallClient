@@ -10443,3 +10443,28 @@ review named the boundary a continuation join, not a function return:
 `+0x74` gate are covered. This code/docs integration is pushed.
 Exact initializer AL-return/caller failure bytes and the final `0xCA6C80`
 boolean helper are the next independent bounded evidence scopes.
+
+## Initializer return gates and failure-epilogue distinction
+
+The allocation diagnostic-join PE checks passed coordinator execution and
+are pushed. Their label now correctly calls the `0xCA6756` JNZ the
+nonzero-result bypass, not a null-result bypass.
+
+The later child initializer calls `0xCA6C20` at `0xCA6A61`.
+A zero AL takes a path clearing child `+0x6C` and AL before return;
+nonzero reaches `0xCA6AA3 -> 0xCA6C80`, whose AL is normalized
+with TEST/SETNZ before return at `0xCA6ABD`.
+The UI caller at `0xBFB542` tests AL and branches on zero to
+`0xBFB668`. That target is a zero-result epilogue returning with
+`retn 0x20`, not itself a cleanup call sequence. Earlier references
+to "failure cleanup" at this exact target are too strong.
+Nonzero continues UI initialization; it does not yet set ready `+0x672`.
+Exact PE assertions and a captured two-gate projection are assigned.
+
+The bounded `0xCA6C80` trace reports an initial call at `0xCA6D37`
+to `0x12BB2A0`, then eleven required lookup calls to `0xCA7090`
+and `0xCA71F0`. Only after these succeed does it replace eight
+pairs at offsets `+0x24..+0x60`. Success sets BL=1 at `0xCA6F49`;
+failure sets BL=0 at `0xCA6FCF`; `0xCA7061` transfers BL to AL.
+The key addresses remain opaque and indirect object targets unresolved.
+A separate bounded lookup-helper contract trace is active.
