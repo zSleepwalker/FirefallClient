@@ -11,8 +11,8 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are one concrete adjacent cursor-method candidate
-and reconstruction of the old-pair unsigned callback gate.
+file-close path. Active boundaries are corrected raw cursor-method inspection
+and immediate callback traversal ordering.
 UI lifecycle code/checks are committed.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
@@ -10091,6 +10091,25 @@ It does not execute the preceding old-pair callbacks or guarantee completion.
 Default `+0x584/+0x588` nonzero provenance remains unresolved after its
 bounded search; only candidate `0xBF9D80` is being checked next, without
 restarting a broad offset scan.
+
+## Old-pair arithmetic projection integrated; mistaken candidate evidence rejected
+
+`UiOldPairCallbackGateProjection.cs` combines captured words, divides
+unsigned by 1000, truncates the quotient to 32 bits, and projects the
+modular threshold and conditional field update. Focused checks cover
+threshold boundaries, flooring, high words, truncation, and subtraction wrap.
+Coordinator review separated tree offset `0x5E4` from method `0xC376A0`;
+the delegated concatenation `0x5E4C376A0` was not an address.
+
+The adjacent-method report is rejected: it transformed already-raw
+addresses and inspected unrelated code, then claimed to invalidate the
+established vtable. Coordinator reads on active IDA port 13337 confirm:
+raw `0x1872B6C` is `90 06 00 01`; raw `0xBFFA90` begins
+`55 8B EC 83 EC 14 56 8B F1 8B 06 8B 40 04 FF D0`;
+raw `0xBF9D80` begins `55 8B EC 83 E4 F8 6A FF`.
+These preserve the prior selector binding and disprove that report's
+claimed raw function boundary. A narrowly corrected candidate task uses
+those exact IDB offsets; default cursor sources remain unresolved meanwhile.
 
 The report's apparent VA lookup discrepancy is not a new mapping gap:
 the IDB is raw/base-zero and a numeric runtime VA must not be used directly
