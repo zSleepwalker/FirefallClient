@@ -7181,6 +7181,26 @@ internal static class StartupBinaryEvidence
             && RelativeBranchTargets(0x12CBFC1, 0xE8, 0x12CC4A0)
             && Matches(0x12CBFD9, "33C08BCE8845ECFF75EC50E8B7040000")
             && RelativeBranchTargets(0x12CBFE4, 0xE8, 0x12CC4A0));
+        check("Binary raw 0x12CB7F0 wrapper constructor sets its vptr, zeroes +4/+8, calls the pair helper, then copies +0xC",
+            VirtualAddressToFileOffset(0x16CC3F0) == 0x12CB7F0
+            && VirtualAddressToFileOffset(0x16CD030) == 0x12CC430
+            && Matches(0x12CB7F0,
+                "558BEC568B7508578BF98D4F048D460450C707C40CC801C70100000000C7410400000000E8170C00008B460C89470C8BC75F5E5DC20400")
+            && RelativeBranchTargets(0x12CB814, 0xE8, 0x12CC430));
+        check("Binary raw 0x12CC430 helper reads source +4 before source +0, then if source +4 is nonnull increments that pointer's +4 DWORD",
+            Matches(0x12CC439, "8B78048BF18B10895508")
+            && Matches(0x12CC443, "85FF740F8D4704BA01000000F00FC1108B5508")
+            && ShortConditionalBranchTargets(0x12CC445, 0x74, 0x12CC456)
+            && Matches(0x12CC44F, "F00FC110"));
+        check("Binary raw 0x12CC430 helper captures destination +4 and conditionally takes its indirect-call paths before publishing destination +4 then +0",
+            Matches(0x12CC456, "8B5E0485DB74348D4B0483C8FFF00FC101")
+            && ShortConditionalBranchTargets(0x12CC45B, 0x74, 0x12CC491)
+            && ShortConditionalBranchTargets(0x12CC467, 0x75, 0x12CC491)
+            && Matches(0x12CC469, "8B038BCBFF108D430883C9FFF00FC108")
+            && ShortConditionalBranchTargets(0x12CC479, 0x75, 0x12CC482)
+            && Matches(0x12CC47B, "8B038BCBFF5004")
+            && Matches(0x12CC482, "8B4508897E045F89065E5B5DC20400")
+            && Matches(0x12CC491, "897E045F89165E5B5DC20400"));
         check("Binary fixed-block singleton requests 0x28 and configures a non-null allocation with (2064, 32, 1); null allocation still publishes this, links VA 0x1E4B0A8, and sets flag +4",
             Matches(0x12CC135, "8BF1")
             && Matches(0x12CC177, "6A28E832BEFEFF")
