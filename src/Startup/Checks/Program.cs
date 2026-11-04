@@ -10,6 +10,7 @@ void Check(string name, bool condition)
 }
 
 UiNestedChildCleanupChecks.Run(Check);
+UiChildBackingAllocationChecks.Run(Check);
 
 var expected = new[]
 {

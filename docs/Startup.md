@@ -131,6 +131,8 @@ The nested cleanup at raw `0xCA6070` receives its object through outer-child `+0
 
 The child constructor at raw `0xCA6370` zeros fields `+0x64` and `+0x68` (`0xCA63D9`, `0xCA63E0`). Its initializer at `0xCA66F0` passes allocation size `0x800` at `0xCA6748` to allocator `0x12C8A20` (`0xCA674D`), stores the returned pointer at `+0x64` (`0xCA67A0`), writes `0x20` to `+0x68` (`0xCA67A3`), and zeros `+0x6C` (`0xCA67AA`). If `+0x64` was already nonzero, the observed diagnostic path continues to the allocation and pointer store if the diagnostic returns; that observation does not prove a failure or ownership contract. The `+0x68` and `+0x6C` names remain offset-only facts: the `0x800` request does not establish a record size or semantic capacity/count.
 
+The backing allocation continuation is projected separately by `UiChildBackingAllocationProjectionRules.ProjectAtContinuation`. A zero captured allocator result reaches the join at raw `0xCA6799` only if its diagnostic returns; without that captured return, the projection is absent. At the join, child `+0x64` receives the captured result (including zero), `+0x68` receives `0x20`, and `+0x6C` receives zero. The later diagnostic branch at `0xCA67B1` uses the comparison of child `+0x74`, not another allocation-success test. This is a captured continuation, not a native OOM implementation or a successful-initialization result.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves
