@@ -653,6 +653,44 @@ Check("UI manager singleton and global event routing boundaries are recorded",
     && UiManagerNativeLayout.LoginModeMessage145GlobalLoadFileOffset == 0x63C1E2
     && UiManagerNativeLayout.LoginModeMessage145CallFileOffset == 0x63C1F5
     && UiManagerNativeLayout.LoginModeMessageId == 0x145);
+Check("UI manager initialization guard rejects nonzero slot+4 getter results and preserves later flag outcomes",
+    UiManagerNativeLayout.UiManagerInitializeMethodFileOffset == 0xBFB310
+    && UiManagerNativeLayout.UiManagerInitializationFlagGetterMethodFileOffset == 0xBFA0C0
+    && UiManagerNativeLayout.UiManagerInitializationFlagGetterVtableOffset == 0x04
+    && UiManagerNativeLayout.UiManagerInitializePartialFlagWriteFileOffset == 0xBFB350
+    && UiManagerNativeLayout.UiManagerInitializeReadyFlagWriteFileOffset == 0xBFB8DC
+    && UiManagerNativeLayout.UiManagerConstructorStateWordOffset == 0x670
+    && UiManagerNativeLayout.UiManagerConstructorStateWordValue == 1
+    && UiManagerNativeLayout.UiManagerInitializationPartialFlagOffset == 0x671
+    && UiManagerNativeLayout.UiManagerEventReadyFlagOffset == 0x672
+    && Enumerable.Range(0, byte.MaxValue + 1).All(value =>
+        UiManagerNativeLayout.ShouldEnterInitialization((byte)value) == (value == 0))
+    && UiManagerNativeLayout.CaptureObservedInitializationFlags(
+        UiManagerInitializationOutcome.PartialInitializationFailed)
+        == new UiManagerInitializationFlagSnapshot(1, 0)
+    && UiManagerNativeLayout.CaptureObservedInitializationFlags(
+        UiManagerInitializationOutcome.Initialized)
+        == new UiManagerInitializationFlagSnapshot(1, 1)
+    && UiManagerNativeLayout.CaptureObservedInitializationFlags(
+        UiManagerInitializationOutcome.Initialized).ShutdownStateWord == 0x0101);
+Check("UI manager payload-tree drain tests byte +671 but clears both initialization bytes",
+    UiManagerNativeLayout.UiManagerShutdownStateWordOffset == 0x671
+    && UiManagerNativeLayout.UiManagerShutdownStateWordSize == 2
+    && UiManagerNativeLayout.UiManagerPayloadTreeOffset == 0x5E4
+    && UiManagerNativeLayout.UiManagerPayloadTreeNodeValueOffset == 0x14
+    && Enumerable.Range(0, ushort.MaxValue + 1).All(value =>
+        UiManagerNativeLayout.ShouldDrainPayloadTree((byte)(value & 0xFF)) == ((value & 0xFF) != 0))
+    && !UiManagerNativeLayout.ShouldDrainPayloadTree(
+        new UiManagerInitializationFlagSnapshot(0, 1).PartialInitializationFlag));
+Check("UI manager payload-tree cleanup keeps internal close, object free, identity removal, then key release",
+    UiManagerNativeLayout.UiManagerShutdownMethodFileOffset == 0xBFA0D0
+    && UiManagerNativeLayout.PayloadTreeCleanupSequence.SequenceEqual(
+    [
+        new UiManagerPayloadCleanupStep("InternalClose", 0xBFA278, 0xC33060),
+        new UiManagerPayloadCleanupStep("NativeObjectFree", 0xBFA27F, 0x12C8D60),
+        new UiManagerPayloadCleanupStep("IdentityRemoval", 0xBFA28B, 0xBFCF30),
+        new UiManagerPayloadCleanupStep("KeyRelease", 0xBFA29C, 0xC09D10)
+    ]));
 Check("UI-set folder traversal and native file-enumeration imports are recorded",
     UiComponentLoadingNativeLayout.UiSetXmlLoaderFileOffset == 0x30AF50
     && UiComponentLoadingNativeLayout.FolderPathLoaderFileOffset == 0x30AB90

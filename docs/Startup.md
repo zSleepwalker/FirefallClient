@@ -53,6 +53,12 @@ not establish a World-mode transition.
 
 `TfWorld_Shutdown` (`0x64B950`) was identified as the app-mode shutdown/deactivation slot. Evidence comments at `0x64BC40` preserve the observer handler's bounded behavior; `TfWorld_ApplyRecordInput` (`0x64DCF0`) names the record handler by its observed action without guessing the record's semantic type.
 
+## UI manager initialization and payload teardown
+
+The UI manager constructor at raw file offset `0xBF7A80` sets the word at `+0x670` to `1`, with the adjacent initialization bytes at `+0x671` and `+0x672` initially zero. Its initializer at `0xBFB310` first calls vtable slot `+4`, whose target `0xBFA0C0` returns the byte at `+0x671`. A nonzero result rejects the already-initialized object; zero allows initialization to proceed. This is an already-initialized guard, not an initialization failure or parent destruction. The continuing path reaches `0xBFB350`, which sets `+0x671` to `1`; a later failure leaves that partial-initialization byte set. Success reaches `0xBFB8DC` and sets `+0x672` to `1`. The managed snapshot records only the observed post-guard outcomes, not a general initializer simulation.
+
+The startup path calls `0x30D150` from `0x30B204` only when `0x30B200` returns zero; a nonzero result branches to `0x30B232` and skips that call. `0x30D150` tail-dispatches UI vtable slot `+0x34` to `0xBFA0D0`. This is the gated bulk-shutdown method, not the destructor. It tests only byte `+0x671` (`0xBFA102`) and, when nonzero, clears the two-byte state beginning there (`0xBFA112`); when nonzero, it drains the payload tree at `+0x5E4`. For a node value at `+0x14`, the observed calls are internal close (`0xC33060`), native object free (`0x12C8D60`), identity removal (`0xBFCF30`), then key release (`0xC09D10`), called from `0xBFA278`, `0xBFA27F`, `0xBFA28B`, and `0xBFA29C`, respectively. Later tree clearing and pointer-set handling are separate operations. Separately, slot `0xBF82A0` reaches `0xBF8AC0` and releases copied-text fields at `+0x5C8` and `+0x34` via `0x30A9D0`; ownership of fields `+0x24`, `+0x974`, and `+0xA08` remains unresolved. These observations do not establish reference-count or broader ownership semantics.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves

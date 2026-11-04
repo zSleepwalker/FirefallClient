@@ -9553,6 +9553,23 @@ directly release `+0x24`; tracing this child's concrete ownership is the
 next bounded task. Ownership of directly stored `+0x974` and success-only
 `+0xA08` remains unresolved; absence of a direct clear is not a leak finding.
 
+## UI lifecycle reconstruction added; shutdown tests a byte, not the cleared word
+
+`src\Startup\UiManagerNativeLayout.cs` now records the verified initialization
+guard, partial/success flag snapshots, and ordered payload close/free/identity/
+key-release call sites. Startup checks cover these synthetic contracts;
+`docs\Startup.md` records their static-only scope.
+
+Coordinator instruction verification corrected the initial projection:
+raw `0xBFA102` compares **byte** `[this+0x671]` with zero and
+`0xBFA109` skips shutdown when zero. Only after passing that guard does
+`0xBFA112` clear **word** `[this+0x671]`; `0xBFA11B` also clears a
+word at `+0x950`. Therefore ready byte `+0x672` alone cannot enable
+shutdown. The code separates the byte predicate from the two-byte state
+snapshot; exhaustive combinations include the `(partial=0, ready=1)` case.
+This supersedes any wording that treats the cleared word as the guard.
+Focused Startup checks and `git diff --check` passed.
+
 The report's apparent VA lookup discrepancy is not a new mapping gap:
 the IDB is raw/base-zero and a numeric runtime VA must not be used directly
 as an IDB address. Raw `0xCD5510 + 0x400C00 = VA 0x10D6110`,

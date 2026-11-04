@@ -1,8 +1,26 @@
 namespace Firefall.Reconstruction.Startup;
 
+public enum UiManagerInitializationOutcome
+{
+    PartialInitializationFailed,
+    Initialized
+}
+
+public readonly record struct UiManagerInitializationFlagSnapshot(
+    byte PartialInitializationFlag,
+    byte ReadyFlag)
+{
+    public ushort ShutdownStateWord => (ushort)(PartialInitializationFlag | (ReadyFlag << 8));
+}
+
+public readonly record struct UiManagerPayloadCleanupStep(
+    string Operation,
+    uint CallSiteFileOffset,
+    uint TargetMethodFileOffset);
+
 /// <summary>
-/// Static singleton and event-routing observations for the client's UI manager.
-/// This does not construct the object or dispatch application events.
+/// Static layout and lifecycle observations for the client's UI manager.
+/// This does not construct the object, dispatch application events, or perform cleanup.
 /// </summary>
 public static class UiManagerNativeLayout
 {
@@ -11,6 +29,19 @@ public static class UiManagerNativeLayout
     public const uint SingletonListWalkerFileOffset = 0x12C3A80;
     public const uint ClientApplicationBootstrapFileOffset = 0x2EAE70;
     public const uint UiManagerConstructorFileOffset = 0xBF7A80;
+    public const uint UiManagerInitializeMethodFileOffset = 0xBFB310;
+    public const uint UiManagerInitializationFlagGetterMethodFileOffset = 0xBFA0C0;
+    public const uint UiManagerInitializePartialFlagWriteFileOffset = 0xBFB350;
+    public const uint UiManagerInitializeReadyFlagWriteFileOffset = 0xBFB8DC;
+    public const uint UiManagerShutdownMethodFileOffset = 0xBFA0D0;
+    public const uint UiManagerPayloadTreeInternalCloseCallSiteFileOffset = 0xBFA278;
+    public const uint UiManagerPayloadTreeNativeObjectFreeCallSiteFileOffset = 0xBFA27F;
+    public const uint UiManagerPayloadTreeIdentityRemovalCallSiteFileOffset = 0xBFA28B;
+    public const uint UiManagerPayloadTreeKeyReleaseCallSiteFileOffset = 0xBFA29C;
+    public const uint UiManagerPayloadInternalCloseMethodFileOffset = 0xC33060;
+    public const uint UiManagerPayloadNativeObjectFreeMethodFileOffset = 0x12C8D60;
+    public const uint UiManagerPayloadIdentityRemovalMethodFileOffset = 0xBFCF30;
+    public const uint UiManagerPayloadKeyReleaseMethodFileOffset = 0xC09D10;
     public const uint UiManagerEventNameToIdMethodFileOffset = 0xBF9AB0;
     public const uint UiManagerEventNameMapLookupHelperFileOffset = 0x3E63B0;
     public const uint UiManagerEventNameMapInsertHelperFileOffset = 0xC079A0;
@@ -83,9 +114,51 @@ public static class UiManagerNativeLayout
     public const uint UiManagerEventNameArrayBeginInitializationFileOffset = 0xBF7FF6;
     public const uint UiManagerEventNameArrayEndInitializationFileOffset = 0xBF8000;
     public const int UiManagerEventReadyFlagOffset = 0x672;
+    public const int UiManagerConstructorStateWordOffset = 0x670;
+    public const int UiManagerInitializationPartialFlagOffset = 0x671;
+    public const int UiManagerInitializationFlagGetterVtableOffset = 0x04;
+    public const int UiManagerShutdownStateWordOffset = 0x671;
+    public const int UiManagerShutdownStateWordSize = 2;
+    public const int UiManagerConstructorStateWordValue = 1;
+    public const int UiManagerPayloadTreeOffset = 0x5E4;
+    public const int UiManagerPayloadTreeNodeValueOffset = 0x14;
     public const int UiManagerListenerNameOffset = 0x70;
     public const int LoginModeMessageId = 0x145;
     public const int EnterZonePausedNotificationId = 110;
     public const string SingletonRttiName = ".?AV?$slSingleton@VuiManager@@@@";
     public const string UiManagerRttiName = ".?AVuiManager@@";
+
+    public static IReadOnlyList<UiManagerPayloadCleanupStep> PayloadTreeCleanupSequence { get; } =
+        Array.AsReadOnly(new[]
+        {
+            new UiManagerPayloadCleanupStep(
+                "InternalClose",
+                UiManagerPayloadTreeInternalCloseCallSiteFileOffset,
+                UiManagerPayloadInternalCloseMethodFileOffset),
+            new UiManagerPayloadCleanupStep(
+                "NativeObjectFree",
+                UiManagerPayloadTreeNativeObjectFreeCallSiteFileOffset,
+                UiManagerPayloadNativeObjectFreeMethodFileOffset),
+            new UiManagerPayloadCleanupStep(
+                "IdentityRemoval",
+                UiManagerPayloadTreeIdentityRemovalCallSiteFileOffset,
+                UiManagerPayloadIdentityRemovalMethodFileOffset),
+            new UiManagerPayloadCleanupStep(
+                "KeyRelease",
+                UiManagerPayloadTreeKeyReleaseCallSiteFileOffset,
+                UiManagerPayloadKeyReleaseMethodFileOffset)
+        });
+
+    public static UiManagerInitializationFlagSnapshot CaptureObservedInitializationFlags(
+        UiManagerInitializationOutcome outcome) =>
+        outcome switch
+        {
+            UiManagerInitializationOutcome.PartialInitializationFailed => new(1, 0),
+            UiManagerInitializationOutcome.Initialized => new(1, 1),
+            _ => throw new ArgumentOutOfRangeException(nameof(outcome))
+        };
+
+    public static bool ShouldEnterInitialization(byte getterResult) => getterResult == 0;
+
+    public static bool ShouldDrainPayloadTree(byte partialInitializationFlag) => partialInitializationFlag != 0;
 }
