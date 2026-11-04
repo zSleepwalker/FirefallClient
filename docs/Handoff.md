@@ -12,7 +12,7 @@ are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
 file-close path. Active boundaries are scripting prefix-registry bulk teardown
-and exact direct-mapping Windows allocation flags/size arithmetic.
+and direct-mapped chunk resize ownership.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
 Normal native CRT return selects `exit(status)`.
@@ -9217,3 +9217,24 @@ and update peak `+0x1B4`; direct mapping also updates minimum base `+0x10`.
 The new report gives direct VirtualAlloc flags `0x103000`, versus normal
 `0x3000`; exact operands and its inconsistent round-up notation require
 a narrow byte-backed follow-up before assigning further flag semantics.
+
+## Direct allocation uses 0x103000; exact size expressions are mask operations
+
+Raw helper `0x12C6E70` computes
+`(granularity + normalizedRequest + 0x1E) & ~(granularity-1)`
+with 32-bit arithmetic. Its inspected push sequence at
+`0x12C6EAF..0x12C6EB9` supplies protection 4, allocation type
+`0x103000`, computed size, and null address to the already PE-verified
+VirtualAlloc slot **VA** `0x1AC42B8`.
+The additional `0x100000` bit is MEM_TOP_DOWN; ordinary fallback instead
+uses `0x3000` and expression
+`(granularity + normalizedRequest + 0x2F) & ~(granularity-1)`.
+Neither expression should be rewritten as conventional round-up of the whole
+sum, which would add another granularity-1 before masking.
+
+With heap limit `+0x1B8` nonzero, both paths reject unsigned
+`current+size <= current` or sum above that limit; a zero limit skips that check.
+Failed direct allocation falls through to the ordinary growth path.
+The report's final alternative raw addresses `0x12862AF/0x1286B10`
+are inconsistent with the raw-IDB basis and are not propagated.
+The next trace follows direct-chunk resize through `0x12C94D0`.
