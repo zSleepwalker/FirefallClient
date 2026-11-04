@@ -11899,3 +11899,13 @@ Next branch-copy code owner is Luna
 `[BE69A7,BE69BD)`; immutable owner
 `0e7f8d4c-c6ed-4c24-8fae-aa82e11df0e6` preserves pending gate anchors.
 Do not stage evidence until writer completion.
+
+Postcopy gate pushed as `c04a689`. Branch-copy code and immutable anchors
+are reviewed and registered; pinned runner passes. Corrected fixtures which
+selected the opposite unsigned branch and supplied a forbidden frame-10
+capture on the taken path. A fall-path subtraction cannot underflow under
+its EDI<=ESI precondition; zero-difference fixture now respects that.
+PE windows independently match 36 and 22 bytes.
+Luna `e0af090c-c85b-43de-a2ee-f16f39166049` owns a read-only exact trace
+of zero-fill instructions after `BE6984` and `BE69DF` through join `BE69F2`.
+Require explicit direction-flag semantics before any REP STOS projection.
