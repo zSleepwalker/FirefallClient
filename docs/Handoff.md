@@ -12,7 +12,7 @@ are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
 file-close path. Active boundaries are Login UI-manager retained-field teardown
-and published scripting-object native storage ownership after VM close.
+and evidence-backed UI lifecycle reconstruction code/checks.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
 Normal native CRT return selects `exit(status)`.
@@ -9510,6 +9510,24 @@ Late initialization failures converge on `0xBFB668` and return zero via
 The caller's subsequent `0x30D150` call site is `0x30B204..0x30B209`;
 its exact predicate and concrete retained-field cleanup are the next task,
 not evidence that those resources have already been released.
+
+## Published scripting objects are freed after VM close during tree drain
+
+The active sample's manager shutdown slot `+0x34`, raw `0xBFA0D0`,
+does not merely close each published object's VM. With the payload from
+tree node `+0x14`, it calls `0xC33060` at `0xBFA278`, then allocator
+free `0x12C8D60` at `0xBFA27F` with the same object pointer.
+Identity removal `0xBFCF30` follows at `0xBFA28B`, and key release
+`0xC09D10` at `0xBFA29C`. This closes the native-storage ownership
+gap for this concrete tree-drain path.
+
+`0x12C8D60` is allocator free logic, not an object-vtable destructor;
+no separate top-level C++ destructor dispatch was identified here.
+`0xBFCFF0` has a similar close/free/identity-remove sequence, but its
+caller remains unresolved and is not required to establish bulk shutdown.
+The next task applies these verified lifecycle boundaries to the existing
+Startup reconstruction and focused synthetic checks, without inventing
+native ownership rules for the still-unclassified initialization pointers.
 
 The report's apparent VA lookup discrepancy is not a new mapping gap:
 the IDB is raw/base-zero and a numeric runtime VA must not be used directly
