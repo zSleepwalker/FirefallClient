@@ -169,6 +169,14 @@ public static class UiManagerNativeLayout
     public const int UiPayloadDescriptorPositionField1Offset = 0x338;
     public const int UiPayloadDescriptorPositionField2Offset = 0x340;
     public const int UiPayloadDescriptorPositionField3Offset = 0x344;
+    public const uint UiManagerCursorRegistrationMethodFileOffset = 0xBFD6D0;
+    public const uint UiManagerCursorLoadCursorAIatVirtualAddress = 0x1AC4C2C;
+    public const uint UiManagerCursorResourceIdentifier = 0x7F8A;
+    public const int UiManagerCursorTreeOffset = 0x6C8;
+    public const uint UiManagerCursorTreeInsertMissingMethodFileOffset = 0xC06D40;
+    public const uint UiManagerCursorTreeNodePayloadStoreFileOffset = 0xC1675D;
+    public const int UiManagerCursorTreeNodeKeyOffset = 0x10;
+    public const int UiManagerCursorTreeNodePayloadOffset = 0x14;
     public const int UiManagerConstructorStateWordOffset = 0x670;
     public const int UiManagerInitializationPartialFlagOffset = 0x671;
     public const int UiManagerInitializationFlagGetterVtableOffset = 0x04;

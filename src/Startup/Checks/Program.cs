@@ -5801,6 +5801,7 @@ NativeGeneratedModeOneWrapperChecks.Run(Check);
 NativeGeneratedDefaultHeaderImageChecks.Run(Check);
 MatrixServerProfilerNamesChecks.Run(Check);
 MatrixServerProfilerFrameChecks.Run(Check);
+UiPayloadProducerGateChecks.Run(Check);
 NativeProfilerSampleChecks.Run(Check);
 NativeProfilerTreeChecks.Run(Check);
 NativeProfilerFrameRefreshChecks.Run(Check);

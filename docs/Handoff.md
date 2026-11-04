@@ -11,8 +11,8 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are registered cursor-tree cleanup
-and reconstruction of derived-state byte/float gates before the record append.
+file-close path. Active boundaries are cursor-selection lookup-miss behavior
+and native record vector growth/publication.
 UI lifecycle code/checks are committed.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
@@ -9918,6 +9918,25 @@ and descriptor nonnull. UI global itself remains unchecked before its
 `+0xA08` dereference. The report's C9-address VA labels are erroneous;
 these are raw IDB offsets. A code task now projects captured branch
 outcomes without emulating FP exceptions or unresolved virtual side effects.
+
+## Cursor-tree teardown releases key and node, not the registered handle
+
+The concrete parent destructor path `0xBF82A0 -> 0xBF8AC0` reaches
+tree erase helper `0xC0C370` at raw `0xBF8F55`.
+Node cleanup `0xC0F590` releases the shared key at `+0x10`, then
+frees the node. It does not read or release payload `+0x14` in this
+traced path, and does not pass that handle to DestroyCursor.
+This is the tree cleanup's policy, not proof about every lifecycle path.
+The report's "IDA VA" labels for these offsets are superseded by the
+raw-IDB convention.
+
+The producer-gate reconstruction now distinguishes earlier rejection from
+later append admission and tests zero/nonzero bytes, equality, NaN and
+infinities. It does not simulate FP exceptions, virtual calls, or append.
+Cursor registration constants distinguish the registration method
+`0xBFD6D0` from an individual call site, and node payload store
+`0xC1675D` from its enclosing constructor. The delegated focused Startup
+run reported 858 passes and no failures.
 
 The report's apparent VA lookup discrepancy is not a new mapping gap:
 the IDB is raw/base-zero and a numeric runtime VA must not be used directly
