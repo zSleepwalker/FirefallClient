@@ -12,7 +12,7 @@ are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
 file-close path. Active boundaries are shared config-file loader size/capacity
-handling and the VM allocator's retry helper/initialization gate.
+handling and the VM allocator context's creation/initialization marker.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
 Normal native CRT return selects `exit(status)`.
@@ -8692,3 +8692,21 @@ for a nonnull pointer. Context owns callback/opaque-userdata references
 in this path; the wrapper neither copies nor frees userdata.
 Setup raw `0xCD5460` writes gate `+0x8C`, but callback/userdata
 initialization was not established.
+
+## VM allocation retry requests a collection pass; marker identity remains open
+
+On eligible allocation failure, raw `0xD675A0` calls `0xCD9EC0`
+with VM/context in ECX and flag 1 in EDX, then repeats the allocator
+callback with the same arguments. Raw `0xCD9EC0` sets context byte
+`+0x3E` for the pass and clears it afterward. If phase byte `+0x3D <= 1`,
+it advances to 2 and runs `0xCD9110`, which unlinks/retains list entries
+and dispatches cleanup; four `0xCD9BE0` phase/mask steps follow.
+These concrete effects support collection-retry interpretation.
+The flag toggle alone does not establish a read-side reentrancy barrier.
+
+Raw `0xCD5460` writes **VA** `0x1C740F8` into context `+0x8C`
+after initialization calls. The marker's apparent raw-IDB fill bytes were
+read without mapping that VA and are not accepted as its contents.
+Its exact object/type and the allocator/userdata producer remain unresolved.
+No static xrefs to setup were found by this pass; callback/indirect setup
+remains possible and is the next concrete continuation.
