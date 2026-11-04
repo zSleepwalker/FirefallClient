@@ -12,7 +12,8 @@ are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
 file-close path. Active boundaries are concrete config-command output routes
-and exact EH state/action routing for traceback fallback-name restoration.
+and protected script-dispatch error handling.
+The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
 Normal native CRT return selects `exit(status)`.
 Exit registration and its logger cleanup predicate are resolved.
@@ -8421,3 +8422,29 @@ Sampled helpers raw `0x322C40` and `0x6E1A80` test `+5`,
 but sink raw `0xE5AC70` has no corresponding entry check.
 Therefore suppression cannot be generalized to all output routes without
 following a concrete command/caller; that is the next bounded task.
+
+## Dispatch EH map resolved: state-0 cleanup does not restore fallback global
+
+Correction: handler **VA** `0x1A4AA4B` maps to raw `0x1649E4B`,
+not `0x1609E4B`. The latter was an unrelated cleanup thunk.
+Prologue raw `0xC3B3C0` begins
+`55 8B EC 6A FF 68 4B AA A4 01 64 A1 00 00 00 00 50 81 EC 9C 00 00 00`,
+registering the actual handler and initializing EH state -1.
+The handler checks the frame cookie, loads FuncInfo **VA** `0x1D5E1E4`,
+and jumps to raw `0x159DE38`, whose import stub reaches
+**MSVCR120.dll!__CxxFrameHandler3**, IAT **VA** `0x1AC4814`.
+
+FuncInfo at backed raw `0x195CDE4` has magic `0x19930522`,
+maxState 1, unwind-map **VA** `0x1D5E208`, and zero try-block/IP-map
+counts/pointers. Its sole entry, raw `0x195CE08`, is
+`toState=-1, action=VA 0x1A4AA40`.
+Action raw `0x1649E40`, bytes
+`8D 8D 68 FF FF FF E9 15 DA 5A FF`, passes `[ebp-0x98]`
+to raw `0xBF7860`.
+
+State becomes 0 at raw `0xC3B544` before dispatch `0xC289C0`,
+and -1 at `0xC3B56F` before normal wrapper cleanup.
+The map's state-0 action performs that local cleanup, not restoration of
+global **VA** `0x1E4891C`; the explicit normal restore is `0xC3B582`.
+This resolves that specific unwind action, not every possible exception path
+or whether ordinary VM errors escape through C++ unwinding.
