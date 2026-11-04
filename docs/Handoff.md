@@ -11,8 +11,8 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are callback-traversal reconstruction
-and concrete publication into the manager callback trees.
+file-close path. Active boundaries are concrete publication into the manager
+callback trees and nested scripting callback-container teardown.
 UI lifecycle code/checks are committed.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
@@ -10137,6 +10137,18 @@ and releases temporary references. Its reported negative search for
 the requested **hexadecimal** `+0x584/+0x588` default sources.
 Its supplied converted VA was also incorrect. No default-source conclusion
 is accepted from that mismatch; the default-source boundary is parked.
+
+## Static traversal evidence integrated without simulating callbacks
+
+The old-pair projection now carries read-only primary, direct, and nested
+traversal records, preserving dispatch order and separating call ranges,
+method targets, receiver offsets, and slot byte offsets.
+Coordinator review corrected `+0x0D` to a **node-byte offset**, not
+a comparison value of thirteen. Successor-link reads remain explicitly
+after dispatch; no snapshot or safety guarantee is introduced.
+The delegated Startup checks reported 886 passes and no failures.
+Successor work follows nested-container cleanup and manager registry
+publication, not another reconstruction of the established arithmetic.
 
 The report's apparent VA lookup discrepancy is not a new mapping gap:
 the IDB is raw/base-zero and a numeric runtime VA must not be used directly

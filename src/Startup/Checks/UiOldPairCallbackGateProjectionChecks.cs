@@ -16,11 +16,40 @@ internal static class UiOldPairCallbackGateProjectionChecks
             && UiOldPairCallbackGateProjectionRules.UnsignedDivideHelperFileOffset == 0x159DD10
             && UiOldPairCallbackGateProjectionRules.FirstStoreAfterCallbackGateFileOffset == 0xC0281C
             && UiOldPairCallbackGateProjectionRules.SecondStoreAfterCallbackGateFileOffset == 0xC02825
+            && UiOldPairCallbackGateProjectionRules.Field20StoreBeforeCallbackWalksFileOffset == 0xC0669C
             && UiOldPairCallbackGateProjectionRules.FirstCallbackListOffset == 0x6B0
             && UiOldPairCallbackGateProjectionRules.SecondCallbackListOffset == 0x6D8
             && UiOldPairCallbackGateProjectionRules.CallbackListSlotOffset == 0x14
             && UiOldPairCallbackGateProjectionRules.PayloadCallbackTreeOffset == 0x5E4
             && UiOldPairCallbackGateProjectionRules.PayloadCallbackMethodFileOffset == 0xC376A0);
+
+        var primaryTraversals = UiOldPairCallbackGateProjectionRules.PrimaryCallbackTraversals;
+        check("UI old-pair primary traversals walk both trees in order and call the node receiver virtual slot without arguments",
+            primaryTraversals.Count == 2
+            && primaryTraversals[0] == new UiOldPairCallbackTraversalEvidence(
+                0x6B0, 0, true, 0xC066B0, 0xC066B5, 0x14, 0x14, 0,
+                true, 0x0D, true, 0x08, 0x00, 0x04, true, false)
+            && primaryTraversals[1] == new UiOldPairCallbackTraversalEvidence(
+                0x6D8, 1, true, 0xC06710, 0xC06715, 0x14, 0x14, 0,
+                true, 0x0D, true, 0x08, 0x00, 0x04, true, false)
+            && UiOldPairCallbackGateProjectionRules.Field20StoreBeforeCallbackWalksFileOffset
+                < primaryTraversals[0].DispatchCodeStartFileOffset);
+
+        var directTraversals = UiOldPairCallbackGateProjectionRules.DirectCallbackTraversals;
+        check("UI old-pair payload traversal follows the two virtual callback trees and distinguishes its direct method target from its callsite",
+            directTraversals.Count == 1
+            && directTraversals[0] == new UiOldPairDirectCallbackTraversalEvidence(
+                0x5E4, 2, 0xC06770, 0xC06773, 0x14, 0xC376A0));
+
+        var nestedTraversals = UiOldPairCallbackGateProjectionRules.NestedCallbackTraversals;
+        check("UI old-pair direct payload callback traverses two node receivers then a container entry through slot 0x14",
+            nestedTraversals.Count == 3
+            && nestedTraversals[0] == new UiOldPairNestedCallbackTraversalEvidence(
+                UiOldPairNestedCallbackContainerKind.Tree, 0x0E8, 0x14, 0x14)
+            && nestedTraversals[1] == new UiOldPairNestedCallbackTraversalEvidence(
+                UiOldPairNestedCallbackContainerKind.Tree, 0x118, 0x14, 0x14)
+            && nestedTraversals[2] == new UiOldPairNestedCallbackTraversalEvidence(
+                UiOldPairNestedCallbackContainerKind.Container, 0x120, 0x08, 0x14));
 
         var belowThreshold = UiOldPairCallbackGateProjectionRules.Project(
             new UiOldPairCallbackGateState(4_999_000, 0, 0));
