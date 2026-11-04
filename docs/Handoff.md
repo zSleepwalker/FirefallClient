@@ -10,8 +10,9 @@ PrivateDialog receiver identification, AES "block-size" interpretation,
 and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
-Current delegated boundaries are console formatting-depth balance/width
-and texture request-buffer lifetime. Mode-16 fixed scatter is resolved.
+Current delegated boundaries are concrete console indentation-option bindings
+and texture pending enqueue-to-drain exception paths. Mode-16 fixed scatter and normal
+buffer release are resolved.
 Shutdown-request callers
 and texture writer dispatch/serialization are bounded unresolved stops,
 not ongoing broad scans.
@@ -7251,3 +7252,66 @@ Raw `0xE5ABA6` multiplies this counter by a configured width; later
 memset prefixes output, capped at 32 characters. This is formatting depth,
 not a dispatch-readiness gate or callback.
 The next scope resolves paired decrement/reset and width binding.
+
+## Tile records own buffers until explicit pending drain cleanup
+
+The active-sample reader raw `0xE9FFF0` receives caller-provided
+`0x28`-byte tile-record storage, not a proven refcounted request object.
+Wrapper `0xEA0430` invokes it. Cleanup helper raw `0xEA0860`
+(VA `0x12A1460`) loops three times from record `+0x14`:
+`0xEA0889` calls free `0x12C8D60`, then `0xEA088E` nulls
+the field, advancing four bytes. Thus `+0x14/+0x18/+0x1C`
+are individually released; the same loop frees `+8/+0xC/+0x10`.
+This is explicit buffer cleanup, not a demonstrated C++ destructor.
+
+Concrete producer raw `0xE9F359` invokes the reader wrapper;
+`0xE9F360` calls `0xE9FEA0` to prepare the other three buffers.
+Raw `0xE9F538` calls `0xEA9D70`; `0xEA9DF0..0xEA9E07`
+shallow-copy exactly `0x28` bytes without observed reference increments.
+Drain raw `0xE9F739` calls encoder `0xEA0560`, followed by
+cleanup `0xEA0860` at `0xE9F740`, then advances by `0x28`.
+This supports practical ownership retained by the pending collection until
+drain; shallow copying alone does not establish shared ownership.
+
+Reader failure exits retain buffers. Separate direct caller `0xEA95F0`
+tests record byte `+0x25`; its false branch frees/nuls three buffers
+starting at `0xEA96F0`. Allocation-exception cleanup and exact source
+type remain unresolved. The next scope examines enclosing unwind and
+pending-collection destruction rather than repeating the normal release loop.
+
+## Console depth decrement/reset are conditional; width binding remains open
+
+Vtable entries following +BC contain **VAs** `0x125BCD0/0x125BCF0`,
+raw `0xE5B0D0/0xE5B0F0`.
+Decrement checks `[ecx+4]!=0`, then decrements global depth and clamps
+negative to zero; otherwise it returns unchanged. The next method clears
+depth only with the same object-field condition.
+Separate reset raw `0xE5D13E` explicitly stores zero to **VA**
+`0x1E49A10`; cleanup branches converge before setting object `+4`
+to 1 and invoking an indirect call. A matched startup increment/decrement
+pair is not established by this pass.
+
+Formatter raw `0xE5ABA6` multiplies depth by DWORD `+0x3C`
+of the object reached through **VA** `0x1E6AC44`, caps prefix
+length at 32, and uses configured/fallback character.
+Names con.indentAmount / con.indentChar at raw
+`0x17DE398/0x17DE3D0` are identified, but adjacent 2/space values
+are not yet proven defaults. The next narrow scope binds their registration.
+The report's renewed uncertainty about startup +BC does not invalidate the
+already byte-verified target above; no new contrary operand was supplied.
+
+## Pending tile-record unwind frees collection backing, not nested buffers
+
+Enclosing function raw `0xE9E6B0` (VA `0x129F2B0`) has pending
+collection at `[ebp-0x14A4]`; state becomes 1 at raw `0xE9EDF2`.
+EH metadata raw `0x1975F08` (VA `0x1D77308`) has magic
+`0x19930522` and two states. State 1->0 action **VA** `0x1A62C29`
+is raw `0x1662029`, whose bytes
+`8D 8D 5C EB FF FF E9 CC 7C 84 FF` select the collection
+and tail-jump to raw `0xEA9D00`.
+That cleanup frees collection backing and zeroes its three pointers,
+without record traversal or nested-field release.
+Normal drain therefore remains the proven nested-buffer reclamation path;
+this unwind handler alone does not establish it.
+The next scope checks one concrete exception-capable path between enqueue
+and drain rather than inferring a throw from allocation names.
