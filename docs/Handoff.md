@@ -11,7 +11,7 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are UI scripting-owner publication/VM creation
+file-close path. Active boundaries are scripting-owner post-creation failure cleanup
 and exact heap trim VirtualFree operands/countdown reset arbitration.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
@@ -8968,3 +8968,29 @@ The new report disputes two prior details: trim VirtualFree may decommit
 rather than release, and countdown reset may be max rather than min of
 `0xFFF` and visited count. Neither conflicting interpretation is treated
 as settled until exact call arguments and cmp/cmov bytes are recorded.
+
+## Scripting-object VM initialization follows construction; UI +A00 binding remains open
+
+Addresses below are raw IDB offsets, not the follow-up's generic VA label.
+Raw `0xC34100`, after allocating/constructing the `0x500`-byte object,
+calls `0xC34450` at `0xC3417B`. That routine invokes `0xC347E0`
+at `0xC346BB`; the latter checks object `+0x78`, creates the VM through
+`0xCD5720`, and stores the result at `0xC3480E..0xC3483C`.
+Null creation and later chunk-load failure return failure; those later
+failure paths do not locally clear the newly stored VM pointer.
+Success reaches `0xC34BE1`.
+
+On initialization failure, `0xC34100` calls `0xC341C0` with the newly
+constructed object and original owner, then returns zero
+(`0xC34186..0xC3418D`). Nonnull cleanup proceeds through `0xC33060`;
+exact VM release/reset in that downstream path is the next task.
+The null-object branch reports an assertion then calls `0xBFCF30(0)`.
+
+UI-manager constructor raw `0xBF7A80` clears `+0xA00/+0xA04/+0xA08`
+at `0xBF8186..0xBF819A`. Destructor `0xBF8AC0` checks `+0xA04`,
+calls that object's virtual `+0x10`, then clears `+0xA04`
+at `0xBF8AFA..0xBF8B0B`.
+Caller `0xBFCA30` consumes its created object's `+0x70` label and a
+collection at its own `+0x5E4`, not a proven `+0xA00` publication.
+The missing UI-context identity edge remains a bounded stop; these objects
+must not be merged solely from their shared VM field offset.
