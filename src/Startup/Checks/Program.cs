@@ -44,6 +44,7 @@ PoolResetVectorCleanupChecks.Run(Check);
 StackAllocationResultChecks.Run(Check);
 UiShaderSourcePoolResetIterationTailChecks.Run(Check);
 UiShaderSourcePoolResetSecondaryRepeatChecks.Run(Check);
+QueuePopCompletionChecks.Run(Check);
 SharedTextPoolSingletonChecks.Run(Check);
 UiShaderSourcePoolTeardownChecks.Run(Check);
 UiShaderSourcePoolSingletonDestructorChecks.Run(Check);

@@ -11410,3 +11410,25 @@ Queue projection assignments:
 `fab06ced-9924-426b-be2a-7fb923f5f6ae` cleanup;
 `827dcf37-2460-4193-900b-9b2a230b4b5e` pop-attempt trace;
 `1a24fbb4-5bab-491c-935d-925b2d416864` successful pop continuation.
+
+Pushed reset tail/secondary-repeat/allocation wrapper code at `03aa6e8`
+after registered and pinned checks passed. Secondary repeat address API
+must say code VA, not IDA EA; the flat IDB EA remains the raw file offset.
+One-attempt queue pop implementation is assigned to
+`acf328bb-462a-4731-b349-e1a5d99baf27`; raw `0x12CE400`
+maps to code VA `0x16CF000`, not the prior trace's transcribed value.
+Queue constructor/global-pool setup trace is assigned to
+`ac9be7d6-1c96-4462-8c8b-9cbcef3248db`.
+
+Queue append raw `0x12CE310` is being traced independently by
+`ecd10413-044e-49f1-914d-77907f6a93b9`. Its visible success path
+publishes the payload in old tail+4 before the new-node link in old tail+0;
+do not infer these stores occur before the tail-pair CAS. Constructor and
+append scopes are separate from sentinel cleanup and pop.
+
+Successful queue-pop continuation is reviewed, registered, and passes pinned
+checks. A separately reloaded old head supplies payload before recycling;
+receiver+10 and captured global-pool+10 each receive XADD -1 independently.
+Cleanup's surrounding empty/retry attempt at raw `0x12C0348..0x12C0382`
+is assigned to `66a7c789-a164-4aa0-849e-e38519bb9583`; it compares
+a fresh tag only after reading head-next, and ignores queue-pop return.
