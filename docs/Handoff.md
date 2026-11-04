@@ -12,7 +12,7 @@ are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
 file-close path. Active boundaries are post-ready UI state-sync inputs and
-the aliased native record sink's concrete drain/reset consumer.
+the native record producer's concrete object-iteration gates.
 UI lifecycle code/checks are committed.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
@@ -9650,6 +9650,21 @@ stack-offset label to ordinal 8 / frame offset `+0x24`, and corrected the
 getter source to **address addition** `getter()+0x48`, not a field load.
 Startup checks passed with those corrections; no wire format, grow policy,
 record meaning, or descriptor lifetime was inferred.
+
+## Aliased record sink drain remains unbound; producer iteration is concrete
+
+The bounded read/drain search did not identify a consumer or reset of the
+aliased descriptor. Raw `0xC5EF40` calls producer `0xC95400` while
+iterating objects; producer flag decimal 1836 is the already recorded
+`+0x72C`, not a new field. Descriptor append and its sixteen-byte stride
+remain verified, but a per-frame clear or drain is not established.
+
+A separate offset match in raw `0x8DDA10` feeds a helper that treats its
+first DWORD as a handle, not this vector descriptor; offset equality
+does not identify the same object. The focused scan's lack of another
+matching global/offset access is a bounded search result, not proof of
+absence of indirect readers. Drain ownership is parked. The next task
+traces `0xC5EF40`'s concrete iteration bounds and producer-call gates.
 
 The report's apparent VA lookup discrepancy is not a new mapping gap:
 the IDB is raw/base-zero and a numeric runtime VA must not be used directly
