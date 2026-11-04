@@ -11879,3 +11879,15 @@ fixture to slot `FFFFFFF8` with retained EDI `1234` (masked index four):
 slot zero would instead produce candidate eight and require a WORD capture.
 First-copy production/check files remain pending author correction and are
 not registered or included in the next commit.
+
+Pushed composition/doubling/buffer allocation as `894c9e3`. First-copy
+correction is now reviewed and registered: separate return status versus
+optional EAX, corrected FF15 bytes, and destination fixture `500+DEAD=E3AD`.
+Pinned runner passes. Postcopy gate `[BE694D,BE6960)` is assigned to Luna
+`eead46ff-2c2f-446d-916a-858ee542ac9f`, immutable owner
+`a5a76f83-a0fc-4749-bdbf-0b0c93ce457e`. Its receiver+4 reload precedes
+cleanup12; prior call EAX participates in saved-pointer LEA; frame-8 reload
+precedes frame-10 store and unsigned JA to `BE69A7`.
+Postcopy branch-body trace was read but not assigned: the fallthrough
+call pushes a frame-10 RELOAD (not an assumed retained pointer), while
+the taken branch pushes retained EDX. Keep those observations independent.
