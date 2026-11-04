@@ -12,7 +12,7 @@ are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
 file-close path. Active boundaries are scripting-manager normal-startup init binding
-and ordinary-chunk usable tail-word lifetime.
+and exact request-normalization boundary arithmetic.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
 Normal native CRT return selects `exit(status)`.
@@ -9341,3 +9341,23 @@ and returns zero. Requests >=`0xFFFFFFC0` return zero before that free path.
 Wrapper `0x12B8030` passes requested size only and does not query capacity.
 No separate usable-size helper call was found on the inspected copy path;
 the bound is computed inline.
+
+## Ordinary usable tail word becomes successor previous-size metadata only after free
+
+Addresses below remain raw IDB offsets despite the follow-up's VA label.
+Allocation raw `0x12C8A20` returns header+8, writes allocated size|3,
+and marks the successor's previous-in-use bit
+(`0x12C8BB5..0x12C8BCB`, `0x12C8CD8..0x12C8CFC`).
+The successor's first word is not required for backward coalescing while
+that bit is set. This accounts for ordinary usable size C-4: the last
+four usable bytes overlap that otherwise-unused successor previous-size word.
+
+Free raw `0x12C8D60`, including `0x12C92E0..0x12C92E9`,
+clears the successor's previous-in-use bit and writes freed size at H+C.
+Only then does that word serve as a valid free-chunk footer.
+Direct mappings retain the distinct C-8 capacity rule.
+
+The follow-up incorrectly described `(n+11)&~7` as ceil-to-8 of n+11
+and overclaimed its slack. The mask rounds that sum down to a multiple of 8;
+no `C-4 >= n+7` guarantee follows. Exact normalization comparisons and
+small/upper-bound cases are the next arithmetic check.
