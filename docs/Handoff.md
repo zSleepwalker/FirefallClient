@@ -11,8 +11,8 @@ and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
 Application shutdown's service-cell dispatch now reaches the concrete console
-file-close path. Active boundaries are required-lookup terminal byte verification,
-success pair-replacement inputs, and reuse of the existing diagnostic-cell binding; callback publication and composite
+file-close path. Active boundaries are captured shader-compile argument framing,
+its PE import/literal checks, and scratch failure-cleanup structural integration; callback publication and composite
 container semantic identity remain parked. UI lifecycle, arithmetic/import
 regressions, and immutable backing-slot projection code/checks are committed.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
@@ -10566,3 +10566,29 @@ replacement-loop read/call/write ordering passed coordinator execution and
 are pushed. This closes their byte-regression integration, not the unresolved
 indirect targets. Active bounded work is compiler-call argument framing
 and failure-versus-shared scratch cleanup after the lookup gates.
+
+## Compile argument frame and failure scratch cleanup bounded
+
+The compiler framing trace reports eleven `D3DCompile` arguments at
+raw `0xCA70FA/0xCA725A`: virtual `+4` return supplies the source
+pointer, virtual `+0xC` return the source byte count; source name,
+defines and include are null; entry/profile are
+`general_drawing_vs`/`vs_3_0` or `general_drawing_ps`/`ps_3_0`;
+both flags are zero; final arguments are local code/error blob outputs.
+Pointer/size roles follow confirmed API argument positions, not concrete
+virtual-target identification. Captured framing code and independent
+PE/import/literal checks are assigned.
+
+The scratch failure trace lists eleven lookup gates, not eight:
+`0xCA6D8B,0xCA6DA9,0xCA6DD5,0xCA6DF3,0xCA6E11,0xCA6E2F,
+0xCA6E4D,0xCA6E6B,0xCA6E89,0xCA6EB5,0xCA6EE1`.
+Their false paths reach the eight-pair scratch cleanup at
+`0xCA6F50..0xCA6F82`, before destination replacement.
+Each nonzero scratch field dispatches virtual `+8` then clears.
+This failure path performs no direct destination-pair writes here;
+called-target side effects remain unresolved. It sets BL=0 at
+`0xCA6FCF`; success sets BL=1 at `0xCA6F49`; the common tail
+transfers BL to AL at `0xCA7061`.
+The earlier initial direct-call failure bypasses scratch cleanup.
+Its callee is not labeled a parser without separate evidence.
+A bounded static failure-layout/check integration is assigned.
