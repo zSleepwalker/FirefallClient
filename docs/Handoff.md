@@ -10,8 +10,9 @@ PrivateDialog receiver identification, AES "block-size" interpretation,
 and tracker `+0x20` uncertainty. Active-sample identity and raw/VA mapping
 are recorded there; do not merge evidence from `.original` without comparison.
 
-Current delegated boundaries are the runtime exit helper's non-sentinel list
-contract and the concrete DumpKeyComboThread worker/teardown ordering.
+Current delegated boundaries are the encoded CRT exit-list lifetime
+and the concrete DumpKeyComboThread chord state/action.
+Exit registration and its logger cleanup predicate are resolved.
 Generic wrapper field `+8` is a duplicated diagnostic label:
 MSVCR120.dll!_strdup/free; the earlier constructor candidate is another destructor.
 Logger unwind binding is now composed
@@ -7927,3 +7928,41 @@ That slot was previously verified as **KERNEL32.dll!DeleteCriticalSection**;
 the follow-up's empty import query does not reopen its identity.
 The cleanup's assertion predicate and non-sentinel registration contract
 remain the next bounded checks.
+
+## Exit list forwarding and logger teardown predicate resolved
+
+Immutable PE parsing identifies IAT **VA** `0x1AC47A0` as
+**MSVCR120.dll!__dllonexit**. In the non-sentinel branch of raw
+`0x136B57F`, the forwarded arguments are
+`(encoded callback, &local[ebp-0x1C], &local[ebp-0x20])`.
+Those locals hold the decoded globals `0x1F1B474/0x1F1B470`;
+the updated values are encoded and stored back after the call.
+This establishes client-side forwarding/state updates, not CRT internals
+or a demonstrated callback-execution order.
+
+Cleanup raw `0x16C17D0` compares logger depth **VA** `0x1F11444` with zero.
+Nonzero takes the assertion path with stack arguments
+`(0x1B73D63, 0x1B73D6F, 0x7F, 0)`; caller removes `0x10` bytes.
+Zero skips that reporter. Either returning path passes **VA** `0x1F11414`
+to the verified DeleteCriticalSection import `0x1AC4274`.
+The continuable assertion does not guarantee continuation: an unhandled
+or non-continuing exception/termination remains outside this straight-line path.
+
+## DumpKeyComboThread concrete worker and bootstrap teardown
+
+Constructor raw `0x2EA330` installs subclass vptr **VA** `0x1C5EA48`
+(backed raw `0x185D648`), whose byte-offset `+0xC` is
+**VA** `0x6EAE00`, code raw `0x2EA200`.
+The generic start thunk raw `0x12BFDD0` invokes that virtual slot.
+The worker checks stop byte `this+4`; otherwise it sleeps 200 ms
+and polls GetAsyncKeyState for `0x11/0x12/0x10/0x2E`
+(Ctrl, Alt, Shift, Delete). Its byte `+0x70` gates a subsequent
+matching-poll action; exact transitions/action are a separate continuation.
+
+Bootstrap constructs the local object at raw `0x2EB14C`, starts it at
+`0x2EB161`, calls ClientApplicationShutdown at `0x2EB1F9`,
+then destroys the object at `0x2EB24A`.
+Destructor raw `0x2EA520` restores the base vptr and joins with 10000 ms.
+Join raw `0x12BFF70` requests stop through byte `+4`, waits, then
+closes the handle and clears started state even on WAIT_TIMEOUT (258).
+Consequently this teardown ordering does not prove worker termination.
