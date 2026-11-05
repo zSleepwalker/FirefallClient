@@ -919,6 +919,11 @@ CleanupCounterGate records the independent global counter read and decrement
 write, preserving incoming CF even when the counter observation is missing.
 The nonzero branch stops before9441; the zero path sets ECX to the address
 immediate and stops before the943C call, whose callee is never entered.
+MaskedTagEqualityGate preserves the original count in ECX and shifted EDI
+in EBX while masking an independent fresh tag DWORD for comparison. A zero
+effective shift count preserves AND flags. RingInsertion retains five ordered
+stores through942F, including incomplete attempts and earlier commits when
+the second-store EDX capture is missing.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

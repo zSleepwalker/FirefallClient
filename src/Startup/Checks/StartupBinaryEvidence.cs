@@ -664,6 +664,13 @@ internal static class StartupBinaryEvidence
             && RawCodeRangeMaps(0x12C942F, 18)
             && ShortConditionalBranchTargets(0x12C9435, 0x75, 0x12C9441)
             && RelativeBranchTargets(0x12C943C, 0xE8, 0x12C78A0));
+        check("Binary masked tag equality preserves the shifted traversal register",
+            Matches(0x12C93D4, "8BC88BDF8B420483E0F8D3E33BC7741F")
+            && RawCodeRangeMaps(0x12C93D4, 16)
+            && ShortConditionalBranchTargets(0x12C93E2, 0x74, 0x12C9403));
+        check("Binary common ring insertion precedes cleanup decrement",
+            Matches(0x12C941C, "89700C89720889460889560CC7461800000000")
+            && RawCodeRangeMaps(0x12C941C, 19));
         check("Binary pinned-sample raw code [0xBE6325,0xBE6352) maps to VA 0x00FE6F25 and preserves its JNZ target",
             imageBase == 0x400000
             && Matches(0xBE6325, "8B4E0853578B7E108D04CDFFFFFFFF4921460C037E0C8BC7C1E80323C88B46048D1C8D00000000833C0300751C")
