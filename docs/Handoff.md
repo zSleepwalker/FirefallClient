@@ -12958,6 +12958,12 @@ not reviewed or registered. IndexedConditional released requested revision,
 not reviewed or registered. ClearIndexed/ConditionalGuarded/SecondFieldTest
 remain active. FinalFieldGate evidence908B..9097 returned CMPfreshglobal/JB
 8E76 else9097, awaits independent verification and successor assignment.
+Checkpointcc38a5a pushed. IndexedConditional revision reviewed and
+registered; runner3528 exit0. DerivedESI is now supplied only at reached
+comparison consumer; cleanbelow has no unreached nestedflags.
+SelectionClear production reviewed, checks returned to40cf3884 for
+cleanroute defaults and impossible missingglobal write assertion.
+FinalStoreEvidence6c5d2238-4d93-48cc-ad5b-d7cd84830198 active raw9097.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional

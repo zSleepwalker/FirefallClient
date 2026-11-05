@@ -655,6 +655,11 @@ ESI-plus-10 read selects `12C9080` or `12C906E`.
 `12C906E` entry, retaining its independent global comparison and ordered
 stores before a fresh ESI-plus-14 read selects `12C8EF2` or `12C908B`.
 The direct `12C9080` bypass does not execute the preceding paired stores.
+`CapacityFinalCalleeIndexedConditionalLifecycleProjection` joins only the
+clean unequal root comparison at `12C903B`, retaining frame-derived ECX.
+The conditional EBX and EAX remain independent captures; derived ESI is
+supplied only when its comparison consumer is reached. Other root exits
+stay bounded and reject conditional captures.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
