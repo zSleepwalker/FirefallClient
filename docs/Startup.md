@@ -679,6 +679,15 @@ remaining an independent live-in. `CapacityFinalCalleeAlternateTagGateProjection
 starts separately at `12C90A2`, masks a fresh DWORD, and retains byte-width
 CMP flags. It is reached from the `12C8E51` branch, not by fallthrough from
 the final paired stores.
+`CapacityFinalCalleeGuardedSuccessorLifecycleProjection` selects the
+`12C906E` paired path or the `12C9080` bypass test without projecting an
+unselected child. `CapacityFinalCalleeAlternateFieldWritesProjection`
+preserves the global write before a fresh low-bit clear and ordered
+EDI-derived stores, stopping at the `12C9441` epilogue entry.
+`CapacityFinalCalleeIndexedGuardedLifecycleProjection` joins only the
+conditional nonzero path, leaving the root's direct table-write path bounded.
+`CapacityFinalCalleePairedFinalLifecycleProjection` carries the successor's
+fresh second-field value into the final guard, preserving all ordered stores.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

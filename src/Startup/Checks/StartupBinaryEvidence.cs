@@ -447,6 +447,10 @@ internal static class StartupBinaryEvidence
             Matches(0x12C90B0, "893DD0ADED018BC7836204FE83C801894604893C3EE977030000")
             && RawCodeRangeMaps(0x12C90B0, 26)
             && RelativeBranchTargets(0x12C90C5, 0xE9, 0x12C9441));
+        check("Binary callee epilogue preserves TEST flags across pops before its opaque call gate",
+            Matches(0x12C9441, "F60584AFED01025F5E5B740B6888AFED01FF157C42AC018BE55DC3")
+            && RawCodeRangeMaps(0x12C9441, 27)
+            && ShortConditionalBranchTargets(0x12C944B, 0x74, 0x12C9458));
         check("Binary pinned-sample raw code [0xBE6325,0xBE6352) maps to VA 0x00FE6F25 and preserves its JNZ target",
             imageBase == 0x400000
             && Matches(0xBE6325, "8B4E0853578B7E108D04CDFFFFFFFF4921460C037E0C8BC7C1E80323C88B46048D1C8D00000000833C0300751C")
