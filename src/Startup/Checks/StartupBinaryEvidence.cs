@@ -7286,6 +7286,15 @@ internal static class StartupBinaryEvidence
             Matches(0xBD2DEB, "BA0A0000008D8E2401000033C0F00FB11185C0750C")
             && Matches(0xBD2E00, "8B86080100008986280100006A028D8E60020000")
             && RelativeBranchTargets(0xBD2E14, 0xE8, 0x12CE310));
+        check("Binary predequeue clock gate reads pointer and field around two fences before unsigned five hundred comparison",
+            Matches(0xBBC8B0, "8B3570FFDF01BBF40100008975F00FAEE88B76680FAEE8FFD02BC68B75F03BC372096A018BCE")
+            && RelativeBranchTargets(0xBBC8D6, 0xE8, 0xBBDDB0)
+            && ImportSlotNames(0x1AC4D24, "timeGetTime"));
+        check("Binary post-binding dispatch rereads context and post-parser maximum before optional store",
+            Matches(0xBD30BC, "83BE14010000008D47FC508D867C0200008BCE50750D")
+            && RelativeBranchTargets(0xBD30D2, 0xE8, 0xBD39D0)
+            && RelativeBranchTargets(0xBD30DF, 0xE8, 0xBD3140)
+            && Matches(0xBD30E4, "39BE880D0000734489BE880D0000"));
         check("Binary Network and GameSocket shutdown ownership and distinct WinHTTP close helpers are fingerprinted",
             ReadUInt32(VirtualAddressToFileOffset(0x1C734B4)) == 0x00FBD900
             && ReadUInt32(VirtualAddressToFileOffset(0x1C734B4) + 8) == 0x00FBE540

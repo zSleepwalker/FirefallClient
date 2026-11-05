@@ -1041,6 +1041,10 @@ GameSocketSenderBindingProjection covers the optional post-admission
 flag branch through token selection, opaque queue append and flag clear.
 It keeps disabled bypasses, missing operands and unused captures distinct,
 and separates historical TEST flags from flags invalidated by normal calls.
+GameSocketCompletionErrorStateProjection starts at the internal
+post-log/release continuation: it observes compare-exchange state ten,
+conditionally copies the fresh field and queues token two. It does not
+model the outer zero-error bypass, concurrency execution or SEH cleanup.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
