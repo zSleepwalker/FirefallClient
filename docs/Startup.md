@@ -615,6 +615,12 @@ descriptor address or the later comparison reload. Its mask reads remain fresh.
 `CapacityFinalCalleeLargeSizeFieldsProjection` reconstructs the bounded
 raw `12C8F76..12C8FA8` gates, frame write, and paired stores without inferring
 ownership. It preserves earlier effects on each missing-read stop.
+`CapacityFinalCalleeAlternateFieldSelectionProjection` writes each candidate
+address before testing the separately loaded DWORD. It stops at `12C8FC2`
+or `12C8FFE`, retaining the first write when the second read is missing.
+`CapacityFinalCalleeFieldDescentStepProjection` performs one bounded descent
+step only. The selected pointer is freshly reloaded after its comparison,
+and the loopback to `12C8FC5` is recorded without executing another iteration.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

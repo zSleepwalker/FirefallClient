@@ -12894,6 +12894,20 @@ Current active GPT-6 Luna successors: FieldClearTail
 `dbf9c628-fc1f-4e3c-98a0-32d6a7d43ebd`, LargeSizeAlternateLifecycle
 `0d586979-cfe6-4eee-966f-ef0c41e44c16`, ConditionalFieldStore
 `0ab54b83-b9d8-4d47-a8f9-c9b258e25853`.
+Checkpoint `398f100` pushed; runner3419 exit0 covered all committed pairs.
+AlternateFieldSelection and FieldDescentStep reviewed/registered but not
+yet validated: runner3421 exposed a captured-zero fixture that lacked the
+zero frame read; corrected it. Runner3424 remains blocked by active
+ConditionalFieldStore BuildPlan parameter mismatch at169, owner informed.
+IndexedRootMask earlier compile errors at648/704 were also sent to owner.
+FieldClearTail returned for correcting raw-to-VA literal to16C9BDD.
+DescriptorFallbackMask revision released after bypass fixes; review of
+remaining helpers/checks needed before registration. ConditionalFieldStore
+native903B..9058 (29bytes) verified in IDA but no immutable runner anchor yet.
+Runner3426 exit0 validates registered AlternateFieldSelection and
+FieldDescentStep after active-owner compile corrections. Released pending
+review: FieldClearTail revision, IndexedRootMask, ConditionalFieldStore,
+LargeSizeAlternateLifecycle, and DescriptorFallbackMask revision.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
