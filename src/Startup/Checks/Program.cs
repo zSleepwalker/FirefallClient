@@ -372,6 +372,8 @@ NetworkDispatcherEntryCookiePreparationChecks.Run(Check);
 NetworkDispatcherEntryFsPublicationChecks.Run(Check);
 NetworkDispatcherEntryLockPreparationChecks.Run(Check);
 NetworkDispatcherEntryImportReturnChecks.Run(Check);
+NetworkDispatcherEntryReturnedTestBranchChecks.Run(Check);
+GameSocketParserDiagnosticCleanupSecondVirtualCallPreparationChecks.Run(Check);
 GameSocketParserDiagnosticCleanupPostCallAddressChecks.Run(Check);
 GameSocketParserDiagnosticCleanupSecondXaddChecks.Run(Check);
 GameSocketParserDiagnosticCleanupSecondXaddBranchChecks.Run(Check);

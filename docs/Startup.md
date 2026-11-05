@@ -1284,6 +1284,11 @@ EBX and operation-time DWORD independently for the locked exchange at BD34D4.
 Its DEC/JNZ suffix preserves ADD carry, decrements the exchanged old DWORD and
 selects unentered BD34DB or BD34E2. Per-plan lazy validation preserves immutable
 semantic checks without repeatedly reconstructing the same ancestry.
+NetworkDispatcherEntryReturnedTestBranchProjection reuses the existing lock-gate
+TEST/JNZ without supplying post-call receiver state, stopping at BBDDEF or
+BBDDF6 before any push, call or counter read. The second parser virtual-call
+preparation independently captures DWORD[ESI] at BD34DB, sets ECX=ESI and stops
+before the slot-four call at BD34DF. Missing reads stop at BD34DB, not after MOV.
 GameSocketParserSelectorDiagnosticPreparationProjection records the five
 diagnostic argument pushes at BD326A..BD3280. It derives ESP from the
 count-consumption lineage but requires fresh ESI and an independent DWORD

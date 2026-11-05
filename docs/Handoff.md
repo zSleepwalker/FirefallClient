@@ -14232,6 +14232,14 @@ Successors994da0c3 secondvptrprep DB..DF active; b304739b returnedTEST/JNZ
 adapter EB..EF/F6 active using existinglockgate with no postreceiver forwarding.
 Current exclusions SecondVirtualCallPreparation/EntryReturnedTestBranch.
 Latest ordinary full4324; reviewed subset4330 succeeded with bothactive excluded.
+ReturnedTEST b304739b fullEOF accepted, reuseslegacygate withoutreceiver captures,
+noeffects beyondTEST/JNZ, unentered EF/F6 targets. Secondvptr994da0c3 revisedpair
+fullEOF reviewed: missingread DB childfalse, missingEBXfixtureD4, actualaliased
+parentstackstore differentfreshread regression. Registeredboth ordinaryfull4332
+exit0 (noexclusions atvalidationstart). New Luna545f307e owns slot4freshtarget/
+opaquereturn DF..E2; Lunac41bb602 owns zeroTEST fallbackPUSH atEF with fresh
+postcallESP/EBX, stoppingF0 noABIlineage. Currentexclusions SecondVirtualCallReturn/
+EntryFallbackPush. No running coordinatorvalidation.
 
 The user's finish-current-tasks-and-stop request supersedes earlier
 continuous-dispatch instructions. All current assignments are now released,
