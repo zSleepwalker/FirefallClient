@@ -628,6 +628,9 @@ reload after the zero store remain independent, even at aliased addresses.
 distinct raw `12C8EB8` opaque call before the mask window. It requires captured
 post-call registers, rejects call-only captures on bypasses, and admits only
 clean mask destinations.
+`CapacityFinalCalleeConditionalFieldStoreProjection` uses an unsigned gate
+before its fresh field comparison, writes exactly one selected field, and
+tests the retained EAX value to select raw `12C8EF2` or `12C9058`.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

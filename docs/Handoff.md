@@ -12916,6 +12916,13 @@ Active Luna successors SelectionDescentLifecycle
 `c992401e-6115-45c4-a1dc-fdac62b80194`, DescentClearLifecycle
 `3ad41ab3-4c3a-4170-b734-b21675df996c`, IndexedConditionalLifecycle
 `0312d7c5-45f5-40be-909a-12eb98209e35`. They own only their new pairs.
+Checkpointdc7fa27 pushed. ConditionalFieldStore reviewed/registered;
+runner3443 exit0 verifies its new29-byte nativeanchor and all registered
+pairs. IndexedRootMask returned to owner for mandatory freshFrameMinusC
+read gate at9013 (beforebranch), missingframe8stop9026, entryVA16C9BFE.
+LargeSizeAlternate owner revising two impossible fixtures that attempted
+to join completedpairedFF8 into alternateFA8; require actual equalityroute.
+Do not register or stage those pairs until revised/reviewed.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
