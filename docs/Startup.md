@@ -731,6 +731,18 @@ unequal raw 0x12C912D edge. It preserves the two preceding frame stores,
 independently reloads EBP-4, and bounds the later comparison at raw
 0x12C9137 or 0x12C913D. Supplied shifted captures on either earlier opaque
 boundary are reported as unreached and prevent clean admission.
+The alternate mask tail reloads EBP-8 and EBP-4 independently, masks CL
+to five bits, complements the shifted value, and applies it to a fresh
+global DWORD at VA 0x1EDADC8. Zero-count shifts preserve captured flags
+(or remain unknown); the final AND defines its own flags. Unused entry
+flags on nonzero shifts prevent clean exit admission.
+
+The alternate successor gate bounds frame equality and fresh-field
+equality at raw 0x12C9190, while unsigned-below and field inequality stop
+before the opaque call at raw 0x12C918A. The separate successor-write
+projection preserves both MOV events even when their addresses alias,
+then stops at raw 0x12C92BD. The backlink-final lifecycle enters the final
+frame comparison only through the earlier clean raw 0x12C9160 bypass.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

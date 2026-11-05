@@ -13076,6 +13076,16 @@ MaskTail4e80926d, SuccessorGatee970fea4, IndexedBacklinkff958892.
 PairedShifted released/reviewed/registered; runner3651 exit0.
 SuccessorWritesd13861c5 assigned verified9190..919B twoMOV/JMP92BD;
 coordinatoranchor pendingrun. ShiftedIndexede4f54204 assigned newcomposition.
+Checkpointc951d71 pushed paired-shifted code andsuccessorwriteanchor;
+runner3652 exit0. MaskTail/SuccessorWrites/SuccessorGate/BacklinkFinal
+reviewed/registered; runner3669 exit0. Fixedsuccessorfixture8-9 CF=true,
+8-7 AF=false; addedmaskExactCleanExitAdmitted rejectingunusedEntryFlags.
+Releasedpendingreview: IndexedBacklinkff958892, ShiftedIndexede4f54204,
+CommonTagWrites0fd829a3. Active: LargeRootaa3a987a, IndexedFinal418bfa3a,
+SuccessorLifecycle8a2955a3, FinalMaskccf2838a, LargeThreshold786bffaf.
+Evidenceagent8a6c3f2b blockedbyIDAtoolabsence; coordinatorfreshbytesobtained
+directly91A8..91D6 and91D6..91EE. LargeThreshold91A8..91B9 assigned;
+JB91B3->8E76 usesCMP91AB flags acrossMOV/store/freshload.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
