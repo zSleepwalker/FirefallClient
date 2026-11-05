@@ -341,6 +341,21 @@ internal static class StartupBinaryEvidence
         check("Binary immutable computed-zero tail still performs its global subtraction",
             Matches(0x12C8E3A, "290D78AFED01E9FC050000")
             && RawCodeRangeMaps(0x12C8E3A, 11));
+        check("Binary immutable tag-equality continuation preserves global writes before its fresh limit gate",
+            Matches(0x12C8F21, "8B0DD4ADED0103CF8935E0ADED018BC1890DD4ADED0183C8018946043B35DCADED017514C705DCADED0100000000C705D0ADED01000000003B0DE4ADED010F86DC04000033D2B9C8ADED01E87FECFFFF")
+            && RawCodeRangeMaps(0x12C8F21, 80)
+            && ShortConditionalBranchTargets(0x12C8F43, 0x75, 0x12C8F59)
+            && RelativeConditionalBranchTargets(0x12C8F5F, 0x0F, 0x86, 0x12C9441));
+        check("Binary immutable nonzero-validation anchor retains ordered reloads and separate branch destinations",
+            Matches(0x12C8E45, "03F83BF3722B3B35DCADED010F844B020000C1E8038945F083F8200F83100100008B4E08894DFC8B4E0C894DEC3BF17506")
+            && RawCodeRangeMaps(0x12C8E45, 49)
+            && ShortConditionalBranchTargets(0x12C8E49, 0x72, 0x12C8E76)
+            && RelativeConditionalBranchTargets(0x12C8E51, 0x0F, 0x84, 0x12C90A2)
+            && RelativeConditionalBranchTargets(0x12C8E60, 0x0F, 0x83, 0x12C8F76)
+            && ShortConditionalBranchTargets(0x12C8E74, 0x75, 0x12C8E7C));
+        check("Binary shared validation-branch destination is an opaque indirect call, not a proven terminal",
+            Matches(0x12C8E76, "FF15244AAC01")
+            && RawCodeRangeMaps(0x12C8E76, 6));
         check("Binary pinned-sample raw code [0xBE6325,0xBE6352) maps to VA 0x00FE6F25 and preserves its JNZ target",
             imageBase == 0x400000
             && Matches(0xBE6325, "8B4E0853578B7E108D04CDFFFFFFFF4921460C037E0C8BC7C1E80323C88B46048D1C8D00000000833C0300751C")

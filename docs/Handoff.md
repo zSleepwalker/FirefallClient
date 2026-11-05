@@ -12691,6 +12691,64 @@ composes only clean computed-zero route, preserving fresh global read/write
 before existing exit projection. DispatchLifecycle and TagValidation remain
 active; keep all three active pairs out of this checkpoint staging.
 
+Alignment checkpoint pushed ebd116d. TagValidation released/reviewed/
+registered and coordinator checks passed; agent ran builds despite request,
+so coordinator validation remains authoritative. DispatchLifecycle released/
+reviewed/registered but four fixture failures returned to owner for revision.
+New active pair owners: AlignmentTagLifecycle
+`c6f505d0-245f-4d87-beaa-02900fa28374`; EntryAlignmentLifecycle
+`cd871ff2-84ee-4e35-9ac1-a021084f7998`. ZeroExitLifecycle still active.
+Coordinator next-window trace raw12C8F21..12C8F71, 80 bytes:
+fresh global1EDADD4 + entryEDI ->ECX; writes1EDADE0=entryESI,
+1EDADD4=ECX,[ESI+4]=ECX|1; fresh compare1EDADDC optionally clears
+1EDADDC and1EDADD0; fresh unsigned ECX<=global1EDADE4 exits9441;
+otherwise EDX0, ECX immediatePEVA1EDADC8, direct callraw12C7BF0
+atF6C endsF71. No implementation owner assigned for this window yet.
+
+Equality continuation owner now `42e24d7d-d1fd-41f9-82c8-93f53116c3d7`.
+NonzeroValidation owner `c096c7e6-7461-4ac5-b395-87cb1e1c8df2` active:
+raw12C8E45..12C8E76 49bytes; ADD EDI,EAX, unsigned ESI<EBX exitE76,
+fresh global1EDADDC equality exit90A2, logical EAX>>3/store[EBP-10],
+unsigned shiftedEAX>=20h exitF76, ordered fresh[ESI+8]/[ESI+C]
+stores to[EBP-4]/[EBP-14], then ESI!=ECX exitE7C or equalityE76.
+E76 is indirect call[PEVA1AC4A24], not proven nonreturning.
+ZeroExitLifecycle reviewed revision now requires exact RET boundary and
+all exit unreached flags clear; registered pending runner. AlignmentTag
+returned for forwarding nested unreached flags and nullable-bool fixture
+compilation. EntryAlignment active writer temporarily blocked latest build
+with identifier/property errors; owner informed. Do not edit active files.
+
+EntryAlignment released/reviewed but returned for distinct successful clean
+alignment branch outcomes (rather than labelling all non-call paths blocked)
+and aggregate forwarded unreached flags. AlignmentTag revised forwarding
+reviewed and registered; ZeroExit clean terminal revision registered.
+Latest coordinator runner shell3328 blocked by active NonzeroValidation
+nullable-record-struct accesses at203,231,251,314; owner informed.
+Next validation must include Dispatch, TagValidation, ZeroExit, AlignmentTag
+registrations plus new equality/nonzero/shared-call anchors. EntryAlignment
+and active EqualityContinuation/NonzeroValidation not yet registered.
+Latest pushed HEAD remains ebd116d; uncommitted reviewed pairs require
+passing coordinator runner before explicit-path checkpoint staging.
+
+Coordinator runner3329 compiled and only failed Dispatch's blocked-first-
+route fixture group; owner received final focused correction. TagValidation,
+ZeroExit, AlignmentTag and EqualityContinuation registered checks pass.
+Equality scalar released/reviewed and successor TagEqualityLifecycle
+`49f2234f-8130-4937-b216-6ba428ca419f` active.
+EntryAlignment revision and NonzeroValidation still awaiting releases.
+Do not stage active pairs; reviewed uncommitted scalar/branch pairs can
+checkpoint after remaining Dispatch fixture passes.
+
+Latest runner3334 now passes Dispatch, Tag, ZeroExit, AlignmentTag,
+EqualityContinuation and EntryAlignment; only NonzeroValidation's first
+unsigned/equal-global fixture group fails and owner has focused correction.
+All seven reviewed/registered pairs are pending explicit checkpoint staging.
+Active successors: AlignmentNonzeroLifecycle
+`9665dc5f-4051-44ab-997e-2bba5aa06255`, TagEqualityLifecycle
+`49f2234f-8130-4937-b216-6ba428ca419f`, call-continuation trace
+`4da05d36-3e1c-4c17-b7bf-d39cbbb8bf8d` (corrected after agent queried
+mapped VA instead of raw IDA EA; only direct raw addresses are authoritative).
+
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
 indirect callback, then fresh receiver+4C DEC and receiver+48 zero/INC.

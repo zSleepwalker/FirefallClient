@@ -531,6 +531,36 @@ frame writes, the AL-bit route, the fresh `[ESI]` subtraction, and the
 independent entry-ECX/computed-ECX gates. Its opaque indirect call retains
 pre-call register evidence only; captured normal return does not establish
 post-call register preservation.
+`CapacityFinalCalleeTagValidationProjection` distinguishes the unsigned
+ESI/EDX guard, the two independently tested bits of the fresh `[EDX+4]`
+DWORD, and the subsequent comparison against fresh global `1EDADE0`.
+Branch destinations remain separate evidence routes; equality stops at
+raw `12C8F21` without inferring later global updates.
+`CapacityFinalCalleeAlignmentTagLifecycleProjection` admits only the clean
+AL-bit route and derives tag ESI/EDX from its local register evidence.
+`CapacityFinalCalleeZeroExitLifecycleProjection` retains the native global
+SUB read/write even when the admitted ECX is zero, then forwards independent
+exit captures. Successful return requires the exact RET boundary and clear
+unreached exit-capture flags.
+`CapacityFinalCalleeTagEqualityContinuationProjection` preserves the ordered
+global and `[ESI+4]` writes before the fresh tag and unsigned-limit reads.
+Optional tag clearing does not replace later reloads with inferred values.
+The direct-call route records only pre-call registers and a captured return
+gate, while the unsigned-limit branch stops at the exit entry.
+
+`FrameHandoffCapacityDispatchLifecycleProjection` connects the admitted
+first-transfer return to only its selected above or at/below branch.
+Successor entry registers come from fresh return reads and local arithmetic;
+opaque downstream call captures remain independent. Supplied unselected
+branch evidence is retained as unreached rather than executed.
+`CapacityFinalCalleeEntryAlignmentLifecycleProjection` derives the original
+loaded EAX, masked ECX, and admitted ESI for the alignment window while
+requiring independent EBP/ESP captures. Clean alignment branches remain
+successful bounded destinations rather than failed calls.
+`CapacityFinalCalleeNonzeroValidationProjection` preserves the initial EDI
+addition, logical EAX shift, ordered frame stores and fresh memory reads.
+The common `12C8E76` destination is an opaque indirect call, not a proven
+nonreturning terminal.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
