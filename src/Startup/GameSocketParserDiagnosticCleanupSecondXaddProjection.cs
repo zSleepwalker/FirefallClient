@@ -292,6 +292,18 @@ public static class GameSocketParserDiagnosticCleanupSecondXaddProjection
         GameSocketParserDiagnosticCleanupPostCallAddressPlan parentPlan =
             GameSocketParserDiagnosticCleanupPostCallAddressProjection.Project(
                 capture.ParentCapture);
+        return ProjectCore(capture, parentPlan);
+    }
+
+    internal static GameSocketParserDiagnosticCleanupSecondXaddPlan ProjectCore(
+        GameSocketParserDiagnosticCleanupSecondXaddCapture capture,
+        GameSocketParserDiagnosticCleanupPostCallAddressPlan parentPlan)
+    {
+        ArgumentNullException.ThrowIfNull(parentPlan);
+        if (parentPlan.Capture != capture.ParentCapture)
+            throw new InvalidOperationException(
+                "The trusted post-call-address plan must match the captured parent.");
+
         var instructions =
             ImmutableArray.CreateBuilder<GameSocketParserDiagnosticCleanupSecondXaddInstruction>();
 

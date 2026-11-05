@@ -238,8 +238,9 @@ public sealed class GameSocketParserDiagnosticCleanupSecondXaddBranchPlan
     private bool ReprojectedParentMatches()
     {
         GameSocketParserDiagnosticCleanupSecondXaddPlan reprojected =
-            GameSocketParserDiagnosticCleanupSecondXaddProjection.Project(
-                Capture.ParentCapture);
+            GameSocketParserDiagnosticCleanupSecondXaddProjection.ProjectCore(
+                Capture.ParentCapture,
+                ParentPlan.ParentPlan);
         return reprojected.Capture == ParentPlan.Capture
             && reprojected.Outcome == ParentPlan.Outcome
             && reprojected.ParentAdmitted == ParentPlan.ParentAdmitted

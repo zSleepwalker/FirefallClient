@@ -1061,6 +1061,271 @@ internal static class NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCheck
             && targetCallReplay.OrderedSemanticPrefixPreserved
             && targetNormalReturn.ExactCleanCompletion
             && targetCallReplay.ExactCleanCompletion);
+
+        static NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowPlan
+            ProjectPostCallWindow(
+                NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchContinuationCapture
+                    parentCapture,
+                bool? parentReturnedNormally,
+                uint? postCallESI,
+                uint? postCallEBX,
+                uint? dwordAtESIPlusA8,
+                uint? dwordAtESIPlusA4) =>
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowProjection.Project(
+                new(
+                    new(
+                        parentCapture,
+                        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallSite
+                            .TakenTargetAtBBDE6C,
+                        parentReturnedNormally),
+                    postCallESI,
+                    postCallEBX,
+                    dwordAtESIPlusA8,
+                    dwordAtESIPlusA4));
+
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowPlan
+            postCallWindow = ProjectPostCallWindow(
+                targetCallParentCapture,
+                true,
+                0x5000,
+                0x7FFFFFFF,
+                0x80000003,
+                0x7FFFFFFF);
+        check("BBDE6F byte anchors and stop boundary are exact",
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowProjection
+                .BytesIndependentlyVerified
+            && Normalize(NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowProjection
+                .CoordinatorWindowBytes) == "8B86A8000000432B86A4000000C1F8023BD872BD"
+            && Normalize(NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowProjection
+                .MoveEAXInstructionBytes) == "8B86A8000000"
+            && Normalize(NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowProjection
+                .IncrementEBXInstructionBytes) == "43"
+            && Normalize(NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowProjection
+                .SubtractInstructionBytes) == "2B86A4000000"
+            && Normalize(NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowProjection
+                .ShiftInstructionBytes) == "C1F802"
+            && Normalize(NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowProjection
+                .CompareInstructionBytes) == "3BD8"
+            && Normalize(NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowProjection
+                .JBInstructionBytes) == "72BD"
+            && NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowProjection
+                .EntryRawFileOffset == 0x00BBDE6F
+            && NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowProjection
+                .IncrementEBXRawFileOffset == 0x00BBDE75
+            && NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowProjection
+                .SubtractRawFileOffset == 0x00BBDE76
+            && NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowProjection
+                .ShiftRawFileOffset == 0x00BBDE7C
+            && NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowProjection
+                .CompareRawFileOffset == 0x00BBDE7F
+            && NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowProjection
+                .StopAtRawFileOffsetExclusive == 0x00BBDE81
+            && postCallWindow.NextControlTransferRawFileOffset == 0x00BBDE81
+            && postCallWindow.NextControlTransferTargetRawFileOffset == 0x00BBDE40
+            && !postCallWindow.BranchInstructionProjected);
+
+        check("BBDE6F window computes values and flags through CMP only",
+            postCallWindow.ParentPlan.ExactCleanCompletion
+            && postCallWindow.ParentPlan.Outcome
+                == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnOutcome
+                    .BoundedAfterTargetCall
+            && postCallWindow.Outcome
+                == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowOutcome
+                    .BoundedBeforeJB
+            && postCallWindow.ExactBoundedCompletion
+            && postCallWindow.ExactCleanCompletion
+            && postCallWindow.EAX == 1
+            && postCallWindow.EBX == 0x80000000
+            && postCallWindow.ESI == 0x5000
+            && postCallWindow.FlagsAtStop is {
+                Carry: false,
+                Parity: true,
+                Auxiliary: true,
+                Zero: false,
+                Sign: false,
+                Overflow: true
+            }
+            && postCallWindow.Instructions is [
+                {
+                    InstructionRawFileOffset: 0x00BBDE6F,
+                    InstructionByteLength: 6,
+                    InstructionBytes: "8B86A8000000",
+                    Kind: NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowInstructionKind
+                        .MoveEAXFromESIPlusA8,
+                    EAXAfter: 0x80000003,
+                    Completed: true,
+                    FlagsAfter: { Carry: null, Parity: null, Auxiliary: null, Zero: null, Sign: null, Overflow: null }
+                },
+                {
+                    InstructionRawFileOffset: 0x00BBDE75,
+                    InstructionByteLength: 1,
+                    InstructionBytes: "43",
+                    Kind: NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowInstructionKind
+                        .IncrementEBX,
+                    EBXAfter: 0x80000000,
+                    Completed: true,
+                    FlagsAfter: { Carry: null, Parity: true, Auxiliary: true, Zero: false, Sign: true, Overflow: true }
+                },
+                {
+                    InstructionRawFileOffset: 0x00BBDE76,
+                    InstructionByteLength: 6,
+                    InstructionBytes: "2B86A4000000",
+                    Kind: NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowInstructionKind
+                        .SubtractESIPlusA4FromEAX,
+                    EAXAfter: 4,
+                    Completed: true,
+                    FlagsAfter: { Carry: false, Parity: true, Auxiliary: true, Zero: false, Sign: false, Overflow: true }
+                },
+                {
+                    InstructionRawFileOffset: 0x00BBDE7C,
+                    InstructionByteLength: 3,
+                    InstructionBytes: "C1F802",
+                    Kind: NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowInstructionKind
+                        .ArithmeticShiftEAXRightByTwo,
+                    EAXAfter: 1,
+                    Completed: true,
+                    FlagsAfter: { Carry: false, Parity: false, Auxiliary: null, Zero: false, Sign: false, Overflow: null }
+                },
+                {
+                    InstructionRawFileOffset: 0x00BBDE7F,
+                    InstructionByteLength: 2,
+                    InstructionBytes: "3BD8",
+                    Kind: NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowInstructionKind
+                        .CompareEBXWithEAX,
+                    EAXAfter: 1,
+                    EBXAfter: 0x80000000,
+                    Completed: true,
+                    FlagsAfter: { Carry: false, Parity: true, Auxiliary: true, Zero: false, Sign: false, Overflow: true }
+                }
+            ]
+            && postCallWindow.Reads is [
+                { InstructionRawFileOffset: 0x00BBDE6F, Address: 0x50A8, Width: 4, Captured: true, Value: 0x80000003 },
+                { InstructionRawFileOffset: 0x00BBDE76, Address: 0x50A4, Width: 4, Captured: true, Value: 0x7FFFFFFF }
+            ]
+            && postCallWindow.CompletedInstructionOffsets.SequenceEqual(
+                targetNormalReturn.CompletedInstructionOffsets
+                    .Add(0x00BBDE6F)
+                    .Add(0x00BBDE75)
+                    .Add(0x00BBDE76)
+                    .Add(0x00BBDE7C)
+                    .Add(0x00BBDE7F))
+            && postCallWindow.StopAtRawFileOffsetExclusive == 0x00BBDE81
+            && !postCallWindow.PostCallRegistersForwarded
+            && !postCallWindow.PostCallFlagsForwarded
+            && !postCallWindow.NativeInstructionsExecuted
+            && !postCallWindow.NativeMemoryReadsExecuted
+            && !postCallWindow.NativeMemoryWritesExecuted);
+
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowPlan
+            missingESI = ProjectPostCallWindow(
+                targetCallParentCapture, true, null, 0x7FFFFFFF, 0x80000003, 0x7FFFFFFF);
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowPlan
+            missingA8 = ProjectPostCallWindow(
+                targetCallParentCapture, true, 0x5000, 0x7FFFFFFF, null, 0x7FFFFFFF);
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowPlan
+            missingEBX = ProjectPostCallWindow(
+                targetCallParentCapture, true, 0x5000, null, 0x80000003, 0x7FFFFFFF);
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowPlan
+            missingA4 = ProjectPostCallWindow(
+                targetCallParentCapture, true, 0x5000, 0x7FFFFFFF, 0x80000003, null);
+        check("Missing post-call captures stop at first use and preserve unused states",
+            missingESI.Outcome
+                == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowOutcome
+                    .MissingPostCallESI
+            && missingESI.ESICaptureState
+                == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowCaptureState
+                    .Missing
+            && missingESI.EBXCaptureState
+                == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowCaptureState
+                    .SuppliedUnused
+            && missingESI.StopAtRawFileOffsetExclusive == 0x00BBDE6F
+            && missingA8.Outcome
+                == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowOutcome
+                    .MissingDWORDAtESIPlusA8
+            && missingA8.Reads is [{
+                InstructionRawFileOffset: 0x00BBDE6F,
+                Address: 0x50A8,
+                Attempted: true,
+                Captured: false,
+                Value: null
+            }]
+            && missingA8.DWORDAtESIPlusA4CaptureState
+                == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowCaptureState
+                    .SuppliedUnused
+            && missingA8.StopAtRawFileOffsetExclusive == 0x00BBDE6F
+            && missingEBX.Outcome
+                == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowOutcome
+                    .MissingPostCallEBX
+            && missingEBX.CompletedInstructionOffsets.SequenceEqual(
+                targetNormalReturn.CompletedInstructionOffsets.Add(0x00BBDE6F))
+            && missingEBX.StopAtRawFileOffsetExclusive == 0x00BBDE75
+            && missingEBX.DWORDAtESIPlusA4CaptureState
+                == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowCaptureState
+                    .SuppliedUnused
+            && missingA4.Outcome
+                == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowOutcome
+                    .MissingDWORDAtESIPlusA4
+            && missingA4.CompletedInstructionOffsets.SequenceEqual(
+                targetNormalReturn.CompletedInstructionOffsets
+                    .Add(0x00BBDE6F)
+                    .Add(0x00BBDE75))
+            && missingA4.StopAtRawFileOffsetExclusive == 0x00BBDE76
+            && missingA4.FlagsAtStop
+                == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowProjection
+                    .IncrementFlags(0x7FFFFFFF, preservedCarry: null));
+
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowPlan
+            pendingPostCallParent = ProjectPostCallWindow(
+                targetCallParentCapture, null, 0x5000, 0x7FFFFFFF, 0x80000003, 0x7FFFFFFF);
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowPlan
+            rejectedPostCallParent = ProjectPostCallWindow(
+                targetCallParentCapture, false, 0x5000, 0x7FFFFFFF, 0x80000003, 0x7FFFFFFF);
+        check("Pending and rejected call-return parents preserve their bounds and captures",
+            pendingPostCallParent.Outcome
+                == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowOutcome
+                    .ParentCallReturnNotAccepted
+            && pendingPostCallParent.ParentPlan.NormalReturnCaptureState
+                == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnCaptureState
+                    .Pending
+            && pendingPostCallParent.CompletedInstructionOffsets.SequenceEqual(
+                pendingPostCallParent.ParentPlan.CompletedInstructionOffsets)
+            && pendingPostCallParent.StopAtRawFileOffsetExclusive == 0x00BBDE6C
+            && pendingPostCallParent.FlagsAtStop == pendingPostCallParent.ParentPlan.FlagsAtStop
+            && pendingPostCallParent.ESICaptureState
+                == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowCaptureState
+                    .SuppliedUnused
+            && rejectedPostCallParent.ParentPlan.Outcome
+                == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnOutcome
+                    .CallDidNotReturnNormally
+            && rejectedPostCallParent.Outcome
+                == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowOutcome
+                    .ParentCallReturnNotAccepted
+            && rejectedPostCallParent.CompletedInstructionOffsets.SequenceEqual(
+                rejectedPostCallParent.ParentPlan.CompletedInstructionOffsets)
+            && rejectedPostCallParent.StopAtRawFileOffsetExclusive == 0x00BBDE6C
+            && rejectedPostCallParent.FlagsAtStop == rejectedPostCallParent.ParentPlan.FlagsAtStop
+            && rejectedPostCallParent.DWORDAtESIPlusA4CaptureState
+                == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowCaptureState
+                    .SuppliedUnused);
+
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowPlan
+            postCallReplay = ProjectPostCallWindow(
+                targetCallParentCapture, true, 0x5000, 0x7FFFFFFF, 0x80000003, 0x7FFFFFFF);
+        check("BBDE6F continuation reprojection is deterministic",
+            postCallWindow.Capture == postCallReplay.Capture
+            && postCallWindow.ParentPlan.Capture == postCallReplay.ParentPlan.Capture
+            && postCallWindow.Outcome == postCallReplay.Outcome
+            && postCallWindow.Instructions.SequenceEqual(postCallReplay.Instructions)
+            && postCallWindow.Reads.SequenceEqual(postCallReplay.Reads)
+            && postCallWindow.CompletedInstructionOffsets.SequenceEqual(
+                postCallReplay.CompletedInstructionOffsets)
+            && postCallWindow.StopAtRawFileOffsetExclusive
+                == postCallReplay.StopAtRawFileOffsetExclusive
+            && postCallWindow.FlagsAtStop == postCallReplay.FlagsAtStop
+            && postCallWindow.OrderedSemanticPrefixPreserved
+            && postCallReplay.OrderedSemanticPrefixPreserved
+            && postCallWindow.ExactCleanCompletion
+            && postCallReplay.ExactCleanCompletion);
     }
 
     private static NetworkDispatcherEntryFallbackDiagnosticReturnCapture

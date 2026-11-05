@@ -2638,3 +2638,772 @@ public static class
     private static NetworkDispatcherLockGateFlags UnknownFlags =>
         new(Carry: null, Parity: null, Auxiliary: null, Zero: null, Sign: null, Overflow: null);
 }
+
+public sealed record
+    NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowCapture(
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnCapture ParentCapture,
+        uint? FreshPostCallESI,
+        uint? FreshPostCallEBX,
+        uint? FreshDWORDAtESIPlusA8,
+        uint? FreshDWORDAtESIPlusA4);
+
+public enum
+    NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowCaptureState
+{
+    Unreached,
+    Missing,
+    Captured,
+    SuppliedUnused
+}
+
+public enum
+    NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowOutcome
+{
+    ParentCallReturnNotAccepted,
+    MissingPostCallESI,
+    MissingDWORDAtESIPlusA8,
+    MissingPostCallEBX,
+    MissingDWORDAtESIPlusA4,
+    BoundedBeforeJB
+}
+
+public enum
+    NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowInstructionKind
+{
+    MoveEAXFromESIPlusA8,
+    IncrementEBX,
+    SubtractESIPlusA4FromEAX,
+    ArithmeticShiftEAXRightByTwo,
+    CompareEBXWithEAX
+}
+
+public readonly record struct
+    NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowInstruction(
+        uint InstructionRawFileOffset,
+        byte InstructionByteLength,
+        string InstructionBytes,
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowInstructionKind Kind,
+        uint? EAXBefore,
+        uint? EAXAfter,
+        uint? EBXBefore,
+        uint? EBXAfter,
+        bool Attempted,
+        bool Reached,
+        bool Completed,
+        NetworkDispatcherLockGateFlags FlagsBefore,
+        NetworkDispatcherLockGateFlags FlagsAfter);
+
+public readonly record struct
+    NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowRead(
+        uint InstructionRawFileOffset,
+        uint Address,
+        byte Width,
+        bool Attempted,
+        bool Captured,
+        uint? Value);
+
+public sealed class
+    NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowPlan
+{
+    private readonly Lazy<
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnPlan>
+        reprojectedParentPlan;
+    private readonly Lazy<
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowPlan>
+        reprojectedPlan;
+    private readonly Lazy<bool> orderedSemanticPrefixPreserved;
+    private readonly Lazy<bool> exactBoundedCompletion;
+    private readonly Lazy<bool> exactCleanCompletion;
+
+    internal NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowPlan(
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowCapture capture,
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnPlan parentPlan,
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowOutcome outcome,
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowCaptureState
+            esiCaptureState,
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowCaptureState
+            ebxCaptureState,
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowCaptureState
+            dwordAtESIPlusA8CaptureState,
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowCaptureState
+            dwordAtESIPlusA4CaptureState,
+        ImmutableArray<
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowInstruction>
+            instructions,
+        ImmutableArray<
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowRead> reads,
+        ImmutableArray<uint> completedInstructionOffsets,
+        uint? stopAtRawFileOffsetExclusive,
+        NetworkDispatcherLockGateFlags? flagsAtStop,
+        uint? eax,
+        uint? ebx,
+        uint? esi,
+        bool projectionEntered)
+    {
+        Capture = capture;
+        ParentPlan = parentPlan;
+        Outcome = outcome;
+        ESICaptureState = esiCaptureState;
+        EBXCaptureState = ebxCaptureState;
+        DWORDAtESIPlusA8CaptureState = dwordAtESIPlusA8CaptureState;
+        DWORDAtESIPlusA4CaptureState = dwordAtESIPlusA4CaptureState;
+        Instructions = instructions;
+        Reads = reads;
+        CompletedInstructionOffsets = completedInstructionOffsets;
+        StopAtRawFileOffsetExclusive = stopAtRawFileOffsetExclusive;
+        FlagsAtStop = flagsAtStop;
+        EAX = eax;
+        EBX = ebx;
+        ESI = esi;
+        ProjectionEntered = projectionEntered;
+        reprojectedParentPlan = new(
+            () => NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnProjection
+                .Project(Capture.ParentCapture),
+            LazyThreadSafetyMode.ExecutionAndPublication);
+        reprojectedPlan = new(
+            () =>
+                NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowProjection
+                    .Project(Capture),
+            LazyThreadSafetyMode.ExecutionAndPublication);
+        orderedSemanticPrefixPreserved = new(
+            ComputeOrderedSemanticPrefixPreserved,
+            LazyThreadSafetyMode.ExecutionAndPublication);
+        exactBoundedCompletion = new(
+            ComputeExactBoundedCompletion,
+            LazyThreadSafetyMode.ExecutionAndPublication);
+        exactCleanCompletion = new(
+            () => ExactBoundedCompletion
+                && OrderedSemanticPrefixPreserved
+                && ParentPlan.ExactCleanCompletion,
+            LazyThreadSafetyMode.ExecutionAndPublication);
+    }
+
+    public NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowCapture Capture
+    {
+        get;
+    }
+    public NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnPlan ParentPlan
+    {
+        get;
+    }
+    public NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowOutcome Outcome
+    {
+        get;
+    }
+    public NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowCaptureState
+        ESICaptureState { get; }
+    public NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowCaptureState
+        EBXCaptureState { get; }
+    public NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowCaptureState
+        DWORDAtESIPlusA8CaptureState { get; }
+    public NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowCaptureState
+        DWORDAtESIPlusA4CaptureState { get; }
+    public ImmutableArray<
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowInstruction>
+        Instructions { get; }
+    public ImmutableArray<
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowRead> Reads { get; }
+    public ImmutableArray<uint> CompletedInstructionOffsets { get; }
+    public uint? StopAtRawFileOffsetExclusive { get; }
+    public NetworkDispatcherLockGateFlags? FlagsAtStop { get; }
+    public uint? EAX { get; }
+    public uint? EBX { get; }
+    public uint? ESI { get; }
+    public bool ProjectionEntered { get; }
+    public uint NextControlTransferRawFileOffset =>
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowProjection
+            .JBInstructionRawFileOffset;
+    public string NextControlTransferBytes =>
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowProjection
+            .JBInstructionBytes;
+    public uint NextControlTransferTargetRawFileOffset =>
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowProjection
+            .JBTargetRawFileOffset;
+    public bool BranchInstructionProjected => false;
+    public bool PostCallRegistersForwarded => false;
+    public bool PostCallFlagsForwarded => false;
+    public bool NativeInstructionsExecuted => false;
+    public bool NativeMemoryReadsExecuted => false;
+    public bool NativeMemoryWritesExecuted => false;
+    public bool ParentInstructionsExecuted => false;
+    public bool OrderedSemanticPrefixPreserved => orderedSemanticPrefixPreserved.Value;
+    public bool ExactBoundedCompletion => exactBoundedCompletion.Value;
+    public bool ExactCleanCompletion => exactCleanCompletion.Value;
+
+    private bool ComputeExactBoundedCompletion()
+    {
+        if (!ProjectionEntered
+            || !ParentPlan.ExactCleanCompletion
+            || Outcome
+                != NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowOutcome
+                    .BoundedBeforeJB
+            || ESICaptureState
+                != NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowCaptureState
+                    .Captured
+            || EBXCaptureState
+                != NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowCaptureState
+                    .Captured
+            || DWORDAtESIPlusA8CaptureState
+                != NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowCaptureState
+                    .Captured
+            || DWORDAtESIPlusA4CaptureState
+                != NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowCaptureState
+                    .Captured
+            || Instructions.Length != 5
+            || Instructions.Any(instruction => !instruction.Attempted
+                || !instruction.Reached || !instruction.Completed)
+            || !Instructions.Select(instruction => instruction.InstructionRawFileOffset)
+                .SequenceEqual([
+                    0x00BBDE6Fu,
+                    0x00BBDE75u,
+                    0x00BBDE76u,
+                    0x00BBDE7Cu,
+                    0x00BBDE7Fu
+                ])
+            || !CompletedInstructionOffsets.SequenceEqual(
+                ParentPlan.CompletedInstructionOffsets
+                    .Add(0x00BBDE6F)
+                    .Add(0x00BBDE75)
+                    .Add(0x00BBDE76)
+                    .Add(0x00BBDE7C)
+                    .Add(0x00BBDE7F))
+            || StopAtRawFileOffsetExclusive
+                != NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowProjection
+                    .StopAtRawFileOffsetExclusive)
+        {
+            return false;
+        }
+
+        uint eaxAfterShift = ShiftResult(
+            unchecked(Capture.FreshDWORDAtESIPlusA8!.Value
+                - Capture.FreshDWORDAtESIPlusA4!.Value));
+        uint ebxAfterIncrement = unchecked(Capture.FreshPostCallEBX!.Value + 1);
+        return FlagsAtStop
+            == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowProjection
+                .CompareFlags(eaxAfterShift, ebxAfterIncrement);
+    }
+
+    private bool ComputeOrderedSemanticPrefixPreserved()
+    {
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnPlan replayedParent =
+            reprojectedParentPlan.Value;
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowPlan replay =
+            reprojectedPlan.Value;
+        if (!SameParentPlan(ParentPlan, replayedParent)
+            || !ParentPlan.OrderedSemanticPrefixPreserved
+            || Capture != replay.Capture
+            || Outcome != replay.Outcome
+            || ESICaptureState != replay.ESICaptureState
+            || EBXCaptureState != replay.EBXCaptureState
+            || DWORDAtESIPlusA8CaptureState != replay.DWORDAtESIPlusA8CaptureState
+            || DWORDAtESIPlusA4CaptureState != replay.DWORDAtESIPlusA4CaptureState
+            || !Instructions.SequenceEqual(replay.Instructions)
+            || !Reads.SequenceEqual(replay.Reads)
+            || !CompletedInstructionOffsets.SequenceEqual(replay.CompletedInstructionOffsets)
+            || StopAtRawFileOffsetExclusive != replay.StopAtRawFileOffsetExclusive
+            || FlagsAtStop != replay.FlagsAtStop
+            || EAX != replay.EAX
+            || EBX != replay.EBX
+            || ESI != replay.ESI
+            || ProjectionEntered != replay.ProjectionEntered)
+        {
+            return false;
+        }
+
+        return ProjectionEntered
+            || (CompletedInstructionOffsets.SequenceEqual(ParentPlan.CompletedInstructionOffsets)
+                && StopAtRawFileOffsetExclusive == ParentPlan.StopAtRawFileOffsetExclusive
+                && FlagsAtStop == ParentPlan.FlagsAtStop);
+    }
+
+    private static bool SameParentPlan(
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnPlan left,
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnPlan right) =>
+        left.Capture == right.Capture
+        && left.ParentPlan.Capture == right.ParentPlan.Capture
+        && left.Outcome == right.Outcome
+        && left.Call == right.Call
+        && left.NormalReturnCaptureState == right.NormalReturnCaptureState
+        && left.CompletedInstructionOffsets.SequenceEqual(right.CompletedInstructionOffsets)
+        && left.StopAtRawFileOffsetExclusive == right.StopAtRawFileOffsetExclusive
+        && left.FlagsAtStop == right.FlagsAtStop
+        && left.CallBoundaryReached == right.CallBoundaryReached
+        && left.NextInstructionBoundaryReached == right.NextInstructionBoundaryReached
+        && left.ProjectionEntered == right.ProjectionEntered
+        && left.OrderedSemanticPrefixPreserved == right.OrderedSemanticPrefixPreserved
+        && left.ExactBoundedCompletion == right.ExactBoundedCompletion
+        && left.ExactCleanCompletion == right.ExactCleanCompletion;
+
+    private static uint ShiftResult(uint value) => unchecked((uint)((int)value >> 2));
+}
+
+public static class
+    NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowProjection
+{
+    public const uint EntryRawFileOffset = 0x00BBDE6F;
+    public const uint IncrementEBXRawFileOffset = 0x00BBDE75;
+    public const uint SubtractRawFileOffset = 0x00BBDE76;
+    public const uint ShiftRawFileOffset = 0x00BBDE7C;
+    public const uint CompareRawFileOffset = 0x00BBDE7F;
+    public const uint StopAtRawFileOffsetExclusive = 0x00BBDE81;
+    public const uint JBInstructionRawFileOffset = StopAtRawFileOffsetExclusive;
+    public const uint JBTargetRawFileOffset = 0x00BBDE40;
+    public const byte MoveEAXInstructionByteLength = 6;
+    public const byte IncrementEBXInstructionByteLength = 1;
+    public const byte SubtractInstructionByteLength = 6;
+    public const byte ShiftInstructionByteLength = 3;
+    public const byte CompareInstructionByteLength = 2;
+    public const byte JBInstructionByteLength = 2;
+    public const byte DWORDWidth = 4;
+    public const string MoveEAXInstructionBytes = "8B86A8000000";
+    public const string IncrementEBXInstructionBytes = "43";
+    public const string SubtractInstructionBytes = "2B86A4000000";
+    public const string ShiftInstructionBytes = "C1F802";
+    public const string CompareInstructionBytes = "3BD8";
+    public const string JBInstructionBytes = "72BD";
+    public const string CoordinatorWindowBytes = "8B86A8000000432B86A4000000C1F8023BD872BD";
+    public const bool BytesIndependentlyVerified = true;
+
+    public static bool ExecutesNativeInstructions => false;
+    public static bool ExecutesNativeMemoryReads => false;
+    public static bool ExecutesNativeMemoryWrites => false;
+
+    public static NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowPlan
+        Project(
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowCapture capture)
+    {
+        ArgumentNullException.ThrowIfNull(capture);
+        ArgumentNullException.ThrowIfNull(capture.ParentCapture);
+        ArgumentNullException.ThrowIfNull(capture.ParentCapture.ParentCapture);
+
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnPlan parent =
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnProjection.Project(
+                capture.ParentCapture);
+        bool parentAccepted =
+            capture.ParentCapture.CallSite
+                == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallSite.TakenTargetAtBBDE6C
+            && parent.ExactCleanCompletion
+            && parent.Outcome
+                == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnOutcome
+                    .BoundedAfterTargetCall
+            && parent.StopAtRawFileOffsetExclusive == EntryRawFileOffset;
+        if (!parentAccepted)
+        {
+            return CreatePlan(
+                capture,
+                parent,
+                NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowOutcome
+                    .ParentCallReturnNotAccepted,
+                StateForUnused(capture.FreshPostCallESI),
+                StateForUnused(capture.FreshPostCallEBX),
+                StateForUnused(capture.FreshDWORDAtESIPlusA8),
+                StateForUnused(capture.FreshDWORDAtESIPlusA4),
+                [],
+                [],
+                parent.CompletedInstructionOffsets,
+                parent.StopAtRawFileOffsetExclusive,
+                parent.FlagsAtStop,
+                null,
+                null,
+                null,
+                false);
+        }
+
+        NetworkDispatcherLockGateFlags callFlags = parent.FlagsAtStop ?? UnknownFlags;
+        if (capture.FreshPostCallESI is not uint esi)
+        {
+            return CreatePlan(
+                capture,
+                parent,
+                NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowOutcome
+                    .MissingPostCallESI,
+                NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowCaptureState
+                    .Missing,
+                StateForUnused(capture.FreshPostCallEBX),
+                StateForUnused(capture.FreshDWORDAtESIPlusA8),
+                StateForUnused(capture.FreshDWORDAtESIPlusA4),
+                [CreateInstruction(
+                    EntryRawFileOffset,
+                    NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowInstructionKind
+                        .MoveEAXFromESIPlusA8,
+                    null, null, null, null, true, false, callFlags, callFlags)],
+                [],
+                parent.CompletedInstructionOffsets,
+                EntryRawFileOffset,
+                parent.FlagsAtStop,
+                null,
+                null,
+                null,
+                true);
+        }
+
+        uint addressA8 = unchecked(esi + 0xA8);
+        var readA8 = CreateRead(EntryRawFileOffset, addressA8, capture.FreshDWORDAtESIPlusA8);
+        if (capture.FreshDWORDAtESIPlusA8 is not uint dwordA8)
+        {
+            return CreatePlan(
+                capture,
+                parent,
+                NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowOutcome
+                    .MissingDWORDAtESIPlusA8,
+                NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowCaptureState
+                    .Captured,
+                StateForUnused(capture.FreshPostCallEBX),
+                NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowCaptureState
+                    .Missing,
+                StateForUnused(capture.FreshDWORDAtESIPlusA4),
+                [CreateInstruction(
+                    EntryRawFileOffset,
+                    NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowInstructionKind
+                        .MoveEAXFromESIPlusA8,
+                    null, null, null, null, true, false, callFlags, callFlags)],
+                [readA8],
+                parent.CompletedInstructionOffsets,
+                EntryRawFileOffset,
+                parent.FlagsAtStop,
+                null,
+                null,
+                esi,
+                true);
+        }
+
+        var move = CreateInstruction(
+            EntryRawFileOffset,
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowInstructionKind
+                .MoveEAXFromESIPlusA8,
+            null,
+            dwordA8,
+            null,
+            null,
+            true,
+            true,
+            callFlags,
+            callFlags);
+        ImmutableArray<
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowInstruction>
+            instructions = [move];
+        ImmutableArray<
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowRead>
+            reads = [readA8];
+        ImmutableArray<uint> offsets =
+            parent.CompletedInstructionOffsets.Add(EntryRawFileOffset);
+
+        if (capture.FreshPostCallEBX is not uint ebxBefore)
+        {
+            var attemptedIncrement = CreateInstruction(
+                IncrementEBXRawFileOffset,
+                NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowInstructionKind
+                    .IncrementEBX,
+                dwordA8,
+                dwordA8,
+                null,
+                null,
+                true,
+                false,
+                callFlags,
+                callFlags);
+            return CreatePlan(
+                capture,
+                parent,
+                NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowOutcome
+                    .MissingPostCallEBX,
+                NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowCaptureState
+                    .Captured,
+                NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowCaptureState
+                    .Missing,
+                NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowCaptureState
+                    .Captured,
+                StateForUnused(capture.FreshDWORDAtESIPlusA4),
+                instructions.Add(attemptedIncrement),
+                reads,
+                offsets,
+                IncrementEBXRawFileOffset,
+                callFlags,
+                dwordA8,
+                null,
+                esi,
+                true);
+        }
+
+        uint ebxAfter = unchecked(ebxBefore + 1);
+        NetworkDispatcherLockGateFlags incrementFlags = IncrementFlags(ebxBefore, callFlags.Carry);
+        var increment = CreateInstruction(
+            IncrementEBXRawFileOffset,
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowInstructionKind
+                .IncrementEBX,
+            dwordA8,
+            dwordA8,
+            ebxBefore,
+            ebxAfter,
+            true,
+            true,
+            callFlags,
+            incrementFlags);
+        instructions = instructions.Add(increment);
+        offsets = offsets.Add(IncrementEBXRawFileOffset);
+
+        uint addressA4 = unchecked(esi + 0xA4);
+        var readA4 = CreateRead(SubtractRawFileOffset, addressA4, capture.FreshDWORDAtESIPlusA4);
+        reads = reads.Add(readA4);
+        if (capture.FreshDWORDAtESIPlusA4 is not uint dwordA4)
+        {
+            var attemptedSubtract = CreateInstruction(
+                SubtractRawFileOffset,
+                NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowInstructionKind
+                    .SubtractESIPlusA4FromEAX,
+                dwordA8,
+                null,
+                ebxAfter,
+                ebxAfter,
+                true,
+                false,
+                incrementFlags,
+                incrementFlags);
+            return CreatePlan(
+                capture,
+                parent,
+                NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowOutcome
+                    .MissingDWORDAtESIPlusA4,
+                NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowCaptureState
+                    .Captured,
+                NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowCaptureState
+                    .Captured,
+                NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowCaptureState
+                    .Captured,
+                NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowCaptureState
+                    .Missing,
+                instructions.Add(attemptedSubtract),
+                reads,
+                offsets,
+                SubtractRawFileOffset,
+                incrementFlags,
+                dwordA8,
+                ebxAfter,
+                esi,
+                true);
+        }
+
+        uint eaxAfterSubtract = unchecked(dwordA8 - dwordA4);
+        NetworkDispatcherLockGateFlags subtractFlags = SubtractFlags(dwordA8, dwordA4);
+        var subtract = CreateInstruction(
+            SubtractRawFileOffset,
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowInstructionKind
+                .SubtractESIPlusA4FromEAX,
+            dwordA8,
+            eaxAfterSubtract,
+            ebxAfter,
+            ebxAfter,
+            true,
+            true,
+            incrementFlags,
+            subtractFlags);
+        uint eaxAfterShift = ShiftResult(eaxAfterSubtract);
+        NetworkDispatcherLockGateFlags shiftFlags = ShiftFlags(eaxAfterSubtract);
+        var shift = CreateInstruction(
+            ShiftRawFileOffset,
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowInstructionKind
+                .ArithmeticShiftEAXRightByTwo,
+            eaxAfterSubtract,
+            eaxAfterShift,
+            ebxAfter,
+            ebxAfter,
+            true,
+            true,
+            subtractFlags,
+            shiftFlags);
+        NetworkDispatcherLockGateFlags compareFlags = CompareFlags(eaxAfterShift, ebxAfter);
+        var compare = CreateInstruction(
+            CompareRawFileOffset,
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowInstructionKind
+                .CompareEBXWithEAX,
+            eaxAfterShift,
+            eaxAfterShift,
+            ebxAfter,
+            ebxAfter,
+            true,
+            true,
+            shiftFlags,
+            compareFlags);
+
+        instructions = instructions.Add(subtract).Add(shift).Add(compare);
+        offsets = offsets
+            .Add(SubtractRawFileOffset)
+            .Add(ShiftRawFileOffset)
+            .Add(CompareRawFileOffset);
+        return CreatePlan(
+            capture,
+            parent,
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowOutcome
+                .BoundedBeforeJB,
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowCaptureState
+                .Captured,
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowCaptureState
+                .Captured,
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowCaptureState
+                .Captured,
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowCaptureState
+                .Captured,
+            instructions,
+            reads,
+            offsets,
+            StopAtRawFileOffsetExclusive,
+            compareFlags,
+            eaxAfterShift,
+            ebxAfter,
+            esi,
+            true);
+    }
+
+    public static NetworkDispatcherLockGateFlags IncrementFlags(uint value, bool? preservedCarry)
+    {
+        uint result = unchecked(value + 1);
+        return new(
+            Carry: preservedCarry,
+            Parity: (BitOperations.PopCount(result & 0xFF) & 1) == 0,
+            Auxiliary: (value & 0xF) == 0xF,
+            Zero: result == 0,
+            Sign: (result & 0x80000000) != 0,
+            Overflow: value == 0x7FFFFFFF);
+    }
+
+    public static NetworkDispatcherLockGateFlags SubtractFlags(uint left, uint right) =>
+        ArithmeticFlags(left, right, unchecked(left - right));
+
+    public static NetworkDispatcherLockGateFlags ShiftFlags(uint value)
+    {
+        uint result = ShiftResult(value);
+        return new(
+            Carry: (value & 0x2) != 0,
+            Parity: (BitOperations.PopCount(result & 0xFF) & 1) == 0,
+            Auxiliary: null,
+            Zero: result == 0,
+            Sign: (result & 0x80000000) != 0,
+            Overflow: null);
+    }
+
+    public static NetworkDispatcherLockGateFlags CompareFlags(uint eax, uint ebx) =>
+        ArithmeticFlags(ebx, eax, unchecked(ebx - eax));
+
+    private static NetworkDispatcherLockGateFlags ArithmeticFlags(
+        uint left,
+        uint right,
+        uint result) =>
+        new(
+            Carry: left < right,
+            Parity: (BitOperations.PopCount(result & 0xFF) & 1) == 0,
+            Auxiliary: ((left ^ right ^ result) & 0x10) != 0,
+            Zero: result == 0,
+            Sign: (result & 0x80000000) != 0,
+            Overflow: ((left ^ right) & (left ^ result) & 0x80000000) != 0);
+
+    private static uint ShiftResult(uint value) => unchecked((uint)((int)value >> 2));
+
+    private static NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowPlan
+        CreatePlan(
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowCapture capture,
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnPlan parent,
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowOutcome outcome,
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowCaptureState esiState,
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowCaptureState ebxState,
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowCaptureState a8State,
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowCaptureState a4State,
+            ImmutableArray<
+                NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowInstruction>
+                instructions,
+            ImmutableArray<
+                NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowRead> reads,
+            ImmutableArray<uint> offsets,
+            uint? stopAt,
+            NetworkDispatcherLockGateFlags? flags,
+            uint? eax,
+            uint? ebx,
+            uint? esi,
+            bool projectionEntered) =>
+        new(
+            capture,
+            parent,
+            outcome,
+            esiState,
+            ebxState,
+            a8State,
+            a4State,
+            instructions,
+            reads,
+            offsets,
+            stopAt,
+            flags,
+            eax,
+            ebx,
+            esi,
+            projectionEntered);
+
+    private static NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowInstruction
+        CreateInstruction(
+            uint rawFileOffset,
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowInstructionKind kind,
+            uint? eaxBefore,
+            uint? eaxAfter,
+            uint? ebxBefore,
+            uint? ebxAfter,
+            bool attempted,
+            bool completed,
+            NetworkDispatcherLockGateFlags flagsBefore,
+            NetworkDispatcherLockGateFlags flagsAfter)
+    {
+        (byte length, string bytes) = Encoding(kind);
+        return new(
+            rawFileOffset,
+            length,
+            bytes,
+            kind,
+            eaxBefore,
+            eaxAfter,
+            ebxBefore,
+            ebxAfter,
+            attempted,
+            true,
+            completed,
+            flagsBefore,
+            flagsAfter);
+    }
+
+    private static (byte Length, string Bytes) Encoding(
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowInstructionKind kind) =>
+        kind switch
+        {
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowInstructionKind
+                .MoveEAXFromESIPlusA8 => (MoveEAXInstructionByteLength, MoveEAXInstructionBytes),
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowInstructionKind
+                .IncrementEBX => (IncrementEBXInstructionByteLength, IncrementEBXInstructionBytes),
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowInstructionKind
+                .SubtractESIPlusA4FromEAX => (SubtractInstructionByteLength, SubtractInstructionBytes),
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowInstructionKind
+                .ArithmeticShiftEAXRightByTwo => (ShiftInstructionByteLength, ShiftInstructionBytes),
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowInstructionKind
+                .CompareEBXWithEAX => (CompareInstructionByteLength, CompareInstructionBytes),
+            _ => throw new ArgumentOutOfRangeException(nameof(kind))
+        };
+
+    private static NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowRead CreateRead(
+        uint instructionRawFileOffset,
+        uint address,
+        uint? value) =>
+        new(
+            instructionRawFileOffset,
+            address,
+            DWORDWidth,
+            Attempted: true,
+            Captured: value.HasValue,
+            value);
+
+    private static NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowCaptureState
+        StateForUnused(uint? value) =>
+        value.HasValue
+            ? NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowCaptureState
+                .SuppliedUnused
+            : NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowCaptureState
+                .Unreached;
+
+    private static NetworkDispatcherLockGateFlags UnknownFlags =>
+        new(Carry: null, Parity: null, Auxiliary: null, Zero: null, Sign: null, Overflow: null);
+}

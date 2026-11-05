@@ -314,6 +314,9 @@ internal static class GameSocketParserDiagnosticCleanupSecondXaddChecks
         check("Immutable input reprojects the complete LEA parent and second XADD evidence",
             replay.Capture == replaySource.Capture
             && replay.Outcome == replaySource.Outcome
+            && replay.ParentPlan.Capture == replay.Capture.ParentCapture
+            && replay.ParentPlan.ParentPlan.Capture
+                == replay.Capture.ParentCapture.ParentCapture
             && replay.FreshPostCallEBXCaptureState
                 == replaySource.FreshPostCallEBXCaptureState
             && replay.FreshDWORDCaptureState == replaySource.FreshDWORDCaptureState

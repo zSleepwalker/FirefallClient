@@ -68,6 +68,13 @@ internal static class NetworkDispatcherEntryFallbackDiagnosticZeroBranchChecks
                 .CompareInstructionBytes) == "3BC1"
             && Normalize(NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
                 .NextControlBoundaryInstructionBytes) == "740B"
+            && Normalize(NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                .FallThroughDestinationInstructionBytes) == "0FAEF8"
+            && Normalize(NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                .BranchTargetDestinationInstructionBytes) == "8B01"
+            && Normalize(NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                .ControlBoundaryAndDestinationAnchorBytes)
+                == "740B0FAEF80FAEE88B45F089018B01"
             && NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
                 .CoordinatorProvidedBytes.Length / 2 == 22
             && NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
@@ -89,7 +96,11 @@ internal static class NetworkDispatcherEntryFallbackDiagnosticZeroBranchChecks
             && NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
                 .RawFileOffsetToCodeVirtualAddress(0x00BBDE97) == 0x00FBEA97
             && NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                .RawFileOffsetToCodeVirtualAddress(0x00BBDE99) == 0x00FBEA99
+            && NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
                 .RawFileOffsetToCodeVirtualAddress(0x00BBDEA4) == 0x00FBEAA4
+            && NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                .ControlBoundaryAndDestinationAnchorBytes.Length / 2 == 15
             && NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
                 .RawFileOffsetToCodeVirtualAddress(0x00BBDE3E)
                 - 0x00BBDE3E
@@ -129,13 +140,13 @@ internal static class NetworkDispatcherEntryFallbackDiagnosticZeroBranchChecks
                     freshOpaqueCallEAX: 0x12345678,
                     freshOpaqueCallEBP: 0x10,
                     freshOpaqueCallESI: 0xFFFFFF98));
-        check("Fresh post-call captures complete value effects and stop before JZ",
+        check("Fresh post-call captures complete value effects through taken JZ",
             taken.ParentPlan.ExactCleanCompletion
             && taken.ParentPlan.EAX == 0
             && taken.ParentPlan.FlagsAtStop is { Zero: true }
             && taken.Outcome
                 == NetworkDispatcherEntryFallbackDiagnosticZeroBranchOutcome
-                    .CompletedBeforeConditionalBranchAtBBDE97
+                    .JzAtBBDE97TakenToBBDEA4
             && taken.BranchConditionCaptureState
                 == NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState.Captured
             && taken.TargetESICaptureState
@@ -262,9 +273,22 @@ internal static class NetworkDispatcherEntryFallbackDiagnosticZeroBranchChecks
                 BranchTargetRawFileOffset: 0x00BBDEA4,
                 BranchTargetCodeVirtualAddress: 0x00FBEAA4,
                 ZeroCondition: true,
+                Taken: true,
+                SelectedDestinationRawFileOffset: 0x00BBDEA4,
+                FlagsBefore: { Zero: true },
+                FlagsAfter: { Zero: true },
+                Reached: true,
+                Attempted: true,
+                BranchProjected: true
+            }
+            && taken.DestinationInstructionBoundary is {
+                InstructionRawFileOffset: 0x00BBDEA4,
+                InstructionCodeVirtualAddress: 0x00FBEAA4,
+                InstructionByteLength: 2,
+                InstructionBytes: "8B01",
                 Reached: true,
                 Attempted: false,
-                BranchProjected: false
+                InstructionExecuted: false
             }
             && taken.FlagsAtStop is {
                 Carry: false,
@@ -280,8 +304,8 @@ internal static class NetworkDispatcherEntryFallbackDiagnosticZeroBranchChecks
             && taken.ESI is null
             && taken.EAX is null
             && taken.EBX is null
-            && taken.StopAtRawFileOffsetExclusive == 0x00BBDE97
-            && taken.LastReachedRawFileOffset == 0x00BBDE95
+            && taken.StopAtRawFileOffsetExclusive == 0x00BBDEA4
+            && taken.LastReachedRawFileOffset == 0x00BBDE97
             && taken.CompletedInstructionOffsets.SequenceEqual(
                 taken.ParentPlan.CompletedInstructionOffsets
                     .Add(0x00BBDE3E)
@@ -290,7 +314,8 @@ internal static class NetworkDispatcherEntryFallbackDiagnosticZeroBranchChecks
                     .Add(0x00BBDE8C)
                     .Add(0x00BBDE8F)
                     .Add(0x00BBDE92)
-                    .Add(0x00BBDE95))
+                    .Add(0x00BBDE95)
+                    .Add(0x00BBDE97))
             && taken.BranchConditionFlagsPreserved
             && !taken.ConditionFlagsPreserved
             && !taken.PostCallFlagsForwarded
@@ -299,12 +324,69 @@ internal static class NetworkDispatcherEntryFallbackDiagnosticZeroBranchChecks
             && taken.PostCallEBX is null
             && taken.ExactBoundedCompletion
             && taken.ExactCleanCompletion
+            && taken.ControlBoundaryConditionCaptureState
+                == NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState.Captured
+            && taken.ControlBoundaryFlagsPreserved
             && !taken.BranchExecuted
             && !taken.TargetInstructionExecuted
             && !taken.CallExecuted
             && !taken.OpaqueCellReadExecuted
             && !taken.CalleeContinuationIdentified
             && !taken.NativeInstructionsExecuted);
+
+        NetworkDispatcherEntryFallbackDiagnosticZeroBranchPlan secondJzNotTaken =
+            NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection.Project(
+                CreateCapture(
+                    dwordAtA8: 0x12345678,
+                    dwordAtA4: 0x12345678,
+                    opaqueCallReturnedNormally: true,
+                    freshOpaqueCallEAX: 0x44,
+                    freshOpaqueCallEBP: 0x10,
+                    freshOpaqueCallESI: 0xFFFFFF99));
+        check("Nonzero CMP result selects JZ fall-through and stops before SFENCE",
+            secondJzNotTaken.ParentPlan.ExactCleanCompletion
+            && secondJzNotTaken.Jz is { Taken: true }
+            && secondJzNotTaken.Compare is {
+                EAXValue: 0,
+                ECXValue: 1,
+                FlagsAfter: { Zero: false }
+            }
+            && secondJzNotTaken.Outcome
+                == NetworkDispatcherEntryFallbackDiagnosticZeroBranchOutcome
+                    .JzAtBBDE97NotTakenToBBDE99
+            && secondJzNotTaken.NextControlBoundary is {
+                InstructionRawFileOffset: 0x00BBDE97,
+                InstructionCodeVirtualAddress: 0x00FBEA97,
+                InstructionByteLength: 2,
+                InstructionBytes: "740B",
+                SignedRelativeDisplacement: 0x0B,
+                NextInstructionRawFileOffset: 0x00BBDE99,
+                BranchTargetRawFileOffset: 0x00BBDEA4,
+                ZeroCondition: false,
+                Taken: false,
+                SelectedDestinationRawFileOffset: 0x00BBDE99,
+                Attempted: true,
+                BranchProjected: true
+            }
+            && secondJzNotTaken.DestinationInstructionBoundary is {
+                InstructionRawFileOffset: 0x00BBDE99,
+                InstructionCodeVirtualAddress: 0x00FBEA99,
+                InstructionByteLength: 3,
+                InstructionBytes: "0FAEF8",
+                Reached: true,
+                Attempted: false,
+                InstructionExecuted: false
+            }
+            && secondJzNotTaken.StopAtRawFileOffsetExclusive == 0x00BBDE99
+            && secondJzNotTaken.LastReachedRawFileOffset == 0x00BBDE97
+            && secondJzNotTaken.CompletedInstructionOffsets[^1] == 0x00BBDE97
+            && secondJzNotTaken.ControlBoundaryConditionCaptureState
+                == NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState.Captured
+            && secondJzNotTaken.FlagsAtStop == secondJzNotTaken.Compare.Value.FlagsAfter
+            && secondJzNotTaken.ExactBoundedCompletion
+            && secondJzNotTaken.ExactCleanCompletion
+            && secondJzNotTaken.ControlBoundaryFlagsPreserved
+            && !secondJzNotTaken.NativeInstructionsExecuted);
 
         NetworkDispatcherEntryFallbackDiagnosticZeroBranchPlan notTaken =
             NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection.Project(
@@ -322,6 +404,8 @@ internal static class NetworkDispatcherEntryFallbackDiagnosticZeroBranchChecks
                 == NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState.SuppliedUnused
             && notTaken.Jz is { Taken: false, Attempted: true, Reached: true, Committed: true }
             && notTaken.Jz.Value.SelectedDestinationRawFileOffset == 0x00BBDE40
+            && notTaken.NextControlBoundary is null
+            && notTaken.DestinationInstructionBoundary is null
             && notTaken.AddressCalculation is null
             && notTaken.CallBoundary is null
             && notTaken.NormalReturnCaptureState
@@ -487,6 +571,8 @@ internal static class NetworkDispatcherEntryFallbackDiagnosticZeroBranchChecks
             && rejectedParent.Jz is null
             && rejectedParent.AddressCalculation is null
             && rejectedParent.CallBoundary is null
+            && rejectedParent.NextControlBoundary is null
+            && rejectedParent.DestinationInstructionBoundary is null
             && rejectedParent.CompletedInstructionOffsets.SequenceEqual(
                 rejectedParent.ParentPlan.CompletedInstructionOffsets)
             && rejectedParent.StopAtRawFileOffsetExclusive
@@ -527,6 +613,9 @@ internal static class NetworkDispatcherEntryFallbackDiagnosticZeroBranchChecks
             && first.AddressCalculation == replay.AddressCalculation
             && first.CallBoundary == replay.CallBoundary
             && first.OpaqueCallReturn == replay.OpaqueCallReturn
+            && first.NextControlBoundary == replay.NextControlBoundary
+            && first.DestinationInstructionBoundary
+                == replay.DestinationInstructionBoundary
             && first.NormalReturnCaptureState == replay.NormalReturnCaptureState
             && first.CompletedInstructionOffsets.SequenceEqual(
                 replay.CompletedInstructionOffsets)

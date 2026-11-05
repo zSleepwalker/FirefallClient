@@ -216,6 +216,9 @@ internal static class GameSocketParserDiagnosticCleanupSecondXaddBranchChecks
             && replayClean
             && source.Capture == replay.Capture
             && source.Outcome == replay.Outcome
+            && replay.ParentPlan.Capture == replay.Capture.ParentCapture
+            && replay.ParentPlan.ParentPlan.Capture
+                == replay.Capture.ParentCapture.ParentCapture
             && source.ParentPlan.Capture == replay.ParentPlan.Capture
             && source.ParentPlan.Instructions.SequenceEqual(
                 replay.ParentPlan.Instructions)
