@@ -13031,6 +13031,15 @@ RootSizeLifecyclee70dfbbb; no edits/stagingtheirfiles untilrelease.
 Checkpoint92c0d92 pushed. AlternateFrameLoads reviewed/registered; corrected
 AF=true for80000000-1 and80000000-7FFFFFFF fixtures; runner3613 exit0.
 Active RootEpilogue992c98c8, RootSizee70dfbbb, AlignedFrame97c80bd7.
+RootSize reviewed/registered, added clean90D2 admission check.
+Runner3621 blockedbyactiveAlignedFrame incompatibleevidenceAddRange;
+owner97c80bd7 notified. RootEpilogue returnedforwronginitialpredicate
+(!IsCleanUnequal rather than !IsExactJmp9441) and entryconstant90CA.
+SecondFrameGate01b489bf active; native9122..912D bytes anchored pendingrun.
+RootEpilogue revision reviewed/registered; cleanunequal fixtures corrected
+to omitunusedrootwrite/epiloguecaptures. SecondFrameGate reviewed/registered;
+runner3624 exit0 including RootSize and nativeanchor. AlignedFrame released
+after evidenceconversion, reviewpending. ShiftedFrameGatefe4204d7 active.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional

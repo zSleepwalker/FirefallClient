@@ -703,6 +703,10 @@ or a nonreturning opaque call.
 The alternate paired frame loads at `12C910C` retain separate fresh values
 even when the first frame store aliases the second load. Both stores precede
 the comparison; equality stops before the opaque call at `12C911C`.
+The root-size lifecycle follows only the unequal root branch, while the
+root-epilogue lifecycle follows only completed root writes. The second
+frame gate at `12C9122` uses an independently captured frame value and
+stops before its own opaque call when equal.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
