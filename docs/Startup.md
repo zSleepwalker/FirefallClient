@@ -1218,6 +1218,9 @@ BBDEC4. Missing captures preserve earlier restored registers and flags.
 NetworkDispatcherFrameResetProjection resets ESP from the proven post-call
 EBP, then independently reads the saved EBP and advances ESP by four.
 It stops before RET4 at BBDEC7 and does not infer a return value or target.
+NetworkDispatcherReturnTransferProjection captures the fresh return target
+at the derived ESP and models the wrapping eight-byte RET4 adjustment.
+The destination is a runtime address, not a raw file offset, and is unentered.
 GameSocketParserStoredByteSelectorGateProjection derives EBX from the
 first header byte and selects BD3294 or BD326A using the fresh stack-byte
 JZ and ordered selector comparisons. Neither destination is entered.
@@ -1232,6 +1235,9 @@ before raw BBC8F0 or BBC9CB.
 NetworkIoErrorCallbackPostLoopByteGateProjection independently reloads two
 locals around a fresh byte comparison. The second MOV overwrites EAX but
 preserves CMP8 flags; the selected BBC8B0 or BBC9DB remains unentered.
+NetworkIoErrorCallbackExitPopProjection records independent EDI/ESI stack
+reads using fresh ESP, retains EAX/CMP8 flags and stops before the indirect
+call at BBC9DD. Rejected ancestors retain their actual bounded endpoints.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

@@ -14053,6 +14053,15 @@ fresh savedEBP, wrapping and earlier-POP alias. Lunaee5281f9 owns bounded
 RET4 target/stack transfer atC7; runtime destination remains unentered.
 Luna38c20082 implements IOCP9DB/9DC POPs through9DD fromfddb contract.
 Current draft exclusions ExitPop and ReturnTransfer; no native execution.
+RET4ee528 and ExitPop38c full EOF accepted4274exit0 ordinary full checks.
+Coordinator fixed RET4's reference to nonexistent parent LastReached using
+the nullable last observed frame instruction and compared immutable scalar
+effects, not nested-array identity. PostLoopByteGate now exposes wrapper
+bound completion separately from child completion to retain dirty ancestors.
+Luna8513749c models IOCP9DD target/normal-return boundary through9E3.
+Luna49c7b1e8 analyzes parser selector diagnostic pushes326A..3281 from
+fresh IDA42-byte window; no semantic interpretation of constant operands.
+Current exclusion only ExitCallReturn; ordinary full4274 is newest baseline.
 
 The user's finish-current-tasks-and-stop request supersedes earlier
 continuous-dispatch instructions. All current assignments are now released,

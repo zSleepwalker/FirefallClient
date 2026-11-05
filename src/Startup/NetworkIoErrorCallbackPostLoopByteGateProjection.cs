@@ -95,7 +95,15 @@ public sealed record NetworkIoErrorCallbackPostLoopByteGatePlan(
     bool ExactChildCompletion,
     bool ExactCleanCompletion,
     uint? LastReachedRawFileOffset,
-    uint? StopBeforeRawFileOffset);
+    uint? StopBeforeRawFileOffset)
+{
+    public bool BoundedCompletionBoundaryReached => ChildGateAdmitted
+        ? ChildBoundedCompletionBoundaryReached
+        : ParentLoopGatePlan.BoundedCompletionBoundaryReached;
+    public bool ExactBoundedCompletion => ChildGateAdmitted
+        ? ExactChildCompletion
+        : ParentLoopGatePlan.ExactBoundedCompletion;
+}
 
 /// <summary>
 /// Reprojects the clean loop-gate fallthrough and records the post-loop byte
