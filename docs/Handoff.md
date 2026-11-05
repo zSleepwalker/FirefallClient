@@ -13835,6 +13835,16 @@ clean completion property. runner4158exit0 exact parser-local/equality
 cleanup exclusions; target removed. Luna successors f5b32308 single
 queue attempt composition and978c7c11 posthelper packet-call preparation.
 No full append publication, packet execution, repost or RET claimed.
+Queue acquisition and sender preparation committed/pushedbf5f863.
+Fresh readonly IDA BD2F19 17bytes reconfirmed sender target BE3A00,
+PUSH EAX/F1F DWORD[ESP+14], MOV ECX,ESI, F25 CALL BD3030:
+E8E20A010050FF7424148BCEE806010000. Packet-call VA FD3C30.
+Equality cleanupe745 pair reviewed; coordinator added missing Projection
+alias and corrected parent effects assertion to exclude final DEC read/
+write. Registered runner4160exit0 exact parser/queueattempt/packetdraft
+exclusions; target removed. Luna22cc287e cleanup CALL and shared
+epilogue successor. bf8 declined external sample; coordinator freshly
+read BBDE0E92bytes and requested same-task contract mapping.
 SmallBinEpilogue released and full EOF reviewed: owner6d052038 revising
 wrong parent type, nullable value-plan access, missing successor-unused
 forwarding, child read/write effect markers and dirty-ring admission.

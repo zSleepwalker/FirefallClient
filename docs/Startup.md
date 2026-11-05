@@ -1084,6 +1084,11 @@ receive-result branch to the independent operation reload and sender
 helper call boundary. A zero operation requires explicit diagnostic-stack
 observations, including an independent stack pointer after normal return.
 Neither projection executes the imported or direct callees.
+CapacityFinalCalleeCommonNodeIndexedEqualityRingCleanupLifecycleProjection
+joins the exact five committed ring stores to the independent cleanup
+counter read and DEC/JNZ gate. The zero path stops before its cleanup
+call, while the nonzero destination remains unentered; neither path
+claims epilogue completion.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
