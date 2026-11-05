@@ -13201,6 +13201,13 @@ ea64136 pushedtwoentrycompositions. MaskOr/SavedIndexedStore reviewed
 registeredrunner3792 exit0; nativeOR8bytes/storegate14bytes anchorsadded.
 ActiveMaskSelectionOr9cca38e5/IndexStoreLifecycle11dcf839; RingWritesrevision
 8f4a7db1 pending. Keepagentfilesunstageduntilreview.
+204335e pushedOR/storegate. RingWritesrevisionreleasedbutreturnedagain:
+truncatedrawaddresses0x9323 vs012C9323, mutable/no namespace/noexactstop/
+tautologicalevidencechecks. Mustrewriteimmutablematchingrepositorypattern.
+ActiveSuccessorThreshold a12d0ee7/SavedMaskShift fed83fef/MaskAnd becd34ae/
+MaskSelectionOr9cca38e5/IndexStore11dcf839.
+Fresh925B..9263 2105CCADED01EB5A ANDfreshglobalVA1EDADCC withEAX
+readmodifywrite thenshortJMP92BD. Neverentercommon tail.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional

@@ -578,6 +578,17 @@ internal static class StartupBinaryEvidence
             Matches(0x12C9243, "8B5A1C89049DF8AEED0185C0752B")
             && RawCodeRangeMaps(0x12C9243, 14)
             && ShortConditionalBranchTargets(0x12C924F, 0x75, 0x12C927C));
+        check("Binary common successor threshold reads independently before unsigned rejection",
+            Matches(0x12C9334, "8B42083B05D8ADED010F8233FBFFFF")
+            && RawCodeRangeMaps(0x12C9334, 15)
+            && RelativeConditionalBranchTargets(0x12C933D, 0x0F, 0x82, 0x12C8E76));
+        check("Binary saved-mask shift reloads both operands before SHL and NOT",
+            Matches(0x12C9251, "8B4A1C8B45F8D3E0F7D0")
+            && RawCodeRangeMaps(0x12C9251, 10));
+        check("Binary common ring stores four independent links before the bounded epilogue jump",
+            Matches(0x12C9323, "89720889700C89460889560CE90D010000")
+            && RawCodeRangeMaps(0x12C9323, 17)
+            && RelativeBranchTargets(0x12C932F, 0xE9, 0x12C9441));
         check("Binary pinned-sample raw code [0xBE6325,0xBE6352) maps to VA 0x00FE6F25 and preserves its JNZ target",
             imageBase == 0x400000
             && Matches(0xBE6325, "8B4E0853578B7E108D04CDFFFFFFFF4921460C037E0C8BC7C1E80323C88B46048D1C8D00000000833C0300751C")
