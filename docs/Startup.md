@@ -882,6 +882,10 @@ captured at9292 and bounds the unsigned branch before the paired stores.
 IndexedFieldStoreZero derives TEST's EAX from the committed store value,
 retaining CMP flags when an earlier store is incomplete and replacing them
 only after TEST executes at9278.
+BacklinkNextThreshold derives the next CMP's ECX from the independent fresh
+read, not the stored backlink value. HighSizeCeilingLifecycle carries the
+shifted EAX into the ceiling check. NextPairedStores retains both directional
+MOV writes, including aliased destinations, before the92A4 read boundary.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

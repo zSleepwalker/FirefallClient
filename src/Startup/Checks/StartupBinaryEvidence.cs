@@ -629,6 +629,9 @@ internal static class StartupBinaryEvidence
             Matches(0x12C9292, "3B0DD8ADED010F82D8FBFFFF")
             && RawCodeRangeMaps(0x12C9292, 12)
             && RelativeConditionalBranchTargets(0x12C9298, 0x0F, 0x82, 0x12C8E76));
+        check("Binary next paired stores preserve both directions before the following fresh read",
+            Matches(0x12C929E, "894810894118")
+            && RawCodeRangeMaps(0x12C929E, 6));
         check("Binary pinned-sample raw code [0xBE6325,0xBE6352) maps to VA 0x00FE6F25 and preserves its JNZ target",
             imageBase == 0x400000
             && Matches(0xBE6325, "8B4E0853578B7E108D04CDFFFFFFFF4921460C037E0C8BC7C1E80323C88B46048D1C8D00000000833C0300751C")
