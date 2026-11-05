@@ -579,6 +579,11 @@ the two-write prelude's register values on later three-write branches.
 from the clean capacity branch at `12C9441`, retaining independent exit reads
 and opaque-call outputs. Any supplied optional exit capture on another route
 is marked unreached, including an otherwise empty capture.
+`CapacityFinalCalleeDescriptorReloadProjection` distinguishes the scaled
+LEA address and frame write from subsequent independent frame reloads.
+`CapacityFinalCalleeFrameMaskUpdateProjection` captures the variable-count
+shift with the x86 low-five-bit count, 32-bit complement, and fresh global
+AND read/write without reusing earlier frame or register values.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

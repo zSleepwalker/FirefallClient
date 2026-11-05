@@ -120,6 +120,8 @@ CapacityFinalCalleeTagEqualityLifecycleChecks.Run(Check);
 CapacityFinalCalleeSizeComparisonCallChecks.Run(Check);
 CapacityFinalCalleeAlignmentNonzeroLifecycleChecks.Run(Check);
 CapacityFinalCalleeTagEqualityExitLifecycleChecks.Run(Check);
+CapacityFinalCalleeDescriptorReloadChecks.Run(Check);
+CapacityFinalCalleeFrameMaskUpdateChecks.Run(Check);
 FrameHandoffCapacityAboveBranchLifecycleChecks.Run(Check);
 FrameHandoffCapacitySecondBranchLifecycleChecks.Run(Check);
 FrameHandoffCapacityFinalCallGateChecks.Run(Check);

@@ -12830,6 +12830,21 @@ FollowingEE9 freshlyreloads[EBP-4] toECX thenwrites[ECX+C]=EAX and
 [EAX+8]=ECX, freshglobal1EDADD8->EBX atEF2 before tagrouteEF8.
 This is observed disasm only beyondEE9; don't inferpointerownership.
 
+Latest checkpoint2ca46b2 pushed after canonicalrunner3361passed.
+Five releasedcomparison/equalitypairs nowcommitted; only activeFrameSize,
+DescriptorReload, FrameMaskUpdate files remainuncommitted.
+New DescriptorComparisonCall owner `84de9ca2-03df-4613-bfa0-ead88dd90b0e`
+active on verified20bytes raw12C8ED5..12C8EE9. Coordinatorowns registrations,
+evidenceanchors, docsandGit. AllagentsGPT-6Luna, no sampleexecution/IDBchanges.
+
+DescriptorReload and FrameMaskUpdate released/reviewed/registered;
+canonicalrunner3366 passed. FrameSize released but returned for clean
+size-terminal admission and nested blocked-capture flag corrections.
+New SizeDescriptorLifecycle owner `554fd250-7e96-4564-9b32-112353430b71`
+active; independent EBP/EBX always, independent ESI after sizeopaque call.
+DescriptorComparisonCall stillactive. Stage only reviewed scalarpairs,
+registrations/docs and pending descriptorcomparisonanchor for checkpoint.
+
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
 indirect callback, then fresh receiver+4C DEC and receiver+48 zero/INC.

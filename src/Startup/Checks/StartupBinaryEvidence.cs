@@ -374,6 +374,12 @@ internal static class StartupBinaryEvidence
             Matches(0x12C8EBE, "8B45EC3B45FC750F8B45F8D3E0F7D02105C8ADED01EB23")
             && RawCodeRangeMaps(0x12C8EBE, 23)
             && ShortConditionalBranchTargets(0x12C8EC4, 0x75, 0x12C8ED5));
+        check("Binary descriptor-comparison anchor retains two bypass gates and its independent opaque call",
+            Matches(0x12C8ED5, "3B45F0740F3BC372053970087406FF15244AAC01")
+            && RawCodeRangeMaps(0x12C8ED5, 20)
+            && ShortConditionalBranchTargets(0x12C8ED8, 0x74, 0x12C8EE9)
+            && ShortConditionalBranchTargets(0x12C8EDC, 0x72, 0x12C8EE3)
+            && ShortConditionalBranchTargets(0x12C8EE1, 0x74, 0x12C8EE9));
         check("Binary pinned-sample raw code [0xBE6325,0xBE6352) maps to VA 0x00FE6F25 and preserves its JNZ target",
             imageBase == 0x400000
             && Matches(0xBE6325, "8B4E0853578B7E108D04CDFFFFFFFF4921460C037E0C8BC7C1E80323C88B46048D1C8D00000000833C0300751C")
