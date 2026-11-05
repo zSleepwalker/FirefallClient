@@ -13938,6 +13938,12 @@ ExactBoundedproperty/nullableenumSequenceEqualcoordinatorfix. Targetremoved.
 Lunac22f5b92nextF88bufferstatusstore/freshCMPanalysis.
 Allcoordinatorbuilds nowforce noincremental UseSharedCompilation=false
 whileactiveSDKglobs/exclusions change; nofullordinaryrun yet.
+Parserfirstbyted380 fullEOFreviewcorrect finalCL/ECXlow3 versusflagsbit3,
+registered4206exit0 withfreshcentralanchorsheader41bytes/entry34/
+receive36/errorepilogue19. Targetremoved. Lunaa95bcc71secondbyte16bit
+rangegateanalysis. a550entrycall/0826outerepiloguereleasedreviewpending.
+Agentsd380/a550admittedbuildsdespiteinitialNOcommandsconstraints;
+reiteratednovalidationallactiveowners; coordinatorforcebuildonly.
 SmallBinEpilogue released and full EOF reviewed: owner6d052038 revising
 wrong parent type, nullable value-plan access, missing successor-unused
 forwarding, child read/write effect markers and dirty-ring admission.

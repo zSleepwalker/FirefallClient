@@ -1138,6 +1138,10 @@ continuation and the earlier diagnostic's explicitly observed normal
 return. Fresh post-call registers and an independent operation reload
 drive the stack store and TEST; it stops before the next diagnostic
 call or the nonzero destination, without claiming a repost.
+GameSocketParserFirstByteFieldsProjection records the first byte's four
+bit partitions and two byte stores, exhaustively covering all 256 scalar
+values. Final ECX contains the low three bits while flags retain the
+earlier bit-3 AND result; the second byte remains unread.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
