@@ -13917,6 +13917,14 @@ correctedAuxiliary allsixflags. CollectionExactBoundedCompletion added.
 Targetsremoved. Successors Lunacb2eb6e8firstentrycallanalysis,
 Lunaec54bcc3outercleanupcounterpair; Lunac24bb705receiveoperation
 reloadpair coversdirectF64ANDzeroF5BnormalfreshESPADD/ESI path.
+Publicatione6 revision fullEOF reviewed4192exit0 after4190localstates
+CS0136coordinatorrenameunreachedStates; targetremoved. Acceptedfresh
+payload/node/ESPcleanup flags andgenericreturnonlynotactualnativeRET.
+Luna7362d2b0outerqueuecontinuationanalysis. FreshIDAheaderF896bytes
+confirmedonebytecontract through321A stopsecondbyte321D; analysis
+finalCLbit3claimcorrectedMOVZXECXAL=>CLlow3; Lunad3808976pair.
+FreshIDA4D34bytesconfirmszeroentryindirectcell5D/nonzerovptrslot6C;
+Lunaa550ba21pair. c24receive/ec54counterreleasedreviewpending.
 SmallBinEpilogue released and full EOF reviewed: owner6d052038 revising
 wrong parent type, nullable value-plan access, missing successor-unused
 forwarding, child read/write effect markers and dirty-ring admission.

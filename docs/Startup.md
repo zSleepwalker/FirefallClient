@@ -1124,6 +1124,11 @@ CapacityFinalCalleeCommonNodeIndexedOuterEqualityRingLifecycleProjection
 composes root indexed equality with both fresh threshold reads and the
 five ring stores. Unsigned bypasses remain distinct from clean completion;
 the decrement at raw 0x12C942F remains unentered.
+GameSocketCompletionErrorQueuePublicationLifecycleProjection admits only
+a clean single-CAS success. It preserves fresh link, stack cleanup,
+payload, and node reload observations and distinct capture boundaries.
+Its generic return-value projection does not establish an actual native
+RET or the outer queue call's normal return.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
