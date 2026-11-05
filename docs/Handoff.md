@@ -14082,6 +14082,14 @@ from an admitted return. Fresh post-call ESP is never inferred from arguments.
 Luna4ba66bb2 owns fresh post-call ESI/DWORD INC at3289 and JMP328F to3473;
 provided bytes require no runtime or callee-semantic assumptions.
 Draft exclusions now ExitEbxRestore and SelectorDiagnosticCounterContinuation.
+Counter continuation4ba66bb2 full EOF reviewed and accepted4288exit0.
+Corrected fixture capture nesting, pre-call ESP expectation2FEC, missing/
+supplied-unused distinction, nullable OF assertion and VA mapping FD4073.
+Coordinator fresh IDA reconfirmed3289 FF86EC000000 E9DF010000 and read
+3473 prefix837D0C02 BF6E050000 8B542414 0F8372FDFFFF EB25.
+Lunaf6623fcc owns CMP[ freshEBP+C],2 / MOVEDI56E / MOVEDX[derivedESP14]
+through3480, stopping before JAE. New captures cannot infer post-call EBP.
+Lunade803c52 remains active; exclusions ExitEbxRestore/DestinationPrefix.
 
 The user's finish-current-tasks-and-stop request supersedes earlier
 continuous-dispatch instructions. All current assignments are now released,

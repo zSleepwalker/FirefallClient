@@ -1250,6 +1250,10 @@ GameSocketParserSelectorDiagnosticReturnCleanupProjection records an explicit
 opaque-call return observation and requires fresh post-call ESP for ADD ESP,14h
 at BD3286. Normal return invalidates earlier arithmetic flags; the ADD derives
 all six flags and stops before the DWORD increment at BD3289.
+GameSocketParserSelectorDiagnosticCounterContinuationProjection requires
+fresh post-call ESI and an independent DWORD at ESI+EC. Its wrapping INC
+preserves CF from the preceding ADD, leaves ESP unchanged, and follows the
+unconditional jump to raw BD3473 (code VA FD4073) without entering that target.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
