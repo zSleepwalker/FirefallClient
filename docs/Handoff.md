@@ -12050,3 +12050,10 @@ projection reviewed/registered and passes exhaustive header oracle. Nonzero
 marker callback owner `5f7d0aa1-1213-4a37-be6d-75ebb3c98e79`;
 read-only zero-marker callback trace owner
 `bb23bedf-bb08-47f4-87ab-a712189c8187` at `BE5B32`.
+
+Length callback follow-through review found missing partial stack state:
+length is already pushed before unresolved payload+8 or payload+4 reads.
+Preserved that single push and added assertions; pinned runner passes.
+Luna `5771a700-1616-43d5-b041-eacd07257703` owns unreliable residue/counter/
+joined-header composition; `74b92c04-9b25-4b67-93f4-2b1671d1159c`
+read-only traces BD58E0 register read widths, searching prior art first.

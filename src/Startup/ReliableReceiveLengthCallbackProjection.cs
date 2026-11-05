@@ -217,6 +217,7 @@ public static class ReliableReceiveLengthCallbackProjection
                 computedLength: length,
                 ecxArgumentAddress: ecxArgumentAddress,
                 payloadDwordAt8Address: payloadDwordAt8Address,
+                stackPushes: ImmutableArray.Create(length),
                 stopAt: PayloadDwordAt8ReadRawFileOffset);
         }
 
@@ -239,6 +240,7 @@ public static class ReliableReceiveLengthCallbackProjection
                 payloadDwordAt8Read: true,
                 payloadDwordAt8Address: payloadDwordAt8Address,
                 payloadDwordAt4Address: payloadDwordAt4Address,
+                stackPushes: ImmutableArray.Create(length),
                 stopAt: PayloadDwordAt4PushRawFileOffset);
         }
 

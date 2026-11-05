@@ -85,6 +85,8 @@ internal static class ReliableReceiveLengthCallbackChecks
             && missingPayload8.EcxArgumentAddress == 0x10203048
             && missingPayload8.EcxArgumentAddress != missingPayload8.Capture.PayloadDwordAt8
             && missingPayload8.ComputedLength == 0x000007FB
+            && missingPayload8.StackPushes.SequenceEqual(new uint[] { 0x7FB })
+            && missingPayload8.CallStackArguments.IsEmpty
             && missingPayload8.StopAtRawFileOffsetExclusive == 0x00BE53D4
             && payload8WithLaterCaptures.Outcome
                 == ReliableReceiveLengthCallbackOutcome.UnreachedCaptureProvided
@@ -105,6 +107,8 @@ internal static class ReliableReceiveLengthCallbackChecks
             && missingPayload4.PayloadDwordAt8Address == 0x10203048
             && missingPayload4.PayloadDwordAt4Address == 0x10203044
             && !missingPayload4.PayloadDwordAt4Read
+            && missingPayload4.StackPushes.SequenceEqual(new uint[] { uint.MaxValue })
+            && missingPayload4.CallStackArguments.IsEmpty
             && missingPayload4.StopAtRawFileOffsetExclusive == 0x00BE53D7
             && payload4WithLaterCaptures.Outcome
                 == ReliableReceiveLengthCallbackOutcome.UnreachedCaptureProvided
