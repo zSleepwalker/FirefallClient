@@ -1006,6 +1006,10 @@ into the address-only LEA and mask gate without repeating size classification.
 Its independent global read follows the earlier root effects, including
 aliases; dirty unused captures affect clean completion, not selected bounded
 exits at the opaque-call instruction or mask-branch destinations.
+IndexedTraversalSlotCleanupLifecycle appends the independent counter
+read/DEC/write/JNZ to the exact indexed four-store handoff. Earlier missing
+indexed, compare, child-read, and store operands remain reached attempts,
+not executed instructions; the cleanup branch destinations stay unentered.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

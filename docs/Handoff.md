@@ -13529,6 +13529,12 @@ fresh ECX and shifted mask EDI, not original size; ring EDX/EAX are the
 LEA bin pointer until successor read overwrites EAX. ESI derives from
 already-consumed parent capture; avoid falsely dirtying below-threshold
 successor exits by supplying inherited ESI as a fresh unused child capture.
+RightRootIndexedMask committed/pushed07494f6 (5files1231insertions).
+Luna1590a54d owns RightRootSmallBinRing zero/nonzero route composition.
+IndexedTraversalSlotCleanup revised pair reviewed/registered runner4102exit0,
+excluding only NodeIndexedTraversal and RightRootSmallBinRing unreviewed
+drafts. Target removed. Fixed parent enum, explicit capture nesting, aliased
+global read address1EDADD8, and added partial instruction execution cases.
 8948188B4A1085C974123B0DD8ADED010F82D8FBFFFF8948108941188B4A1485C974123B0DD8ADED010F82BFFBFFFF894814894118.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
