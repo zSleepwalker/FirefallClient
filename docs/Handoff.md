@@ -13260,6 +13260,12 @@ BacklinkNexta3628316-561d-4163-874a-857d15e41ce2.
 Ownerreportedisolatedtestdespiteprohibition; remindedcoordinatorsolevalidation.
 ActiveEaxBacklink522c45a4-c230-4619-aadc-688a492b0825,
 FieldStoreZero7ccf33c0 andHighSizeEntry10c754f1.
+9316d88pushed. HighSizeEntry/EaxBacklink reviewedregisteredrunner3887exit0.
+Removed fabricated XOR incomingECXzero event; strengthenedEaxBacklinkexact
+childoutcome/branch/unused gates and removed tautological stopcheck.
+ActiveFieldStoreZero7ccf33c0-c608-4c60-8eec-2fb75e17e37d,
+HighSizeCeilingee1beb7a-f222-4ec3-a385-f68a5fce94af,
+NextFieldThreshold544e5707-5f1d-4607-a145-a0cbbe10909f.
 8948188B4A1085C974123B0DD8ADED010F82D8FBFFFF8948108941188B4A1485C974123B0DD8ADED010F82BFFBFFFF894814894118.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,

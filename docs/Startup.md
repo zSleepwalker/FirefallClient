@@ -872,6 +872,9 @@ zero and preserving the selected92BD or927C destination without entering it.
 BacklinkNextField retains the9288 store attempt or commitment before independently
 reading [EDX+10]. Its TEST uses the fresh value even when the address aliases
 the preceding write, and stops before9292 or92A4.
+HighSizeEntry retains SHR's intermediate flags but uses TEST's replacement
+flags for the935B branch. EaxBacklink admits9288 only after an exact not-below
+threshold edge, preserving CMP flags until the child's fresh-value TEST.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
