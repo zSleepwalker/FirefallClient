@@ -13572,6 +13572,52 @@ Fresh IDA read rawBBC860 length395 independently confirmed IOCP worker
 bytes; Luna9ed77d9d owns NetworkIoCompletionPass projection/check pair
 outside the allocator chain. Cached imports and empty/fallback/dispatch
 semantics must be resolved from native evidence before assigning names.
+NodeIndexedTraversalZeroSlot pair committed/pushed4a649ad after ordinary
+full runner4110exit0. New Luna4c9f620c owns NodeIndexedTraversalSlotStores
+9468 four-store tail, deriving original indexed EDX and inherited ESI;
+Luna6d052038 still owns SmallBinEpilogue. All three active pairs need
+release/full EOF review before Program registration. Temporary target absent.
+IOCP9ed released pair full EOF reviewed and revision requested. Coordinator
+fresh IDA BBC911 length203 confirms unconditional FF55E4 GetLastError
+before BOOL branch; first draft consumed it only on empty failure.
+Null-key diagnostics do not license a callback on zero: native later reloads
+key and dereferences its vtable; success also rereads OVERLAPPED after
+diagnostic. Require independent late captures and bounded null-key stops.
+Import1AC4DA0 identity remains unverified by the separate1AC4378 mapping.
+Fix callback enum spelling and immutable captures/reached-unused visibility
+before registering. This pair remains unvalidated and uncommitted.
+NodeStores4c9 released/full EOF reviewed; revision requested for actual
+IterationPlan API, inherited ESI nesting, capture fixture layer, entry
+constant and incorrect overflow/alias CMP fixtures. Preserve parent
+bounded bypasses and dirty945C rather than deriving bounded completion
+only from admitted threshold/store exits. All three owners currently
+revising; do not register/build these drafts without review or exact
+temporary exclusions. Latest persisted code remains pushed4a649ad.
+SmallBinEpilogue revised and registered; runner4112 found two missing
+closing parentheses corrected by coordinator. runner4114 compiled, five
+fixture groups failed (TEST/pops/call/RET/alias). Owner revising explicit
+late ESP/EBP fixture captures; no validation success yet, target removed.
+Fresh original-PE import read: VA1AC4378/raw16C2F78 is
+KERNEL32.dll!GetLastError; VA1AC4DA0/raw16C39A0 is WSOCK32.dll ordinal111,
+not a named GetLastError import. IOCP owner informed to preserve ordinal
+identity until independently resolved. No sample execution performed.
+runner4116 node stores compile failed five nullable-to-bool flags conversions;
+owner implementing nullable six-field wrapper without false defaults.
+NodeStores registration removed pending release. runner4118 SmallBin
+compiled with only alias fixture failure remaining; owner correcting fresh
+successor EAX alias (default80000010 does not equal indexed-bin EDX).
+Temporary exclusions removed after each run; target currently absent.
+NodeStores and SmallBinEpilogue revisions reviewed/registered and
+runner4120exit0. Only unreviewed NetworkIoCompletionPass pair excluded;
+target removed immediately. Nullable flags retained; nonzero ring alias
+fixture now freshly captures bin EAX with lower threshold, not80000010.
+Both reviewed pairs ready for explicit Git commit/push. Latest ordinary
+full remains runner4110; IOCP revision and next-network379 evidence active.
+SmallBinEpilogue released and full EOF reviewed: owner6d052038 revising
+wrong parent type, nullable value-plan access, missing successor-unused
+forwarding, child read/write effect markers and dirty-ring admission.
+Do not register this draft yet; preserve selected bounded9441 when dirty
+admission is blocked. Successor IOCP9ed and NodeStores4c9 remain active.
 8948188B4A1085C974123B0DD8ADED010F82D8FBFFFF8948108941188B4A1485C974123B0DD8ADED010F82BFFBFFFF894814894118.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,

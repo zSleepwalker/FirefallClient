@@ -1024,6 +1024,11 @@ NodeIndexedTraversalZeroSlotLifecycle connects only the clean zero-child
 branch to a fresh threshold CMP/JB. The LEA child-slot address supplies ECX,
 missing threshold data preserves the prior TEST flags, and unused child data
 blocks admission without erasing the already selected bounded exit.
+NodeIndexedTraversalSlotStoresLifecycle extends the admitted not-below
+route with four ordered stores and the cleanup jump, retaining original
+indexed EDX rather than the zero-child value. SmallBinEpilogueLifecycle
+admits either completed ring tail directly to the gated epilogue without
+a cleanup-counter decrement; equal-root bypasses remain distinct.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
