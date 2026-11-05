@@ -12011,3 +12011,36 @@ forwarding-to-return composition; `028ba578-4400-4fcc-866b-40781a947369`
 callback-result diagnostic; `facf7d53-325f-4a74-8f97-063ac1df3eae`
 masked-length callback; `259158f9-28fb-4f03-ad44-790eadfd311c`
 independent frame+8 slot publication suffix.
+
+Pushed callback gate and paired recycle returns as `2340038`.
+Completed callback/recycle immutable evidence owner `ba5ec568...` reviewed;
+sole successor evidence writer `91f74030-0034-409c-bb97-fb80bf3eb508`
+owns result/length/scalar/publication windows, preserving prior anchors.
+Coordinator independently read raw `[BE53DD,BE53E9)`:
+`8BD08ACBE8FA04FFFF83C404` (EDX=EAX, CL=BL, call BD58E0,
+normal cleanup 4); Luna `0d95196c-54e8-4ede-8136-4422c18df574`
+owns its code/checks, optional captured ECX upper bits, not whole-byte widening.
+Unreliable continuation trace read: `[BE5AE4,BE5AF0)` is
+`8B4F088D46FF83C41401411C`: receiver+8 read, ESI-1 in EAX,
+cleanup 20, add to counter at loaded pointer+1C. Luna
+`6a7be6fb-8fdd-4844-af5a-ca112ba41338` owns this code/check pair.
+Trace's raw BE2F50 VA arithmetic was wrong: correct VA `FE3B50`,
+not `FE6B50`; no mapping disagreement.
+
+Forwarding composition, publication suffix, callback-result, masked-length
+files reviewed/registered. Corrected composition's comparison of two distinct
+enum types and moved tail projection after route/pointer validation so invalid
+captures expose no projected tail effects. Runner blocked by masked-length
+author's out-of-position named arguments; same author notified.
+Luna `a40154ba-872b-4329-98e9-8d00744edc32` owns unreliable joined-header
+preparation `[BE5AF0,BE5B16)`, including ESI=zero-extended AX after DWORD
+length subtraction, independent WORD reload, frame stores and selector branch.
+
+Seven new code/check registrations now pass pinned runner: forwarding-return
+composition, callback-result, masked-length, publication, scalar handoff,
+unreliable residue handoff/counter. Fixed composition mismatch tests to
+require absent tail plans. Sole evidence writer now
+`f3ab3f11-8915-46aa-a3f7-c8ddd2e2195c` adds unreliable windows and preserves
+completed pending receive result/publication anchors.
+Read-only Luna `f2c08a16-984e-425d-a41f-1ec7ef89d6af` traces unreliable
+post-callback `BE5B25`, stopping at next opaque handoff.

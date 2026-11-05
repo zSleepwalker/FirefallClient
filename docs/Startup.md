@@ -343,6 +343,20 @@ PE import names identify cell VA `0x1AC4424` as `std::_Xbad_alloc`, `0x1AC45C0` 
 
 `ReliableReceiveEmptySlotCallbackProjection` covers `[0xBE538D,0xBE53A2)`. MOV BX/SHR BX/AND BL select header bits 12/13; zero branches to `BE53E9`. Otherwise DWORD[payload+8] supplies the base of an indirect target read at +C, while ECX is the address payload+8. No stack arguments are explicitly pushed. Target/address zero is a captured scalar, not a null guard or validity guarantee.
 
+`ReliableReceiveForwardingReturnProjection` composes the forwarding caller and recycle-return projections. Only completed caller cleanup admits a tail capture. Route and the independently reloaded receiver+8/EAX pointer must match before projecting any tail effects. A mismatched route/pointer or incomplete return cannot be mistaken for completion from its raw boundary alone.
+
+`ReliableReceiveCallbackResultProjection` covers the callback-return TEST/JNZ at raw `BE53A2` and zero-result diagnostic handoff through `BE53BC`. Nonzero EAX branches to `BE53BF`; zero pushes `0`, `205`, `1B58B27`, `1B58BDA` through absolute cell `1C15EA0`. Its separate cleanup is outside this projection.
+
+`ReliableReceiveLengthCallbackProjection` covers `[BE53BF,BE53DD)` after the nonzero-result edge. Independently reloaded header WORD is masked with `7FF`, zero-extended, then subtracts four with DWORD wrap. Length is pushed before payload+8 is read; payload+4 is read/pushed next, then the indirect target at the loaded pointer+4. ECX is payload+8's address, not contents.
+
+`ReliableReceiveSlotPublicationProjection` covers `[BE53E9,BE53F7)`. An independent frame+8 DWORD reload supplies the address for the payload pointer write, then AL=1 preserves the pointer's upper 24 EAX bits before pops and RET 4. The captured pointer need not equal an earlier frame write; zero is not guarded. All effects remain projections, not access-success guarantees.
+
+`ReliableReceiveCallbackScalarHandoffProjection` covers `[BE53DD,BE53E9)`. EDX receives captured callback EAX; CL receives retained BL without inventing ECX's upper 24 bits. The opaque call to raw `BD58E0` has no explicit pushes in this window; its normal return gates the four-byte cleanup.
+
+`UnreliableReceiveResidueHandoffProjection` covers `[BE5AC2,BE5AE4)` under the validated earlier masked receiver-minus-payload residue gate. The reversed difference is truncated to a WORD; residues at most one bypass the helper to `BE5AF0`. Otherwise it pushes receiver+4, residue-minus-one, literal `1BB8D04`, zero, receiver+18 to raw `BE2F50`, preserving independent reads and normal-return capture.
+
+`UnreliableReceiveResidueCounterProjection` covers `[BE5AE4,BE5AF0)` only after normal helper return. Receiver+8 is independently read, EAX becomes retained ESI minus one with DWORD wrap, 20 stack bytes are cleaned up, then that value is added to the independently captured counter at loaded-pointer+1C. A missing counter capture retains the earlier cleanup but projects no counter write.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves

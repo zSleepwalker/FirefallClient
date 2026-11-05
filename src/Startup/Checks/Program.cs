@@ -18,6 +18,13 @@ ReliableReceiveForwardingCallerChecks.Run(Check);
 ReliableReceiveRecordWordChecks.Run(Check);
 ReliableReceiveRecycleReturnChecks.Run(Check);
 ReliableReceiveEmptySlotCallbackChecks.Run(Check);
+ReliableReceiveForwardingReturnChecks.Run(Check);
+ReliableReceiveSlotPublicationChecks.Run(Check);
+ReliableReceiveCallbackResultChecks.Run(Check);
+ReliableReceiveLengthCallbackChecks.Run(Check);
+ReliableReceiveCallbackScalarHandoffChecks.Run(Check);
+UnreliableReceiveResidueCounterChecks.Run(Check);
+UnreliableReceiveResidueHandoffChecks.Run(Check);
 PayloadGrowthZeroFillChecks.Run(Check);
 
 void Check(string name, bool condition)
