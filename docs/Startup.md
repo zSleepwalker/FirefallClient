@@ -423,6 +423,8 @@ The reliable masked-length callback's validated entry also admits the zero-resul
 
 `FrameHandoffCapacitySeedLoopProjection` derives a single iteration's ESI/EDX from the seed and validates optional identities before projecting it. `FrameHandoffSlotCallPublicationProjection` carries native receiver ESI, slot byte offset EBX and wrapping sum EDI into publication; nonzero-slot routes skip calls/stores, while zero-slot routes require unflagged call results. `FrameHandoffPublicationReturnProjection` validates formed ECX and receiver ESI before final reads, writes and increment.
 
+`FrameHandoffContinuationLifecycleProjection` uses the effective call-derived publication capture to compose the complete `BE64C5..BE652F` continuation. `FrameHandoffCapacityPrefixProjection` preserves the receiver+C read, ordered frame-8/frame-4 stores and unsigned scaling gate before the call. `FrameHandoffCapacityCallProjection` models cleanup4 before the returned EAX frame store, the nonzero return gate and independent indirect-call return; invalid entry routes and unreached captures cannot authorize successful admission.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves

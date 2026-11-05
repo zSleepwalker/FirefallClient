@@ -12369,6 +12369,14 @@ BE6BCA..FD. Return-join read-only owner
 `83375c4c-050c-44eb-9a8f-5d1c1467a78f` tracesFD..BE6C10.
 Do not use broad latercall/zero-fill report before bounded verification.
 
+Latest pushed HEAD `77c9d36` pins prefix/call anchors.
+CapacityPrefix/CapacityCall/ContinuationLifecycle reviewed/registered,
+passing. Coordinator rejected invalid enum call routes (previously fell
+through to direct call), added fixture, and corrected continuation fixture
+whose flagged first-stage was already blocked, not nominally complete.
+PrefixCall composition owner `76dc753e-9c3a-453c-af27-e51cbb14a729`
+owns new pair. Active Transfer77f0d27f and ReturnJoin83375c4c remain.
+
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
 indirect callback, then fresh receiver+4C DEC and receiver+48 zero/INC.
