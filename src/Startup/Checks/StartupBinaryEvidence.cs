@@ -7313,6 +7313,10 @@ internal static class StartupBinaryEvidence
         check("Binary receive helper return pushes fresh count before the packet-call boundary",
             Matches(0xBD2F1E, "50FF7424148BCE")
             && RelativeBranchTargets(0xBD2F25, 0xE8, 0xBD3030));
+        check("Binary packet return prepares three stack fields before its operation branch",
+            Matches(0xBD2F2A, "83BEF40D0000008D8678020000C744241C0000000089442428C74424247805000075176A006A5B6858EAC5016858EAC501FF15A05EC10183C410"));
+        check("Binary parser resize return extracts a fresh pointer before the header-byte boundary",
+            Matches(0xBD31DC, "8B54243885D274058B5204EB0233D289542414BF6E050000895424248A02"));
         check("Binary nonzero parser dispatches through a fresh stack-local vtable before preserve-one resize",
             Matches(0xBD31C5, "8D4C24348B442434FF500C6A01508D4C243C")
             && RelativeBranchTargets(0xBD31D7, 0xE8, 0x12CBCB0)

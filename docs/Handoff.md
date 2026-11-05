@@ -13878,6 +13878,17 @@ after4168compilefailure; addedpendingcellTESTflags/dirtyunusedcell
 RET fixtures. Registered4170exit0 exact queueattempt/collection/post-
 packetstackdraft exclusions; targetremoved. Luna5ab327d8 outer/root
 indexed equality9403 compositiongap successor analysis.
+Equality cleanup epilogue committed/pushedcfe742c. Fresh postpacket
+58byte and postresize pointer27byte centralanchors runner4172exit0
+exactqueueattempt/collection/postpacketstackexclusions targetremoved,
+anchorsawaitnextcodecommit. ActiveLunaf5brevision e64collection
+28c6stackprep 16e4pointeranalysis 5abouteranalysis.
+Queuef5b revision reviewed coordinatornullableOutcome4174 andwrapper
+fixtureparameter4176compilefixes;4178exit0 exactcollection/postpacket/
+parserpointerdraft exclusions targetremoved. Registered. Lunae6b11c36
+success-only publication successor. Parserpointer16e4 reportconsumed
+samehash/directbytesconfirmed; Luna12b78516 boundedpointeradapter.
+Outer5ab confirmsseparateouterequal9403 admissiongap, nochildreplay.
 SmallBinEpilogue released and full EOF reviewed: owner6d052038 revising
 wrong parent type, nullable value-plan access, missing successor-unused
 forwarding, child read/write effect markers and dirty-ring admission.

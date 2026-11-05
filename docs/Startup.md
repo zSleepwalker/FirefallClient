@@ -1103,6 +1103,11 @@ joins the five-store cleanup counter paths to the shared bit-1 TEST
 epilogue. Only an observed normal zero-counter cleanup return enters
 that epilogue; unused return captures dirty clean admission without
 erasing an actual bounded RET.
+GameSocketCompletionErrorQueueAttemptLifecycleProjection joins a clean
+nonzero acquisition to one generic append attempt. It keeps tag and tail
+reads independent, compares returned EAX before EDX, and stops at retry
+or pre-publication success. CMPXCHG8B changes only ZF; the preceding OR
+provides the preserved non-ZF flags. No retry or publication is executed.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
