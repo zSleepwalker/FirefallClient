@@ -863,6 +863,10 @@ AlternateRing shares the four-store mechanism while retaining9343's distinct
 instruction evidence. SavedIndexReject derives EBX only from the later absolute
 reload. RejectField retains ECX into the fresh field comparison; IndexedFieldStore
 selects +10 or +14 and preserves CMP flags through the bounded9278 handoff.
+SavedIndexedZeroMask keeps both reloads independent of the preceding zero
+store, restoring the parent TEST flags when the masked SHL count is zero.
+SuccessorRing derives EAX from the fresh successor read and retains EDX,
+admitting the alternate ring only at the exact not-below9343 edge.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

@@ -13247,6 +13247,11 @@ SavedZeroMask3a3c19f7 releasedbutpendingreview; SuccessorRing57243020
 revisionrequested exactgate/successfulESIclean/consumer-gatedEAX.
 ActiveBacklinkNexta3628316-561d-4163-874a-857d15e41ce2 and
 PostStoreZeroc3ea8a36-64a7-4e22-8272-7dbc8c44a320.
+c7e55c6pushedreviewedbatch. SavedZeroMaskandSuccessorRingrevisionreviewed
+registeredrunner3845exit0. ZeroMaskfixturecount9incorrectlyexpectedzero:
+changedto32; retainedindependentaliasframeA5 notpriorzerostore.
+SuccessorRingrevisionexactgateandESIclean fixed; addedmissingprerequisitechecks.
+ActiveBacklinkNexta3628316 andPostStoreZeroc3ea8a36 only.
 8948188B4A1085C974123B0DD8ADED010F82D8FBFFFF8948108941188B4A1485C974123B0DD8ADED010F82BFFBFFFF894814894118.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
