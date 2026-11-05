@@ -13545,6 +13545,17 @@ EntryRawFileOffset corrected to upstream node entry, separate iteration
 entry93E4. Excluded only IndexedCleanupEpilogue and RightRootSmallBinRing
 unreviewed drafts; target removed. Both other pairs full EOF reviewed and
 returned for exact fixture/API corrections to their exclusive owners.
+NodeIndexedTraversal committed/pusheda186d21 (5files945insertions).
+Luna73bc7518 owns NodeTraversalZeroSlot exact zero945C threshold successor.
+Luna1590a54d revises small-bin ring pair;89c4b333 revises indexed epilogue
+pair. Latest reviewed-subset runner4104exit0; no temporary target remains.
+IndexedCleanupEpilogue and RightRootSmallBinRing released revisions
+reviewed/registered runner4106exit0. Only NodeTraversalZeroSlot draft
+excluded; temporary target removed. Fixed indexed epilogue full effect
+count19, null stack captures on clean zero bypass, actual unused post-call
+EBP input, and wrap/missing-pop checks. Small-bin corrected capture nesting,
+missing inherited ESI stops in parent92C2, aliased fixture values, internal
+entry, and selected below-threshold destination fallback.
 8948188B4A1085C974123B0DD8ADED010F82D8FBFFFF8948108941188B4A1485C974123B0DD8ADED010F82BFFBFFFF894814894118.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,

@@ -1014,6 +1014,12 @@ NodeIndexedTraversalLifecycle extends the exact nonzero indexed-mask/tag
 unequal handoff through one traversal iteration. EBX comes from the completed
 tag shift, EDX from the fresh indexed pointer, and EDI from the original size.
 It does not reread the tag or enter another iteration at the loop boundary.
+IndexedCleanupEpilogueLifecycle extends the indexed counter's exact nonzero
+handoff to the gated epilogue, preserving ten parent effects before the TEST
+and independent stack/call observations. RightRootSmallBinRingLifecycle
+extends the mask branches through their OR/ring or successor-threshold/ring
+tails, deriving inherited ESI and preserving independent fresh thresholds.
+Neither ring tail enters the selected epilogue or abort destination.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
