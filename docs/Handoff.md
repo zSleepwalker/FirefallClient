@@ -13028,6 +13028,9 @@ registered. AlternateRootLifecycle reviewed/registered; cleanunequal90F6
 admission corrected and final9441 verified; runner3609 exit0. FrameLoads
 nativeanchor910C..9122 included. ActiveFrameLoads b2c47863 and
 RootSizeLifecyclee70dfbbb; no edits/stagingtheirfiles untilrelease.
+Checkpoint92c0d92 pushed. AlternateFrameLoads reviewed/registered; corrected
+AF=true for80000000-1 and80000000-7FFFFFFF fixtures; runner3613 exit0.
+Active RootEpilogue992c98c8, RootSizee70dfbbb, AlignedFrame97c80bd7.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional

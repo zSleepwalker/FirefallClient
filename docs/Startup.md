@@ -700,6 +700,9 @@ its clean unequal exit remains bounded. The aligned-size projection stores
 the shifted value before the unsigned threshold branch. The alternate
 epilogue lifecycle preserves preceding writes on missing stack evidence
 or a nonreturning opaque call.
+The alternate paired frame loads at `12C910C` retain separate fresh values
+even when the first frame store aliases the second load. Both stores precede
+the comparison; equality stops before the opaque call at `12C911C`.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
