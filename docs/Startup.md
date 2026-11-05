@@ -673,6 +673,12 @@ against a fresh global at `12C908B`, then performs the two ordered stores
 and jumps to `12C8EF2`. `CapacityFinalCalleeConditionalGuardedLifecycleProjection`
 joins only clean nonzero conditional-store routes to `12C9058`; retained
 registers are supplied only at reached consumers, with independent later reads.
+`CapacityFinalCalleeSecondTestTailLifecycleProjection` joins the fresh
+nonzero second-field value at `12C908B` to the final guard, with EAX
+remaining an independent live-in. `CapacityFinalCalleeAlternateTagGateProjection`
+starts separately at `12C90A2`, masks a fresh DWORD, and retains byte-width
+CMP flags. It is reached from the `12C8E51` branch, not by fallthrough from
+the final paired stores.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

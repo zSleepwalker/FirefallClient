@@ -438,6 +438,15 @@ internal static class StartupBinaryEvidence
             && RawCodeRangeMaps(0x12C908B, 23)
             && RelativeConditionalBranchTargets(0x12C9091, 0x0F, 0x82, 0x12C8E76)
             && RelativeBranchTargets(0x12C909D, 0xE9, 0x12C8EF2));
+        check("Binary alternate tag gate masks the loaded DWORD before its byte comparison",
+            Matches(0x12C90A2, "8B420483E0033C030F8548FEFFFF")
+            && RawCodeRangeMaps(0x12C90A2, 14)
+            && RelativeConditionalBranchTargets(0x12C90AA, 0x0F, 0x85, 0x12C8EF8)
+            && RelativeConditionalBranchTargets(0x12C8E51, 0x0F, 0x84, 0x12C90A2));
+        check("Binary alternate field writes clear a fresh low bit before EDI-derived stores",
+            Matches(0x12C90B0, "893DD0ADED018BC7836204FE83C801894604893C3EE977030000")
+            && RawCodeRangeMaps(0x12C90B0, 26)
+            && RelativeBranchTargets(0x12C90C5, 0xE9, 0x12C9441));
         check("Binary pinned-sample raw code [0xBE6325,0xBE6352) maps to VA 0x00FE6F25 and preserves its JNZ target",
             imageBase == 0x400000
             && Matches(0xBE6325, "8B4E0853578B7E108D04CDFFFFFFFF4921460C037E0C8BC7C1E80323C88B46048D1C8D00000000833C0300751C")

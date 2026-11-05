@@ -12979,6 +12979,19 @@ Checkpoint6ab2786 pushed. FinalPairedTail reviewed/registered, runner3544
 exit0; ConditionalGuarded reviewed/registered with explicit guarded-stop
 guards, runner3545 exit0. SecondTestTail427a8112-1ce9-4999-9cfc-42dfa3dc0478
 active. GuardedSuccessor7cc29746 and IndexedGuarded9d594cf2 remain active.
+Checkpointfec7965 pushed. SecondTestTail released/reviewed/registered but
+runner3548/3550 blocked by active IndexedGuarded nullable compilation
+errors; owner notified. Not validated/committed yet. Alternate90A2..90B0
+bytes and inbound8E51 independently verified/anchored; correctVA16C9CA2,
+evidence agent's1309CA2 was wrong. AlternateTagGate78ef9728 active;
+AlternateSuccessorEvidence2e747d02 active90B0 trace. GuardedSuccessor
+released/reviewed, returned to owner to block BEFORE child projection on
+unselected branch captures and expose explicit unreached flags.
+Runner3555 exit0: SecondTestTail and AlternateTagGate reviewed/registered
+and validated. Alternate90B0..90CA nativebytes independently verified and
+anchored offline; AlternateFieldWrites0c16c1f3-17a3-443f-b84e-2d9de78d116d
+active. IndexedGuarded9d594cf2 fixed compileblocks but remains active;
+GuardedSuccessor7cc29746 revision active; PairedFinal88ecf267 active.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
