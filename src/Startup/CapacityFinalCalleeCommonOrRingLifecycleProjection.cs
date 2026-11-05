@@ -212,6 +212,8 @@ public static class CapacityFinalCalleeCommonOrRingLifecycleProjection
             && child.ExactCleanCompletion
             && child.StopAtRawFileOffsetExclusive == CompletionRawFileOffset
             && branchReached
+            && child.BranchTargetRawFileOffset == CompletionRawFileOffset
+            && !externalUnusedChildEntryEAXCaptureProvided
             && !child.DestinationEntered;
 
         return new(capture, outcome)

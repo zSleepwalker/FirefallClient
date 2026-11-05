@@ -13240,6 +13240,13 @@ ActiveIndexedField6d3902da/EaxThresholdfd457a5f/IndexRejectLifecyclead27c350.
 Fixed sameCMP independentoperand retention, fieldborrowAF andbadplanproperty.
 ActiveAlternateRing5932b12c/FieldStoref2c47f97/SavedZeroMask3a3c19f7/
 IndexRejectLifecyclead27c350. Raw9288..92BDfresh53bytes
+12c5406pushedgates. AlternateRing/SavedIndexReject/IndexedFieldStore/
+RejectField reviewedregistered runner3841exit0. Existingringhelperrefactored
+sharedroute, defaultregressionmaintained. Stronger exacthandoffchecks.
+SavedZeroMask3a3c19f7 releasedbutpendingreview; SuccessorRing57243020
+revisionrequested exactgate/successfulESIclean/consumer-gatedEAX.
+ActiveBacklinkNexta3628316-561d-4163-874a-857d15e41ce2 and
+PostStoreZeroc3ea8a36-64a7-4e22-8272-7dbc8c44a320.
 8948188B4A1085C974123B0DD8ADED010F82D8FBFFFF8948108941188B4A1485C974123B0DD8ADED010F82BFFBFFFF894814894118.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,

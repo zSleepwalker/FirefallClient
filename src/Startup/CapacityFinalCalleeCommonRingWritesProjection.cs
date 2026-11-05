@@ -40,6 +40,11 @@ public sealed record CapacityFinalCalleeCommonRingWritesPlan(
 {
     public ImmutableArray<CapacityFinalCalleeCommonRingWrite> Writes { get; init; } =
         ImmutableArray<CapacityFinalCalleeCommonRingWrite>.Empty;
+    public uint EntryRawFileOffset { get; init; }
+    public uint BranchNextRawFileOffset { get; init; }
+    public ImmutableArray<CapacityFinalCalleeCommonRingWritesInstructionEvidence>
+        InstructionEvidence { get; init; } =
+            ImmutableArray<CapacityFinalCalleeCommonRingWritesInstructionEvidence>.Empty;
     public bool EntryEDXReadReached { get; init; }
     public bool EntryEAXReadReached { get; init; }
     public bool EntryESIReadReached { get; init; }
@@ -51,6 +56,18 @@ public sealed record CapacityFinalCalleeCommonRingWritesPlan(
     public bool DestinationEntered { get; init; }
     public uint StopAtRawFileOffsetExclusive { get; init; }
 }
+
+internal readonly record struct CapacityFinalCalleeCommonRingWritesRoute(
+    uint EntryRawFileOffset,
+    uint FirstWriteRawFileOffset,
+    uint SecondWriteRawFileOffset,
+    uint ThirdWriteRawFileOffset,
+    uint FourthWriteRawFileOffset,
+    uint BranchRawFileOffset,
+    uint BranchNextRawFileOffset,
+    uint BranchTargetRawFileOffset,
+    ImmutableArray<CapacityFinalCalleeCommonRingWritesInstructionEvidence>
+        InstructionEvidence);
 
 /// <summary>
 /// Projects the four ordered DWORD stores and their unconditional branch.
@@ -109,6 +126,22 @@ public static class CapacityFinalCalleeCommonRingWritesProjection
 
     public static CapacityFinalCalleeCommonRingWritesPlan Project(
         CapacityFinalCalleeCommonRingWritesCapture capture)
+        => ProjectCore(
+            capture,
+            new(
+                EntryRawFileOffset,
+                FirstWriteRawFileOffset,
+                SecondWriteRawFileOffset,
+                ThirdWriteRawFileOffset,
+                FourthWriteRawFileOffset,
+                BranchRawFileOffset,
+                BranchNextRawFileOffset,
+                BranchTargetRawFileOffset,
+                Instructions));
+
+    internal static CapacityFinalCalleeCommonRingWritesPlan ProjectCore(
+        CapacityFinalCalleeCommonRingWritesCapture capture,
+        CapacityFinalCalleeCommonRingWritesRoute route)
     {
         var writes = ImmutableArray.CreateBuilder<CapacityFinalCalleeCommonRingWrite>();
         bool entryEDXReadReached = false;
@@ -123,6 +156,9 @@ public static class CapacityFinalCalleeCommonRingWritesProjection
             new(capture, outcome)
             {
                 Writes = writes.ToImmutable(),
+                EntryRawFileOffset = route.EntryRawFileOffset,
+                BranchNextRawFileOffset = route.BranchNextRawFileOffset,
+                InstructionEvidence = route.InstructionEvidence,
                 EntryEDXReadReached = entryEDXReadReached,
                 EntryEAXReadReached = entryEAXReadReached,
                 EntryESIReadReached = entryESIReadReached,
@@ -130,7 +166,7 @@ public static class CapacityFinalCalleeCommonRingWritesProjection
                     !entryEAXReadReached && capture.EntryEAX.HasValue,
                 BranchReached = branchReached,
                 BranchTargetRawFileOffset =
-                    branchReached ? BranchTargetRawFileOffset : null,
+                    branchReached ? route.BranchTargetRawFileOffset : null,
                 FlagsUnaffected = true,
                 ExactCleanCompletion = exactCleanCompletion,
                 DestinationEntered = false,
@@ -141,7 +177,7 @@ public static class CapacityFinalCalleeCommonRingWritesProjection
         entryESIReadReached = true;
         AddWrite(
             writes,
-            FirstWriteRawFileOffset,
+            route.FirstWriteRawFileOffset,
             Add(capture.EntryEDX, EDXDisplacement),
             capture.EntryEDX.HasValue,
             capture.EntryESI,
@@ -150,21 +186,21 @@ public static class CapacityFinalCalleeCommonRingWritesProjection
         {
             return Finish(
                 CapacityFinalCalleeCommonRingWritesOutcome.MissingEntryEDXForFirstWrite,
-                FirstWriteRawFileOffset);
+                route.FirstWriteRawFileOffset);
         }
 
         if (!capture.EntryESI.HasValue)
         {
             return Finish(
                 CapacityFinalCalleeCommonRingWritesOutcome.MissingEntryESIForFirstWrite,
-                FirstWriteRawFileOffset);
+                route.FirstWriteRawFileOffset);
         }
 
         entryEAXReadReached = true;
         entryESIReadReached = true;
         AddWrite(
             writes,
-            SecondWriteRawFileOffset,
+            route.SecondWriteRawFileOffset,
             Add(capture.EntryEAX, EAXDisplacement),
             capture.EntryEAX.HasValue,
             capture.EntryESI,
@@ -173,14 +209,14 @@ public static class CapacityFinalCalleeCommonRingWritesProjection
         {
             return Finish(
                 CapacityFinalCalleeCommonRingWritesOutcome.MissingEntryEAXForSecondWrite,
-                SecondWriteRawFileOffset);
+                route.SecondWriteRawFileOffset);
         }
 
         entryESIReadReached = true;
         entryEAXReadReached = true;
         AddWrite(
             writes,
-            ThirdWriteRawFileOffset,
+            route.ThirdWriteRawFileOffset,
             Add(capture.EntryESI, ESIPlus8Displacement),
             capture.EntryESI.HasValue,
             capture.EntryEAX,
@@ -190,7 +226,7 @@ public static class CapacityFinalCalleeCommonRingWritesProjection
         entryEDXReadReached = true;
         AddWrite(
             writes,
-            FourthWriteRawFileOffset,
+            route.FourthWriteRawFileOffset,
             Add(capture.EntryESI, ESIPlusCDisplacement),
             capture.EntryESI.HasValue,
             capture.EntryEDX,
@@ -199,7 +235,7 @@ public static class CapacityFinalCalleeCommonRingWritesProjection
         branchReached = true;
         return Finish(
             CapacityFinalCalleeCommonRingWritesOutcome.CompletedTo012C9441,
-            BranchTargetRawFileOffset,
+            route.BranchTargetRawFileOffset,
             exactCleanCompletion: true);
     }
 

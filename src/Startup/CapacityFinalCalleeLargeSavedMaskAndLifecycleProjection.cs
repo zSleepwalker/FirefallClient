@@ -239,7 +239,10 @@ public static class CapacityFinalCalleeLargeSavedMaskAndLifecycleProjection
             ParentFlagsPreservedThroughChild = !childAndExecuted,
             ChildAndFlagsReplacedParentFlags = childAndExecuted,
             ExactCleanExitAdmitted =
-                child.ExactStopAtJumpTarget
+                child.Outcome == CapacityFinalCalleeLargeMaskAndStoreOutcome.Completed
+                && child.ExactStopAtJumpTarget
+                && child.JumpReached
+                && !child.CommonTailEntered
                 && child.JumpTargetRawFileOffset
                     == CompletedStopRawFileOffsetExclusive
                 && child.StopAtRawFileOffsetExclusive

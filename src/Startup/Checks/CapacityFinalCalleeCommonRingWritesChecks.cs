@@ -133,6 +133,10 @@ internal static class CapacityFinalCalleeCommonRingWritesChecks
             && complete.BranchTargetRawFileOffset == 0x012C9441
             && complete.ExactCleanCompletion
             && complete.StopAtRawFileOffsetExclusive == 0x012C9441
+            && complete.EntryRawFileOffset == 0x012C9323
+            && complete.BranchNextRawFileOffset == 0x012C9334
+            && complete.InstructionEvidence.SequenceEqual(
+                CapacityFinalCalleeCommonRingWritesProjection.Instructions)
             && !complete.DestinationEntered
             && complete.FlagsUnaffected);
 
@@ -176,6 +180,7 @@ internal static class CapacityFinalCalleeCommonRingWritesChecks
                     { RawFileOffset: 0x012C9329, Address: 0x1008, Value: 0x1000, Committed: true },
                     { RawFileOffset: 0x012C932C, Address: 0x100C, Value: 0x1000, Committed: true }
                 ]);
+
     }
 
     private static bool EvidenceMatches()

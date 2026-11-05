@@ -607,6 +607,10 @@ internal static class StartupBinaryEvidence
             Matches(0x12C927C, "3B05D8ADED010F82EEFBFFFF")
             && RawCodeRangeMaps(0x12C927C, 12)
             && RelativeConditionalBranchTargets(0x12C9282, 0x0F, 0x82, 0x12C8E76));
+        check("Binary alternate ring route retains its distinct four stores and final jump",
+            Matches(0x12C9343, "89720889700C89460889560CE9ED000000")
+            && RawCodeRangeMaps(0x12C9343, 17)
+            && RelativeBranchTargets(0x12C934F, 0xE9, 0x12C9441));
         check("Binary pinned-sample raw code [0xBE6325,0xBE6352) maps to VA 0x00FE6F25 and preserves its JNZ target",
             imageBase == 0x400000
             && Matches(0xBE6325, "8B4E0853578B7E108D04CDFFFFFFFF4921460C037E0C8BC7C1E80323C88B46048D1C8D00000000833C0300751C")

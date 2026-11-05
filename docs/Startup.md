@@ -859,6 +859,10 @@ IndexedFieldGate bounds the fresh [ECX+10] comparison at926B and preserves the
 independent EDX operand when the memory evidence is missing. EaxGlobalThreshold
 bounds927C's comparison against the separately captured absolute global.
 Neither projection enters the selected store or rejection destination.
+AlternateRing shares the four-store mechanism while retaining9343's distinct
+instruction evidence. SavedIndexReject derives EBX only from the later absolute
+reload. RejectField retains ECX into the fresh field comparison; IndexedFieldStore
+selects +10 or +14 and preserves CMP flags through the bounded9278 handoff.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
