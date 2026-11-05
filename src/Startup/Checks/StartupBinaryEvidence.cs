@@ -79,6 +79,10 @@ internal static class StartupBinaryEvidence
                 && VirtualAddressToFileOffset(lastVirtualAddress) == lastRawOffset;
         }
 
+        check("Common tag-root CMP/JNZ bytes retain the independent global operand",
+            Matches(0x012C92C8, "3B35DCADED01751C")
+            && ShortConditionalBranchTargets(0x012C92CE, 0x75, 0x012C92EC));
+
         uint peOffset = ReadUInt32(0x3C);
         ushort sectionCount = BinaryPrimitives.ReadUInt16LittleEndian(ReadAt(peOffset + 6, 2));
         ushort optionalHeaderSize = BinaryPrimitives.ReadUInt16LittleEndian(ReadAt(peOffset + 20, 2));

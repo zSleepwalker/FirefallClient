@@ -950,6 +950,20 @@ RightFieldStoresLifecycle derives the paired stores' ECX from the fresh field
 and preserves the threshold's typed flags. ZeroSlotStoresLifecycle carries the
 CMP operands into the four-store tail, separating bounded exits from clean
 completion when late pointer captures remain unused.
+SelfRingCleanupLifecycle and NodeSelfRingLifecycle compose the exact fresh-mask
+zero edge into ordered self-ring stores; cleanup observes its counter independently
+after the stores. ZeroSlotCleanupLifecycle similarly preserves the four-store
+sequence and full compare flags when the counter read is missing. DEC preserves
+the admitted clear carry, and neither cleanup destination nor call is entered.
+TraversalZeroSlotLifecycle derives the threshold slot from the single child LEA,
+rejects unused child-plus-four captures, and distinguishes internal threshold
+entry from its unentered outer destination. RightFieldTagLifecycle admits both
+clean right-field routes into the shared MOV/OR/tag stores and stops before
+raw `0x012C92C8`, preserving parent flags until OR executes.
+RingCleanupEpilogueLifecycle admits only the exact nonzero cleanup edge into
+the existing bounded epilogue. Nullable late ESP/EBP and fresh TEST/stack/call
+observations remain independent. A captured normal opaque-call return leaves
+all arithmetic flags unknown rather than forwarding pre-call TEST flags.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

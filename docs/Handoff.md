@@ -13396,6 +13396,35 @@ notified. SelfRingCleanup77c21735 returnedafterEOFreview for exactadmission
 (not merelyChildJumpReached), missingcounterDECnotexecuted, unusedcounter
 missingpointerfixture. RightFieldTagea554b43 active onboth92BDparentroutes.
 runner4041exit0 validates two registered store lifecycle pairs.
+ea14633pushed. SelfRingCleanup revision andNodeSelfRing reviewed/registered
+pendingvalidation. Node addedentryconstant/nullableguards andcorrectedwrapped
+childaddressfixture (globalstorefirst). TraversalZeroSlot20c1b0ca revision
+returnedfor exactzerogate (dirtylatechild4stopbeforethreshold), then parent
+file overwrittenwithStoreTail/LateESI bysuccessor4ce559ff;runner4051 missing
+Read/Instructiontypes.4ce instructedceaseparentedits;20c1restoreownreleased
+threshold-onlyrevision. Do noteditparentuntilownersresolve.
+ZeroCleanupd6a035e8 revisionneedsaggregateflags/order/childexactgates;runner4049
+nullableboolconverter185. ActiveRightTagea554b43, RingEpilogue0bc2b86f,
+NodeRingCleanup7fae1042. Latestauthoritativepass4041 andHEAD ea14633.
+Traversal parent restored by20c1 and full restored pair reviewed/registered.
+Five pending reviewed pairs: SelfRingCleanup, NodeSelfRing, ZeroSlotCleanup,
+TraversalZeroSlot, RightFieldTag. Coordinator corrected right-tag parent gate
+stop92B7 vs composite92BD; zero-cleanup read effects are not committed writes,
+and order predicates require reached accesses. runner4058 blocked only active
+SlotStores bool-nullable conversion and RingEpilogue distinct flag-type equality;
+owners notified. Fresh IDA92C8 eight bytes3B35DCADED01751C added offline anchor.
+Luna0d9083e7 owns newRightTagRootLifecycle pair, derivingESI into independent
+VA1EDADDC CMP/JNZ gate, bounded92D0/92EC; no parent edits.
+runner4065exit0 validates six registered reviewed lifecycle pairs and native
+root-gate anchor. A temporary MSBuild target excluded five named unreviewed
+draft pairs from compilation only; target removed afterward. Ordinary full
+runner4063 remained blocked by active RightTagRoot draft compile errors.
+RingCleanupEpilogue reviewed/registered: missing TEST preserves full DEC flags,
+but an observed normal opaque-call return makes all six flags unknown.
+SlotStores4ce and NodeRingCleanup7fae returned for exact internal-entry gates,
+entry constants, ordered effects and corrected stale wrap/alias fixtures.
+Active successors: RightTagRoot0d9083e7, IndexedTagTraversald8350c8b,
+ZeroCleanupEpilogue7614ecde; all GPT-6 Luna with exclusive new-pair ownership.
 8948188B4A1085C974123B0DD8ADED010F82D8FBFFFF8948108941188B4A1485C974123B0DD8ADED010F82BFFBFFFF894814894118.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
