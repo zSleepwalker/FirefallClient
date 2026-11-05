@@ -774,6 +774,10 @@ value's plus-C field. Missing EDX prevents CMP completion without discarding
 the independently reached memory operand. The common root gate likewise
 retains its global read when ESI is missing. Both gates compute all CMP
 flags and stop at their exact branch destinations without entering them.
+The second field test at raw91E3 independently reads EDX+10, overwrites
+EBP-4 with that field's address, and tests the fresh value. Zero selects
+9226; nonzero selects91F0. The common root store at raw92D0 writes EDI to
+VA1EDADD0 and jumps to9441 without entering the epilogue or changing flags.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

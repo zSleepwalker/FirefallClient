@@ -522,6 +522,14 @@ internal static class StartupBinaryEvidence
             Matches(0x12C92C8, "3B35DCADED01751C")
             && RawCodeRangeMaps(0x12C92C8, 8)
             && ShortConditionalBranchTargets(0x12C92CE, 0x75, 0x12C92EC));
+        check("Binary large second field test overwrites the saved address before testing its fresh value",
+            Matches(0x12C91E3, "8B42108D4A10894DFC85C07436")
+            && RawCodeRangeMaps(0x12C91E3, 13)
+            && ShortConditionalBranchTargets(0x12C91EE, 0x74, 0x12C9226));
+        check("Binary common root store jumps directly to the gated epilogue",
+            Matches(0x12C92D0, "893DD0ADED01E966010000")
+            && RawCodeRangeMaps(0x12C92D0, 11)
+            && RelativeBranchTargets(0x12C92D6, 0xE9, 0x12C9441));
         check("Binary pinned-sample raw code [0xBE6325,0xBE6352) maps to VA 0x00FE6F25 and preserves its JNZ target",
             imageBase == 0x400000
             && Matches(0xBE6325, "8B4E0853578B7E108D04CDFFFFFFFF4921460C037E0C8BC7C1E80323C88B46048D1C8D00000000833C0300751C")
