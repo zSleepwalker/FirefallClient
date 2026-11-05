@@ -964,6 +964,13 @@ RingCleanupEpilogueLifecycle admits only the exact nonzero cleanup edge into
 the existing bounded epilogue. Nullable late ESP/EBP and fresh TEST/stack/call
 observations remain independent. A captured normal opaque-call return leaves
 all arithmetic flags unknown rather than forwarding pre-call TEST flags.
+TraversalSlotStoresLifecycle carries the derived child-slot ECX and original
+traversal EDX into four ordered pointer stores and their cleanup jump.
+RightTagRootLifecycle retains both right-field routes and independently
+observes the root DWORD at VA `0x01EDADDC` after tag writes, including aliases.
+NodeRingCleanupLifecycle observes the counter after initialized-node and
+self-ring writes, preserves OR flags on a missing read, and separates clean
+completion from a bounded bypass carrying unused counter data.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

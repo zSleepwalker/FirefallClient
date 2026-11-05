@@ -13425,6 +13425,23 @@ SlotStores4ce and NodeRingCleanup7fae returned for exact internal-entry gates,
 entry constants, ordered effects and corrected stale wrap/alias fixtures.
 Active successors: RightTagRoot0d9083e7, IndexedTagTraversald8350c8b,
 ZeroCleanupEpilogue7614ecde; all GPT-6 Luna with exclusive new-pair ownership.
+Six reviewed pairs committed and pushed as4f14f14 (16files,4805insertions).
+Latest reviewed-subset validation is runner4065exit0; full active-draft build
+not yet green. Main checkout and branch remain untouched.
+Tracking caution: coordinator accidentally ran an unscoped session-SQL update
+after runner4068, overwriting historical assignment status/evidence (not IDs or
+objectives). Affected historical rows are marked needs-history-recovery; current
+known assignments/checkpoint4f14f14 were restored explicitly. Use committed
+handoffs/checkpoints/Git rather than those historical status/evidence fields.
+runner4074exit0 is an ordinary full offline build/check run, including three
+new reviewed registrations: TraversalSlotStores, RightTagRoot, NodeRingCleanup.
+Coordinator fixed root flags on pre-OR stops, dirty-root parent stop92BD,
+node cleanup clean-vs-bounded unused-counter bypass, and index31 alias child
+OR value80000001. SlotStores parent restoration and revised entry gates pass.
+Pending released EOF reviews: IndexedTagTraversald8350c8b and ZeroCleanupEpilogue
+7614ecde. Active new pairs: TraversalSlotCleanup9f7cfdc7,
+RightRootSuccessordb4ba8a1 (fresh92D0/92ECbytes verified),
+NodeCleanupEpilogue48e7e283. All use GPT-6 Luna and named-pair-only edits.
 8948188B4A1085C974123B0DD8ADED010F82D8FBFFFF8948108941188B4A1485C974123B0DD8ADED010F82BFFBFFFF894814894118.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
