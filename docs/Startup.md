@@ -1075,6 +1075,15 @@ direct path, observes a fresh counter increment, and compares a byte
 argument before the frame and receiver-byte clears. INC preserves the
 preceding carry flag, including an unknown carry after a normal opaque
 return. Both branch destinations remain unentered.
+GameSocketCompletionErrorQueueAcquisitionProjection joins the exact
+pre-call error-state boundary to the existing queue acquisition prefix.
+Captured acquisition results assume a normal opaque return; missing
+results stop at its result store. The tail-tag read remains unentered.
+GameSocketReceiveSenderPreparationProjection joins a clean nonzero
+receive-result branch to the independent operation reload and sender
+helper call boundary. A zero operation requires explicit diagnostic-stack
+observations, including an independent stack pointer after normal return.
+Neither projection executes the imported or direct callees.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
