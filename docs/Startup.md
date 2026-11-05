@@ -1161,6 +1161,10 @@ GameSocketCompletionErrorReturnProjection adds an independent captured
 return target and RET4 stack adjustment to the error epilogue. It records
 only a bounded logical transfer, without entering that target or inferring
 an EAX result.
+NetworkDispatcherPostCallCountGateProjection projects fresh post-vtable
+ESI, EBX, collection end and start observations. INC, SUB, SAR2 and unsigned
+CMP/JB select an unentered reload boundary or opaque-cell boundary; no
+collection count or register observation is forwarded across the call.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
