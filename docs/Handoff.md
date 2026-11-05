@@ -13045,6 +13045,15 @@ corrected missingfresh unreachedECX flag and7FFFFFFF-80000000 CFtrue.
 Runner3626 exit0. AlignedFrame returnedfor>=20 contaminatedadmission and
 explicitcleanhandoff. Active PairedFrameGate1ba9590b and
 SecondShiftedf46ea4ff; existingcompiledactivepairs mustnotbestaged.
+Checkpoint9cec822 pushed. IndexedFrameGate31d14540 active: freshIDA
+913D..9151 LEAframeaddresswindow verified; anchorpendingrunner3631,
+blockedbyactiveAlignedFrame line189 undefinedlocal (ownernotified).
+Freshsurroundingdisassembly:9151 CMPECX,EBX/JB915A;9155 CMP[ECX+C],EDX/
+JZ9160 elseopaqueCALL915A.9160 freshframe14->EAX/CMP EAX,ECX/JNZ917C.
+These latterwindows notyetbyteanchored orassigned; no inferredcallpreservation.
+AlignedFrame revision reviewed/registered; runner3632 exit0 including
+913D indexedframe nativeanchor. Both>=20 clean/contaminated fixtures tested.
+PairedFrameGate1ba9590b, SecondShiftedf46ea4ff, IndexedFrame31d14540 active.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional

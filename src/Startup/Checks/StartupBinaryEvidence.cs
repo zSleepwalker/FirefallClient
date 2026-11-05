@@ -472,6 +472,10 @@ internal static class StartupBinaryEvidence
             Matches(0x12C912D, "8B45FCC1E0033BC87406")
             && RawCodeRangeMaps(0x12C912D, 10)
             && ShortConditionalBranchTargets(0x12C9135, 0x74, 0x12C913D));
+        check("Binary alternate indexed frame address is computed by LEA before the equality branch",
+            Matches(0x12C913D, "8B45FC8B4DF08D04C5F0ADED018945F43BC8740F")
+            && RawCodeRangeMaps(0x12C913D, 20)
+            && ShortConditionalBranchTargets(0x12C914F, 0x74, 0x12C9160));
         check("Binary pinned-sample raw code [0xBE6325,0xBE6352) maps to VA 0x00FE6F25 and preserves its JNZ target",
             imageBase == 0x400000
             && Matches(0xBE6325, "8B4E0853578B7E108D04CDFFFFFFFF4921460C037E0C8BC7C1E80323C88B46048D1C8D00000000833C0300751C")

@@ -710,6 +710,9 @@ stops before its own opaque call when equal.
 The shifted-frame gate at `12C912D` reloads `[EBP-4]` independently,
 shifts with DWORD wrapping, and keeps undefined shift flags absent.
 Equality bypasses the opaque call at `12C9137`.
+The aligned-frame lifecycle enters the frame loads only through the clean
+below-threshold branch. It supplies retained EBP only when the first frame
+store consumes it and rejects later captures on the large-size bypass.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
