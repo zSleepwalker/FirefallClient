@@ -847,6 +847,10 @@ SavedIndexStoreLifecycle admits only the exact equality9243 edge, retaining
 original EDX but independently reloading the child index at the same address.
 The child EAX remains an explicit capture and a missing value preserves the
 attempted store and prior CMP flags without advancing to TEST.
+SavedMaskShift retains the fresh shift count across later missing frame
+evidence and computes NOT without changing SHL flags. MaskSelectionOr derives
+both OR operands from the existing selection helper. MaskSuccessor instead
+keeps child EDX and both successor reads independent of the earlier mask.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
