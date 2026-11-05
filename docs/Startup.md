@@ -985,6 +985,11 @@ IndexedTraversalZeroSlotLifecycle derives the threshold ECX from the indexed
 traversal's child-slot LEA. It rejects dirty zero-child handoffs before the
 threshold read, retains fresh child/global observations even when they alias,
 and stops before either threshold destination.
+TraversalSlotCleanupLifecycle appends an independent counter observation to
+the four-store traversal route, distinguishing reached instruction attempts
+from execution when operands are missing. RightRootSuccessorLifecycle carries
+consumed EDI into the root-equal global store/jump or the root-unequal
+SHR-by-three size gate, without entering either helper's selected destination.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
