@@ -635,6 +635,13 @@ internal static class StartupBinaryEvidence
         check("Binary high-size BSR derives the frame value and masked indexed result",
             Matches(0x12C936F, "0FBDC08BD08945EC8BC78D4A07D3E883E0018D0C50")
             && RawCodeRangeMaps(0x12C936F, 21));
+        check("Binary indexed node initialization prepares its address and clears both fields",
+            Matches(0x12C9384, "894E1C8D1C8DF8AEED01BA01000000C7461400000000C7461000000000")
+            && RawCodeRangeMaps(0x12C9384, 29));
+        check("Binary fresh right-field TEST chooses its bounded zero exit",
+            Matches(0x12C92A4, "8B4A1485C97412")
+            && RawCodeRangeMaps(0x12C92A4, 7)
+            && ShortConditionalBranchTargets(0x12C92A9, 0x74, 0x12C92BD));
         check("Binary pinned-sample raw code [0xBE6325,0xBE6352) maps to VA 0x00FE6F25 and preserves its JNZ target",
             imageBase == 0x400000
             && Matches(0xBE6325, "8B4E0853578B7E108D04CDFFFFFFFF4921460C037E0C8BC7C1E80323C88B46048D1C8D00000000833C0300751C")

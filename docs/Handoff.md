@@ -13298,6 +13298,16 @@ RightField32087092-9d87-472e-a1e6-54eba24e3c04;
 IndexedNode467c28fd-0de2-45c7-922f-c86108307e4e.
 FreshIDA93A1disasmconfirmedMOVglobalVA1EDADCC/SHLEDXCL/TEST/
 JNZ93C0else93AC; zeroOR/store/selfringJMP942F at93BE.
+f20e319pushed. IndexedNode467c28fd andRightField32087092pairsreviewed
+registered/nativeanchorsadded; nodefirstattempt/commitpropertiesadded.
+runner3928blockedbyactiveHighSizeIndexchecks incompatibleflagcomparison
+line48/missingImmutableArrayusingline250; owner61070b0fnotified.
+Do notcommitpendingnode/rightbatchuntilcoordinatorrunnerpasses.
+ActiveFreshMask9426568f-fc64-4aca-846d-4b285bc83c0b;
+RightFieldThreshold9c333e8a-56ec-4b03-8b01-a48a8a21d578.
+Node/rightgatecoordinatorrunner3931exit0afterIndexownerfixedbuild.
+HighSizeIndex61070b0f/FreshMask9426568f/RightThreshold9c333e8a
+releasedpendingfullreview/register. SelfRingf2642355 active.
 8948188B4A1085C974123B0DD8ADED010F82D8FBFFFF8948108941188B4A1485C974123B0DD8ADED010F82BFFBFFFF894814894118.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,

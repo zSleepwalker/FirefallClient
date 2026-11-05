@@ -894,6 +894,11 @@ NextThresholdStoresLifecycle admits the exact929E threshold fallthrough
 before its two directional stores. Parent CMP flags survive both MOVs,
 including a missing store-address stop; the independent global observation
 remains ordered before writes. A bypassed late EAX capture is explicitly unused.
+IndexedNodeInitialization models the9384 field store, address-only indexed
+LEA, EDX initialization, and two ordered zero stores through93A1. Partial first
+store operands survive without a committed write. RightFieldGate independently
+reloads [EDX+14], tests that fresh value, and stops at92BD or92AB without
+entering either destination.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
