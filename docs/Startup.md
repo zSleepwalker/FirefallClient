@@ -1037,6 +1037,10 @@ at most one 500-ms fallback, one hundred counted attempts, independent
 error/key/OVERLAPPED reads and opaque return observations. Missing stop
 data or unused captures cannot claim clean completion; null dispatch
 keys remain bounded rather than invoking an inferred callback.
+GameSocketSenderBindingProjection covers the optional post-admission
+flag branch through token selection, opaque queue append and flag clear.
+It keeps disabled bypasses, missing operands and unused captures distinct,
+and separates historical TEST flags from flags invalidated by normal calls.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

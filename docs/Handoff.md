@@ -13674,6 +13674,13 @@ anchors; awaiting next offline runner. Latest pushedHEAD4c09a8d.
 runner4130exit0 freshsender/errorcallbackanchors validated with exactly
 three unreviewedpairs excluded. Target removed; reviewedcode includes
 IOCPpass and nodecleanup. Operational notes/anchors ready explicitcommit.
+Sender/error anchors committed/pushed7eb6784. Sender4b051 revision full
+EOF reviewed/registered; coordinator corrected readCommitted tofalse
+(captured reads are not writes). runner4132exit0 with exact errorstate/
+nodeepilogue/clockgate unreviewed pairs excluded; target removed.
+Maintenanceanalysisba0 released, coordinator freshIDA43bytesBBC8B0..DB
+confirmed; Lunaa1519161 owns NetworkIoCompletionClockGate new pair.
+This500 predequeue modular-clock gate is distinct from IOCP fallback500.
 SmallBinEpilogue released and full EOF reviewed: owner6d052038 revising
 wrong parent type, nullable value-plan access, missing successor-unused
 forwarding, child read/write effect markers and dirty-ring admission.
