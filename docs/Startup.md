@@ -752,6 +752,10 @@ ESI is missing, and keeps both stores ordered even at aliased addresses.
 The indexed-final lifecycle enters the final-frame gate only on indexed
 equality, retaining its preceding store. Its ECX handoff is withheld until
 the independent EBP-14 reload makes the consuming CMP reachable.
+The large-frame threshold projection compares a fresh EDX+8 value with
+EBX, stores it at EBP-14, then independently reloads EBP-10. The MOV
+instructions preserve the original CMP flags: JB selects raw 0x12C8E76
+or 0x12C91B9 from that earlier unsigned comparison, not the reloaded ECX.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

@@ -182,6 +182,7 @@ CapacityFinalCalleeIndexedBacklinkLifecycleChecks.Run(Check);
 CapacityFinalCalleeShiftedIndexedLifecycleChecks.Run(Check);
 CapacityFinalCalleeCommonTailTagWritesChecks.Run(Check);
 CapacityFinalCalleeIndexedFinalLifecycleChecks.Run(Check);
+CapacityFinalCalleeLargeFrameThresholdProjectionChecks.Run(Check);
 FrameHandoffCapacityAboveBranchLifecycleChecks.Run(Check);
 FrameHandoffCapacitySecondBranchLifecycleChecks.Run(Check);
 FrameHandoffCapacityFinalCallGateChecks.Run(Check);
