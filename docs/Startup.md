@@ -584,6 +584,17 @@ LEA address and frame write from subsequent independent frame reloads.
 `CapacityFinalCalleeFrameMaskUpdateProjection` captures the variable-count
 shift with the x86 low-five-bit count, 32-bit complement, and fresh global
 AND read/write without reusing earlier frame or register values.
+`CapacityFinalCalleeFrameSizeLifecycleProjection` carries ESI/ESP only across
+the frame-call bypass and requires independent post-call captures otherwise;
+EAX is always independently captured. A reached but contaminated size
+boundary is not admitted as a successful lifecycle.
+`CapacityFinalCalleeDescriptorComparisonCallProjection` distinguishes the
+two equality bypasses from the unsigned-below and memory-mismatch call
+routes, preserving the fresh reads and exact comparison operand order.
+`CapacityFinalCalleePairedFieldWritesProjection` records the two ordered
+stores at raw `12C8EE9..12C8EF8`, followed by an independent global reload.
+It retains both stores when that reload is missing, including aliased
+destinations; it does not infer pointer ownership or list semantics.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

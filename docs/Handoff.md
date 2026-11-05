@@ -12845,6 +12845,28 @@ active; independent EBP/EBX always, independent ESI after sizeopaque call.
 DescriptorComparisonCall stillactive. Stage only reviewed scalarpairs,
 registrations/docs and pending descriptorcomparisonanchor for checkpoint.
 
+Latestcheckpointdff4655 pushed. Active FrameMaskTagLifecycle
+`d28e7c84-cd24-4e3d-82e3-02ab30cc0f6a` requires independenttagESI/EDX
+after cleanmaskupdate; FrameMismatchED5 staysbounded if no tagcaptures.
+Otheractive owners FrameSize revision94bfd6b4, SizeDescriptor554fd250,
+DescriptorComparisonCall84de9ca2. Coordinator should keep nextrunner serialized
+and avoid staging activepairs until released/reviewed.
+
+FrameSize revision and DescriptorComparison released/reviewed/registered.
+Runner3375 blocked by activeSizeDescriptor helperparameter mismatch at20/55;
+owner informed. New DescriptorMaskLifecycle
+`292580a4-d188-4f50-a5cb-1f90513cea2b` active onlyno-calldescriptor
+equalityEBE ->framemask, deriving locallypreservedECX frominitialFrame10
+read, not scaledEAX orfreshFrame10CMP reload.
+PairedFieldWrites owner `8e785c8d-d798-4501-9997-d7dedd522cf0` active
+on verified15bytes EE9..EF8; immutableanchor pendingvalidation.
+Update: PairedFieldWrites released, reviewed, and registered; runner3387
+exit0 validates FrameSize, DescriptorComparison, PairedFieldWrites and
+the new EE9 native anchor. SizeDescriptor returned to owner for rejecting
+contaminated descriptor terminal outcomes. Active successors:
+DescriptorPairedLifecycle `d9eec5a2-4bd8-420f-a6c7-12e32cfa1f03` and
+PairedTagLifecycle `67c0f152-e74d-4e61-8807-de368caa0972`, GPT-6 Luna.
+
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
 indirect callback, then fresh receiver+4C DEC and receiver+48 zero/INC.
