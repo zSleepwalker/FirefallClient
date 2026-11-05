@@ -877,6 +877,8 @@ flags for the935B branch. EaxBacklink admits9288 only after an exact not-below
 threshold edge, preserving CMP flags until the child's fresh-value TEST.
 HighSizeCeiling performs a full unsigned comparison against FFFF, selecting
 the936F BSR entry or setting ECX to31 before the9384 store boundary.
+NextFieldThreshold keeps ECX and the absolute global operand independently
+captured at9292 and bounds the unsigned branch before the paired stores.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

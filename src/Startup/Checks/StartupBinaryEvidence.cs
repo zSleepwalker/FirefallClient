@@ -625,6 +625,10 @@ internal static class StartupBinaryEvidence
             && RawCodeRangeMaps(0x12C9361, 14)
             && ShortConditionalBranchTargets(0x12C9366, 0x76, 0x12C936F)
             && ShortConditionalBranchTargets(0x12C936D, 0xEB, 0x12C9384));
+        check("Binary fresh next-field threshold precedes the paired stores",
+            Matches(0x12C9292, "3B0DD8ADED010F82D8FBFFFF")
+            && RawCodeRangeMaps(0x12C9292, 12)
+            && RelativeConditionalBranchTargets(0x12C9298, 0x0F, 0x82, 0x12C8E76));
         check("Binary pinned-sample raw code [0xBE6325,0xBE6352) maps to VA 0x00FE6F25 and preserves its JNZ target",
             imageBase == 0x400000
             && Matches(0xBE6325, "8B4E0853578B7E108D04CDFFFFFFFF4921460C037E0C8BC7C1E80323C88B46048D1C8D00000000833C0300751C")
