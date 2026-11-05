@@ -11943,3 +11943,51 @@ pinned runner passes. Publication review corrected helper argument names,
 the missing receiver+4 stop at `BE69F5`, and `FFFFFFFF+1==0` fixture.
 No inferred publication occurs before independently captured counter read.
 Finalization immutable writer remains active; do not stage its file yet.
+
+Second-copy/publication pushed as `44bb37c`. Finalization evidence finished
+and reviewed; new immutable owner `5b6bfd61-d346-47be-8eb0-68f4619b7994`
+preserves its pending anchors while adding reliable slot `[BE5303,BE532F)`.
+Slot production/check owner is `1f87b03c-4e9d-4649-874e-dd37ce62c664`.
+Read-only successors `dc6bd1a9-4d4a-447d-b9cf-781bc962cb95` own high-delta
+`[BE52A5,BE52DF)`; `46071380-0e5e-4420-af4e-5220f6bd639f` owns record
+comparison `[BE532F,BE5353)`. All Luna. No receive continuation code
+registered yet; zero-fill author remains active.
+
+High-delta trace mapping typo rejected: `BE52A5+400C00=FE5EA5`, not
+`4BE92A5`. Shared two-caller projection/checks assigned to Luna
+`d915f27f-4086-4069-b20b-dfb030745423`, exact 34-byte windows
+`[BE52A5,BE52C7)` / `[BE5353,BE5375)`. New sole immutable writer
+`ad74a354-38c4-4fa9-acd9-e27a1c097aca` preserves pending finalization/slot
+anchors. Caller receiver+8 reload precedes ADD ESP,18 on both paths.
+Read-only Luna `8e7d7264-270d-4199-a3ba-2b1994ef06d9` traces the paired
+counter/recycle/AL-only return tails; no code assignment yet.
+
+Reliable slot code/checks reviewed/registered; qualified a missing cross-type
+constant reference. Runner currently catches active zero-fill check helper
+parameter typos; author notified. Record-word projection owner
+`b2f26990-dac3-4fca-a17f-c921d4624ecb`; sole evidence owner
+`304e4ba8-65c7-43a9-b9a3-576d835f4e3b` preserves pending anchors.
+Correct record diagnostic literals are `1B58B3E` / `1B58B1B`, not earlier
+trace's `1BB...` values.
+Tail trace again incorrectly queried mapped VA in flat IDA; coordinator raw
+disassembly confirms identical INC DWORD[EAX+20], global VA `1DFFF84`,
+payload push, call `BD5C60`, AL-only one, RET 4. Luna
+`03540207-aa5d-4b6b-8ed6-ee15ae7b91f3` owns paired tail code/checks.
+
+Empty-slot callback `[BE538D,BE53A2)` independently matches its 21-byte PE
+window. Luna `ebe91a7f-2b8e-4e46-bcc3-693baed3ab92` owns its code/checks:
+header WORD bits 12/13 gate an indirect slot+C call, ECX=payload+8 address,
+no explicit pushes. Zero loaded pointer is not a guard. Immutable writer
+for this window is not yet assigned.
+Read-only Luna `2718019d-6b5a-4b8b-bc65-2b8a9b063e60` owns unreliable
+alternate continuation `BE5AC2`, stopping at the first opaque handoff.
+
+Slot, forwarding, and symbolic zero-fill registrations now pass the pinned
+offline runner. Corrected forwarding record-constructor named argument;
+corrected zero-fill's premature rejection of legitimate frame-4 and final
+REP captures before an otherwise fully captured first REP. Fault/missing
+first completion still blocks later reads. Both existing successful two-REP
+and maximum-count fixtures now exercise the corrected path.
+Successor read-only traces: `fc43d3fd-cda5-41c8-8078-0eca3fef9aa9`
+post-callback `BE53A2`, `fd5f3eb9-1ba8-490e-a28f-5f0ffd447023`
+zero-header `BE53E9`, each stops at the next opaque handoff.
