@@ -14194,6 +14194,15 @@ Current exclusions EntryCookiePreparation/DiagnosticCleanupPostCallAddress.
 3ee62c7 committed/pushed register-save and virtual-return pairs. Independent
 offline binary anchors added for dispatcherB0..CF and parserCB..E2;4322exit0.
 Latest ordinary full remains4308; reviewed subset4322 excludes two active drafts.
+Cookie508a942f and post-call addresse3f9941b pairs fully reviewed through EOF,
+registered and ordinary full4324exit0 accepted. Both agents respected no-build
+restriction. Cookie load remains independent under aliasing; immutable frame
+reprojection ignores legacy supplied plan, XOR flags computed and PUSH wraps.
+Post-call LEA uses freshESI only, parentcompletion separate from childcompletion.
+Successors Lunaf0ce39cb owns CFLEA EBP-0C and D2FS:[0] logicalpublication
+stoppingD8 beforeMOVESI,ECX. Luna1f4b5beb owns D4secondLOCKXADD requiring
+freshpostcallEBX and operationDWORD, stoppingD8 beforeDEC. Never inherit oldEBX.
+Current exclusions EntryFsPublication/DiagnosticCleanupSecondXadd.
 
 The user's finish-current-tasks-and-stop request supersedes earlier
 continuous-dispatch instructions. All current assignments are now released,

@@ -1264,6 +1264,12 @@ GameSocketParserDiagnosticCleanupVirtualCallReturnProjection independently
 captures the slot-zero DWORD at BD34CF and its opaque normal-return observation.
 Pending and abnormal returns retain last-known flags; normal return stops
 at BD34D1 with arithmetic flags and post-call registers unknown.
+NetworkDispatcherEntryCookiePreparationProjection captures the operation-time
+DWORD at VA 1DC5000, XORs it with the derived frame EBP and pushes the result,
+stopping at BBDDCF. Cookie validity and ABI semantics remain unmodeled.
+GameSocketParserDiagnosticCleanupPostCallAddressProjection requires independent
+post-call ESI for LEA EAX,[ESI+8], preserving unknown arithmetic flags and stopping
+at BD34D4 before the second locked XADD. It does not inherit pre-call EBX or ESP.
 GameSocketParserSelectorDiagnosticPreparationProjection records the five
 diagnostic argument pushes at BD326A..BD3280. It derives ESP from the
 count-consumption lineage but requires fresh ESI and an independent DWORD
