@@ -14068,6 +14068,13 @@ Parser49c contract exposed missing numeric ESI lineage; Lunae5702b71
 implements derived ESP but requires fresh ESI at327B and independent110
 field DWORD. No reconciliation with earlier aliased writes is permitted.
 Current draft exclusions SelectorDiagnosticPreparation and ExitEbxRestore.
+ParserSelectorDiagnosticPreparation e5702b71 full EOF reviewed and accepted
+runner4280 exit0. Added semantic immutable-capture reprojection coverage.
+Fresh ESI/field stays independent even when its source aliases the first
+committed push; missing fifth-push captures retain four stores and ESP-10.
+Luna1d4a3554 owns explicit diagnostic call return and fresh post-call
+ESP ADD14 through3289. Luna de803c52 remains on IOCP post-call POP EBX.
+Current draft exclusions ExitEbxRestore and SelectorDiagnosticReturnCleanup.
 
 The user's finish-current-tasks-and-stop request supersedes earlier
 continuous-dispatch instructions. All current assignments are now released,
