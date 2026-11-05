@@ -11991,3 +11991,11 @@ and maximum-count fixtures now exercise the corrected path.
 Successor read-only traces: `fc43d3fd-cda5-41c8-8078-0eca3fef9aa9`
 post-callback `BE53A2`, `fd5f3eb9-1ba8-490e-a28f-5f0ffd447023`
 zero-header `BE53E9`, each stops at the next opaque handoff.
+
+Pushed reviewed slot/forwarding/zero-fill code and accumulated immutable
+anchors as `f70aad0`. Record WORD projection/checks now reviewed, registered,
+and passing. Record immutable anchors were included in that prior commit.
+Sole new immutable writer `ba5ec568-ab49-4f95-b274-dd246e2a7570` owns
+callback/recycle windows. Luna `3914df5b-f54d-4f0a-9fec-cf5b1d7dbec7`
+owns unreliable residue handoff code/checks `[BE5AC2,BE5AE4)`;
+`7bceee3d-3184-4192-a2ee-802fac9b966d` traces its normal continuation.
