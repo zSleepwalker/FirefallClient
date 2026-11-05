@@ -2,45 +2,40 @@
 
 ## Current dispatcher/parser suffix review
 
-Reviewed standalone pairs now cover parser slot-four return, fresh E2 stack
-read and segment-relative FS restoration, four independent epilogue POPs,
-and dispatcher fallback PUSH/import return/fresh-EBX counter INC.
-Coordinator corrected a missing check-method brace after the FS suite
-extraction, a supplied-unused counter fixture, and rejected-counter flag
-preservation. Independent IDA bytes at raw BD34E2 (22 bytes) and BBDDEF
-(10 bytes) match new offline binary anchors.
+New reviewed coverage now includes:
 
-Subsequent full runners remained expensive and were stopped by exact shell/PID.
-The source-backed performance changes share a coordinator-reprojected frame
-prefix inside cookie/register-save projection and cache immutable second-XADD
-branch predicates; no validation predicate is removed. Focused runner4350 uses
-the existing check project with a session-only entry point for all ten reviewed
-suffix suites, changed-ancestor regressions, and full independent binary anchors.
-It has progressed through dispatcher counter checks; completion is pending.
+- **Dispatcher**: fallback diagnostic preparation (`BBDE1A..BBDE2A`), direct-call
+  return bound at `BBDE2B`, and call-target arithmetic prefix
+  (`BBDE2B..BBDE3D`, stop before `BBDE3E` JZ).
+- **Parser first-branch**: FS restore (`BD34E2..BD34EC`), register POP chain
+  (`BD34ED..BD34F0`), and frame/RET8 suffix (`BD34F1..BD34F6`).
+- **Binary anchors**: independent first-branch chain anchors added to
+  `StartupBinaryEvidence` for the three windows above plus one contiguous
+  `BD34E2..BD34F6` assertion.
 
-Parser frame reset, logical RET8, dispatcher byte argument compare and clear
-stores have full EOF review and registrations. Corrected invalid frame-plan
-Reads/Pops references, undefined fixture helper, missing clean/bounded
-conjunction, and projection-constant qualification. Newly released dispatcher
-zero branch (48c8db27) and parser skip-slot-four FS restore (930b4775) remain
-unreviewed. Active GPT-6 Luna successors are dispatcher selector compare
-(aa64755f) and parser preserved-DEC-flags register POPs (98ed87fc).
-Exclude these four unreviewed/active pairs in focused validation.
-Latest pushed checkpoint remains d51b86b until validation succeeds.
+Build currently succeeds for the full checks project after coordinator fixes:
 
-Dispatcher-only runner4352 completed with zero failures using an isolated
-session output directory: all five fallback suffix suites, register-save and
-cookie ancestor regressions, and the full independent binary-anchor suite.
-This dispatcher subset is ready for persistence. Parser runner4350 remains
-active separately; parser suffix acceptance is still pending.
+- added missing `MissingOutcome(...)` helper in
+  `SecondBranchRegisterPopsProjection`;
+- replaced non-constant pattern usage in
+  `NetworkDispatcherEntryFallbackDiagnosticReturnProjection`;
+- corrected enum-type comparison in
+  `GameSocketParserDiagnosticCleanupFirstBranchRegisterPopsChecks`.
 
-Dispatcher fallback continuation through argument-zero JZ, selector DWORD CMP,
-signed JG, and the two-PUSH non-taken prefix passed runner4356 with zero failures,
-including all earlier dispatcher suffix suites and the full binary oracle.
-Constructor, constant qualification, nullable-read scalar comparison, and an
-invalid ancestor-property reference were corrected without changing byte semantics.
-Checkpoint 480a0d2 is pushed; this next dispatcher batch is ready to persist.
-Parser runner4350 still uses the older suffix replay implementation.
+Focused validations passed with zero failures:
+
+- dispatcher preparation/return/call-target prefix + binary anchors;
+- parser first-branch FS/POPs/frame-return + binary anchors.
+
+Second-branch focused runtime remains expensive: isolated runner repeatedly
+reaches `second-branch FS restore` and `second-branch register pops` headings,
+then stalls before a conclusive `second-branch frame return` result; those
+suites are compile-clean but still runtime-pending acceptance.
+
+Active GPT-6 Luna successors now split the `BBDE3E` branch boundary:
+
+- **nonzero JZ-not-taken path** from `BBDE40` (agent `93b4088b`);
+- **zero JZ-taken path** from `BBDE83` (agent `26355611`).
 
 ClientApi/WinHTTP details are in [ClientApiWinHttp.md](ClientApiWinHttp.md).
 

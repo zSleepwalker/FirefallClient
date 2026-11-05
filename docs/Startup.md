@@ -9,14 +9,21 @@ After frame/receiver clears, JZ at raw BBDE08 selects BBDECA for argument zero
 or BBDE0E otherwise. The latter compares fresh DWORD[VA1E68590] with one;
 JG at BBDE15 uses signed greater-than, selecting BBDE2B or BBDE17.
 The non-taken path projects independent fresh ESP/ECX into PUSH ECX and PUSH 0,
-stopping at BBDE1A before the next diagnostic argument preparation.
+stopping at BBDE1A before the next diagnostic argument preparation. From there,
+the continuation now includes diagnostic argument setup through the direct CALL
+at BBDE26, bounded return at BBDE2B, and call-target arithmetic
+(`MOV/XOR/SUB/SAR/TEST`) through BBDE3D with a stop before the JZ at BBDE3E.
+The zero/nonzero BBDE3E branch continuations are actively being reconstructed.
 
-The parser diagnostic cleanup continuation reconstructs the slot-four indirect
-call return, fresh stack read at ESP+48, segment-relative FS:[0] restoration,
-and four independent POPs at raw BD34ED..BD34F0. The bounded frame-reset suffix
-uses fresh EBP and a separate POP EBP stack read before RET8. These are offline
-value-only projections: missing captures stop the relevant instruction, opaque
-returns invalidate flags/register knowledge, and no target is executed.
+The parser diagnostic cleanup continuation now includes both first-branch
+(`BD34E2..BD34F6`) and second-branch epilogue families. First-branch FS restore,
+register POPs, and frame/RET8 are compile-clean and focused-run validated.
+Second-branch FS restore/register POPs/frame-return are compile-clean and fully
+reviewed, but runtime acceptance is still pending because focused execution
+repeatedly stalls before the frame-return suite completes. All of these remain
+offline value-only projections: missing captures stop at precise boundaries,
+no native target is executed, and no caller continuation is inferred unless
+explicitly modeled.
 
 The PE entry RVA `0x136B9B0` translates to **raw file offset `0x136ADB0`** using the `.text` section mapping. IDA's raw-file loader did not automatically mark this actual entry as a function; its preexisting `nullsub_112` at raw `0x136B9B0` is **not** the PE entry. A new function was defined at the translated offset.
 

@@ -7362,6 +7362,18 @@ internal static class StartupBinaryEvidence
             Matches(0xBD34CB, "8B068BCEFF108D4608F00FC1184B75078B068BCEFF5004"));
         check("Binary parser second-call epilogue restores FS and pops four registers before resetting the frame",
             Matches(0xBD34E2, "8B4C244864890D00000000595F5E5B8BE55DC20800CC"));
+        check("Binary first-branch FS restore independently anchors MOV ECX,[ESP+48] and MOV FS:[0],ECX",
+            RawCodeRangeMaps(0xBD34E2, 11)
+            && Matches(0xBD34E2, "8B4C244864890D00000000"));
+        check("Binary first-branch register-pop window independently anchors POP ECX,EDI,ESI,EBX",
+            RawCodeRangeMaps(0xBD34ED, 4)
+            && Matches(0xBD34ED, "595F5E5B"));
+        check("Binary first-branch frame-return window independently anchors MOV ESP,EBP; POP EBP; RETN 8",
+            RawCodeRangeMaps(0xBD34F1, 6)
+            && Matches(0xBD34F1, "8BE55DC20800"));
+        check("Binary first-branch cleanup windows form one contiguous raw E2-F6 chain ending before F7",
+            RawCodeRangeMaps(0xBD34E2, 0x15)
+            && Matches(0xBD34E2, "8B4C244864890D00000000595F5E5B8BE55DC20800"));
         check("Binary dispatcher fallback pushes EBX and calls the distinct import before incrementing its counter",
             Matches(0xBBDDEF, "53FF157842AC01FF4330"));
         check("Binary dispatcher fallback comparison reads one argument byte, not a DWORD",
