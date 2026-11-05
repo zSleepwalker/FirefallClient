@@ -12668,6 +12668,29 @@ first-return dispatch `707d1845-46a5-492a-b20f-5d30cb0e1634`,
 tag branch `f24535df-8be7-4ffc-b03a-58467db22f0a`,
 computed-zero branch `9f44de5f-cfaa-4185-86f7-bf23450ff31f`.
 
+Checkpoint pushed da893be. The three custom reverse-engineer trace agents
+did not have IDA tools; their unverified address translations are not
+authoritative. Coordinator directly verified first-return bytes and
+tag/zero destinations through read-only IDA tools instead.
+New active implementation owners, all GPT-6 Luna:
+DispatchLifecycle `5bcec49c-2ea5-476d-8080-acb046d924f0`;
+TagValidation `aab0f8c4-035d-4599-8856-6f35a5713658`.
+Tag window raw12C8EF8..12C8F21 gates unsigned ESI>=EDX,
+fresh[EDX+4] bit0 clear, bit1 set, then EDX!=fresh[PEVA1EDADE0].
+Exits respectively12C8E76,12C8E76,12C92DB,12C90CA; equality
+fallsF21. Computed-zero tail raw12C8E3A..12C8E45 still reads and
+writes global PEVA1EDAF78 via SUB ECX before JMP12C9441:
+even entry ECX0 must not erase the native read/write evidence.
+
+AlignmentDispatch released, reviewed and registered. Coordinator fixed
+captured-zero ESI-read fixture to take the entryECX branch before later
+LEA overwrites EAX; this is not a production semantic change. Canonical
+offline runner passed including new tag and computed-zero anchors.
+ZeroExitLifecycle `3ae486b0-c3bb-4e01-ae1b-bce0ad28ecd0` active
+composes only clean computed-zero route, preserving fresh global read/write
+before existing exit projection. DispatchLifecycle and TagValidation remain
+active; keep all three active pairs out of this checkpoint staging.
+
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
 indirect callback, then fresh receiver+4C DEC and receiver+48 zero/INC.

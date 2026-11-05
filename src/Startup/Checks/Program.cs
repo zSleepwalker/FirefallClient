@@ -107,6 +107,7 @@ CapacityFinalCalleeFirstValidationChecks.Run(Check);
 CapacityFinalCalleePrefixLifecycleChecks.Run(Check);
 CapacityFinalCalleeValidationLifecycleChecks.Run(Check);
 CapacityFinalCalleeEntryValidationChecks.Run(Check);
+CapacityFinalCalleeAlignmentDispatchChecks.Run(Check);
 FrameHandoffCapacityAboveBranchLifecycleChecks.Run(Check);
 FrameHandoffCapacitySecondBranchLifecycleChecks.Run(Check);
 FrameHandoffCapacityFinalCallGateChecks.Run(Check);

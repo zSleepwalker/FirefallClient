@@ -331,6 +331,16 @@ internal static class StartupBinaryEvidence
             && RelativeConditionalBranchTargets(0x12C8DBB, 0x0F, 0x85, 0x12C8EF8)
             && ShortConditionalBranchTargets(0x12C8DC7, 0x75, 0x12C8E45)
             && ShortConditionalBranchTargets(0x12C8DD5, 0x74, 0x12C8E3A));
+        check("Binary immutable callee tag-validation anchor retains four distinct exits",
+            Matches(0x12C8EF8, "3BF20F8376FFFFFF8B4A04F6C1010F846AFFFFFFF6C1020F85C60300003B15E0ADED010F85A9010000")
+            && RawCodeRangeMaps(0x12C8EF8, 41)
+            && RelativeConditionalBranchTargets(0x12C8EFA, 0x0F, 0x83, 0x12C8E76)
+            && RelativeConditionalBranchTargets(0x12C8F06, 0x0F, 0x84, 0x12C8E76)
+            && RelativeConditionalBranchTargets(0x12C8F0F, 0x0F, 0x85, 0x12C92DB)
+            && RelativeConditionalBranchTargets(0x12C8F1B, 0x0F, 0x85, 0x12C90CA));
+        check("Binary immutable computed-zero tail still performs its global subtraction",
+            Matches(0x12C8E3A, "290D78AFED01E9FC050000")
+            && RawCodeRangeMaps(0x12C8E3A, 11));
         check("Binary pinned-sample raw code [0xBE6325,0xBE6352) maps to VA 0x00FE6F25 and preserves its JNZ target",
             imageBase == 0x400000
             && Matches(0xBE6325, "8B4E0853578B7E108D04CDFFFFFFFF4921460C037E0C8BC7C1E80323C88B46048D1C8D00000000833C0300751C")

@@ -526,6 +526,11 @@ as partial evidence, not admitted as a clean continuation.
 lifecycle to this validation without admitting validation captures on the
 zero-entry RET path. Nonzero validation receives the exact derived prefix
 capture, while post-call ESI remains independently captured.
+`CapacityFinalCalleeAlignmentDispatchProjection` retains the two initial
+frame writes, the AL-bit route, the fresh `[ESI]` subtraction, and the
+independent entry-ECX/computed-ECX gates. Its opaque indirect call retains
+pre-call register evidence only; captured normal return does not establish
+post-call register preservation.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
