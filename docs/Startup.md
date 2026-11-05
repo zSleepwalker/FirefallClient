@@ -971,6 +971,12 @@ observes the root DWORD at VA `0x01EDADDC` after tag writes, including aliases.
 NodeRingCleanupLifecycle observes the counter after initialized-node and
 self-ring writes, preserves OR flags on a missing read, and separates clean
 completion from a bounded bypass carrying unused counter data.
+IndexedTagTraversalLifecycle carries the classified count and loaded pointer
+through one tag comparison and one traversal iteration, without repeating the
+fresh tag read at raw `0x012C93D8`. ZeroCleanupEpilogueLifecycle joins the
+four-store cleanup's exact nonzero branch to the existing epilogue; missing
+entry registers and later observations remain explicit, and a normal opaque
+call return invalidates all six arithmetic flags.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

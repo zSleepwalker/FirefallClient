@@ -13442,6 +13442,14 @@ Pending released EOF reviews: IndexedTagTraversald8350c8b and ZeroCleanupEpilogu
 7614ecde. Active new pairs: TraversalSlotCleanup9f7cfdc7,
 RightRootSuccessordb4ba8a1 (fresh92D0/92ECbytes verified),
 NodeCleanupEpilogue48e7e283. All use GPT-6 Luna and named-pair-only edits.
+Three pairs above committed/pushed4d0c4f6 (9files2599insertions).
+IndexedTagTraversal fullEOF reviewed; fixed fixture read addresses304 and94
+(indexed slot address is not the pointer value it loads). ZeroCleanupEpilogue
+fullEOF reviewed and registered, with internal9441/outerdestination distinction.
+runner4080exit0 validates both registered pairs excluding four named unreviewed
+drafts via temporaryMSBuildtarget removed afterward. Fullrunner4078 blocked
+activeRightRootSuccessor compile errors; owner notified. NewLuna289a5a10 owns
+IndexedTraversalZeroSlot exactcleanzerochild945C into derived-slot threshold.
 8948188B4A1085C974123B0DD8ADED010F82D8FBFFFF8948108941188B4A1485C974123B0DD8ADED010F82BFFBFFFF894814894118.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
