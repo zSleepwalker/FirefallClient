@@ -644,6 +644,10 @@ bounded at raw `12C8EF8`, `12C903B`, `12C9058`, and `12C8EF2`.
 terminal, carrying the original frame-derived EDX into the clear tail.
 FC5 loopbacks stay single-step; contaminated captures preserve effects
 without admitting the continuation.
+`CapacityFinalCalleeSelectionDescentLifecycleProjection` carries either
+clean FC2 selection's EAX into one descent step, with a separately captured
+frame-minus-four reload. The FFE selection bypass cannot consume descent
+captures, and FC5 is a bounded loopback rather than an iterative model.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

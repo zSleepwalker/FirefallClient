@@ -12940,6 +12940,9 @@ ClearIndexed1c307112-11c7-4f0b-a4e1-e64186ca8373;
 SuccessorPairedStores6580ea95-4d08-4c5d-a612-20481a8792e5.
 Do not stage active files. Native906E..908B evidence returned, not yet
 independently verified/anchored; guarded store successor JZ goes9080.
+Checkpointc922798 pushed. SelectionDescent reviewed/registered; runner3486
+exit0. Native906E..908B now independently verified against IDA bytes and
+anchored offline with JB8E76/JZ8EF2 targets. Active owners unchanged.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
