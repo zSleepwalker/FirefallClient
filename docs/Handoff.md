@@ -13649,6 +13649,17 @@ runner4124exit0 excludes exactly three named unreviewed IOCP/senderbinding/
 errorstate pairs. Target removed. Owner unexpectedly ran isolated7/7 and
 standardbuild despite no-build instructions; coordinator result is
 authoritative, not owner's claim. Review found no further source defect.
+NodeCleanup committed/pushedec72f75; Luna2d2a6ac8 owns NodeIndexedCleanupEpilogue
+successor. IOCP9ed revisions reviewed/registered: coordinator corrected
+clean completion to accept captured zero stop as well as true, and missing
+BOOL attempt/overall stop metadata both atTESTBBC920. runner4126 one
+metadata fixture failure fixed; runner4128exit0. Three exact unreviewed
+sender/error/nodeepilogue exclusions removed after validation.
+Sender4b051 revision requested for inheritedESIbeforeflagread, missing
+senderPUSH operand, preciseaddress/effect/flags/stopmetadata, cleanvsbounded.
+Errord5e621 incorrectly wrote literalnewsrc/newChecks paths and ran tests;
+owner moving onlynamedpair toactualsrcStartup/Checks, no further tests.
+IOCP pair ready explicitcommit/push; no sample execution or IDB mutation.
 SmallBinEpilogue released and full EOF reviewed: owner6d052038 revising
 wrong parent type, nullable value-plan access, missing successor-unused
 forwarding, child read/write effect markers and dirty-ring admission.

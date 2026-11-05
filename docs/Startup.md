@@ -1032,6 +1032,11 @@ a cleanup-counter decrement; equal-root bypasses remain distinct.
 NodeIndexedTraversalSlotCleanupLifecycle observes the fresh counter
 decrement after the four-store jump, preserving carry and bounded
 zero/nonzero destinations without entering the cleanup call or epilogue.
+NetworkIoCompletionPassProjection observes one bounded dequeue pass:
+at most one 500-ms fallback, one hundred counted attempts, independent
+error/key/OVERLAPPED reads and opaque return observations. Missing stop
+data or unused captures cannot claim clean completion; null dispatch
+keys remain bounded rather than invoking an inferred callback.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
