@@ -1112,6 +1112,10 @@ GameSocketReceivePostPacketStackPreparationProjection observes fresh
 post-packet registers and an independent operation read before the
 three stack stores. The nonzero destination and zero-path diagnostic
 call remain unentered; this is preparation evidence, not a full repost.
+GameSocketParserPostResizePointerProjection observes independent
+post-resize stack and DWORD reads, preserves branch-specific TEST/XOR
+flags through two stores, and records EDI as 0x56E. It stops before the
+first header-byte read, including when the derived address is zero.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
