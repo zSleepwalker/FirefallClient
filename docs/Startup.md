@@ -595,6 +595,10 @@ routes, preserving the fresh reads and exact comparison operand order.
 stores at raw `12C8EE9..12C8EF8`, followed by an independent global reload.
 It retains both stores when that reload is missing, including aliased
 destinations; it does not infer pointer ownership or list semantics.
+`CapacityFinalCalleeFrameMaskTagLifecycleProjection` admits the tag join
+only after a clean global-mask write and requires independent ESI/EDX.
+A clean frame mismatch remains bounded at raw `12C8ED5`; supplying tag
+captures on that route rejects admission without erasing earlier effects.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

@@ -383,6 +383,17 @@ internal static class StartupBinaryEvidence
         check("Binary paired-field writes retain the independent global reload after both stores",
             Matches(0x12C8EE9, "8B4DFC89410C8948088B1DD8ADED01")
             && RawCodeRangeMaps(0x12C8EE9, 15));
+        check("Binary descriptor fallback is a distinct opaque call before the frame-mask entry",
+            Matches(0x12C8EB8, "FF15244AAC01")
+            && RawCodeRangeMaps(0x12C8EB8, 6));
+        check("Binary large-size field gates preserve the frame write and ordered paired stores",
+            Matches(0x12C8F76, "8B46188945EC8B460C3BC674258B4E083BCB0F82E8FEFFFF39710C0F85DFFEFFFF3970080F85D6FEFFFF89410C894808EB50")
+            && RawCodeRangeMaps(0x12C8F76, 50)
+            && ShortConditionalBranchTargets(0x12C8F81, 0x74, 0x12C8FA8)
+            && RelativeConditionalBranchTargets(0x12C8F88, 0x0F, 0x82, 0x12C8E76)
+            && RelativeConditionalBranchTargets(0x12C8F91, 0x0F, 0x85, 0x12C8E76)
+            && RelativeConditionalBranchTargets(0x12C8F9A, 0x0F, 0x85, 0x12C8E76)
+            && ShortBranchTargets(0x12C8FA6, 0xEB, 0x12C8FF8));
         check("Binary pinned-sample raw code [0xBE6325,0xBE6352) maps to VA 0x00FE6F25 and preserves its JNZ target",
             imageBase == 0x400000
             && Matches(0xBE6325, "8B4E0853578B7E108D04CDFFFFFFFF4921460C037E0C8BC7C1E80323C88B46048D1C8D00000000833C0300751C")

@@ -12866,6 +12866,12 @@ the new EE9 native anchor. SizeDescriptor returned to owner for rejecting
 contaminated descriptor terminal outcomes. Active successors:
 DescriptorPairedLifecycle `d9eec5a2-4bd8-420f-a6c7-12e32cfa1f03` and
 PairedTagLifecycle `67c0f152-e74d-4e61-8807-de368caa0972`, GPT-6 Luna.
+Checkpoint `24ca947` pushed. FrameMaskTag released/reviewed/registered;
+runner3392 exit0 also verifies new native anchors at EB8 and F76..FA8.
+LargeSizeFields `9733943b-9708-4393-ab9c-963998918aeb` owns the new
+50-byte scalar window; DescriptorFallbackMaskLifecycle
+`e5c8a5aa-6c5d-4309-bdf4-ae528dfa3e61` owns the EB8 opaque-call bridge.
+Both use GPT-6 Luna and must not edit coordinator registrations/evidence.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
