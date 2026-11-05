@@ -7295,6 +7295,12 @@ internal static class StartupBinaryEvidence
             && RelativeBranchTargets(0xBD30D2, 0xE8, 0xBD39D0)
             && RelativeBranchTargets(0xBD30DF, 0xE8, 0xBD3140)
             && Matches(0xBD30E4, "39BE880D0000734489BE880D0000"));
+        check("Binary failed receive result suppresses error 996 before the shared dynamic error callback",
+            Matches(0xBD2ED1, "FF15644DAC0185C07510FF15A04DAC013DE4030000")
+            && RelativeBranchTargets(0xBD2EE6, 0xE9, 0xBD2FF7)
+            && Matches(0xBD2FF7, "74088B168BCE50FF5220")
+            && ReadUInt32(0x16C39A0) == 0x8000006F
+            && ImportSlotNames(0x1AC4D64, "WSAGetOverlappedResult"));
         check("Binary Network and GameSocket shutdown ownership and distinct WinHTTP close helpers are fingerprinted",
             ReadUInt32(VirtualAddressToFileOffset(0x1C734B4)) == 0x00FBD900
             && ReadUInt32(VirtualAddressToFileOffset(0x1C734B4) + 8) == 0x00FBE540

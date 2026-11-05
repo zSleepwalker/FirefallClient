@@ -1045,6 +1045,12 @@ GameSocketCompletionErrorStateProjection starts at the internal
 post-log/release continuation: it observes compare-exchange state ten,
 conditionally copies the fresh field and queues token two. It does not
 model the outer zero-error bypass, concurrency execution or SEH cleanup.
+CapacityFinalCalleeCommonNodeIndexedCleanupEpilogueLifecycleProjection
+joins the indexed node cleanup counter to the shared gated epilogue.
+The zero-counter path requires a separately observed normal helper return;
+the nonzero path enters directly. Pending calls preserve preceding flags,
+while normal opaque returns invalidate them. Unused captures spoil clean
+admission without erasing an observed bounded child return.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

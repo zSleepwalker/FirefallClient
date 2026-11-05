@@ -13697,6 +13697,43 @@ at missingatomic to precedingXOR and pending/nonreturnqueue toTEST
 exactlynodeepilogue/clockgate drafts; target removed. Readyexplicitcommit.
 Nodeepilogue2d2 released into wrongliteralnewsrc/newChecks; owner moving
 namedpair toactualsrc paths before review. No extra build/test permitted.
+Errorstate and clock/context byteanchors committed/pushedec2874a.
+Luna1fe9bd7e investigating receive callback overlapped-result error tail:
+996 suppression versus opaque error callback, distinct from implemented
+state continuation. Other active owners a151clock,2d2nodeepiloguemove,
+2a0freshcontextanalysis. Latest subset4136exit0/ordinaryfull4110.
+2a0 analysis consumed: repository-only gap, not fresh sample evidence;
+coordinator's earlier BC54byte/3130 windows supply verified route.
+Luna80edcfa7 implementing exactnamed GameSocketDatagramContextDispatch
+pair, composing clean sender-binding tail with fresh context and fresh
+post-nonzero-parser high-water read; opaque parsers remain unentered.
+Node2d2 actualsrcpair full EOF reviewed: requested qualification of plan
+constant; preserve DEC/TEST flags at pending/non-normal call observations;
+normal returns alone invalidate flags. Also dirty unused cleanup-return
+capture must spoil clean child exit without erasing bounded return, and
+missing/non-normal cleanup cannot be clean. Equal/below fixture corrected
+by owner next; no coordinator validation of this pair yet.
+Lunadb918472 investigating raw012CE310 bounded token-queue helper/prior
+art gap, distinct from current socket callback and context work.
+Clock a151 released pair EOF review found wrong raw entry derived from
+opcode bytes (8B3570 rather than BBC8B0) and inconsistent dispatcher
+raw/RVA, selected destination and pending-call flags. Revision requested;
+also make saved-stack reload after clock return a fresh independent read,
+with EBP required only at the reached save, not initial global read.
+Receive analysis1fe9 fresh sample route consumed; its named error-import
+claim rejected: coordinator rechecked raw16C39A0=8000006F ordinal111.
+Fresh IDA BD2ED1/BD2FF7 windows confirm result/error996/sharedslot20
+route, and BBC8B0 clock window reconfirmed. Added receive fingerprints
+await validation. Luna18953e25 implementing bounded receive result gate,
+success at BD2EEB and error skip/normal callback at BD3001 unentered.
+Node2d2 revision consumed: corrected flags/qualification/clean rules.
+Coordinator fixed null tested-byte unused assertion and added explicit
+dirty unused cleanup-return/retained bounded child return fixture.
+Registered node epilogue; runner4138exit0 including fresh receive anchors,
+excluding exactly clock/context/receive-result/error-queue draft pairs.
+Temporary target removed. Lunaf73ce3f5 fresh indexed nonzero-child gap
+analysis successor; Lunae942587e composing error-state queue-call
+handoff into generic QueueAppendAcquisition without duplicating helper.
 SmallBinEpilogue released and full EOF reviewed: owner6d052038 revising
 wrong parent type, nullable value-plan access, missing successor-unused
 forwarding, child read/write effect markers and dirty-ring admission.
