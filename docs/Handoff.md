@@ -13151,6 +13151,12 @@ indexedaddressa6157ab5 plusBacklinkSuccessor04efd91f/RootPaired53fc6086.
 Verifiedunassignedraw920B..9226 bytes3B15D8ADED018955FC8B55F40F8259FCFFFF8B4DFCC70100000000:
 CMPentryEDX/freshVA1EDADD8; storeEDXatEBP-4; freshEBP-CreloadEDX;
 JB9217->8E76usesearlierCMPflags; otherwisefreshEBP-4->ECX then[ECX]=0.
+e5bfe30 pushedrootcompositions. NodeReload/SavedFrame reviewedregistered,
+runner3742 exit0. CorrectedmaximumDWORDTESTparitytrue; explicitreloadstop.
+Releasedpendingreview NodeField04d32a23, IndexedAddressa6157ab5,
+RootPaired53fc6086. BacklinkSuccessor04efd91f returnedtocreateownChecks
+instead ofmodifyingexistingLargeSuccessorWritesChecks. ActiveLeafThreshold
+a7cda27f; newSavedFrameCommonb702abbf. CoordinatorProgram/docs pendingcommit.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional

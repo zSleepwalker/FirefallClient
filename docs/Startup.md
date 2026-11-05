@@ -797,6 +797,9 @@ CommonRootSize preserves the parent CMP when caller EDI is missing and
 enters the size gate only on root inequality. FinalMaskCommonRoot retains
 three writes before its independent root read; unused root captures on
 the bounded917C path prevent clean admission.
+The bounded node reload loads fresh EAX through ECX, retains that address
+in EDX, and stops at91F3 without iterating. The saved-frame gate independently
+loads EBP-10 and tests it: zero selects92BD, nonzero selects9231.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
