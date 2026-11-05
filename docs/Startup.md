@@ -1270,6 +1270,10 @@ stopping at BBDDCF. Cookie validity and ABI semantics remain unmodeled.
 GameSocketParserDiagnosticCleanupPostCallAddressProjection requires independent
 post-call ESI for LEA EAX,[ESI+8], preserving unknown arithmetic flags and stopping
 at BD34D4 before the second locked XADD. It does not inherit pre-call EBX or ESP.
+NetworkDispatcherEntryFsPublicationProjection derives EAX as frame EBP-0Ch
+and records a logical DWORD publication to segment-relative FS:[0] at BBDDD2,
+stopping at BBDDD8. It preserves ESP, XOR flags and the distinct earlier FS read;
+no linear-address or exception-ABI interpretation is made.
 GameSocketParserSelectorDiagnosticPreparationProjection records the five
 diagnostic argument pushes at BD326A..BD3280. It derives ESP from the
 count-consumption lineage but requires fresh ESI and an independent DWORD

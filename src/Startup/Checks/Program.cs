@@ -369,6 +369,7 @@ NetworkIoErrorCallbackExitReturnTransferChecks.Run(Check);
 NetworkDispatcherEntryFramePrefixChecks.Run(Check);
 NetworkDispatcherEntryRegisterSaveChecks.Run(Check);
 NetworkDispatcherEntryCookiePreparationChecks.Run(Check);
+NetworkDispatcherEntryFsPublicationChecks.Run(Check);
 GameSocketParserDiagnosticCleanupPostCallAddressChecks.Run(Check);
 GameSocketParserDiagnosticCleanupVirtualCallReturnChecks.Run(Check);
 CapacityFinalCalleeCommonTraversalSlotCleanupLifecycleChecks.Run(Check);

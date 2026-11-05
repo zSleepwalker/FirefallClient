@@ -14203,6 +14203,12 @@ Successors Lunaf0ce39cb owns CFLEA EBP-0C and D2FS:[0] logicalpublication
 stoppingD8 beforeMOVESI,ECX. Luna1f4b5beb owns D4secondLOCKXADD requiring
 freshpostcallEBX and operationDWORD, stoppingD8 beforeDEC. Never inherit oldEBX.
 Current exclusions EntryFsPublication/DiagnosticCleanupSecondXadd.
+FSpublicationf0ce39cb fullEOF reviewed registered4326exit0. DerivedframeLEA
+wraps, logicalFS:[0]write remains segment-relative and oldFSreadindependent.
+Luna2b1d0834 owns D8MOVESI freshECX, DALEAEBX ESI6C, DDbyteframewrite,
+E1PUSHEBX and E2DWORDframewrite stoppingE5 beforeimportcall.
+SecondXADD1f4b5beb remains active; current exclusions EntryLockPreparation/
+DiagnosticCleanupSecondXadd. Latest ordinaryfull4324, subset4326.
 
 The user's finish-current-tasks-and-stop request supersedes earlier
 continuous-dispatch instructions. All current assignments are now released,
