@@ -343,9 +343,11 @@ CapacityFinalCalleeCommonNodeIndexedSecondEqualityCleanupLifecycleChecks.Run(Che
 NetworkDispatcherFencedPublicationChecks.Run(Check);
 NetworkDispatcherFinalCallPreparationChecks.Run(Check);
 NetworkDispatcherFinalReturnSehStoreChecks.Run(Check);
+NetworkDispatcherRegisterRestoreChecks.Run(Check);
 GameSocketParserStoredByteSelectorGateChecks.Run(Check);
 NetworkIoErrorCallbackReturnChecks.Run(Check);
 NetworkIoErrorCallbackLoopGateChecks.Run(Check);
+NetworkIoErrorCallbackPostLoopByteGateChecks.Run(Check);
 CapacityFinalCalleeCommonTraversalSlotCleanupLifecycleChecks.Run(Check);
 CapacityFinalCalleeCommonTraversalCleanupEpilogueLifecycleChecks.Run(Check);
 CapacityFinalCalleeLargeRightRootSuccessorLifecycleChecks.Run(Check);

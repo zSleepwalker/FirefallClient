@@ -14040,6 +14040,14 @@ after fixture fixes: ImmutableArray.Length, supplied-unused postcall EBP,
 and comparison with the actual incomplete parent bound rather than true.
 Luna74d87c14 owns four independent stack POP observations C0..C3, boundedC4.
 Luna60bc post-loop byte pair remains active; no sample/IDB changes.
+Register74d and post-loop byte60bc full EOF reviewed and accepted4270exit0
+ordinary full checks. Coordinator corrected restore range precedence,
+named argument, equal-parent skipped stack capture, zero-based missing
+capture helper and reprojection fixture; byte-prefix comparison now uses
+the newly reprojected parent rather than nested immutable-array identity.
+Next Lunafd339286 models frame reset/EBP POP throughC7; Lunafddb744c
+analyzes IOCP exit POPs through9DD indirect boundary. Draft exclusion
+currently only FrameReset; ordinary full4270 preceded new drafts.
 
 The user's finish-current-tasks-and-stop request supersedes earlier
 continuous-dispatch instructions. All current assignments are now released,

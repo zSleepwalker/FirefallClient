@@ -1212,6 +1212,9 @@ NetworkDispatcherFinalReturnSehStoreProjection independently captures the
 target and normal return, then a fresh post-call EBP/local DWORD. It records
 the DWORD store to FS segment offset zero and stops before BBDEC0 POP;
 no linear address, callee identity, or ABI is inferred.
+NetworkDispatcherRegisterRestoreProjection records four independent POP
+reads and logical register/ESP updates, stopping before the frame reset at
+BBDEC4. Missing captures preserve earlier restored registers and flags.
 GameSocketParserStoredByteSelectorGateProjection derives EBX from the
 first header byte and selects BD3294 or BD326A using the fresh stack-byte
 JZ and ordered selector comparisons. Neither destination is entered.
@@ -1223,6 +1226,9 @@ NetworkIoErrorCallbackLoopGateProjection uses fresh post-call EBP/EDI and
 independent local loads before INC/CMP and the signed JL. It preserves
 unknown CF through INC, then computes the full comparison flags and stops
 before raw BBC8F0 or BBC9CB.
+NetworkIoErrorCallbackPostLoopByteGateProjection independently reloads two
+locals around a fresh byte comparison. The second MOV overwrites EAX but
+preserves CMP8 flags; the selected BBC8B0 or BBC9DB remains unentered.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
