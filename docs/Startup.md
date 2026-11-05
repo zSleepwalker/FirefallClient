@@ -1238,6 +1238,9 @@ preserves CMP8 flags; the selected BBC8B0 or BBC9DB remains unentered.
 NetworkIoErrorCallbackExitPopProjection records independent EDI/ESI stack
 reads using fresh ESP, retains EAX/CMP8 flags and stops before the indirect
 call at BBC9DD. Rejected ancestors retain their actual bounded endpoints.
+NetworkIoErrorCallbackExitCallReturnProjection independently captures the
+call-cell DWORD and explicit normal return. It invalidates arithmetic flags
+only after normal return and stops before POP EBX at BBC9E3.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

@@ -14062,6 +14062,12 @@ Luna8513749c models IOCP9DD target/normal-return boundary through9E3.
 Luna49c7b1e8 analyzes parser selector diagnostic pushes326A..3281 from
 fresh IDA42-byte window; no semantic interpretation of constant operands.
 Current exclusion only ExitCallReturn; ordinary full4274 is newest baseline.
+ExitCallReturn851 full EOF accepted4278exit0 after nested-capture fixture
+correction. Lunade803c52 owns fresh post-call ESP/EBX POP through9E4.
+Parser49c contract exposed missing numeric ESI lineage; Lunae5702b71
+implements derived ESP but requires fresh ESI at327B and independent110
+field DWORD. No reconciliation with earlier aliased writes is permitted.
+Current draft exclusions SelectorDiagnosticPreparation and ExitEbxRestore.
 
 The user's finish-current-tasks-and-stop request supersedes earlier
 continuous-dispatch instructions. All current assignments are now released,
