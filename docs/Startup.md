@@ -800,6 +800,10 @@ the bounded917C path prevent clean admission.
 The bounded node reload loads fresh EAX through ECX, retains that address
 in EDX, and stops at91F3 without iterating. The saved-frame gate independently
 loads EBP-10 and tests it: zero selects92BD, nonzero selects9231.
+NodeFieldSelection preserves a separate fresh saved EDX while inspecting
+EAX+14 and, only after zero, EAX+10. LEAs preserve each CMP's flags.
+CommonIndexedAddress forms the address without reading it and stops at
+the opaque9304 call instruction or the clean930A branch.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
