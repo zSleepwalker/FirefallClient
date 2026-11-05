@@ -13872,6 +13872,12 @@ BD31D7 64bytes resize-return pointer seam and BD2F2A58bytes stack-
 prep seam captured. Luna16e4874a parser successor analysis and
 28c6d216 postpacket stackprep implementation;8be9 reportconsumed
 freshsampledirectreadcorrect thencoordinatorIDAconfirmed.
+Parser dispatch committed/pushedaa826fe. Equality epilogue22cc fullEOF
+review coordinatormade effectbuilderinternal and fixednullableaccess
+after4168compilefailure; addedpendingcellTESTflags/dirtyunusedcell
+RET fixtures. Registered4170exit0 exact queueattempt/collection/post-
+packetstackdraft exclusions; targetremoved. Luna5ab327d8 outer/root
+indexed equality9403 compositiongap successor analysis.
 SmallBinEpilogue released and full EOF reviewed: owner6d052038 revising
 wrong parent type, nullable value-plan access, missing successor-unused
 forwarding, child read/write effect markers and dirty-ring admission.

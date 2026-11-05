@@ -1098,6 +1098,11 @@ vtable and slot-C target after constructor return. It derives the resize
 receiver from an independently captured post-getter ESP, not the earlier
 local address, and stops before the resize call. Pending or nonnormal
 getter observations preserve the incoming flags at the call boundary.
+CapacityFinalCalleeCommonNodeIndexedEqualityRingCleanupEpilogueLifecycleProjection
+joins the five-store cleanup counter paths to the shared bit-1 TEST
+epilogue. Only an observed normal zero-counter cleanup return enters
+that epilogue; unused return captures dirty clean admission without
+erasing an actual bounded RET.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
