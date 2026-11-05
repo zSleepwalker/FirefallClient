@@ -7356,6 +7356,10 @@ internal static class StartupBinaryEvidence
             && Matches(0xBD34AD, "C7442450FFFFFFFF8B74243C85F6742583CBFF8D46048BCBF00FC10875178B06"));
         check("Binary IOCP exit restores EBX and the frame before a near RET",
             Matches(0xBBC9DD, "FF156097DF015B8BE55DC3"));
+        check("Binary dispatcher entry builds the frame and saves registers before the cookie preparation",
+            Matches(0xBBDDB0, "558BEC6AFF68183CA40164A1000000005083EC0C535657A10050DC0133C550"));
+        check("Binary parser slot-zero call returns before a distinct post-call address and locked operation",
+            Matches(0xBD34CB, "8B068BCEFF108D4608F00FC1184B75078B068BCEFF5004"));
         check("Binary nonzero parser dispatches through a fresh stack-local vtable before preserve-one resize",
             Matches(0xBD31C5, "8D4C24348B442434FF500C6A01508D4C243C")
             && RelativeBranchTargets(0xBD31D7, 0xE8, 0x12CBCB0)

@@ -14191,6 +14191,9 @@ ran nonincremental/no-shared validation after registering checks.
 FreshIDA BD34D1 bytes24:8D4608F00FC1184B75078B068BCEFF50048B4C244864890D.
 Lunae3f9941b owns ONLY D1LEA from freshpostcallESI stoppingD4 beforeLOCKXADD.
 Current exclusions EntryCookiePreparation/DiagnosticCleanupPostCallAddress.
+3ee62c7 committed/pushed register-save and virtual-return pairs. Independent
+offline binary anchors added for dispatcherB0..CF and parserCB..E2;4322exit0.
+Latest ordinary full remains4308; reviewed subset4322 excludes two active drafts.
 
 The user's finish-current-tasks-and-stop request supersedes earlier
 continuous-dispatch instructions. All current assignments are now released,
