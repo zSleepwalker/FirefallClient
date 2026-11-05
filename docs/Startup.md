@@ -668,6 +668,11 @@ frame and global captures remain independent from the clear-tail writes.
 execution only after a clean terminal selection/descent at FDD. FFE
 bypasses and FC5 loopbacks remain bounded and cannot consume clear-tail
 captures; missing reads preserve only effects reached before the stop.
+`CapacityFinalCalleeFinalPairedTailProjection` guards the final ECX value
+against a fresh global at `12C908B`, then performs the two ordered stores
+and jumps to `12C8EF2`. `CapacityFinalCalleeConditionalGuardedLifecycleProjection`
+joins only clean nonzero conditional-store routes to `12C9058`; retained
+registers are supplied only at reached consumers, with independent later reads.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
