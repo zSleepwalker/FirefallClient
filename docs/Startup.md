@@ -399,6 +399,10 @@ The reliable masked-length callback's validated entry also admits the zero-resul
 
 `UnreliableReceiveHighCountCounterProjection` uses a fresh receiver+4C reload after those calls. DEC wraps; post-DEC zero writes receiver+48 without reading it, while nonzero independently reads/increments receiver+48. Missing later captures retain the completed DEC. An unreached receiver+48 capture on the zero path is flagged even though both visible writes are projected.
 
+`PayloadXorEntrySetupProjection` requires admitted diagnostic-entry outcomes plus matching frame, retained EBX, and boundary AL before any stack/table reads. `UnreliableReceiveBelowThresholdReturnProjection` constructs the frame handoff from the stored receiver/frame identities only on the exact below-threshold outcome; high-count paths stop before their unmodeled cleanup rather than jumping to the shared return.
+
+`UnreliableReceiveHighCountSuffixProjection` admits counter updates only after a clean zero-object branch or normal indirect callback return. It preserves partial DEC effects but rejects unreached zero-path counter+48 captures as complete joins.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves

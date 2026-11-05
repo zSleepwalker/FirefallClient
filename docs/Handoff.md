@@ -12178,6 +12178,24 @@ Read-only helper/prior-art traces: BE64A0 owner
 `a686b2f8-a5a5-46e2-8ef3-09286a0d317a`; BE6440 owner
 `b1f34702-0c12-4d52-9bae-1d0834046999`.
 
+Pushed reviewed high-count forwarding/callback/counter pairs as `a7b555f`.
+XOR entry/setup and below-threshold return compositions reviewed/registered;
+validation currently waits on high-count suffix author's same-task local
+shadowing compile fix. `385035ec-b4de-43f6-90c0-ce50f3aeee93` owns the
+result-stores/high-count-forward composition.
+Suffix immutable anchors completed/reviewed; no active evidence writer.
+
+Entry/setup, below-threshold return, and high-count suffix compositions pass
+the pinned runner after coordinator fixture fixes (matching frame in partial
+XOR table capture; invalid counter gate with no later counter capture).
+Suffix selected destination now denotes clean completed join `BE5C0F`,
+not predecessor callback boundary `BE5BFE`.
+Read-only helper traces completed: BE64A0's first block gates an opaque
+BE6B50 call on low-two-bit sum and unsigned capacity arithmetic;
+BE6440 passes local frame-C address to BE6B30 then reads its EAX result.
+Code owners `efca7624-c0c8-408c-8b37-66d62ac231b3` (BE64A0 entry) and
+`05a883e5-b613-4dc1-96ef-7238a683196a` (BE6440 entry).
+
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
 indirect callback, then fresh receiver+4C DEC and receiver+48 zero/INC.

@@ -13695,5 +13695,52 @@ internal static class StartupBinaryEvidence
                 == rawStartupCommonCallbackShortEpilogueEndFileOffset
             && Matches(rawStartupCommonCallbackShortEpilogueFileOffset,
                 "5E5B8BE55DC3"));
+
+        const uint rawStartupCommonCallbackLowCountCallFileOffset = 0xBE5BF1;
+        const uint rawStartupCommonCallbackLowCountCallEndFileOffset = 0xBE5BFE;
+        const int startupCommonCallbackLowCountCallLength =
+            (int)(rawStartupCommonCallbackLowCountCallEndFileOffset
+                - rawStartupCommonCallbackLowCountCallFileOffset);
+        const uint startupCommonCallbackLowCountCallCodeVirtualAddress =
+            rawStartupCommonCallbackLowCountCallFileOffset + 0x400C00;
+        check("Binary pinned-sample FirefallClient.exe SHA256 97362D668FF64778193A64759265E4AE90842043C4A15B627DF9902FD9135445 raw [0xBE5BF1,0xBE5BFE) maps by raw+0x400C00 to code VA [0xFE67F1,0xFE67FE); MOV ECX,[EAX]; TEST ECX,ECX; JZ at raw 0xBE5BF5 targets the normal continuation at raw 0xBE5BFE; MOV EAX,[ECX]; PUSH 1; CALL DWORD [EAX+8] at raw 0xBE5BFB has normal return boundary raw 0xBE5BFE",
+            startupCommonCallbackLowCountCallLength == 0x0D
+            && startupCommonCallbackLowCountCallCodeVirtualAddress == 0xFE67F1
+            && startupCommonCallbackLowCountCallCodeVirtualAddress
+                + startupCommonCallbackLowCountCallLength == 0xFE67FE
+            && RawCodeRangeMaps(rawStartupCommonCallbackLowCountCallFileOffset,
+                startupCommonCallbackLowCountCallLength)
+            && VirtualAddressToFileOffset(startupCommonCallbackLowCountCallCodeVirtualAddress)
+                == rawStartupCommonCallbackLowCountCallFileOffset
+            && VirtualAddressToFileOffset(startupCommonCallbackLowCountCallCodeVirtualAddress
+                + startupCommonCallbackLowCountCallLength)
+                == rawStartupCommonCallbackLowCountCallEndFileOffset
+            && Matches(rawStartupCommonCallbackLowCountCallFileOffset,
+                "8B0885C974078B016A01FF5008")
+            && ShortConditionalBranchTargets(0xBE5BF5, 0x74, 0xBE5BFE));
+
+        const uint rawStartupCommonCallbackCountUpdateFileOffset = 0xBE5BFE;
+        const uint rawStartupCommonCallbackCountUpdateEndFileOffset = 0xBE5C0F;
+        const int startupCommonCallbackCountUpdateLength =
+            (int)(rawStartupCommonCallbackCountUpdateEndFileOffset
+                - rawStartupCommonCallbackCountUpdateFileOffset);
+        const uint startupCommonCallbackCountUpdateCodeVirtualAddress =
+            rawStartupCommonCallbackCountUpdateFileOffset + 0x400C00;
+        check("Binary pinned-sample FirefallClient.exe SHA256 97362D668FF64778193A64759265E4AE90842043C4A15B627DF9902FD9135445 raw [0xBE5BFE,0xBE5C0F) maps by raw+0x400C00 to code VA [0xFE67FE,0xFE680F); DEC DWORD [EDI+0x4C] uses a fresh [EDI+0x4C] value, not a threshold value; JNZ at raw 0xBE5C01 targets raw 0xBE5C0C; zero path stores 0 to [EDI+0x48] then JMPs to raw 0xBE5C0F; nonzero path increments [EDI+0x48] then joins at raw 0xBE5C0F; the zero path does not read [EDI+0x48]",
+            startupCommonCallbackCountUpdateLength == 0x11
+            && startupCommonCallbackCountUpdateCodeVirtualAddress == 0xFE67FE
+            && startupCommonCallbackCountUpdateCodeVirtualAddress
+                + startupCommonCallbackCountUpdateLength == 0xFE680F
+            && RawCodeRangeMaps(rawStartupCommonCallbackCountUpdateFileOffset,
+                startupCommonCallbackCountUpdateLength)
+            && VirtualAddressToFileOffset(startupCommonCallbackCountUpdateCodeVirtualAddress)
+                == rawStartupCommonCallbackCountUpdateFileOffset
+            && VirtualAddressToFileOffset(startupCommonCallbackCountUpdateCodeVirtualAddress
+                + startupCommonCallbackCountUpdateLength)
+                == rawStartupCommonCallbackCountUpdateEndFileOffset
+            && Matches(rawStartupCommonCallbackCountUpdateFileOffset,
+                "FF4F4C7509C7474800000000EB03FF4748")
+            && ShortConditionalBranchTargets(0xBE5C01, 0x75, 0xBE5C0C)
+            && ShortConditionalBranchTargets(0xBE5C0A, 0xEB, 0xBE5C0F));
     }
 }
