@@ -393,6 +393,8 @@ The reliable masked-length callback's validated entry also admits the zero-resul
 
 `ReliableReceiveLengthPublicationProjection` composes normal length callback, scalar helper cleanup, and publication with payload identity validation and an independently captured frame+8 pointer. `UnreliableReceiveFrameHandoffProjection` covers shared `[BE5C0F,BE5C26)` address-only handoff to `BE64A0` and its normal AL=1 epilogue; unknown helper EAX does not block the known low-byte effect.
 
+`PayloadXorReturnProjection` covers `[BD594E,BD5954)`: restores ESI/EBX, resets ESP from EBP, restores EBP, and returns without immediate cleanup or an EAX write. Optional captured EAX is preserved, not interpreted as the input pointer. `UnreliableReceiveZeroForwardReturnProjection` admits the zero-AL return only after the exact normally returned forwarding outcome, never the nonzero-ESI branch at the same end offset.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves

@@ -13395,5 +13395,305 @@ internal static class StartupBinaryEvidence
             && Matches(rawStartupPayloadWordJoinFileOffset,
                 "668B43026689471E0FB70B8BC1C1E90C25FF07000083E80480E1030FB7F08975FC894D08741C")
             && ShortConditionalBranchTargets(0xBE5B14, 0x74, 0xBE5B32));
+
+        const uint rawStartupPayloadCallbackIndirectHandoffFileOffset = 0xBE5B16;
+        const uint rawStartupPayloadCallbackIndirectHandoffEndFileOffset = 0xBE5B25;
+        const int startupPayloadCallbackIndirectHandoffLength =
+            (int)(rawStartupPayloadCallbackIndirectHandoffEndFileOffset
+                - rawStartupPayloadCallbackIndirectHandoffFileOffset);
+        const uint startupPayloadCallbackIndirectHandoffCodeVirtualAddress =
+            rawStartupPayloadCallbackIndirectHandoffFileOffset + 0x400C00;
+        check("Binary pinned-sample FirefallClient.exe SHA256 97362D668FF64778193A64759265E4AE90842043C4A15B627DF9902FD9135445 raw [0xBE5B16,0xBE5B25) maps by raw+0x400C00 to code VA [0xFE6716,0xFE6725); zero-extends SI, forms ECX as payload+8, pushes the length, reads the DWORD at payload+8, pushes payload+4, then calls through the value read at payload+8 plus 4; normal indirect-call return boundary is 0xBE5B25, instruction evidence only",
+            startupPayloadCallbackIndirectHandoffLength == 0x0F
+            && startupPayloadCallbackIndirectHandoffCodeVirtualAddress == 0xFE6716
+            && startupPayloadCallbackIndirectHandoffCodeVirtualAddress
+                + startupPayloadCallbackIndirectHandoffLength == 0xFE6725
+            && RawCodeRangeMaps(rawStartupPayloadCallbackIndirectHandoffFileOffset,
+                startupPayloadCallbackIndirectHandoffLength)
+            && VirtualAddressToFileOffset(startupPayloadCallbackIndirectHandoffCodeVirtualAddress)
+                == rawStartupPayloadCallbackIndirectHandoffFileOffset
+            && VirtualAddressToFileOffset(startupPayloadCallbackIndirectHandoffCodeVirtualAddress
+                + startupPayloadCallbackIndirectHandoffLength)
+                == rawStartupPayloadCallbackIndirectHandoffEndFileOffset
+            && Matches(rawStartupPayloadCallbackIndirectHandoffFileOffset,
+                "0FB7C68D4B08508B01FF7304FF5004"));
+
+        const uint rawStartupPayloadCallbackContinuationFileOffset = 0xBE5B25;
+        const uint rawStartupPayloadCallbackContinuationEndFileOffset = 0xBE5B32;
+        const int startupPayloadCallbackContinuationLength =
+            (int)(rawStartupPayloadCallbackContinuationEndFileOffset
+                - rawStartupPayloadCallbackContinuationFileOffset);
+        const uint startupPayloadCallbackContinuationCodeVirtualAddress =
+            rawStartupPayloadCallbackContinuationFileOffset + 0x400C00;
+        check("Binary pinned-sample FirefallClient.exe SHA256 97362D668FF64778193A64759265E4AE90842043C4A15B627DF9902FD9135445 raw [0xBE5B25,0xBE5B32) maps by raw+0x400C00 to code VA [0xFE6725,0xFE6732); reloads only CL from frame+8 preserving unknown upper ECX bits, copies full EAX to EDX, and calls relative target raw 0xBD58E0 from 0xBE5B2A; normal return at 0xBE5B2F reaches the four-byte cleanup, outside opaque-callee attribution",
+            startupPayloadCallbackContinuationLength == 0x0D
+            && startupPayloadCallbackContinuationCodeVirtualAddress == 0xFE6725
+            && startupPayloadCallbackContinuationCodeVirtualAddress
+                + startupPayloadCallbackContinuationLength == 0xFE6732
+            && RawCodeRangeMaps(rawStartupPayloadCallbackContinuationFileOffset,
+                startupPayloadCallbackContinuationLength)
+            && VirtualAddressToFileOffset(startupPayloadCallbackContinuationCodeVirtualAddress)
+                == rawStartupPayloadCallbackContinuationFileOffset
+            && VirtualAddressToFileOffset(startupPayloadCallbackContinuationCodeVirtualAddress
+                + startupPayloadCallbackContinuationLength)
+                == rawStartupPayloadCallbackContinuationEndFileOffset
+            && Matches(rawStartupPayloadCallbackContinuationFileOffset,
+                "8A4D088BD0E8B1FDFEFF83C404")
+            && RelativeBranchTargets(0xBE5B2A, 0xE8, 0xBD58E0));
+
+        const uint rawStartupReceiverOptionalDispatchFileOffset = 0xBE5B32;
+        const uint rawStartupReceiverOptionalDispatchEndFileOffset = 0xBE5B52;
+        const int startupReceiverOptionalDispatchLength =
+            (int)(rawStartupReceiverOptionalDispatchEndFileOffset
+                - rawStartupReceiverOptionalDispatchFileOffset);
+        const uint startupReceiverOptionalDispatchCodeVirtualAddress =
+            rawStartupReceiverOptionalDispatchFileOffset + 0x400C00;
+        check("Binary pinned-sample FirefallClient.exe SHA256 97362D668FF64778193A64759265E4AE90842043C4A15B627DF9902FD9135445 raw [0xBE5B32,0xBE5B52) maps by raw+0x400C00 to code VA [0xFE6732,0xFE6752); compares DWORD [EDI+0x14] with zero and JNZ at raw 0xBE5B36 targets raw 0xBE5B52; zero route pushes 0, 0x2CA, 0x01B58C06, and 0x01B58C07, calls indirectly through cell 0x01C15EA0, returns normally at raw 0xBE5B4F, and cleans 0x10 stack bytes; instruction evidence only",
+            startupReceiverOptionalDispatchLength == 0x20
+            && startupReceiverOptionalDispatchCodeVirtualAddress == 0xFE6732
+            && startupReceiverOptionalDispatchCodeVirtualAddress
+                + startupReceiverOptionalDispatchLength == 0xFE6752
+            && RawCodeRangeMaps(rawStartupReceiverOptionalDispatchFileOffset,
+                startupReceiverOptionalDispatchLength)
+            && VirtualAddressToFileOffset(startupReceiverOptionalDispatchCodeVirtualAddress)
+                == rawStartupReceiverOptionalDispatchFileOffset
+            && VirtualAddressToFileOffset(startupReceiverOptionalDispatchCodeVirtualAddress
+                + startupReceiverOptionalDispatchLength)
+                == rawStartupReceiverOptionalDispatchEndFileOffset
+            && Matches(rawStartupReceiverOptionalDispatchFileOffset,
+                "837F1400751A6A0068CA02000068068CB50168078CB501FF15A05EC10183C410")
+            && ShortConditionalBranchTargets(0xBE5B36, 0x75, 0xBE5B52));
+
+        const uint rawStartupCommonCallbackDispatchFileOffset = 0xBE5B52;
+        const uint rawStartupCommonCallbackDispatchEndFileOffset = 0xBE5B64;
+        const int startupCommonCallbackDispatchLength =
+            (int)(rawStartupCommonCallbackDispatchEndFileOffset
+                - rawStartupCommonCallbackDispatchFileOffset);
+        const uint startupCommonCallbackDispatchCodeVirtualAddress =
+            rawStartupCommonCallbackDispatchFileOffset + 0x400C00;
+        check("Binary pinned-sample FirefallClient.exe SHA256 97362D668FF64778193A64759265E4AE90842043C4A15B627DF9902FD9135445 raw [0xBE5B52,0xBE5B64) maps by raw+0x400C00 to code VA [0xFE6752,0xFE6764); pushes zero, zero-extends SI, pushes the DWORD at payload+4 and the address payload+8 formed by LEA, then independently reloads DWORD [EDI+0x14] into EAX and calls EAX at raw 0xBE5B62; normal return boundary is raw 0xBE5B64, with no target-equality or ownership claim",
+            startupCommonCallbackDispatchLength == 0x12
+            && startupCommonCallbackDispatchCodeVirtualAddress == 0xFE6752
+            && startupCommonCallbackDispatchCodeVirtualAddress
+                + startupCommonCallbackDispatchLength == 0xFE6764
+            && RawCodeRangeMaps(rawStartupCommonCallbackDispatchFileOffset,
+                startupCommonCallbackDispatchLength)
+            && VirtualAddressToFileOffset(startupCommonCallbackDispatchCodeVirtualAddress)
+                == rawStartupCommonCallbackDispatchFileOffset
+            && VirtualAddressToFileOffset(startupCommonCallbackDispatchCodeVirtualAddress
+                + startupCommonCallbackDispatchLength)
+                == rawStartupCommonCallbackDispatchEndFileOffset
+            && Matches(rawStartupCommonCallbackDispatchFileOffset,
+                "6A000FB7C650FF73048D4308508B4714FFD0"));
+
+        const uint rawStartupMarkerCallbackWindowFileOffset = 0xBD58E0;
+        const uint rawStartupMarkerCallbackWindowEndFileOffset = 0xBD5912;
+        const int startupMarkerCallbackWindowLength =
+            (int)(rawStartupMarkerCallbackWindowEndFileOffset
+                - rawStartupMarkerCallbackWindowFileOffset);
+        const uint startupMarkerCallbackWindowCodeVirtualAddress =
+            rawStartupMarkerCallbackWindowFileOffset + 0x400C00;
+        check("Binary pinned-sample FirefallClient.exe SHA256 97362D668FF64778193A64759265E4AE90842043C4A15B627DF9902FD9135445 raw [0xBD58E0,0xBD5912) maps by raw+0x400C00 to code VA [0xFD64E0,0xFD6512); MOV AL,CL then stores AL at [EBP-1], and MOV EBX,EDX; JZ at raw 0xBD58EF targets 0xBD58F5 while unsigned JB at 0xBD58F3 targets 0xBD5912, so AL=0 or AL>=4 follows the diagnostic sequence and AL=1..3 skips it; that sequence pushes 0, 0x70F, 0x1B585FB, and 0x1B58601 before CALL through absolute cell VA 0x1C15EA0; normal fallthrough reloads [EBP-1] into AL, adds 0x10 to ESP, and reaches boundary 0xBD5912 before the next instruction reads [EBP+0x14]; instruction evidence only",
+            startupMarkerCallbackWindowLength == 0x32
+            && startupMarkerCallbackWindowCodeVirtualAddress == 0xFD64E0
+            && startupMarkerCallbackWindowCodeVirtualAddress
+                + startupMarkerCallbackWindowLength == 0xFD6512
+            && RawCodeRangeMaps(rawStartupMarkerCallbackWindowFileOffset,
+                startupMarkerCallbackWindowLength)
+            && VirtualAddressToFileOffset(startupMarkerCallbackWindowCodeVirtualAddress)
+                == rawStartupMarkerCallbackWindowFileOffset
+            && VirtualAddressToFileOffset(startupMarkerCallbackWindowCodeVirtualAddress
+                + startupMarkerCallbackWindowLength)
+                == rawStartupMarkerCallbackWindowEndFileOffset
+            && Matches(rawStartupMarkerCallbackWindowFileOffset,
+                "558BEC518AC18845FF538BDA5684C074043C04721D6A00680F07000068FB85B501680186B501FF15A05EC1018A45FF83C410")
+            && ShortConditionalBranchTargets(0xBD58EF, 0x74, 0xBD58F5)
+            && ShortConditionalBranchTargets(0xBD58F3, 0x72, 0xBD5912));
+
+        const uint rawStartupCommonCallbackContinuationFileOffset = 0xBE5B64;
+        const uint rawStartupCommonCallbackContinuationEndFileOffset = 0xBE5B78;
+        const int startupCommonCallbackContinuationLength =
+            (int)(rawStartupCommonCallbackContinuationEndFileOffset
+                - rawStartupCommonCallbackContinuationFileOffset);
+        const uint startupCommonCallbackContinuationCodeVirtualAddress =
+            rawStartupCommonCallbackContinuationFileOffset + 0x400C00;
+        check("Binary pinned-sample FirefallClient.exe SHA256 97362D668FF64778193A64759265E4AE90842043C4A15B627DF9902FD9135445 raw [0xBE5B64,0xBE5B78) maps by raw+0x400C00 to code VA [0xFE6764,0xFE6778); reads global cell VA 0x01DFFF84, adds 0x10 to ESP, copies EAX to ESI and stores it at frame+8, pushes EBX, and calls relative target raw 0xBD5C60 at raw 0xBE5B73; normal return boundary is raw 0xBE5B78",
+            startupCommonCallbackContinuationLength == 0x14
+            && startupCommonCallbackContinuationCodeVirtualAddress == 0xFE6764
+            && startupCommonCallbackContinuationCodeVirtualAddress
+                + startupCommonCallbackContinuationLength == 0xFE6778
+            && RawCodeRangeMaps(rawStartupCommonCallbackContinuationFileOffset,
+                startupCommonCallbackContinuationLength)
+            && VirtualAddressToFileOffset(startupCommonCallbackContinuationCodeVirtualAddress)
+                == rawStartupCommonCallbackContinuationFileOffset
+            && VirtualAddressToFileOffset(startupCommonCallbackContinuationCodeVirtualAddress
+                + startupCommonCallbackContinuationLength)
+                == rawStartupCommonCallbackContinuationEndFileOffset
+            && Matches(rawStartupCommonCallbackContinuationFileOffset,
+                "8B0D84FFDF0183C4108BF089750853E8E800FFFF")
+            && RelativeBranchTargets(0xBE5B73, 0xE8, 0xBD5C60));
+
+        const uint rawStartupCommonCallbackZeroResultFileOffset = 0xBE5B78;
+        const uint rawStartupCommonCallbackZeroResultEndFileOffset = 0xBE5B9E;
+        const int startupCommonCallbackZeroResultLength =
+            (int)(rawStartupCommonCallbackZeroResultEndFileOffset
+                - rawStartupCommonCallbackZeroResultFileOffset);
+        const uint startupCommonCallbackZeroResultCodeVirtualAddress =
+            rawStartupCommonCallbackZeroResultFileOffset + 0x400C00;
+        check("Binary pinned-sample FirefallClient.exe SHA256 97362D668FF64778193A64759265E4AE90842043C4A15B627DF9902FD9135445 raw [0xBE5B78,0xBE5B9E) maps by raw+0x400C00 to code VA [0xFE6778,0xFE679E); TEST ESI,ESI and JNZ at raw 0xBE5B7A targets raw 0xBE5BAC; zero route pushes receiver+4, selected receiver value ([receiver[0]+4] when nonzero, otherwise VA 0x01C5EA68), VA 0x01BB8E7C, 4, and receiver+0x18, then calls relative target raw 0xBE2F50 at raw 0xBE5B99; normal return boundary is raw 0xBE5B9E",
+            startupCommonCallbackZeroResultLength == 0x26
+            && startupCommonCallbackZeroResultCodeVirtualAddress == 0xFE6778
+            && startupCommonCallbackZeroResultCodeVirtualAddress
+                + startupCommonCallbackZeroResultLength == 0xFE679E
+            && RawCodeRangeMaps(rawStartupCommonCallbackZeroResultFileOffset,
+                startupCommonCallbackZeroResultLength)
+            && VirtualAddressToFileOffset(startupCommonCallbackZeroResultCodeVirtualAddress)
+                == rawStartupCommonCallbackZeroResultFileOffset
+            && VirtualAddressToFileOffset(startupCommonCallbackZeroResultCodeVirtualAddress
+                + startupCommonCallbackZeroResultLength)
+                == rawStartupCommonCallbackZeroResultEndFileOffset
+            && Matches(rawStartupCommonCallbackZeroResultFileOffset,
+                "85F675308B07B968EAC501FF77048B400485C00F45C851687C8EBB016A04FF7718E8B2D3FFFF")
+            && ShortConditionalBranchTargets(0xBE5B7A, 0x75, 0xBE5BAC)
+            && RelativeBranchTargets(0xBE5B99, 0xE8, 0xBE2F50));
+
+        const uint rawStartupCommonCallbackNonzeroResultFileOffset = 0xBE5BAC;
+        const uint rawStartupCommonCallbackNonzeroResultEndFileOffset = 0xBE5BC4;
+        const int startupCommonCallbackNonzeroResultLength =
+            (int)(rawStartupCommonCallbackNonzeroResultEndFileOffset
+                - rawStartupCommonCallbackNonzeroResultFileOffset);
+        const uint startupCommonCallbackNonzeroResultCodeVirtualAddress =
+            rawStartupCommonCallbackNonzeroResultFileOffset + 0x400C00;
+        check("Binary pinned-sample FirefallClient.exe SHA256 97362D668FF64778193A64759265E4AE90842043C4A15B627DF9902FD9135445 raw [0xBE5BAC,0xBE5BC4) maps by raw+0x400C00 to code VA [0xFE67AC,0xFE67C4); reads receiver+4 and frame-4, stores the former at result+0x20 and zero-extends CX before storing at result+0x24; unsigned CMP receiver+0x4C,0x10000 and JB at raw 0xBE5BC2 targets raw 0xBE5C0F, with fallthrough at raw 0xBE5BC4",
+            startupCommonCallbackNonzeroResultLength == 0x18
+            && startupCommonCallbackNonzeroResultCodeVirtualAddress == 0xFE67AC
+            && startupCommonCallbackNonzeroResultCodeVirtualAddress
+                + startupCommonCallbackNonzeroResultLength == 0xFE67C4
+            && RawCodeRangeMaps(rawStartupCommonCallbackNonzeroResultFileOffset,
+                startupCommonCallbackNonzeroResultLength)
+            && VirtualAddressToFileOffset(startupCommonCallbackNonzeroResultCodeVirtualAddress)
+                == rawStartupCommonCallbackNonzeroResultFileOffset
+            && VirtualAddressToFileOffset(startupCommonCallbackNonzeroResultCodeVirtualAddress
+                + startupCommonCallbackNonzeroResultLength)
+                == rawStartupCommonCallbackNonzeroResultEndFileOffset
+            && Matches(rawStartupCommonCallbackNonzeroResultFileOffset,
+                "8B47048B4DFC8946200FB7C1894624817F4C00000100724B")
+            && ShortConditionalBranchTargets(0xBE5BC2, 0x72, 0xBE5C0F));
+
+        const uint rawStartupCommonCallbackEpilogueFileOffset = 0xBE5B9E;
+        const uint rawStartupCommonCallbackEpilogueEndFileOffset = 0xBE5BAC;
+        const int startupCommonCallbackEpilogueLength =
+            (int)(rawStartupCommonCallbackEpilogueEndFileOffset
+                - rawStartupCommonCallbackEpilogueFileOffset);
+        const uint startupCommonCallbackEpilogueCodeVirtualAddress =
+            rawStartupCommonCallbackEpilogueFileOffset + 0x400C00;
+        check("Binary pinned-sample FirefallClient.exe SHA256 97362D668FF64778193A64759265E4AE90842043C4A15B627DF9902FD9135445 raw [0xBE5B9E,0xBE5BAC) maps by raw+0x400C00 to code VA [0xFE679E,0xFE67AC); ADD ESP,0x14; XOR AL,AL (not EAX); POP EDI,ESI,EBX; MOV ESP,EBP; POP EBP; RET 4",
+            startupCommonCallbackEpilogueLength == 0x0E
+            && startupCommonCallbackEpilogueCodeVirtualAddress == 0xFE679E
+            && startupCommonCallbackEpilogueCodeVirtualAddress
+                + startupCommonCallbackEpilogueLength == 0xFE67AC
+            && RawCodeRangeMaps(rawStartupCommonCallbackEpilogueFileOffset,
+                startupCommonCallbackEpilogueLength)
+            && VirtualAddressToFileOffset(startupCommonCallbackEpilogueCodeVirtualAddress)
+                == rawStartupCommonCallbackEpilogueFileOffset
+            && VirtualAddressToFileOffset(startupCommonCallbackEpilogueCodeVirtualAddress
+                + startupCommonCallbackEpilogueLength)
+                == rawStartupCommonCallbackEpilogueEndFileOffset
+            && Matches(rawStartupCommonCallbackEpilogueFileOffset,
+                "83C41432C05F5E5B8BE55DC20400"));
+
+        const uint rawStartupCommonCallbackTableSetupFileOffset = 0xBD5912;
+        const uint rawStartupCommonCallbackTableSetupEndFileOffset = 0xBD5939;
+        const int startupCommonCallbackTableSetupLength =
+            (int)(rawStartupCommonCallbackTableSetupEndFileOffset
+                - rawStartupCommonCallbackTableSetupFileOffset);
+        const uint startupCommonCallbackTableSetupCodeVirtualAddress =
+            rawStartupCommonCallbackTableSetupFileOffset + 0x400C00;
+        check("Binary pinned-sample FirefallClient.exe SHA256 97362D668FF64778193A64759265E4AE90842043C4A15B627DF9902FD9135445 raw [0xBD5912,0xBD5939) maps by raw+0x400C00 to code VA [0xFD6512,0xFD6539); exact table setup uses physical [EBP+8] (not IDA frame offset 0x14), zero-extends AL for an AL*8 index, and loads absolute table VAs 0x01BB7490 and 0x01BB7494 before CMP EBX,ECX/JNB; JNB at raw 0xBD592A targets 0xBD594E, JNZ at raw 0xBD5933 targets 0xBD5946, and JA at raw 0xBD5937 targets 0xBD5946; branch evidence only, not a safe-table-bounds or runtime-success claim",
+            startupCommonCallbackTableSetupLength == 0x27
+            && startupCommonCallbackTableSetupCodeVirtualAddress == 0xFD6512
+            && startupCommonCallbackTableSetupCodeVirtualAddress
+                + startupCommonCallbackTableSetupLength == 0xFD6539
+            && RawCodeRangeMaps(rawStartupCommonCallbackTableSetupFileOffset,
+                startupCommonCallbackTableSetupLength)
+            && VirtualAddressToFileOffset(startupCommonCallbackTableSetupCodeVirtualAddress)
+                == rawStartupCommonCallbackTableSetupFileOffset
+            && VirtualAddressToFileOffset(startupCommonCallbackTableSetupCodeVirtualAddress
+                + startupCommonCallbackTableSetupLength)
+                == rawStartupCommonCallbackTableSetupEndFileOffset
+            && Matches(rawStartupCommonCallbackTableSetupFileOffset,
+                "8B4D080FB6C003CB8B14C59074BB018B34C59474BB013BD973228D430890F6C30775113BC1770D")
+            && ShortConditionalBranchTargets(0xBD592A, 0x73, 0xBD594E)
+            && ShortConditionalBranchTargets(0xBD5933, 0x75, 0xBD5946)
+            && ShortConditionalBranchTargets(0xBD5937, 0x77, 0xBD5946));
+
+        const uint rawStartupCommonCallbackTerminalFileOffset = 0xBE5C0F;
+        const uint rawStartupCommonCallbackTerminalEndFileOffset = 0xBE5C26;
+        const int startupCommonCallbackTerminalLength =
+            (int)(rawStartupCommonCallbackTerminalEndFileOffset
+                - rawStartupCommonCallbackTerminalFileOffset);
+        const uint startupCommonCallbackTerminalCodeVirtualAddress =
+            rawStartupCommonCallbackTerminalFileOffset + 0x400C00;
+        check("Binary pinned-sample FirefallClient.exe SHA256 97362D668FF64778193A64759265E4AE90842043C4A15B627DF9902FD9135445 raw [0xBE5C0F,0xBE5C26) maps by raw+0x400C00 to code VA [0xFE680F,0xFE6826); LEA forms frame+8 and receiver+0x3C without reading either address, CALL at raw 0xBE5C16 targets raw 0xBE64A0 (code VA 0xFE70A0), normal return boundary is raw 0xBE5C1B; POP EDI,ESI; MOV AL,1 sets AL only; POP EBX; MOV ESP,EBP; POP EBP; RET 4",
+            startupCommonCallbackTerminalLength == 0x17
+            && startupCommonCallbackTerminalCodeVirtualAddress == 0xFE680F
+            && startupCommonCallbackTerminalCodeVirtualAddress
+                + startupCommonCallbackTerminalLength == 0xFE6826
+            && RawCodeRangeMaps(rawStartupCommonCallbackTerminalFileOffset,
+                startupCommonCallbackTerminalLength)
+            && VirtualAddressToFileOffset(startupCommonCallbackTerminalCodeVirtualAddress)
+                == rawStartupCommonCallbackTerminalFileOffset
+            && VirtualAddressToFileOffset(startupCommonCallbackTerminalCodeVirtualAddress
+                + startupCommonCallbackTerminalLength)
+                == rawStartupCommonCallbackTerminalEndFileOffset
+            && Matches(rawStartupCommonCallbackTerminalFileOffset,
+                "8D4508508D4F3CE8850800005F5EB0015B8BE55DC20400")
+            && RelativeBranchTargets(0xBE5C16, 0xE8, 0xBE64A0));
+
+        const uint rawStartupCommonCallbackHighCountCallFileOffset = 0xBE5BC4;
+        const uint rawStartupCommonCallbackHighCountCallEndFileOffset = 0xBE5BF1;
+        const int startupCommonCallbackHighCountCallLength =
+            (int)(rawStartupCommonCallbackHighCountCallEndFileOffset
+                - rawStartupCommonCallbackHighCountCallFileOffset);
+        const uint startupCommonCallbackHighCountCallCodeVirtualAddress =
+            rawStartupCommonCallbackHighCountCallFileOffset + 0x400C00;
+        check("Binary pinned-sample FirefallClient.exe SHA256 97362D668FF64778193A64759265E4AE90842043C4A15B627DF9902FD9135445 raw [0xBE5BC4,0xBE5BF1) maps by raw+0x400C00 to code VA [0xFE67C4,0xFE67F1); high-count call setup pushes 0x2D8, 0x01BB8EC0, [receiver+4], 0x01BB8F0C, 0, and [receiver+0x18]; CALL at raw 0xBE5BDB targets raw 0xBE2F50 with normal return boundary 0xBE5BE0; reloads [receiver+8], forms receiver+0x3C in ECX, cleans 0x18 stack bytes, increments [EAX+0x1C], then CALL at raw 0xBE5BEC targets raw 0xBE6440 with normal return boundary 0xBE5BF1",
+            startupCommonCallbackHighCountCallLength == 0x2D
+            && startupCommonCallbackHighCountCallCodeVirtualAddress == 0xFE67C4
+            && startupCommonCallbackHighCountCallCodeVirtualAddress
+                + startupCommonCallbackHighCountCallLength == 0xFE67F1
+            && RawCodeRangeMaps(rawStartupCommonCallbackHighCountCallFileOffset,
+                startupCommonCallbackHighCountCallLength)
+            && VirtualAddressToFileOffset(startupCommonCallbackHighCountCallCodeVirtualAddress)
+                == rawStartupCommonCallbackHighCountCallFileOffset
+            && VirtualAddressToFileOffset(startupCommonCallbackHighCountCallCodeVirtualAddress
+                + startupCommonCallbackHighCountCallLength)
+                == rawStartupCommonCallbackHighCountCallEndFileOffset
+            && Matches(rawStartupCommonCallbackHighCountCallFileOffset,
+                "68D802000068C08EBB01FF7704680C8FBB016A00FF7718E870D3FFFF8B47088D4F3C83C418FF401CE84F080000")
+            && RelativeBranchTargets(0xBE5BDB, 0xE8, 0xBE2F50)
+            && RelativeBranchTargets(0xBE5BEC, 0xE8, 0xBE6440));
+
+        const uint rawStartupCommonCallbackShortEpilogueFileOffset = 0xBD594E;
+        const uint rawStartupCommonCallbackShortEpilogueEndFileOffset = 0xBD5954;
+        const int startupCommonCallbackShortEpilogueLength =
+            (int)(rawStartupCommonCallbackShortEpilogueEndFileOffset
+                - rawStartupCommonCallbackShortEpilogueFileOffset);
+        const uint startupCommonCallbackShortEpilogueCodeVirtualAddress =
+            rawStartupCommonCallbackShortEpilogueFileOffset + 0x400C00;
+        check("Binary pinned-sample FirefallClient.exe SHA256 97362D668FF64778193A64759265E4AE90842043C4A15B627DF9902FD9135445 raw [0xBD594E,0xBD5954) maps by raw+0x400C00 to code VA [0xFD654E,0xFD6554); six-byte epilogue POP ESI; POP EBX; MOV ESP,EBP; POP EBP; RET, with no EAX write and no RET immediate; no input-pointer return is inferred",
+            startupCommonCallbackShortEpilogueLength == 0x06
+            && startupCommonCallbackShortEpilogueCodeVirtualAddress == 0xFD654E
+            && startupCommonCallbackShortEpilogueCodeVirtualAddress
+                + startupCommonCallbackShortEpilogueLength == 0xFD6554
+            && RawCodeRangeMaps(rawStartupCommonCallbackShortEpilogueFileOffset,
+                startupCommonCallbackShortEpilogueLength)
+            && VirtualAddressToFileOffset(startupCommonCallbackShortEpilogueCodeVirtualAddress)
+                == rawStartupCommonCallbackShortEpilogueFileOffset
+            && VirtualAddressToFileOffset(startupCommonCallbackShortEpilogueCodeVirtualAddress
+                + startupCommonCallbackShortEpilogueLength)
+                == rawStartupCommonCallbackShortEpilogueEndFileOffset
+            && Matches(rawStartupCommonCallbackShortEpilogueFileOffset,
+                "5E5B8BE55DC3"));
     }
 }
