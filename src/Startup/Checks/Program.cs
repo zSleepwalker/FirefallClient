@@ -367,6 +367,8 @@ NetworkIoErrorCallbackExitEbxRestoreChecks.Run(Check);
 NetworkIoErrorCallbackExitFrameResetChecks.Run(Check);
 NetworkIoErrorCallbackExitReturnTransferChecks.Run(Check);
 NetworkDispatcherEntryFramePrefixChecks.Run(Check);
+NetworkDispatcherEntryRegisterSaveChecks.Run(Check);
+GameSocketParserDiagnosticCleanupVirtualCallReturnChecks.Run(Check);
 CapacityFinalCalleeCommonTraversalSlotCleanupLifecycleChecks.Run(Check);
 CapacityFinalCalleeCommonTraversalCleanupEpilogueLifecycleChecks.Run(Check);
 CapacityFinalCalleeLargeRightRootSuccessorLifecycleChecks.Run(Check);

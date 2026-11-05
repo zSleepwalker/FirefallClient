@@ -14180,6 +14180,17 @@ Rejected child FlagsAtStop forwards actual caller flags separately.
 Luna4b901018 owns fresh EBX/ESI/EDI PUSH C4..C6 stoppingC7 before cookie
 global read. Luna1a4c728c remains on parser indirect-call return.
 Current exclusions DispatcherEntryRegisterSave/DiagnosticCleanupVirtualCallReturn.
+Register-save4b901018 fullEOF accepted4318exit0; corrected fixture DWORD nullable
+sequence and own-vs-parent completed instruction assertions. Three PUSH saves
+preserve derivedESP and SUBflags, stopC7. Luna508a942f owns C7MOV globalcookie,
+CCXOR derivedEBP, CEPUSH stoppingCF. No cookie-validation semantics.
+Virtual-return1a4c728c fullEOF accepted4320exit0; independent slot-zero target,
+explicitreturn, actualrejectedbounds and no postopaque registerforwarding.
+Agent again ran forbiddenbuild/Gitchecks; coordinator did not rely on them and
+ran nonincremental/no-shared validation after registering checks.
+FreshIDA BD34D1 bytes24:8D4608F00FC1184B75078B068BCEFF50048B4C244864890D.
+Lunae3f9941b owns ONLY D1LEA from freshpostcallESI stoppingD4 beforeLOCKXADD.
+Current exclusions EntryCookiePreparation/DiagnosticCleanupPostCallAddress.
 
 The user's finish-current-tasks-and-stop request supersedes earlier
 continuous-dispatch instructions. All current assignments are now released,

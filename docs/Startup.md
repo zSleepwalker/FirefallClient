@@ -1257,6 +1257,13 @@ call from the immutable clock-gate capture without rewriting its return status.
 Fresh entry ESP/EBP and a segment-relative FS:[0] DWORD supply four stack
 pushes and SUB ESP,0Ch. It stops before PUSH EBX at BBDDC4; rejected callers
 retain their actual endpoint and leave entry captures unused.
+NetworkDispatcherEntryRegisterSaveProjection extends the accepted frame with
+fresh EBX/ESI/EDI pushes at BBDDC4..BBDDC6, retaining partial stack state and
+all SUB flags. The cookie global read at BBDDC7 remains unentered.
+GameSocketParserDiagnosticCleanupVirtualCallReturnProjection independently
+captures the slot-zero DWORD at BD34CF and its opaque normal-return observation.
+Pending and abnormal returns retain last-known flags; normal return stops
+at BD34D1 with arithmetic flags and post-call registers unknown.
 GameSocketParserSelectorDiagnosticPreparationProjection records the five
 diagnostic argument pushes at BD326A..BD3280. It derives ESP from the
 count-consumption lineage but requires fresh ESI and an independent DWORD
