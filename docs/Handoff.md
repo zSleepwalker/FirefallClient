@@ -13213,6 +13213,10 @@ runner3801 exit0 FlagsAtStop/unusedfirstcaptureadded. SavedMaskShiftreturned
 correctmissingfreshstops9251/9254 andpreserveearlyECX/evidencemapping.
 MaskSelectionOrreturnedactualhelpercomposition (duplicateddispatch and
 impossiblesuppliedderivedmask). NewMaskSuccessor6fc12aac active.
+1811cdc pushedSuccessorThreshold. RingWritessecondrevision/MaskAndreviewed
+registeredrunner3803 exit0. NewOrRingae589e82 active. IndexStore11dcf839
+releasednotyetreviewed; SavedMaskShiftfed83fef/MaskSelectionOr9cca38e5
+samepair revisions active. MaskSuccessor6fc12aac active.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional

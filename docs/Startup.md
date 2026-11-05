@@ -839,6 +839,10 @@ reach TEST or JNZ, and both zero and nonzero destinations remain bounded.
 CommonSuccessorThreshold compares the freshly loaded EDX+8 DWORD against
 an independent VA1EDADD8 capture, exposing unsigned JB and all CMP flags
 without entering either rejection or later writes.
+CommonRingWrites preserves all four ordered link stores, including aliasing
+and independently captured attempted operands, before the bounded9441 jump.
+LargeMaskAndStore reads and updates VA1EDADCC independently, retaining known
+global data when EAX is missing and stopping before the common tail at92BD.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
