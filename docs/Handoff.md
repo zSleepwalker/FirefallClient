@@ -14014,6 +14014,36 @@ Second-equality cleanup872 full EOF reviewed and accepted4250exit0.
 Coordinator fixed the inherited flag type to TraversalIterationFlags and
 added a missing-second-child regression (no manufactured cleanup completion).
 Repost committed/pushed51d47af; no successor assigned after stop request.
+
+### Paused after completing current tasks
+
+The user's finish-current-tasks-and-stop request supersedes earlier
+continuous-dispatch instructions. All current assignments are now released,
+reviewed through EOF, registered and accepted. Do not start successors
+until the user explicitly resumes work.
+
+- Fenced publication d8c: corrected equal-route supplied-unused cleanliness,
+  removed a false empty-child-read claim, and covered byte/counter aliases.
+  Stops before raw BBDEAD PUSH; fence effects are static observations only.
+- Parser selector f017: all 1,024 independent selector/fresh-byte combinations
+  cover the ordered JZ/CMP/JE gates. Stops before raw BD3294 or BD326A.
+- IOCP return 46c: corrected admitted missing/pending/non-normal completion
+  metadata to false, fixed a non-alias wrap fixture, and compared semantic
+  reprojection values rather than nested ImmutableArray reference equality.
+  Stops before raw BBC9BB after an observed normal return; target unentered.
+
+Fresh read-only IDA bytes reconfirmed raw BD325E (12 bytes), BBC983 (5)
+and BBDE99 (20), now pinned independently in StartupBinaryEvidence.
+Ordinary full build and offline checks passed runner4256 exit0 without
+draft exclusions. The temporary exclusion target was removed. The sample
+was not executed or modified, the IDB was not changed, and main remained
+untouched. Continue on zsleepwalker-firefall-reverse-engineering if resumed.
+
+Potential resume boundaries, not assigned: parser selected-path join
+BD3294 versus diagnostic pushes BD326A; dispatcher PUSH/call preparation
+BBDEAD; IOCP timeout-reset continuation BBC9BB; allocator selected epilogue
+12C9441 or opaque cleanup call 12C943C. Preserve fresh captures across calls,
+DWORD wrapping, independent alias reads and missing-versus-unused states.
 SmallBinEpilogue released and full EOF reviewed: owner6d052038 revising
 wrong parent type, nullable value-plan access, missing successor-unused
 forwarding, child read/write effect markers and dirty-ring admission.

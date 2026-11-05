@@ -1200,6 +1200,17 @@ CapacityFinalCalleeCommonNodeIndexedSecondEqualityCleanupLifecycleProjection
 admits the existing DEC/JNZ helper only after the exact five ring stores.
 Its fresh counter read remains independent of aliased prior writes; the
 selected nonzero target or zero-path call remains unentered.
+NetworkDispatcherFencedPublicationProjection records both fence/store
+routes, an independent field reload, byte publication and fresh counter
+DEC. It preserves incoming CF and stops before the next PUSH at BBDEAD;
+skipped-but-supplied captures prevent clean completion.
+GameSocketParserStoredByteSelectorGateProjection derives EBX from the
+first header byte and selects BD3294 or BD326A using the fresh stack-byte
+JZ and ordered selector comparisons. Neither destination is entered.
+NetworkIoErrorCallbackReturnProjection captures the indirect slot-0x20
+target independently and requires an explicit normal return before the
+BBC986 jump to BBC9BB. Missing or pending captures do not inherit the
+parent's completed boundary; no callback identity or ABI is inferred.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
