@@ -126,6 +126,7 @@ CapacityFinalCalleeFrameSizeLifecycleChecks.Run(Check);
 CapacityFinalCalleeDescriptorComparisonCallChecks.Run(Check);
 CapacityFinalCalleePairedFieldWritesChecks.Run(Check);
 CapacityFinalCalleeFrameMaskTagLifecycleChecks.Run(Check);
+CapacityFinalCalleeSizeDescriptorLifecycleChecks.Run(Check);
 FrameHandoffCapacityAboveBranchLifecycleChecks.Run(Check);
 FrameHandoffCapacitySecondBranchLifecycleChecks.Run(Check);
 FrameHandoffCapacityFinalCallGateChecks.Run(Check);

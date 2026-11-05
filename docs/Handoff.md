@@ -12872,6 +12872,15 @@ LargeSizeFields `9733943b-9708-4393-ab9c-963998918aeb` owns the new
 50-byte scalar window; DescriptorFallbackMaskLifecycle
 `e5c8a5aa-6c5d-4309-bdf4-ae528dfa3e61` owns the EB8 opaque-call bridge.
 Both use GPT-6 Luna and must not edit coordinator registrations/evidence.
+SizeDescriptor revised/released/reviewed/registered; runner3398 exit0.
+Native future windows FA8..FC2 (26), FC2..FDD (27), FDD..FFE (33) were
+verified through IDA bytes/disassembly and offline anchors. Descending
+pointer loop must remain bounded to a single iteration until separately
+evidenced; MOV/LEA preserve flags used by subsequent branches.
+AlternateFieldSelection `60337689-4713-49e7-bbaa-0732a1b58309` active.
+DescriptorPaired owner briefly added checks outside its owned pair;
+instructed to move them and remove residual edits. Do not stage the
+existing PairedFieldWritesChecks until restored and reviewed.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional

@@ -394,6 +394,21 @@ internal static class StartupBinaryEvidence
             && RelativeConditionalBranchTargets(0x12C8F91, 0x0F, 0x85, 0x12C8E76)
             && RelativeConditionalBranchTargets(0x12C8F9A, 0x0F, 0x85, 0x12C8E76)
             && ShortBranchTargets(0x12C8FA6, 0xEB, 0x12C8FF8));
+        check("Binary alternate field selection writes each candidate address before testing its value",
+            Matches(0x12C8FA8, "8B46148D4E14894DFC85C0750D8B46108D4E10894DFC85C0743C")
+            && RawCodeRangeMaps(0x12C8FA8, 26)
+            && ShortConditionalBranchTargets(0x12C8FB3, 0x75, 0x12C8FC2)
+            && ShortConditionalBranchTargets(0x12C8FC0, 0x74, 0x12C8FFE));
+        check("Binary field descent reloads the selected pointer and loops to a fresh comparison",
+            Matches(0x12C8FC2, "8B55FC837814008D48147509837810008D481074068B018BD1EBE8")
+            && RawCodeRangeMaps(0x12C8FC2, 27)
+            && ShortConditionalBranchTargets(0x12C8FCC, 0x75, 0x12C8FD7)
+            && ShortConditionalBranchTargets(0x12C8FD5, 0x74, 0x12C8FDD)
+            && ShortBranchTargets(0x12C8FDB, 0xEB, 0x12C8FC5));
+        check("Binary field-clear tail preserves comparison flags across its frame write and reload",
+            Matches(0x12C8FDD, "3B15D8ADED018955FC8B55F40F8287FEFFFF8B4DFCC701000000008B1DD8ADED01")
+            && RawCodeRangeMaps(0x12C8FDD, 33)
+            && RelativeConditionalBranchTargets(0x12C8FE9, 0x0F, 0x82, 0x12C8E76));
         check("Binary pinned-sample raw code [0xBE6325,0xBE6352) maps to VA 0x00FE6F25 and preserves its JNZ target",
             imageBase == 0x400000
             && Matches(0xBE6325, "8B4E0853578B7E108D04CDFFFFFFFF4921460C037E0C8BC7C1E80323C88B46048D1C8D00000000833C0300751C")

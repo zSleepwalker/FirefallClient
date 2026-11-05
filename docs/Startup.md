@@ -599,6 +599,11 @@ destinations; it does not infer pointer ownership or list semantics.
 only after a clean global-mask write and requires independent ESI/EDX.
 A clean frame mismatch remains bounded at raw `12C8ED5`; supplying tag
 captures on that route rejects admission without erasing earlier effects.
+`CapacityFinalCalleeSizeDescriptorLifecycleProjection` joins only the clean
+size boundary. It carries ESI across the size-call bypass, requires a fresh
+ESI capture after an opaque call, and independently captures EBP/EBX.
+Contaminated descriptor destinations retain their native effects but do not
+count as admitted successful routes.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
