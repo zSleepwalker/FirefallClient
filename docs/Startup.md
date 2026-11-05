@@ -769,6 +769,11 @@ keeping contaminated opaque exits bounded. Mask-common and successor-common
 lifecycles preserve all earlier writes when later caller registers are
 missing; aliasing does not collapse their ordered write events. Mask-common
 also retains shift/NOT flags when the fresh global read is missing.
+The large backlink gate independently reloads EBP-14 before reading that
+value's plus-C field. Missing EDX prevents CMP completion without discarding
+the independently reached memory operand. The common root gate likewise
+retains its global read when ESI is missing. Both gates compute all CMP
+flags and stop at their exact branch destinations without entering them.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

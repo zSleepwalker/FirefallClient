@@ -13119,6 +13119,12 @@ MaskCommon fixedmissingglobal FlagsAtStop toretainshift/NOTflags, regressionadde
 ActiveLargeRootThresholdcompileerror blockedrunner3694, ownerfixednullable
 SequenceEqual; pairnowreleasedpendingreview. NewactiveLargeSecondTest10233f9f
 raw91E3..91F0; CommonRootStore595f5cb9 raw92D0..92DB (verifiedbytes).
+Checkpointf9a9185 pushedcommonlifecycles. LargeBacklink/CommonRoot reviewed
+registered; runner3704 exit0. CorrectedLargeBacklink missingEDX toretain
+independentlyreachedCMPmemoryread. NewactiveThresholdBacklink624622d1,
+CommonWritesRoot9ae11164. Releasedpendingreview IndexedBacklinkFinald5a33e1d,
+LargeRootThresholddee191fb, LargeRootFirst61fa11ed, LargeSecondTest10233f9f,
+CommonRootStore595f5cb9; activeFinalMaskCommon0a4a34c5.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
