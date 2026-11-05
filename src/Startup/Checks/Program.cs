@@ -331,6 +331,7 @@ GameSocketCompletionErrorEpilogueChecks.Run(Check);
 GameSocketParserSecondByteScalarGateChecks.Run(Check);
 GameSocketCompletionErrorReturnChecks.Run(Check);
 NetworkDispatcherPostCallCountGateChecks.Run(Check);
+CapacityFinalCalleeCommonNodeIndexedTraversalSecondIterationChecks.Run(Check);
 CapacityFinalCalleeCommonTraversalSlotCleanupLifecycleChecks.Run(Check);
 CapacityFinalCalleeCommonTraversalCleanupEpilogueLifecycleChecks.Run(Check);
 CapacityFinalCalleeLargeRightRootSuccessorLifecycleChecks.Run(Check);

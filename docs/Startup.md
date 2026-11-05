@@ -1165,6 +1165,11 @@ NetworkDispatcherPostCallCountGateProjection projects fresh post-vtable
 ESI, EBX, collection end and start observations. INC, SUB, SAR2 and unsigned
 CMP/JB select an unentered reload boundary or opaque-cell boundary; no
 collection count or register observation is forwarded across the call.
+CapacityFinalCalleeCommonNodeIndexedTraversalSecondIterationProjection
+adds exactly one loopback pass, deriving its node and doubled index from
+the first pass and retaining the original size operand. Each child and
+tag read remains fresh; equality, zero and another loopback are bounded
+without entering a third pass.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
