@@ -460,6 +460,10 @@ internal static class StartupBinaryEvidence
             Matches(0x12C90F6, "83E1F88BC103F9C1E8038945FC83F8200F838F000000")
             && RawCodeRangeMaps(0x12C90F6, 22)
             && RelativeConditionalBranchTargets(0x12C9106, 0x0F, 0x83, 0x12C919B));
+        check("Binary alternate paired frame loads precede the independent equality call gate",
+            Matches(0x12C910C, "8B42088945F08B420C8945EC3BD07506FF15244AAC01")
+            && RawCodeRangeMaps(0x12C910C, 22)
+            && ShortConditionalBranchTargets(0x12C911A, 0x75, 0x12C9122));
         check("Binary pinned-sample raw code [0xBE6325,0xBE6352) maps to VA 0x00FE6F25 and preserves its JNZ target",
             imageBase == 0x400000
             && Matches(0xBE6325, "8B4E0853578B7E108D04CDFFFFFFFF4921460C037E0C8BC7C1E80323C88B46048D1C8D00000000833C0300751C")

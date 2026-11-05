@@ -13016,6 +13016,18 @@ Corrected epiloguemissingEBX fixture to actuallysupplylatecalltarget;
 GuardedFinal firststore318, successorbacklink218, originalECXcomparison.
 Active AlternateAlignedSizef8794379, AlternateEpilogue21f02020,
 AlternateRootLifecycle59405ba5. Allnewpairs only; coordinatorownsrunner/docs.
+Checkpointaf62a8b pushed. AlternateEpilogue production reviewed; corrected
+missingclosingparen. Checks returned toowner21f02020 for nullableGatedPlan
+CS1061 afterrunner3604. Parentfixedpushaddress11111119 and cleanunusedEBX.
+AlignedSize reviewed, ownerf8794379 revising admission for BOTH cleanroutes.
+PairedFrameLoads b2c47863 active (910C..911C bytes independentlyverified),
+RootSizeLifecycle e70dfbbb active. Program registers AlternateEpilogue but
+build currentlyblockedby its checks; no downstream checks yet registered.
+AlternateEpilogue nullablechecks revised; runner3608 exit0 with AlignedSize
+registered. AlternateRootLifecycle reviewed/registered; cleanunequal90F6
+admission corrected and final9441 verified; runner3609 exit0. FrameLoads
+nativeanchor910C..9122 included. ActiveFrameLoads b2c47863 and
+RootSizeLifecyclee70dfbbb; no edits/stagingtheirfiles untilrelease.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional

@@ -695,6 +695,11 @@ The alternate root gate at `12C90CA` and equal-path writes at `12C90D2`
 remain separate bounded projections. The gated epilogue at `12C9441`
 records independent stack reads, preserves TEST flags across POPs, and
 requires fresh post-call EBP rather than assuming opaque-call preservation.
+The alternate root lifecycle joins only equality to its ordered writes;
+its clean unequal exit remains bounded. The aligned-size projection stores
+the shifted value before the unsigned threshold branch. The alternate
+epilogue lifecycle preserves preceding writes on missing stack evidence
+or a nonreturning opaque call.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
