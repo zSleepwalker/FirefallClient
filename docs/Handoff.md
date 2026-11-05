@@ -12296,6 +12296,17 @@ flagged-zero-bridge admission and prereq identity gating; do not stage.
 Final frame-helper tail read-only owner
 `d1e7e2cf-b347-49d3-89dd-c60ae19b0400` starts651C through actualRET4.
 
+Latest pushed HEAD `f13baee` includes seed/call/publication immutable
+anchors. ObjectHelperLifecycle refinement released, reviewed/registered,
+passing. EmptySlotCall author correcting PUSH evidence6A0A→native6A10
+and missingEAX partial steps (stopF9 beforecopy/cleanup/test).
+Final tail trace verifiedTWOoptionalreads: [EBP8] at6520 then[pointer]
+at6523 before[ECX]write6525, INC[ESI10]6527, RET4 ends652F.
+FinalWriteReturn owner `862f36dc-78fe-4ef1-bb75-a21a0c28373c`;
+CapacityLoop one-iteration owner `02839568-aecc-49e8-ba1e-6a242928f9f7`.
+Loop CMP(EAX,1), not SUB carry, admits zero-difference growth route;
+failure gate is unsigned(0FFFFFFF-ESI)<ESI. No frame argument read.
+
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
 indirect callback, then fresh receiver+4C DEC and receiver+48 zero/INC.

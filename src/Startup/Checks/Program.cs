@@ -63,6 +63,7 @@ FrameHandoffHelperSlotChecks.Run(Check);
 HighCountObjectHelperReturnChecks.Run(Check);
 FrameHandoffHelperEntrySlotChecks.Run(Check);
 FrameHandoffCapacitySeedChecks.Run(Check);
+HighCountObjectHelperLifecycleChecks.Run(Check);
 PayloadGrowthZeroFillChecks.Run(Check);
 
 void Check(string name, bool condition)

@@ -415,6 +415,8 @@ The reliable masked-length callback's validated entry also admits the zero-resul
 
 `FrameHandoffHelperEntrySlotProjection` admits the three exact unflagged `BE64C5` entry routes and checks receiver identity before slot reads/writes, without equating independent reload values. `FrameHandoffCapacitySeedProjection` records the receiver store at frame-14 before the receiver+8 read, seeds ESI with one, and replaces that seed only for a nonzero read before the `BE6B70` join.
 
+`HighCountObjectHelperLifecycleProjection` joins the helper entry and indexed return, independently loading `[first loaded DWORD]` at `BE6456` only on the nonzero route. The zero route supplies retained ESI zero and rejects any nonzero-only bridge capture before tail effects. Optional return register identity captures are checked only after entry/bridge prerequisites; the composed EAX/ESI values come from the entry and bridge.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves
