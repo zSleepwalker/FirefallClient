@@ -593,6 +593,10 @@ internal static class StartupBinaryEvidence
             Matches(0x12C925B, "2105CCADED01EB5A")
             && RawCodeRangeMaps(0x12C925B, 8)
             && Matches(0x12C9261, "EB5A"));
+        check("Binary indexed rejection compares registers before unsigned JB",
+            Matches(0x12C9263, "3BCB0F820BFCFFFF")
+            && RawCodeRangeMaps(0x12C9263, 8)
+            && RelativeConditionalBranchTargets(0x12C9265, 0x0F, 0x82, 0x12C8E76));
         check("Binary pinned-sample raw code [0xBE6325,0xBE6352) maps to VA 0x00FE6F25 and preserves its JNZ target",
             imageBase == 0x400000
             && Matches(0xBE6325, "8B4E0853578B7E108D04CDFFFFFFFF4921460C037E0C8BC7C1E80323C88B46048D1C8D00000000833C0300751C")

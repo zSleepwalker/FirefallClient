@@ -851,6 +851,10 @@ SavedMaskShift retains the fresh shift count across later missing frame
 evidence and computes NOT without changing SHL flags. MaskSelectionOr derives
 both OR operands from the existing selection helper. MaskSuccessor instead
 keeps child EDX and both successor reads independent of the earlier mask.
+OrRing retains the global OR write before any later missing ring operand.
+SavedMaskAnd passes the NOT result into the independent global update,
+preserving shift flags until AND completes. IndexedReject bounds the register
+CMP/JB at9263 without projecting the following field access.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
