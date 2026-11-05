@@ -7325,6 +7325,14 @@ internal static class StartupBinaryEvidence
             Matches(0xBD2F64, "8B86F40D00008944241885C07516506A5B6858EAC5016858EAC501FF15A05EC10183C410"));
         check("Binary error queue normal return restores segment-relative SEH and stack registers before RET",
             Matches(0xBD2E19, "8B4DF464890D00000000595F5E8BE55DC20400"));
+        check("Binary second header byte constructs a scalar before the unsigned 16-bit range branch",
+            Matches(0xBD321D, "0FB6420166C1E108660BC80FB7C1894424188D48FE663BCF0F874D020000"));
+        check("Binary receive buffer status store precedes an independent operation comparison",
+            Matches(0xBD2F88, "8B9EF40D000081C398000000C7038000000083BEF40D00000075176A006A5B6858EAC5016858EAC501FF15A05EC10183C410"));
+        check("Binary dispatcher postcall count reloads both collection bounds before unsigned iteration selection",
+            Matches(0xBBDE6F, "8B86A8000000432B86A4000000C1F8023BD872BD8D5E6CFF15244DAC01"));
+        check("Binary indexed traversal loopback doubles its rolling index before fresh child and tag reads",
+            Matches(0x12C93E4, "8BC303DBC1E81F83C0048D0C828B0185C074658BD08B420483E0F83BC775E1"));
         check("Binary nonzero parser dispatches through a fresh stack-local vtable before preserve-one resize",
             Matches(0xBD31C5, "8D4C24348B442434FF500C6A01508D4C243C")
             && RelativeBranchTargets(0xBD31D7, 0xE8, 0x12CBCB0)

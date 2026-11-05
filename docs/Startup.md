@@ -1153,6 +1153,10 @@ GameSocketCompletionErrorEpilogueProjection observes segment-relative
 FS restoration and independent stack pops only after a clean normal
 queue-call return. Its combined trace preserves parent effects and
 stops before RET4; neither return target nor EAX is inferred.
+GameSocketParserSecondByteScalarGateProjection forms the 11-bit scalar
+from an independent second byte and compares its adjusted low word
+against 0x56E. All 2,048 values preserve the selected JA or fallthrough
+boundary; this does not establish semantic length or parser acceptance.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
