@@ -13325,6 +13325,12 @@ boundbeforeCALL943C orTEST9441;DECpreservesincomingCF.
 HighSizeIndexrevisionreviewedremainingEOF/checks;registered.
 SelfRing+Indexrunner3940exit0 afterRightLifecycleownerfixedConvertbuild.
 Indexdirtybypass/missingEBPnotclean/fullBSRsuccessgate now enforced.
+2cb8f10pushed. RightFieldThresholdLifecycle/IndexedCountpairsreadEOF,
+registerednativecountanchor runner3946exit0. Fixedshortbranchfixturedecode,
+parentfallthroughenteredflag,exactchildCMPexit; countknownCMPimmediate
+retainedmissingECX andunusedlateECXproperty. ActiveHighSizeNode
+6f913573-a2a6-47ae-a3f2-0ef8add96379; FreshMaskSelfRingd07c1ab6;
+CleanupCounterffef4c55. Nootherpendingreviewedchanges.
 8948188B4A1085C974123B0DD8ADED010F82D8FBFFFF8948108941188B4A1485C974123B0DD8ADED010F82BFFBFFFF894814894118.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,

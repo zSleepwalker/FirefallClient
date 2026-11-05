@@ -654,6 +654,11 @@ internal static class StartupBinaryEvidence
             Matches(0x12C93AC, "0BC2A3CCADED018933895E1889760C897608EB6F")
             && RawCodeRangeMaps(0x12C93AC, 20)
             && ShortConditionalBranchTargets(0x12C93BE, 0xEB, 0x12C942F));
+        check("Binary indexed count classification retains both paths before its register transfer",
+            Matches(0x12C93C0, "8B1383F91F750433C0EB09D1E9B8190000002BC1")
+            && RawCodeRangeMaps(0x12C93C0, 20)
+            && ShortConditionalBranchTargets(0x12C93C5, 0x75, 0x12C93CB)
+            && ShortConditionalBranchTargets(0x12C93C9, 0xEB, 0x12C93D4));
         check("Binary pinned-sample raw code [0xBE6325,0xBE6352) maps to VA 0x00FE6F25 and preserves its JNZ target",
             imageBase == 0x400000
             && Matches(0xBE6325, "8B4E0853578B7E108D04CDFFFFFFFF4921460C037E0C8BC7C1E80323C88B46048D1C8D00000000833C0300751C")

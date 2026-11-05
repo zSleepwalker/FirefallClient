@@ -910,6 +910,11 @@ Zero/above-ceiling bypasses leave a supplied late EBP explicitly unused;
 missing EBP cannot admit clean completion. SelfRingTail preserves its committed
 global OR store during partial local-store stops, then records four separate
 ring writes before the unentered942F jump.
+RightFieldThresholdLifecycle derives the comparison register from the fresh
+field observation, retaining parent TEST flags until the independent CMP
+executes. IndexedCountClassification retains its fresh indexed DWORD before
+the31 comparison; the equal path clears EAX without assuming its incoming value,
+while the alternate path shifts ECX and subtracts it from19h.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
