@@ -713,6 +713,9 @@ Equality bypasses the opaque call at `12C9137`.
 The aligned-frame lifecycle enters the frame loads only through the clean
 below-threshold branch. It supplies retained EBP only when the first frame
 store consumes it and rejects later captures on the large-size bypass.
+The paired-frame gate lifecycle carries retained EDX/EBP only across its
+clean unequal edge. The second-shifted lifecycle leaves equality bounded
+at the preceding opaque call and preserves independent subsequent reloads.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

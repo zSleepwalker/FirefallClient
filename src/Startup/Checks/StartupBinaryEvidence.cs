@@ -476,6 +476,15 @@ internal static class StartupBinaryEvidence
             Matches(0x12C913D, "8B45FC8B4DF08D04C5F0ADED018945F43BC8740F")
             && RawCodeRangeMaps(0x12C913D, 20)
             && ShortConditionalBranchTargets(0x12C914F, 0x74, 0x12C9160));
+        check("Binary alternate backlink gate stops at its opaque call or bypasses it",
+            Matches(0x12C9151, "3BCB720539510C7406FF15244AAC01")
+            && RawCodeRangeMaps(0x12C9151, 15)
+            && ShortConditionalBranchTargets(0x12C9153, 0x72, 0x12C915A)
+            && ShortConditionalBranchTargets(0x12C9158, 0x74, 0x12C9160));
+        check("Binary alternate final frame comparison has a bounded nonzero edge",
+            Matches(0x12C9160, "8B45EC3BC17515")
+            && RawCodeRangeMaps(0x12C9160, 7)
+            && ShortConditionalBranchTargets(0x12C9165, 0x75, 0x12C917C));
         check("Binary pinned-sample raw code [0xBE6325,0xBE6352) maps to VA 0x00FE6F25 and preserves its JNZ target",
             imageBase == 0x400000
             && Matches(0xBE6325, "8B4E0853578B7E108D04CDFFFFFFFF4921460C037E0C8BC7C1E80323C88B46048D1C8D00000000833C0300751C")

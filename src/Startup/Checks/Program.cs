@@ -168,6 +168,8 @@ CapacityFinalCalleeRootEpilogueLifecycleChecks.Run(Check);
 CapacityFinalCalleeAlternateSecondFrameGateChecks.Run(Check);
 CapacityFinalCalleeAlternateShiftedFrameGateChecks.Run(Check);
 CapacityFinalCalleeAlignedFrameLifecycleChecks.Run(Check);
+CapacityFinalCalleePairedFrameGateLifecycleChecks.Run(Check);
+CapacityFinalCalleeSecondShiftedLifecycleChecks.Run(Check);
 FrameHandoffCapacityAboveBranchLifecycleChecks.Run(Check);
 FrameHandoffCapacitySecondBranchLifecycleChecks.Run(Check);
 FrameHandoffCapacityFinalCallGateChecks.Run(Check);

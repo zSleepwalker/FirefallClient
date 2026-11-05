@@ -13054,6 +13054,15 @@ These latterwindows notyetbyteanchored orassigned; no inferredcallpreservation.
 AlignedFrame revision reviewed/registered; runner3632 exit0 including
 913D indexedframe nativeanchor. Both>=20 clean/contaminated fixtures tested.
 PairedFrameGate1ba9590b, SecondShiftedf46ea4ff, IndexedFrame31d14540 active.
+Checkpoint1f11567 pushed. BacklinkGatedc11c165 active; bytes9151..9160
+freshlyverified. Anchorpendingrunner3634 blockedbyactiveSecondShifted
+Checks nonexistentFreshFrameMinus10planproperty (ownernotified).
+Fresh9160..9167 bytes8B45EC3BC17515:frame14fresh/CMP EAX,ECX/JNZ917C.
+PairedFrameGate and SecondShifted released/reviewed/registered;
+runner3637 exit0 withbacklink/finalframe nativeanchors. Backlinkdc11c165 and
+FinalFrame54199bc1 releasedreviewpending; IndexedFrame31d14540 active;
+PairedShifted71455ef8 active. Fresh9167..917C masktailbytes verifiedonly,
+notanchored/assigned yet; jump displacement141 targets92BD.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
