@@ -12221,6 +12221,18 @@ New read-only capacity-callee trace `4b7ad275-30b9-45f6-a83d-5f04b1d0380b`
 starts `BE6B50`. Object-helper shared continuation read-only owner
 `9df91d6b-ac9c-4cea-8d03-1bfd00496496` starts `BE6458`.
 
+Frame-helper entry refinement released, reviewed, registered, passing.
+Coordinator corrected wrap fixture to put FFFFFFFC in the actual +10
+operand. Object-helper continuation trace finished: BE6458..6477 reads
+helper-EAX+8, retained-ESI+8 and +4, then indexed DWORD and returns full EAX;
+zero bases remain legal captures. Implementation owner
+`fa99b242-1cf8-4389-ad60-39a14e7d3687` owns new ObjectHelperReturn pair.
+Frame-helper BE64C5 slot-gate implementation owner
+`57bde316-a7a9-4698-a2be-8cfdc6af3472` owns new FrameHandoffHelperSlot pair.
+Full high-count lifecycle composition owner
+`8f935e49-06a8-407d-9b82-b6ac2e929234` owns new Lifecycle pair.
+All are GPT-6 Luna; coordinator retains Program/docs/evidence ownership.
+
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
 indirect callback, then fresh receiver+4C DEC and receiver+48 zero/INC.

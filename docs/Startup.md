@@ -407,6 +407,8 @@ The reliable masked-length callback's validated entry also admits the zero-resul
 
 `UnreliableReceiveHighCountReturnProjection` enters the shared frame handoff only after an unflagged completed suffix, carrying the counter receiver and an explicit frame capture. `HighCountObjectHelperEntryProjection` passes a local frame-0C address to opaque `BE6B30`, then independently captures its returned EAX address and loaded DWORD. Zero branches to `BE6458`; nonzero stops before the additional read at `BE6456`.
 
+`FrameHandoffHelperEntryProjection` preserves independent receiver+0C/+10 reads, wrapping sum and low-bit gate, then compares receiver+8 unsigned against `(receiver10+4)>>2` with DWORD wrap before the shift. Both bypass branches join `BE64C5`; otherwise receiver10 is pushed and opaque `BE6B50` called. Missing reads preserve earlier captures and stop at their instruction, while missing/nonreturn call evidence stops at `BE64C0`. No receiver writes occur in this window.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves
