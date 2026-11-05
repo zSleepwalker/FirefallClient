@@ -716,6 +716,11 @@ store consumes it and rejects later captures on the large-size bypass.
 The paired-frame gate lifecycle carries retained EDX/EBP only across its
 clean unequal edge. The second-shifted lifecycle leaves equality bounded
 at the preceding opaque call and preserves independent subsequent reloads.
+The alternate backlink gate preserves both comparisons without entering the
+opaque call at raw 0x12C915A. Only the not-below path reads ECX+C; a fresh
+field comparison equal to EDX selects raw 0x12C9160. The final-frame gate
+then independently reloads EBP-14 and compares it with ECX, bounding equal
+and unequal paths at raw 0x12C9167 and 0x12C917C respectively.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

@@ -485,6 +485,16 @@ internal static class StartupBinaryEvidence
             Matches(0x12C9160, "8B45EC3BC17515")
             && RawCodeRangeMaps(0x12C9160, 7)
             && ShortConditionalBranchTargets(0x12C9165, 0x75, 0x12C917C));
+        check("Binary alternate mask tail shifts independent frame data before a global AND",
+            Matches(0x12C9167, "8B45F88B4DFCD3E0F7D02105C8ADED01E941010000")
+            && RawCodeRangeMaps(0x12C9167, 21)
+            && RelativeBranchTargets(0x12C9177, 0xE9, 0x12C92BD));
+        check("Binary alternate successor comparisons stop before the opaque call or paired writes",
+            Matches(0x12C917C, "3B45F4740F3BC372053950087406FF15244AAC01")
+            && RawCodeRangeMaps(0x12C917C, 20)
+            && ShortConditionalBranchTargets(0x12C917F, 0x74, 0x12C9190)
+            && ShortConditionalBranchTargets(0x12C9183, 0x72, 0x12C918A)
+            && ShortConditionalBranchTargets(0x12C9188, 0x74, 0x12C9190));
         check("Binary pinned-sample raw code [0xBE6325,0xBE6352) maps to VA 0x00FE6F25 and preserves its JNZ target",
             imageBase == 0x400000
             && Matches(0xBE6325, "8B4E0853578B7E108D04CDFFFFFFFF4921460C037E0C8BC7C1E80323C88B46048D1C8D00000000833C0300751C")
