@@ -12066,3 +12066,10 @@ marker/scalar callback windows. Luna `1e3c4f4c-3a48-43a9-99c6-4fb60aa0781d`
 owns unreliable scalar callback code/checks. Luna
 `a1d9c809-cdf8-4092-8542-5942a3275dd6` owns minimal reliable zero-header
 empty-slot publication composition; nonzero callback stops at result boundary.
+
+Pushed occupied-slot composition as `465814b`. Nonzero-marker callback
+reviewed/registered and passes. Zero-marker trace confirms receiver+14
+compare, optional diagnostic, then independently reloaded receiver+14 target:
+Luna `b095b705-1b54-4806-9358-1cda3678b243` owns presence/diagnostic gate,
+`655aabf2-006a-449d-9354-eb28abce343a` owns four-push direct callback,
+`516a7cd2-4c67-4ca8-8011-d0a0b5a96b86` traces normal continuation `BE5B64`.

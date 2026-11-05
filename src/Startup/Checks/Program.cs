@@ -27,6 +27,7 @@ UnreliableReceiveResidueCounterChecks.Run(Check);
 UnreliableReceiveResidueHandoffChecks.Run(Check);
 UnreliableReceiveJoinedHeaderChecks.Run(Check);
 ReliableReceiveOccupiedSlotChecks.Run(Check);
+UnreliableReceiveMarkerCallbackChecks.Run(Check);
 PayloadGrowthZeroFillChecks.Run(Check);
 
 void Check(string name, bool condition)

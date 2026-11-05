@@ -361,6 +361,8 @@ PE import names identify cell VA `0x1AC4424` as `std::_Xbad_alloc`, `0x1AC45C0` 
 
 `ReliableReceiveOccupiedSlotProjection` composes slot selection, record WORD comparison, forwarding, and the recycle-return tail. It validates retained receiver, record pointer, and payload correspondence before later effects. Only the exact successful WORD outcomes admit forwarding; an invalid capture with a branch destination does not suffice. Independent memory reloads remain independent, including receiver+8.
 
+`UnreliableReceiveMarkerCallbackProjection` covers `[BE5B16,BE5B25)` under a nonzero selector in `1..3`. Retained SI is directly zero-extended and pushed before reading DWORD[payload+8]. The payload+4 DWORD is then read/pushed before the indirect target at loaded-pointer+4. ECX is payload+8's address. Missing later captures retain the length push; only normal call return reaches `BE5B25`.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves
