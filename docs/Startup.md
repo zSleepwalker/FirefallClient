@@ -749,6 +749,9 @@ EBP-10 value into ECX while retaining the preceding local store. Both
 compositions reject downstream evidence on their bounded bypass routes.
 The common-tail tag-write projection retains its OR result and flags if
 ESI is missing, and keeps both stores ordered even at aliased addresses.
+The indexed-final lifecycle enters the final-frame gate only on indexed
+equality, retaining its preceding store. Its ECX handoff is withheld until
+the independent EBP-14 reload makes the consuming CMP reachable.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
