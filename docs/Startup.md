@@ -1215,6 +1215,9 @@ no linear address, callee identity, or ABI is inferred.
 NetworkDispatcherRegisterRestoreProjection records four independent POP
 reads and logical register/ESP updates, stopping before the frame reset at
 BBDEC4. Missing captures preserve earlier restored registers and flags.
+NetworkDispatcherFrameResetProjection resets ESP from the proven post-call
+EBP, then independently reads the saved EBP and advances ESP by four.
+It stops before RET4 at BBDEC7 and does not infer a return value or target.
 GameSocketParserStoredByteSelectorGateProjection derives EBX from the
 first header byte and selects BD3294 or BD326A using the fresh stack-byte
 JZ and ordered selector comparisons. Neither destination is entered.

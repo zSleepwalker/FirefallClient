@@ -14048,6 +14048,11 @@ the newly reprojected parent rather than nested immutable-array identity.
 Next Lunafd339286 models frame reset/EBP POP throughC7; Lunafddb744c
 analyzes IOCP exit POPs through9DD indirect boundary. Draft exclusion
 currently only FrameReset; ordinary full4270 preceded new drafts.
+Frame resetfd339 full EOF accepted4272exit0, including distinct priorESP,
+fresh savedEBP, wrapping and earlier-POP alias. Lunaee5281f9 owns bounded
+RET4 target/stack transfer atC7; runtime destination remains unentered.
+Luna38c20082 implements IOCP9DB/9DC POPs through9DD fromfddb contract.
+Current draft exclusions ExitPop and ReturnTransfer; no native execution.
 
 The user's finish-current-tasks-and-stop request supersedes earlier
 continuous-dispatch instructions. All current assignments are now released,
