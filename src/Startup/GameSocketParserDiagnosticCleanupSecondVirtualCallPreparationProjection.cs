@@ -92,8 +92,9 @@ public sealed class GameSocketParserDiagnosticCleanupSecondVirtualCallPreparatio
         LastReachedRawFileOffset = lastReachedRawFileOffset;
         StopBeforeRawFileOffset = stopBeforeRawFileOffset;
         reprojectedParentPlan = new(() =>
-            GameSocketParserDiagnosticCleanupSecondXaddBranchProjection.Project(
-                Capture.ParentCapture));
+            GameSocketParserDiagnosticCleanupSecondXaddBranchProjection.ProjectCore(
+                Capture.ParentCapture,
+                ParentPlan.ParentPlan));
         orderedSemanticPrefixPreserved = new(ComputeOrderedSemanticPrefixPreserved);
         exactCleanCompletion = new(ComputeExactCleanCompletion);
     }

@@ -281,6 +281,18 @@ public static class GameSocketParserDiagnosticCleanupSecondXaddBranchProjection
         GameSocketParserDiagnosticCleanupSecondXaddPlan parentPlan =
             GameSocketParserDiagnosticCleanupSecondXaddProjection.Project(
                 capture.ParentCapture);
+        return ProjectCore(capture, parentPlan);
+    }
+
+    internal static GameSocketParserDiagnosticCleanupSecondXaddBranchPlan ProjectCore(
+        GameSocketParserDiagnosticCleanupSecondXaddBranchCapture capture,
+        GameSocketParserDiagnosticCleanupSecondXaddPlan parentPlan)
+    {
+        ArgumentNullException.ThrowIfNull(parentPlan);
+        if (parentPlan.Capture != capture.ParentCapture)
+            throw new InvalidOperationException(
+                "The trusted SecondXadd plan must match the captured parent.");
+
         var instructions =
             ImmutableArray.CreateBuilder<GameSocketParserDiagnosticCleanupSecondXaddBranchInstruction>();
         bool parentAdmitted =
