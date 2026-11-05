@@ -425,6 +425,8 @@ The reliable masked-length callback's validated entry also admits the zero-resul
 
 `FrameHandoffContinuationLifecycleProjection` uses the effective call-derived publication capture to compose the complete `BE64C5..BE652F` continuation. `FrameHandoffCapacityPrefixProjection` preserves the receiver+C read, ordered frame-8/frame-4 stores and unsigned scaling gate before the call. `FrameHandoffCapacityCallProjection` models cleanup4 before the returned EAX frame store, the nonzero return gate and independent indirect-call return; invalid entry routes and unreached captures cannot authorize successful admission.
 
+`FrameHandoffCapacityTransferProjection` models `BE6BCA..BE6BFD`: signed SAR, independent frame reads, ordered scalar pushes and an opaque indirect-call normal boundary. Its admission rejects unreached later captures. `FrameHandoffCapacityTransferReturnProjection` models the fresh receiver read before cleanup12, wrapping addition of independently captured return EAX and entry EDI, independent frame-8 reload, frame-10 store and unsigned branch to `BE6C10` or `BE6C57`; it makes no callee-preservation claim.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves

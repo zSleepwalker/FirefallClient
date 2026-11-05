@@ -12377,6 +12377,46 @@ whose flagged first-stage was already blocked, not nominally complete.
 PrefixCall composition owner `76dc753e-9c3a-453c-af27-e51cbb14a729`
 owns new pair. Active Transfer77f0d27f and ReturnJoin83375c4c remain.
 
+Reviewed prefix/call/continuation pushed as `655f15b`.
+First transfer owner `77f0d27f` released; native order/bytes reviewed,
+refinement requested for explicit unreached captures and SuccessAdmission.
+ReturnJoin trace `83375c4c` completed; implementation owner
+`704fdb55-0bcc-4fc5-909e-b4a2b3b7cc15` owns TransferReturn pair.
+HelperLifecycle owner `2340766a-cce7-4135-9f0b-9de81acfc8d1`
+owns entry-through-continuation composition.
+
+Custom reverse-engineer trace `6b2e43a1` lacked IDA tools; no verified
+window returned. Coordinator instead verified raw `BE6C10..BE6C57`
+via IDA disasm/get_bytes and offline PE bytes (identical).
+SecondTransfer prefix owner `a4f503a1-53b0-4812-b4cc-267b48656710`
+owns only `BE6C10..BE6C34` projection/check pair. Evidence writer
+`dd6afd80-0ca2-4a90-b6a9-35e51ba5730a` exclusively owns
+StartupBinaryEvidence anchors for first transfer, return join, second prefix.
+
+Verified second-prefix bytes:
+`8D04BD000000008BD6C1F8022BD78955F48D1C8500000000A19C48AC015351FF75F0FFD0`.
+At C10 EAX=EDI*4, C17 EDX=ESI, C19 signed SAR EAX2,
+C1C EDX-=EDI, C1E frame-C store, C21 EBX=EAX*4;
+C28 independent call-cell DWORD load, C2D/C2E push EBX/ECX,
+C2F independently read/push frame-10, C32 call EAX, normal C34.
+Cell zero is a captured target, not an invented guard.
+
+Next bounded continuation: C34 fresh frame-C read into ECX before
+C37 cleanup12; C3A EDX=EBX+opaque return EAX; TEST/JZ C3D/C3F
+to C4A. Nonzero C41 XOR EAX, C43 EDI=EDX, C45 REP STOSD,
+C47 independent frame-8 reload EDI. DF direction is not established
+in this bounded slice: do not assume forward writes. C4A fresh
+frame-4 load EBX, TEST EDI/JZ C4D/C4F to CA2, else C51 ECX=EDI,
+C53 EDI=EBX, C55 jump C9E. This later portion is trace only;
+no implementation admission yet. Preserve reloads and opaque call outputs.
+
+FirstTransfer and TransferReturn pairs reviewed/registered and passing.
+Coordinator added first-transfer SuccessAdmission after author supplied
+unreached flags but omitted that property. TransferLifecycle owner
+`4719867f-8c66-49a9-baa7-ec03e5652946` owns composition pair.
+Return EntryEDI/ESI remain independent post-call captures, not assumed
+preserved from the first call's inputs.
+
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
 indirect callback, then fresh receiver+4C DEC and receiver+48 zero/INC.

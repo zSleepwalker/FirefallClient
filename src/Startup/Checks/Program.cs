@@ -73,6 +73,8 @@ FrameHandoffPublicationReturnChecks.Run(Check);
 FrameHandoffSlotCallPublicationChecks.Run(Check);
 FrameHandoffCapacityPrefixChecks.Run(Check);
 FrameHandoffCapacityCallChecks.Run(Check);
+FrameHandoffCapacityTransferChecks.Run(Check);
+FrameHandoffCapacityTransferReturnChecks.Run(Check);
 FrameHandoffContinuationLifecycleChecks.Run(Check);
 PayloadGrowthZeroFillChecks.Run(Check);
 
