@@ -886,6 +886,10 @@ BacklinkNextThreshold derives the next CMP's ECX from the independent fresh
 read, not the stored backlink value. HighSizeCeilingLifecycle carries the
 shifted EAX into the ceiling check. NextPairedStores retains both directional
 MOV writes, including aliased destinations, before the92A4 read boundary.
+HighSizeBitScan models the936F BSR, committed9374 frame store, masked SHR,
+and final index LEA through9384. Zero BSR leaves its destination undefined
+and prevents further projection. The actual AND and final LEA begin at
+raw012C937E and012C9381; the subsequent store remains outside this helper.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

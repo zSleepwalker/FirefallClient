@@ -13283,6 +13283,12 @@ Fixed nonexistentchildunusedproperty,incompatibleflagtypefixturecomparison,
 parentTEST10000paritytrue. BitScanc3b257ae releasedpendingreview:
 agentcorrectlyfoundAND937E/LEA9381(notcoordinatorstated937F/9382).
 ActiveNextThresholdStores522aff77-0b0c-46aa-a4d5-365312dc77d2.
+92ed5aepushed. BitScanpairreviewedregisteredrunner3923exit0;
+IDA936F21bytesrereadconfirmAND937E/LEA9381. Fresh9384..93A1
+bytes894E1C8D1C8DF8AEED01BA01000000C7461400000000C7461000000000.
+NewLunaHighSizeIndexLifecycle16326e63-6160-4fd2-9753-343da40e4b12
+andRightFieldGate26dbd5ac-a166-43f3-b6d5-1e61305fbb9d active.
+RightField92A4..92ABbytes8B4A1485C97412; freshreadnotstoreforwarding.
 8948188B4A1085C974123B0DD8ADED010F82D8FBFFFF8948108941188B4A1485C974123B0DD8ADED010F82BFFBFFFF894814894118.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
