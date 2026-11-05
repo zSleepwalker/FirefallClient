@@ -940,6 +940,12 @@ IndexedCountTagLifecycle derives the tag-gate count and pointer from the
 indexed classification, with independent late tag data and preserved flags.
 RightPairedStores models the two owner-field MOVs at raw `0x012C92B7`,
 including same-instruction partial operands and distinct ordered alias stores.
+ZeroSlotStoreTail keeps EDX as the owner-field source and stops at its direct
+cleanup jump. NodeFreshMaskLifecycle carries node-derived index/bit operands
+into the fresh global gate, rejecting dirty parent handoffs. TagTraversalLifecycle
+derives a single iteration from the unequal tag edge. RingCleanupLifecycle
+admits an independent counter decrement only after both non-borrowing thresholds
+and all five ring stores; its incoming carry is necessarily clear.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

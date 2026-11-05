@@ -13378,6 +13378,16 @@ reachDEC; two fixtures need nonborrowvalues and derivedCFfalse. NeedDEC0/
 80000000 cases, aggregateflags and exactcleanupbranchgates. RightFieldStores
 cf07ebfd active; SelfRingCleanup77c21735 active. Prior handoff already
 PE-verified cell1AC4A24 as MSVCR120.dll!abort; flatIDB import query empty.
+89a1dc1 pushed. ZeroSlotTail/NodeFreshMask revision/TagTraversal/RingCleanup
+revision reviewed through EOF and registered. Tail runner3992exit0.
+Fixed tag fixture missingchildread is reached attempted, not unreached;
+strengthenedzero andterminalgates. Node index31 fixture must inspect
+IndexLifecycle.FinalIndexECX, not ceiling-path ChildMoveResultECX.
+runner3998 blocked activeSelfRingCleanup203 undefinedZeroPathEcxValue,
+owner77c21735 notified. ActiveZeroSlotStores4b114dc5,
+TraversalZeroSlot20c1b0ca, NodeSelfRingd39cb3eb; RightFieldStorescf07ebfd.
+runner4004exit0 validates registered four-pair batch. RightFieldStores and
+ZeroSlotStores now released awaiting full review/integration.
 8948188B4A1085C974123B0DD8ADED010F82D8FBFFFF8948108941188B4A1485C974123B0DD8ADED010F82BFFBFFFF894814894118.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
