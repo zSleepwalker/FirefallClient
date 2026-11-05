@@ -530,6 +530,15 @@ internal static class StartupBinaryEvidence
             Matches(0x12C92D0, "893DD0ADED01E966010000")
             && RawCodeRangeMaps(0x12C92D0, 11)
             && RelativeBranchTargets(0x12C92D6, 0xE9, 0x12C9441));
+        check("Binary large successor compares the fresh forward field before paired writes",
+            Matches(0x12C91C5, "3950080F85A8FCFFFF89430C895808EB53")
+            && RawCodeRangeMaps(0x12C91C5, 17)
+            && RelativeConditionalBranchTargets(0x12C91C8, 0x0F, 0x85, 0x12C8E76)
+            && ShortConditionalBranchTargets(0x12C91D4, 0xEB, 0x12C9229));
+        check("Binary common size gate shifts caller EDI before an unsigned threshold branch",
+            Matches(0x12C92EC, "8BCFC1E90383F920735E")
+            && RawCodeRangeMaps(0x12C92EC, 10)
+            && ShortConditionalBranchTargets(0x12C92F4, 0x73, 0x12C9354));
         check("Binary pinned-sample raw code [0xBE6325,0xBE6352) maps to VA 0x00FE6F25 and preserves its JNZ target",
             imageBase == 0x400000
             && Matches(0xBE6325, "8B4E0853578B7E108D04CDFFFFFFFF4921460C037E0C8BC7C1E80323C88B46048D1C8D00000000833C0300751C")

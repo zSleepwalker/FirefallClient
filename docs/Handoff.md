@@ -13128,6 +13128,14 @@ CommonRootStore595f5cb9; activeFinalMaskCommon0a4a34c5.
 38ac55a pushedLargeBacklink/CommonRoot. SecondFieldTest/CommonRootStore
 reviewedregistered; nativeanchorsadded raw91E3/92D0. Runner3710 exit0.
 NewLunaCommonRootStored6cec70b andLargePairedField1fdd1d89 ownnewpairs.
+bc5584b pushedsecondfield/rootstore. Runner3725 exit0 coversnewregistered
+FinalMaskCommon, IndexedBacklinkFinal, CommonSize, CommonWritesRoot,
+LargeRootThreshold revised, CommonRootStore revised. CorrectedfixtureEBP
+default100 andmissingparent cleanadmissionfalse; latestflags/gatedEBP.
+FreshIDAanchorslarge successor91C5 andcommon size92EC added. ActiveLuna
+CommonRootSize622437f8 andFinalMaskCommonRoot824532cd. Releasedpending
+LargeRootFirst61fa11ed revised, ThresholdBacklink624622d1,
+LargeSuccessorWrites35613d09, LargePairedField1fdd1d89.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional

@@ -778,6 +778,14 @@ The second field test at raw91E3 independently reads EDX+10, overwrites
 EBP-4 with that field's address, and tests the fresh value. Zero selects
 9226; nonzero selects91F0. The common root store at raw92D0 writes EDI to
 VA1EDADD0 and jumps to9441 without entering the epilogue or changing flags.
+FinalMaskCommon and IndexedBacklinkFinal preserve independent downstream
+captures and exact clean branch handoffs. CommonWritesRoot keeps both tag
+stores before a fresh global read, including aliases. CommonRootStore
+admits only fully evidenced equal or unequal exits, never missing operands.
+LargeRootThreshold derives EBP only at the child store and retains the
+latest CMP flags even if the subsequent frame reload is missing. The
+common size gate shifts unsigned EDI by three before comparing against20h;
+its destinations are92F6 and9354.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
