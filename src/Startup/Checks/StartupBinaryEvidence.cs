@@ -495,6 +495,10 @@ internal static class StartupBinaryEvidence
             && ShortConditionalBranchTargets(0x12C917F, 0x74, 0x12C9190)
             && ShortConditionalBranchTargets(0x12C9183, 0x72, 0x12C918A)
             && ShortConditionalBranchTargets(0x12C9188, 0x74, 0x12C9190));
+        check("Binary alternate successor stores retain their order before the common tail",
+            Matches(0x12C9190, "89410C894808E922010000")
+            && RawCodeRangeMaps(0x12C9190, 11)
+            && RelativeBranchTargets(0x12C9196, 0xE9, 0x12C92BD));
         check("Binary pinned-sample raw code [0xBE6325,0xBE6352) maps to VA 0x00FE6F25 and preserves its JNZ target",
             imageBase == 0x400000
             && Matches(0xBE6325, "8B4E0853578B7E108D04CDFFFFFFFF4921460C037E0C8BC7C1E80323C88B46048D1C8D00000000833C0300751C")

@@ -726,6 +726,11 @@ computes the wrapping address 0x1EDADF0 plus eight times the first value,
 and stores that address at EBP-C before comparing it with the second value.
 LEA performs no memory read. Equal selects raw 0x12C9160; unequal selects
 raw 0x12C9151, with the local write retained on both paths.
+The paired-shifted lifecycle joins only the clean second comparison's
+unequal raw 0x12C912D edge. It preserves the two preceding frame stores,
+independently reloads EBP-4, and bounds the later comparison at raw
+0x12C9137 or 0x12C913D. Supplied shifted captures on either earlier opaque
+boundary are reported as unreached and prevent clean admission.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

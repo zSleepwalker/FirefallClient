@@ -13073,6 +13073,9 @@ anchors (runner3645 exit0). IndexedFrame released/reviewed/registered,
 runner3647 exit0. IndexedBacklinkff958892 assigned composition.
 Active pairs: PairedShifted71455ef8, BacklinkFinalb834db0d,
 MaskTail4e80926d, SuccessorGatee970fea4, IndexedBacklinkff958892.
+PairedShifted released/reviewed/registered; runner3651 exit0.
+SuccessorWritesd13861c5 assigned verified9190..919B twoMOV/JMP92BD;
+coordinatoranchor pendingrun. ShiftedIndexede4f54204 assigned newcomposition.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
