@@ -522,12 +522,16 @@ Detailed ClientApi rounds moved here from [Handoff.md](Handoff.md) to keep the c
   appends it with dynamic-array helper `0xBC55C0`, and pumps it once through
   `ClientApi_PumpRequestWorker`. This gate allows at most one new worker in a
   single invocation; the settings object's meaning remains unknown.
-- The `0x38`-byte tracker constructor `0xBC3AE0` initializes the worker array
+- The `0x38`-byte tracker constructor `0xBC3AE0` initializes the pending queue
   at `+0x10`, stores its manager pointer at `+0x28`, and stores route text/value
-  at `+0x2C/+0x30`. Its vector initialization helper zeroes tracker `+0x20`;
+  at `+0x2C/+0x30`. Its queue initialization helper zeroes tracker `+0x20`;
   the pump returns that field plus the count of workers with nonzero completion
   pointers (`0xBC413B`). Thus `+0x20` is not established as a boolean enable
-  flag, and the source of any later nonzero value remains unknown.
+  flag. The November 4 active-sample trace resolves it as the pending queue
+  count: enqueue `0x12CE310` increments queue `+0x10` at `0x12CE32A`,
+  while dequeue `0x12CE400` decrements it at `0x12CE47D`. Both operate
+  on tracker `+0x10`. The former worker-array interpretation of that field
+  is superseded; see the detailed pointer route in `Handoff.md`.
 - `ClientApi_PumpRouteWorkers` is called by `ClientApi_PumpRoutes`
   (`0xBC4550`), which iterates route records and aggregates per-route return
   values. The pool gate, worker allocation, and call targets are checked in
@@ -573,7 +577,7 @@ Detailed ClientApi rounds moved here from [Handoff.md](Handoff.md) to keep the c
 - After scheduling, the worker logs `Queuing retry %u of %u.` from sample VA
   `0x1C7389C` while the count remains below the limit. When the increment
   reaches the limit, it logs `Queuing final retry %u, resetting connection.`
-  from sample VA `0x1C7373C`, closes the handle at request `+0x20` if present,
+  from sample VA `0x1C7373C`, closes the handle at worker `+0x20` if present,
   and calls `0xBC38F0`. CompanionTools checks the retry policy/helper, count
   and flag stores, reset default, time/powf imports and call sites, constants,
   deadline stores, log strings, and final connection-reset call.
@@ -586,6 +590,61 @@ Detailed ClientApi rounds moved here from [Handoff.md](Handoff.md) to keep the c
   120 seconds.
 
 ## Unresolved
-- The semantic names of response kinds 2 and 4 and the full behavior of the
-  `0x12CE310` handoff are not established. The refresh flag argument is
-  observed; effective cache behavior is not.
+- Kind 2's semantic name remains unresolved. The November 4 active-sample
+  trace establishes that failed request opening/setup produces kind 4 and
+  the concrete Login response handler labels it `WinHTTP Error`. This is a
+  consumer's translation, not a claim that every producer was traced.
+  `0x12CE310` requeues the request pointer on the same tracker queue;
+  failed setup either retries or invokes an acquired weak callback before
+  destroying the request. Response storage is recycled and callback context
+  freed on both paths; exact callsites are in `Handoff.md`.
+  The refresh flag argument is observed; effective cache behavior is not.
+
+# November 4: admission and application-shutdown boundaries
+
+Submission `0xBC43C0` rejects disabled manager `+0x21`, active drain
+`+0x20`, or request validation failure before enqueue. Validation
+`0xBC1380 -> 0xBCDF20` requires nonempty host, signed port 1..65535,
+nonempty slash-prefixed path, and matching emptiness of content-type text
+and body logical length. It does not check method, scheme, or a MIME literal.
+Manager initialization enables `+0x21` only after successful WinHttpOpen;
+normal application startup does not continue to mode creation if that
+initialization fails. Conditional rejected-submission traces therefore do
+not demonstrate normal-startup failure.
+
+Application shutdown calls `0xBC4620(3000)` at `0x3097B7`, ignores its
+Boolean result, then calls `0xBBD570(3000)`. Drain blocks new submissions
+but pumps existing work; it aggregates pending requests and workers with
+completion contexts. Empty accounting returns one; timeout returns zero,
+with no request destruction or handle cancellation in the drain itself.
+The deadline test follows a pump without recounting, so work completing in
+that pump can still produce timeout. A negative timeout loops indefinitely;
+nonnegative timeout expires when unsigned elapsed ticks reach the deadline.
+After each pump the loop calls `KERNEL32.dll!SwitchToThread`, falling
+back to `Sleep(1)` when it returns zero. Direct PE OFT/IAT parsing resolves
+the saved call target at IAT VA `0x1AC4188`; it is not a message-pump API.
+
+Subsequent final release destroys manager/routes/workers and pending
+requests; queued requests are deleted without ordinary completion delivery.
+Detached active-context cleanup remains tied to HANDLE_CLOSING. Direct
+completion-handle closure/descendant-handle guarantees are not established
+by the inspected teardown. This is application shutdown, not GUI logout;
+the latter's resolved event-83 notification does not prove HTTP cancellation.
+Exact guards, ownership callsites, and remaining indirect edges are in
+`Handoff.md`.
+
+The final-reference arm of network release destroys the manager **before**
+its separate 3000-ms tracking-vector pump. That deadline is not a gate on
+manager destruction and does not bound the subsequent thread join: the join
+receives zero, translated to INFINITE. Nonfinal releases only decrement the
+network owner's refcount; application shutdown does not force that count to
+one. The subsequent trace identifies the tracking vector as owning polymorphic UDP
+socket handlers, not detached HTTP contexts. The pump explicitly skips
+the destroyed/null manager. Residual handlers are deleted only after the
+worker join returns, followed by IOCP closure and WSACleanup. This ordering
+does not itself establish blocking: the worker's stop/wait path is a
+separate boundary. The traced IOCP pass uses at most one 500-ms dequeue
+wait and at most 100 dequeue attempts before checking stop again; the join
+hook posts no stop sentinel. Quiet-stop observation therefore needs no
+external completion, but callbacks/maintenance returning and scheduling
+remain assumptions, not a total join-duration guarantee.

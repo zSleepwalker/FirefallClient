@@ -1,6 +1,361 @@
 using Firefall.Reconstruction.Startup;
 
 int failures = 0;
+PayloadWordGrowthGateChecks.Run(Check);
+PayloadWordSlotIndexChecks.Run(Check);
+PayloadWordSlotAllocationChecks.Run(Check);
+PayloadWordCopyTailChecks.Run(Check);
+PayloadWordGrowthDoublingChecks.Run(Check);
+PayloadGrowthBufferAllocationChecks.Run(Check);
+PayloadWordAppendChecks.Run(Check);
+PayloadGrowthFirstCopyChecks.Run(Check);
+PayloadGrowthPostCopyGateChecks.Run(Check);
+PayloadGrowthBranchCopyChecks.Run(Check);
+PayloadGrowthTakenSecondCopyChecks.Run(Check);
+PayloadGrowthPublicationChecks.Run(Check);
+ReliableReceiveSlotGateChecks.Run(Check);
+ReliableReceiveForwardingCallerChecks.Run(Check);
+ReliableReceiveRecordWordChecks.Run(Check);
+ReliableReceiveRecycleReturnChecks.Run(Check);
+ReliableReceiveEmptySlotCallbackChecks.Run(Check);
+ReliableReceiveForwardingReturnChecks.Run(Check);
+ReliableReceiveSlotPublicationChecks.Run(Check);
+ReliableReceiveCallbackResultChecks.Run(Check);
+ReliableReceiveLengthCallbackChecks.Run(Check);
+ReliableReceiveCallbackScalarHandoffChecks.Run(Check);
+UnreliableReceiveResidueCounterChecks.Run(Check);
+UnreliableReceiveResidueHandoffChecks.Run(Check);
+UnreliableReceiveJoinedHeaderChecks.Run(Check);
+ReliableReceiveOccupiedSlotChecks.Run(Check);
+UnreliableReceiveMarkerCallbackChecks.Run(Check);
+UnreliableReceiveCallbackScalarChecks.Run(Check);
+UnreliableReceiveResidueJoinChecks.Run(Check);
+ReliableReceiveEmptyPublicationChecks.Run(Check);
+UnreliableReceiveCallbackPresenceChecks.Run(Check);
+UnreliableReceiveDirectCallbackChecks.Run(Check);
+UnreliableReceiveMarkerScalarChecks.Run(Check);
+UnreliableReceivePresenceCallbackChecks.Run(Check);
+ReliableReceiveResultLengthChecks.Run(Check);
+UnreliableReceiveCallbackRecycleChecks.Run(Check);
+UnreliableReceiveZeroResultChecks.Run(Check);
+UnreliableReceiveZeroReturnChecks.Run(Check);
+PayloadXorDiagnosticEntryChecks.Run(Check);
+UnreliableReceiveResultStoresChecks.Run(Check);
+PayloadXorTableSetupChecks.Run(Check);
+UnreliableReceiveSelectorCallbackChecks.Run(Check);
+UnreliableReceiveFrameHandoffChecks.Run(Check);
+ReliableReceiveLengthPublicationChecks.Run(Check);
+UnreliableReceiveCallbackRecycleJoinChecks.Run(Check);
+PayloadXorReturnChecks.Run(Check);
+UnreliableReceiveZeroForwardReturnChecks.Run(Check);
+UnreliableReceiveHighCountForwardChecks.Run(Check);
+UnreliableReceiveHighCountCallbackChecks.Run(Check);
+UnreliableReceiveHighCountCounterChecks.Run(Check);
+PayloadXorEntrySetupChecks.Run(Check);
+UnreliableReceiveBelowThresholdReturnChecks.Run(Check);
+UnreliableReceiveHighCountSuffixChecks.Run(Check);
+UnreliableReceiveHighCountResultChecks.Run(Check);
+UnreliableReceiveHighCountReturnChecks.Run(Check);
+HighCountObjectHelperEntryChecks.Run(Check);
+FrameHandoffHelperEntryChecks.Run(Check);
+UnreliableReceiveHighCountLifecycleChecks.Run(Check);
+FrameHandoffHelperSlotChecks.Run(Check);
+HighCountObjectHelperReturnChecks.Run(Check);
+FrameHandoffHelperEntrySlotChecks.Run(Check);
+FrameHandoffCapacitySeedChecks.Run(Check);
+HighCountObjectHelperLifecycleChecks.Run(Check);
+FrameHandoffEmptySlotCallChecks.Run(Check);
+FrameHandoffSlotPublicationChecks.Run(Check);
+FrameHandoffFinalWriteReturnChecks.Run(Check);
+FrameHandoffCapacityLoopChecks.Run(Check);
+FrameHandoffCapacitySeedLoopChecks.Run(Check);
+FrameHandoffPublicationReturnChecks.Run(Check);
+FrameHandoffSlotCallPublicationChecks.Run(Check);
+FrameHandoffCapacityPrefixChecks.Run(Check);
+FrameHandoffCapacityCallChecks.Run(Check);
+FrameHandoffCapacityPrefixCallChecks.Run(Check);
+FrameHandoffCapacityTransferChecks.Run(Check);
+FrameHandoffCapacityTransferReturnChecks.Run(Check);
+FrameHandoffCapacityTransferLifecycleChecks.Run(Check);
+FrameHandoffCapacitySecondTransferChecks.Run(Check);
+FrameHandoffCapacitySecondReturnGateChecks.Run(Check);
+FrameHandoffCapacitySecondTransferLifecycleChecks.Run(Check);
+FrameHandoffCapacityPrefixTransferChecks.Run(Check);
+FrameHandoffCapacityAboveTransferChecks.Run(Check);
+FrameHandoffCapacityRepeatStoreChecks.Run(Check);
+FrameHandoffCapacityFillJoinChecks.Run(Check);
+FrameHandoffCapacityLoopPrefixChecks.Run(Check);
+FrameHandoffCapacityAboveSecondTransferChecks.Run(Check);
+FrameHandoffCapacityAboveReturnGateChecks.Run(Check);
+FrameHandoffCapacityGateRepeatChecks.Run(Check);
+FrameHandoffCapacityFinalReturnChecks.Run(Check);
+FrameHandoffCapacityFinalLifecycleChecks.Run(Check);
+FrameHandoffCapacityAboveLifecycleChecks.Run(Check);
+FrameHandoffCapacityFillSharedRepeatChecks.Run(Check);
+FrameHandoffCapacityRepeatFillJoinChecks.Run(Check);
+FrameHandoffCapacityAboveRepeatChecks.Run(Check);
+FrameHandoffCapacityFillFinalLifecycleChecks.Run(Check);
+CapacityFinalCalleeExitChecks.Run(Check);
+FrameHandoffCapacityFirstFillLifecycleChecks.Run(Check);
+FrameHandoffCapacityAboveFinalLifecycleChecks.Run(Check);
+FrameHandoffCapacityFirstFinalLifecycleChecks.Run(Check);
+CapacityFinalCalleeEntryChecks.Run(Check);
+FrameHandoffCapacityOverflowTailChecks.Run(Check);
+FrameHandoffCapacityLoopOverflowChecks.Run(Check);
+CapacityFinalCalleePrefixCallChecks.Run(Check);
+CapacityFinalCalleeFirstValidationChecks.Run(Check);
+CapacityFinalCalleePrefixLifecycleChecks.Run(Check);
+CapacityFinalCalleeValidationLifecycleChecks.Run(Check);
+CapacityFinalCalleeEntryValidationChecks.Run(Check);
+CapacityFinalCalleeAlignmentDispatchChecks.Run(Check);
+CapacityFinalCalleeTagValidationChecks.Run(Check);
+FrameHandoffCapacityDispatchLifecycleChecks.Run(Check);
+CapacityFinalCalleeZeroExitLifecycleChecks.Run(Check);
+CapacityFinalCalleeAlignmentTagLifecycleChecks.Run(Check);
+CapacityFinalCalleeTagEqualityContinuationChecks.Run(Check);
+CapacityFinalCalleeNonzeroValidationChecks.Run(Check);
+CapacityFinalCalleeEntryAlignmentLifecycleChecks.Run(Check);
+CapacityFinalCalleeFrameComparisonCallChecks.Run(Check);
+CapacityFinalCalleeTagEqualityLifecycleChecks.Run(Check);
+CapacityFinalCalleeSizeComparisonCallChecks.Run(Check);
+CapacityFinalCalleeAlignmentNonzeroLifecycleChecks.Run(Check);
+CapacityFinalCalleeTagEqualityExitLifecycleChecks.Run(Check);
+CapacityFinalCalleeDescriptorReloadChecks.Run(Check);
+CapacityFinalCalleeFrameMaskUpdateChecks.Run(Check);
+CapacityFinalCalleeFrameSizeLifecycleChecks.Run(Check);
+CapacityFinalCalleeDescriptorComparisonCallChecks.Run(Check);
+CapacityFinalCalleePairedFieldWritesChecks.Run(Check);
+CapacityFinalCalleeFrameMaskTagLifecycleChecks.Run(Check);
+CapacityFinalCalleeSizeDescriptorLifecycleChecks.Run(Check);
+CapacityFinalCalleePairedTagLifecycleChecks.Run(Check);
+CapacityFinalCalleeLargeSizeFieldsChecks.Run(Check);
+CapacityFinalCalleeDescriptorMaskLifecycleChecks.Run(Check);
+CapacityFinalCalleeDescriptorPairedLifecycleChecks.Run(Check);
+CapacityFinalCalleeAlternateFieldSelectionChecks.Run(Check);
+CapacityFinalCalleeFieldDescentStepChecks.Run(Check);
+CapacityFinalCalleeFieldClearTailChecks.Run(Check);
+CapacityFinalCalleeDescriptorFallbackMaskLifecycleChecks.Run(Check);
+CapacityFinalCalleeConditionalFieldStoreChecks.Run(Check);
+CapacityFinalCalleeLargeSizeAlternateLifecycleChecks.Run(Check);
+CapacityFinalCalleeDescentClearLifecycleChecks.Run(Check);
+CapacityFinalCalleeIndexedRootMaskChecks.Run(Check);
+CapacityFinalCalleeSelectionDescentLifecycleChecks.Run(Check);
+CapacityFinalCalleeGuardedFieldStoreChecks.Run(Check);
+CapacityFinalCalleeSuccessorPairedStoresChecks.Run(Check);
+CapacityFinalCalleeIndexedConditionalLifecycleChecks.Run(Check);
+CapacityFinalCalleeSecondFieldTestChecks.Run(Check);
+CapacityFinalCalleeClearIndexedLifecycleChecks.Run(Check);
+CapacityFinalCalleeSelectionClearLifecycleChecks.Run(Check);
+CapacityFinalCalleeFinalPairedTailChecks.Run(Check);
+CapacityFinalCalleeConditionalGuardedLifecycleChecks.Run(Check);
+CapacityFinalCalleeSecondTestTailLifecycleChecks.Run(Check);
+CapacityFinalCalleeAlternateTagGateChecks.Run(Check);
+CapacityFinalCalleeGuardedSuccessorLifecycleChecks.Run(Check);
+CapacityFinalCalleeAlternateFieldWritesChecks.Run(Check);
+CapacityFinalCalleeIndexedGuardedLifecycleChecks.Run(Check);
+CapacityFinalCalleePairedFinalLifecycleChecks.Run(Check);
+CapacityFinalCalleeAlternateRootWritesChecks.Run(Check);
+CapacityFinalCalleeGatedEpilogueChecks.Run(Check);
+CapacityFinalCalleeAlternateTagWritesLifecycleChecks.Run(Check);
+CapacityFinalCalleeGuardedFinalLifecycleChecks.Run(Check);
+CapacityFinalCalleeAlternateRootGateChecks.Run(Check);
+CapacityFinalCalleeAlternateEpilogueLifecycleChecks.Run(Check);
+CapacityFinalCalleeAlternateAlignedSizeChecks.Run(Check);
+CapacityFinalCalleeAlternateRootLifecycleChecks.Run(Check);
+CapacityFinalCalleeAlternateFrameLoadsChecks.Run(Check);
+CapacityFinalCalleeAlternateRootSizeLifecycleChecks.Run(Check);
+CapacityFinalCalleeRootEpilogueLifecycleChecks.Run(Check);
+CapacityFinalCalleeAlternateSecondFrameGateChecks.Run(Check);
+CapacityFinalCalleeAlternateShiftedFrameGateChecks.Run(Check);
+CapacityFinalCalleeAlignedFrameLifecycleChecks.Run(Check);
+CapacityFinalCalleePairedFrameGateLifecycleChecks.Run(Check);
+CapacityFinalCalleeSecondShiftedLifecycleChecks.Run(Check);
+CapacityFinalCalleeAlternateBacklinkGateChecks.Run(Check);
+CapacityFinalCalleeAlternateFinalFrameGateChecks.Run(Check);
+CapacityFinalCalleeAlternateIndexedFrameGateChecks.Run(Check);
+CapacityFinalCalleePairedShiftedLifecycleChecks.Run(Check);
+CapacityFinalCalleeAlternateMaskTailChecks.Run(Check);
+CapacityFinalCalleeAlternateSuccessorWritesChecks.Run(Check);
+CapacityFinalCalleeAlternateSuccessorGateChecks.Run(Check);
+CapacityFinalCalleeBacklinkFinalLifecycleChecks.Run(Check);
+CapacityFinalCalleeIndexedBacklinkLifecycleChecks.Run(Check);
+CapacityFinalCalleeShiftedIndexedLifecycleChecks.Run(Check);
+CapacityFinalCalleeCommonTailTagWritesChecks.Run(Check);
+CapacityFinalCalleeIndexedFinalLifecycleChecks.Run(Check);
+CapacityFinalCalleeLargeFrameThresholdProjectionChecks.Run(Check);
+CapacityFinalCalleeLargeFrameRootGateChecks.Run(Check);
+CapacityFinalCalleeFinalMaskLifecycleChecks.Run(Check);
+CapacityFinalCalleeLargeFrameFirstFieldTestChecks.Run(Check);
+CapacityFinalCalleeSuccessorWritesLifecycleChecks.Run(Check);
+CapacityFinalCalleeMaskCommonLifecycleChecks.Run(Check);
+CapacityFinalCalleeSuccessorCommonLifecycleChecks.Run(Check);
+CapacityFinalCalleeLargeFrameBacklinkGateChecks.Run(Check);
+CapacityFinalCalleeCommonTailRootGateChecks.Run(Check);
+CapacityFinalCalleeCommonTailRootStoreChecks.Run(Check);
+CapacityFinalCalleeLargeFrameSecondFieldTestChecks.Run(Check);
+CapacityFinalCalleeFinalMaskCommonLifecycleChecks.Run(Check);
+CapacityFinalCalleeIndexedBacklinkFinalLifecycleChecks.Run(Check);
+CapacityFinalCalleeCommonTailSizeGateChecks.Run(Check);
+CapacityFinalCalleeCommonWritesRootLifecycleChecks.Run(Check);
+CapacityFinalCalleeLargeRootThresholdLifecycleChecks.Run(Check);
+CapacityFinalCalleeCommonRootStoreLifecycleChecks.Run(Check);
+CapacityFinalCalleeLargeRootFirstFieldLifecycleChecks.Run(Check);
+CapacityFinalCalleeLargeSuccessorWritesChecks.Run(Check);
+CapacityFinalCalleeLargeThresholdBacklinkLifecycleChecks.Run(Check);
+CapacityFinalCalleeLargePairedFieldTestLifecycleChecks.Run(Check);
+CapacityFinalCalleeCommonRootSizeLifecycleChecks.Run(Check);
+CapacityFinalCalleeFinalMaskCommonRootLifecycleChecks.Run(Check);
+CapacityFinalCalleeLargeNodeReloadChecks.Run(Check);
+CapacityFinalCalleeLargeSavedFrameGateChecks.Run(Check);
+CapacityFinalCalleeLargeNodeFieldSelectionChecks.Run(Check);
+CapacityFinalCalleeCommonIndexedAddressGateChecks.Run(Check);
+CapacityFinalCalleeLargeBacklinkSuccessorLifecycleChecks.Run(Check);
+CapacityFinalCalleeLargeSavedFrameCommonLifecycleChecks.Run(Check);
+CapacityFinalCalleeLargeLeafThresholdGateProjectionChecks.Run(Check);
+CapacityFinalCalleeLargeNodeSelectionReloadLifecycleProjectionChecks.Run(Check);
+CapacityFinalCalleeLargeRootPairedFieldLifecycleChecks.Run(Check);
+CapacityFinalCalleeLargeLeafClearStoreProjectionChecks.Run(Check);
+CapacityFinalCalleeLargeNodeSelectionLeafThresholdLifecycleProjectionChecks.Run(Check);
+CapacityFinalCalleeLargeLeafThresholdClearLifecycleProjectionChecks.Run(Check);
+CapacityFinalCalleeCommonSizeIndexedLifecycleChecks.Run(Check);
+CapacityFinalCalleeLargeSavedIndexGateChecks.Run(Check);
+CapacityFinalCalleeCommonMaskSelectionGateChecks.Run(Check);
+CapacityFinalCalleeLargeSavedFrameCommonRootLifecycleChecks.Run(Check);
+CapacityFinalCalleeLargeSavedFrameIndexedLifecycleChecks.Run(Check);
+CapacityFinalCalleeCommonIndexedMaskLifecycleChecks.Run(Check);
+CapacityFinalCalleeCommonMaskOrStoreChecks.Run(Check);
+CapacityFinalCalleeLargeSavedIndexedStoreGateChecks.Run(Check);
+CapacityFinalCalleeCommonSuccessorThresholdGateProjectionChecks.Run(Check);
+CapacityFinalCalleeCommonRingWritesChecks.Run(Check);
+CapacityFinalCalleeLargeMaskAndStoreChecks.Run(Check);
+CapacityFinalCalleeLargeSavedIndexStoreLifecycleChecks.Run(Check);
+CapacityFinalCalleeLargeSavedMaskShiftChecks.Run(Check);
+CapacityFinalCalleeCommonMaskSelectionOrLifecycleProjectionChecks.Run(Check);
+CapacityFinalCalleeCommonMaskSuccessorLifecycleChecks.Run(Check);
+CapacityFinalCalleeCommonOrRingLifecycleChecks.Run(Check);
+CapacityFinalCalleeLargeSavedMaskAndLifecycleChecks.Run(Check);
+CapacityFinalCalleeLargeIndexedRejectGateProjectionChecks.Run(Check);
+CapacityFinalCalleeLargeIndexedFieldGateProjectionChecks.Run(Check);
+CapacityFinalCalleeLargeEaxGlobalThresholdGateProjectionChecks.Run(Check);
+CapacityFinalCalleeCommonAlternateRingWritesProjectionChecks.Run(Check);
+CapacityFinalCalleeLargeSavedIndexRejectLifecycleChecks.Run(Check);
+CapacityFinalCalleeLargeIndexedFieldStoreLifecycleProjectionChecks.Run(Check);
+CapacityFinalCalleeLargeRejectFieldLifecycleProjectionChecks.Run(Check);
+CapacityFinalCalleeLargeSavedIndexedZeroMaskLifecycleChecks.Run(Check);
+CapacityFinalCalleeCommonSuccessorRingLifecycleProjectionChecks.Run(Check);
+CapacityFinalCalleeLargePostStoreZeroGateChecks.Run(Check);
+CapacityFinalCalleeLargeBacklinkNextFieldGateChecks.Run(Check);
+CapacityFinalCalleeCommonHighSizeEntryGateProjectionChecks.Run(Check);
+CapacityFinalCalleeLargeEaxBacklinkLifecycleChecks.Run(Check);
+CapacityFinalCalleeCommonHighSizeCeilingGateProjectionChecks.Run(Check);
+CapacityFinalCalleeLargeNextFieldThresholdGateChecks.Run(Check);
+CapacityFinalCalleeLargeIndexedFieldStoreZeroLifecycleProjectionChecks.Run(Check);
+CapacityFinalCalleeLargeBacklinkNextThresholdLifecycleChecks.Run(Check);
+CapacityFinalCalleeCommonHighSizeCeilingLifecycleChecks.Run(Check);
+CapacityFinalCalleeCommonHighSizeBitScanProjectionChecks.Run(Check);
+CapacityFinalCalleeLargeNextPairedStoresChecks.Run(Check);
+CapacityFinalCalleeLargeNextThresholdStoresLifecycleChecks.Run(Check);
+CapacityFinalCalleeCommonIndexedNodeInitializationChecks.Run(Check);
+CapacityFinalCalleeLargeRightFieldGateChecks.Run(Check);
+CapacityFinalCalleeLargeRightFieldThresholdGateChecks.Run(Check);
+CapacityFinalCalleeCommonFreshMaskGateChecks.Run(Check);
+CapacityFinalCalleeCommonSelfRingTailChecks.Run(Check);
+CapacityFinalCalleeCommonHighSizeIndexLifecycleChecks.Run(Check);
+CapacityFinalCalleeLargeRightFieldThresholdLifecycleChecks.Run(Check);
+CapacityFinalCalleeCommonIndexedCountClassificationChecks.Run(Check);
+CapacityFinalCalleeCleanupCounterGateChecks.Run(Check);
+CapacityFinalCalleeCommonMaskedTagEqualityGateChecks.Run(Check);
+CapacityFinalCalleeCommonRingInsertionChecks.Run(Check);
+CapacityFinalCalleeCommonDualPointerThresholdChecks.Run(Check);
+CapacityFinalCalleeCommonFreshMaskSelfRingLifecycleChecks.Run(Check);
+CapacityFinalCalleeCommonHighSizeNodeLifecycleChecks.Run(Check);
+CapacityFinalCalleeCommonTraversalIterationChecks.Run(Check);
+CapacityFinalCalleeCommonZeroSlotThresholdGateChecks.Run(Check);
+CapacityFinalCalleeCommonDualThresholdRingLifecycleChecks.Run(Check);
+CapacityFinalCalleeCommonIndexedCountTagLifecycleChecks.Run(Check);
+CapacityFinalCalleeLargeRightPairedStoresChecks.Run(Check);
+CapacityFinalCalleeCommonZeroSlotStoreTailChecks.Run(Check);
+CapacityFinalCalleeCommonTagTraversalLifecycleChecks.Run(Check);
+CapacityFinalCalleeCommonNodeFreshMaskLifecycleChecks.Run(Check);
+CapacityFinalCalleeCommonRingCleanupLifecycleChecks.Run(Check);
+CapacityFinalCalleeLargeRightFieldStoresLifecycleChecks.Run(Check);
+CapacityFinalCalleeCommonZeroSlotStoresLifecycleChecks.Run(Check);
+CapacityFinalCalleeCommonSelfRingCleanupLifecycleChecks.Run(Check);
+CapacityFinalCalleeCommonNodeSelfRingLifecycleChecks.Run(Check);
+CapacityFinalCalleeCommonZeroSlotCleanupLifecycleChecks.Run(Check);
+CapacityFinalCalleeLargeRightFieldTagLifecycleChecks.Run(Check);
+CapacityFinalCalleeCommonTraversalZeroSlotLifecycleChecks.Run(Check);
+CapacityFinalCalleeCommonRingCleanupEpilogueLifecycleChecks.Run(Check);
+CapacityFinalCalleeCommonTraversalSlotStoresLifecycleChecks.Run(Check);
+CapacityFinalCalleeLargeRightTagRootLifecycleChecks.Run(Check);
+CapacityFinalCalleeCommonNodeRingCleanupLifecycleChecks.Run(Check);
+CapacityFinalCalleeCommonIndexedTagTraversalLifecycleChecks.Run(Check);
+CapacityFinalCalleeCommonZeroCleanupEpilogueLifecycleChecks.Run(Check);
+CapacityFinalCalleeCommonNodeCleanupEpilogueLifecycleChecks.Run(Check);
+CapacityFinalCalleeCommonIndexedTraversalZeroSlotLifecycleChecks.Run(Check);
+CapacityFinalCalleeCommonIndexedTraversalSlotStoresLifecycleChecks.Run(Check);
+CapacityFinalCalleeCommonIndexedTraversalSlotCleanupLifecycleChecks.Run(Check);
+CapacityFinalCalleeCommonIndexedCleanupEpilogueLifecycleChecks.Run(Check);
+CapacityFinalCalleeCommonNodeMaskIndexedLifecycleChecks.Run(Check);
+CapacityFinalCalleeCommonNodeIndexedTraversalLifecycleChecks.Run(Check);
+CapacityFinalCalleeCommonNodeIndexedTraversalZeroSlotLifecycleChecks.Run(Check);
+CapacityFinalCalleeCommonNodeIndexedTraversalSlotStoresLifecycleChecks.Run(Check);
+CapacityFinalCalleeCommonNodeIndexedTraversalSlotCleanupLifecycleChecks.Run(Check);
+NetworkIoCompletionPassChecks.Run(Check);
+GameSocketSenderBindingChecks.Run(Check);
+GameSocketCompletionErrorStateChecks.Run(Check);
+CapacityFinalCalleeCommonNodeIndexedCleanupEpilogueLifecycleChecks.Run(Check);
+GameSocketReceiveResultGateChecks.Run(Check);
+NetworkIoCompletionClockGateChecks.Run(Check);
+GameSocketDatagramContextDispatchChecks.Run(Check);
+CapacityFinalCalleeCommonNodeIndexedEqualityRingLifecycleChecks.Run(Check);
+NetworkDispatcherLockGateChecks.Run(Check);
+GameSocketCompletionErrorQueueAcquisitionChecks.Run(Check);
+GameSocketReceiveSenderPreparationChecks.Run(Check);
+CapacityFinalCalleeCommonNodeIndexedEqualityRingCleanupLifecycleChecks.Run(Check);
+GameSocketReceivePacketCallPreparationChecks.Run(Check);
+GameSocketParserLocalSizeDispatchChecks.Run(Check);
+CapacityFinalCalleeCommonNodeIndexedEqualityRingCleanupEpilogueLifecycleChecks.Run(Check);
+GameSocketCompletionErrorQueueAttemptLifecycleChecks.Run(Check);
+GameSocketReceivePostPacketStackPreparationChecks.Run(Check);
+GameSocketParserPostResizePointerChecks.Run(Check);
+NetworkDispatcherCollectionGateChecks.Run(Check);
+CapacityFinalCalleeCommonNodeIndexedOuterEqualityRingLifecycleChecks.Run(Check);
+GameSocketCompletionErrorQueuePublicationLifecycleChecks.Run(Check);
+CapacityFinalCalleeCommonNodeIndexedOuterEqualityRingCleanupLifecycleChecks.Run(Check);
+GameSocketReceiveOperationReloadGateChecks.Run(Check);
+GameSocketParserFirstByteFieldsChecks.Run(Check);
+NetworkDispatcherEntryCallPreparationChecks.Run(Check);
+CapacityFinalCalleeCommonNodeIndexedOuterEqualityRingCleanupEpilogueLifecycleChecks.Run(Check);
+GameSocketCompletionErrorEpilogueChecks.Run(Check);
+GameSocketParserSecondByteScalarGateChecks.Run(Check);
+GameSocketCompletionErrorReturnChecks.Run(Check);
+NetworkDispatcherPostCallCountGateChecks.Run(Check);
+CapacityFinalCalleeCommonNodeIndexedTraversalSecondIterationChecks.Run(Check);
+GameSocketParserCallerCountGateChecks.Run(Check);
+GameSocketReceiveBufferStatusGateChecks.Run(Check);
+NetworkDispatcherCellReturnAddressGateChecks.Run(Check);
+CapacityFinalCalleeCommonNodeIndexedSecondEqualityRingLifecycleChecks.Run(Check);
+GameSocketParserCountConsumptionStoresChecks.Run(Check);
+NetworkIoErrorCallbackPreparationChecks.Run(Check);
+GameSocketReceiveRepostCallPreparationChecks.Run(Check);
+CapacityFinalCalleeCommonNodeIndexedSecondEqualityCleanupLifecycleChecks.Run(Check);
+NetworkDispatcherFencedPublicationChecks.Run(Check);
+GameSocketParserStoredByteSelectorGateChecks.Run(Check);
+NetworkIoErrorCallbackReturnChecks.Run(Check);
+CapacityFinalCalleeCommonTraversalSlotCleanupLifecycleChecks.Run(Check);
+CapacityFinalCalleeCommonTraversalCleanupEpilogueLifecycleChecks.Run(Check);
+CapacityFinalCalleeLargeRightRootSuccessorLifecycleChecks.Run(Check);
+CapacityFinalCalleeLargeRightRootIndexedMaskLifecycleChecks.Run(Check);
+CapacityFinalCalleeLargeRightRootSmallBinRingLifecycleChecks.Run(Check);
+CapacityFinalCalleeLargeRightRootSmallBinEpilogueLifecycleChecks.Run(Check);
+FrameHandoffCapacityAboveBranchLifecycleChecks.Run(Check);
+FrameHandoffCapacitySecondBranchLifecycleChecks.Run(Check);
+FrameHandoffCapacityFinalCallGateChecks.Run(Check);
+FrameHandoffCapacitySharedRepeatChecks.Run(Check);
+FrameHandoffHelperLifecycleChecks.Run(Check);
+FrameHandoffContinuationLifecycleChecks.Run(Check);
+PayloadGrowthZeroFillChecks.Run(Check);
 
 void Check(string name, bool condition)
 {
@@ -8,6 +363,91 @@ void Check(string name, bool condition)
     if (!condition)
         failures++;
 }
+
+UiNestedChildCleanupChecks.Run(Check);
+UiChildBackingAllocationChecks.Run(Check);
+UiChildInitializationResultChecks.Run(Check);
+UiChildRequiredLookupChecks.Run(Check);
+UiChildPairReplacementChecks.Run(Check);
+UiChildScratchCleanupChecks.Run(Check);
+UiChildShaderCompileChecks.Run(Check);
+UiChildShaderBlobCleanupChecks.Run(Check);
+UiShaderSourceWrapperChecks.Run(Check);
+UiShaderSourceCopyChecks.Run(Check);
+UiShaderSourceInitialCopyChecks.Run(Check);
+UiShaderSourcePairReplacementChecks.Run(Check);
+UiShaderSourceClearChecks.Run(Check);
+UiShaderSourceDestructorChecks.Run(Check);
+UiShaderSourceControlReleaseChecks.Run(Check);
+UiShaderSourcePoolReturnChecks.Run(Check);
+UiShaderSourceNonPoolReleaseChecks.Run(Check);
+UiShaderSourceAllocationChecks.Run(Check);
+UiShaderSourcePoolCandidateChecks.Run(Check);
+UiShaderSourcePoolInitializationChecks.Run(Check);
+UiShaderSourcePoolConfigurationChecks.Run(Check);
+UiShaderSourcePoolResetEntryChecks.Run(Check);
+UiShaderSourcePoolResetCallbackChecks.Run(Check);
+UiShaderSourcePoolResetFinalizationChecks.Run(Check);
+UiShaderSourcePoolResetAlignmentChecks.Run(Check);
+UiShaderSourcePoolResetAppendChecks.Run(Check);
+UiShaderSourcePoolResetGrowthChecks.Run(Check);
+UiShaderSourcePoolResetRemovalChecks.Run(Check);
+UiShaderSourcePoolResetStorageChecks.Run(Check);
+UiShaderSourcePoolResetSecondaryGateChecks.Run(Check);
+UiShaderSourcePoolResetPrimaryGateChecks.Run(Check);
+PoolResetVectorCleanupChecks.Run(Check);
+StackAllocationResultChecks.Run(Check);
+UiShaderSourcePoolResetIterationTailChecks.Run(Check);
+UiShaderSourcePoolResetSecondaryRepeatChecks.Run(Check);
+QueuePopCompletionChecks.Run(Check);
+QueuePopAttemptChecks.Run(Check);
+QueueCleanupEmptyAttemptChecks.Run(Check);
+QueueAppendAttemptChecks.Run(Check);
+QueueAppendPublicationChecks.Run(Check);
+QueueSentinelReturnChecks.Run(Check);
+QueueEmbeddedPoolDrainChecks.Run(Check);
+QueueSentinelInitializationChecks.Run(Check);
+QueueAppendAcquisitionChecks.Run(Check);
+QueueDestructorFinalizationChecks.Run(Check);
+QueueGlobalPoolInitializationChecks.Run(Check);
+SocketReceivedQueuePopChecks.Run(Check);
+SocketFragmentEnqueueChecks.Run(Check);
+ContextQueueAppendChecks.Run(Check);
+OwnerCallbackQueueDeliveryChecks.Run(Check);
+SocketSmallStatusChecks.Run(Check);
+SocketLargeQueueGateChecks.Run(Check);
+DeferredControlCallbackChecks.Run(Check);
+SocketPayloadHeaderDispatchChecks.Run(Check);
+SocketStatePredicateChecks.Run(Check);
+SocketStateEntryChecks.Run(Check);
+SocketPayloadRecycleTailChecks.Run(Check);
+SocketPayloadRecyclePrefixChecks.Run(Check);
+SocketHeaderFieldGetterChecks.Run(Check);
+SocketHeaderCaseContinuationChecks.Run(Check);
+ReliableReceiveEntryChecks.Run(Check);
+UnreliableReceiveEntryChecks.Run(Check);
+ReliableReceiveDeltaGateChecks.Run(Check);
+UnreliableReceiveDeltaGateChecks.Run(Check);
+ReceiveGuardForwardingChecks.Run(Check);
+ReliableReceiveAlternateHandoffChecks.Run(Check);
+SharedTextPoolSingletonChecks.Run(Check);
+UiShaderSourcePoolTeardownChecks.Run(Check);
+UiShaderSourcePoolSingletonDestructorChecks.Run(Check);
+UiShaderSourcePoolDrainChecks.Run(Check);
+UiShaderSourcePoolPopChecks.Run(Check);
+UiShaderSourcePoolPushChecks.Run(Check);
+UiShaderSourcePoolAcquisitionChecks.Run(Check);
+UiShaderSourcePoolReplenishmentChecks.Run(Check);
+UiShaderSourcePoolReplenishmentResultChecks.Run(Check);
+UiShaderSourcePoolReplenishmentAlignmentChecks.Run(Check);
+UiShaderSourcePoolReplenishmentIterationChecks.Run(Check);
+SingletonTeardownWalkerChecks.Run(Check);
+UiShaderSourceBackingAlignmentChecks.Run(Check);
+UiShaderSourcePoolControlChecks.Run(Check);
+UiShaderSourcePreserveCopyChecks.Run(Check);
+UiShaderSourceReuseChecks.Run(Check);
+UiShaderSourceReadOnlyOffsetChecks.Run(Check);
+UiShaderSourceReadChecks.Run(Check);
 
 var expected = new[]
 {
@@ -653,6 +1093,329 @@ Check("UI manager singleton and global event routing boundaries are recorded",
     && UiManagerNativeLayout.LoginModeMessage145GlobalLoadFileOffset == 0x63C1E2
     && UiManagerNativeLayout.LoginModeMessage145CallFileOffset == 0x63C1F5
     && UiManagerNativeLayout.LoginModeMessageId == 0x145);
+Check("UI manager initialization guard rejects nonzero slot+4 getter results and preserves later flag outcomes",
+    UiManagerNativeLayout.UiManagerInitializeMethodFileOffset == 0xBFB310
+    && UiManagerNativeLayout.UiManagerInitializationFlagGetterMethodFileOffset == 0xBFA0C0
+    && UiManagerNativeLayout.UiManagerInitializationFlagGetterVtableOffset == 0x04
+    && UiManagerNativeLayout.UiManagerInitializePartialFlagWriteFileOffset == 0xBFB350
+    && UiManagerNativeLayout.UiManagerInitializeReadyFlagWriteFileOffset == 0xBFB8DC
+    && UiManagerNativeLayout.UiManagerConstructorStateWordOffset == 0x670
+    && UiManagerNativeLayout.UiManagerConstructorStateWordValue == 1
+    && UiManagerNativeLayout.UiManagerInitializationPartialFlagOffset == 0x671
+    && UiManagerNativeLayout.UiManagerEventReadyFlagOffset == 0x672
+    && Enumerable.Range(0, byte.MaxValue + 1).All(value =>
+        UiManagerNativeLayout.ShouldEnterInitialization((byte)value) == (value == 0))
+    && UiManagerNativeLayout.CaptureObservedInitializationFlags(
+        UiManagerInitializationOutcome.PartialInitializationFailed)
+        == new UiManagerInitializationFlagSnapshot(1, 0)
+    && UiManagerNativeLayout.CaptureObservedInitializationFlags(
+        UiManagerInitializationOutcome.Initialized)
+        == new UiManagerInitializationFlagSnapshot(1, 1)
+    && UiManagerNativeLayout.CaptureObservedInitializationFlags(
+        UiManagerInitializationOutcome.Initialized).ShutdownStateWord == 0x0101);
+Check("UI startup callback stores the getter-sourced descriptor at +A08 before setting the ready flag",
+    UiManagerNativeLayout.UiManagerDescriptorGetterCallSiteFileOffset == 0x30B1B4
+    && UiManagerNativeLayout.UiManagerDescriptorGetterResultAddressOffset == 0x48
+    && UiManagerNativeLayout.UiManagerInitializeDescriptorArgumentOrdinal == 8
+    && UiManagerNativeLayout.UiManagerInitializeDescriptorArgumentFrameOffset == 0x24
+    && UiManagerNativeLayout.UiManagerInitializeDescriptorCallbackCallSiteFileOffset == 0xBFB8C6
+    && UiManagerNativeLayout.UiManagerInitializeDescriptorCallbackReceiverOffset == 0x974
+    && UiManagerNativeLayout.UiManagerInitializeDescriptorCallbackVtableOffset == 0x30
+    && UiManagerNativeLayout.UiManagerInitializeDescriptorCallbackArgument == 1
+    && !UiManagerNativeLayout.UiManagerInitializeDescriptorCallbackReturnIsUsed
+    && UiManagerNativeLayout.UiManagerInitializeDescriptorStoreFileOffset == 0xBFB8CE
+    && UiManagerNativeLayout.UiManagerPayloadDescriptorOffset == 0xA08
+    && UiManagerNativeLayout.UiManagerInitializeReadyFlagWriteFileOffset == 0xBFB8DC);
+var syncInput = new UiManagerStateSyncInput(
+    1, 1, 1, 0x58C, 1, 0x588, 0x584, 1, 1, 0x58C);
+Check("UI state-sync projection requires both raw gates and preserves the ignored callback result",
+    UiManagerNativeLayout.UiManagerStateSyncMethodFileOffset == 0xBFFA90
+    && UiManagerNativeLayout.UiManagerStateSyncCallerMethodFileOffset == 0xBFF930
+    && UiManagerNativeLayout.UiManagerStateSyncCallerCallSiteFileOffset == 0xBFFA3F
+    && UiManagerNativeLayout.UiManagerStateSyncGetCursorInfoIatVirtualAddress == 0x1AC4C24
+    && UiManagerNativeLayout.UiManagerStateSyncGetCursorInfoIatFileOffset == 0x16C3824
+    && UiManagerNativeLayout.UiManagerStateSyncCursorInfoSize == 20
+    && UiManagerNativeLayout.UiManagerStateSyncCursorInfoCbSizeOffset == 0
+    && UiManagerNativeLayout.UiManagerStateSyncCursorInfoFlagsOffset == 4
+    && UiManagerNativeLayout.UiManagerStateSyncCursorInfoCursorHandleOffset == 8
+    && UiManagerNativeLayout.UiManagerStateSyncCursorInfoXOffset == 12
+    && UiManagerNativeLayout.UiManagerStateSyncCursorInfoYOffset == 16
+    && UiManagerNativeLayout.UiManagerInitializationFlagGetterVtableOffset == 0x04
+    && UiManagerNativeLayout.UiManagerStateSyncComponentReceiverOffset == 0x974
+    && UiManagerNativeLayout.UiManagerStateSyncComponentVtableOffset == 0x1C
+    && !UiManagerNativeLayout.UiManagerStateSyncComponentReturnIsUsed
+    && UiManagerNativeLayout.ProjectStateSync(syncInput)
+        == new UiManagerStateSyncProjection(1, null)
+    && Enumerable.Range(0, byte.MaxValue + 1).All(value =>
+        UiManagerNativeLayout.ProjectStateSync(syncInput with { GetterResult = (byte)value }).GateResult
+            == (value == 0 ? 0 : 1)
+        && UiManagerNativeLayout.ProjectStateSync(syncInput with { ReadyFlag = (byte)value }).GateResult
+            == (value == 0 ? 0 : 1)
+        && (value != 0
+            || (UiManagerNativeLayout.ProjectStateSync(syncInput with { GetterResult = (byte)value }).ComponentCall is null
+                && UiManagerNativeLayout.ProjectStateSync(syncInput with { ReadyFlag = (byte)value }).ComponentCall is null))));
+Check("UI state-sync selection follows only the recorded +58C/+590, +588, then +584 fallback",
+    UiManagerNativeLayout.UiManagerStateSyncField58COffset == 0x58C
+    && UiManagerNativeLayout.UiManagerStateSyncField590Offset == 0x590
+    && UiManagerNativeLayout.UiManagerStateSyncField588Offset == 0x588
+    && UiManagerNativeLayout.UiManagerStateSyncField584Offset == 0x584
+    && UiManagerNativeLayout.ProjectStateSync(syncInput with { Field598 = 1, CursorFlags = 0 })
+        .ComponentCall == new UiManagerStateSyncCall(1, 0x58C)
+    && UiManagerNativeLayout.ProjectStateSync(syncInput with
+        {
+            Field590 = 0,
+            Field598 = 1,
+            CursorFlags = 0
+        }).ComponentCall == new UiManagerStateSyncCall(1, 0x588)
+    && UiManagerNativeLayout.ProjectStateSync(syncInput with
+        {
+            Field58C = 0,
+            Field598 = 1,
+            CursorFlags = 0
+        }).ComponentCall == new UiManagerStateSyncCall(1, 0x588)
+    && UiManagerNativeLayout.ProjectStateSync(syncInput with
+        {
+            Field590 = 0,
+            Field588 = 0,
+            Field598 = 1,
+            CursorFlags = 0
+        }).ComponentCall == new UiManagerStateSyncCall(1, 0x584)
+    && UiManagerNativeLayout.ProjectStateSync(syncInput with
+        {
+            Field590 = 0,
+            Field588 = 0,
+            Field584 = 0,
+            Field598 = 1,
+            CursorFlags = 0
+        }).ComponentCall == new UiManagerStateSyncCall(1, 0));
+Check("UI state-sync nonzero-byte branches and captured cursor comparisons use exact zero/one tests",
+    UiManagerNativeLayout.UiManagerStateSyncField598Offset == 0x598
+    && Enumerable.Range(0, byte.MaxValue + 1).All(value =>
+        UiManagerNativeLayout.ProjectStateSync(syncInput with { Field590 = (byte)value, Field598 = 1, CursorFlags = 0 })
+            .ComponentCall == new UiManagerStateSyncCall(1, value == 0 ? 0x588u : 0x58Cu)
+        && UiManagerNativeLayout.ProjectStateSync(syncInput with
+            {
+                Field670 = (byte)value,
+                Field598 = 0,
+                CursorFlags = 1
+            }).ComponentCall == (value == 0
+                ? new UiManagerStateSyncCall(1, 0x58Cu)
+                : new UiManagerStateSyncCall(0, 0))
+        && UiManagerNativeLayout.ProjectStateSync(syncInput with
+            {
+                Field670 = 1,
+                Field598 = (byte)value,
+                CursorFlags = 1,
+                CursorHandle = 0x58C
+            }).ComponentCall == (value == 0
+                ? new UiManagerStateSyncCall(0, 0)
+                : null)
+        && UiManagerNativeLayout.ProjectStateSync(syncInput with
+            {
+                Field670 = 1,
+                Field598 = 0,
+                CursorFlags = (uint)value
+            }).ComponentCall == (value == 1
+                ? new UiManagerStateSyncCall(0, 0)
+                : null))
+    && UiManagerNativeLayout.ProjectStateSync(syncInput with
+        {
+            Field670 = 1,
+            Field598 = 1,
+            CursorFlags = 1,
+            CursorHandle = 0x58C
+        }).ComponentCall is null
+    && UiManagerNativeLayout.ProjectStateSync(syncInput with
+        {
+            Field670 = 1,
+            Field598 = 1,
+            CursorFlags = 2,
+            CursorHandle = 0x58C
+        }).ComponentCall is null
+    && UiManagerNativeLayout.ProjectStateSync(syncInput with
+        {
+            Field670 = 1,
+            Field598 = 1,
+            CursorFlags = 2,
+            CursorHandle = 0x58D
+        }).ComponentCall == new UiManagerStateSyncCall(1, 0x58C)
+    && UiManagerNativeLayout.ProjectStateSync(syncInput with
+        {
+            Field670 = 1,
+            Field598 = 1,
+            CursorFlags = 1,
+            CursorHandle = 0x58D
+        }).ComponentCall == new UiManagerStateSyncCall(1, 0x58C)
+    && UiManagerNativeLayout.ProjectStateSync(syncInput with
+        {
+            Field670 = 1,
+            Field598 = 0,
+            CursorFlags = 0x100
+        }).ComponentCall is null
+    && UiManagerNativeLayout.ProjectStateSync(syncInput with
+        {
+            Field670 = 1,
+            Field598 = 1,
+            CursorFlags = 2,
+            CursorHandle = 0x8000058C
+        }).ComponentCall == new UiManagerStateSyncCall(1, 0x58C));
+var angleCorrection = UiManagerAngleCorrectionProjectionRules.Project(
+    new UiManagerAngleCorrectionInput(-1f, -1f, 1, 1));
+var negativeZeroAngleCorrection = UiManagerAngleCorrectionProjectionRules.Project(
+    new UiManagerAngleCorrectionInput(-0f, -0f, 0, 1));
+var negativeMultipleAngleCorrection = UiManagerAngleCorrectionProjectionRules.Project(
+    new UiManagerAngleCorrectionInput(-UiManagerAngleCorrectionProjectionRules.TwoPi, -0f, 1, 0));
+var nanSumAngleCorrection = UiManagerAngleCorrectionProjectionRules.Project(
+    new UiManagerAngleCorrectionInput(float.NaN, 0.25f, 1, 1));
+var nanRemainderAngleCorrection = UiManagerAngleCorrectionProjectionRules.Project(
+    new UiManagerAngleCorrectionInput(-1f, float.NaN, 1, 1));
+Check("UI angle correction uses captured fmod results, preserves zero, and keeps the separate byte flag gate",
+    UiManagerAngleCorrectionProjectionRules.DerivedStateMethodFileOffset == 0xCCA190
+    && UiManagerAngleCorrectionProjectionRules.AngleCorrectionStubFileOffset == 0x159DD00
+    && UiManagerAngleCorrectionProjectionRules.AngleCorrectionStubBytes == "FF 25 20 48 AC 01"
+    && UiManagerAngleCorrectionProjectionRules.AngleCorrectionIatVirtualAddress == 0x1AC4820
+    && UiManagerAngleCorrectionProjectionRules.AngleCorrectionIatFileOffset == 0x16C3420
+    && UiManagerAngleCorrectionProjectionRules.AngleCorrectionImport == "MSVCR120.dll!_CIfmod"
+    && UiManagerAngleCorrectionProjectionRules.TwoPiConstantVirtualAddress == 0x1C5E1C4
+    && UiManagerAngleCorrectionProjectionRules.TwoPiConstantFileOffset == 0x185CDC4
+    && UiManagerAngleCorrectionProjectionRules.TwoPiConstantBits == 0x40C90FDB
+    && BitConverter.SingleToUInt32Bits(UiManagerAngleCorrectionProjectionRules.TwoPi) == 0x40C90FDB
+    && UiManagerAngleCorrectionProjectionRules.ZeroConstantVirtualAddress == 0x1C817A4
+    && UiManagerAngleCorrectionProjectionRules.ZeroConstantFileOffset == 0x18803A4
+    && UiManagerAngleCorrectionProjectionRules.OneConstantVirtualAddress == 0x1C81BE8
+    && UiManagerAngleCorrectionProjectionRules.OneConstantFileOffset == 0x18807E8
+    && UiManagerAngleCorrectionProjectionRules.FirstValueInputOffset == 8
+    && UiManagerAngleCorrectionProjectionRules.ParentValueInputOffset == 0x14
+    && UiManagerAngleCorrectionProjectionRules.ProjectedValueOffset == 0x14
+    && UiManagerAngleCorrectionProjectionRules.InputFlagOffset == 1
+    && UiManagerAngleCorrectionProjectionRules.ParentFlagOffset == 0x24
+    && UiManagerAngleCorrectionProjectionRules.ProjectedFlagOffset == 0x24
+    && BitConverter.SingleToUInt32Bits(angleCorrection.ProjectedValue)
+        == BitConverter.SingleToUInt32Bits(-1f + UiManagerAngleCorrectionProjectionRules.TwoPi)
+    && angleCorrection.ProjectedFlag
+    && BitConverter.SingleToUInt32Bits(negativeZeroAngleCorrection.ProjectedValue)
+        == 0x80000000
+    && !negativeZeroAngleCorrection.ProjectedFlag
+    && BitConverter.SingleToUInt32Bits(negativeMultipleAngleCorrection.ProjectedValue)
+        == 0x80000000
+    && !negativeMultipleAngleCorrection.ProjectedFlag
+    && UiManagerAngleCorrectionProjectionRules.Project(
+        new UiManagerAngleCorrectionInput(1f, -0.5f, 1, 1)).ProjectedValue == -0.5f
+    && nanSumAngleCorrection.ProjectedValue == 0.25f
+    && nanSumAngleCorrection.ProjectedFlag
+    && float.IsNaN(nanRemainderAngleCorrection.ProjectedValue)
+    && nanRemainderAngleCorrection.ProjectedFlag
+    && Enumerable.Range(0, byte.MaxValue + 1).All(value =>
+        UiManagerAngleCorrectionProjectionRules.Project(
+           new UiManagerAngleCorrectionInput(1f, 0f, (byte)value, 1)).ProjectedFlag
+               == (value != 0)
+        && UiManagerAngleCorrectionProjectionRules.Project(
+           new UiManagerAngleCorrectionInput(1f, 0f, 1, (byte)value)).ProjectedFlag
+               == (value != 0)));
+Check("UI payload descriptor consumer and append helper retain the observed pointer and positional-record layout",
+    UiManagerNativeLayout.UiPayloadDescriptorConsumerMethodFileOffset == 0xC95400
+    && UiManagerNativeLayout.UiPayloadDescriptorConsumerMethodVirtualAddress == 0x1096000
+    && UiManagerNativeLayout.UiPayloadDescriptorConsumerObjectFlagOffset == 0x72C
+    && UiManagerNativeLayout.UiManagerGlobalPointerVirtualAddress == 0x1E002B8
+    && UiManagerNativeLayout.UiManagerPayloadDescriptorOffset == 0xA08
+    && UiManagerNativeLayout.UiPayloadDescriptorAppendMethodFileOffset == 0xC97380
+    && UiManagerNativeLayout.UiPayloadDescriptorGrowMethodFileOffset == 0xC978F0
+    && UiManagerNativeLayout.UiPayloadDescriptorBeginPointerOffset == 0
+    && UiManagerNativeLayout.UiPayloadDescriptorEndPointerOffset == 4
+    && UiManagerNativeLayout.UiPayloadDescriptorCapacityPointerOffset == 8
+    && UiManagerNativeLayout.UiPayloadDescriptorPositionRecordByteCount == 0x10
+    && UiManagerNativeLayout.UiPayloadDescriptorPositionRecordCopiedDwordCount == 4
+    && UiManagerNativeLayout.UiPayloadDescriptorPositionRecordEndAdvance == 0x10
+    && new[]
+    {
+        UiManagerNativeLayout.UiPayloadDescriptorPositionField0Offset,
+        UiManagerNativeLayout.UiPayloadDescriptorPositionField1Offset,
+        UiManagerNativeLayout.UiPayloadDescriptorPositionField2Offset,
+        UiManagerNativeLayout.UiPayloadDescriptorPositionField3Offset
+    }.SequenceEqual([0x33C, 0x338, 0x340, 0x344]));
+Check("UI manager payload-tree drain tests byte +671 but clears both initialization bytes",
+    UiManagerNativeLayout.UiManagerShutdownStateWordOffset == 0x671
+    && UiManagerNativeLayout.UiManagerShutdownStateWordSize == 2
+    && UiManagerNativeLayout.UiManagerPayloadTreeOffset == 0x5E4
+    && UiManagerNativeLayout.UiManagerPayloadTreeNodeValueOffset == 0x14
+    && Enumerable.Range(0, ushort.MaxValue + 1).All(value =>
+        UiManagerNativeLayout.ShouldDrainPayloadTree((byte)(value & 0xFF)) == ((value & 0xFF) != 0))
+    && !UiManagerNativeLayout.ShouldDrainPayloadTree(
+        new UiManagerInitializationFlagSnapshot(0, 1).PartialInitializationFlag));
+Check("UI manager payload-tree cleanup keeps internal close, object free, identity removal, then key release",
+    UiManagerNativeLayout.UiManagerShutdownMethodFileOffset == 0xBFA0D0
+    && UiManagerNativeLayout.PayloadTreeCleanupSequence.SequenceEqual(
+    [
+        new UiManagerPayloadCleanupStep("InternalClose", 0xBFA278, 0xC33060),
+        new UiManagerPayloadCleanupStep("NativeObjectFree", 0xBFA27F, 0x12C8D60),
+        new UiManagerPayloadCleanupStep("IdentityRemoval", 0xBFA28B, 0xBFCF30),
+        new UiManagerPayloadCleanupStep("KeyRelease", 0xBFA29C, 0xC09D10)
+    ]));
+Check("UI manager gated shutdown records the null-gated child +0x24 trace",
+    UiManagerNativeLayout.UiManagerShutdownMethodFileOffset == 0xBFA0D0
+    && UiManagerNativeLayout.UiManagerShutdownChild24PointerLoadFileOffset == 0xBFAD2A
+    && UiManagerNativeLayout.UiManagerShutdownChild24InitialNullTestFileOffset == 0xBFAD37
+    && UiManagerNativeLayout.UiManagerShutdownChild24PointerOffset == 0x24
+    && UiManagerNativeLayout.UiManagerShutdownChild24ReloadFileOffset == 0xBFAD40
+    && UiManagerNativeLayout.UiManagerShutdownChild24SecondNullTestFileOffset == 0xBFAD43
+    && UiManagerNativeLayout.UiManagerShutdownChild24SecondNullBranchFileOffset == 0xBFAD45
+    && UiManagerNativeLayout.Child24ShutdownSequence.SequenceEqual(
+    [
+        new UiManagerChild24ShutdownStep("Child24PrimaryCall", 0xBFAD3B, 0xCA7330),
+        new UiManagerChild24ShutdownStep("Child24ReleaseHelperCall", 0xBFAD48, 0xBFAF40),
+        new UiManagerChild24ShutdownStep("Child150Cleanup", 0xBFAF50, 0xCA6070),
+        new UiManagerChild24ShutdownStep("Child150NativeFree", 0xBFAF57, 0x12C8D60),
+        new UiManagerChild24ShutdownStep("ChildDependencyVirtualCall", 0xBFAF82, null),
+        new UiManagerChild24ShutdownStep("ChildObjectNativeFree", 0xBFAF87, 0x12C8D60)
+    ])
+    && UiManagerNativeLayout.UiManagerShutdownChild24PointerClearFileOffset == 0xBFAD4D
+    && UiManagerNativeLayout.UiManagerShutdownChild24CallsAreNullGated
+    && UiManagerNativeLayout.UiManagerChild24ShutdownResetMethodFileOffset == 0xCA7330
+    && UiManagerNativeLayout.UiManagerChildShutdownResetPairLoopCount == 8
+    && UiManagerNativeLayout.UiManagerChildShutdownResetLoopPointerFieldCount == 16
+    && UiManagerNativeLayout.UiManagerChildShutdownResetLoopPointerOffsets.SequenceEqual(
+        Enumerable.Range(0, UiManagerNativeLayout.UiManagerChildShutdownResetLoopPointerFieldCount)
+            .Select(index => 0x24 + index * 4))
+    && UiManagerNativeLayout.UiManagerChildShutdownResetLaterPointerOffsets.SequenceEqual(
+        [0x08, 0x14, 0x0C, 0x10, 0x74])
+    && UiManagerNativeLayout.UiManagerChild24ShutdownResetFirstLoopCallFileOffset == 0xCA734A
+    && UiManagerNativeLayout.UiManagerChild24ShutdownResetFirstLoopStoreFileOffset == 0xCA734D
+    && UiManagerNativeLayout.UiManagerChild24ShutdownResetSecondLoopCallFileOffset == 0xCA735D
+    && UiManagerNativeLayout.UiManagerChild24ShutdownResetSecondLoopStoreFileOffset == 0xCA7360
+    && UiManagerNativeLayout.UiManagerChild24ShutdownResetChild8StoreFileOffset == 0xCA7379
+    && UiManagerNativeLayout.UiManagerChild24ShutdownResetChild64FreeCallFileOffset == 0xCA73F2
+    && UiManagerNativeLayout.UiManagerChild24ShutdownResetChild68ClearFileOffset == 0xCA73F7
+    && UiManagerNativeLayout.UiManagerChild24ShutdownResetReturnFileOffset == 0xCA7401
+    && UiManagerNativeLayout.UiManagerChildObjectCleanupFieldOffset == 0x150
+    && UiManagerNativeLayout.UiManagerChildReleaseHelperUsesThiscallReceiverInEcx
+    && UiManagerNativeLayout.UiManagerChildReleaseHelperCallerPushesUnreadChildCopy
+    && UiManagerNativeLayout.UiManagerChildReleaseHelperReturnStackBytes == 4
+    && UiManagerNativeLayout.UiManagerChild150CleanupCallSiteFileOffset == 0xBFAF50
+    && UiManagerNativeLayout.UiManagerChildDependencyZeroTestFileOffset == 0xBFAF5C
+    && UiManagerNativeLayout.UiManagerChildDependencyZeroBranchFileOffset == 0xBFAF60
+    && UiManagerNativeLayout.UiManagerChildDependencyLoadFileOffset == 0xBFAF7C
+    && UiManagerNativeLayout.UiManagerChildDependencyPointerOffset == 4
+    && UiManagerNativeLayout.UiManagerChildDependencyVtableOffset == 8
+    && UiManagerNativeLayout.UiManagerChildObjectNativeFreeCallSiteFileOffset == 0xBFAF87
+    && UiManagerNativeLayout.UiManagerChildReleaseHelperReturnFileOffset == 0xBFAF90);
+Check("UI child backing initialization records the constructor zeros and ordered 0x800-byte allocation stores",
+    UiManagerNativeLayout.UiManagerChildBackingConstructorFileOffset == 0xCA6370
+    && UiManagerNativeLayout.UiManagerChildBackingInitializeMethodFileOffset == 0xCA66F0
+    && UiManagerNativeLayout.UiManagerChildBackingPointerFieldOffset == 0x64
+    && UiManagerNativeLayout.UiManagerChildBackingField68Offset == 0x68
+    && UiManagerNativeLayout.UiManagerChildBackingField6COffset == 0x6C
+    && UiManagerNativeLayout.UiManagerChildBackingAllocationRequestSize == 0x800
+    && UiManagerNativeLayout.UiManagerChildBackingField68InitializedValue == 0x20
+    && UiManagerNativeLayout.ChildBackingInitializationSequence.SequenceEqual(
+    [
+        new UiManagerChildBackingInitializationStep("ConstructorField64Zero", 0xCA63D9, null, 0x64, 0),
+        new UiManagerChildBackingInitializationStep("ConstructorField68Zero", 0xCA63E0, null, 0x68, 0),
+        new UiManagerChildBackingInitializationStep("AllocationSizeArgument", 0xCA6748, null, null, 0x800),
+        new UiManagerChildBackingInitializationStep("AllocatorCall", 0xCA674D, 0x12C8A20, null, null),
+        new UiManagerChildBackingInitializationStep("BackingPointerStore", 0xCA67A0, null, 0x64, null),
+        new UiManagerChildBackingInitializationStep("Field68ValueStore", 0xCA67A3, null, 0x68, 0x20),
+        new UiManagerChildBackingInitializationStep("Field6CZeroStore", 0xCA67AA, null, 0x6C, 0)
+    ]));
 Check("UI-set folder traversal and native file-enumeration imports are recorded",
     UiComponentLoadingNativeLayout.UiSetXmlLoaderFileOffset == 0x30AF50
     && UiComponentLoadingNativeLayout.FolderPathLoaderFileOffset == 0x30AB90
@@ -5516,6 +6279,7 @@ MatrixServerMessageNativeTypeChecks.Run(Check);
 MatrixSynchronizationDispatchChecks.Run(Check);
 NativeMt19937Checks.Run(Check);
 NativeByteVectorHeapChecks.Run(Check);
+NativeRecordVectorCapacityProjectionChecks.Run(Check);
 NativeByteVectorSortChecks.Run(Check);
 NativeAdapterAddressFingerprintChecks.Run(Check);
 NativeWindowsDriveSerialFingerprintChecks.Run(Check);
@@ -5543,6 +6307,9 @@ NativeGeneratedModeOneWrapperChecks.Run(Check);
 NativeGeneratedDefaultHeaderImageChecks.Run(Check);
 MatrixServerProfilerNamesChecks.Run(Check);
 MatrixServerProfilerFrameChecks.Run(Check);
+UiPayloadProducerGateChecks.Run(Check);
+UiCursorCacheProjectionChecks.Run(Check);
+UiOldPairCallbackGateProjectionChecks.Run(Check);
 NativeProfilerSampleChecks.Run(Check);
 NativeProfilerTreeChecks.Run(Check);
 NativeProfilerFrameRefreshChecks.Run(Check);
@@ -6849,6 +7616,77 @@ Check("Selected application event IDs remain explicitly unbound; native event-li
     && DialogApplicationDispatchNativeLayout.UnreferencedNativeEventNameLiterals.All(literal =>
         !DialogApplicationDispatchNativeLayout.SelectedEventNameBindings.Any(binding =>
             binding.EventName == literal.Name)));
+Check("Scripting-object cleanup closes the VM before the ordered payload passes and resets",
+    StartupObjectLifecycleNativeLayout.VmCloseCallFileOffset
+        < StartupObjectLifecycleNativeLayout.ObservedPayloadDispatches[0].LoopFileOffset
+    && StartupObjectLifecycleNativeLayout.PayloadPassContainerOffsets.SequenceEqual(
+        [0xF0, 0xE8, 0xE0, 0xD8, 0x100, 0x110, 0x118, 0x140])
+    && StartupObjectLifecycleNativeLayout.PayloadResetContainerOffsets.SequenceEqual(
+        StartupObjectLifecycleNativeLayout.PayloadPassContainerOffsets)
+    && StartupObjectLifecycleNativeLayout.Container118ResetBlockStartFileOffset
+        < StartupObjectLifecycleNativeLayout.Container118ResetBlockEndFileOffset
+    && StartupObjectLifecycleNativeLayout.PostPassContainer120CallFileOffset
+        > StartupObjectLifecycleNativeLayout.Container118ResetBlockEndFileOffset
+    && StartupObjectLifecycleNativeLayout.StoredObjectReleaseBlockStartFileOffset
+        < StartupObjectLifecycleNativeLayout.StoredObjectReleaseBlockEndFileOffset);
+Check("Cleanup callback payload offsets, virtual slots, and explicit arguments remain distinct",
+    StartupObjectLifecycleNativeLayout.ObservedPayloadDispatches.SequenceEqual(
+    [
+        new StartupPayloadDispatchSnapshot(0xE8, 0xC33326, 0xC3335D, 0x14, 0, 1),
+        new StartupPayloadDispatchSnapshot(0x118, 0xC336DA, 0xC33706, 0x14, 0, 1)
+    ])
+    && StartupObjectLifecycleNativeLayout.CallbackWalkerFileOffset == 0xC376A0
+    && StartupObjectLifecycleNativeLayout.CallbackWalkerVirtualSlotOffset == 0x14
+    && StartupObjectLifecycleNativeLayout.ObservedPayloadDispatches.All(dispatch =>
+        dispatch.VirtualSlotOffset != dispatch.ExplicitArgumentValue));
+Check("Nested container +0x120 keeps its observed fields and backing-array geometry separate from node-relative fields",
+    StartupObjectLifecycleNativeLayout.Container120InitializerCallerSetupFileOffset == 0xC32A73
+    && StartupObjectLifecycleNativeLayout.Container120InitializerCallFileOffset == 0xC32A79
+    && StartupObjectLifecycleNativeLayout.Container120InitializerMethodFileOffset == 0xC41670
+    && StartupObjectLifecycleNativeLayout.Container120HeadOffset == 0
+    && StartupObjectLifecycleNativeLayout.Container120CountOffset == 4
+    && StartupObjectLifecycleNativeLayout.Container120BackingBeginOffset == 8
+    && StartupObjectLifecycleNativeLayout.Container120BackingEndOffset == 0xC
+    && StartupObjectLifecycleNativeLayout.Container120BackingCapacityOffset == 0x10
+    && StartupObjectLifecycleNativeLayout.Container120Field14Offset == 0x14
+    && StartupObjectLifecycleNativeLayout.Container120Field14Value == 7
+    && StartupObjectLifecycleNativeLayout.Container120Field18Offset == 0x18
+    && StartupObjectLifecycleNativeLayout.Container120Field18Value == 8
+    && StartupObjectLifecycleNativeLayout.Container120Field1COffset == 0x1C
+    && StartupObjectLifecycleNativeLayout.Container120Field1CValueBits == 0x3F800000
+    && StartupObjectLifecycleNativeLayout.Container120SentinelSize == 0xC
+    && StartupObjectLifecycleNativeLayout.Container120SentinelNextOffset == 0
+    && StartupObjectLifecycleNativeLayout.Container120SentinelPreviousOffset == 4
+    && StartupObjectLifecycleNativeLayout.Container120InitialBackingSlotCount == 16
+    && StartupObjectLifecycleNativeLayout.Container120BackingSlotSize == 4
+    && StartupObjectLifecycleNativeLayout.Container120InitialBackingByteCount == 0x40
+    && StartupObjectLifecycleNativeLayout.Container120ListNodeField8Offset == 8
+    && StartupObjectLifecycleNativeLayout.PostPassContainer120Offset
+        + StartupObjectLifecycleNativeLayout.Container120BackingBeginOffset == 0x128
+    && StartupObjectLifecycleNativeLayout.Container120ListNodeField8Offset == 8);
+Check("Nested container initial backing projection repeats the captured sentinel pointer in sixteen immutable slots",
+    new uint[] { 0, 0x81234567, uint.MaxValue }.All(capturedSentinel =>
+    {
+        var slots = StartupObjectLifecycleNativeLayout.ProjectContainer120InitialBackingSlots(
+            capturedSentinel);
+        return slots.Count == 16
+            && slots.All(slot => slot == capturedSentinel)
+            && slots is IList<uint> readOnlySlots
+            && readOnlySlots.IsReadOnly;
+    }));
+Check("Manager destruction and insertion-failure anchors record only observed release actions",
+    StartupObjectLifecycleNativeLayout.Manager6B0DestructorFileOffset == 0xBF8AC0
+    && StartupObjectLifecycleNativeLayout.ManagerKeyCleanupMethodFileOffset == 0xC0BD90
+    && StartupObjectLifecycleNativeLayout.ManagerNodeReleaseMethodFileOffset == 0xC0EB00
+    && StartupObjectLifecycleNativeLayout.ManagerNodeKeyOffset == 0x10
+    && StartupObjectLifecycleNativeLayout.ManagerDestructorPathFileOffsets.SequenceEqual(
+        [0xBF8AC0u, 0xC0BD90u, 0xC0EB00u])
+    && StartupObjectLifecycleNativeLayout.InsertFailurePathHelperFileOffset == 0xC3C9B0
+    && StartupObjectLifecycleNativeLayout.InsertFailurePathAnchorFileOffset == 0xC64420
+    && StartupObjectLifecycleNativeLayout.InsertFailurePathFileOffsets.SequenceEqual(
+        [0xC3C9B0u, 0xC64420u])
+    && StartupObjectLifecycleNativeLayout.InsertFailurePayloadVirtualSlotOffset == 0
+    && StartupObjectLifecycleNativeLayout.InsertFailurePayloadExplicitArgumentValue == 1);
 
 if (args.Length != 0)
 {
