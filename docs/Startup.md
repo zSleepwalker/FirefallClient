@@ -1116,6 +1116,14 @@ GameSocketParserPostResizePointerProjection observes independent
 post-resize stack and DWORD reads, preserves branch-specific TEST/XOR
 flags through two stores, and records EDI as 0x56E. It stops before the
 first header-byte read, including when the derived address is zero.
+NetworkDispatcherCollectionGateProjection preserves the signed threshold
+gate and opaque logging boundary, then uses independent end/start and
+first-entry reads. Selected empty, zero-entry, and nonzero-entry
+continuations remain unentered.
+CapacityFinalCalleeCommonNodeIndexedOuterEqualityRingLifecycleProjection
+composes root indexed equality with both fresh threshold reads and the
+five ring stores. Unsigned bypasses remain distinct from clean completion;
+the decrement at raw 0x12C942F remains unentered.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

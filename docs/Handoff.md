@@ -13911,6 +13911,12 @@ registered4182exit0 exactcollection/publication/outerdraft exclusions;
 targetremoved. Lunaf766cc9b one-byte headerbit extraction analysis.
 FreshIDA F64126bytes confirms additionaloperationreloaddiagnostic
 gate beforebroaderrepost; suppliedc498same-taskanalysis notexpanded.
+Collectione64+outeraff revisions reviewed/registered4188exit0:
+4184fixturecrossflagtypefail,4186coordinatorAuxiliaryCarrynamefail
+correctedAuxiliary allsixflags. CollectionExactBoundedCompletion added.
+Targetsremoved. Successors Lunacb2eb6e8firstentrycallanalysis,
+Lunaec54bcc3outercleanupcounterpair; Lunac24bb705receiveoperation
+reloadpair coversdirectF64ANDzeroF5BnormalfreshESPADD/ESI path.
 SmallBinEpilogue released and full EOF reviewed: owner6d052038 revising
 wrong parent type, nullable value-plan access, missing successor-unused
 forwarding, child read/write effect markers and dirty-ring admission.
