@@ -879,6 +879,9 @@ HighSizeCeiling performs a full unsigned comparison against FFFF, selecting
 the936F BSR entry or setting ECX to31 before the9384 store boundary.
 NextFieldThreshold keeps ECX and the absolute global operand independently
 captured at9292 and bounds the unsigned branch before the paired stores.
+IndexedFieldStoreZero derives TEST's EAX from the committed store value,
+retaining CMP flags when an earlier store is incomplete and replacing them
+only after TEST executes at9278.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
