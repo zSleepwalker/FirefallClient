@@ -439,6 +439,8 @@ The reliable masked-length callback's validated entry also admits the zero-resul
 
 `FrameHandoffCapacityAboveSecondTransferProjection` preserves independent receiver/frame reads, signed scaling and pushes through the second above-branch call. `FrameHandoffCapacityAboveReturnGateProjection` preserves cleanup24 before the returned EAX addition and fresh frame-4 reload, without assuming post-call EBX/ESI preservation.
 
+`FrameHandoffCapacitySharedRepeatProjection` models the separate `BE6C9E..BE6CA2` compressed directional zero store without a subsequent frame-8 reload. `FrameHandoffCapacityFinalCallGateProjection` independently reloads frame-14 and receiver4 before the optional direct call, exposing outgoing EDI only on the no-call bypass. `FrameHandoffCapacityFinalReturnProjection` preserves the ordered receiver8 ADD, receiver4 overwrite and RET4 without claiming a full EAX result.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves

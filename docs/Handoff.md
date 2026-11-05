@@ -12527,6 +12527,14 @@ FinalCallGate/FinalReturn/SharedRepeat released but NOT reviewed/registered.
 AboveLifecycle owner `5094e5ec-fc17-433d-91bf-d4624c202794`
 owns above first/second transfer and scalar-return composition.
 
+FinalCallGate/FinalReturn/SharedRepeat pairs reviewed/registered/passing.
+FinalLifecycle owner `daed1d32-ee99-43ce-99ed-57e0b7751e99`
+owns final call/return composition; no-call EDI derived, opaque-call
+EDI independent. FillSharedRepeat owner
+`3d5bfa78-759c-4bcf-ad26-39b941e64945` owns fill-join/shared-REP
+composition. All future composition scopes preserve independent reloads
+and require explicit DF/completion captures. No evidence writer active.
+
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
 indirect callback, then fresh receiver+4C DEC and receiver+48 zero/INC.
