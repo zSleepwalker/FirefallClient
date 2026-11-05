@@ -721,6 +721,11 @@ opaque call at raw 0x12C915A. Only the not-below path reads ECX+C; a fresh
 field comparison equal to EDX selects raw 0x12C9160. The final-frame gate
 then independently reloads EBP-14 and compares it with ECX, bounding equal
 and unequal paths at raw 0x12C9167 and 0x12C917C respectively.
+The preceding indexed-frame gate independently reloads EBP-4 and EBP-10,
+computes the wrapping address 0x1EDADF0 plus eight times the first value,
+and stores that address at EBP-C before comparing it with the second value.
+LEA performs no memory read. Equal selects raw 0x12C9160; unequal selects
+raw 0x12C9151, with the local write retained on both paths.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
