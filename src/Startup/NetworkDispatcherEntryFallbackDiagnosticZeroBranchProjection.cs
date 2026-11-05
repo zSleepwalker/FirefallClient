@@ -8,7 +8,8 @@ public readonly record struct NetworkDispatcherEntryFallbackDiagnosticZeroBranch
     bool? OpaqueCallReturnedNormally = null,
     uint? FreshPostCallEAX = null,
     uint? FreshPostCallEBP = null,
-    uint? FreshPostCallESI = null);
+    uint? FreshPostCallESI = null,
+    uint? FreshFallthroughStackLoadEAX = null);
 
 public enum NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState
 {
@@ -178,6 +179,38 @@ public readonly record struct NetworkDispatcherEntryFallbackDiagnosticZeroBranch
     bool Attempted,
     bool InstructionExecuted);
 
+public enum NetworkDispatcherEntryFallbackDiagnosticZeroBranchFallthroughEffectKind
+{
+    SFENCE,
+    LFENCE,
+    StackScalarLoad,
+    FieldScalarStore
+}
+
+public readonly record struct NetworkDispatcherEntryFallbackDiagnosticZeroBranchFallthroughEffect(
+    uint InstructionRawFileOffset,
+    uint InstructionCodeVirtualAddress,
+    byte InstructionByteLength,
+    string InstructionBytes,
+    NetworkDispatcherEntryFallbackDiagnosticZeroBranchFallthroughEffectKind Kind,
+    uint? OperandAddress,
+    uint? Value,
+    NetworkDispatcherLockGateFlags FlagsBefore,
+    NetworkDispatcherLockGateFlags FlagsAfter,
+    bool Reached,
+    bool Attempted,
+    bool Committed,
+    bool NativeMemoryReadExecuted,
+    bool NativeMemoryWriteExecuted);
+
+public readonly record struct NetworkDispatcherEntryFallbackDiagnosticZeroBranchFallthroughContinuation(
+    ImmutableArray<NetworkDispatcherEntryFallbackDiagnosticZeroBranchFallthroughEffect> Effects,
+    ImmutableArray<uint> CompletedInstructionOffsets,
+    uint StopAtRawFileOffsetExclusive,
+    uint LastReachedRawFileOffset,
+    NetworkDispatcherLockGateFlags FlagsAtStop,
+    bool ExactBoundedCompletion);
+
 public sealed class NetworkDispatcherEntryFallbackDiagnosticZeroBranchPlan
 {
     private readonly Lazy<NetworkDispatcherEntryFallbackDiagnosticCallTargetPrefixPlan>
@@ -217,6 +250,8 @@ public sealed class NetworkDispatcherEntryFallbackDiagnosticZeroBranchPlan
             nextControlBoundary,
         NetworkDispatcherEntryFallbackDiagnosticZeroBranchDestinationBoundary?
             destinationInstructionBoundary,
+        NetworkDispatcherEntryFallbackDiagnosticZeroBranchFallthroughContinuation?
+            fallthroughContinuation,
         ImmutableArray<uint> completedInstructionOffsets,
         bool parentContinuationReached,
         bool projectionEntered,
@@ -248,6 +283,7 @@ public sealed class NetworkDispatcherEntryFallbackDiagnosticZeroBranchPlan
         Compare = compare;
         NextControlBoundary = nextControlBoundary;
         DestinationInstructionBoundary = destinationInstructionBoundary;
+        FallthroughContinuation = fallthroughContinuation;
         CompletedInstructionOffsets = completedInstructionOffsets;
         ParentContinuationReached = parentContinuationReached;
         ProjectionEntered = projectionEntered;
@@ -309,10 +345,14 @@ public sealed class NetworkDispatcherEntryFallbackDiagnosticZeroBranchPlan
         NextControlBoundary { get; }
     public NetworkDispatcherEntryFallbackDiagnosticZeroBranchDestinationBoundary?
         DestinationInstructionBoundary { get; }
+    public NetworkDispatcherEntryFallbackDiagnosticZeroBranchFallthroughContinuation?
+        FallthroughContinuation { get; }
     public bool StackStoreCommitted => StackStore is { Committed: true };
     public bool ImmediateSuffixCompleted =>
         NextControlBoundary is { Reached: true, Attempted: true, BranchProjected: true }
-        && DestinationInstructionBoundary is { Reached: true, Attempted: false }
+        && (NextControlBoundary.Value.Taken == true
+            ? DestinationInstructionBoundary is { Reached: true, Attempted: false }
+            : FallthroughContinuation is { ExactBoundedCompletion: true })
         && Compare is { Committed: true };
     public ImmutableArray<uint> CompletedInstructionOffsets { get; }
     public uint EntryRawFileOffset =>
@@ -1333,6 +1373,10 @@ public static class NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
         ControlBoundaryFallThroughRawFileOffset;
     public const uint BranchTargetDestinationInstructionRawFileOffset =
         ControlBoundaryTargetRawFileOffset;
+    public const uint FallthroughLFENCERawFileOffset = 0x00BBDE9C;
+    public const uint FallthroughStackScalarLoadRawFileOffset = 0x00BBDE9F;
+    public const uint FallthroughFieldScalarStoreRawFileOffset = 0x00BBDEA2;
+    public const uint FallthroughJoinBoundaryRawFileOffset = 0x00BBDEA4;
     public const uint StackStoreDisplacement = 0x10;
     public const uint ESIToECXFieldDisplacement = 0x68;
     public const uint OpaqueCallTargetSlotVirtualAddress = 0x01AC4D24;
@@ -1354,6 +1398,9 @@ public static class NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
     public const byte NextControlBoundaryInstructionByteLength = 2;
     public const byte FallThroughDestinationInstructionByteLength = 3;
     public const byte BranchTargetDestinationInstructionByteLength = 2;
+    public const byte FallthroughLFENCEInstructionByteLength = 3;
+    public const byte FallthroughStackScalarLoadInstructionByteLength = 3;
+    public const byte FallthroughFieldScalarStoreInstructionByteLength = 2;
     public const int NextControlBoundaryRelativeDisplacement = 0x0B;
     public const string BranchInstructionBytes =
         NetworkDispatcherEntryFallbackDiagnosticCallTargetPrefixProjection
@@ -1370,6 +1417,10 @@ public static class NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
     public const string BranchTargetDestinationInstructionBytes = "8B01";
     public const string ControlBoundaryAndDestinationAnchorBytes =
         "740B0FAEF80FAEE88B45F089018B01";
+    public const string FallthroughLFENCEInstructionBytes = "0FAEE8";
+    public const string FallthroughStackScalarLoadInstructionBytes = "8B45F0";
+    public const string FallthroughFieldScalarStoreInstructionBytes = "8901";
+    public const string FallthroughWindowBytes = "0FAEF80FAEE88B45F08901";
     public const string OpaqueCallTargetSlotImportName = "timeGetTime";
     public const string ImmediateSuffixBytes = "8945F08D4E688D45F03BC1";
     public const string CoordinatorProvidedBytes =
@@ -1401,6 +1452,12 @@ public static class NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
         RawFileOffsetToCodeVirtualAddress(FallThroughDestinationInstructionRawFileOffset);
     public static uint BranchTargetDestinationInstructionCodeVirtualAddress =>
         RawFileOffsetToCodeVirtualAddress(BranchTargetDestinationInstructionRawFileOffset);
+    public static uint FallthroughLFENCECodeVirtualAddress =>
+        RawFileOffsetToCodeVirtualAddress(FallthroughLFENCERawFileOffset);
+    public static uint FallthroughStackScalarLoadCodeVirtualAddress =>
+        RawFileOffsetToCodeVirtualAddress(FallthroughStackScalarLoadRawFileOffset);
+    public static uint FallthroughFieldScalarStoreCodeVirtualAddress =>
+        RawFileOffsetToCodeVirtualAddress(FallthroughFieldScalarStoreRawFileOffset);
     public static bool ExecutesNativeInstructions => false;
     public static bool ExecutesOpaqueCellCall => false;
 
@@ -1455,6 +1512,8 @@ public static class NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
         NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState
             controlBoundaryConditionCaptureState =
                 NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState.Unreached;
+        NetworkDispatcherEntryFallbackDiagnosticZeroBranchFallthroughContinuation?
+            fallthroughContinuation = null;
         NetworkDispatcherEntryFallbackDiagnosticZeroBranchOutcome outcome =
             NetworkDispatcherEntryFallbackDiagnosticZeroBranchOutcome.ParentPrefixNotAccepted;
         bool projectionEntered = false;
@@ -1842,6 +1901,114 @@ public static class NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
             }
         }
 
+        if (nextControlBoundary is { Taken: false }
+            && compare is { } fallthroughCompare
+            && stackStore is { Committed: true, StackAddress: uint savedStackAddress }
+            && leaECX is { ResultValue: uint fieldAddress })
+        {
+            NetworkDispatcherLockGateFlags fallthroughFlags =
+                fallthroughCompare.FlagsAfter;
+            uint? reloadedValue = capture.FreshFallthroughStackLoadEAX;
+            ImmutableArray<uint> fallthroughOffsets =
+                completedOffsets.ToImmutable()
+                    .Add(FallThroughDestinationInstructionRawFileOffset)
+                    .Add(FallthroughLFENCERawFileOffset);
+            ImmutableArray<NetworkDispatcherEntryFallbackDiagnosticZeroBranchFallthroughEffect>
+                fallthroughEffects =
+                    ImmutableArray.Create(
+                        new NetworkDispatcherEntryFallbackDiagnosticZeroBranchFallthroughEffect(
+                            FallThroughDestinationInstructionRawFileOffset,
+                            FallThroughDestinationInstructionCodeVirtualAddress,
+                            FallThroughDestinationInstructionByteLength,
+                            FallThroughDestinationInstructionBytes,
+                            NetworkDispatcherEntryFallbackDiagnosticZeroBranchFallthroughEffectKind
+                                .SFENCE,
+                            null,
+                            null,
+                            fallthroughFlags,
+                            fallthroughFlags,
+                            Reached: true,
+                            Attempted: false,
+                            Committed: false,
+                            NativeMemoryReadExecuted: false,
+                            NativeMemoryWriteExecuted: false),
+                        new NetworkDispatcherEntryFallbackDiagnosticZeroBranchFallthroughEffect(
+                            FallthroughLFENCERawFileOffset,
+                            FallthroughLFENCECodeVirtualAddress,
+                            FallthroughLFENCEInstructionByteLength,
+                            FallthroughLFENCEInstructionBytes,
+                            NetworkDispatcherEntryFallbackDiagnosticZeroBranchFallthroughEffectKind
+                                .LFENCE,
+                            null,
+                            null,
+                            fallthroughFlags,
+                            fallthroughFlags,
+                            Reached: true,
+                            Attempted: false,
+                            Committed: false,
+                            NativeMemoryReadExecuted: false,
+                            NativeMemoryWriteExecuted: false),
+                        new NetworkDispatcherEntryFallbackDiagnosticZeroBranchFallthroughEffect(
+                            FallthroughStackScalarLoadRawFileOffset,
+                            FallthroughStackScalarLoadCodeVirtualAddress,
+                            FallthroughStackScalarLoadInstructionByteLength,
+                            FallthroughStackScalarLoadInstructionBytes,
+                            NetworkDispatcherEntryFallbackDiagnosticZeroBranchFallthroughEffectKind
+                                .StackScalarLoad,
+                            savedStackAddress,
+                            reloadedValue,
+                            fallthroughFlags,
+                            fallthroughFlags,
+                            Reached: true,
+                            Attempted: true,
+                            Committed: reloadedValue.HasValue,
+                            NativeMemoryReadExecuted: false,
+                            NativeMemoryWriteExecuted: false));
+            uint continuationStop;
+            uint continuationLastReached;
+            bool exactFallthroughCompletion;
+            if (reloadedValue is uint loadedValue)
+            {
+                fallthroughEffects = fallthroughEffects.Add(
+                    new NetworkDispatcherEntryFallbackDiagnosticZeroBranchFallthroughEffect(
+                        FallthroughFieldScalarStoreRawFileOffset,
+                        FallthroughFieldScalarStoreCodeVirtualAddress,
+                        FallthroughFieldScalarStoreInstructionByteLength,
+                        FallthroughFieldScalarStoreInstructionBytes,
+                        NetworkDispatcherEntryFallbackDiagnosticZeroBranchFallthroughEffectKind
+                            .FieldScalarStore,
+                        fieldAddress,
+                        loadedValue,
+                        fallthroughFlags,
+                        fallthroughFlags,
+                        Reached: true,
+                        Attempted: true,
+                        Committed: true,
+                        NativeMemoryReadExecuted: false,
+                        NativeMemoryWriteExecuted: false));
+                fallthroughOffsets = fallthroughOffsets
+                    .Add(FallthroughStackScalarLoadRawFileOffset)
+                    .Add(FallthroughFieldScalarStoreRawFileOffset);
+                continuationStop = FallthroughJoinBoundaryRawFileOffset;
+                continuationLastReached = FallthroughFieldScalarStoreRawFileOffset;
+                exactFallthroughCompletion = true;
+            }
+            else
+            {
+                continuationStop = FallthroughStackScalarLoadRawFileOffset;
+                continuationLastReached = FallthroughLFENCERawFileOffset;
+                exactFallthroughCompletion = false;
+            }
+
+            fallthroughContinuation = new(
+                fallthroughEffects,
+                fallthroughOffsets,
+                continuationStop,
+                continuationLastReached,
+                fallthroughFlags,
+                ExactBoundedCompletion: exactFallthroughCompletion);
+        }
+
         return new(
             capture,
             parentPlan,
@@ -1866,6 +2033,7 @@ public static class NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
             compare,
             nextControlBoundary,
             destinationInstructionBoundary,
+            fallthroughContinuation,
             completedOffsets.ToImmutable(),
             parentContinuationReached,
             projectionEntered,

@@ -13,30 +13,35 @@ stopping at BBDE1A before the next diagnostic argument preparation. From there,
 the continuation now includes diagnostic argument setup through the direct CALL
 at BBDE26, bounded return at BBDE2B, and call-target arithmetic
 (`MOV/XOR/SUB/SAR/TEST`) through BBDE3D with a stop before the JZ at BBDE3E.
-Current bounded branch coverage includes:
+Current source-level bounded branch coverage includes:
 - JZ not-taken path `BBDE40..BBDE49`, stop before `BBDE4B` JNZ.
 - JZ taken path to `BBDE83`, stop before indirect CALL `BBDE86`.
 - Nonzero-path call boundaries at `BBDE5D` and `BBDE6C`, each with explicit
   normal-return stop at `BBDE63`/`BBDE6F`.
+- Nonzero post-call arithmetic and JB boundary through `BBDE81`, with both
+  branch destinations modeled.
 - Zero-path post-call continuation `BBDE8C..BBDE96`, stop before `BBDE97` JZ.
-The next unresolved dispatcher continuation is the `BBDE97` split and follow-on
-continuations from `BBDE63` and `BBDE6F`.
+- Zero-path `BBDE97` split and fallthrough window through `BBDEA2`.
+The focused dispatcher run now rebuilds and executes from the matching focused
+output path and reports `Failures: 0`, including the nonzero/JB and zero
+fallthrough continuations. Earlier stale-focused-binary reports remain
+historical and are not accepted as validation evidence.
 
 The parser diagnostic cleanup continuation now includes both first-branch
 (`BD34E2..BD34F6`) and second-branch epilogue families. First-branch FS restore,
-register POPs, and frame/RET8 are compile-clean and focused-run validated.
-Second-branch FS restore/register POPs/frame-return are compile-clean and fully
-reviewed, but runtime acceptance is still pending because focused execution
-repeatedly stalls before the frame-return suite completes. All of these remain
-offline value-only projections: missing captures stop at precise boundaries,
-no native target is executed, and no caller continuation is inferred unless
-explicitly modeled.
+register POPs, and frame/RET8 compile, but previously cited focused success
+included stale-runner output and is not claimed as current-source runtime
+acceptance.
+Second-branch FS restore/register POPs/frame-return now complete conclusive
+fresh focused runs with `Failures: 0`. All of these remain offline value-only
+projections: missing captures stop at precise boundaries, no native target is
+executed, and no caller continuation is inferred unless explicitly modeled.
 
 Normal second-call parser suffix checks (`SecondVirtualCallReturn`,
 `SecondCallFsRestore`, `SecondCallRegisterPops`, `SecondCallFrameReset`,
-`SecondCallReturn`) are compile-clean but still runtime-pending for practical
-focused completion; they are intentionally not registered in the main
-`Program.cs` suite list yet.
+`SecondCallReturn`) now complete in focused runs with `Failures: 0`; they are
+still intentionally not registered in the main `Program.cs` suite list until
+the untracked pair files are explicitly accepted and staged.
 
 The PE entry RVA `0x136B9B0` translates to **raw file offset `0x136ADB0`** using the `.text` section mapping. IDA's raw-file loader did not automatically mark this actual entry as a function; its preexisting `nullsub_112` at raw `0x136B9B0` is **not** the PE entry. A new function was defined at the translated offset.
 

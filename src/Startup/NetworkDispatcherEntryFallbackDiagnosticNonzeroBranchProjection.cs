@@ -59,6 +59,24 @@ public readonly record struct NetworkDispatcherEntryFallbackDiagnosticNonzeroBra
     NetworkDispatcherLockGateFlags FlagsBefore,
     NetworkDispatcherLockGateFlags FlagsAfter);
 
+public readonly record struct NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJz(
+    uint InstructionRawFileOffset,
+    uint InstructionCodeVirtualAddress,
+    byte InstructionByteLength,
+    string InstructionBytes,
+    int SignedRelativeDisplacement,
+    uint BranchTargetCodeVirtualAddress,
+    uint BranchTargetRawFileOffset,
+    uint FallthroughRawFileOffset,
+    uint SelectedDestinationRawFileOffset,
+    uint TestedEAX,
+    NetworkDispatcherLockGateFlags FlagsBefore,
+    NetworkDispatcherLockGateFlags FlagsAfter,
+    bool Taken,
+    bool Attempted,
+    bool Reached,
+    bool Committed);
+
 public sealed class NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPlan
 {
     private readonly Lazy<NetworkDispatcherEntryFallbackDiagnosticCallTargetPrefixPlan>
@@ -80,6 +98,7 @@ public sealed class NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPlan
         ImmutableArray<NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchRead> reads,
         ImmutableArray<NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchInstruction>
             instructions,
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJz? jzBranch,
         ImmutableArray<uint> completedInstructionOffsets,
         uint? stopAtRawFileOffsetExclusive,
         uint? esi,
@@ -98,6 +117,7 @@ public sealed class NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPlan
         ArrayEntryCaptureState = arrayEntryCaptureState;
         Reads = reads;
         Instructions = instructions;
+        JzBranch = jzBranch;
         CompletedInstructionOffsets = completedInstructionOffsets;
         StopAtRawFileOffsetExclusive = stopAtRawFileOffsetExclusive;
         ESI = esi;
@@ -140,6 +160,7 @@ public sealed class NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPlan
     }
     public ImmutableArray<NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchInstruction>
         Instructions { get; }
+    public NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJz? JzBranch { get; }
     public ImmutableArray<uint> CompletedInstructionOffsets { get; }
     public uint EntryRawFileOffset =>
         NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchProjection.EntryRawFileOffset;
@@ -151,7 +172,11 @@ public sealed class NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPlan
     public NetworkDispatcherLockGateFlags? FlagsAtStop { get; }
     public bool BranchNotTakenAccepted { get; }
     public bool JnzBoundaryReached { get; }
-    public bool ConditionalBranchProjected => false;
+    public bool ConditionalBranchProjected => JzBranch is {
+        Attempted: true,
+        Reached: true,
+        Committed: true
+    };
     public bool ProjectionEntered { get; }
     public bool ParentInstructionsExecuted => false;
     public bool NativeInstructionsExecuted => false;
@@ -165,6 +190,40 @@ public sealed class NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPlan
         ProjectionEntered
         && ParentPlan.ExactCleanCompletion
         && BranchNotTakenAccepted
+        && ConditionalBranchProjected
+        && JzBranch is {
+            InstructionRawFileOffset:
+                NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchProjection
+                    .EntryJzRawFileOffset,
+            InstructionCodeVirtualAddress:
+                NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchProjection
+                    .EntryJzCodeVirtualAddress,
+            InstructionByteLength:
+                NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchProjection
+                    .JzInstructionByteLength,
+            InstructionBytes:
+                NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchProjection
+                    .JzInstructionBytes,
+            SignedRelativeDisplacement:
+                NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchProjection
+                    .JzSignedRelativeDisplacement,
+            BranchTargetRawFileOffset:
+                NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchProjection
+                    .JzTargetRawFileOffset,
+            FallthroughRawFileOffset:
+                NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchProjection
+                    .JzNextRawFileOffset,
+            SelectedDestinationRawFileOffset:
+                NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchProjection
+                    .JzNextRawFileOffset,
+            Taken: false,
+            Attempted: true,
+            Reached: true,
+            Committed: true
+        }
+        && JzBranch.Value.TestedEAX == ParentPlan.EAX
+        && JzBranch.Value.FlagsBefore == ParentPlan.FlagsAtStop
+        && JzBranch.Value.FlagsAfter == ParentPlan.FlagsAtStop
         && Outcome == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchOutcome
             .BoundedBeforeJnz
         && DWORDAtA4CaptureState
@@ -177,6 +236,8 @@ public sealed class NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPlan
         && Instructions.All(instruction => instruction is { Reached: true, Committed: true })
         && CompletedInstructionOffsets.SequenceEqual(
             ParentPlan.CompletedInstructionOffsets
+                .Add(NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchProjection
+                    .EntryJzRawFileOffset)
                 .Add(NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchProjection
                     .MoveEaxRawFileOffset)
                 .Add(NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchProjection
@@ -259,6 +320,7 @@ public sealed class NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPlan
             || ArrayEntryCaptureState != replay.ArrayEntryCaptureState
             || !Reads.SequenceEqual(replay.Reads)
             || !Instructions.SequenceEqual(replay.Instructions)
+            || JzBranch != replay.JzBranch
             || !CompletedInstructionOffsets.SequenceEqual(
                 replay.CompletedInstructionOffsets)
             || StopAtRawFileOffsetExclusive != replay.StopAtRawFileOffsetExclusive
@@ -287,15 +349,29 @@ public sealed class NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPlan
                         .EntryJzRawFileOffset
                 && ParentPlan.FlagsAtStop is { Zero: true }
                 && ParentPlan.EAX == 0;
-            return Outcome == (jzTaken
-                    ? NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchOutcome.JzTaken
-                    : NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchOutcome
-                        .ParentCallTargetPrefixNotAccepted)
+            return (jzTaken
+                    ? Outcome
+                            == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchOutcome.JzTaken
+                        && JzBranch
+                            == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchProjection
+                                .CreateJzBranch(ParentPlan, taken: true)
+                        && CompletedInstructionOffsets.SequenceEqual(
+                            ParentPlan.CompletedInstructionOffsets.Add(
+                                NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchProjection
+                                    .EntryJzRawFileOffset))
+                        && StopAtRawFileOffsetExclusive
+                            == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchProjection
+                                .JzTargetRawFileOffset
+                    : Outcome
+                            == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchOutcome
+                                .ParentCallTargetPrefixNotAccepted
+                        && JzBranch is null
+                        && CompletedInstructionOffsets.SequenceEqual(
+                            ParentPlan.CompletedInstructionOffsets)
+                        && StopAtRawFileOffsetExclusive
+                            == ParentPlan.StopAtRawFileOffsetExclusive)
                 && Instructions.IsEmpty
                 && Reads.IsEmpty
-                && CompletedInstructionOffsets.SequenceEqual(
-                    ParentPlan.CompletedInstructionOffsets)
-                && StopAtRawFileOffsetExclusive == ParentPlan.StopAtRawFileOffsetExclusive
                 && FlagsAtStop == ParentPlan.FlagsAtStop
                 && !BranchNotTakenAccepted
                 && !JnzBoundaryReached
@@ -355,7 +431,9 @@ public sealed class NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPlan
                 && flagsBefore == inheritedFlags
                 && flagsAfter == inheritedFlags
                 && CompletedInstructionOffsets.SequenceEqual(
-                    ParentPlan.CompletedInstructionOffsets)
+                    ParentPlan.CompletedInstructionOffsets.Add(
+                        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchProjection
+                            .EntryJzRawFileOffset))
                 && StopAtRawFileOffsetExclusive
                     == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchProjection
                         .MoveEaxRawFileOffset
@@ -416,7 +494,11 @@ public sealed class NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPlan
                     Committed: false
                 }
                 && CompletedInstructionOffsets.SequenceEqual(
-                    ParentPlan.CompletedInstructionOffsets.Add(
+                    ParentPlan.CompletedInstructionOffsets
+                        .Add(
+                            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchProjection
+                                .EntryJzRawFileOffset)
+                        .Add(
                         NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchProjection
                             .MoveEaxRawFileOffset))
                 && StopAtRawFileOffsetExclusive
@@ -488,6 +570,8 @@ public sealed class NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPlan
             && CompletedInstructionOffsets.SequenceEqual(
                 ParentPlan.CompletedInstructionOffsets
                     .Add(NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchProjection
+                        .EntryJzRawFileOffset)
+                    .Add(NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchProjection
                         .MoveEaxRawFileOffset)
                     .Add(NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchProjection
                         .MoveEdiRawFileOffset)
@@ -514,10 +598,10 @@ public sealed class NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPlan
             == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchProjection
                 .EntryJzRawFileOffset
         && parent.EAX is uint eax
-        && eax != 0
         && parent.EBX == 0
         && parent.ESI.HasValue
-        && parent.FlagsAtStop is { Zero: false };
+        && parent.FlagsAtStop is { Zero: bool zero }
+        && zero == (eax == 0);
 
     private static NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchInstruction Instruction(
         uint rawFileOffset,
@@ -606,6 +690,12 @@ public static class NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchProject
 {
     public const uint EntryRawFileOffset = 0x00BBDE40;
     public const uint EntryJzRawFileOffset = 0x00BBDE3E;
+    public const uint EntryJzCodeVirtualAddress = 0x00FBEA3E;
+    public const uint JzNextRawFileOffset = 0x00BBDE40;
+    public const uint JzTargetRawFileOffset = 0x00BBDE83;
+    public const int JzSignedRelativeDisplacement = 0x43;
+    public const byte JzInstructionByteLength = 2;
+    public const string JzInstructionBytes = "7443";
     public const uint MoveEaxRawFileOffset = 0x00BBDE40;
     public const uint MoveEdiRawFileOffset = 0x00BBDE46;
     public const uint TestEdiRawFileOffset = 0x00BBDE49;
@@ -627,6 +717,8 @@ public static class NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchProject
 
     public static uint EntryCodeVirtualAddress =>
         RawFileOffsetToCodeVirtualAddress(EntryRawFileOffset);
+    public static uint EntryJzTargetCodeVirtualAddress =>
+        RawFileOffsetToCodeVirtualAddress(JzTargetRawFileOffset);
     public static uint BranchCodeVirtualAddress =>
         RawFileOffsetToCodeVirtualAddress(BranchRawFileOffset);
     public static bool ExecutesNativeInstructions => false;
@@ -642,29 +734,48 @@ public static class NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchProject
                 capture.ParentCapture);
         if (!BranchAdmitted(parent))
         {
-            bool jzTaken =
-                parent.ExactCleanCompletion
-                && parent.Outcome
-                    == NetworkDispatcherEntryFallbackDiagnosticCallTargetPrefixOutcome
-                        .BoundedBeforeJz
-                && parent.BranchBoundaryReached
-                && parent.StopAtRawFileOffsetExclusive == EntryJzRawFileOffset
-                && parent.FlagsAtStop is { Zero: true }
-                && parent.EAX == 0;
             return new(
                 capture,
                 parent,
-                jzTaken
-                    ? NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchOutcome.JzTaken
-                    : NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchOutcome
-                        .ParentCallTargetPrefixNotAccepted,
+                NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchOutcome
+                    .ParentCallTargetPrefixNotAccepted,
                 StateForUnreachedParent(capture.FreshDWORDAtESIPlusA4),
                 StateForUnreachedParent(capture.FreshArrayEntryDWORDAtAddress),
                 ImmutableArray<NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchRead>.Empty,
                 ImmutableArray<
                     NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchInstruction>.Empty,
+                null,
                 parent.CompletedInstructionOffsets,
                 parent.StopAtRawFileOffsetExclusive,
+                null,
+                null,
+                null,
+                null,
+                parent.FlagsAtStop,
+                branchNotTakenAccepted: false,
+                jnzBoundaryReached: false,
+                projectionEntered: false);
+        }
+
+        bool jzTaken = parent.FlagsAtStop!.Value.Zero!.Value;
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJz jzBranch =
+            CreateJzBranch(parent, jzTaken);
+        ImmutableArray<uint> completedThroughJz =
+            parent.CompletedInstructionOffsets.Add(EntryJzRawFileOffset);
+        if (jzTaken)
+        {
+            return new(
+                capture,
+                parent,
+                NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchOutcome.JzTaken,
+                StateForUnreachedParent(capture.FreshDWORDAtESIPlusA4),
+                StateForUnreachedParent(capture.FreshArrayEntryDWORDAtAddress),
+                ImmutableArray<NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchRead>.Empty,
+                ImmutableArray<
+                    NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchInstruction>.Empty,
+                jzBranch,
+                completedThroughJz,
+                JzTargetRawFileOffset,
                 null,
                 null,
                 null,
@@ -710,7 +821,8 @@ public static class NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchProject
                 StateForUnused(capture.FreshArrayEntryDWORDAtAddress),
                 ImmutableArray.Create(firstRead),
                 ImmutableArray.Create(attemptedMove),
-                parent.CompletedInstructionOffsets,
+                jzBranch,
+                completedThroughJz,
                 MoveEaxRawFileOffset,
                 esi,
                 eaxAtEntry,
@@ -767,7 +879,8 @@ public static class NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchProject
                 NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCaptureState.Missing,
                 ImmutableArray.Create(firstRead, secondRead),
                 ImmutableArray.Create(moveEax, attemptedMoveEdi),
-                parent.CompletedInstructionOffsets.Add(MoveEaxRawFileOffset),
+                jzBranch,
+                completedThroughJz.Add(MoveEaxRawFileOffset),
                 MoveEdiRawFileOffset,
                 esi,
                 firstDWORD,
@@ -813,7 +926,9 @@ public static class NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchProject
             NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCaptureState.Captured,
             ImmutableArray.Create(firstRead, secondRead),
             ImmutableArray.Create(moveEax, moveEdi, testEdi),
+            jzBranch,
             parent.CompletedInstructionOffsets
+                .Add(EntryJzRawFileOffset)
                 .Add(MoveEaxRawFileOffset)
                 .Add(MoveEdiRawFileOffset)
                 .Add(TestEdiRawFileOffset),
@@ -887,10 +1002,35 @@ public static class NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchProject
         && parent.BranchBoundaryReached
         && parent.StopAtRawFileOffsetExclusive == EntryJzRawFileOffset
         && parent.EAX is uint eax
-        && eax != 0
         && parent.EBX == 0
         && parent.ESI.HasValue
-        && parent.FlagsAtStop is { Zero: false };
+        && parent.FlagsAtStop is { Zero: bool zero }
+        && zero == (eax == 0);
+
+    internal static NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJz CreateJzBranch(
+        NetworkDispatcherEntryFallbackDiagnosticCallTargetPrefixPlan parent,
+        bool taken)
+    {
+        NetworkDispatcherLockGateFlags flags = parent.FlagsAtStop!.Value;
+        uint targetVA = RawFileOffsetToCodeVirtualAddress(JzTargetRawFileOffset);
+        return new(
+            EntryJzRawFileOffset,
+            RawFileOffsetToCodeVirtualAddress(EntryJzRawFileOffset),
+            JzInstructionByteLength,
+            JzInstructionBytes,
+            JzSignedRelativeDisplacement,
+            targetVA,
+            JzTargetRawFileOffset,
+            JzNextRawFileOffset,
+            taken ? JzTargetRawFileOffset : JzNextRawFileOffset,
+            parent.EAX!.Value,
+            flags,
+            flags,
+            taken,
+            Attempted: true,
+            Reached: true,
+            Committed: true);
+    }
 
     private static NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCaptureState
         StateForUnreachedParent(uint? value) =>
@@ -1204,8 +1344,11 @@ public sealed class
                     Value: 1
                 }]
             : EDIReadCaptureState
-                    == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchContinuationCaptureState
-                        .SuppliedUnused
+                    == (Capture.FreshDWORDAtEDI.HasValue
+                        ? NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchContinuationCaptureState
+                            .SuppliedUnused
+                        : NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchContinuationCaptureState
+                            .Unreached)
                 && ESPCaptureState
                     == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchContinuationCaptureState
                         .Captured
@@ -3406,4 +3549,378 @@ public static class
 
     private static NetworkDispatcherLockGateFlags UnknownFlags =>
         new(Carry: null, Parity: null, Auxiliary: null, Zero: null, Sign: null, Overflow: null);
+}
+
+public sealed record
+    NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationCapture(
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowCapture ParentCapture);
+
+public enum
+    NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationCaptureState
+{
+    Unreached,
+    Missing,
+    Captured,
+    SuppliedUnused
+}
+
+public enum
+    NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationOutcome
+{
+    ParentPostCallWindowNotAccepted,
+    MissingCompareCarryFlag,
+    BoundedAtTakenTarget,
+    BoundedAtFallthrough
+}
+
+public readonly record struct
+    NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBInstructionEvidence(
+        uint InstructionRawFileOffset,
+        byte InstructionByteLength,
+        string InstructionBytes,
+        bool ConditionCarry,
+        bool Taken,
+        uint SelectedDestinationRawFileOffset,
+        bool InstructionReached,
+        bool Attempted,
+        bool Projected,
+        bool DestinationBoundaryReached);
+
+public sealed class
+    NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationPlan
+{
+    private readonly Lazy<
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowPlan>
+        reprojectedParentPlan;
+    private readonly Lazy<
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationPlan>
+        reprojectedPlan;
+    private readonly Lazy<bool> orderedSemanticPrefixPreserved;
+    private readonly Lazy<bool> exactBoundedCompletion;
+    private readonly Lazy<bool> exactCleanCompletion;
+
+    internal NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationPlan(
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationCapture capture,
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowPlan parentPlan,
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationOutcome outcome,
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationCaptureState
+            branchCaptureState,
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBInstructionEvidence? branch,
+        ImmutableArray<uint> completedInstructionOffsets,
+        uint? stopAtRawFileOffsetExclusive,
+        uint? selectedBranchTargetRawFileOffset,
+        bool? conditionalBranchTaken,
+        NetworkDispatcherLockGateFlags? flagsAtStop,
+        bool destinationBoundaryReached,
+        bool projectionEntered)
+    {
+        Capture = capture;
+        ParentPlan = parentPlan;
+        Outcome = outcome;
+        BranchCaptureState = branchCaptureState;
+        Branch = branch;
+        CompletedInstructionOffsets = completedInstructionOffsets;
+        StopAtRawFileOffsetExclusive = stopAtRawFileOffsetExclusive;
+        SelectedBranchTargetRawFileOffset = selectedBranchTargetRawFileOffset;
+        ConditionalBranchTaken = conditionalBranchTaken;
+        FlagsAtStop = flagsAtStop;
+        DestinationBoundaryReached = destinationBoundaryReached;
+        ProjectionEntered = projectionEntered;
+        reprojectedParentPlan = new(
+            () => NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowProjection
+                .Project(Capture.ParentCapture),
+            LazyThreadSafetyMode.ExecutionAndPublication);
+        reprojectedPlan = new(
+            () => NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationProjection
+                .Project(Capture),
+            LazyThreadSafetyMode.ExecutionAndPublication);
+        orderedSemanticPrefixPreserved = new(
+            ComputeOrderedSemanticPrefixPreserved,
+            LazyThreadSafetyMode.ExecutionAndPublication);
+        exactBoundedCompletion = new(
+            ComputeExactBoundedCompletion,
+            LazyThreadSafetyMode.ExecutionAndPublication);
+        exactCleanCompletion = new(
+            () => ExactBoundedCompletion
+                && OrderedSemanticPrefixPreserved
+                && ParentPlan.ExactCleanCompletion,
+            LazyThreadSafetyMode.ExecutionAndPublication);
+    }
+
+    public NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationCapture Capture
+    {
+        get;
+    }
+    public NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowPlan ParentPlan
+    {
+        get;
+    }
+    public NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationOutcome Outcome
+    {
+        get;
+    }
+    public NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationCaptureState
+        BranchCaptureState { get; }
+    public NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBInstructionEvidence? Branch
+    {
+        get;
+    }
+    public ImmutableArray<uint> CompletedInstructionOffsets { get; }
+    public uint? StopAtRawFileOffsetExclusive { get; }
+    public uint? SelectedBranchTargetRawFileOffset { get; }
+    public bool? ConditionalBranchTaken { get; }
+    public NetworkDispatcherLockGateFlags? FlagsAtStop { get; }
+    public bool DestinationBoundaryReached { get; }
+    public bool DestinationInstructionsExecuted => false;
+    public bool BranchInstructionProjected => Branch is not null;
+    public bool ProjectionEntered { get; }
+    public bool NativeInstructionsExecuted => false;
+    public bool NativeMemoryReadsExecuted => false;
+    public bool NativeMemoryWritesExecuted => false;
+    public bool ParentInstructionsExecuted => false;
+    public bool OrderedSemanticPrefixPreserved => orderedSemanticPrefixPreserved.Value;
+    public bool ExactBoundedCompletion => exactBoundedCompletion.Value;
+    public bool ExactCleanCompletion => exactCleanCompletion.Value;
+
+    private bool ComputeExactBoundedCompletion()
+    {
+        if (!ProjectionEntered
+            || !ParentPlan.ExactCleanCompletion
+            || BranchCaptureState
+                != NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationCaptureState
+                    .Captured
+            || Branch is not {
+                InstructionRawFileOffset:
+                    NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationProjection
+                        .JBInstructionRawFileOffset,
+                InstructionByteLength:
+                    NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationProjection
+                        .JBInstructionByteLength,
+                InstructionBytes:
+                    NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationProjection
+                        .JBInstructionBytes,
+                InstructionReached: true,
+                Attempted: true,
+                Projected: true,
+                DestinationBoundaryReached: true
+            }
+            || !ConditionalBranchTaken.HasValue
+            || Branch.Value.ConditionCarry != ParentPlan.FlagsAtStop?.Carry
+            || Branch.Value.Taken != ConditionalBranchTaken.Value
+            || SelectedBranchTargetRawFileOffset
+                != Branch.Value.SelectedDestinationRawFileOffset
+            || !DestinationBoundaryReached
+            || !CompletedInstructionOffsets.SequenceEqual(
+                ParentPlan.CompletedInstructionOffsets.Add(
+                    NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationProjection
+                        .JBInstructionRawFileOffset))
+            || FlagsAtStop != ParentPlan.FlagsAtStop)
+        {
+            return false;
+        }
+
+        return ConditionalBranchTaken.Value
+            ? Outcome
+                    == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationOutcome
+                        .BoundedAtTakenTarget
+                && SelectedBranchTargetRawFileOffset
+                    == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationProjection
+                        .TakenTargetRawFileOffset
+                && StopAtRawFileOffsetExclusive
+                    == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationProjection
+                        .TakenTargetRawFileOffset
+            : Outcome
+                    == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationOutcome
+                        .BoundedAtFallthrough
+                && SelectedBranchTargetRawFileOffset
+                    == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationProjection
+                        .FallthroughRawFileOffset
+                && StopAtRawFileOffsetExclusive
+                    == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationProjection
+                        .FallthroughRawFileOffset;
+    }
+
+    private bool ComputeOrderedSemanticPrefixPreserved()
+    {
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowPlan replayedParent =
+            reprojectedParentPlan.Value;
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationPlan replay =
+            reprojectedPlan.Value;
+        return SameParentPlan(ParentPlan, replayedParent)
+            && ParentPlan.OrderedSemanticPrefixPreserved
+            && Capture == replay.Capture
+            && Outcome == replay.Outcome
+            && BranchCaptureState == replay.BranchCaptureState
+            && Branch == replay.Branch
+            && CompletedInstructionOffsets.SequenceEqual(replay.CompletedInstructionOffsets)
+            && StopAtRawFileOffsetExclusive == replay.StopAtRawFileOffsetExclusive
+            && SelectedBranchTargetRawFileOffset == replay.SelectedBranchTargetRawFileOffset
+            && ConditionalBranchTaken == replay.ConditionalBranchTaken
+            && FlagsAtStop == replay.FlagsAtStop
+            && DestinationBoundaryReached == replay.DestinationBoundaryReached
+            && ProjectionEntered == replay.ProjectionEntered;
+    }
+
+    private static bool SameParentPlan(
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowPlan left,
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowPlan right) =>
+        left.Capture == right.Capture
+        && left.ParentPlan.Capture == right.ParentPlan.Capture
+        && left.Outcome == right.Outcome
+        && left.ESICaptureState == right.ESICaptureState
+        && left.EBXCaptureState == right.EBXCaptureState
+        && left.DWORDAtESIPlusA8CaptureState == right.DWORDAtESIPlusA8CaptureState
+        && left.DWORDAtESIPlusA4CaptureState == right.DWORDAtESIPlusA4CaptureState
+        && left.Instructions.SequenceEqual(right.Instructions)
+        && left.Reads.SequenceEqual(right.Reads)
+        && left.CompletedInstructionOffsets.SequenceEqual(right.CompletedInstructionOffsets)
+        && left.StopAtRawFileOffsetExclusive == right.StopAtRawFileOffsetExclusive
+        && left.FlagsAtStop == right.FlagsAtStop
+        && left.EAX == right.EAX
+        && left.EBX == right.EBX
+        && left.ESI == right.ESI
+        && left.ProjectionEntered == right.ProjectionEntered
+        && left.OrderedSemanticPrefixPreserved == right.OrderedSemanticPrefixPreserved
+        && left.ExactBoundedCompletion == right.ExactBoundedCompletion
+        && left.ExactCleanCompletion == right.ExactCleanCompletion;
+}
+
+public static class
+    NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationProjection
+{
+    public const uint JBInstructionRawFileOffset = 0x00BBDE81;
+    public const uint FallthroughRawFileOffset = 0x00BBDE83;
+    public const uint TakenTargetRawFileOffset = 0x00BBDE40;
+    public const byte JBInstructionByteLength = 2;
+    public const byte TakenDestinationInstructionByteLength = 6;
+    public const byte FallthroughDestinationInstructionByteLength = 3;
+    public const string JBInstructionBytes = "72BD";
+    public const string TakenDestinationInstructionBytes = "8B86A4000000";
+    public const string FallthroughDestinationInstructionBytes = "8D5E6C";
+    public const bool BytesIndependentlyVerified = true;
+
+    public static bool ExecutesNativeInstructions => false;
+
+    public static NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationPlan
+        Project(
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationCapture capture)
+    {
+        ArgumentNullException.ThrowIfNull(capture);
+        ArgumentNullException.ThrowIfNull(capture.ParentCapture);
+
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowPlan parent =
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowProjection
+                .Project(capture.ParentCapture);
+        bool parentAccepted =
+            parent.ExactCleanCompletion
+            && parent.Outcome
+                == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowOutcome
+                    .BoundedBeforeJB
+            && parent.StopAtRawFileOffsetExclusive == JBInstructionRawFileOffset;
+        if (!parentAccepted)
+        {
+            return CreatePlan(
+                capture,
+                parent,
+                NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationOutcome
+                    .ParentPostCallWindowNotAccepted,
+                StateForUnused(parent.FlagsAtStop?.Carry),
+                null,
+                parent.CompletedInstructionOffsets,
+                parent.StopAtRawFileOffsetExclusive,
+                null,
+                null,
+                parent.FlagsAtStop,
+                destinationBoundaryReached: false,
+                projectionEntered: false);
+        }
+
+        if (parent.FlagsAtStop?.Carry is not bool carry)
+        {
+            return CreatePlan(
+                capture,
+                parent,
+                NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationOutcome
+                    .MissingCompareCarryFlag,
+                NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationCaptureState
+                    .Missing,
+                null,
+                parent.CompletedInstructionOffsets,
+                JBInstructionRawFileOffset,
+                null,
+                null,
+                parent.FlagsAtStop,
+                destinationBoundaryReached: false,
+                projectionEntered: true);
+        }
+
+        bool taken = carry;
+        uint destination = taken ? TakenTargetRawFileOffset : FallthroughRawFileOffset;
+        var branch = new NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBInstructionEvidence(
+            JBInstructionRawFileOffset,
+            JBInstructionByteLength,
+            JBInstructionBytes,
+            carry,
+            taken,
+            destination,
+            InstructionReached: true,
+            Attempted: true,
+            Projected: true,
+            DestinationBoundaryReached: true);
+        return CreatePlan(
+            capture,
+            parent,
+            taken
+                ? NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationOutcome
+                    .BoundedAtTakenTarget
+                : NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationOutcome
+                    .BoundedAtFallthrough,
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationCaptureState
+                .Captured,
+            branch,
+            parent.CompletedInstructionOffsets.Add(JBInstructionRawFileOffset),
+            destination,
+            destination,
+            taken,
+            parent.FlagsAtStop,
+            destinationBoundaryReached: true,
+            projectionEntered: true);
+    }
+
+    private static NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationPlan
+        CreatePlan(
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationCapture capture,
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowPlan parent,
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationOutcome outcome,
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationCaptureState
+                branchCaptureState,
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBInstructionEvidence? branch,
+            ImmutableArray<uint> completedInstructionOffsets,
+            uint? stopAtRawFileOffsetExclusive,
+            uint? selectedBranchTargetRawFileOffset,
+            bool? conditionalBranchTaken,
+            NetworkDispatcherLockGateFlags? flagsAtStop,
+            bool destinationBoundaryReached,
+            bool projectionEntered) =>
+        new(
+            capture,
+            parent,
+            outcome,
+            branchCaptureState,
+            branch,
+            completedInstructionOffsets,
+            stopAtRawFileOffsetExclusive,
+            selectedBranchTargetRawFileOffset,
+            conditionalBranchTaken,
+            flagsAtStop,
+            destinationBoundaryReached,
+            projectionEntered);
+
+    private static NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationCaptureState
+        StateForUnused(bool? value) =>
+        value.HasValue
+            ? NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationCaptureState
+                .SuppliedUnused
+            : NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationCaptureState
+                .Unreached;
 }

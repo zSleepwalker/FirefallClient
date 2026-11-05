@@ -19,30 +19,23 @@ New reviewed coverage now includes:
   `StartupBinaryEvidence` for the three windows above plus one contiguous
   `BD34E2..BD34F6` assertion.
 
-Build currently succeeds for the full checks project after coordinator fixes:
+The latest full checks-project build (run 4748) succeeded with zero errors and
+nine nullable warnings. This is compile evidence only, not focused runtime
+acceptance.
 
-- added missing `MissingOutcome(...)` helper in
-  `SecondBranchRegisterPopsProjection`;
-- replaced non-constant pattern usage in
-  `NetworkDispatcherEntryFallbackDiagnosticReturnProjection`;
-- corrected enum-type comparison in
-  `GameSocketParserDiagnosticCleanupFirstBranchRegisterPopsChecks`.
+The current focused dispatcher run now rebuilds and executes from the matching
+focused output path and reports `Failures: 0` for the call-target prefix,
+nonzero branch (including JB), zero branch, and dispatcher binary anchors.
+Earlier stale-binary reports remain historical only and should not be used as
+evidence for newer source revisions.
 
-Focused validations passed with zero failures:
+The current dispatcher source extends through the nonzero JB at `BBDE81` and
+the zero-path `BBDE97` fallthrough window, with focused runtime acceptance now
+recorded by the fresh focused run above.
 
-- dispatcher preparation/return/call-target prefix + zero/nonzero branch checks
-  + binary anchors;
-- parser first-branch FS/POPs/frame-return + binary anchors.
-
-Current dispatcher continuation tasks:
-
-- nonzero fallthrough continuation from `BBDE63`;
-- zero-path branch boundary at `BBDE97` (both outcomes);
-- nonzero target continuation from `BBDE6F`.
-
-Normal second-call parser suffixes remain runtime-pending and are currently
-left out of `Program.cs` registration until practical focused execution
-completes:
+Normal second-call parser suffixes now complete in focused execution with
+`Failures: 0`, but they remain out of `Program.cs` registration until those
+untracked production/check pairs are explicitly accepted and staged:
 
 - `SecondVirtualCallReturn`
 - `SecondCallFsRestore`
@@ -50,12 +43,12 @@ completes:
 - `SecondCallFrameReset`
 - `SecondCallReturn`
 
-Second-branch focused runtime remains expensive: isolated runner repeatedly
-reaches `second-branch FS restore` and `second-branch register pops` headings,
-then stalls before a conclusive `second-branch frame return` result; those
-suites are compile-clean but still runtime-pending acceptance.
+Second-branch focused runtime now completes conclusive fresh focused runs with
+`Failures: 0` for FS restore, register pops, and frame return. Second-call
+focused runtime also now completes conclusive fresh runs with `Failures: 0`
+across virtual-call return, FS restore, register pops, frame reset, and return.
 
-Active GPT-6 Luna successors now split the `BBDE3E` branch boundary:
+Previously assigned GPT-6 Luna work covered the `BBDE3E` branch boundary:
 
 - **nonzero JZ-not-taken path** from `BBDE40` (agent `93b4088b`);
 - **zero JZ-taken path** from `BBDE83` (agent `26355611`).

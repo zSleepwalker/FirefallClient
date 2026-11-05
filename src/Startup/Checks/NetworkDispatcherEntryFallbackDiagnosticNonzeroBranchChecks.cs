@@ -63,6 +63,20 @@ internal static class NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCheck
             && NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchProjection.EntryRawFileOffset
                 == 0x00BBDE40
             && NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchProjection
+                .EntryJzRawFileOffset == 0x00BBDE3E
+            && NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchProjection
+                .JzNextRawFileOffset == 0x00BBDE40
+            && NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchProjection
+                .JzTargetRawFileOffset == 0x00BBDE83
+            && NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchProjection
+                .JzSignedRelativeDisplacement == 0x43
+            && Normalize(NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchProjection
+                .JzInstructionBytes) == "7443"
+            && NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchProjection
+                .RawFileOffsetToCodeVirtualAddress(0x00BBDE3E) == 0x00FBEA3E
+            && NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchProjection
+                .EntryJzTargetCodeVirtualAddress == 0x00FBEA83
+            && NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchProjection
                 .MoveEaxRawFileOffset == 0x00BBDE40
             && NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchProjection
                 .MoveEdiRawFileOffset == 0x00BBDE46
@@ -195,13 +209,30 @@ internal static class NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCheck
             }
             && success.CompletedInstructionOffsets.SequenceEqual(
                 success.ParentPlan.CompletedInstructionOffsets
+                    .Add(0x00BBDE3E)
                     .Add(0x00BBDE40)
                     .Add(0x00BBDE46)
                     .Add(0x00BBDE49))
             && success.CompletedInstructionOffsets[^1] == 0x00BBDE49
             && success.StopAtRawFileOffsetExclusive == 0x00BBDE4B
             && success.JnzBoundaryReached
-            && !success.ConditionalBranchProjected
+            && success.ConditionalBranchProjected
+            && success.JzBranch is {
+                InstructionRawFileOffset: 0x00BBDE3E,
+                InstructionCodeVirtualAddress: 0x00FBEA3E,
+                InstructionByteLength: 2,
+                InstructionBytes: "7443",
+                SignedRelativeDisplacement: 0x43,
+                BranchTargetCodeVirtualAddress: 0x00FBEA83,
+                BranchTargetRawFileOffset: 0x00BBDE83,
+                FallthroughRawFileOffset: 0x00BBDE40,
+                SelectedDestinationRawFileOffset: 0x00BBDE40,
+                TestedEAX: 1,
+                Taken: false,
+                Attempted: true,
+                Reached: true,
+                Committed: true
+            }
             && !success.NativeInstructionsExecuted
             && !success.NativeMemoryReadsExecuted
             && !success.NativeMemoryWritesExecuted
@@ -232,7 +263,8 @@ internal static class NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCheck
                 { InstructionRawFileOffset: 0x00BBDE40, Committed: false }
             ]
             && missingFirstDWORD.CompletedInstructionOffsets.SequenceEqual(
-                missingFirstDWORD.ParentPlan.CompletedInstructionOffsets)
+                missingFirstDWORD.ParentPlan.CompletedInstructionOffsets.Add(0x00BBDE3E))
+            && missingFirstDWORD.ConditionalBranchProjected
             && missingFirstDWORD.StopAtRawFileOffsetExclusive == 0x00BBDE40
             && missingFirstDWORD.FlagsAtStop == missingFirstDWORD.ParentPlan.FlagsAtStop
             && missingArrayEntry.DWORDAtA4CaptureState
@@ -248,7 +280,9 @@ internal static class NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCheck
                 { InstructionRawFileOffset: 0x00BBDE46, Committed: false }
             ]
             && missingArrayEntry.CompletedInstructionOffsets.SequenceEqual(
-                missingArrayEntry.ParentPlan.CompletedInstructionOffsets.Add(0x00BBDE40))
+                missingArrayEntry.ParentPlan.CompletedInstructionOffsets
+                    .Add(0x00BBDE3E)
+                    .Add(0x00BBDE40))
             && missingArrayEntry.StopAtRawFileOffsetExclusive == 0x00BBDE46
             && missingArrayEntry.FlagsAtStop == missingArrayEntry.ParentPlan.FlagsAtStop
             && !missingFirstDWORD.ExactCleanCompletion
@@ -282,13 +316,11 @@ internal static class NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCheck
             && rejectedParent.Reads.IsEmpty
             && pendingParent.Reads.IsEmpty
             && jzTaken.CompletedInstructionOffsets.SequenceEqual(
-                jzTaken.ParentPlan.CompletedInstructionOffsets)
+                jzTaken.ParentPlan.CompletedInstructionOffsets.Add(0x00BBDE3E))
             && rejectedParent.CompletedInstructionOffsets.SequenceEqual(
                 rejectedParent.ParentPlan.CompletedInstructionOffsets)
             && pendingParent.CompletedInstructionOffsets.SequenceEqual(
                 pendingParent.ParentPlan.CompletedInstructionOffsets)
-            && jzTaken.StopAtRawFileOffsetExclusive
-                == jzTaken.ParentPlan.StopAtRawFileOffsetExclusive
             && rejectedParent.StopAtRawFileOffsetExclusive
                 == rejectedParent.ParentPlan.StopAtRawFileOffsetExclusive
             && pendingParent.StopAtRawFileOffsetExclusive
@@ -296,7 +328,16 @@ internal static class NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCheck
             && jzTaken.FlagsAtStop == jzTaken.ParentPlan.FlagsAtStop
             && rejectedParent.FlagsAtStop == rejectedParent.ParentPlan.FlagsAtStop
             && pendingParent.FlagsAtStop == pendingParent.ParentPlan.FlagsAtStop
-            && jzTaken.StopAtRawFileOffsetExclusive == 0x00BBDE3E
+            && jzTaken.StopAtRawFileOffsetExclusive == 0x00BBDE83
+            && jzTaken.ConditionalBranchProjected
+            && jzTaken.JzBranch is {
+                Taken: true,
+                BranchTargetRawFileOffset: 0x00BBDE83,
+                FallthroughRawFileOffset: 0x00BBDE40,
+                SelectedDestinationRawFileOffset: 0x00BBDE83,
+                TestedEAX: 0,
+                Committed: true
+            }
             && rejectedParent.StopAtRawFileOffsetExclusive == 0x00BBDE26
             && pendingParent.StopAtRawFileOffsetExclusive
                 == pendingParent.ParentPlan.StopAtRawFileOffsetExclusive
@@ -360,6 +401,25 @@ internal static class NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCheck
                     jnzTaken,
                     entryESP,
                     dwordAtEDI));
+
+        static bool SameContinuationCaptureInputs(
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchContinuationCapture left,
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchContinuationCapture right) =>
+            left.FreshJnzTaken == right.FreshJnzTaken
+            && left.FreshEntryESP == right.FreshEntryESP
+            && left.FreshDWORDAtEDI == right.FreshDWORDAtEDI
+            && left.ParentCapture.FreshDWORDAtESIPlusA4
+                == right.ParentCapture.FreshDWORDAtESIPlusA4
+            && left.ParentCapture.FreshArrayEntryDWORDAtAddress
+                == right.ParentCapture.FreshArrayEntryDWORDAtAddress
+            && left.ParentCapture.ParentCapture.ParentCapture.NormalReturnObserved
+                == right.ParentCapture.ParentCapture.ParentCapture.NormalReturnObserved
+            && left.ParentCapture.ParentCapture.FreshPostCallESI
+                == right.ParentCapture.ParentCapture.FreshPostCallESI
+            && left.ParentCapture.ParentCapture.FreshDWORDAtESIPlusA8
+                == right.ParentCapture.ParentCapture.FreshDWORDAtESIPlusA8
+            && left.ParentCapture.ParentCapture.FreshDWORDAtESIPlusA4
+                == right.ParentCapture.ParentCapture.FreshDWORDAtESIPlusA4;
 
         static string NormalizeContinuationBytes(string value) =>
             string.Concat(value.Where(Uri.IsHexDigit)).ToUpperInvariant();
@@ -742,7 +802,9 @@ internal static class NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCheck
             && validReplay.ExactCleanCompletion
             && fallthrough.OrderedSemanticPrefixPreserved
             && fallthrough.ExactCleanCompletion
-            && fallthrough.Capture == fallthroughReplayAgain.Capture
+            && SameContinuationCaptureInputs(
+                fallthrough.Capture,
+                fallthroughReplayAgain.Capture)
             && fallthrough.Instructions.SequenceEqual(fallthroughReplayAgain.Instructions)
             && fallthrough.StackWrites.SequenceEqual(fallthroughReplayAgain.StackWrites)
             && fallthrough.CompletedInstructionOffsets.SequenceEqual(
@@ -1174,7 +1236,7 @@ internal static class NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCheck
                         .SubtractESIPlusA4FromEAX,
                     EAXAfter: 4,
                     Completed: true,
-                    FlagsAfter: { Carry: false, Parity: true, Auxiliary: true, Zero: false, Sign: false, Overflow: true }
+                    FlagsAfter: { Carry: false, Parity: false, Auxiliary: true, Zero: false, Sign: false, Overflow: true }
                 },
                 {
                     InstructionRawFileOffset: 0x00BBDE7C,
@@ -1326,6 +1388,168 @@ internal static class NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCheck
             && postCallReplay.OrderedSemanticPrefixPreserved
             && postCallWindow.ExactCleanCompletion
             && postCallReplay.ExactCleanCompletion);
+
+        static NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationPlan
+            ProjectJB(
+                NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchContinuationCapture
+                    parentCapture,
+                uint postCallEBX,
+                uint dwordAtESIPlusA8,
+                uint dwordAtESIPlusA4) =>
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationProjection.Project(
+                new(
+                    new(
+                        new(
+                            parentCapture,
+                            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallSite
+                                .TakenTargetAtBBDE6C,
+                            true),
+                        0x5000,
+                        postCallEBX,
+                        dwordAtESIPlusA8,
+                        dwordAtESIPlusA4)));
+
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationPlan
+            jbFallthrough = ProjectJB(
+                targetCallParentCapture,
+                0x7FFFFFFF,
+                0x80000003,
+                0x7FFFFFFF);
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationPlan
+            jbTaken = ProjectJB(
+                targetCallParentCapture,
+                0,
+                0x1000,
+                0);
+        check("BBDE81 JB and destination byte anchors are exact",
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationProjection
+                .BytesIndependentlyVerified
+            && Normalize(NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationProjection
+                .JBInstructionBytes) == "72BD"
+            && Normalize(NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationProjection
+                .TakenDestinationInstructionBytes) == "8B86A4000000"
+            && Normalize(NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationProjection
+                .FallthroughDestinationInstructionBytes) == "8D5E6C"
+            && NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationProjection
+                .JBInstructionRawFileOffset == 0x00BBDE81
+            && NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationProjection
+                .TakenTargetRawFileOffset == 0x00BBDE40
+            && NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationProjection
+                .FallthroughRawFileOffset == 0x00BBDE83);
+
+        check("CMP carry selects both JB destinations without executing destination instructions",
+            jbFallthrough.ParentPlan.ExactCleanCompletion
+            && jbFallthrough.ParentPlan.FlagsAtStop is { Carry: false }
+            && jbFallthrough.Outcome
+                == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationOutcome
+                    .BoundedAtFallthrough
+            && jbFallthrough.Branch is {
+                InstructionRawFileOffset: 0x00BBDE81,
+                InstructionByteLength: 2,
+                InstructionBytes: "72BD",
+                ConditionCarry: false,
+                Taken: false,
+                SelectedDestinationRawFileOffset: 0x00BBDE83,
+                InstructionReached: true,
+                Attempted: true,
+                Projected: true,
+                DestinationBoundaryReached: true
+            }
+            && jbFallthrough.CompletedInstructionOffsets.SequenceEqual(
+                jbFallthrough.ParentPlan.CompletedInstructionOffsets.Add(0x00BBDE81))
+            && jbFallthrough.StopAtRawFileOffsetExclusive == 0x00BBDE83
+            && jbFallthrough.SelectedBranchTargetRawFileOffset == 0x00BBDE83
+            && jbFallthrough.FlagsAtStop == jbFallthrough.ParentPlan.FlagsAtStop
+            && jbFallthrough.DestinationBoundaryReached
+            && !jbFallthrough.DestinationInstructionsExecuted
+            && jbTaken.ParentPlan.ExactCleanCompletion
+            && jbTaken.ParentPlan.FlagsAtStop is { Carry: true }
+            && jbTaken.Outcome
+                == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationOutcome
+                    .BoundedAtTakenTarget
+            && jbTaken.Branch is {
+                InstructionRawFileOffset: 0x00BBDE81,
+                InstructionBytes: "72BD",
+                ConditionCarry: true,
+                Taken: true,
+                SelectedDestinationRawFileOffset: 0x00BBDE40,
+                DestinationBoundaryReached: true
+            }
+            && jbTaken.CompletedInstructionOffsets.SequenceEqual(
+                jbTaken.ParentPlan.CompletedInstructionOffsets.Add(0x00BBDE81))
+            && jbTaken.StopAtRawFileOffsetExclusive == 0x00BBDE40
+            && jbTaken.SelectedBranchTargetRawFileOffset == 0x00BBDE40
+            && jbTaken.FlagsAtStop == jbTaken.ParentPlan.FlagsAtStop
+            && jbTaken.DestinationBoundaryReached
+            && !jbTaken.DestinationInstructionsExecuted
+            && !jbFallthrough.NativeInstructionsExecuted
+            && !jbTaken.NativeInstructionsExecuted);
+
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowCapture
+            rejectedWindowCapture =
+            new(
+                new(
+                    targetCallParentCapture,
+                    NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallSite
+                        .TakenTargetAtBBDE6C,
+                    false),
+                0x5000,
+                0x7FFFFFFF,
+                0x80000003,
+                0x7FFFFFFF);
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationPlan
+            rejectedJBParent =
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationProjection
+                .Project(new(rejectedWindowCapture));
+        check("Rejected JB parent inherits its boundary and leaves branch captures unused",
+            rejectedJBParent.ParentPlan.Outcome
+                == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchPostCallWindowOutcome
+                    .ParentCallReturnNotAccepted
+            && rejectedJBParent.Outcome
+                == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationOutcome
+                    .ParentPostCallWindowNotAccepted
+            && rejectedJBParent.Branch is null
+            && rejectedJBParent.BranchCaptureState
+                == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationCaptureState
+                    .SuppliedUnused
+            && rejectedJBParent.CompletedInstructionOffsets.SequenceEqual(
+                rejectedJBParent.ParentPlan.CompletedInstructionOffsets)
+            && rejectedJBParent.StopAtRawFileOffsetExclusive
+                == rejectedJBParent.ParentPlan.StopAtRawFileOffsetExclusive
+            && rejectedJBParent.FlagsAtStop == rejectedJBParent.ParentPlan.FlagsAtStop
+            && !rejectedJBParent.DestinationBoundaryReached);
+
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationPlan
+            jbFallthroughReplay =
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationProjection
+                .Project(jbFallthrough.Capture);
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationPlan jbTakenReplay =
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchJBContinuationProjection
+                .Project(jbTaken.Capture);
+        check("Both JB outcomes reproject deterministically",
+            jbFallthrough.Capture == jbFallthroughReplay.Capture
+            && jbFallthrough.ParentPlan.Capture == jbFallthroughReplay.ParentPlan.Capture
+            && jbFallthrough.Branch == jbFallthroughReplay.Branch
+            && jbFallthrough.Outcome == jbFallthroughReplay.Outcome
+            && jbFallthrough.CompletedInstructionOffsets.SequenceEqual(
+                jbFallthroughReplay.CompletedInstructionOffsets)
+            && jbFallthrough.StopAtRawFileOffsetExclusive
+                == jbFallthroughReplay.StopAtRawFileOffsetExclusive
+            && jbFallthrough.OrderedSemanticPrefixPreserved
+            && jbFallthroughReplay.OrderedSemanticPrefixPreserved
+            && jbFallthrough.ExactCleanCompletion
+            && jbFallthroughReplay.ExactCleanCompletion
+            && jbTaken.Capture == jbTakenReplay.Capture
+            && jbTaken.ParentPlan.Capture == jbTakenReplay.ParentPlan.Capture
+            && jbTaken.Branch == jbTakenReplay.Branch
+            && jbTaken.Outcome == jbTakenReplay.Outcome
+            && jbTaken.CompletedInstructionOffsets.SequenceEqual(
+                jbTakenReplay.CompletedInstructionOffsets)
+            && jbTaken.StopAtRawFileOffsetExclusive == jbTakenReplay.StopAtRawFileOffsetExclusive
+            && jbTaken.OrderedSemanticPrefixPreserved
+            && jbTakenReplay.OrderedSemanticPrefixPreserved
+            && jbTaken.ExactCleanCompletion
+            && jbTakenReplay.ExactCleanCompletion);
     }
 
     private static NetworkDispatcherEntryFallbackDiagnosticReturnCapture
