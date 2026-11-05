@@ -1129,6 +1129,10 @@ a clean single-CAS success. It preserves fresh link, stack cleanup,
 payload, and node reload observations and distinct capture boundaries.
 Its generic return-value projection does not establish an actual native
 RET or the outer queue call's normal return.
+CapacityFinalCalleeCommonNodeIndexedOuterEqualityRingCleanupLifecycleProjection
+admits the fresh counter decrement only after validating the root
+equality path's five ordered stores. It preserves carry and stops before
+the nonzero shared epilogue or zero-path cleanup call.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
