@@ -471,6 +471,16 @@ identity captures as cross-checks rather than missing prerequisites. Its
 zero branch rejects repeat-only captures; missing DF and incomplete REP
 retain partial effects and cannot admit the final join.
 
+`FrameHandoffCapacityFillFinalLifecycleProjection` derives final-gate
+admission only after the clean fill/shared-REP route and validates its
+frame before the fresh frame14 read. On the final no-call bypass, EBX
+must agree with the earlier fill frame4 reload before any final writes;
+the called route retains independent register captures.
+`CapacityFinalCalleeExitProjection` models only raw `12C9441..12C945C`,
+with ordered TEST/pop/gated-call/epilogue captures. Encoded data operands
+are PE VAs, separate from raw instruction offsets; restored values are
+not promised as outputs of the subsequent opaque call.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves

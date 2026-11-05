@@ -12583,6 +12583,14 @@ owns above repeat-to-final tail, checking EBX/ESI continuity only on the
 final no-call bypass. Active FillFinalLifecycle, CalleeExit and
 FirstFillLifecycle files remain unregistered/unreviewed.
 
+AboveRepeat pushed0d6f878. FillFinalLifecycle and CalleeExit reviewed,
+registered and passed coordinator pinned offline runner. FillFinal fixtures
+now explicitly supply call status when asserting it is unreached.
+FirstFinalLifecycle owner `3a735978-00dd-466c-bdd9-6bb200dfc7ca` composes
+RepeatFillJoin-to-FillFinal without inventing missing ESI continuity.
+Entry trace owner `e9182693-1628-40dd-afc8-9d433bdf345a` owns read-only
+bounded raw12C8D60 entry/ECXzero path evidence, not files.
+
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
 indirect callback, then fresh receiver+4C DEC and receiver+48 zero/INC.
