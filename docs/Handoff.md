@@ -13643,6 +13643,12 @@ Both queue token2 atBD2E14; boundedBD2E19 beforeSEHcleanup.
 Lunad5e62107 owns GameSocketCompletionErrorState pair for that internal
 continuation only, not wholeerrorcallback: entryerror0 directly skipsCAS
 and is distinct. No concurrency execution or inferred logging semantics.
+IOCP byte anchors committed/pushed03bcb1f after runner4122exit0.
+NodeCleanup0c22 released/full EOF reviewed/registered; coordinator
+runner4124exit0 excludes exactly three named unreviewed IOCP/senderbinding/
+errorstate pairs. Target removed. Owner unexpectedly ran isolated7/7 and
+standardbuild despite no-build instructions; coordinator result is
+authoritative, not owner's claim. Review found no further source defect.
 SmallBinEpilogue released and full EOF reviewed: owner6d052038 revising
 wrong parent type, nullable value-plan access, missing successor-unused
 forwarding, child read/write effect markers and dirty-ring admission.

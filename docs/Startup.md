@@ -1029,6 +1029,9 @@ route with four ordered stores and the cleanup jump, retaining original
 indexed EDX rather than the zero-child value. SmallBinEpilogueLifecycle
 admits either completed ring tail directly to the gated epilogue without
 a cleanup-counter decrement; equal-root bypasses remain distinct.
+NodeIndexedTraversalSlotCleanupLifecycle observes the fresh counter
+decrement after the four-store jump, preserving carry and bounded
+zero/nonzero destinations without entering the cleanup call or epilogue.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
