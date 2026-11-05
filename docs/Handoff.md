@@ -13345,6 +13345,31 @@ runner3960exit0;fixedSHLcount31fixtureOFundefinednotfalse.
 TraversalIteration19ff0d14-723f-4d47-a280-47d07a6fc825active.
 Fresh93F5JZ945CtargetisadditionalcodeafterRET945B,notreturninstruction.
 Future945C..9475bytes3B0DD8ADED010F820EFAFFFF893189561889760C897608EBBA.
+d79ac33pushed. DualThreshold/FreshMaskSelfRingrevision/HighSizeNode
+pairsreviewedEOFregisteredanchor;fixedmissingEBXfixturefresh40not20,
+nodeunusedESI/secondthirdstorereachgates. runner3964blockedactiveTraversal
+EventImmediate368;owner19ffnotified. Pending3pairbatchnotcommittedyet.
+ActiveDualThresholdRing09b45f08-db37-4e67-962b-dc55c2c28dcd,
+ZeroSlotThreshold997e7dbe-71ad-4bcd-abf5-8ef2a9ca79db.
+Traversal/ZeroSlotThreshold/DualThresholdRing released and reviewed through EOF.
+Traversal fixes retain known CMP left on missing EDI, TEST event result,
+and MOV-read preserved flags. Dual-ring exact gates check reached reads,
+comparisons/branches and unused captures; internal941C entry now explicit.
+Zero-slot target entry is explicitly false. Both scalar native anchors added.
+runner3971 blocked active NodeFreshMask missing destination properties and
+ImmutableArray FindIndex/FindLastIndex APIs; owner14c11bb4 notified.
+Active successors: ZeroSlotStoreTail9301d3e6, IndexedCountTagfb6cdd72,
+TagTraversaled8c0704, RingCleanupf0822979. All GPT-6 Luna; coordinator
+alone integrates, builds, stages reviewed files, commits and pushes.
+runner3981 reached all registered checks; sole traversal fixture failed:
+FFFFFFF8 low byte has odd parity, PF=false (fixed). runner3982 then
+blocked active IndexedCountTag nullable flags converter127; ownerfb6cdd72
+notified. Fresh IDA confirms945B=C3 before945CCMP;8E76 starts indirect
+CALL [absolutePEVA01AC4A24], not a return/failure interpretation.
+runner3986 exit0 validates all six reviewed registered pairs. NodeFreshMask
+released/reviewed but returned to14c11bb4: dirty unused EBP must stop before
+fresh gate, not execute child; strengthen exact child gates/internal93A1entry.
+RightPairedStoresc80900ae active on fresh92B7six-byte window.
 8948188B4A1085C974123B0DD8ADED010F82D8FBFFFF8948108941188B4A1485C974123B0DD8ADED010F82BFFBFFFF894814894118.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,

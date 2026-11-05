@@ -924,6 +924,18 @@ in EBX while masking an independent fresh tag DWORD for comparison. A zero
 effective shift count preserves AND flags. RingInsertion retains five ordered
 stores through942F, including incomplete attempts and earlier commits when
 the second-store EDX capture is missing.
+DualPointerThreshold loads both independent observations before its first
+comparison, even when that comparison branches below. FreshMaskSelfRingLifecycle
+derives both OR operands from the prior gate and rejects unused late pointers
+on bypass. HighSizeNodeLifecycle derives the initialization index across all
+three size paths, preserving parent flags and frame-before-node write order.
+TraversalIteration models one indexed child selection and masked comparison,
+stopping at equality, zero-child, or loop-back edges without another iteration.
+The zero-child destination at raw `0x012C945C` is additional CMP/JB code after
+the preceding RET, not a return instruction. ZeroSlotThresholdGate captures
+both same-instruction operands independently. DualThresholdRingLifecycle
+derives the insertion pointers from the two fresh reads and preserves CMP2
+flags through five ordered stores, stopping before the cleanup decrement.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
