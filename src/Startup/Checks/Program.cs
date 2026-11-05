@@ -36,6 +36,16 @@ UnreliableReceiveDirectCallbackChecks.Run(Check);
 UnreliableReceiveMarkerScalarChecks.Run(Check);
 UnreliableReceivePresenceCallbackChecks.Run(Check);
 ReliableReceiveResultLengthChecks.Run(Check);
+UnreliableReceiveCallbackRecycleChecks.Run(Check);
+UnreliableReceiveZeroResultChecks.Run(Check);
+UnreliableReceiveZeroReturnChecks.Run(Check);
+PayloadXorDiagnosticEntryChecks.Run(Check);
+UnreliableReceiveResultStoresChecks.Run(Check);
+PayloadXorTableSetupChecks.Run(Check);
+UnreliableReceiveSelectorCallbackChecks.Run(Check);
+UnreliableReceiveFrameHandoffChecks.Run(Check);
+ReliableReceiveLengthPublicationChecks.Run(Check);
+UnreliableReceiveCallbackRecycleJoinChecks.Run(Check);
 PayloadGrowthZeroFillChecks.Run(Check);
 
 void Check(string name, bool condition)

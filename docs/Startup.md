@@ -379,6 +379,20 @@ The reliable masked-length callback's validated entry also admits the zero-resul
 
 `ReliableReceiveResultLengthProjection` composes both admitted result routes with the length callback. Only a normally returned zero-result diagnostic projects cleanup 16 at `BE53BC`; that completed cleanup remains visible if the later length capture is missing or invalid.
 
+`UnreliableReceiveCallbackRecycleProjection` covers `[BE5B64,BE5B78)`: global DWORD read precedes cleanup 16, full callback EAX copy to ESI/frame+8, payload push, and opaque helper call. Missing EAX preserves the preceding read and cleanup. `UnreliableReceiveZeroResultProjection` follows normal helper return: nonzero ESI branches away; zero reads receiver+0, pushes receiver+4, reads the first loaded value+4, selects that nonzero value or literal `1C5EA68`, and completes five ordered forwarding arguments.
+
+`UnreliableReceiveZeroReturnProjection` covers `[BE5B9E,BE5BAC)` after normal forwarding return. Cleanup 20 and RET 4 are distinct; XOR AL clears only the low byte, with upper EAX known only from an optional helper-return capture. The epilogue restores EDI/ESI/EBX, resets ESP from EBP, and restores EBP.
+
+`UnreliableReceiveResultStoresProjection` covers the nonzero-result edge `[BE5BAC,BE5BC4)`. It independently reads receiver+4 and frame-4 before either result+20/+24 store, zero-extends only the reloaded frame low WORD for the latter, then compares a fresh receiver+4C DWORD unsigned with `10000`. Receiver base zero is not an entry guard; missing counter capture retains both completed stores.
+
+`PayloadXorDiagnosticEntryProjection` covers `[BD58E0,BD5912)`. Markers 1..3 skip diagnosis; 0 and 4..255 diagnose but are not rejected. A normal diagnostic return independently reloads BYTE[EBP-1] before cleanup 16. The retained EDX-to-EBX scalar and potentially different reloaded AL reach the later table setup; no XOR body or buffer safety is inferred.
+
+`PayloadXorTableSetupProjection` reads the physical frame+8 length and two independently captured table DWORDs selected by all eight AL bits before testing the unsigned wrapped end. Empty/wrapped ranges still require both table reads. Alignment and unsigned start+8/end guards select the first body boundary without projecting XOR writes.
+
+`UnreliableReceiveSelectorCallbackProjection` joins the header's zero-selector route or normal nonzero marker/scalar route with the presence/direct callback. Payload, receiver, selector, and retained length identities are checked before later-stage effects; the scalar frame BYTE and callback targets remain independent. `UnreliableReceiveCallbackRecycleJoinProjection` then requires a normal direct return and matching payload identity before any recycle continuation effect.
+
+`ReliableReceiveLengthPublicationProjection` composes normal length callback, scalar helper cleanup, and publication with payload identity validation and an independently captured frame+8 pointer. `UnreliableReceiveFrameHandoffProjection` covers shared `[BE5C0F,BE5C26)` address-only handoff to `BE64A0` and its normal AL=1 epilogue; unknown helper EAX does not block the known low-byte effect.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves

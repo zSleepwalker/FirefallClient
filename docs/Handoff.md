@@ -12117,3 +12117,71 @@ direct-plan test member access. Sole evidence writer now
 `309093e3-ef01-40f8-8d97-80a79f4bb6f5` for unreliable result continuations.
 Zero-result return tail `[BE5B9E,BE5BAC)` owner:
 `0c3bd73d-e266-403a-95a8-cafe74c8b467`.
+
+Pushed reviewed callback compositions/boundary corrections as `b9eb465`.
+New selector join `[BE5AF0,BE5B64)` owner
+`d3e6c937-fe2a-4621-956a-8338d2228e3c`; reliable length/scalar/publication
+join owner `5a8ee11f-7a89-40ab-85f8-94e634ce8463`.
+Recycle bridge, zero-result forwarding, zero-return epilogue, and XOR
+diagnostic entry are registered pending final validation. Zero-result author
+is fixing positional-argument compile errors and nonreturn stop boundaries.
+Result-store author is removing an invented receiver-nonzero gate and
+correcting MOVZX/store instruction offsets before registration.
+
+XOR setup trace confirms physical `[EBP+8]` length operand (IDA's stack-frame
+offset `14` is not the physical displacement), then AL zero-extension,
+wrapped EBX+length end, and two table DWORD reads at VA `1BB7490/94+AL*8`.
+Both table reads precede empty/wrapped-end unsigned JNB. Owner
+`10edbe70-2208-4673-94a7-b062d65748f6` models `[BD5912,BD5939)`.
+Sole evidence writer `df73a305-4d2f-42cb-bc4a-570c5037e24e` appends that
+window and zero-return tail, preserving all preceding anchors.
+Read-only below-threshold continuation trace owner
+`d3bd75ea-3d38-4b94-a0e9-4427ae7528d6` starts `BE5C0F`.
+
+Below-threshold trace completed; raw evidence shows shared frame-address
+handoff/return `[BE5C0F,BE5C26)`, LEA frame+8 push, LEA receiver+3C ECX,
+call BE64A0, AL-only 1 epilogue. Trace's mapped VAs were incorrect:
+correct entry/end are `FE680F/FE6826`. Code owner
+`575ce81a-cfc2-4ba6-b079-06853506c362` has the correction.
+High-count cleanup `[BE5BC4,BE5C0F)` read-only owner
+`9d5b48be-6cb3-48dc-babf-7d53b34ef560`.
+Presence/direct-to-recycle composition owner
+`31199ed5-b488-4e8b-87c2-6db65b9c919e`.
+XOR epilogue `[BD594E,...return)` read-only owner
+`7b24813e-525e-4fed-af8f-7d8e43421a65`.
+
+Result-store refinement is complete/reviewed/registered: only zero result
+invalidates entry; receiver zero is allowed. MOVZX and result+24 store have
+separate correct offsets `BE5BB5/BE5BB8`.
+Evidence writer `e6ecff04-4249-4a95-aacc-2bf50629fd3f` now owns only the
+shared frame-address handoff anchor; preceding anchor writer released.
+Zero-result forwarding/return composition owner
+`ee68218e-d8d1-4eaa-851f-4c0c58cb900a`.
+
+High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
+cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
+indirect callback, then fresh receiver+4C DEC and receiver+48 zero/INC.
+Luna `d42f635a-8c57-4c35-8223-d55402bad1aa` owns forwarding prefix through
+`BE5BF1`; `3929b69d-789d-4cad-a21e-f3beae4e9fe4` owns optional callback
+through `BE5BFE`; `6a9048ec-d73d-4540-9700-9e604c1859bb` owns fresh-counter
+DEC/zero-store-or-INC join through `BE5C0F`.
+XOR epilogue verified `[BD594E,BD5954)` = `5E5B8BE55DC3`, no EAX write
+or immediate RET cleanup; code owner `1bc1b962-718e-45db-a1c7-62c948f28d74`.
+Sole evidence writer `bedcbd43-2e18-4b05-b95c-e64c9eaa5a8d` pins the
+high-count forwarding and XOR epilogue windows.
+
+Coordinator review caught XOR setup author's incorrect embedded byte strings
+(B7 instead of BB table operands; CMP `3BCB` instead of `3BD9`) and a check
+enum typo. Author `10edbe70-2208-4673-94a7-b062d65748f6` is correcting only
+its two files; independent immutable PE anchors already contain exact bytes.
+Selector join author is correcting nullable plan member accesses before
+registration. All shared sample/IDB access remains read-only.
+
+Reviewed and registered table setup, selector join, frame-address handoff,
+reliable length/publication join, and presence/direct/recycle join.
+Coordinator fixed diagnostic-check helper's unintended default BYTE reload,
+frame-handoff missing/nonreturn stops to call-site `BE5C16`, and recycle-join
+fixture's failed diagnostic stop to `BE5B49`.
+Completed but not yet reviewed/registered: XOR epilogue code
+`1bc1b962-718e-45db-a1c7-62c948f28d74` and zero-forward/return composition
+`ee68218e-d8d1-4eaa-851f-4c0c58cb900a`.
