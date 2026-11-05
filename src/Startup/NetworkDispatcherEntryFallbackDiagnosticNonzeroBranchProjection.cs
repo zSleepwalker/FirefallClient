@@ -2106,3 +2106,535 @@ public static class
             : NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchContinuationCaptureState
                 .Unreached;
 }
+
+public enum NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallSite
+{
+    FallthroughAtBBDE5D,
+    TakenTargetAtBBDE6C
+}
+
+public sealed record NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnCapture(
+    NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchContinuationCapture ParentCapture,
+    NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallSite CallSite,
+    bool? NormalReturnObserved);
+
+public enum NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnCaptureState
+{
+    Unreached,
+    Pending,
+    Captured,
+    SuppliedUnused
+}
+
+public enum NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnOutcome
+{
+    ParentNotAccepted,
+    CallSiteNotReached,
+    NormalReturnNotObserved,
+    CallDidNotReturnNormally,
+    BoundedAfterFallthroughCall,
+    BoundedAfterTargetCall
+}
+
+public readonly record struct
+    NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallEvidence(
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallSite CallSite,
+        uint InstructionRawFileOffset,
+        uint InstructionCodeVirtualAddress,
+        byte InstructionByteLength,
+        string InstructionBytes,
+        bool InstructionReached,
+        bool Attempted,
+        bool? ReturnedNormally,
+        bool Completed);
+
+public sealed class
+    NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnPlan
+{
+    private readonly Lazy<
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchContinuationPlan>
+        reprojectedParentPlan;
+    private readonly Lazy<
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnPlan>
+        reprojectedPlan;
+    private readonly Lazy<bool> orderedSemanticPrefixPreserved;
+    private readonly Lazy<bool> exactBoundedCompletion;
+    private readonly Lazy<bool> exactCleanCompletion;
+
+    internal NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnPlan(
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnCapture capture,
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchContinuationPlan parentPlan,
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnOutcome outcome,
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallEvidence? call,
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnCaptureState
+            normalReturnCaptureState,
+        ImmutableArray<uint> completedInstructionOffsets,
+        uint? stopAtRawFileOffsetExclusive,
+        NetworkDispatcherLockGateFlags? flagsAtStop,
+        bool callBoundaryReached,
+        bool nextInstructionBoundaryReached,
+        bool projectionEntered)
+    {
+        Capture = capture;
+        ParentPlan = parentPlan;
+        Outcome = outcome;
+        Call = call;
+        NormalReturnCaptureState = normalReturnCaptureState;
+        CompletedInstructionOffsets = completedInstructionOffsets;
+        StopAtRawFileOffsetExclusive = stopAtRawFileOffsetExclusive;
+        FlagsAtStop = flagsAtStop;
+        CallBoundaryReached = callBoundaryReached;
+        NextInstructionBoundaryReached = nextInstructionBoundaryReached;
+        ProjectionEntered = projectionEntered;
+        reprojectedParentPlan = new(
+            () => NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchContinuationProjection
+                .Project(Capture.ParentCapture),
+            LazyThreadSafetyMode.ExecutionAndPublication);
+        reprojectedPlan = new(
+            () => NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnProjection
+                .Project(Capture),
+            LazyThreadSafetyMode.ExecutionAndPublication);
+        orderedSemanticPrefixPreserved = new(
+            ComputeOrderedSemanticPrefixPreserved,
+            LazyThreadSafetyMode.ExecutionAndPublication);
+        exactBoundedCompletion = new(
+            ComputeExactBoundedCompletion,
+            LazyThreadSafetyMode.ExecutionAndPublication);
+        exactCleanCompletion = new(
+            ComputeExactCleanCompletion,
+            LazyThreadSafetyMode.ExecutionAndPublication);
+    }
+
+    public NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnCapture Capture
+    {
+        get;
+    }
+    public NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchContinuationPlan ParentPlan
+    {
+        get;
+    }
+    public NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnOutcome Outcome
+    {
+        get;
+    }
+    public NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallEvidence? Call { get; }
+    public NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnCaptureState
+        NormalReturnCaptureState { get; }
+    public ImmutableArray<uint> CompletedInstructionOffsets { get; }
+    public uint? StopAtRawFileOffsetExclusive { get; }
+    public NetworkDispatcherLockGateFlags? FlagsAtStop { get; }
+    public bool CallBoundaryReached { get; }
+    public bool NextInstructionBoundaryReached { get; }
+    public bool ProjectionEntered { get; }
+    public bool PostCallFlagsForwarded => false;
+    public bool PostCallRegistersForwarded => false;
+    public bool NativeInstructionsExecuted => false;
+    public bool NativeCallExecuted => false;
+    public bool NativeMemoryReadsExecuted => false;
+    public bool NativeMemoryWritesExecuted => false;
+    public bool ParentInstructionsExecuted => false;
+    public bool OrderedSemanticPrefixPreserved => orderedSemanticPrefixPreserved.Value;
+    public bool ExactBoundedCompletion => exactBoundedCompletion.Value;
+    public bool ExactCleanCompletion => exactCleanCompletion.Value;
+
+    private bool ComputeExactBoundedCompletion()
+    {
+        if (!ProjectionEntered)
+        {
+            return false;
+        }
+
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnOutcome expectedOutcome =
+            Capture.CallSite
+                == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallSite
+                    .FallthroughAtBBDE5D
+                ? NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnOutcome
+                    .BoundedAfterFallthroughCall
+                : NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnOutcome
+                    .BoundedAfterTargetCall;
+        uint callRawFileOffset =
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnProjection
+                .CallRawFileOffset(Capture.CallSite);
+        uint nextRawFileOffset =
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnProjection
+                .NextInstructionRawFileOffset(Capture.CallSite);
+        return ProjectionEntered
+            && ParentPlan.ExactCleanCompletion
+            && Outcome == expectedOutcome
+            && Call is {
+                InstructionReached: true,
+                Attempted: true,
+                ReturnedNormally: true,
+                Completed: true
+            }
+            && Call.Value.CallSite == Capture.CallSite
+            && Call.Value.InstructionRawFileOffset == callRawFileOffset
+            && CallBoundaryReached
+            && NextInstructionBoundaryReached
+            && CompletedInstructionOffsets.SequenceEqual(
+                ParentPlan.CompletedInstructionOffsets.Add(callRawFileOffset))
+            && CompletedInstructionOffsets[^1] == callRawFileOffset
+            && StopAtRawFileOffsetExclusive == nextRawFileOffset
+            && FlagsAtStop == UnknownFlags;
+    }
+
+    private bool ComputeExactCleanCompletion() =>
+        ComputeExactBoundedCompletion()
+        && OrderedSemanticPrefixPreserved
+        && NormalReturnCaptureState
+            == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnCaptureState
+                .Captured;
+
+    private bool ComputeOrderedSemanticPrefixPreserved()
+    {
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchContinuationPlan replayedParent =
+            reprojectedParentPlan.Value;
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnPlan replay =
+            reprojectedPlan.Value;
+        if (!SameParentPlan(ParentPlan, replayedParent)
+            || !ParentPlan.OrderedSemanticPrefixPreserved
+            || Capture != replay.Capture
+            || Outcome != replay.Outcome
+            || Call != replay.Call
+            || NormalReturnCaptureState != replay.NormalReturnCaptureState
+            || !CompletedInstructionOffsets.SequenceEqual(
+                replay.CompletedInstructionOffsets)
+            || StopAtRawFileOffsetExclusive != replay.StopAtRawFileOffsetExclusive
+            || FlagsAtStop != replay.FlagsAtStop
+            || CallBoundaryReached != replay.CallBoundaryReached
+            || NextInstructionBoundaryReached != replay.NextInstructionBoundaryReached
+            || ProjectionEntered != replay.ProjectionEntered)
+        {
+            return false;
+        }
+
+        if (!ProjectionEntered)
+        {
+            return Call is null
+                && CompletedInstructionOffsets.SequenceEqual(
+                    ParentPlan.CompletedInstructionOffsets)
+                && StopAtRawFileOffsetExclusive == ParentPlan.StopAtRawFileOffsetExclusive
+                && FlagsAtStop == ParentPlan.FlagsAtStop
+                && !CallBoundaryReached
+                && !NextInstructionBoundaryReached;
+        }
+
+        uint callRawFileOffset =
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnProjection
+                .CallRawFileOffset(Capture.CallSite);
+        uint nextRawFileOffset =
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnProjection
+                .NextInstructionRawFileOffset(Capture.CallSite);
+        bool normalReturnObserved = Capture.NormalReturnObserved == true;
+        bool isPending = Capture.NormalReturnObserved is null;
+        return CallBoundaryReached
+            && Call is {
+                InstructionRawFileOffset: var actualCallRawFileOffset,
+                InstructionCodeVirtualAddress: var callCodeVirtualAddress,
+                InstructionByteLength: var callByteLength,
+                InstructionBytes: var callBytes,
+                InstructionReached: true,
+                Attempted: true
+            }
+            && Call.Value.CallSite == Capture.CallSite
+            && actualCallRawFileOffset == callRawFileOffset
+            && callCodeVirtualAddress
+                == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnProjection
+                    .RawFileOffsetToCodeVirtualAddress(callRawFileOffset)
+            && callByteLength
+                == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnProjection
+                    .CallInstructionByteLength(Capture.CallSite)
+            && callBytes
+                == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnProjection
+                    .CallInstructionBytes(Capture.CallSite)
+            && Call.Value.ReturnedNormally == Capture.NormalReturnObserved
+            && Call.Value.Completed == normalReturnObserved
+            && NormalReturnCaptureState == (isPending
+                ? NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnCaptureState
+                    .Pending
+                : NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnCaptureState
+                    .Captured)
+            && (normalReturnObserved
+                ? Outcome == (Capture.CallSite
+                        == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallSite
+                            .FallthroughAtBBDE5D
+                        ? NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnOutcome
+                            .BoundedAfterFallthroughCall
+                        : NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnOutcome
+                            .BoundedAfterTargetCall)
+                    && CompletedInstructionOffsets.SequenceEqual(
+                        ParentPlan.CompletedInstructionOffsets.Add(callRawFileOffset))
+                    && StopAtRawFileOffsetExclusive == nextRawFileOffset
+                    && NextInstructionBoundaryReached
+                    && FlagsAtStop == UnknownFlags
+                : Outcome == (isPending
+                        ? NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnOutcome
+                            .NormalReturnNotObserved
+                        : NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnOutcome
+                            .CallDidNotReturnNormally)
+                    && CompletedInstructionOffsets.SequenceEqual(
+                        ParentPlan.CompletedInstructionOffsets)
+                    && StopAtRawFileOffsetExclusive == callRawFileOffset
+                    && !NextInstructionBoundaryReached
+                    && FlagsAtStop == ParentPlan.FlagsAtStop);
+    }
+
+    private bool SameParentPlan(
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchContinuationPlan left,
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchContinuationPlan right) =>
+        left.Capture == right.Capture
+        && left.ParentPlan.Capture == right.ParentPlan.Capture
+        && left.Outcome == right.Outcome
+        && left.BranchCaptureState == right.BranchCaptureState
+        && left.EDIReadCaptureState == right.EDIReadCaptureState
+        && left.ESPCaptureState == right.ESPCaptureState
+        && left.Reads.SequenceEqual(right.Reads)
+        && left.StackWrites.SequenceEqual(right.StackWrites)
+        && left.Instructions.SequenceEqual(right.Instructions)
+        && left.CompletedInstructionOffsets.SequenceEqual(
+            right.CompletedInstructionOffsets)
+        && left.StopAtRawFileOffsetExclusive == right.StopAtRawFileOffsetExclusive
+        && left.SelectedBranchTargetRawFileOffset == right.SelectedBranchTargetRawFileOffset
+        && left.ConditionalBranchTaken == right.ConditionalBranchTaken
+        && left.ESI == right.ESI
+        && left.EAX == right.EAX
+        && left.EBX == right.EBX
+        && left.ECX == right.ECX
+        && left.EDI == right.EDI
+        && left.ESP == right.ESP
+        && left.FlagsAtStop == right.FlagsAtStop
+        && left.BranchObservationAccepted == right.BranchObservationAccepted
+        && left.BranchInstructionProjected == right.BranchInstructionProjected
+        && left.ProjectionEntered == right.ProjectionEntered
+        && left.ExactBoundedCompletion == right.ExactBoundedCompletion
+        && left.ExactCleanCompletion == right.ExactCleanCompletion;
+
+    private static NetworkDispatcherLockGateFlags UnknownFlags =>
+        new(Carry: null, Parity: null, Auxiliary: null, Zero: null, Sign: null, Overflow: null);
+}
+
+/// <summary>
+/// Reprojects either opaque indirect call and stops at its immediate return boundary.
+/// </summary>
+public static class
+    NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnProjection
+{
+    public const uint FallthroughCallRawFileOffset = 0x00BBDE5D;
+    public const uint FallthroughNextInstructionRawFileOffset = 0x00BBDE63;
+    public const uint TargetCallRawFileOffset = 0x00BBDE6C;
+    public const uint TargetNextInstructionRawFileOffset = 0x00BBDE6F;
+    public const byte FallthroughCallInstructionByteLength = 6;
+    public const byte TargetCallInstructionByteLength = 3;
+    public const string FallthroughCallInstructionBytes = "FF15A05EC101";
+    public const string FallthroughNextInstructionBytes = "83C410";
+    public const string TargetCallInstructionBytes = "FF5010";
+    public const string TargetNextInstructionBytes = "8B86A8000000";
+    public const bool CallsAreIndirect = true;
+    public const bool BytesIndependentlyVerified = true;
+
+    public static bool ExecutesNativeInstructions => false;
+
+    public static NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnPlan Project(
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnCapture capture)
+    {
+        ArgumentNullException.ThrowIfNull(capture);
+        ArgumentNullException.ThrowIfNull(capture.ParentCapture);
+        ArgumentNullException.ThrowIfNull(capture.ParentCapture.ParentCapture);
+
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchContinuationPlan parent =
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchContinuationProjection.Project(
+                capture.ParentCapture);
+        bool parentAccepted =
+            parent.ExactCleanCompletion
+            && parent.BranchObservationAccepted
+            && parent.BranchInstructionProjected;
+        bool callSiteReached =
+            parentAccepted
+            && ((capture.CallSite
+                    == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallSite
+                        .FallthroughAtBBDE5D
+                && parent.Outcome
+                    == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchContinuationOutcome
+                        .BoundedBeforeFallthroughCall
+                && parent.StopAtRawFileOffsetExclusive == FallthroughCallRawFileOffset)
+                || (capture.CallSite
+                        == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallSite
+                            .TakenTargetAtBBDE6C
+                    && parent.Outcome
+                        == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchContinuationOutcome
+                            .BoundedBeforeTargetCall
+                    && parent.StopAtRawFileOffsetExclusive == TargetCallRawFileOffset));
+
+        if (!parentAccepted || !callSiteReached)
+        {
+            return CreatePlan(
+                capture,
+                parent,
+                !parentAccepted
+                    ? NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnOutcome
+                        .ParentNotAccepted
+                    : NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnOutcome
+                        .CallSiteNotReached,
+                null,
+                StateForUnreachedParent(capture.NormalReturnObserved),
+                parent.CompletedInstructionOffsets,
+                parent.StopAtRawFileOffsetExclusive,
+                parent.FlagsAtStop,
+                callBoundaryReached: false,
+                nextInstructionBoundaryReached: false,
+                projectionEntered: false);
+        }
+
+        uint callRawFileOffset = CallRawFileOffset(capture.CallSite);
+        var call = new NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallEvidence(
+            capture.CallSite,
+            callRawFileOffset,
+            RawFileOffsetToCodeVirtualAddress(callRawFileOffset),
+            CallInstructionByteLength(capture.CallSite),
+            CallInstructionBytes(capture.CallSite),
+            InstructionReached: true,
+            Attempted: true,
+            ReturnedNormally: capture.NormalReturnObserved,
+            Completed: capture.NormalReturnObserved == true);
+        if (capture.NormalReturnObserved is null)
+        {
+            return CreatePlan(
+                capture,
+                parent,
+                NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnOutcome
+                    .NormalReturnNotObserved,
+                call,
+                NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnCaptureState
+                    .Pending,
+                parent.CompletedInstructionOffsets,
+                callRawFileOffset,
+                parent.FlagsAtStop,
+                callBoundaryReached: true,
+                nextInstructionBoundaryReached: false,
+                projectionEntered: true);
+        }
+
+        if (capture.NormalReturnObserved == false)
+        {
+            return CreatePlan(
+                capture,
+                parent,
+                NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnOutcome
+                    .CallDidNotReturnNormally,
+                call,
+                NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnCaptureState
+                    .Captured,
+                parent.CompletedInstructionOffsets,
+                callRawFileOffset,
+                parent.FlagsAtStop,
+                callBoundaryReached: true,
+                nextInstructionBoundaryReached: false,
+                projectionEntered: true);
+        }
+
+        return CreatePlan(
+            capture,
+            parent,
+            capture.CallSite
+                == NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallSite
+                    .FallthroughAtBBDE5D
+                ? NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnOutcome
+                    .BoundedAfterFallthroughCall
+                : NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnOutcome
+                    .BoundedAfterTargetCall,
+            call,
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnCaptureState.Captured,
+            parent.CompletedInstructionOffsets.Add(callRawFileOffset),
+            NextInstructionRawFileOffset(capture.CallSite),
+            UnknownFlags,
+            callBoundaryReached: true,
+            nextInstructionBoundaryReached: true,
+            projectionEntered: true);
+    }
+
+    public static uint CallRawFileOffset(
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallSite callSite) =>
+        callSite switch
+        {
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallSite.FallthroughAtBBDE5D =>
+                FallthroughCallRawFileOffset,
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallSite.TakenTargetAtBBDE6C =>
+                TargetCallRawFileOffset,
+            _ => throw new ArgumentOutOfRangeException(nameof(callSite))
+        };
+
+    public static uint NextInstructionRawFileOffset(
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallSite callSite) =>
+        callSite switch
+        {
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallSite.FallthroughAtBBDE5D =>
+                FallthroughNextInstructionRawFileOffset,
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallSite.TakenTargetAtBBDE6C =>
+                TargetNextInstructionRawFileOffset,
+            _ => throw new ArgumentOutOfRangeException(nameof(callSite))
+        };
+
+    public static byte CallInstructionByteLength(
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallSite callSite) =>
+        callSite switch
+        {
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallSite.FallthroughAtBBDE5D =>
+                FallthroughCallInstructionByteLength,
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallSite.TakenTargetAtBBDE6C =>
+                TargetCallInstructionByteLength,
+            _ => throw new ArgumentOutOfRangeException(nameof(callSite))
+        };
+
+    public static string CallInstructionBytes(
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallSite callSite) =>
+        callSite switch
+        {
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallSite.FallthroughAtBBDE5D =>
+                FallthroughCallInstructionBytes,
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallSite.TakenTargetAtBBDE6C =>
+                TargetCallInstructionBytes,
+            _ => throw new ArgumentOutOfRangeException(nameof(callSite))
+        };
+
+    public static uint RawFileOffsetToCodeVirtualAddress(uint rawFileOffset) =>
+        NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchContinuationProjection
+            .RawFileOffsetToCodeVirtualAddress(rawFileOffset);
+
+    private static NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnPlan
+        CreatePlan(
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnCapture capture,
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchContinuationPlan parent,
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnOutcome outcome,
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallEvidence? call,
+            NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnCaptureState
+                normalReturnCaptureState,
+            ImmutableArray<uint> completedInstructionOffsets,
+            uint? stopAtRawFileOffsetExclusive,
+            NetworkDispatcherLockGateFlags? flagsAtStop,
+            bool callBoundaryReached,
+            bool nextInstructionBoundaryReached,
+            bool projectionEntered) =>
+        new(
+            capture,
+            parent,
+            outcome,
+            call,
+            normalReturnCaptureState,
+            completedInstructionOffsets,
+            stopAtRawFileOffsetExclusive,
+            flagsAtStop,
+            callBoundaryReached,
+            nextInstructionBoundaryReached,
+            projectionEntered);
+
+    private static NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnCaptureState
+        StateForUnreachedParent(bool? value) =>
+        value.HasValue
+            ? NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnCaptureState
+                .SuppliedUnused
+            : NetworkDispatcherEntryFallbackDiagnosticNonzeroBranchCallReturnCaptureState
+                .Unreached;
+
+    private static NetworkDispatcherLockGateFlags UnknownFlags =>
+        new(Carry: null, Parity: null, Auxiliary: null, Zero: null, Sign: null, Overflow: null);
+}

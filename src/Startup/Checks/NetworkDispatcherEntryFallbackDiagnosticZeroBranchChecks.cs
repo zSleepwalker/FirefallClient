@@ -9,7 +9,7 @@ internal static class NetworkDispatcherEntryFallbackDiagnosticZeroBranchChecks
         static string Normalize(string value) =>
             string.Concat(value.Where(Uri.IsHexDigit)).ToUpperInvariant();
 
-        check("Coordinator byte anchor covers JZ, target LEA, opaque CALL, and return continuation",
+        check("Coordinator byte anchor covers opaque return through the next conditional boundary",
             NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
                 .BytesIndependentlyVerified
             && NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
@@ -25,6 +25,20 @@ internal static class NetworkDispatcherEntryFallbackDiagnosticZeroBranchChecks
             && NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
                 .NormalReturnRawFileOffset == 0x00BBDE8C
             && NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                .StorePostCallEAXRawFileOffset == 0x00BBDE8C
+            && NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                .LeaECXRawFileOffset == 0x00BBDE8F
+            && NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                .LeaEAXRawFileOffset == 0x00BBDE92
+            && NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                .CompareRawFileOffset == 0x00BBDE95
+            && NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                .NextControlBoundaryRawFileOffset == 0x00BBDE97
+            && NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                .ControlBoundaryFallThroughRawFileOffset == 0x00BBDE99
+            && NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                .ControlBoundaryTargetRawFileOffset == 0x00BBDEA4
+            && NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
                 .CallBoundaryRawFileOffset
                 + NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
                     .CallBoundaryInstructionByteLength
@@ -36,15 +50,28 @@ internal static class NetworkDispatcherEntryFallbackDiagnosticZeroBranchChecks
             && Normalize(NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
                 .BranchInstructionBytes) == "7443"
             && Normalize(NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
-                .CoordinatorProvidedBytes) == "8D5E6CFF15244DAC018945F0"
+                .CoordinatorProvidedBytes)
+                == "8D5E6CFF15244DAC018945F08D4E688D45F03BC1740B"
             && Normalize(NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
                 .LeaEBXInstructionBytes) == "8D5E6C"
             && Normalize(NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
                 .CallBoundaryInstructionBytes) == "FF15244DAC01"
             && Normalize(NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
                 .NormalReturnInstructionBytes) == "8945F0"
+            && Normalize(NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                .ImmediateSuffixBytes) == "8945F08D4E688D45F03BC1"
+            && Normalize(NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                .LeaECXInstructionBytes) == "8D4E68"
+            && Normalize(NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                .LeaEAXInstructionBytes) == "8D45F0"
+            && Normalize(NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                .CompareInstructionBytes) == "3BC1"
+            && Normalize(NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                .NextControlBoundaryInstructionBytes) == "740B"
             && NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
-                .CoordinatorProvidedBytes.Length / 2 == 12
+                .CoordinatorProvidedBytes.Length / 2 == 22
+            && NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                .ImmediateSuffixBytes.Length / 2 == 11
             && NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
                 .RawFileOffsetToCodeVirtualAddress(0x00BBDE3E) == 0x00FBEA3E
             && NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
@@ -53,6 +80,16 @@ internal static class NetworkDispatcherEntryFallbackDiagnosticZeroBranchChecks
                 .RawFileOffsetToCodeVirtualAddress(0x00BBDE86) == 0x00FBEA86
             && NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
                 .RawFileOffsetToCodeVirtualAddress(0x00BBDE8C) == 0x00FBEA8C
+            && NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                .RawFileOffsetToCodeVirtualAddress(0x00BBDE8F) == 0x00FBEA8F
+            && NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                .RawFileOffsetToCodeVirtualAddress(0x00BBDE92) == 0x00FBEA92
+            && NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                .RawFileOffsetToCodeVirtualAddress(0x00BBDE95) == 0x00FBEA95
+            && NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                .RawFileOffsetToCodeVirtualAddress(0x00BBDE97) == 0x00FBEA97
+            && NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                .RawFileOffsetToCodeVirtualAddress(0x00BBDEA4) == 0x00FBEAA4
             && NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
                 .RawFileOffsetToCodeVirtualAddress(0x00BBDE3E)
                 - 0x00BBDE3E
@@ -88,14 +125,17 @@ internal static class NetworkDispatcherEntryFallbackDiagnosticZeroBranchChecks
                 CreateCapture(
                     dwordAtA8: 0x12345678,
                     dwordAtA4: 0x12345678,
-                    opaqueCallReturnedNormally: true));
-        check("Zero TEST path models the normal opaque-call return boundary",
+                    opaqueCallReturnedNormally: true,
+                    freshOpaqueCallEAX: 0x12345678,
+                    freshOpaqueCallEBP: 0x10,
+                    freshOpaqueCallESI: 0xFFFFFF98));
+        check("Fresh post-call captures complete value effects and stop before JZ",
             taken.ParentPlan.ExactCleanCompletion
             && taken.ParentPlan.EAX == 0
             && taken.ParentPlan.FlagsAtStop is { Zero: true }
             && taken.Outcome
                 == NetworkDispatcherEntryFallbackDiagnosticZeroBranchOutcome
-                    .CompletedAtNormalReturnBoundaryBBDE8C
+                    .CompletedBeforeConditionalBranchAtBBDE97
             && taken.BranchConditionCaptureState
                 == NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState.Captured
             && taken.TargetESICaptureState
@@ -154,13 +194,85 @@ internal static class NetworkDispatcherEntryFallbackDiagnosticZeroBranchChecks
                 Sign: null,
                 Overflow: null
             }
+            && taken.PostOpaqueCallEAXCaptureState
+                == NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState.Captured
+            && taken.PostOpaqueCallEBPCaptureState
+                == NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState.Captured
+            && taken.PostOpaqueCallESICaptureState
+                == NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState.Captured
+            && taken.StackStore is {
+                InstructionRawFileOffset: 0x00BBDE8C,
+                InstructionCodeVirtualAddress: 0x00FBEA8C,
+                InstructionByteLength: 3,
+                InstructionBytes: "8945F0",
+                EBPValue: 0x10,
+                EAXValue: 0x12345678,
+                StackAddress: 0,
+                StoredValue: 0x12345678,
+                Attempted: true,
+                Reached: true,
+                Captured: true,
+                Committed: true,
+                NativeMemoryWriteExecuted: false
+            }
+            && taken.LeaECX is {
+                InstructionRawFileOffset: 0x00BBDE8F,
+                InstructionCodeVirtualAddress: 0x00FBEA8F,
+                DestinationRegister:
+                    NetworkDispatcherEntryFallbackDiagnosticZeroBranchLeaDestination.ECX,
+                InputValue: 0xFFFFFF98,
+                ResultValue: 0,
+                Committed: true,
+                FlagsWritten: false
+            }
+            && taken.LeaEAX is {
+                InstructionRawFileOffset: 0x00BBDE92,
+                InstructionCodeVirtualAddress: 0x00FBEA92,
+                DestinationRegister:
+                    NetworkDispatcherEntryFallbackDiagnosticZeroBranchLeaDestination.EAX,
+                InputValue: 0x10,
+                ResultValue: 0,
+                Committed: true,
+                FlagsWritten: false
+            }
+            && taken.Compare is {
+                InstructionRawFileOffset: 0x00BBDE95,
+                InstructionCodeVirtualAddress: 0x00FBEA95,
+                InstructionByteLength: 2,
+                InstructionBytes: "3BC1",
+                EAXValue: 0,
+                ECXValue: 0,
+                SubtractionResult: 0,
+                Committed: true,
+                FlagsAfter: {
+                    Carry: false,
+                    Parity: true,
+                    Auxiliary: false,
+                    Zero: true,
+                    Sign: false,
+                    Overflow: false
+                }
+            }
+            && taken.NextControlBoundary is {
+                InstructionRawFileOffset: 0x00BBDE97,
+                InstructionCodeVirtualAddress: 0x00FBEA97,
+                InstructionBytes: "740B",
+                SignedRelativeDisplacement: 0x0B,
+                NextInstructionRawFileOffset: 0x00BBDE99,
+                BranchTargetRawFileOffset: 0x00BBDEA4,
+                BranchTargetCodeVirtualAddress: 0x00FBEAA4,
+                ZeroCondition: true,
+                Reached: true,
+                Attempted: false,
+                BranchProjected: false
+            }
             && taken.FlagsAtStop is {
-                Carry: null,
-                Parity: null,
-                Auxiliary: null,
-                Zero: null,
-                Sign: null,
-                Overflow: null
+                Carry: false,
+                Parity: true,
+                Auxiliary: false,
+                Zero: true,
+                Sign: false,
+                Overflow: false
             }
             && taken.PreCallESI == 0x5000
             && taken.PreCallEAX == 0
@@ -168,13 +280,17 @@ internal static class NetworkDispatcherEntryFallbackDiagnosticZeroBranchChecks
             && taken.ESI is null
             && taken.EAX is null
             && taken.EBX is null
-            && taken.StopAtRawFileOffsetExclusive == 0x00BBDE8C
-            && taken.LastReachedRawFileOffset == 0x00BBDE86
+            && taken.StopAtRawFileOffsetExclusive == 0x00BBDE97
+            && taken.LastReachedRawFileOffset == 0x00BBDE95
             && taken.CompletedInstructionOffsets.SequenceEqual(
                 taken.ParentPlan.CompletedInstructionOffsets
                     .Add(0x00BBDE3E)
                     .Add(0x00BBDE83)
-                    .Add(0x00BBDE86))
+                    .Add(0x00BBDE86)
+                    .Add(0x00BBDE8C)
+                    .Add(0x00BBDE8F)
+                    .Add(0x00BBDE92)
+                    .Add(0x00BBDE95))
             && taken.BranchConditionFlagsPreserved
             && !taken.ConditionFlagsPreserved
             && !taken.PostCallFlagsForwarded
@@ -271,6 +387,73 @@ internal static class NetworkDispatcherEntryFallbackDiagnosticZeroBranchChecks
             && !nonreturningCall.NormalReturnBoundaryReached
             && nonreturningCall.StopAtRawFileOffsetExclusive == 0x00BBDE86);
 
+        NetworkDispatcherEntryFallbackDiagnosticZeroBranchPlan missingPostCallEBP =
+            NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection.Project(
+                CreateCapture(
+                    dwordAtA8: 0x12345678,
+                    dwordAtA4: 0x12345678,
+                    opaqueCallReturnedNormally: true,
+                    freshOpaqueCallEAX: 0x44,
+                    freshOpaqueCallESI: 0x3000));
+        NetworkDispatcherEntryFallbackDiagnosticZeroBranchPlan missingPostCallEAX =
+            NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection.Project(
+                CreateCapture(
+                    dwordAtA8: 0x12345678,
+                    dwordAtA4: 0x12345678,
+                    opaqueCallReturnedNormally: true,
+                    freshOpaqueCallEBP: 0x3010,
+                    freshOpaqueCallESI: 0x3000));
+        NetworkDispatcherEntryFallbackDiagnosticZeroBranchPlan missingPostCallESI =
+            NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection.Project(
+                CreateCapture(
+                    dwordAtA8: 0x12345678,
+                    dwordAtA4: 0x12345678,
+                    opaqueCallReturnedNormally: true,
+                    freshOpaqueCallEAX: 0x44,
+                    freshOpaqueCallEBP: 0x3010));
+        check("Missing fresh return registers preserve only already committed suffix effects",
+            missingPostCallEBP.Outcome
+                == NetworkDispatcherEntryFallbackDiagnosticZeroBranchOutcome
+                    .MissingFreshPostCallEBP
+            && missingPostCallEBP.PostOpaqueCallEBPCaptureState
+                == NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState.Missing
+            && missingPostCallEBP.PostOpaqueCallEAXCaptureState
+                == NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState.SuppliedUnused
+            && missingPostCallEBP.PostOpaqueCallESICaptureState
+                == NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState.SuppliedUnused
+            && missingPostCallEBP.StackStore is {
+                Attempted: true,
+                Reached: true,
+                StackAddress: null,
+                StoredValue: null,
+                Committed: false
+            }
+            && missingPostCallEBP.StopAtRawFileOffsetExclusive == 0x00BBDE8C
+            && missingPostCallEAX.Outcome
+                == NetworkDispatcherEntryFallbackDiagnosticZeroBranchOutcome
+                    .MissingFreshPostCallEAX
+            && missingPostCallEAX.PostOpaqueCallEAXCaptureState
+                == NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState.Missing
+            && missingPostCallEAX.StackStore is {
+                StackAddress: 0x3000,
+                StoredValue: null,
+                Committed: false
+            }
+            && missingPostCallEAX.StopAtRawFileOffsetExclusive == 0x00BBDE8C
+            && missingPostCallESI.Outcome
+                == NetworkDispatcherEntryFallbackDiagnosticZeroBranchOutcome
+                    .MissingFreshPostCallESI
+            && missingPostCallESI.PostOpaqueCallESICaptureState
+                == NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState.Missing
+            && missingPostCallESI.StackStoreCommitted
+            && missingPostCallESI.LeaECX is {
+                Attempted: true,
+                Reached: true,
+                Committed: false
+            }
+            && missingPostCallESI.StopAtRawFileOffsetExclusive == 0x00BBDE8F
+            && missingPostCallESI.LastReachedRawFileOffset == 0x00BBDE8C);
+
         NetworkDispatcherEntryFallbackDiagnosticZeroBranchPlan missingESI =
             NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection.Project(
                 CreateCapture(freshPostCallESI: null));
@@ -323,7 +506,10 @@ internal static class NetworkDispatcherEntryFallbackDiagnosticZeroBranchChecks
             CreateCapture(
                 dwordAtA8: 0x12345678,
                 dwordAtA4: 0x12345678,
-                opaqueCallReturnedNormally: true);
+                opaqueCallReturnedNormally: true,
+                freshOpaqueCallEAX: 0x12345678,
+                freshOpaqueCallEBP: 0x10,
+                freshOpaqueCallESI: 0xFFFFFF98);
         NetworkDispatcherEntryFallbackDiagnosticZeroBranchPlan first =
             NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection.Project(
                 immutableCapture);
@@ -382,7 +568,10 @@ internal static class NetworkDispatcherEntryFallbackDiagnosticZeroBranchChecks
         uint? comparedDword = 0,
         uint? entryESP = 0x5008,
         uint? entryECX = 0x12345678,
-        bool? opaqueCallReturnedNormally = null) =>
+        bool? opaqueCallReturnedNormally = null,
+        uint? freshOpaqueCallEAX = null,
+        uint? freshOpaqueCallEBP = null,
+        uint? freshOpaqueCallESI = null) =>
         new(
             new NetworkDispatcherEntryFallbackDiagnosticCallTargetPrefixCapture(
                 CreateReturnCapture(
@@ -393,7 +582,10 @@ internal static class NetworkDispatcherEntryFallbackDiagnosticZeroBranchChecks
                 freshPostCallESI,
                 dwordAtA8,
                 dwordAtA4),
-            opaqueCallReturnedNormally);
+            opaqueCallReturnedNormally,
+            freshOpaqueCallEAX,
+            freshOpaqueCallEBP,
+            freshOpaqueCallESI);
 
     private static NetworkDispatcherEntryFallbackDiagnosticReturnCapture CreateReturnCapture(
         bool? normalReturnObserved,

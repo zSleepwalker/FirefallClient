@@ -5,7 +5,10 @@ namespace Firefall.Reconstruction.Startup;
 
 public readonly record struct NetworkDispatcherEntryFallbackDiagnosticZeroBranchCapture(
     NetworkDispatcherEntryFallbackDiagnosticCallTargetPrefixCapture ParentCapture,
-    bool? OpaqueCallReturnedNormally = null);
+    bool? OpaqueCallReturnedNormally = null,
+    uint? FreshPostCallEAX = null,
+    uint? FreshPostCallEBP = null,
+    uint? FreshPostCallESI = null);
 
 public enum NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState
 {
@@ -23,7 +26,10 @@ public enum NetworkDispatcherEntryFallbackDiagnosticZeroBranchOutcome
     JzNotTakenToBBDE40,
     MissingOpaqueCallReturnStatus,
     OpaqueCallDidNotReturnNormally,
-    CompletedAtNormalReturnBoundaryBBDE8C
+    MissingFreshPostCallEBP,
+    MissingFreshPostCallEAX,
+    MissingFreshPostCallESI,
+    CompletedBeforeConditionalBranchAtBBDE97
 }
 
 public readonly record struct NetworkDispatcherEntryFallbackDiagnosticZeroBranchJz(
@@ -92,6 +98,72 @@ public readonly record struct NetworkDispatcherEntryFallbackDiagnosticZeroBranch
     bool TargetExecuted,
     bool NextInstructionExecuted);
 
+public readonly record struct NetworkDispatcherEntryFallbackDiagnosticZeroBranchStackStore(
+    uint InstructionRawFileOffset,
+    uint InstructionCodeVirtualAddress,
+    byte InstructionByteLength,
+    string InstructionBytes,
+    uint? EBPValue,
+    uint? EAXValue,
+    uint? StackAddress,
+    uint? StoredValue,
+    NetworkDispatcherLockGateFlags FlagsBefore,
+    NetworkDispatcherLockGateFlags FlagsAfter,
+    bool Attempted,
+    bool Reached,
+    bool Captured,
+    bool Committed,
+    bool NativeMemoryWriteExecuted);
+
+public enum NetworkDispatcherEntryFallbackDiagnosticZeroBranchLeaDestination
+{
+    ECX,
+    EAX
+}
+
+public readonly record struct NetworkDispatcherEntryFallbackDiagnosticZeroBranchLeaResult(
+    uint InstructionRawFileOffset,
+    uint InstructionCodeVirtualAddress,
+    byte InstructionByteLength,
+    string InstructionBytes,
+    NetworkDispatcherEntryFallbackDiagnosticZeroBranchLeaDestination DestinationRegister,
+    uint? InputValue,
+    uint? ResultValue,
+    NetworkDispatcherLockGateFlags FlagsBefore,
+    NetworkDispatcherLockGateFlags FlagsAfter,
+    bool Attempted,
+    bool Reached,
+    bool Committed,
+    bool FlagsWritten);
+
+public readonly record struct NetworkDispatcherEntryFallbackDiagnosticZeroBranchCompare(
+    uint InstructionRawFileOffset,
+    uint InstructionCodeVirtualAddress,
+    byte InstructionByteLength,
+    string InstructionBytes,
+    uint EAXValue,
+    uint ECXValue,
+    uint SubtractionResult,
+    NetworkDispatcherLockGateFlags FlagsBefore,
+    NetworkDispatcherLockGateFlags FlagsAfter,
+    bool Attempted,
+    bool Reached,
+    bool Committed);
+
+public readonly record struct NetworkDispatcherEntryFallbackDiagnosticZeroBranchControlBoundary(
+    uint InstructionRawFileOffset,
+    uint InstructionCodeVirtualAddress,
+    byte InstructionByteLength,
+    string InstructionBytes,
+    int SignedRelativeDisplacement,
+    uint NextInstructionRawFileOffset,
+    uint BranchTargetRawFileOffset,
+    uint BranchTargetCodeVirtualAddress,
+    bool? ZeroCondition,
+    bool Reached,
+    bool Attempted,
+    bool BranchProjected);
+
 public sealed class NetworkDispatcherEntryFallbackDiagnosticZeroBranchPlan
 {
     private readonly Lazy<NetworkDispatcherEntryFallbackDiagnosticCallTargetPrefixPlan>
@@ -111,10 +183,22 @@ public sealed class NetworkDispatcherEntryFallbackDiagnosticZeroBranchPlan
         NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState targetESICaptureState,
         NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState
             normalReturnCaptureState,
+        NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState
+            postOpaqueCallEAXCaptureState,
+        NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState
+            postOpaqueCallEBPCaptureState,
+        NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState
+            postOpaqueCallESICaptureState,
         NetworkDispatcherEntryFallbackDiagnosticZeroBranchJz? jz,
         NetworkDispatcherEntryFallbackDiagnosticZeroBranchLea? addressCalculation,
         NetworkDispatcherEntryFallbackDiagnosticZeroBranchCallBoundary? callBoundary,
         NetworkDispatcherEntryFallbackDiagnosticZeroBranchOpaqueCallReturn? opaqueCallReturn,
+        NetworkDispatcherEntryFallbackDiagnosticZeroBranchStackStore? stackStore,
+        NetworkDispatcherEntryFallbackDiagnosticZeroBranchLeaResult? leaECX,
+        NetworkDispatcherEntryFallbackDiagnosticZeroBranchLeaResult? leaEAX,
+        NetworkDispatcherEntryFallbackDiagnosticZeroBranchCompare? compare,
+        NetworkDispatcherEntryFallbackDiagnosticZeroBranchControlBoundary?
+            nextControlBoundary,
         ImmutableArray<uint> completedInstructionOffsets,
         bool parentContinuationReached,
         bool projectionEntered,
@@ -132,10 +216,18 @@ public sealed class NetworkDispatcherEntryFallbackDiagnosticZeroBranchPlan
         BranchConditionCaptureState = branchConditionCaptureState;
         TargetESICaptureState = targetESICaptureState;
         NormalReturnCaptureState = normalReturnCaptureState;
+        PostOpaqueCallEAXCaptureState = postOpaqueCallEAXCaptureState;
+        PostOpaqueCallEBPCaptureState = postOpaqueCallEBPCaptureState;
+        PostOpaqueCallESICaptureState = postOpaqueCallESICaptureState;
         Jz = jz;
         AddressCalculation = addressCalculation;
         CallBoundary = callBoundary;
         OpaqueCallReturn = opaqueCallReturn;
+        StackStore = stackStore;
+        LeaECX = leaECX;
+        LeaEAX = leaEAX;
+        Compare = compare;
+        NextControlBoundary = nextControlBoundary;
         CompletedInstructionOffsets = completedInstructionOffsets;
         ParentContinuationReached = parentContinuationReached;
         ProjectionEntered = projectionEntered;
@@ -173,11 +265,30 @@ public sealed class NetworkDispatcherEntryFallbackDiagnosticZeroBranchPlan
         TargetESICaptureState { get; }
     public NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState
         NormalReturnCaptureState { get; }
+    public NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState
+        PostOpaqueCallEAXCaptureState { get; }
+    public NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState
+        PostOpaqueCallEBPCaptureState { get; }
+    public NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState
+        PostOpaqueCallESICaptureState { get; }
+    public uint? FreshPostCallEAX => Capture.FreshPostCallEAX;
+    public uint? FreshPostCallEBP => Capture.FreshPostCallEBP;
+    public uint? FreshPostCallESI => Capture.FreshPostCallESI;
     public NetworkDispatcherEntryFallbackDiagnosticZeroBranchJz? Jz { get; }
     public NetworkDispatcherEntryFallbackDiagnosticZeroBranchLea? AddressCalculation { get; }
     public NetworkDispatcherEntryFallbackDiagnosticZeroBranchCallBoundary? CallBoundary { get; }
     public NetworkDispatcherEntryFallbackDiagnosticZeroBranchOpaqueCallReturn?
         OpaqueCallReturn { get; }
+    public NetworkDispatcherEntryFallbackDiagnosticZeroBranchStackStore? StackStore { get; }
+    public NetworkDispatcherEntryFallbackDiagnosticZeroBranchLeaResult? LeaECX { get; }
+    public NetworkDispatcherEntryFallbackDiagnosticZeroBranchLeaResult? LeaEAX { get; }
+    public NetworkDispatcherEntryFallbackDiagnosticZeroBranchCompare? Compare { get; }
+    public NetworkDispatcherEntryFallbackDiagnosticZeroBranchControlBoundary?
+        NextControlBoundary { get; }
+    public bool StackStoreCommitted => StackStore is { Committed: true };
+    public bool ImmediateSuffixCompleted =>
+        NextControlBoundary is { Reached: true, Attempted: false, BranchProjected: false }
+        && Compare is { Committed: true };
     public ImmutableArray<uint> CompletedInstructionOffsets { get; }
     public uint EntryRawFileOffset =>
         NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection.BranchRawFileOffset;
@@ -266,9 +377,23 @@ public sealed class NetworkDispatcherEntryFallbackDiagnosticZeroBranchPlan
                 && AddressCalculation is null
                 && CallBoundary is null
                 && OpaqueCallReturn is null
+                && StackStore is null
+                && LeaECX is null
+                && LeaEAX is null
+                && Compare is null
+                && NextControlBoundary is null
                 && NormalReturnCaptureState
                     == NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
                         .ReturnStatusUnusedOrUnreached(Capture.OpaqueCallReturnedNormally)
+                && PostOpaqueCallEAXCaptureState
+                    == NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                        .ReturnStatusUnusedOrUnreached(Capture.FreshPostCallEAX)
+                && PostOpaqueCallEBPCaptureState
+                    == NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                        .ReturnStatusUnusedOrUnreached(Capture.FreshPostCallEBP)
+                && PostOpaqueCallESICaptureState
+                    == NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                        .ReturnStatusUnusedOrUnreached(Capture.FreshPostCallESI)
                 && CompletedInstructionOffsets.SequenceEqual(
                     ParentPlan.CompletedInstructionOffsets)
                 && StopAtRawFileOffsetExclusive == ParentPlan.StopAtRawFileOffsetExclusive
@@ -325,9 +450,23 @@ public sealed class NetworkDispatcherEntryFallbackDiagnosticZeroBranchPlan
                 && AddressCalculation is null
                 && CallBoundary is null
                 && OpaqueCallReturn is null
+                && StackStore is null
+                && LeaECX is null
+                && LeaEAX is null
+                && Compare is null
+                && NextControlBoundary is null
                 && NormalReturnCaptureState
                     == NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
                         .ReturnStatusUnusedOrUnreached(Capture.OpaqueCallReturnedNormally)
+                && PostOpaqueCallEAXCaptureState
+                    == NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                        .ReturnStatusUnusedOrUnreached(Capture.FreshPostCallEAX)
+                && PostOpaqueCallEBPCaptureState
+                    == NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                        .ReturnStatusUnusedOrUnreached(Capture.FreshPostCallEBP)
+                && PostOpaqueCallESICaptureState
+                    == NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                        .ReturnStatusUnusedOrUnreached(Capture.FreshPostCallESI)
                 && CompletedInstructionOffsets.SequenceEqual(expectedOffsets)
                 && StopAtRawFileOffsetExclusive
                     == NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
@@ -347,10 +486,32 @@ public sealed class NetworkDispatcherEntryFallbackDiagnosticZeroBranchPlan
         expectedOffsets = expectedOffsets.Add(
             NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
                 .CallBoundaryRawFileOffset);
-        return Outcome
-                == NetworkDispatcherEntryFallbackDiagnosticZeroBranchOutcome
-                    .CompletedAtNormalReturnBoundaryBBDE8C
-            && SuffixAdmitted
+        expectedOffsets = expectedOffsets.Add(
+            NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                .StorePostCallEAXRawFileOffset)
+            .Add(NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection.LeaECXRawFileOffset)
+            .Add(NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection.LeaEAXRawFileOffset)
+            .Add(NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection.CompareRawFileOffset);
+        if (Outcome
+                != NetworkDispatcherEntryFallbackDiagnosticZeroBranchOutcome
+                    .CompletedBeforeConditionalBranchAtBBDE97
+            || Capture.FreshPostCallEBP is not uint postCallEBP
+            || Capture.FreshPostCallESI is not uint postCallESI
+            || Capture.FreshPostCallEAX is not uint postCallEAX)
+        {
+            return false;
+        }
+
+        uint expectedStackAddress = unchecked(postCallEBP
+            - NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                .StackStoreDisplacement);
+        uint expectedECX = unchecked(postCallESI
+            + NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                .ESIToECXFieldDisplacement);
+        NetworkDispatcherLockGateFlags expectedCompareFlags =
+            NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                .ComputeCompareFlags(expectedStackAddress, expectedECX);
+        return SuffixAdmitted
             && AddressCalculation is {
                 InstructionRawFileOffset:
                     NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
@@ -441,16 +602,150 @@ public sealed class NetworkDispatcherEntryFallbackDiagnosticZeroBranchPlan
             && OpaqueCallReturn.Value.FlagsAfter
                 == NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
                     .UnknownFlags
+            && PostOpaqueCallEAXCaptureState
+                == NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState.Captured
+            && PostOpaqueCallEBPCaptureState
+                == NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState.Captured
+            && PostOpaqueCallESICaptureState
+                == NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState.Captured
+            && StackStore is {
+                InstructionRawFileOffset:
+                    NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                        .StorePostCallEAXRawFileOffset,
+                InstructionByteLength:
+                    NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                        .StorePostCallEAXInstructionByteLength,
+                InstructionBytes:
+                    NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                        .StorePostCallEAXInstructionBytes,
+                Attempted: true,
+                Reached: true,
+                Captured: true,
+                Committed: true,
+                NativeMemoryWriteExecuted: false
+            }
+            && StackStore.Value.InstructionCodeVirtualAddress
+                == NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                    .StorePostCallEAXCodeVirtualAddress
+            && StackStore.Value.EBPValue == postCallEBP
+            && StackStore.Value.EAXValue == postCallEAX
+            && StackStore.Value.StackAddress == expectedStackAddress
+            && StackStore.Value.StoredValue == postCallEAX
+            && StackStore.Value.FlagsBefore
+                == NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection.UnknownFlags
+            && StackStore.Value.FlagsAfter == StackStore.Value.FlagsBefore
+            && LeaECX is {
+                InstructionRawFileOffset:
+                    NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                        .LeaECXRawFileOffset,
+                InstructionByteLength:
+                    NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                        .LeaECXInstructionByteLength,
+                InstructionBytes:
+                    NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                        .LeaECXInstructionBytes,
+                DestinationRegister:
+                    NetworkDispatcherEntryFallbackDiagnosticZeroBranchLeaDestination.ECX,
+                Attempted: true,
+                Reached: true,
+                Committed: true,
+                FlagsWritten: false
+            }
+            && LeaECX.Value.InstructionCodeVirtualAddress
+                == NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                    .LeaECXCodeVirtualAddress
+            && LeaECX.Value.InputValue == postCallESI
+            && LeaECX.Value.ResultValue == expectedECX
+            && LeaECX.Value.FlagsBefore
+                == NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection.UnknownFlags
+            && LeaECX.Value.FlagsAfter == LeaECX.Value.FlagsBefore
+            && LeaEAX is {
+                InstructionRawFileOffset:
+                    NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                        .LeaEAXRawFileOffset,
+                InstructionByteLength:
+                    NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                        .LeaEAXInstructionByteLength,
+                InstructionBytes:
+                    NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                        .LeaEAXInstructionBytes,
+                DestinationRegister:
+                    NetworkDispatcherEntryFallbackDiagnosticZeroBranchLeaDestination.EAX,
+                Attempted: true,
+                Reached: true,
+                Committed: true,
+                FlagsWritten: false
+            }
+            && LeaEAX.Value.InstructionCodeVirtualAddress
+                == NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                    .LeaEAXCodeVirtualAddress
+            && LeaEAX.Value.InputValue == postCallEBP
+            && LeaEAX.Value.ResultValue == expectedStackAddress
+            && LeaEAX.Value.FlagsBefore == LeaECX.Value.FlagsAfter
+            && LeaEAX.Value.FlagsAfter == LeaEAX.Value.FlagsBefore
+            && Compare is {
+                InstructionRawFileOffset:
+                    NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                        .CompareRawFileOffset,
+                InstructionByteLength:
+                    NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                        .CompareInstructionByteLength,
+                InstructionBytes:
+                    NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                        .CompareInstructionBytes,
+                Attempted: true,
+                Reached: true,
+                Committed: true
+            }
+            && Compare.Value.InstructionCodeVirtualAddress
+                == NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                    .CompareCodeVirtualAddress
+            && Compare.Value.EAXValue == expectedStackAddress
+            && Compare.Value.ECXValue == expectedECX
+            && Compare.Value.SubtractionResult
+                == unchecked(expectedStackAddress - expectedECX)
+            && Compare.Value.FlagsBefore == LeaEAX.Value.FlagsAfter
+            && Compare.Value.FlagsAfter == expectedCompareFlags
+            && NextControlBoundary is {
+                InstructionRawFileOffset:
+                    NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                        .NextControlBoundaryRawFileOffset,
+                InstructionByteLength:
+                    NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                        .NextControlBoundaryInstructionByteLength,
+                InstructionBytes:
+                    NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                        .NextControlBoundaryInstructionBytes,
+                SignedRelativeDisplacement:
+                    NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                        .NextControlBoundaryRelativeDisplacement,
+                NextInstructionRawFileOffset:
+                    NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                        .ControlBoundaryFallThroughRawFileOffset,
+                BranchTargetRawFileOffset:
+                    NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                        .ControlBoundaryTargetRawFileOffset,
+                Reached: true,
+                Attempted: false,
+                BranchProjected: false
+            }
+            && NextControlBoundary.Value.InstructionCodeVirtualAddress
+                == NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                    .NextControlBoundaryCodeVirtualAddress
+            && NextControlBoundary.Value.BranchTargetCodeVirtualAddress
+                == NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                    .RawFileOffsetToCodeVirtualAddress(
+                        NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                            .ControlBoundaryTargetRawFileOffset)
+            && NextControlBoundary.Value.ZeroCondition == expectedCompareFlags.Zero
             && CompletedInstructionOffsets.SequenceEqual(expectedOffsets)
             && StopAtRawFileOffsetExclusive
                 == NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
-                    .NormalReturnRawFileOffset
+                    .NextControlBoundaryRawFileOffset
             && LastReachedRawFileOffset
                 == NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
-                    .CallBoundaryRawFileOffset
-            && FlagsAtStop
-                == NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
-                    .UnknownFlags;
+                    .CompareRawFileOffset
+            && FlagsAtStop == expectedCompareFlags;
     }
 
     private bool ComputeExactCleanCompletion() =>
@@ -458,7 +753,7 @@ public sealed class NetworkDispatcherEntryFallbackDiagnosticZeroBranchPlan
         && ParentPlan.ExactCleanCompletion
         && Outcome
             == NetworkDispatcherEntryFallbackDiagnosticZeroBranchOutcome
-                .CompletedAtNormalReturnBoundaryBBDE8C
+                .CompletedBeforeConditionalBranchAtBBDE97
         && ExactBoundedCompletion
         && BranchConditionCaptureState
             == NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState.Captured
@@ -466,7 +761,15 @@ public sealed class NetworkDispatcherEntryFallbackDiagnosticZeroBranchPlan
             == NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState.Captured
         && NormalReturnCaptureState
             == NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState.Captured
+        && PostOpaqueCallEAXCaptureState
+            == NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState.Captured
+        && PostOpaqueCallEBPCaptureState
+            == NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState.Captured
+        && PostOpaqueCallESICaptureState
+            == NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState.Captured
         && OpaqueCallReturnedNormally == true
+        && StackStoreCommitted
+        && ImmediateSuffixCompleted
         && BranchConditionFlagsPreserved
         && CallBoundaryReached
         && !BranchExecuted
@@ -495,9 +798,23 @@ public sealed class NetworkDispatcherEntryFallbackDiagnosticZeroBranchPlan
                 && AddressCalculation is null
                 && CallBoundary is null
                 && OpaqueCallReturn is null
+                && StackStore is null
+                && LeaECX is null
+                && LeaEAX is null
+                && Compare is null
+                && NextControlBoundary is null
                 && NormalReturnCaptureState
                     == NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
                         .ReturnStatusUnusedOrUnreached(Capture.OpaqueCallReturnedNormally)
+                && PostOpaqueCallEAXCaptureState
+                    == NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                        .ReturnStatusUnusedOrUnreached(Capture.FreshPostCallEAX)
+                && PostOpaqueCallEBPCaptureState
+                    == NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                        .ReturnStatusUnusedOrUnreached(Capture.FreshPostCallEBP)
+                && PostOpaqueCallESICaptureState
+                    == NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                        .ReturnStatusUnusedOrUnreached(Capture.FreshPostCallESI)
                 && CompletedInstructionOffsets.SequenceEqual(
                     ParentPlan.CompletedInstructionOffsets)
                 && StopAtRawFileOffsetExclusive == ParentPlan.StopAtRawFileOffsetExclusive
@@ -522,9 +839,23 @@ public sealed class NetworkDispatcherEntryFallbackDiagnosticZeroBranchPlan
             return AddressCalculation is null
                 && CallBoundary is null
                 && OpaqueCallReturn is null
+                && StackStore is null
+                && LeaECX is null
+                && LeaEAX is null
+                && Compare is null
+                && NextControlBoundary is null
                 && NormalReturnCaptureState
                     == NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
                         .ReturnStatusUnusedOrUnreached(Capture.OpaqueCallReturnedNormally)
+                && PostOpaqueCallEAXCaptureState
+                    == NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                        .ReturnStatusUnusedOrUnreached(Capture.FreshPostCallEAX)
+                && PostOpaqueCallEBPCaptureState
+                    == NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                        .ReturnStatusUnusedOrUnreached(Capture.FreshPostCallEBP)
+                && PostOpaqueCallESICaptureState
+                    == NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                        .ReturnStatusUnusedOrUnreached(Capture.FreshPostCallESI)
                 && CompletedInstructionOffsets.SequenceEqual(
                     ParentPlan.CompletedInstructionOffsets.Add(
                         NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
@@ -638,18 +969,9 @@ public sealed class NetworkDispatcherEntryFallbackDiagnosticZeroBranchPlan
                 && call.FlagsAfter
                     == NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
                         .UnknownFlags
-                && CompletedInstructionOffsets.SequenceEqual(targetPathOffsets.Add(
+                && ComputeOrderedImmediateSuffix(targetPathOffsets.Add(
                     NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
-                        .CallBoundaryRawFileOffset))
-                && StopAtRawFileOffsetExclusive
-                    == NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
-                        .NormalReturnRawFileOffset
-                && LastReachedRawFileOffset
-                    == NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
-                        .CallBoundaryRawFileOffset
-                && FlagsAtStop
-                    == NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
-                        .UnknownFlags;
+                        .CallBoundaryRawFileOffset));
         }
 
         return NormalReturnCaptureState
@@ -674,6 +996,194 @@ public sealed class NetworkDispatcherEntryFallbackDiagnosticZeroBranchPlan
                 == NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
                     .LeaEBXRawFileOffset
             && FlagsAtStop == ParentPlan.FlagsAtStop;
+    }
+
+    private bool ComputeOrderedImmediateSuffix(ImmutableArray<uint> callOffsets)
+    {
+        NetworkDispatcherLockGateFlags unknownFlags =
+            NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection.UnknownFlags;
+        if (StackStore is not { } store
+            || store.InstructionRawFileOffset
+                != NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                    .StorePostCallEAXRawFileOffset
+            || store.InstructionCodeVirtualAddress
+                != NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                    .StorePostCallEAXCodeVirtualAddress
+            || store.InstructionByteLength
+                != NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                    .StorePostCallEAXInstructionByteLength
+            || store.InstructionBytes
+                != NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                    .StorePostCallEAXInstructionBytes
+            || !store.Attempted
+            || !store.Reached
+            || store.NativeMemoryWriteExecuted
+            || store.FlagsBefore != unknownFlags
+            || store.FlagsAfter != unknownFlags)
+        {
+            return false;
+        }
+
+        ImmutableArray<uint> beforeStoreOffsets = callOffsets;
+        if (Capture.FreshPostCallEBP is not uint ebp)
+        {
+            return Outcome
+                    == NetworkDispatcherEntryFallbackDiagnosticZeroBranchOutcome
+                        .MissingFreshPostCallEBP
+                && PostOpaqueCallEBPCaptureState
+                    == NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState.Missing
+                && PostOpaqueCallEAXCaptureState
+                    == NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                        .ReturnStatusUnusedOrUnreached(Capture.FreshPostCallEAX)
+                && PostOpaqueCallESICaptureState
+                    == NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                        .ReturnStatusUnusedOrUnreached(Capture.FreshPostCallESI)
+                && store.EBPValue is null
+                && store.EAXValue is null
+                && store.StackAddress is null
+                && store.StoredValue is null
+                && !store.Captured
+                && !store.Committed
+                && LeaECX is null
+                && LeaEAX is null
+                && Compare is null
+                && NextControlBoundary is null
+                && CompletedInstructionOffsets.SequenceEqual(beforeStoreOffsets)
+                && StopAtRawFileOffsetExclusive
+                    == NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                        .StorePostCallEAXRawFileOffset
+                && LastReachedRawFileOffset
+                    == NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                        .CallBoundaryRawFileOffset
+                && FlagsAtStop == unknownFlags;
+        }
+
+        uint stackAddress = unchecked(ebp
+            - NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                .StackStoreDisplacement);
+        if (Capture.FreshPostCallEAX is not uint postCallEAX)
+        {
+            return Outcome
+                    == NetworkDispatcherEntryFallbackDiagnosticZeroBranchOutcome
+                        .MissingFreshPostCallEAX
+                && PostOpaqueCallEBPCaptureState
+                    == NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState.Captured
+                && PostOpaqueCallEAXCaptureState
+                    == NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState.Missing
+                && PostOpaqueCallESICaptureState
+                    == NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                        .ReturnStatusUnusedOrUnreached(Capture.FreshPostCallESI)
+                && store.EBPValue == ebp
+                && store.EAXValue is null
+                && store.StackAddress == stackAddress
+                && store.StoredValue is null
+                && !store.Captured
+                && !store.Committed
+                && LeaECX is null
+                && LeaEAX is null
+                && Compare is null
+                && NextControlBoundary is null
+                && CompletedInstructionOffsets.SequenceEqual(beforeStoreOffsets)
+                && StopAtRawFileOffsetExclusive
+                    == NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                        .StorePostCallEAXRawFileOffset
+                && LastReachedRawFileOffset
+                    == NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                        .CallBoundaryRawFileOffset
+                && FlagsAtStop == unknownFlags;
+        }
+
+        ImmutableArray<uint> afterStoreOffsets = beforeStoreOffsets.Add(
+            NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                .StorePostCallEAXRawFileOffset);
+        if (!store.Captured
+            || !store.Committed
+            || store.EBPValue != ebp
+            || store.EAXValue != postCallEAX
+            || store.StackAddress != stackAddress
+            || store.StoredValue != postCallEAX
+            || PostOpaqueCallEBPCaptureState
+                != NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState.Captured
+            || PostOpaqueCallEAXCaptureState
+                != NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState.Captured)
+        {
+            return false;
+        }
+
+        if (Capture.FreshPostCallESI is not uint esi)
+        {
+            return Outcome
+                    == NetworkDispatcherEntryFallbackDiagnosticZeroBranchOutcome
+                        .MissingFreshPostCallESI
+                && PostOpaqueCallESICaptureState
+                    == NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState.Missing
+                && LeaECX is {
+                    DestinationRegister:
+                        NetworkDispatcherEntryFallbackDiagnosticZeroBranchLeaDestination.ECX,
+                    Attempted: true,
+                    Reached: true,
+                    Committed: false,
+                    InputValue: null,
+                    ResultValue: null,
+                    FlagsWritten: false
+                }
+                && LeaECX.Value.InstructionRawFileOffset
+                    == NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                        .LeaECXRawFileOffset
+                && LeaECX.Value.FlagsBefore == unknownFlags
+                && LeaECX.Value.FlagsAfter == unknownFlags
+                && LeaEAX is null
+                && Compare is null
+                && NextControlBoundary is null
+                && CompletedInstructionOffsets.SequenceEqual(afterStoreOffsets)
+                && StopAtRawFileOffsetExclusive
+                    == NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                        .LeaECXRawFileOffset
+                && LastReachedRawFileOffset
+                    == NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                        .StorePostCallEAXRawFileOffset
+                && FlagsAtStop == unknownFlags;
+        }
+
+        uint ecxValue = unchecked(esi
+            + NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                .ESIToECXFieldDisplacement);
+        return PostOpaqueCallESICaptureState
+                == NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState.Captured
+            && Outcome
+                == NetworkDispatcherEntryFallbackDiagnosticZeroBranchOutcome
+                    .CompletedBeforeConditionalBranchAtBBDE97
+            && ExactBoundedCompletion
+            && LeaECX is {
+                DestinationRegister:
+                    NetworkDispatcherEntryFallbackDiagnosticZeroBranchLeaDestination.ECX,
+                InputValue: var ecxInput,
+                ResultValue: var ecxResult,
+                Attempted: true,
+                Reached: true,
+                Committed: true,
+                FlagsWritten: false
+            }
+            && ecxInput == esi
+            && ecxResult == ecxValue
+            && LeaEAX is { Committed: true, DestinationRegister:
+                NetworkDispatcherEntryFallbackDiagnosticZeroBranchLeaDestination.EAX }
+            && Compare is { Committed: true }
+            && NextControlBoundary is { Reached: true, Attempted: false, BranchProjected: false }
+            && CompletedInstructionOffsets.SequenceEqual(
+                afterStoreOffsets
+                    .Add(NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                        .LeaECXRawFileOffset)
+                    .Add(NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                        .LeaEAXRawFileOffset)
+                    .Add(NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                        .CompareRawFileOffset))
+            && StopAtRawFileOffsetExclusive
+                == NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                    .NextControlBoundaryRawFileOffset
+            && LastReachedRawFileOffset
+                == NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
+                    .CompareRawFileOffset;
     }
 
     private bool ReprojectedParentMatches(
@@ -718,6 +1228,15 @@ public static class NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
     public const uint NormalReturnRawFileOffset = 0x00BBDE8C;
     public const uint NormalReturnInstructionBoundaryRawFileOffset =
         NormalReturnRawFileOffset;
+    public const uint StorePostCallEAXRawFileOffset = 0x00BBDE8C;
+    public const uint LeaECXRawFileOffset = 0x00BBDE8F;
+    public const uint LeaEAXRawFileOffset = 0x00BBDE92;
+    public const uint CompareRawFileOffset = 0x00BBDE95;
+    public const uint NextControlBoundaryRawFileOffset = 0x00BBDE97;
+    public const uint ControlBoundaryFallThroughRawFileOffset = 0x00BBDE99;
+    public const uint ControlBoundaryTargetRawFileOffset = 0x00BBDEA4;
+    public const uint StackStoreDisplacement = 0x10;
+    public const uint ESIToECXFieldDisplacement = 0x68;
     public const uint OpaqueCallTargetSlotVirtualAddress = 0x01AC4D24;
     public const uint OpaqueCallTargetSlotRawFileOffset = 0x016C3924;
     public const uint ESIToOpaqueCellDisplacement = 0x6C;
@@ -730,14 +1249,27 @@ public static class NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
     public const byte LeaEBXInstructionByteLength = 3;
     public const byte CallBoundaryInstructionByteLength = 6;
     public const byte NormalReturnInstructionByteLength = 3;
+    public const byte StorePostCallEAXInstructionByteLength = 3;
+    public const byte LeaECXInstructionByteLength = 3;
+    public const byte LeaEAXInstructionByteLength = 3;
+    public const byte CompareInstructionByteLength = 2;
+    public const byte NextControlBoundaryInstructionByteLength = 2;
+    public const int NextControlBoundaryRelativeDisplacement = 0x0B;
     public const string BranchInstructionBytes =
         NetworkDispatcherEntryFallbackDiagnosticCallTargetPrefixProjection
             .BranchInstructionBytes;
     public const string LeaEBXInstructionBytes = "8D5E6C";
     public const string CallBoundaryInstructionBytes = "FF15244DAC01";
     public const string NormalReturnInstructionBytes = "8945F0";
+    public const string StorePostCallEAXInstructionBytes = "8945F0";
+    public const string LeaECXInstructionBytes = "8D4E68";
+    public const string LeaEAXInstructionBytes = "8D45F0";
+    public const string CompareInstructionBytes = "3BC1";
+    public const string NextControlBoundaryInstructionBytes = "740B";
     public const string OpaqueCallTargetSlotImportName = "timeGetTime";
-    public const string CoordinatorProvidedBytes = "8D5E6CFF15244DAC018945F0";
+    public const string ImmediateSuffixBytes = "8945F08D4E688D45F03BC1";
+    public const string CoordinatorProvidedBytes =
+        "8D5E6CFF15244DAC018945F08D4E688D45F03BC1740B";
     public const bool BytesIndependentlyVerified = true;
     public const bool OpaqueCallTargetAddressResolved = false;
 
@@ -751,6 +1283,16 @@ public static class NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
         RawFileOffsetToCodeVirtualAddress(CallBoundaryRawFileOffset);
     public static uint NormalReturnCodeVirtualAddress =>
         RawFileOffsetToCodeVirtualAddress(NormalReturnRawFileOffset);
+    public static uint StorePostCallEAXCodeVirtualAddress =>
+        RawFileOffsetToCodeVirtualAddress(StorePostCallEAXRawFileOffset);
+    public static uint LeaECXCodeVirtualAddress =>
+        RawFileOffsetToCodeVirtualAddress(LeaECXRawFileOffset);
+    public static uint LeaEAXCodeVirtualAddress =>
+        RawFileOffsetToCodeVirtualAddress(LeaEAXRawFileOffset);
+    public static uint CompareCodeVirtualAddress =>
+        RawFileOffsetToCodeVirtualAddress(CompareRawFileOffset);
+    public static uint NextControlBoundaryCodeVirtualAddress =>
+        RawFileOffsetToCodeVirtualAddress(NextControlBoundaryRawFileOffset);
     public static bool ExecutesNativeInstructions => false;
     public static bool ExecutesOpaqueCellCall => false;
 
@@ -780,6 +1322,12 @@ public static class NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
                 : NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState.Unreached;
         NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState normalReturnState =
             ReturnStatusUnusedOrUnreached(capture.OpaqueCallReturnedNormally);
+        NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState postCallEAXState =
+            ReturnStatusUnusedOrUnreached(capture.FreshPostCallEAX);
+        NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState postCallEBPState =
+            ReturnStatusUnusedOrUnreached(capture.FreshPostCallEBP);
+        NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState postCallESIState =
+            ReturnStatusUnusedOrUnreached(capture.FreshPostCallESI);
         var completedOffsets =
             ImmutableArray.CreateBuilder<uint>();
         completedOffsets.AddRange(parentPlan.CompletedInstructionOffsets);
@@ -788,6 +1336,12 @@ public static class NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
         NetworkDispatcherEntryFallbackDiagnosticZeroBranchCallBoundary? callBoundary = null;
         NetworkDispatcherEntryFallbackDiagnosticZeroBranchOpaqueCallReturn? opaqueCallReturn =
             null;
+        NetworkDispatcherEntryFallbackDiagnosticZeroBranchStackStore? stackStore = null;
+        NetworkDispatcherEntryFallbackDiagnosticZeroBranchLeaResult? leaECX = null;
+        NetworkDispatcherEntryFallbackDiagnosticZeroBranchLeaResult? leaEAX = null;
+        NetworkDispatcherEntryFallbackDiagnosticZeroBranchCompare? compare = null;
+        NetworkDispatcherEntryFallbackDiagnosticZeroBranchControlBoundary?
+            nextControlBoundary = null;
         NetworkDispatcherEntryFallbackDiagnosticZeroBranchOutcome outcome =
             NetworkDispatcherEntryFallbackDiagnosticZeroBranchOutcome.ParentPrefixNotAccepted;
         bool projectionEntered = false;
@@ -926,12 +1480,201 @@ public static class NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
                         if (capture.OpaqueCallReturnedNormally == true)
                         {
                             completedOffsets.Add(CallBoundaryRawFileOffset);
-                            outcome =
-                                NetworkDispatcherEntryFallbackDiagnosticZeroBranchOutcome
-                                    .CompletedAtNormalReturnBoundaryBBDE8C;
                             stopAt = NormalReturnRawFileOffset;
                             lastReached = CallBoundaryRawFileOffset;
                             flagsAtStop = UnknownFlags;
+
+                            postCallEBPState = StateForCapturedValue(capture.FreshPostCallEBP);
+                            if (capture.FreshPostCallEBP is not uint postCallEBP)
+                            {
+                                postCallEAXState =
+                                    ReturnStatusUnusedOrUnreached(capture.FreshPostCallEAX);
+                                postCallESIState =
+                                    ReturnStatusUnusedOrUnreached(capture.FreshPostCallESI);
+                                stackStore = new(
+                                    StorePostCallEAXRawFileOffset,
+                                    StorePostCallEAXCodeVirtualAddress,
+                                    StorePostCallEAXInstructionByteLength,
+                                    StorePostCallEAXInstructionBytes,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    UnknownFlags,
+                                    UnknownFlags,
+                                    Attempted: true,
+                                    Reached: true,
+                                    Captured: false,
+                                    Committed: false,
+                                    NativeMemoryWriteExecuted: false);
+                                outcome =
+                                    NetworkDispatcherEntryFallbackDiagnosticZeroBranchOutcome
+                                        .MissingFreshPostCallEBP;
+                            }
+                            else
+                            {
+                                uint stackAddress = unchecked(postCallEBP
+                                    - StackStoreDisplacement);
+                                if (capture.FreshPostCallEAX is not uint postCallEAX)
+                                {
+                                    postCallEAXState =
+                                        NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState
+                                            .Missing;
+                                    postCallESIState =
+                                        ReturnStatusUnusedOrUnreached(capture.FreshPostCallESI);
+                                    stackStore = new(
+                                        StorePostCallEAXRawFileOffset,
+                                        StorePostCallEAXCodeVirtualAddress,
+                                        StorePostCallEAXInstructionByteLength,
+                                        StorePostCallEAXInstructionBytes,
+                                        postCallEBP,
+                                        null,
+                                        stackAddress,
+                                        null,
+                                        UnknownFlags,
+                                        UnknownFlags,
+                                        Attempted: true,
+                                        Reached: true,
+                                        Captured: false,
+                                        Committed: false,
+                                        NativeMemoryWriteExecuted: false);
+                                    outcome =
+                                        NetworkDispatcherEntryFallbackDiagnosticZeroBranchOutcome
+                                            .MissingFreshPostCallEAX;
+                                }
+                                else
+                                {
+                                    postCallEAXState =
+                                        NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState
+                                            .Captured;
+                                    stackStore = new(
+                                        StorePostCallEAXRawFileOffset,
+                                        StorePostCallEAXCodeVirtualAddress,
+                                        StorePostCallEAXInstructionByteLength,
+                                        StorePostCallEAXInstructionBytes,
+                                        postCallEBP,
+                                        postCallEAX,
+                                        stackAddress,
+                                        postCallEAX,
+                                        UnknownFlags,
+                                        UnknownFlags,
+                                        Attempted: true,
+                                        Reached: true,
+                                        Captured: true,
+                                        Committed: true,
+                                        NativeMemoryWriteExecuted: false);
+                                    completedOffsets.Add(StorePostCallEAXRawFileOffset);
+                                    lastReached = StorePostCallEAXRawFileOffset;
+                                    stopAt = LeaECXRawFileOffset;
+
+                                    postCallESIState =
+                                        StateForCapturedValue(capture.FreshPostCallESI);
+                                    if (capture.FreshPostCallESI is not uint postCallESI)
+                                    {
+                                        leaECX = new(
+                                            LeaECXRawFileOffset,
+                                            LeaECXCodeVirtualAddress,
+                                            LeaECXInstructionByteLength,
+                                            LeaECXInstructionBytes,
+                                            NetworkDispatcherEntryFallbackDiagnosticZeroBranchLeaDestination
+                                                .ECX,
+                                            null,
+                                            null,
+                                            UnknownFlags,
+                                            UnknownFlags,
+                                            Attempted: true,
+                                            Reached: true,
+                                            Committed: false,
+                                            FlagsWritten: false);
+                                        outcome =
+                                            NetworkDispatcherEntryFallbackDiagnosticZeroBranchOutcome
+                                                .MissingFreshPostCallESI;
+                                    }
+                                    else
+                                    {
+                                        uint ecxValue = unchecked(postCallESI
+                                            + ESIToECXFieldDisplacement);
+                                        postCallESIState =
+                                            NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState
+                                                .Captured;
+                                        leaECX = new(
+                                            LeaECXRawFileOffset,
+                                            LeaECXCodeVirtualAddress,
+                                            LeaECXInstructionByteLength,
+                                            LeaECXInstructionBytes,
+                                            NetworkDispatcherEntryFallbackDiagnosticZeroBranchLeaDestination
+                                                .ECX,
+                                            postCallESI,
+                                            ecxValue,
+                                            UnknownFlags,
+                                            UnknownFlags,
+                                            Attempted: true,
+                                            Reached: true,
+                                            Committed: true,
+                                            FlagsWritten: false);
+                                        completedOffsets.Add(LeaECXRawFileOffset);
+                                        lastReached = LeaECXRawFileOffset;
+                                        stopAt = LeaEAXRawFileOffset;
+
+                                        leaEAX = new(
+                                            LeaEAXRawFileOffset,
+                                            LeaEAXCodeVirtualAddress,
+                                            LeaEAXInstructionByteLength,
+                                            LeaEAXInstructionBytes,
+                                            NetworkDispatcherEntryFallbackDiagnosticZeroBranchLeaDestination
+                                                .EAX,
+                                            postCallEBP,
+                                            stackAddress,
+                                            UnknownFlags,
+                                            UnknownFlags,
+                                            Attempted: true,
+                                            Reached: true,
+                                            Committed: true,
+                                            FlagsWritten: false);
+                                        completedOffsets.Add(LeaEAXRawFileOffset);
+                                        lastReached = LeaEAXRawFileOffset;
+                                        stopAt = CompareRawFileOffset;
+
+                                        NetworkDispatcherLockGateFlags cmpFlags =
+                                            ComputeCompareFlags(stackAddress, ecxValue);
+                                        uint subtraction = unchecked(stackAddress - ecxValue);
+                                        compare = new(
+                                            CompareRawFileOffset,
+                                            CompareCodeVirtualAddress,
+                                            CompareInstructionByteLength,
+                                            CompareInstructionBytes,
+                                            stackAddress,
+                                            ecxValue,
+                                            subtraction,
+                                            UnknownFlags,
+                                            cmpFlags,
+                                            Attempted: true,
+                                            Reached: true,
+                                            Committed: true);
+                                        completedOffsets.Add(CompareRawFileOffset);
+                                        lastReached = CompareRawFileOffset;
+                                        nextControlBoundary = new(
+                                            NextControlBoundaryRawFileOffset,
+                                            NextControlBoundaryCodeVirtualAddress,
+                                            NextControlBoundaryInstructionByteLength,
+                                            NextControlBoundaryInstructionBytes,
+                                            NextControlBoundaryRelativeDisplacement,
+                                            ControlBoundaryFallThroughRawFileOffset,
+                                            ControlBoundaryTargetRawFileOffset,
+                                            RawFileOffsetToCodeVirtualAddress(
+                                                ControlBoundaryTargetRawFileOffset),
+                                            cmpFlags.Zero,
+                                            Reached: true,
+                                            Attempted: false,
+                                            BranchProjected: false);
+                                        outcome =
+                                            NetworkDispatcherEntryFallbackDiagnosticZeroBranchOutcome
+                                                .CompletedBeforeConditionalBranchAtBBDE97;
+                                        stopAt = NextControlBoundaryRawFileOffset;
+                                        flagsAtStop = cmpFlags;
+                                    }
+                                }
+                            }
                         }
                         else
                         {
@@ -966,10 +1709,18 @@ public static class NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
             branchConditionState,
             targetESIState,
             normalReturnState,
+            postCallEAXState,
+            postCallEBPState,
+            postCallESIState,
             jz,
             lea,
             callBoundary,
             opaqueCallReturn,
+            stackStore,
+            leaECX,
+            leaEAX,
+            compare,
+            nextControlBoundary,
             completedOffsets.ToImmutable(),
             parentContinuationReached,
             projectionEntered,
@@ -1037,6 +1788,32 @@ public static class NetworkDispatcherEntryFallbackDiagnosticZeroBranchProjection
         returnedNormally.HasValue
             ? NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState.SuppliedUnused
             : NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState.Unreached;
+
+    internal static NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState
+        ReturnStatusUnusedOrUnreached(uint? value) =>
+        value.HasValue
+            ? NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState.SuppliedUnused
+            : NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState.Unreached;
+
+    private static NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState
+        StateForCapturedValue(uint? value) =>
+        value.HasValue
+            ? NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState.Captured
+            : NetworkDispatcherEntryFallbackDiagnosticZeroBranchCaptureState.Missing;
+
+    internal static NetworkDispatcherLockGateFlags ComputeCompareFlags(uint left, uint right)
+    {
+        uint result = unchecked(left - right);
+        bool evenParity =
+            (System.Numerics.BitOperations.PopCount((uint)(byte)result) & 1) == 0;
+        return new(
+            Carry: left < right,
+            Parity: evenParity,
+            Auxiliary: ((left ^ right ^ result) & 0x10) != 0,
+            Zero: result == 0,
+            Sign: (result & 0x80000000) != 0,
+            Overflow: ((left ^ right) & (left ^ result) & 0x80000000) != 0);
+    }
 
     internal static NetworkDispatcherLockGateFlags UnknownFlags =>
         new(Carry: null, Parity: null, Auxiliary: null, Zero: null, Sign: null, Overflow: null);
