@@ -14133,6 +14133,16 @@ logical RMW only, no concurrency/native-atomic claims. Luna637b2743 owns
 fresh runtime-target RET E7 transfer with wrapping ESP+4, no target entry.
 Current draft exclusions DiagnosticCleanupXadd/ExitReturnTransfer.
 Newest ordinary full baseline4302exit0 supersedes4274.
+XADDe0c61ca8 and exitRET637b2743 full EOF reviewed, accepted ordinary
+full4308exit0 with no exclusions. Fixed XADD helper accessibility, missing
+Numerics import, nullable ZF assertion, fixture capture nesting/ancestor levels
+and rejected-parent bounded completion. Logical RMW source remains independent.
+IOCP RET retains runtime destination0/max without code-entry or validity claims;
+ESPafter derives from reset-frame source+8, never restoredEBP+8.
+Luna6342e9e5 owns JNZ34C97517 selecting34E2 or34CB; Luna1ec57241
+identifies one next genuine IOCP gap read-only, prioritizing8B0.
+Current draft exclusion only DiagnosticCleanupXaddBranch.
+Newest ordinary full baseline4308exit0 supersedes4302.
 
 The user's finish-current-tasks-and-stop request supersedes earlier
 continuous-dispatch instructions. All current assignments are now released,
