@@ -12473,6 +12473,60 @@ FillJoin owner `84d394c4-71ab-406f-a003-ea805137b3e1` owns C4A..C57.
 GateRepeat owner `23ecce24-7bd7-4188-adcf-1c038f18b8a8` owns
 second-return-gate-to-directional-REP composition.
 
+Latest pushed `0f51764` includes corrected anchors.
+AboveSecondTransfer owner `7d8afd4e-4e45-4ad3-889e-42b7d5f235e9`
+owns C6D..C8F pair. AboveReturnGate owner
+`57f5217a-46f5-496c-8f43-82e432e87bf5` owns C8F..C9E:
+`83C4188D3C038B5DFC85F674068BCE`; cleanup24 before LEA,
+fresh frame-4 read, TEST ESI/JZ CA2 else MOV ECX=ESI.
+Shared second REP raw C9E..CA2 is `33C0F3AB`, distinct from
+earlier C41 REP slice (no fresh frame-8 read afterward).
+Final capacity tail CA2..CB1 trace only:
+`8B7DEC8B4F0485C97405E8AF206E00`; fresh frame-14 read EDI,
+fresh receiver4 read ECX, TEST/JZ CB1, else direct call raw12C8D60.
+No release/free/ownership inference. Later CB1 receiver8 ADD and
+receiver4 store require bounded verification before implementation.
+
+Coordinator verified fill/above continuation PE bytes identical to IDA.
+Exclusive evidence writer `e8ca5c8d-96e3-4fed-89c8-f8309ae28dda`
+owns FillJoin/AboveSecondTransfer/AboveReturnGate anchors.
+Verified final raw BE6CB1..BE6CC0 via IDA:
+`017708895F045F5E5B8BE55DC20400`.
+ADD DWORD[entryEDI+8], entryESI (independent old value read, wrap),
+MOV DWORD[entryEDI+4], entryEBX, POP EDI/ESI/EBX,
+ESP=EBP, POP EBP, RET4. No full EAX return guarantee in this slice.
+Future bounded task can implement these final effects after tail gate;
+do not infer freeing from the preceding direct call.
+
+LoopPrefix refinement reviewed; removed incorrect fixture expectation
+MissingEntryRoute (route is derived, actual missing direct-call status).
+FillJoin reviewed; removed unrelated bogus CoordinatorId constant.
+Both registered; validation blocked by active AboveSecondTransfer
+BuildPlan missing unreachedReceiver4 parameter (owner notified).
+Fill/above immutable anchors reviewed/released, pending validation commit.
+FinalReturn owner `754371f6-8106-404c-a355-659d6ccd649f`
+owns BE6CB1..BE6CC0 final ADD/store/RET4 pair.
+FinalCallGate owner `898bd171-cc83-4d77-b181-d6a803c752b4`
+owns BE6CA2..BE6CB1 independent frame-14/receiver4 reads and call gate.
+
+SharedRepeat owner `bc51d180-4962-408e-a005-61a770c10ab6`
+owns BE6C9E..BE6CA2 pair, reusing compressed store descriptor.
+Final-tail evidence writer `7a3dc276-9399-4141-bd3b-9b4cce6ee860`
+now exclusively owns StartupBinaryEvidence (previous anchors released
+but uncommitted; wait for new writer release before whole-file staging).
+Coordinator PE verified BE6C9E..BE6CC0:
+`33C0F3AB8B7DEC8B4F0485C97405E8AF206E00017708895F045F5E5B8BE55DC20400`.
+
+LoopPrefix/FillJoin/AboveSecondTransfer/AboveReturnGate/GateRepeat
+reviewed/registered and passing. GateRepeat fixture corrections: supplied
+EDX identity must equal wrapping gate LEA; optional absent EBP identity
+cannot be expected true; missing gate read with supplied later EAX is
+GateHasUnreachedCaptures. Native projections unchanged.
+Both evidence writers released and all six pending anchors reviewed/passing.
+FinalCallGate/FinalReturn/SharedRepeat released but NOT reviewed/registered.
+AboveLifecycle owner `5094e5ec-fc17-433d-91bf-d4624c202794`
+owns above first/second transfer and scalar-return composition.
+
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
 indirect callback, then fresh receiver+4C DEC and receiver+48 zero/INC.

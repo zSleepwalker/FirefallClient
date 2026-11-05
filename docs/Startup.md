@@ -435,6 +435,10 @@ The reliable masked-length callback's validated entry also admits the zero-resul
 
 `FrameHandoffCapacityRepeatStoreProjection` represents `BE6C41..BE6C4A` with one compressed zero-store descriptor, explicitly captured DF and normal REP completion. It does not assume forward direction or enumerate writes; a missing fresh frame-8 reload retains completed REP effects.
 
+`FrameHandoffCapacityLoopPrefixProjection` admits only the exact unsigned exit of one loop iteration, deriving prefix ESI/EDX without running additional iterations. `FrameHandoffCapacityFillJoinProjection` independently reloads frame-4 before selecting the final-repeat or direct-tail route. `FrameHandoffCapacityGateRepeatProjection` derives nonzero REP inputs from the return gate while rejecting repeat-only captures on the zero bypass.
+
+`FrameHandoffCapacityAboveSecondTransferProjection` preserves independent receiver/frame reads, signed scaling and pushes through the second above-branch call. `FrameHandoffCapacityAboveReturnGateProjection` preserves cleanup24 before the returned EAX addition and fresh frame-4 reload, without assuming post-call EBX/ESI preservation.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves

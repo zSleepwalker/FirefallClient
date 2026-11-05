@@ -266,11 +266,41 @@ internal static class StartupBinaryEvidence
             && Matches(0xBE6C41, "33C08BFAF3AB8B7DF8")
             && RawCodeRangeMaps(0xBE6C41, 9)
             && VirtualAddressToFileOffset(0x00FE7841) == 0xBE6C41);
+        check("Binary immutable PE anchor raw [0xBE6C4A,0xBE6C57) maps to VA 0x00FE784A",
+            imageBase == 0x400000
+            && Matches(0xBE6C4A, "8B5DFC85FF74518BCF8BFBEB47")
+            && RawCodeRangeMaps(0xBE6C4A, 13)
+            && VirtualAddressToFileOffset(0x00FE784A) == 0xBE6C4A);
         check("Binary immutable PE anchor raw [0xBE6C57,0xBE6C6D) maps to VA 0x00FE7857",
             imageBase == 0x400000
             && Matches(0xBE6C57, "8D3CB5000000008BC783E0FC50A19C48AC015152FFD0")
             && RawCodeRangeMaps(0xBE6C57, 22)
             && VirtualAddressToFileOffset(0x00FE7857) == 0xBE6C57);
+        check("Binary immutable PE anchor raw [0xBE6C6D,0xBE6C8F) maps to VA 0x00FE786D",
+            imageBase == 0x400000
+            && Matches(0xBE6C6D, "8B43048B55F48D0C072BD103D0C1FA028D1C95000000005351FF75FCFF159C48AC01")
+            && RawCodeRangeMaps(0xBE6C6D, 34)
+            && VirtualAddressToFileOffset(0x00FE786D) == 0xBE6C6D);
+        check("Binary immutable PE anchor raw [0xBE6C8F,0xBE6C9E) maps to VA 0x00FE788F",
+            imageBase == 0x400000
+            && Matches(0xBE6C8F, "83C4188D3C038B5DFC85F674068BCE")
+            && RawCodeRangeMaps(0xBE6C8F, 15)
+            && VirtualAddressToFileOffset(0x00FE788F) == 0xBE6C8F);
+        check("Binary immutable PE anchor raw [0xBE6C9E,0xBE6CA2) maps to VA 0x00FE789E",
+            imageBase == 0x400000
+            && Matches(0xBE6C9E, "33C0F3AB")
+            && RawCodeRangeMaps(0xBE6C9E, 4)
+            && VirtualAddressToFileOffset(0x00FE789E) == 0xBE6C9E);
+        check("Binary immutable PE anchor raw [0xBE6CA2,0xBE6CB1) maps to VA 0x00FE78A2",
+            imageBase == 0x400000
+            && Matches(0xBE6CA2, "8B7DEC8B4F0485C97405E8AF206E00")
+            && RawCodeRangeMaps(0xBE6CA2, 15)
+            && VirtualAddressToFileOffset(0x00FE78A2) == 0xBE6CA2);
+        check("Binary immutable PE anchor raw [0xBE6CB1,0xBE6CC0) maps to VA 0x00FE78B1",
+            imageBase == 0x400000
+            && Matches(0xBE6CB1, "017708895F045F5E5B8BE55DC20400")
+            && RawCodeRangeMaps(0xBE6CB1, 15)
+            && VirtualAddressToFileOffset(0x00FE78B1) == 0xBE6CB1);
         check("Binary pinned-sample raw code [0xBE6325,0xBE6352) maps to VA 0x00FE6F25 and preserves its JNZ target",
             imageBase == 0x400000
             && Matches(0xBE6325, "8B4E0853578B7E108D04CDFFFFFFFF4921460C037E0C8BC7C1E80323C88B46048D1C8D00000000833C0300751C")
