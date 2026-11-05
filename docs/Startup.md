@@ -490,6 +490,23 @@ captures. The final callee's raw `12C8D60..12C8D78` entry anchor confirms
 zero ECX jumps directly to the epilogue after frame allocation, bypassing
 the global mask read and EBX/ESI/EDI saves; nonzero behavior remains bounded.
 
+`FrameHandoffCapacityFirstFinalLifecycleProjection` preserves all eight
+first-gate/fill-branch/final-call combinations. It derives the downstream
+fill capture from the admitted first fill plan, retains partial first REP
+effects, and does not invent a missing ESI continuity contract.
+`CapacityFinalCalleeEntryProjection` records frame allocation and ordered
+stack stores with DWORD-wrapped addresses. Its zero path requires an
+independent saved-EBP reload before RET; its nonzero path stops after the
+three register saves, with no claim about the subsequent call.
+
+`FrameHandoffCapacityOverflowTailProjection` keeps loop overflow distinct
+from the unsigned size guard: raw `BE6CC0` pushes encoded VA `1C607A4`,
+then calls through encoded VA `1AC45C0`. A captured normal return ends at
+`BE6CCB`; neither nonreturn nor an epilogue is inferred from the call.
+The separate callee-prefix and first-validation anchors pin the mask-gated
+call at `12C8D82` and the fresh global/ESI4 reads and unsigned/tag branches
+at `12C8D88..12C8DA7`.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves

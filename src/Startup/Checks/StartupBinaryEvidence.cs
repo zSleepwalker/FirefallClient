@@ -312,6 +312,19 @@ internal static class StartupBinaryEvidence
             && Matches(0x12C8D60, "558BEC83EC3085C90F84EA060000F60584AFED0102535657")
             && RawCodeRangeMaps(0x12C8D60, 24)
             && RelativeConditionalBranchTargets(0x12C8D68, 0x0F, 0x84, 0x12C9458));
+        check("Binary immutable overflow-tail anchor is separate from the normal RET4",
+            Matches(0xBE6CC0, "68A407C601FF15C045AC01")
+            && RawCodeRangeMaps(0xBE6CC0, 11)
+            && RelativeConditionalBranchTargets(0xBE6B87, 0x0F, 0x82, 0xBE6CC0));
+        check("Binary immutable callee-prefix anchor preserves flags until its optional call",
+            Matches(0x12C8D78, "8D71F8740B6888AFED01FF157842AC01")
+            && RawCodeRangeMaps(0x12C8D78, 16)
+            && ShortConditionalBranchTargets(0x12C8D7B, 0x74, 0x12C8D88));
+        check("Binary immutable callee first-validation anchor retains unsigned and tag branches",
+            Matches(0x12C8D88, "8B1DD8ADED013BF30F82E00000008B46048BC883E10383F9010F84CF000000")
+            && RawCodeRangeMaps(0x12C8D88, 31)
+            && RelativeConditionalBranchTargets(0x12C8D90, 0x0F, 0x82, 0x12C8E76)
+            && RelativeConditionalBranchTargets(0x12C8DA1, 0x0F, 0x84, 0x12C8E76));
         check("Binary pinned-sample raw code [0xBE6325,0xBE6352) maps to VA 0x00FE6F25 and preserves its JNZ target",
             imageBase == 0x400000
             && Matches(0xBE6325, "8B4E0853578B7E108D04CDFFFFFFFF4921460C037E0C8BC7C1E80323C88B46048D1C8D00000000833C0300751C")

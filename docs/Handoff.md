@@ -12600,6 +12600,38 @@ AboveBranchLifecycle owner `bb922be1-e409-4817-85a5-0972327641b3` active.
 FirstFinal owner notified to fix mismatched fixture parameter names;
 its files remain unregistered. All agents use GPT-6 Luna.
 
+FirstFill/AboveFinal/entry anchor pushedc8ba0a9. FirstFinal reviewed and
+returned for route-admission correction: either first gate route may feed
+either fill branch; preserve all eight route combinations. Fixtures that
+assert unreached call status must actually supply it.
+SecondBranchLifecycle owner `0b49b470-4e0c-47e4-8e25-1313521ceafc`
+owns second-transfer-to-final composition. Failure trace owner
+`9066c5b2-73fc-45da-88d4-754578bdbad0` owns bounded read-only capacity
+failure tail. Neither owns registration/docs/evidence/Git.
+
+FirstFinal revision and CalleeEntry reviewed/registered; validation blocked
+by active AboveBranch nullable-struct access errors, owner notified.
+Callee prefix trace `edbcfcb7-c830-426a-9d2b-8f79fd105a8d` owns read-only
+raw12C8D78 early mask-gated call prefix. No assumptions from names.
+
+Overflow trace verified rawBE6CC0..CCB PUSH encodedVA1C607A4 then
+CALL cellVA1AC45C0, target unresolved/nonreturn not proven. Size guard
+instead entersBE6BC4 cell1AC4424. OverflowTail pair owner
+`16d6609a-fd2e-4331-99aa-54c2d6491b20`.
+Prefix raw12C8D78..88 verified LEAESI[ECX-8], JZmaskclear, PUSHVA1EDAF88,
+CALLcellVA1AC4278. PrefixCall owner `89c3977c-e72f-4347-ad9c-d4057b291cdd`.
+First validation88..A7 verified freshglobal EBX, unsignedESI comparison,
+freshESI4 EAX read and lowtwo-bit==1 branch to12C8E76. Three immutable
+anchors added, pending serial validation with entry/FirstFinal stagedpair.
+
+OverflowTail reviewed/registered. LoopOverflow successor
+`73445c13-c26d-4865-b15d-ca40848eaa02` owns one-iteration overflow
+composition; FirstValidation owner `259bb22c-6493-4dbf-985a-776c814b6ce4`
+owns fresh global/ESI4 scalar gate. PrefixCall/AboveBranch released but
+returned for compile alignment fixes; SecondBranch active literal type
+correction requested. Entry/FirstFinal/Overflow and anchors awaiting
+shared compilation before commit. No active files staged.
+
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
 indirect callback, then fresh receiver+4C DEC and receiver+48 zero/INC.
