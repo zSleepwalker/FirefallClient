@@ -832,6 +832,10 @@ SavedFrameIndexed keeps child EDX independent of the saved ECX value.
 CommonIndexedMask preserves the parent CMP flags when the child's masked
 shift count is zero and its fresh global is missing; a reached TEST replaces
 those flags before either bounded mask destination.
+CommonMaskOrStore writes only the OR result to VA1EDADC8 without rereading
+that global. SavedIndexedStoreGate performs a new EDX+1C read before the
+indexed EAX store; missing EAX retains the attempted store address but cannot
+reach TEST or JNZ, and both zero and nonzero destinations remain bounded.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

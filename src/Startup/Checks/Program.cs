@@ -223,6 +223,8 @@ CapacityFinalCalleeCommonMaskSelectionGateChecks.Run(Check);
 CapacityFinalCalleeLargeSavedFrameCommonRootLifecycleChecks.Run(Check);
 CapacityFinalCalleeLargeSavedFrameIndexedLifecycleChecks.Run(Check);
 CapacityFinalCalleeCommonIndexedMaskLifecycleChecks.Run(Check);
+CapacityFinalCalleeCommonMaskOrStoreChecks.Run(Check);
+CapacityFinalCalleeLargeSavedIndexedStoreGateChecks.Run(Check);
 FrameHandoffCapacityAboveBranchLifecycleChecks.Run(Check);
 FrameHandoffCapacitySecondBranchLifecycleChecks.Run(Check);
 FrameHandoffCapacityFinalCallGateChecks.Run(Check);

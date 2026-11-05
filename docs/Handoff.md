@@ -13197,6 +13197,10 @@ da36d5b pushedMask/SavedCommonRoot. SavedFrameIndexed/IndexedMaskreviewed
 registeredrunner3790 exit0; fixed fixturecrossflagtypecomparison.
 MaskOr09333b8d/SavedIndexedStore520827f2 releasedpendingreview.
 RingWrites8f4a7db1returnedtomoveembeddedRunchecks toseparateChecksfile.
+ea64136 pushedtwoentrycompositions. MaskOr/SavedIndexedStore reviewed
+registeredrunner3792 exit0; nativeOR8bytes/storegate14bytes anchorsadded.
+ActiveMaskSelectionOr9cca38e5/IndexStoreLifecycle11dcf839; RingWritesrevision
+8f4a7db1 pending. Keepagentfilesunstageduntilreview.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional

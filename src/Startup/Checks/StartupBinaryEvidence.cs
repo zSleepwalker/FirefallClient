@@ -571,6 +571,13 @@ internal static class StartupBinaryEvidence
             Matches(0x12C930A, "BF01000000D3E78B0DC8ADED0185F97519")
             && RawCodeRangeMaps(0x12C930A, 17)
             && ShortConditionalBranchTargets(0x12C9319, 0x75, 0x12C9334));
+        check("Binary common mask OR stores its result without rereading the global",
+            Matches(0x12C931B, "0BCF890DC8ADED01")
+            && RawCodeRangeMaps(0x12C931B, 8));
+        check("Binary saved indexed store completes before TEST and JNZ",
+            Matches(0x12C9243, "8B5A1C89049DF8AEED0185C0752B")
+            && RawCodeRangeMaps(0x12C9243, 14)
+            && ShortConditionalBranchTargets(0x12C924F, 0x75, 0x12C927C));
         check("Binary pinned-sample raw code [0xBE6325,0xBE6352) maps to VA 0x00FE6F25 and preserves its JNZ target",
             imageBase == 0x400000
             && Matches(0xBE6325, "8B4E0853578B7E108D04CDFFFFFFFF4921460C037E0C8BC7C1E80323C88B46048D1C8D00000000833C0300751C")
