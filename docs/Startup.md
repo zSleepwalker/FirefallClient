@@ -1001,6 +1001,11 @@ TraversalCleanupEpilogueLifecycle joins the exact nonzero counter handoff to
 the gated epilogue, retaining ordered effects and nullable stack captures.
 Completion requires the observed RET boundary; a normally returning opaque
 call makes all arithmetic flags unknown even if a later capture is missing.
+RightRootIndexedMaskLifecycle carries the already-classified small-bin count
+into the address-only LEA and mask gate without repeating size classification.
+Its independent global read follows the earlier root effects, including
+aliases; dirty unused captures affect clean completion, not selected bounded
+exits at the opaque-call instruction or mask-branch destinations.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

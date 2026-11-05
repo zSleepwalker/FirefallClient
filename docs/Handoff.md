@@ -13514,6 +13514,21 @@ session-only target removed. Node classifier verified00FFFF00index31,
 00BFFF00index30. Epilogue fixture arguments now actually provide the
 asserted unused call-status/post-call-EBP observations. Both pairs ready
 for explicit staging and push. Luna42775d37 owns NodeIndexedTraversal.
+Both pairs committed/pushedafbe3b4 (7files2548insertions).
+Active Luna assignments:42775d37 node indexed traversal;916e56e5
+right-root indexed mask revised bounded/clean separation;2f7a0ff6
+indexed traversal cleanup API/capture corrections;74cb6271 small-bin
+route contracts analysis. No temporary MSBuild exclusion target remains.
+RightRootIndexedMask revisions reviewed/registered runner4100exit0,
+excluding only IndexedTraversalSlotCleanup and NodeIndexedTraversal drafts.
+Temporary target removed. Clean versus actual bounded completion now
+distinct; interleaved parent effects and independent late global preserved.
+Small-bin route contracts74cb6271 reviewed: reuse CommonOrRingLifecycle
+for zero931B, CommonSuccessorRingLifecycle for nonzero9334. OR uses
+fresh ECX and shifted mask EDI, not original size; ring EDX/EAX are the
+LEA bin pointer until successor read overwrites EAX. ESI derives from
+already-consumed parent capture; avoid falsely dirtying below-threshold
+successor exits by supplying inherited ESI as a fresh unused child capture.
 8948188B4A1085C974123B0DD8ADED010F82D8FBFFFF8948108941188B4A1485C974123B0DD8ADED010F82BFFBFFFF894814894118.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
