@@ -45,6 +45,9 @@ public readonly record struct GameSocketParserDiagnosticCleanupPostCallAddressIn
 
 public sealed class GameSocketParserDiagnosticCleanupPostCallAddressPlan
 {
+    private readonly System.Lazy<bool> _orderedSemanticPrefixPreserved;
+    private readonly System.Lazy<bool> _exactCleanCompletion;
+
     internal GameSocketParserDiagnosticCleanupPostCallAddressPlan(
         GameSocketParserDiagnosticCleanupPostCallAddressCapture capture,
         GameSocketParserDiagnosticCleanupVirtualCallReturnPlan parentPlan,
@@ -71,6 +74,9 @@ public sealed class GameSocketParserDiagnosticCleanupPostCallAddressPlan
         FlagsAtStop = flagsAtStop;
         LastReachedRawFileOffset = lastReachedRawFileOffset;
         StopBeforeRawFileOffset = stopBeforeRawFileOffset;
+        _orderedSemanticPrefixPreserved = new(
+            ComputeOrderedSemanticPrefixPreserved);
+        _exactCleanCompletion = new(ComputeExactCleanCompletion);
     }
 
     public GameSocketParserDiagnosticCleanupPostCallAddressCapture Capture { get; }
@@ -114,12 +120,17 @@ public sealed class GameSocketParserDiagnosticCleanupPostCallAddressPlan
     public ImmutableArray<GameSocketParserDiagnosticCleanupStackPrefixMemoryEffect> MemoryEffects =>
         ParentPlan.MemoryEffects;
     public bool OrderedSemanticPrefixPreserved =>
+        _orderedSemanticPrefixPreserved.Value;
+
+    private bool ComputeOrderedSemanticPrefixPreserved() =>
         ParentPlan.OrderedSemanticPrefixPreserved
         && ReprojectedParentMatches()
         && Reads.SequenceEqual(ParentPlan.Reads)
         && MemoryEffects.SequenceEqual(ParentPlan.MemoryEffects);
 
-    public bool ExactCleanCompletion =>
+    public bool ExactCleanCompletion => _exactCleanCompletion.Value;
+
+    private bool ComputeExactCleanCompletion() =>
         ParentAdmitted
         && ParentPlan.ExactCleanCompletion
         && Outcome

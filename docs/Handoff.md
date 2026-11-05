@@ -14209,6 +14209,29 @@ Luna2b1d0834 owns D8MOVESI freshECX, DALEAEBX ESI6C, DDbyteframewrite,
 E1PUSHEBX and E2DWORDframewrite stoppingE5 beforeimportcall.
 SecondXADD1f4b5beb remains active; current exclusions EntryLockPreparation/
 DiagnosticCleanupSecondXadd. Latest ordinaryfull4324, subset4326.
+SecondXADD1f4b5beb fullEOFreviewed registered runner4328 built successfully but
+offline checker ran for many minutes withoutcompletion; stopped that exact
+shell. No acceptance/commit yet. Luna dfbf162c is fixing repeated immutable
+semantic reprojection cost ONLY in SecondXadd/PostCallAddress/VirtualCallReturn
+production files; preserve API/invariants, no globalcache. Agent edits pending.
+Lockprep2b1d0834 fullEOFreviewed and registered AFTER4328 build, so requires
+next combinedvalidation. Successors f289259d DEC/JNZ D8..DB/E2 active.
+Importreturn0b2c8203 released/reviewed throughEOF, revisionrequested: missing
+constructor bool, EAXcapturestate gating when targetmissing, explicit attempted
+cellread evidence and truthful aliasfixture. No acceptance/registration yet.
+Current exclusions EntryImportReturn/DiagnosticCleanupSecondXaddBranch.
+Latest HEADcd8a812; no running coordinatorvalidation after stopping4328.
+Combined runner4330exit0 after dfbf162c per-plan thread-safe Lazy caches in
+SecondXadd/PostCallAddress/VirtualCallReturn; full diff reviewed predicates
+unchanged. Exponential repeat work removed without globalcache or skippedchecks.
+SecondXadd1f4b5beb, DECbranchf289259d, lockprep2b1d0834 and revisedimportreturn
+0b2c8203 now validated including registeredchecks. Arbitrary ADD helper distinct
+from original hardcoded-minusone helper. Importtargetread missing records attempt
+but no call; supplied EAX unused until targetpresent and normalreturn.
+Successors994da0c3 secondvptrprep DB..DF active; b304739b returnedTEST/JNZ
+adapter EB..EF/F6 active using existinglockgate with no postreceiver forwarding.
+Current exclusions SecondVirtualCallPreparation/EntryReturnedTestBranch.
+Latest ordinary full4324; reviewed subset4330 succeeded with bothactive excluded.
 
 The user's finish-current-tasks-and-stop request supersedes earlier
 continuous-dispatch instructions. All current assignments are now released,

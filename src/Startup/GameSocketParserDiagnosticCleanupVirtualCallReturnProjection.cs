@@ -67,6 +67,9 @@ public readonly record struct GameSocketParserDiagnosticCleanupVirtualCallReturn
 
 public sealed class GameSocketParserDiagnosticCleanupVirtualCallReturnPlan
 {
+    private readonly System.Lazy<bool> _orderedSemanticPrefixPreserved;
+    private readonly System.Lazy<bool> _exactCleanCompletion;
+
     internal GameSocketParserDiagnosticCleanupVirtualCallReturnPlan(
         GameSocketParserDiagnosticCleanupVirtualCallReturnCapture capture,
         GameSocketParserDiagnosticCleanupVirtualCallPreparationPlan parentPlan,
@@ -108,6 +111,9 @@ public sealed class GameSocketParserDiagnosticCleanupVirtualCallReturnPlan
         ChildBoundedCompletionBoundaryReached = childBoundedCompletionBoundaryReached;
         LastReachedRawFileOffset = lastReachedRawFileOffset;
         StopBeforeRawFileOffset = stopBeforeRawFileOffset;
+        _orderedSemanticPrefixPreserved = new(
+            ComputeOrderedSemanticPrefixPreserved);
+        _exactCleanCompletion = new(ComputeExactCleanCompletion);
     }
 
     public GameSocketParserDiagnosticCleanupVirtualCallReturnCapture Capture { get; }
@@ -136,7 +142,9 @@ public sealed class GameSocketParserDiagnosticCleanupVirtualCallReturnPlan
             ? ChildBoundedCompletionBoundaryReached
             : ParentPlan.ExactBoundedCompletion;
     public bool ExactBoundedCompletion => BoundedCompletionBoundaryReached;
-    public bool ExactCleanCompletion =>
+    public bool ExactCleanCompletion => _exactCleanCompletion.Value;
+
+    private bool ComputeExactCleanCompletion() =>
         ParentCallBoundaryAdmitted
         && ParentPlan.IsCleanCompletion
         && Outcome
@@ -201,6 +209,9 @@ public sealed class GameSocketParserDiagnosticCleanupVirtualCallReturnPlan
     public ImmutableArray<GameSocketParserDiagnosticCleanupStackPrefixMemoryEffect> MemoryEffects =>
         ParentPlan.MemoryEffects;
     public bool OrderedSemanticPrefixPreserved =>
+        _orderedSemanticPrefixPreserved.Value;
+
+    private bool ComputeOrderedSemanticPrefixPreserved() =>
         ParentPlan.OrderedSemanticPrefixPreserved
         && ReprojectedParentMatches()
         && Reads.SequenceEqual(ParentPlan.Reads)

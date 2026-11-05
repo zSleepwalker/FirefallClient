@@ -1274,6 +1274,16 @@ NetworkDispatcherEntryFsPublicationProjection derives EAX as frame EBP-0Ch
 and records a logical DWORD publication to segment-relative FS:[0] at BBDDD2,
 stopping at BBDDD8. It preserves ESP, XOR flags and the distinct earlier FS read;
 no linear-address or exception-ABI interpretation is made.
+NetworkDispatcherEntryLockPreparationProjection consumes fresh entry ECX,
+derives EBX as ESI+6Ch and records the byte local, stack push and DWORD local
+in order before BBDDE5. NetworkDispatcherEntryImportReturnProjection captures
+the fresh target at VA 1AC4284 and explicit return independently; normal return
+requires fresh EAX for a clean BBDDEB boundary and forwards no other registers.
+GameSocketParserDiagnosticCleanupSecondXaddProjection requires fresh post-call
+EBX and operation-time DWORD independently for the locked exchange at BD34D4.
+Its DEC/JNZ suffix preserves ADD carry, decrements the exchanged old DWORD and
+selects unentered BD34DB or BD34E2. Per-plan lazy validation preserves immutable
+semantic checks without repeatedly reconstructing the same ancestry.
 GameSocketParserSelectorDiagnosticPreparationProjection records the five
 diagnostic argument pushes at BD326A..BD3280. It derives ESP from the
 count-consumption lineage but requires fresh ESI and an independent DWORD
