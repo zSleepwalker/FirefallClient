@@ -13765,6 +13765,21 @@ merely because StopAtRaw is non-null. runner4142 compile failure was
 remaining incompatible check comparison; fixed. runner4144exit0 exact
 error-queue/indexed-equality exclusions, target removed. Context registered,
 ready commit. Lunabaa646b0 nonzero-parser-entry bounded prior-art gap next.
+Context dispatch committed/pushedfa7ff94. Active owners: e942 error queue
+acquisition composition, c043 indexed equality ring bridge, edb maintenance
+entry analysis, d2a8 receive success-preparation analysis, baa parser entry
+analysis. Latest coordinator reviewed-subset4144exit0; ordinary full4110.
+No temporary exclusion target or coordinator background shell remains.
+edb/d2a8 reports repository-only (fresh sample refused); coordinator
+closed evidence directly with IDA BBDDB0 disassembly/BBDDEB35bytes and
+BD2EEB63bytes. Sender direct helper target is BE3A00, NOT BD3A00;
+report's target was wrong despite existing anchor's rel displacement.
+Dispatcher argument comparison is BYTE [EBP+8], not DWORD.
+Added exact receive-success and dispatcher lock-result fingerprints;
+runner4146exit0 exact queue/equality/sender-preparation/lock-gate exclusions,
+temporary target removed. Luna c1ed7441 implementing bounded sender
+preparation through first direct helper call; Luna866546f9 dispatcher
+post-first-call lock-result gate through byte-argument branch endpoints.
 SmallBinEpilogue released and full EOF reviewed: owner6d052038 revising
 wrong parent type, nullable value-plan access, missing successor-unused
 forwarding, child read/write effect markers and dirty-ring admission.

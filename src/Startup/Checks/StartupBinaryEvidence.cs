@@ -7301,6 +7301,13 @@ internal static class StartupBinaryEvidence
             && Matches(0xBD2FF7, "74088B168BCE50FF5220")
             && ReadUInt32(0x16C39A0) == 0x8000006F
             && ImportSlotNames(0x1AC4D64, "WSAGetOverlappedResult"));
+        check("Binary receive success diagnoses a zero operation before independently reloading sender storage",
+            Matches(0xBD2EEB, "83BEF40D00000075176A006A5B6858EAC5016858EAC501FF15A05EC10183C410")
+            && Matches(0xBD2F0B, "8B8EF40D00008D4424345083C118")
+            && RelativeBranchTargets(0xBD2F19, 0xE8, 0xBE3A00));
+        check("Binary dispatcher lock-result gate increments the fresh counter and compares a byte argument before clears",
+            Matches(0xBBDDEB, "85C0750753FF157842AC01FF4330807D0800C745FC00000000C6466400")
+            && Matches(0xBBDE08, "0F84BC000000"));
         check("Binary Network and GameSocket shutdown ownership and distinct WinHTTP close helpers are fingerprinted",
             ReadUInt32(VirtualAddressToFileOffset(0x1C734B4)) == 0x00FBD900
             && ReadUInt32(VirtualAddressToFileOffset(0x1C734B4) + 8) == 0x00FBE540
