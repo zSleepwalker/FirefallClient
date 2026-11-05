@@ -7347,6 +7347,42 @@ internal static class StartupBinaryEvidence
             Matches(0xBBC983, "FF5220EB33"));
         check("Binary dispatcher fences precede publication and a fresh counter decrement",
             Matches(0xBBDE99, "0FAEF80FAEE88B45F089018B01C6466401FF4B30"));
+        check("Binary parser diagnostic arguments precede the opaque return cleanup and counter jump",
+            Matches(0xBD326A, "685703000068D86EBB0168B46EBB016A01FFB610010000E8CAFC000083C414FF86EC000000E9DF010000")
+            && RelativeBranchTargets(0xBD3281, 0xE8, 0xBE2F50)
+            && RelativeBranchTargets(0xBD328F, 0xE9, 0xBD3473));
+        check("Binary parser diagnostic destination and cleanup RMW retain their exact byte boundaries",
+            Matches(0xBD3473, "837D0C02BF6E0500008B5424140F8372FDFFFFEB25")
+            && Matches(0xBD34AD, "C7442450FFFFFFFF8B74243C85F6742583CBFF8D46048BCBF00FC10875178B06"));
+        check("Binary IOCP exit restores EBX and the frame before a near RET",
+            Matches(0xBBC9DD, "FF156097DF015B8BE55DC3"));
+        check("Binary dispatcher entry builds the frame and saves registers before the cookie preparation",
+            Matches(0xBBDDB0, "558BEC6AFF68183CA40164A1000000005083EC0C535657A10050DC0133C550"));
+        check("Binary parser slot-zero call returns before a distinct post-call address and locked operation",
+            Matches(0xBD34CB, "8B068BCEFF108D4608F00FC1184B75078B068BCEFF5004"));
+        check("Binary parser second-call epilogue restores FS and pops four registers before resetting the frame",
+            Matches(0xBD34E2, "8B4C244864890D00000000595F5E5B8BE55DC20800CC"));
+        check("Binary first-branch FS restore independently anchors MOV ECX,[ESP+48] and MOV FS:[0],ECX",
+            RawCodeRangeMaps(0xBD34E2, 11)
+            && Matches(0xBD34E2, "8B4C244864890D00000000"));
+        check("Binary first-branch register-pop window independently anchors POP ECX,EDI,ESI,EBX",
+            RawCodeRangeMaps(0xBD34ED, 4)
+            && Matches(0xBD34ED, "595F5E5B"));
+        check("Binary first-branch frame-return window independently anchors MOV ESP,EBP; POP EBP; RETN 8",
+            RawCodeRangeMaps(0xBD34F1, 6)
+            && Matches(0xBD34F1, "8BE55DC20800"));
+        check("Binary first-branch cleanup windows form one contiguous raw E2-F6 chain ending before F7",
+            RawCodeRangeMaps(0xBD34E2, 0x15)
+            && Matches(0xBD34E2, "8B4C244864890D00000000595F5E5B8BE55DC20800"));
+        check("Binary dispatcher fallback pushes EBX and calls the distinct import before incrementing its counter",
+            Matches(0xBBDDEF, "53FF157842AC01FF4330"));
+        check("Binary dispatcher fallback comparison reads one argument byte, not a DWORD",
+            Matches(0xBBDDF9, "807D0800"));
+        check("Binary dispatcher frame and receiver clears precede the argument-zero branch",
+            Matches(0xBBDDFD, "C745FC00000000C64664000F84BC000000"));
+        check("Binary dispatcher argument-zero bypass and signed selector branch retain their distinct destinations",
+            Matches(0xBBDE08, "0F84BC000000833D9085E601017F14516A00")
+            && Matches(0xBBDECA, "8B86A8000000"));
         check("Binary nonzero parser dispatches through a fresh stack-local vtable before preserve-one resize",
             Matches(0xBD31C5, "8D4C24348B442434FF500C6A01508D4C243C")
             && RelativeBranchTargets(0xBD31D7, 0xE8, 0x12CBCB0)

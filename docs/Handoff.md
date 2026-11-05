@@ -1,5 +1,58 @@
 # Reverse-engineering handoff
 
+## Current dispatcher/parser suffix review
+
+New reviewed coverage now includes:
+
+- **Dispatcher**: fallback diagnostic preparation (`BBDE1A..BBDE2A`), direct-call
+  return bound at `BBDE2B`, and call-target arithmetic prefix
+  (`BBDE2B..BBDE3D`, stop before `BBDE3E` JZ), plus both immediate
+  branch projections:
+  - nonzero path `BBDE40..BBDE49` (stop before `BBDE4B` JNZ),
+  - zero path `BBDE3E` taken to `BBDE83` (stop before `BBDE86` indirect CALL),
+  - nonzero-path opaque call boundaries at `BBDE5D` and `BBDE6C` with explicit
+    normal-return stops at `BBDE63` / `BBDE6F`,
+  - zero-path post-call window `BBDE8C..BBDE96` (stop before `BBDE97` JZ).
+- **Parser first-branch**: FS restore (`BD34E2..BD34EC`), register POP chain
+  (`BD34ED..BD34F0`), and frame/RET8 suffix (`BD34F1..BD34F6`).
+- **Binary anchors**: independent first-branch chain anchors added to
+  `StartupBinaryEvidence` for the three windows above plus one contiguous
+  `BD34E2..BD34F6` assertion.
+
+The latest full checks-project build (run 4748) succeeded with zero errors and
+nine nullable warnings. This is compile evidence only, not focused runtime
+acceptance.
+
+The current focused dispatcher run now rebuilds and executes from the matching
+focused output path and reports `Failures: 0` for the call-target prefix,
+nonzero branch (including JB), zero branch, and dispatcher binary anchors.
+Earlier stale-binary reports remain historical only and should not be used as
+evidence for newer source revisions.
+
+The current dispatcher source extends through the nonzero JB at `BBDE81` and
+the zero-path `BBDE97` fallthrough window, with focused runtime acceptance now
+recorded by the fresh focused run above.
+
+Normal second-call parser suffixes now complete in focused execution with
+`Failures: 0`, but they remain out of `Program.cs` registration until those
+untracked production/check pairs are explicitly accepted and staged:
+
+- `SecondVirtualCallReturn`
+- `SecondCallFsRestore`
+- `SecondCallRegisterPops`
+- `SecondCallFrameReset`
+- `SecondCallReturn`
+
+Second-branch focused runtime now completes conclusive fresh focused runs with
+`Failures: 0` for FS restore, register pops, and frame return. Second-call
+focused runtime also now completes conclusive fresh runs with `Failures: 0`
+across virtual-call return, FS restore, register pops, frame reset, and return.
+
+Previously assigned GPT-6 Luna work covered the `BBDE3E` branch boundary:
+
+- **nonzero JZ-not-taken path** from `BBDE40` (agent `93b4088b`);
+- **zero JZ-taken path** from `BBDE83` (agent `26355611`).
+
 ClientApi/WinHTTP details are in [ClientApiWinHttp.md](ClientApiWinHttp.md).
 
 ## Latest continuation navigation (November 4)
@@ -14016,6 +14069,242 @@ added a missing-second-child regression (no manufactured cleanup completion).
 Repost committed/pushed51d47af; no successor assigned after stop request.
 
 ### Paused after completing current tasks
+
+Resume update: the user resumed after PR #1 merged. Fetched local main and
+origin/main both c622f4c; main remains occupied by the main checkout, which
+was not accessed. This worktree's reverse-engineering branch fast-forwarded
+to c622f4c. The pause below is historical, superseded by the resume request.
+Dispatcher final preparation172 full EOF reviewed, registered and accepted
+4258exit0. Both parent routes, missing captures and fresh argument aliases
+are covered; stop BBDEB0 before target read/call.
+Luna4f6a5fb4 implements the returned IOCP signed loop gate from790 analysis;
+Luna9b5e83fa analyzes dispatcher final import return through SEH store.
+Raw BBC9BB is a local reload/counter gate, not by itself evidence of a
+timeout-reset store; earlier timeout semantics need separate evidence.
+IOCP loop4f6 revised full EOF accepted4260exit0; rejected dirty97D bounds
+forwarded only on nonadmission, while all admitted missing captures remain
+incomplete. Both signed destinations8F0/9CB are unentered.
+Luna60bcf28d implements next post-loop byte gate fromfd4a supplied-byte
+analysis:9CB local-24, CMPBYTE+4, local-28, JZ8B0/9DB. No byte meaning
+or receiver identity is established. Dispatcher26a FSstorepair released
+pending full review; correct exclusive endpointC0, notBF.
+IOCP loop committed/pushed16554fd. Dispatcher26a full EOF accepted4264exit0
+after fixture fixes: ImmutableArray.Length, supplied-unused postcall EBP,
+and comparison with the actual incomplete parent bound rather than true.
+Luna74d87c14 owns four independent stack POP observations C0..C3, boundedC4.
+Luna60bc post-loop byte pair remains active; no sample/IDB changes.
+Register74d and post-loop byte60bc full EOF reviewed and accepted4270exit0
+ordinary full checks. Coordinator corrected restore range precedence,
+named argument, equal-parent skipped stack capture, zero-based missing
+capture helper and reprojection fixture; byte-prefix comparison now uses
+the newly reprojected parent rather than nested immutable-array identity.
+Next Lunafd339286 models frame reset/EBP POP throughC7; Lunafddb744c
+analyzes IOCP exit POPs through9DD indirect boundary. Draft exclusion
+currently only FrameReset; ordinary full4270 preceded new drafts.
+Frame resetfd339 full EOF accepted4272exit0, including distinct priorESP,
+fresh savedEBP, wrapping and earlier-POP alias. Lunaee5281f9 owns bounded
+RET4 target/stack transfer atC7; runtime destination remains unentered.
+Luna38c20082 implements IOCP9DB/9DC POPs through9DD fromfddb contract.
+Current draft exclusions ExitPop and ReturnTransfer; no native execution.
+RET4ee528 and ExitPop38c full EOF accepted4274exit0 ordinary full checks.
+Coordinator fixed RET4's reference to nonexistent parent LastReached using
+the nullable last observed frame instruction and compared immutable scalar
+effects, not nested-array identity. PostLoopByteGate now exposes wrapper
+bound completion separately from child completion to retain dirty ancestors.
+Luna8513749c models IOCP9DD target/normal-return boundary through9E3.
+Luna49c7b1e8 analyzes parser selector diagnostic pushes326A..3281 from
+fresh IDA42-byte window; no semantic interpretation of constant operands.
+Current exclusion only ExitCallReturn; ordinary full4274 is newest baseline.
+ExitCallReturn851 full EOF accepted4278exit0 after nested-capture fixture
+correction. Lunade803c52 owns fresh post-call ESP/EBX POP through9E4.
+Parser49c contract exposed missing numeric ESI lineage; Lunae5702b71
+implements derived ESP but requires fresh ESI at327B and independent110
+field DWORD. No reconciliation with earlier aliased writes is permitted.
+Current draft exclusions SelectorDiagnosticPreparation and ExitEbxRestore.
+ParserSelectorDiagnosticPreparation e5702b71 full EOF reviewed and accepted
+runner4280 exit0. Added semantic immutable-capture reprojection coverage.
+Fresh ESI/field stays independent even when its source aliases the first
+committed push; missing fifth-push captures retain four stores and ESP-10.
+Luna1d4a3554 owns explicit diagnostic call return and fresh post-call
+ESP ADD14 through3289. Luna de803c52 remains on IOCP post-call POP EBX.
+Current draft exclusions ExitEbxRestore and SelectorDiagnosticReturnCleanup.
+Parser diagnostic return/cleanup 1d4a3554 full EOF reviewed, accepted4284
+exit0. Fixed nullable-flag assertions, retained instruction flags on pending/
+non-normal observations, and distinguished supplied-unused return observation
+from an admitted return. Fresh post-call ESP is never inferred from arguments.
+Luna4ba66bb2 owns fresh post-call ESI/DWORD INC at3289 and JMP328F to3473;
+provided bytes require no runtime or callee-semantic assumptions.
+Draft exclusions now ExitEbxRestore and SelectorDiagnosticCounterContinuation.
+Counter continuation4ba66bb2 full EOF reviewed and accepted4288exit0.
+Corrected fixture capture nesting, pre-call ESP expectation2FEC, missing/
+supplied-unused distinction, nullable OF assertion and VA mapping FD4073.
+Coordinator fresh IDA reconfirmed3289 FF86EC000000 E9DF010000 and read
+3473 prefix837D0C02 BF6E050000 8B542414 0F8372FDFFFF EB25.
+Lunaf6623fcc owns CMP[ freshEBP+C],2 / MOVEDI56E / MOVEDX[derivedESP14]
+through3480, stopping before JAE. New captures cannot infer post-call EBP.
+Lunade803c52 remains active; exclusions ExitEbxRestore/DestinationPrefix.
+Destination prefixf6623fcc full EOF reviewed, accepted4290exit0; corrected
+nullable flag assertions and decoupled selector fixtures from comparison
+DWORDs. Selector3 reprojection now explicit, final rerun4292.
+Lunab0f46ecd owns JAE3480 (CFclear selects31F8), otherwise JMP3486
+selects34AD. No target instruction or new memory capture is admitted.
+Current exclusions ExitEbxRestore and DestinationBranchGate.
+Destination branch b0f46ecd full EOF reviewed, accepted4294exit0. Corrected
+capture-level comparison, destination-modeled metadata, guarded known CF,
+and added distinct pending/null and non-normal/false ancestor fixtures.
+Coordinator freshIDA34AD: C7442450FFFFFFFF8B74243C85F67425...
+Fresh31F8: 8A028AC80FB6D8C0E90480E103C1EB06884C2412...
+Lunade7a0eb4 owns34AD ESP50 store / freshESP3C loadESI / TEST through34BB;
+only short-jump-selected34AD admitted, no JZ/release semantics yet.
+Exclusions ExitEbxRestore/DiagnosticCleanupStackPrefix. de803c52 still active.
+Cleanup stack prefixde7a0eb4 full EOF reviewed and accepted4296exit0.
+Corrected fixture pre-ADD ESP and wrapped resulting addresses, capture nesting;
+added explicit alternate31F8 rejection with supplied-zero capture unused.
+Lunaad52e1c0 owns JZ34BB7425: TESTZFset selects34E2 otherwise34BD.
+No target/atomic/release instruction admitted; all TEST flags remain intact.
+Current exclusions ExitEbxRestore/DiagnosticCleanupZeroBranch.
+Cleanup zero branchad52e1c0 full EOF reviewed, accepted4298exit0 after
+correcting own read-count assertion (ancestor reads live in effect prefix).
+Luna99ee3bf6 owns OR EBX,-1 / LEA EAX,[ESI4] / MOVECX,EBX through34C5;
+LOCKXADD remains unentered. No prior EBX capture needed for absorbing OR.
+IOCP EBXde803c52 released; coordinator review pending, not yet accepted.
+Current exclusions ExitEbxRestore/DiagnosticCleanupRegisterPreparation.
+IOCP exit EBXde803c52 full EOF reviewed and accepted4300exit0. Corrected
+fixture nested input and pre-call ESP expectation (two earlier POPs add8).
+Fresh restored EBX remains independent when its read aliases prior POP.
+Luna6d2c79dd owns fresh post-call EBP MOVESP,EBP / independentSavedEBP
+POP throughE7; no RET admitted. Luna99ee3bf6 owns parser register prefix.
+Current exclusions ExitFrameReset/DiagnosticCleanupRegisterPreparation.
+Parser registers99ee3bf6 and IOCP frame6d2c79dd full EOF reviewed, accepted
+ordinary full4302exit0 with all draft exclusions removed. Parser agent ran a
+prohibited build; coordinator forced nonincremental/nonshared full validation,
+did not rely on that agent build, and reiterated no-build rules to successors.
+Frame fixture capture nesting and named arguments corrected before validation.
+Coordinator freshIDA34C5 F00FC10875178B068BCEFF108D4608F0; E7 C3.
+Lunae0c61ca8 owns captured locked XADD DWORD[EAX],ECX through34C9;
+logical RMW only, no concurrency/native-atomic claims. Luna637b2743 owns
+fresh runtime-target RET E7 transfer with wrapping ESP+4, no target entry.
+Current draft exclusions DiagnosticCleanupXadd/ExitReturnTransfer.
+Newest ordinary full baseline4302exit0 supersedes4274.
+XADDe0c61ca8 and exitRET637b2743 full EOF reviewed, accepted ordinary
+full4308exit0 with no exclusions. Fixed XADD helper accessibility, missing
+Numerics import, nullable ZF assertion, fixture capture nesting/ancestor levels
+and rejected-parent bounded completion. Logical RMW source remains independent.
+IOCP RET retains runtime destination0/max without code-entry or validity claims;
+ESPafter derives from reset-frame source+8, never restoredEBP+8.
+Luna6342e9e5 owns JNZ34C97517 selecting34E2 or34CB; Luna1ec57241
+identifies one next genuine IOCP gap read-only, prioritizing8B0.
+Current draft exclusion only DiagnosticCleanupXaddBranch.
+Newest ordinary full baseline4308exit0 supersedes4302.
+IOCP gap analyst1ec57241 consumed:8B0 clock prefix already exists separately;
+next genuine gap dispatcher entryBBDDB0..BBDDEB before modeled lockgate.
+Coordinator freshIDA59byte window:
+558BEC6AFF68183CA40164A1000000005083EC0C535657A10050DC0133C5508D45F4
+64A3000000008BF18D5E6CC645EC0153895DE8FF158442AC01.
+Luna499a0c50 owns bounded entry frame/FS-read prefixB0..C4 only, fresh
+entry ESP/EBP/flags and FSoffset0DWORD; no caller ABI/register assumptions.
+Clock dispatcher-call pending admission must remain distinct from normal return.
+Current draft exclusions DiagnosticCleanupXaddBranch/DispatcherEntryFramePrefix.
+XADD branch6342e9e5 full EOF reviewed and accepted4310exit0. Corrected
+ancestor API levels and nonexistent cleanup-prefixed destination capture names;
+ancestor reads/effects live in register parent, RMW evidence remains separate.
+Lunac8e8de45 owns freshvptr MOV EAX,[ESI] / MOVECX,ESI through34CF,
+only fallthrough34CB admitted; slot0 target/call remains unentered.
+Luna499a0c50 remains on dispatcher entry frame prefix.
+Current exclusions DispatcherEntryFramePrefix/DiagnosticCleanupVirtualCallPreparation.
+Independent offline binary anchors now cover parser diagnostic pushes/call/
+counter jump, destination/cleanup RMW prefix, and IOCP exit call/epilogue.
+Reviewed-subset4312exit0 verifies these against the authorized sample bytes.
+Entry frame499a0c50 full EOF review found forced caller-return rewriting and
+missing unused-capture metadata; same owner revises before admission. No
+entry-frame code is accepted or registered yet. c8e8de45 remains active.
+Virtual-call preparationc8e8de45 full EOF reviewed, accepted4314exit0.
+Corrected alternate-ancestor API level; added actual aliased earlier-store
+regression with different fresh vptr value instead of equal-value pseudo-alias.
+Luna1a4c728c owns freshslot0 target/explicit opaque return at34CF through
+34D1; no post-call register or ABI preservation admitted.
+Entry frame499a0c50 remains under same-owner revision.
+Current exclusions DispatcherEntryFramePrefix/DiagnosticCleanupVirtualCallReturn.
+Entry frame499a0c50 revision full EOF reviewed, accepted4316exit0. Original
+caller return/outcome/bounds now preserved; child captures distinguish unused/
+missing. Coordinator fixed missingFS state ordering and flags capture lifetime:
+entry flags are captured before SUB overwrite, not retroactively unused.
+Rejected child FlagsAtStop forwards actual caller flags separately.
+Luna4b901018 owns fresh EBX/ESI/EDI PUSH C4..C6 stoppingC7 before cookie
+global read. Luna1a4c728c remains on parser indirect-call return.
+Current exclusions DispatcherEntryRegisterSave/DiagnosticCleanupVirtualCallReturn.
+Register-save4b901018 fullEOF accepted4318exit0; corrected fixture DWORD nullable
+sequence and own-vs-parent completed instruction assertions. Three PUSH saves
+preserve derivedESP and SUBflags, stopC7. Luna508a942f owns C7MOV globalcookie,
+CCXOR derivedEBP, CEPUSH stoppingCF. No cookie-validation semantics.
+Virtual-return1a4c728c fullEOF accepted4320exit0; independent slot-zero target,
+explicitreturn, actualrejectedbounds and no postopaque registerforwarding.
+Agent again ran forbiddenbuild/Gitchecks; coordinator did not rely on them and
+ran nonincremental/no-shared validation after registering checks.
+FreshIDA BD34D1 bytes24:8D4608F00FC1184B75078B068BCEFF50048B4C244864890D.
+Lunae3f9941b owns ONLY D1LEA from freshpostcallESI stoppingD4 beforeLOCKXADD.
+Current exclusions EntryCookiePreparation/DiagnosticCleanupPostCallAddress.
+3ee62c7 committed/pushed register-save and virtual-return pairs. Independent
+offline binary anchors added for dispatcherB0..CF and parserCB..E2;4322exit0.
+Latest ordinary full remains4308; reviewed subset4322 excludes two active drafts.
+Cookie508a942f and post-call addresse3f9941b pairs fully reviewed through EOF,
+registered and ordinary full4324exit0 accepted. Both agents respected no-build
+restriction. Cookie load remains independent under aliasing; immutable frame
+reprojection ignores legacy supplied plan, XOR flags computed and PUSH wraps.
+Post-call LEA uses freshESI only, parentcompletion separate from childcompletion.
+Successors Lunaf0ce39cb owns CFLEA EBP-0C and D2FS:[0] logicalpublication
+stoppingD8 beforeMOVESI,ECX. Luna1f4b5beb owns D4secondLOCKXADD requiring
+freshpostcallEBX and operationDWORD, stoppingD8 beforeDEC. Never inherit oldEBX.
+Current exclusions EntryFsPublication/DiagnosticCleanupSecondXadd.
+FSpublicationf0ce39cb fullEOF reviewed registered4326exit0. DerivedframeLEA
+wraps, logicalFS:[0]write remains segment-relative and oldFSreadindependent.
+Luna2b1d0834 owns D8MOVESI freshECX, DALEAEBX ESI6C, DDbyteframewrite,
+E1PUSHEBX and E2DWORDframewrite stoppingE5 beforeimportcall.
+SecondXADD1f4b5beb remains active; current exclusions EntryLockPreparation/
+DiagnosticCleanupSecondXadd. Latest ordinaryfull4324, subset4326.
+SecondXADD1f4b5beb fullEOFreviewed registered runner4328 built successfully but
+offline checker ran for many minutes withoutcompletion; stopped that exact
+shell. No acceptance/commit yet. Luna dfbf162c is fixing repeated immutable
+semantic reprojection cost ONLY in SecondXadd/PostCallAddress/VirtualCallReturn
+production files; preserve API/invariants, no globalcache. Agent edits pending.
+Lockprep2b1d0834 fullEOFreviewed and registered AFTER4328 build, so requires
+next combinedvalidation. Successors f289259d DEC/JNZ D8..DB/E2 active.
+Importreturn0b2c8203 released/reviewed throughEOF, revisionrequested: missing
+constructor bool, EAXcapturestate gating when targetmissing, explicit attempted
+cellread evidence and truthful aliasfixture. No acceptance/registration yet.
+Current exclusions EntryImportReturn/DiagnosticCleanupSecondXaddBranch.
+Latest HEADcd8a812; no running coordinatorvalidation after stopping4328.
+Combined runner4330exit0 after dfbf162c per-plan thread-safe Lazy caches in
+SecondXadd/PostCallAddress/VirtualCallReturn; full diff reviewed predicates
+unchanged. Exponential repeat work removed without globalcache or skippedchecks.
+SecondXadd1f4b5beb, DECbranchf289259d, lockprep2b1d0834 and revisedimportreturn
+0b2c8203 now validated including registeredchecks. Arbitrary ADD helper distinct
+from original hardcoded-minusone helper. Importtargetread missing records attempt
+but no call; supplied EAX unused until targetpresent and normalreturn.
+Successors994da0c3 secondvptrprep DB..DF active; b304739b returnedTEST/JNZ
+adapter EB..EF/F6 active using existinglockgate with no postreceiver forwarding.
+Current exclusions SecondVirtualCallPreparation/EntryReturnedTestBranch.
+Latest ordinary full4324; reviewed subset4330 succeeded with bothactive excluded.
+ReturnedTEST b304739b fullEOF accepted, reuseslegacygate withoutreceiver captures,
+noeffects beyondTEST/JNZ, unentered EF/F6 targets. Secondvptr994da0c3 revisedpair
+fullEOF reviewed: missingread DB childfalse, missingEBXfixtureD4, actualaliased
+parentstackstore differentfreshread regression. Registeredboth ordinaryfull4332
+exit0 (noexclusions atvalidationstart). New Luna545f307e owns slot4freshtarget/
+opaquereturn DF..E2; Lunac41bb602 owns zeroTEST fallbackPUSH atEF with fresh
+postcallESP/EBX, stoppingF0 noABIlineage. Currentexclusions SecondVirtualCallReturn/
+EntryFallbackPush. No running coordinatorvalidation.
+Slot4return545f307e fullEOF reviewed registered; fallbackpushc41bb602 revised
+pair fullEOF reviewed standalonechecks restored acceptedReturnedTestBranch
+diffempty. Corrected FlagsBeforePush metadata and actualprecallEBX/ESI fixtures,
+coordinator fixed crossflagstypecomparison. runner4334 built/run stillongoing.
+FSrestorea2625474 initially editedwrongexistingchecks, corrected standalonepair
+fullEOF reviewed coordinatorfixed branchancestorlevel. Fallbackimport23850f43
+fullEOF reviewed noissues. Bothregistered AFTER4334build require nextcombined.
+dfbf162c sameperformancefollowup caches acceptedSecondXaddBranch immutable
+Ordered/ExactClean properties; threepreviousnodesalreadycached. Pendingrelease.
+Luna581fd123 owns fourfresh epiloguePOP ED..F1; Lunafb28d384 owns ONLYfallback
+counter INC F6..F9 requiring freshpostfallbackEBX and independentDWORD.
+Currentexclusions SecondCallRegisterPops/FallbackCounter. HEADd51b86b.
 
 The user's finish-current-tasks-and-stop request supersedes earlier
 continuous-dispatch instructions. All current assignments are now released,

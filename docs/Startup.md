@@ -1,5 +1,48 @@
 # Process startup (partial)
 
+The current dispatcher entry continuation reconstructs the zero-result fallback
+as a fresh stack PUSH, a distinct indirect import return, and a counter INC
+using independently captured post-call EBX and DWORD values. Its next comparison
+is byte-sized (`80 7D 08 00` at raw BBDDF9), with a fresh EBP and argument byte;
+earlier counter writes do not supply that read even when addresses alias.
+After frame/receiver clears, JZ at raw BBDE08 selects BBDECA for argument zero
+or BBDE0E otherwise. The latter compares fresh DWORD[VA1E68590] with one;
+JG at BBDE15 uses signed greater-than, selecting BBDE2B or BBDE17.
+The non-taken path projects independent fresh ESP/ECX into PUSH ECX and PUSH 0,
+stopping at BBDE1A before the next diagnostic argument preparation. From there,
+the continuation now includes diagnostic argument setup through the direct CALL
+at BBDE26, bounded return at BBDE2B, and call-target arithmetic
+(`MOV/XOR/SUB/SAR/TEST`) through BBDE3D with a stop before the JZ at BBDE3E.
+Current source-level bounded branch coverage includes:
+- JZ not-taken path `BBDE40..BBDE49`, stop before `BBDE4B` JNZ.
+- JZ taken path to `BBDE83`, stop before indirect CALL `BBDE86`.
+- Nonzero-path call boundaries at `BBDE5D` and `BBDE6C`, each with explicit
+  normal-return stop at `BBDE63`/`BBDE6F`.
+- Nonzero post-call arithmetic and JB boundary through `BBDE81`, with both
+  branch destinations modeled.
+- Zero-path post-call continuation `BBDE8C..BBDE96`, stop before `BBDE97` JZ.
+- Zero-path `BBDE97` split and fallthrough window through `BBDEA2`.
+The focused dispatcher run now rebuilds and executes from the matching focused
+output path and reports `Failures: 0`, including the nonzero/JB and zero
+fallthrough continuations. Earlier stale-focused-binary reports remain
+historical and are not accepted as validation evidence.
+
+The parser diagnostic cleanup continuation now includes both first-branch
+(`BD34E2..BD34F6`) and second-branch epilogue families. First-branch FS restore,
+register POPs, and frame/RET8 compile, but previously cited focused success
+included stale-runner output and is not claimed as current-source runtime
+acceptance.
+Second-branch FS restore/register POPs/frame-return now complete conclusive
+fresh focused runs with `Failures: 0`. All of these remain offline value-only
+projections: missing captures stop at precise boundaries, no native target is
+executed, and no caller continuation is inferred unless explicitly modeled.
+
+Normal second-call parser suffix checks (`SecondVirtualCallReturn`,
+`SecondCallFsRestore`, `SecondCallRegisterPops`, `SecondCallFrameReset`,
+`SecondCallReturn`) now complete in focused runs with `Failures: 0`; they are
+still intentionally not registered in the main `Program.cs` suite list until
+the untracked pair files are explicitly accepted and staged.
+
 The PE entry RVA `0x136B9B0` translates to **raw file offset `0x136ADB0`** using the `.text` section mapping. IDA's raw-file loader did not automatically mark this actual entry as a function; its preexisting `nullsub_112` at raw `0x136B9B0` is **not** the PE entry. A new function was defined at the translated offset.
 
 The entry thunk at `0x136ADB0` calls `0x136B4A4` to initialize the MSVC security cookie (with a corresponding inverted cookie), then jumps to `0x136ADBA`. The latter acquires the CRT startup lock via thread identity and interlocked compare/exchange, runs initializer ranges, optionally invokes the dynamic TLS callback, skips the executable name and whitespace in the command line (respecting quotes), calls the application's entry through `0x2E9630`, then follows the CRT exit/cleanup path. The raw-image decompilation misleadingly labels the passed `0x400000` **image base** as a function; it is not a call into the `MZ` header.
@@ -1204,6 +1247,23 @@ NetworkDispatcherFencedPublicationProjection records both fence/store
 routes, an independent field reload, byte publication and fresh counter
 DEC. It preserves incoming CF and stops before the next PUSH at BBDEAD;
 skipped-but-supplied captures prevent clean completion.
+NetworkDispatcherFinalCallPreparationProjection derives the final local
+argument address from the proven post-cell EBP, independently reads its
+DWORD and pushes it using a fresh ESP. It stops before the indirect call
+at raw BBDEB0; neither target identity nor call behavior is inferred.
+NetworkDispatcherFinalReturnSehStoreProjection independently captures the
+target and normal return, then a fresh post-call EBP/local DWORD. It records
+the DWORD store to FS segment offset zero and stops before BBDEC0 POP;
+no linear address, callee identity, or ABI is inferred.
+NetworkDispatcherRegisterRestoreProjection records four independent POP
+reads and logical register/ESP updates, stopping before the frame reset at
+BBDEC4. Missing captures preserve earlier restored registers and flags.
+NetworkDispatcherFrameResetProjection resets ESP from the proven post-call
+EBP, then independently reads the saved EBP and advances ESP by four.
+It stops before RET4 at BBDEC7 and does not infer a return value or target.
+NetworkDispatcherReturnTransferProjection captures the fresh return target
+at the derived ESP and models the wrapping eight-byte RET4 adjustment.
+The destination is a runtime address, not a raw file offset, and is unentered.
 GameSocketParserStoredByteSelectorGateProjection derives EBX from the
 first header byte and selects BD3294 or BD326A using the fresh stack-byte
 JZ and ordered selector comparisons. Neither destination is entered.
@@ -1211,6 +1271,112 @@ NetworkIoErrorCallbackReturnProjection captures the indirect slot-0x20
 target independently and requires an explicit normal return before the
 BBC986 jump to BBC9BB. Missing or pending captures do not inherit the
 parent's completed boundary; no callback identity or ABI is inferred.
+NetworkIoErrorCallbackLoopGateProjection uses fresh post-call EBP/EDI and
+independent local loads before INC/CMP and the signed JL. It preserves
+unknown CF through INC, then computes the full comparison flags and stops
+before raw BBC8F0 or BBC9CB.
+NetworkIoErrorCallbackPostLoopByteGateProjection independently reloads two
+locals around a fresh byte comparison. The second MOV overwrites EAX but
+preserves CMP8 flags; the selected BBC8B0 or BBC9DB remains unentered.
+NetworkIoErrorCallbackExitPopProjection records independent EDI/ESI stack
+reads using fresh ESP, retains EAX/CMP8 flags and stops before the indirect
+call at BBC9DD. Rejected ancestors retain their actual bounded endpoints.
+NetworkIoErrorCallbackExitCallReturnProjection independently captures the
+call-cell DWORD and explicit normal return. It invalidates arithmetic flags
+only after normal return and stops before POP EBX at BBC9E3.
+NetworkIoErrorCallbackExitEbxRestoreProjection uses fresh post-call ESP and
+an independent saved-EBX DWORD for POP EBX at BBC9E3. It advances ESP by four
+with wrapping arithmetic, preserves unknown flags, and stops before MOV ESP,EBP.
+NetworkIoErrorCallbackExitFrameResetProjection requires fresh post-call EBP
+for MOV ESP,EBP and independently captures the saved DWORD for POP EBP.
+It distinguishes the frame-reset source from restored EBP and stops before
+RET at BBC9E7; missing saved input retains the completed frame reset.
+NetworkIoErrorCallbackExitReturnTransferProjection captures an independent
+runtime target DWORD at the reset ESP for the near RET at BBC9E7. Successful
+transfer advances ESP by four and has no raw-file stop address; the target
+remains unentered and unvalidated.
+NetworkDispatcherEntryFramePrefixProjection admits a clean pending dispatcher
+call from the immutable clock-gate capture without rewriting its return status.
+Fresh entry ESP/EBP and a segment-relative FS:[0] DWORD supply four stack
+pushes and SUB ESP,0Ch. It stops before PUSH EBX at BBDDC4; rejected callers
+retain their actual endpoint and leave entry captures unused.
+NetworkDispatcherEntryRegisterSaveProjection extends the accepted frame with
+fresh EBX/ESI/EDI pushes at BBDDC4..BBDDC6, retaining partial stack state and
+all SUB flags. The cookie global read at BBDDC7 remains unentered.
+GameSocketParserDiagnosticCleanupVirtualCallReturnProjection independently
+captures the slot-zero DWORD at BD34CF and its opaque normal-return observation.
+Pending and abnormal returns retain last-known flags; normal return stops
+at BD34D1 with arithmetic flags and post-call registers unknown.
+NetworkDispatcherEntryCookiePreparationProjection captures the operation-time
+DWORD at VA 1DC5000, XORs it with the derived frame EBP and pushes the result,
+stopping at BBDDCF. Cookie validity and ABI semantics remain unmodeled.
+GameSocketParserDiagnosticCleanupPostCallAddressProjection requires independent
+post-call ESI for LEA EAX,[ESI+8], preserving unknown arithmetic flags and stopping
+at BD34D4 before the second locked XADD. It does not inherit pre-call EBX or ESP.
+NetworkDispatcherEntryFsPublicationProjection derives EAX as frame EBP-0Ch
+and records a logical DWORD publication to segment-relative FS:[0] at BBDDD2,
+stopping at BBDDD8. It preserves ESP, XOR flags and the distinct earlier FS read;
+no linear-address or exception-ABI interpretation is made.
+NetworkDispatcherEntryLockPreparationProjection consumes fresh entry ECX,
+derives EBX as ESI+6Ch and records the byte local, stack push and DWORD local
+in order before BBDDE5. NetworkDispatcherEntryImportReturnProjection captures
+the fresh target at VA 1AC4284 and explicit return independently; normal return
+requires fresh EAX for a clean BBDDEB boundary and forwards no other registers.
+GameSocketParserDiagnosticCleanupSecondXaddProjection requires fresh post-call
+EBX and operation-time DWORD independently for the locked exchange at BD34D4.
+Its DEC/JNZ suffix preserves ADD carry, decrements the exchanged old DWORD and
+selects unentered BD34DB or BD34E2. Per-plan lazy validation preserves immutable
+semantic checks without repeatedly reconstructing the same ancestry.
+NetworkDispatcherEntryReturnedTestBranchProjection reuses the existing lock-gate
+TEST/JNZ without supplying post-call receiver state, stopping at BBDDEF or
+BBDDF6 before any push, call or counter read. The second parser virtual-call
+preparation independently captures DWORD[ESI] at BD34DB, sets ECX=ESI and stops
+before the slot-four call at BD34DF. Missing reads stop at BD34DB, not after MOV.
+GameSocketParserSelectorDiagnosticPreparationProjection records the five
+diagnostic argument pushes at BD326A..BD3280. It derives ESP from the
+count-consumption lineage but requires fresh ESI and an independent DWORD
+at ESI+110 for the fifth push, preserving the first four pushes if either
+capture is missing. The call at BD3281 remains unentered.
+GameSocketParserSelectorDiagnosticReturnCleanupProjection records an explicit
+opaque-call return observation and requires fresh post-call ESP for ADD ESP,14h
+at BD3286. Normal return invalidates earlier arithmetic flags; the ADD derives
+all six flags and stops before the DWORD increment at BD3289.
+GameSocketParserSelectorDiagnosticCounterContinuationProjection requires
+fresh post-call ESI and an independent DWORD at ESI+EC. Its wrapping INC
+preserves CF from the preceding ADD, leaves ESP unchanged, and follows the
+unconditional jump to raw BD3473 (code VA FD4073) without entering that target.
+GameSocketParserDiagnosticDestinationPrefixProjection captures fresh post-call
+EBP and independent DWORDs at EBP+C and derived ESP+14. CMP with 2 replaces
+arithmetic flags; MOV EDI,56Eh and MOV EDX preserve them. It stops before
+JAE at raw BD3480 and retains the committed EDI load if the EDX read is missing.
+GameSocketParserDiagnosticDestinationBranchGateProjection uses only the
+comparison carry flag: JAE selects raw BD31F8 for unsigned values at least 2;
+otherwise the short jump selects BD34AD. Both paths preserve registers and
+flags and stop before executing their selected target.
+GameSocketParserDiagnosticCleanupStackPrefixProjection records the DWORD
+store of FFFFFFFF at derived ESP+50, then independently reads ESP+3C into
+ESI and applies TEST ESI,ESI. Missing input retains the committed store;
+successful TEST leaves AF unknown and stops before JZ at BD34BB.
+GameSocketParserDiagnosticCleanupZeroBranchProjection preserves the TEST
+flags and selects BD34E2 for zero ESI or BD34BD otherwise. It adds no
+memory effects and executes neither selected target.
+GameSocketParserDiagnosticCleanupRegisterPreparationProjection derives
+EBX and ECX as FFFFFFFF from OR EBX,-1 and MOV ECX,EBX without requiring
+the prior EBX value. LEA EAX,[ESI+4] wraps without dereferencing memory.
+The prefix preserves ESP and stops before LOCK XADD at BD34C5.
+GameSocketParserDiagnosticCleanupXaddProjection records an operation-time
+DWORD capture for LOCK XADD [EAX],ECX. It projects the wrapping sum with
+FFFFFFFF, places the old DWORD in ECX, and derives ADD32 flags. This is a
+bounded logical read-modify-write, not a concurrency simulation, and stops
+before JNZ at BD34C9.
+GameSocketParserDiagnosticCleanupXaddBranchProjection preserves the captured
+RMW result and ADD32 flags. JNZ selects BD34E2 unless the old DWORD was 1,
+in which case its zero result selects the fallthrough at BD34CB. Neither
+destination is executed by this projection.
+GameSocketParserDiagnosticCleanupVirtualCallPreparationProjection reads a
+fresh DWORD at derived ESI into EAX and sets ECX to ESI. The read remains
+independent of earlier aliased stores; missing input preserves prior registers
+and flags. It stops before the indirect slot-zero call at BD34CF.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
