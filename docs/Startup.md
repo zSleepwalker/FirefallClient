@@ -369,9 +369,15 @@ PE import names identify cell VA `0x1AC4424` as `std::_Xbad_alloc`, `0x1AC45C0` 
 
 `ReliableReceiveEmptyPublicationProjection` composes only the zero-slot, clean zero-header branch through independent frame+8 publication. A normal nonzero-header callback stops at its result boundary instead; an otherwise matching branch destination cannot bypass forbidden captures or missing prerequisites.
 
-`UnreliableReceiveCallbackPresenceProjection` covers `[BE5B32,BE5B52)` for zero marker. A nonzero receiver+14 DWORD skips the diagnostic. Zero pushes `0`, `2CA`, `1B58C06`, `1B58C07` through absolute cell `1C15EA0`; normal return gates cleanup 16. This first target check does not fix a later target reload.
+`UnreliableReceiveCallbackPresenceProjection` covers `[BE5B32,BE5B52)` from a validated boundary reached either by the zero-selector branch or normally returning nonzero-marker scalar cleanup. A nonzero receiver+14 DWORD skips the diagnostic. Zero pushes `0`, `2CA`, `1B58C06`, `1B58C07` through absolute cell `1C15EA0`; normal return gates cleanup 16. This first target check does not fix a later target reload.
 
 `UnreliableReceiveDirectCallbackProjection` covers `[BE5B52,BE5B64)`. It pushes zero, zero-extended SI, independent DWORD[payload+4], and the payload+8 address, then independently reloads receiver+14 and calls EAX. Missing later captures preserve preceding pushes; target zero is not guarded in this window.
+
+`UnreliableReceiveMarkerScalarProjection` admits the scalar handoff only after a normal marker-callback return; frame+8 BYTE and callback-return EAX remain independent captures. `UnreliableReceivePresenceCallbackProjection` admits only successful presence outcomes and requires matching receiver identity before projecting the independent callback-target reload. Invalid or unreached captures cannot advance either composition.
+
+The reliable masked-length callback's validated entry also admits the zero-result diagnostic after its normal cleanup, not only the nonzero-result branch.
+
+`ReliableReceiveResultLengthProjection` composes both admitted result routes with the length callback. Only a normally returned zero-result diagnostic projects cleanup 16 at `BE53BC`; that completed cleanup remains visible if the later length capture is missing or invalid.
 
 ## Sorted adapter-address MD5 (offline projection)
 

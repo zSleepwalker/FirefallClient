@@ -31,15 +31,37 @@ internal static class UnreliableReceiveCallbackPresenceChecks
                 == 0x01C15EA0
             && InstructionsMatch());
 
-        check("Only the zero entry marker is accepted",
-            UnreliableReceiveCallbackPresenceProjection.IsValidEntryMarker(0)
-            && RejectsInvalidEntryMarker(1)
-            && RejectsInvalidEntryMarker(byte.MaxValue));
+        UnreliableReceiveCallbackPresencePlan rejectedEntry =
+            UnreliableReceiveCallbackPresenceProjection.Project(
+                new(0x10203040, false, 0, true));
+        check("A false entry-boundary validation rejects without projection effects or flags",
+            rejectedEntry.Outcome
+                == UnreliableReceiveCallbackPresenceOutcome.EntryBoundaryNotValidated
+            && rejectedEntry.ReceiverDwordAt14Address is null
+            && !rejectedEntry.ReceiverDwordAt14Read
+            && rejectedEntry.CapturedReceiverDwordAt14 is null
+            && !rejectedEntry.UnreachedDiagnosticCallReturnProvided
+            && rejectedEntry.StackPushesInInstructionOrder.IsEmpty
+            && !rejectedEntry.IndirectCallReached
+            && rejectedEntry.DiagnosticCallReturnedNormally is null
+            && !rejectedEntry.NormalCallBoundaryReached
+            && !rejectedEntry.StackCleanupReached
+            && rejectedEntry.StackCleanupBytes is null
+            && rejectedEntry.SelectedDestinationRawFileOffset is null
+            && rejectedEntry.StopAtRawFileOffsetExclusive == 0x00BE5B32);
+
+        check("A validated boundary does not presume which selector/callback path arrived",
+            UnreliableReceiveCallbackPresenceProjection.Project(
+                new(0x10203040, true, 0, true)).Outcome
+                == UnreliableReceiveCallbackPresenceOutcome.NormalReturnReached
+            && UnreliableReceiveCallbackPresenceProjection.Project(
+                new(0x10203040, true, 1, null)).Outcome
+                == UnreliableReceiveCallbackPresenceOutcome.NonzeroReceiverDword);
 
         UnreliableReceiveCallbackPresencePlan missingReceiverRead =
-            UnreliableReceiveCallbackPresenceProjection.Project(new(0x10203040, 0, null, null));
+            UnreliableReceiveCallbackPresenceProjection.Project(new(0x10203040, true, null, null));
         UnreliableReceiveCallbackPresencePlan diagnosticAfterMissingRead =
-            UnreliableReceiveCallbackPresenceProjection.Project(new(0x10203040, 0, null, true));
+            UnreliableReceiveCallbackPresenceProjection.Project(new(0x10203040, true, null, true));
         check("A missing first receiver read blocks the route and any later diagnostic capture",
             missingReceiverRead.Outcome
                 == UnreliableReceiveCallbackPresenceOutcome.MissingReceiverDwordAt14
@@ -55,13 +77,13 @@ internal static class UnreliableReceiveCallbackPresenceChecks
 
         UnreliableReceiveCallbackPresencePlan nonzeroReceiver14 =
             UnreliableReceiveCallbackPresenceProjection.Project(
-                new(0x10203040, 0, 1, null));
+                new(0x10203040, true, 1, null));
         UnreliableReceiveCallbackPresencePlan maxReceiver14 =
             UnreliableReceiveCallbackPresenceProjection.Project(
-                new(0x10203040, 0, uint.MaxValue, null));
+                new(0x10203040, true, uint.MaxValue, null));
         UnreliableReceiveCallbackPresencePlan unreachableDiagnostic =
             UnreliableReceiveCallbackPresenceProjection.Project(
-                new(0x10203040, 0, 1, false));
+                new(0x10203040, true, 1, false));
         check("Any nonzero receiver DWORD skips the callback path and reaches the branch destination",
             nonzeroReceiver14.Outcome == UnreliableReceiveCallbackPresenceOutcome.NonzeroReceiverDword
             && nonzeroReceiver14.CapturedReceiverDwordAt14 == 1
@@ -80,13 +102,13 @@ internal static class UnreliableReceiveCallbackPresenceChecks
 
         UnreliableReceiveCallbackPresencePlan missingDiagnostic =
             UnreliableReceiveCallbackPresenceProjection.Project(
-                new(0x10203040, 0, 0, null));
+                new(0x10203040, true, 0, null));
         UnreliableReceiveCallbackPresencePlan nonReturningDiagnostic =
             UnreliableReceiveCallbackPresenceProjection.Project(
-                new(0x10203040, 0, 0, false));
+                new(0x10203040, true, 0, false));
         UnreliableReceiveCallbackPresencePlan normalDiagnostic =
             UnreliableReceiveCallbackPresenceProjection.Project(
-                new(0x10203040, 0, 0, true));
+                new(0x10203040, true, 0, true));
         uint[] expectedPushes = { 0, 0x2CA, 0x01B58C06, 0x01B58C07 };
         check("Zero enters the opaque call; only its normal return reaches the 0x10-byte cleanup",
             missingDiagnostic.Outcome
@@ -118,24 +140,11 @@ internal static class UnreliableReceiveCallbackPresenceChecks
 
         UnreliableReceiveCallbackPresencePlan wrappedReceiverAddress =
             UnreliableReceiveCallbackPresenceProjection.Project(
-                new(uint.MaxValue - 0x13, 0, null, null));
+                new(uint.MaxValue - 0x13, true, null, null));
         check("The independently captured receiver field address uses DWORD wraparound",
             wrappedReceiverAddress.ReceiverDwordAt14Address == 0
             && UnreliableReceiveCallbackPresenceProjection.ReceiverDwordAt14Address(uint.MaxValue)
                 == 0x13);
-    }
-
-    private static bool RejectsInvalidEntryMarker(byte marker)
-    {
-        try
-        {
-            UnreliableReceiveCallbackPresenceProjection.Project(new(0, marker, null, null));
-            return false;
-        }
-        catch (ArgumentOutOfRangeException)
-        {
-            return true;
-        }
     }
 
     private static bool InstructionsMatch()

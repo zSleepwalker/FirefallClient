@@ -12087,3 +12087,33 @@ reliable empty-publication composition, unreliable callback presence/direct
 code now reviewed, registered, passing the pinned runner.
 Luna `7ae3b8a7-9123-49a0-9b8b-ad68491ad34c` composes presence gate and
 independently reloaded direct callback target, without forcing target equality.
+
+Pushed reviewed joins/direct callbacks as `28ced0e`. Successor refinements:
+length callback's entry flag is renamed to boundary validation, since a
+normal zero-result diagnostic also falls through cleanup to `BE53BF`.
+Luna `8c70c4c4-2490-48aa-a28f-1df6dec47335` composes result/cleanup/length.
+Likewise `BE5B32` is reached by zero marker OR normal nonzero-marker scalar
+continuation; presence author is changing zero-only marker gate to explicit
+boundary validation, and presence-composition author notified.
+Luna `3762ac38-ad8b-4ba6-8653-d5cdbf4f238f` composes marker/scalar.
+Luna `e5867f3c-327a-41af-9cc1-8a40c59a71b2` owns BD58E0 diagnostic-entry
+projection; sole evidence writer `0f3b12cb-5838-4f41-b1b1-192a508553cd`
+pins its entry window, preserving all pending unreliable callback anchors.
+
+Direct-callback continuation raw IDA confirms `[BE5B64,BE5B78)`:
+global read, cleanup16, ESI=callbackEAX, frame+8 write, payload push,
+call BD5C60. Luna `3fd602d1-4fe9-4d7c-a670-e6c533b7e550` owns it.
+Luna `e2a7a633-9f01-4abe-94e6-b3204112b7dd` owns TEST ESI / zero-result
+forwarding handoff `[BE5B78,BE5B9E)`. Nonzero-result stores and unsigned
+receiver+4C threshold `[BE5BAC,BE5BC4)` owner is
+`a3c3722a-0c1f-45ae-acea-20edf5b3dbb4`; independent frame-4 reload
+precedes both result+20/+24 stores.
+Read-only Luna `e3a87479-5439-4484-ba2f-f3594f7d7121` traces XOR helper
+post-diagnostic length/table boundary starting `BD5912`, stopping before loop.
+
+Boundary API corrections and marker/scalar, presence/direct, result/length
+compositions are reviewed and registered. Coordinator corrected nullable
+direct-plan test member access. Sole evidence writer now
+`309093e3-ef01-40f8-8d97-80a79f4bb6f5` for unreliable result continuations.
+Zero-result return tail `[BE5B9E,BE5BAC)` owner:
+`0c3bd73d-e266-403a-95a8-cafe74c8b467`.

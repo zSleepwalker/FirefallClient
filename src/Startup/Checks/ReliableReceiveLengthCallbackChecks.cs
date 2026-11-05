@@ -52,7 +52,7 @@ internal static class ReliableReceiveLengthCallbackChecks
         ReliableReceiveLengthCallbackPlan headerWithUnreachedLaterCaptures =
             ReliableReceiveLengthCallbackProjection.Project(
                 new(true, 0x10203040, null, 0, 0, 0, true));
-        check("The prior-return EAX gate is explicit and header reads precede all later captures",
+        check("Entry-boundary validation is explicit and header reads precede all later captures",
             entryGateNotMet.Outcome == ReliableReceiveLengthCallbackOutcome.EntryGateNotMet
             && !entryGateNotMet.PayloadHeaderRead
             && entryGateNotMet.UnreachedPayloadHeaderCaptureProvided

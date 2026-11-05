@@ -4,12 +4,13 @@ namespace Firefall.Reconstruction.Startup;
 
 public readonly record struct UnreliableReceiveCallbackPresenceCapture(
     uint ReceiverEdi,
-    byte EntryMarker,
+    bool EntryBoundaryValidated,
     uint? ReceiverDwordAt14,
     bool? DiagnosticCallReturnedNormally);
 
 public enum UnreliableReceiveCallbackPresenceOutcome
 {
+    EntryBoundaryNotValidated,
     MissingReceiverDwordAt14,
     UnreachedCaptureProvided,
     NonzeroReceiverDword,
@@ -22,7 +23,7 @@ public readonly record struct UnreliableReceiveCallbackPresencePlan(
     UnreliableReceiveCallbackPresenceCapture Capture,
     UnreliableReceiveCallbackPresenceOutcome Outcome,
     bool ReceiverDwordAt14Read,
-    uint ReceiverDwordAt14Address,
+    uint? ReceiverDwordAt14Address,
     uint? CapturedReceiverDwordAt14,
     bool UnreachedDiagnosticCallReturnProvided,
     ImmutableArray<uint> StackPushesInInstructionOrder,
@@ -42,6 +43,8 @@ public readonly record struct UnreliableReceiveCallbackPresenceInstructionEviden
 
 /// <summary>
 /// Projects the receiver-presence gate and its opaque indirect call through stack cleanup.
+/// The validated entry boundary admits either the clean zero-selector branch or the
+/// normal nonzero-marker callback scalar-helper cleanup path.
 /// </summary>
 public static class UnreliableReceiveCallbackPresenceProjection
 {
@@ -123,23 +126,17 @@ public static class UnreliableReceiveCallbackPresenceProjection
     public static uint NonzeroBranchDestination(uint branchRawFileOffset) =>
         unchecked(branchRawFileOffset + 2 + 0x1A);
 
-    public static bool IsValidEntryMarker(byte marker) => marker == 0;
-
-    public static void ValidateEntryMarker(byte marker)
-    {
-        if (!IsValidEntryMarker(marker))
-        {
-            throw new ArgumentOutOfRangeException(
-                nameof(marker),
-                marker,
-                "This projection requires entry marker zero.");
-        }
-    }
-
     public static UnreliableReceiveCallbackPresencePlan Project(
         UnreliableReceiveCallbackPresenceCapture capture)
     {
-        ValidateEntryMarker(capture.EntryMarker);
+        if (!capture.EntryBoundaryValidated)
+        {
+            return Stop(
+                capture,
+                UnreliableReceiveCallbackPresenceOutcome.EntryBoundaryNotValidated,
+                receiverDwordAt14Address: null,
+                stopAt: EntryRawFileOffset);
+        }
 
         uint receiverDwordAt14Address = ReceiverDwordAt14Address(capture.ReceiverEdi);
         if (capture.ReceiverDwordAt14 is not uint receiverDwordAt14)
@@ -219,7 +216,7 @@ public static class UnreliableReceiveCallbackPresenceProjection
     private static UnreliableReceiveCallbackPresencePlan Stop(
         UnreliableReceiveCallbackPresenceCapture capture,
         UnreliableReceiveCallbackPresenceOutcome outcome,
-        uint receiverDwordAt14Address,
+        uint? receiverDwordAt14Address,
         bool receiverDwordAt14Read = false,
         uint? capturedReceiverDwordAt14 = null,
         bool unreachedDiagnosticCallReturnProvided = false,

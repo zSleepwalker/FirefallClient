@@ -33,6 +33,9 @@ UnreliableReceiveResidueJoinChecks.Run(Check);
 ReliableReceiveEmptyPublicationChecks.Run(Check);
 UnreliableReceiveCallbackPresenceChecks.Run(Check);
 UnreliableReceiveDirectCallbackChecks.Run(Check);
+UnreliableReceiveMarkerScalarChecks.Run(Check);
+UnreliableReceivePresenceCallbackChecks.Run(Check);
+ReliableReceiveResultLengthChecks.Run(Check);
 PayloadGrowthZeroFillChecks.Run(Check);
 
 void Check(string name, bool condition)

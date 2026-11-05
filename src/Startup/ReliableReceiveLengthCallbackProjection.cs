@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 namespace Firefall.Reconstruction.Startup;
 
 public readonly record struct ReliableReceiveLengthCallbackCapture(
-    bool EntryPriorReturnEaxNonzero,
+    bool EntryBoundaryValidated,
     uint PayloadEdi,
     ushort? PayloadHeader,
     uint? PayloadDwordAt8,
@@ -59,8 +59,9 @@ public readonly record struct ReliableReceiveLengthCallbackInstructionEvidence(
     string Bytes);
 
 /// <summary>
-/// Projects the validated-entry length callback through its indirect call's
-/// normal-return boundary, without assigning meaning to the captured values.
+/// Projects the length callback from a boundary admitted either by a nonzero
+/// result edge or by normally returning diagnostic cleanup, through its
+/// indirect call's normal-return boundary without interpreting captured values.
 /// </summary>
 public static class ReliableReceiveLengthCallbackProjection
 {
@@ -166,7 +167,7 @@ public static class ReliableReceiveLengthCallbackProjection
     public static ReliableReceiveLengthCallbackPlan Project(
         ReliableReceiveLengthCallbackCapture capture)
     {
-        if (!capture.EntryPriorReturnEaxNonzero)
+        if (!capture.EntryBoundaryValidated)
         {
             return Stop(
                 capture: capture,
