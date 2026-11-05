@@ -12348,6 +12348,17 @@ owns new CapacityPrefix pair only throughbeforecallB5.
 Post-call read-onlytrace owner
 `ee9585e1-6267-4b8b-ae63-c552c9250ed8` startsBE6BCA.
 
+Latest pushed HEAD `036eecb` pins final/loop native anchors.
+CapacitySeedLoop, SlotCallPublication, PublicationReturn pairs reviewed,
+registered and passing. Coordinator added explicit unreached optional
+seed-loop identity flags and guarded formedECX without null-forgiving.
+Whole continuation composition owner
+`1d833ee8-e59f-4376-9a91-08fb9199b226` owns ContinuationLifecycle pair.
+Capacity call suffix owner `a49bbeac-5ee5-41a0-9965-4cc7c58870ab`
+owns CapacityCall pair. Sole evidence writer
+`4940b18d-783c-40f4-9512-5fd0221f7b51` adds prefix/call anchors;
+await release before staging.
+
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
 indirect callback, then fresh receiver+4C DEC and receiver+48 zero/INC.

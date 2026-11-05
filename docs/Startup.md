@@ -421,6 +421,8 @@ The reliable masked-length callback's validated entry also admits the zero-resul
 
 `FrameHandoffFinalWriteReturnProjection` tests ECX, conditionally reads a pointer at frame+8 and then its pointee DWORD before writing to ECX, and independently increments receiver+10 with DWORD wrap before RET4. `FrameHandoffCapacityLoopProjection` projects one iteration only: CMP of wrapped ESI-EDX against one governs the zero-difference branch, followed by the unsigned ESI/eight exit or unsigned `(0FFFFFFF-ESI)<ESI` failure gate; otherwise ESI doubles and selects the loop entry.
 
+`FrameHandoffCapacitySeedLoopProjection` derives a single iteration's ESI/EDX from the seed and validates optional identities before projecting it. `FrameHandoffSlotCallPublicationProjection` carries native receiver ESI, slot byte offset EBX and wrapping sum EDI into publication; nonzero-slot routes skip calls/stores, while zero-slot routes require unflagged call results. `FrameHandoffPublicationReturnProjection` validates formed ECX and receiver ESI before final reads, writes and increment.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves
