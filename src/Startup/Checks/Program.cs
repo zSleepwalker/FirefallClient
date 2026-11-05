@@ -60,6 +60,7 @@ HighCountObjectHelperEntryChecks.Run(Check);
 FrameHandoffHelperEntryChecks.Run(Check);
 UnreliableReceiveHighCountLifecycleChecks.Run(Check);
 FrameHandoffHelperSlotChecks.Run(Check);
+HighCountObjectHelperReturnChecks.Run(Check);
 PayloadGrowthZeroFillChecks.Run(Check);
 
 void Check(string name, bool condition)

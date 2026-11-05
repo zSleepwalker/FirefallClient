@@ -411,6 +411,8 @@ The reliable masked-length callback's validated entry also admits the zero-resul
 
 `FrameHandoffHelperSlotProjection` models the `BE64C5` continuation's mask write to receiver+0C separately from its fresh reload. Independent receiver+8/+10/+4 and indexed-slot reads determine the zero fallthrough at `BE64F2` or nonzero branch to `BE650E`. `UnreliableReceiveHighCountLifecycleProjection` composes successful result forwarding through callback/counter/shared return; counter receiver mismatch and unreached callback captures block counter entry before writes.
 
+`HighCountObjectHelperReturnProjection` models `BE6458..BE6477`: independent reads at helper-EAX+8 and retained-ESI+8/+4, wrapping decrement and masked index, indexed DWORD reload, then full-EAX address arithmetic and plain RET. Missing register prerequisites mark supplied dependent reads unreached; zero register bases remain captured values, not absence.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves
