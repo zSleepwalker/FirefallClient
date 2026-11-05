@@ -786,6 +786,13 @@ LargeRootThreshold derives EBP only at the child store and retains the
 latest CMP flags even if the subsequent frame reload is missing. The
 common size gate shifts unsigned EDI by three before comparing against20h;
 its destinations are92F6 and9354.
+LargeRootFirstField and LargePairedFieldTest gate fresh field reads on
+their exact predecessor branches. The paired path requires a zero first
+field, preserves both writes to EBP-4, and retains first TEST flags when
+the second read is missing. LargeThresholdBacklink independently reloads
+the frame despite its preceding store. LargeSuccessorWrites retains the
+fresh CMP operand when EDX is absent, records a reached first store when
+EBX is missing, and preserves two distinct aliased writes on equality.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
