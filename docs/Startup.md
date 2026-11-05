@@ -875,6 +875,8 @@ the preceding write, and stops before9292 or92A4.
 HighSizeEntry retains SHR's intermediate flags but uses TEST's replacement
 flags for the935B branch. EaxBacklink admits9288 only after an exact not-below
 threshold edge, preserving CMP flags until the child's fresh-value TEST.
+HighSizeCeiling performs a full unsigned comparison against FFFF, selecting
+the936F BSR entry or setting ECX to31 before the9384 store boundary.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
