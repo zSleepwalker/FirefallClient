@@ -13193,6 +13193,10 @@ constant gating; renamedCommonTailCompletedBoundaryRawFileOffset.
 ActiveSavedFrameIndexed447fdb8f/IndexedMaskb08596d5/MaskOr09333b8d/
 RingWrites8f4a7db1. Verified931B..9323 0BCF890DC8ADED01 OR+globalstore.
 9323..9334 89720889700C89460889560CE90D010000 fourwrites/JMP9441.
+da36d5b pushedMask/SavedCommonRoot. SavedFrameIndexed/IndexedMaskreviewed
+registeredrunner3790 exit0; fixed fixturecrossflagtypecomparison.
+MaskOr09333b8d/SavedIndexedStore520827f2 releasedpendingreview.
+RingWrites8f4a7db1returnedtomoveembeddedRunchecks toseparateChecksfile.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
