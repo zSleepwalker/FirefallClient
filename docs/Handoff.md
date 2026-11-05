@@ -12196,6 +12196,14 @@ BE6440 passes local frame-C address to BE6B30 then reads its EAX result.
 Code owners `efca7624-c0c8-408c-8b37-66d62ac231b3` (BE64A0 entry) and
 `05a883e5-b613-4dc1-96ef-7238a683196a` (BE6440 entry).
 
+Pushed reviewed conditional joins/suffix anchors as `bb1f3be`.
+High-count result/forward composition reviewed/registered and passes; fixed
+its partial-capture fixture and final selected destination to `BE5BF1`.
+High-count suffix/shared-return owner
+`2295d27f-9730-4b53-90ca-ab86cfb40a79`.
+Sole helper-entry evidence writer
+`2699cc1c-225a-4611-9407-16f8ab518f75`.
+
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
 indirect callback, then fresh receiver+4C DEC and receiver+48 zero/INC.

@@ -54,6 +54,7 @@ UnreliableReceiveHighCountCounterChecks.Run(Check);
 PayloadXorEntrySetupChecks.Run(Check);
 UnreliableReceiveBelowThresholdReturnChecks.Run(Check);
 UnreliableReceiveHighCountSuffixChecks.Run(Check);
+UnreliableReceiveHighCountResultChecks.Run(Check);
 PayloadGrowthZeroFillChecks.Run(Check);
 
 void Check(string name, bool condition)

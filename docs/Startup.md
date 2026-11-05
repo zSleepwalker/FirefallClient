@@ -403,6 +403,8 @@ The reliable masked-length callback's validated entry also admits the zero-resul
 
 `UnreliableReceiveHighCountSuffixProjection` admits counter updates only after a clean zero-object branch or normal indirect callback return. It preserves partial DEC effects but rejects unreached zero-path counter+48 captures as complete joins.
 
+`UnreliableReceiveHighCountResultProjection` admits forwarding only after the exact at-or-above-threshold result and matching receiver identity. Receiver+4 is independently reloaded for forwarding; its value need not equal the prior result-store input. Partial forwarding retains completed result stores and its own earlier pushes/cleanup.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves
