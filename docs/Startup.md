@@ -359,6 +359,8 @@ PE import names identify cell VA `0x1AC4424` as `std::_Xbad_alloc`, `0x1AC45C0` 
 
 `UnreliableReceiveJoinedHeaderProjection` covers `[BE5AF0,BE5B16)`. WORD[payload+2] is written to receiver+1E before an independent header WORD reload. Header length is masked to `7FF`, subtracts four as a DWORD, then is truncated through zero-extended AX into ESI and frame-4. The selector from header bits 12/13 is stored independently at frame+8 before its zero branch to `BE5B32`; nonzero falls through to `BE5B16`.
 
+`ReliableReceiveOccupiedSlotProjection` composes slot selection, record WORD comparison, forwarding, and the recycle-return tail. It validates retained receiver, record pointer, and payload correspondence before later effects. Only the exact successful WORD outcomes admit forwarding; an invalid capture with a branch destination does not suffice. Independent memory reloads remain independent, including receiver+8.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves

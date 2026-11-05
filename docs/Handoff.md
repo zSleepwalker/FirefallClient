@@ -12057,3 +12057,12 @@ Preserved that single push and added assertions; pinned runner passes.
 Luna `5771a700-1616-43d5-b041-eacd07257703` owns unreliable residue/counter/
 joined-header composition; `74b92c04-9b25-4b67-93f4-2b1671d1159c`
 read-only traces BD58E0 register read widths, searching prior art first.
+
+Pushed accumulated immutable anchors and length partial-push correction
+as `06ab2ba`. Occupied-slot composition reviewed/registered and passes;
+fixed a fixture expecting Missing instead of UnreachedPayloadWordCapture.
+Sole immutable writer `2c2daee2-e3c4-49e2-873f-0048598b1297` owns unreliable
+marker/scalar callback windows. Luna `1e3c4f4c-3a48-43a9-99c6-4fb60aa0781d`
+owns unreliable scalar callback code/checks. Luna
+`a1d9c809-cdf8-4092-8542-5942a3275dd6` owns minimal reliable zero-header
+empty-slot publication composition; nonzero callback stops at result boundary.
