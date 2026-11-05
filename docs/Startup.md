@@ -357,6 +357,8 @@ PE import names identify cell VA `0x1AC4424` as `std::_Xbad_alloc`, `0x1AC45C0` 
 
 `UnreliableReceiveResidueCounterProjection` covers `[BE5AE4,BE5AF0)` only after normal helper return. Receiver+8 is independently read, EAX becomes retained ESI minus one with DWORD wrap, 20 stack bytes are cleaned up, then that value is added to the independently captured counter at loaded-pointer+1C. A missing counter capture retains the earlier cleanup but projects no counter write.
 
+`UnreliableReceiveJoinedHeaderProjection` covers `[BE5AF0,BE5B16)`. WORD[payload+2] is written to receiver+1E before an independent header WORD reload. Header length is masked to `7FF`, subtracts four as a DWORD, then is truncated through zero-extended AX into ESI and frame-4. The selector from header bits 12/13 is stored independently at frame+8 before its zero branch to `BE5B32`; nonzero falls through to `BE5B16`.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves

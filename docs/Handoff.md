@@ -12044,3 +12044,9 @@ require absent tail plans. Sole evidence writer now
 completed pending receive result/publication anchors.
 Read-only Luna `f2c08a16-984e-425d-a41f-1ec7ef89d6af` traces unreliable
 post-callback `BE5B25`, stopping at next opaque handoff.
+
+Pushed seven callback/residue code stages as `43b9572`. Joined-header
+projection reviewed/registered and passes exhaustive header oracle. Nonzero
+marker callback owner `5f7d0aa1-1213-4a37-be6d-75ebb3c98e79`;
+read-only zero-marker callback trace owner
+`bb23bedf-bb08-47f4-87ab-a712189c8187` at `BE5B32`.
