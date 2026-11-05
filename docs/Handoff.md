@@ -13613,6 +13613,36 @@ target removed immediately. Nullable flags retained; nonzero ring alias
 fixture now freshly captures bin EAX with lower threshold, not80000010.
 Both reviewed pairs ready for explicit Git commit/push. Latest ordinary
 full remains runner4110; IOCP revision and next-network379 evidence active.
+Reviewed pairs committed/pushed8d827a7. Luna0c22ee64 now owns
+NodeIndexedTraversalSlotCleanup successor (fresh942F counter DEC, bounded
+943C/9441, no opaque call). Lunaf149e7d4 investigating concrete receive
+callback +18 as a distinct read-only network seam;379 notified to exclude
+that narrow seam from its next-network candidate. IOCP9ed revision remains
+active. No temporary target, no main-checkout access, no sample execution.
+IOCP revision full EOF rereviewed: correcting missing-read stop addresses,
+BOOL branch not reached without capture, post-diagnostic null-key handling
+must still attempt preceding OVERLAPPED CMP, and missing/unused stop
+captures cannot be labeled clean native completion. Fresh IDA disasm
+independently confirms JNZBBC922, failure overlap CMPBBC924/key CMPBBC953,
+success key reloadBBC9A5, overlap CMPBBC9AB, late JZBBC9D5.
+Coordinator added exact byte/import evidence anchors to StartupBinaryEvidence
+for these pass routes; they await next offline validation and commit.
+runner4122exit0 validates fresh IOCP anchors, excluding only IOCP/nodecleanup
+unreviewed pairs; target removed. Analysis379 released optional sender
+binding gap; coordinator freshIDA BD307A66bytes identifies actualCMP
+startBD307B (379 partial-anchorBD307C began insideinstruction). Luna4b051f98
+owns new GameSocketSenderBinding pair boundedBD30BC, opaquehelperreturns,
+predicateAL and token3/token2 queue before flagclear. Callbackf149 report
+is repository-only, no freshsampleverification; receive+18 constants/docs
+already exist but pureoutcome projection absent. Adjacent error+20 at
+BD2D70 freshly read by coordinator172bytes; notyetassignedimplementation.
+Fresh IDA disasm BD2D70 confirms internal post-releaseBD2DEB:
+EDX10,ECX=ESI+124,EAX0,LOCKCMPXCHG;TESTreturnedoldEAX.
+Old0 commits state10 then fresh[ESI+108]->[ESI+128]; nonzero skipscopy.
+Both queue token2 atBD2E14; boundedBD2E19 beforeSEHcleanup.
+Lunad5e62107 owns GameSocketCompletionErrorState pair for that internal
+continuation only, not wholeerrorcallback: entryerror0 directly skipsCAS
+and is distinct. No concurrency execution or inferred logging semantics.
 SmallBinEpilogue released and full EOF reviewed: owner6d052038 revising
 wrong parent type, nullable value-plan access, missing successor-unused
 forwarding, child read/write effect markers and dirty-ring admission.

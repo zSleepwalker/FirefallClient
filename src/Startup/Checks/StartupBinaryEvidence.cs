@@ -7261,6 +7261,18 @@ internal static class StartupBinaryEvidence
             && Matches(NetworkIoCompletionNativeLayout.DequeueCompletionCallFileOffset, "FF55E8")
             && Matches(GameSocketReceiveNativeLayout.GetOverlappedResultCallFileOffset, "FF15644DAC01")
             && Matches(GameSocketReceiveNativeLayout.RepostReceiveCallFileOffset, "FF15544DAC01"));
+        check("Binary IOCP pass reads errors before branching and consumes a single fallback",
+            Matches(0xBBC914, "8BF0FF55E4C745F80000000085F67564")
+            && Matches(0xBBC924, "3975F4752A3D020100007419")
+            && Matches(0xBBC949, "85DB747E8BC333DBEB6B")
+            && Matches(0xBBC973, "FF55E03DE3030000743E")
+            && ImportSlotNames(0x1AC4378, "GetLastError")
+            && ReadUInt32(VirtualAddressToFileOffset(0x1AC4DA0)) == 0x8000006F);
+        check("Binary IOCP pass reloads diagnostic keys and bounds its inner loop at one hundred",
+            Matches(0xBBC97D, "8B4DFC508B11FF5220")
+            && Matches(0xBBC9A5, "8B4DFC83C410837DF4008B017405FF5018EB03FF501C")
+            && Matches(0xBBC9BB, "8B45F88B75F04783FF640F8C25FFFFFF")
+            && Matches(0xBBC9CB, "8B45DC807804008B45D80F84D5FEFFFF"));
         check("Binary Network and GameSocket shutdown ownership and distinct WinHTTP close helpers are fingerprinted",
             ReadUInt32(VirtualAddressToFileOffset(0x1C734B4)) == 0x00FBD900
             && ReadUInt32(VirtualAddressToFileOffset(0x1C734B4) + 8) == 0x00FBE540
