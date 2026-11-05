@@ -936,6 +936,10 @@ the preceding RET, not a return instruction. ZeroSlotThresholdGate captures
 both same-instruction operands independently. DualThresholdRingLifecycle
 derives the insertion pointers from the two fresh reads and preserves CMP2
 flags through five ordered stores, stopping before the cleanup decrement.
+IndexedCountTagLifecycle derives the tag-gate count and pointer from the
+indexed classification, with independent late tag data and preserved flags.
+RightPairedStores models the two owner-field MOVs at raw `0x012C92B7`,
+including same-instruction partial operands and distinct ordered alias stores.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

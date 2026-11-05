@@ -13370,6 +13370,14 @@ runner3986 exit0 validates all six reviewed registered pairs. NodeFreshMask
 released/reviewed but returned to14c11bb4: dirty unused EBP must stop before
 fresh gate, not execute child; strengthen exact child gates/internal93A1entry.
 RightPairedStoresc80900ae active on fresh92B7six-byte window.
+1bed0ec committed/pushed six pairs. IndexedCountTag and RightPairedStores
+reviewed through EOF, registered, runner3990 exit0. Count-tag entry corrected
+to93C0 (handoff93D4); aggregate flags/internalentry and exactboundedgates added.
+RingCleanup returned tof0822979: trueCMP2CF means borrow bypass, cannot
+reachDEC; two fixtures need nonborrowvalues and derivedCFfalse. NeedDEC0/
+80000000 cases, aggregateflags and exactcleanupbranchgates. RightFieldStores
+cf07ebfd active; SelfRingCleanup77c21735 active. Prior handoff already
+PE-verified cell1AC4A24 as MSVCR120.dll!abort; flatIDB import query empty.
 8948188B4A1085C974123B0DD8ADED010F82D8FBFFFF8948108941188B4A1485C974123B0DD8ADED010F82BFFBFFFF894814894118.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
