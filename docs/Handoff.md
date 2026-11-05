@@ -6,7 +6,10 @@ New reviewed coverage now includes:
 
 - **Dispatcher**: fallback diagnostic preparation (`BBDE1A..BBDE2A`), direct-call
   return bound at `BBDE2B`, and call-target arithmetic prefix
-  (`BBDE2B..BBDE3D`, stop before `BBDE3E` JZ).
+  (`BBDE2B..BBDE3D`, stop before `BBDE3E` JZ), plus both immediate
+  branch projections:
+  - nonzero path `BBDE40..BBDE49` (stop before `BBDE4B` JNZ),
+  - zero path `BBDE3E` taken to `BBDE83` (stop before `BBDE86` indirect CALL).
 - **Parser first-branch**: FS restore (`BD34E2..BD34EC`), register POP chain
   (`BD34ED..BD34F0`), and frame/RET8 suffix (`BD34F1..BD34F6`).
 - **Binary anchors**: independent first-branch chain anchors added to
@@ -24,8 +27,19 @@ Build currently succeeds for the full checks project after coordinator fixes:
 
 Focused validations passed with zero failures:
 
-- dispatcher preparation/return/call-target prefix + binary anchors;
+- dispatcher preparation/return/call-target prefix + zero/nonzero branch checks
+  + binary anchors;
 - parser first-branch FS/POPs/frame-return + binary anchors.
+
+Normal second-call parser suffixes remain runtime-pending and are currently
+left out of `Program.cs` registration until practical focused execution
+completes:
+
+- `SecondVirtualCallReturn`
+- `SecondCallFsRestore`
+- `SecondCallRegisterPops`
+- `SecondCallFrameReset`
+- `SecondCallReturn`
 
 Second-branch focused runtime remains expensive: isolated runner repeatedly
 reaches `second-branch FS restore` and `second-branch register pops` headings,

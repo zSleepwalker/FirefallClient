@@ -13,7 +13,11 @@ stopping at BBDE1A before the next diagnostic argument preparation. From there,
 the continuation now includes diagnostic argument setup through the direct CALL
 at BBDE26, bounded return at BBDE2B, and call-target arithmetic
 (`MOV/XOR/SUB/SAR/TEST`) through BBDE3D with a stop before the JZ at BBDE3E.
-The zero/nonzero BBDE3E branch continuations are actively being reconstructed.
+Current bounded branch coverage includes:
+- JZ not-taken path `BBDE40..BBDE49`, stop before `BBDE4B` JNZ.
+- JZ taken path to `BBDE83`, stop before indirect CALL `BBDE86`.
+The next unresolved dispatcher continuation is the `BBDE4B` JNZ split and the
+`BBDE86` indirect-call return boundary.
 
 The parser diagnostic cleanup continuation now includes both first-branch
 (`BD34E2..BD34F6`) and second-branch epilogue families. First-branch FS restore,
@@ -24,6 +28,12 @@ repeatedly stalls before the frame-return suite completes. All of these remain
 offline value-only projections: missing captures stop at precise boundaries,
 no native target is executed, and no caller continuation is inferred unless
 explicitly modeled.
+
+Normal second-call parser suffix checks (`SecondVirtualCallReturn`,
+`SecondCallFsRestore`, `SecondCallRegisterPops`, `SecondCallFrameReset`,
+`SecondCallReturn`) are compile-clean but still runtime-pending for practical
+focused completion; they are intentionally not registered in the main
+`Program.cs` suite list yet.
 
 The PE entry RVA `0x136B9B0` translates to **raw file offset `0x136ADB0`** using the `.text` section mapping. IDA's raw-file loader did not automatically mark this actual entry as a function; its preexisting `nullsub_112` at raw `0x136B9B0` is **not** the PE entry. A new function was defined at the translated offset.
 
