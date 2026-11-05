@@ -1196,6 +1196,10 @@ GameSocketReceiveRepostCallPreparationProjection records nine ordered
 argument pushes and three independent fresh reads before the repost
 import boundary. The last stack-address argument is entry ESP + 0x24,
 not + 0x18; missing captures retain reached EAX/ESP and arithmetic flags.
+CapacityFinalCalleeCommonNodeIndexedSecondEqualityCleanupLifecycleProjection
+admits the existing DEC/JNZ helper only after the exact five ring stores.
+Its fresh counter read remains independent of aliased prior writes; the
+selected nonzero target or zero-path call remains unentered.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

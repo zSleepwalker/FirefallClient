@@ -14010,6 +14010,10 @@ User requests finishing current tasks, notes, commit and stop. No further
 successors will be assigned. Current remaining pairs: second-equality
 cleanup872, fenced publicationd8c, parser selectorf01701d6 and IOCP return
 46c00f13; the last two were assigned before the stop request.
+Second-equality cleanup872 full EOF reviewed and accepted4250exit0.
+Coordinator fixed the inherited flag type to TraversalIterationFlags and
+added a missing-second-child regression (no manufactured cleanup completion).
+Repost committed/pushed51d47af; no successor assigned after stop request.
 SmallBinEpilogue released and full EOF reviewed: owner6d052038 revising
 wrong parent type, nullable value-plan access, missing successor-unused
 forwarding, child read/write effect markers and dirty-ring admission.
