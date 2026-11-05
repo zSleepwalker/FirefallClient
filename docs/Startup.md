@@ -809,6 +809,9 @@ only after child equality reaches the first store. SavedFrameCommon enters
 the tag stores only on the zero frame path. LeafThreshold preserves the
 independent global CMP operands and its flags across the saved EDX store
 and a fresh EBP-C reload; that reload cannot change the earlier JB decision.
+NodeSelectionReload derives the node read address from the selected LEA,
+not the previously captured field value. Aliased node reads remain fresh,
+and the backward jump to91F3 is a bounded exit rather than another iteration.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

@@ -13168,6 +13168,8 @@ LeafCMPentryEDXcapturedindependentlyevenmissingglobal; FlagsAtStopadded.
 RootPaired53fc6086 returnedtocomposeexistingPairedFieldhelper ratherthan
 duplicate dispatch. NewactiveLunaLeafClear855c45bf/SizeIndexed2b4e01ab;
 NodeSelectionReloadd2922569 remainsactive. Leafthresholdnativeanchoradded.
+f04dda2 pushedthreepairs. NodeSelectionReload reviewedwith exactbranch
+handoffs registeredrunner3754 exit0. FreshNodeLeafThreshold57204d65 active.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
