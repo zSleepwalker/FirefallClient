@@ -14159,6 +14159,12 @@ Lunac8e8de45 owns freshvptr MOV EAX,[ESI] / MOVECX,ESI through34CF,
 only fallthrough34CB admitted; slot0 target/call remains unentered.
 Luna499a0c50 remains on dispatcher entry frame prefix.
 Current exclusions DispatcherEntryFramePrefix/DiagnosticCleanupVirtualCallPreparation.
+Independent offline binary anchors now cover parser diagnostic pushes/call/
+counter jump, destination/cleanup RMW prefix, and IOCP exit call/epilogue.
+Reviewed-subset4312exit0 verifies these against the authorized sample bytes.
+Entry frame499a0c50 full EOF review found forced caller-return rewriting and
+missing unused-capture metadata; same owner revises before admission. No
+entry-frame code is accepted or registered yet. c8e8de45 remains active.
 
 The user's finish-current-tasks-and-stop request supersedes earlier
 continuous-dispatch instructions. All current assignments are now released,

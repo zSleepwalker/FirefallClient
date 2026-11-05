@@ -7347,6 +7347,15 @@ internal static class StartupBinaryEvidence
             Matches(0xBBC983, "FF5220EB33"));
         check("Binary dispatcher fences precede publication and a fresh counter decrement",
             Matches(0xBBDE99, "0FAEF80FAEE88B45F089018B01C6466401FF4B30"));
+        check("Binary parser diagnostic arguments precede the opaque return cleanup and counter jump",
+            Matches(0xBD326A, "685703000068D86EBB0168B46EBB016A01FFB610010000E8CAFC000083C414FF86EC000000E9DF010000")
+            && RelativeBranchTargets(0xBD3281, 0xE8, 0xBE2F50)
+            && RelativeBranchTargets(0xBD328F, 0xE9, 0xBD3473));
+        check("Binary parser diagnostic destination and cleanup RMW retain their exact byte boundaries",
+            Matches(0xBD3473, "837D0C02BF6E0500008B5424140F8372FDFFFFEB25")
+            && Matches(0xBD34AD, "C7442450FFFFFFFF8B74243C85F6742583CBFF8D46048BCBF00FC10875178B06"));
+        check("Binary IOCP exit restores EBX and the frame before a near RET",
+            Matches(0xBBC9DD, "FF156097DF015B8BE55DC3"));
         check("Binary nonzero parser dispatches through a fresh stack-local vtable before preserve-one resize",
             Matches(0xBD31C5, "8D4C24348B442434FF500C6A01508D4C243C")
             && RelativeBranchTargets(0xBD31D7, 0xE8, 0x12CBCB0)
