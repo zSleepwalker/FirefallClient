@@ -1069,6 +1069,12 @@ joins only the nonzero child's exact masked-equality fallthrough to the
 existing dual-threshold ring tail. It preserves distinct outer equality,
 zero-child and loop-back exits, inherits the child-derived EDX, and retains
 fresh threshold reads before the five stores. Completion stops before DEC.
+NetworkDispatcherLockGateProjection starts after the dispatcher's first
+opaque import call. It separates the zero-result fallback call from the
+direct path, observes a fresh counter increment, and compares a byte
+argument before the frame and receiver-byte clears. INC preserves the
+preceding carry flag, including an unknown carry after a normal opaque
+return. Both branch destinations remain unentered.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

@@ -13814,6 +13814,18 @@ runner4150 compile failure corrected; runner4152exit0 with exact queue/
 sender/dispatcher/parser-local exclusions. Registered equality bridge,
 temporary target removed. Lunae745d466 composing five-store equality
 ring into fresh DEC/JNZ cleanup gate, no helper-call/epilogue yet.
+Indexed equality bridge and parser-local anchors committed/pushed3fe27ba.
+c1ed sender-preparation full EOF review requested actual missing-ESP
+stop before first diagnostic PUSH, retained parent bounded statuses,
+and corrected ADD(0,0x18) auxiliary flag fixture. Owner revising only pair.
+Latest reviewed subset4152exit0/ordinary full4110. Active e942 queue and
+866 lock revisions; c1ed sender revision; 5b75 parser-local and e745
+equality-cleanup implementations. Temporary target absent.
+Dispatcher866 revision reviewed; coordinator corrected missing D digit
+in BBDE04/08/0E constants and matching fixtures. Registered gate;
+runner4154exit0 exact queue/sender/parser-local/equality-cleanup draft
+exclusions, temporary target removed. Lunabf8c3a21 bounded dispatcher
+collection/count entry gap at BBDE0E successor; no full iteration.
 SmallBinEpilogue released and full EOF reviewed: owner6d052038 revising
 wrong parent type, nullable value-plan access, missing successor-unused
 forwarding, child read/write effect markers and dirty-ring admission.
