@@ -12943,6 +12943,21 @@ independently verified/anchored; guarded store successor JZ goes9080.
 Checkpointc922798 pushed. SelectionDescent reviewed/registered; runner3486
 exit0. Native906E..908B now independently verified against IDA bytes and
 anchored offline with JB8E76/JZ8EF2 targets. Active owners unchanged.
+Checkpoint284d52b pushed. GuardedFieldStore released and reviewed; registered
+but runner3501/3506 blocked by active SelectionClear nullable record-struct
+errors. Owner40cf3884 informed; do not edit its active pair. Guarded pair is
+not yet validated or committed. IndexedConditional returned to0312d7c5:
+must not fabricate derived ESI as unused nested capture on clean below or
+missing EBX routes; currently admits an unreached ESI flag. Also preserve
+conditional capture flags on contaminated root joins. Do not register it.
+ConditionalGuarded977381be-49ac-4660-bf01-66f80ee2357c active;
+FinalFieldGateEvidence82707de4-115d-4ec2-92e9-4dbcc689411a read-only908B trace.
+Runner3521 exit0: GuardedFieldStore and SuccessorPairedStores reviewed,
+registered and validated. SelectionClear owner released nullable fix/pair,
+not reviewed or registered. IndexedConditional released requested revision,
+not reviewed or registered. ClearIndexed/ConditionalGuarded/SecondFieldTest
+remain active. FinalFieldGate evidence908B..9097 returned CMPfreshglobal/JB
+8E76 else9097, awaits independent verification and successor assignment.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional

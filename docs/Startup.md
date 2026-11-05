@@ -648,6 +648,13 @@ without admitting the continuation.
 clean FC2 selection's EAX into one descent step, with a separately captured
 frame-minus-four reload. The FFE selection bypass cannot consume descent
 captures, and FC5 is a bounded loopback rather than an iterative model.
+`CapacityFinalCalleeGuardedFieldStoreProjection` covers raw `12C9058..12C906E`:
+the unsigned global comparison precedes the ECX store, then a fresh
+ESI-plus-10 read selects `12C9080` or `12C906E`.
+`CapacityFinalCalleeSuccessorPairedStoresProjection` covers only the
+`12C906E` entry, retaining its independent global comparison and ordered
+stores before a fresh ESI-plus-14 read selects `12C8EF2` or `12C908B`.
+The direct `12C9080` bypass does not execute the preceding paired stores.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
