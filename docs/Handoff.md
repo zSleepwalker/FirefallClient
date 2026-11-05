@@ -14116,6 +14116,12 @@ Luna99ee3bf6 owns OR EBX,-1 / LEA EAX,[ESI4] / MOVECX,EBX through34C5;
 LOCKXADD remains unentered. No prior EBX capture needed for absorbing OR.
 IOCP EBXde803c52 released; coordinator review pending, not yet accepted.
 Current exclusions ExitEbxRestore/DiagnosticCleanupRegisterPreparation.
+IOCP exit EBXde803c52 full EOF reviewed and accepted4300exit0. Corrected
+fixture nested input and pre-call ESP expectation (two earlier POPs add8).
+Fresh restored EBX remains independent when its read aliases prior POP.
+Luna6d2c79dd owns fresh post-call EBP MOVESP,EBP / independentSavedEBP
+POP throughE7; no RET admitted. Luna99ee3bf6 owns parser register prefix.
+Current exclusions ExitFrameReset/DiagnosticCleanupRegisterPreparation.
 
 The user's finish-current-tasks-and-stop request supersedes earlier
 continuous-dispatch instructions. All current assignments are now released,

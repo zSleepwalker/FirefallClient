@@ -1241,6 +1241,9 @@ call at BBC9DD. Rejected ancestors retain their actual bounded endpoints.
 NetworkIoErrorCallbackExitCallReturnProjection independently captures the
 call-cell DWORD and explicit normal return. It invalidates arithmetic flags
 only after normal return and stops before POP EBX at BBC9E3.
+NetworkIoErrorCallbackExitEbxRestoreProjection uses fresh post-call ESP and
+an independent saved-EBX DWORD for POP EBX at BBC9E3. It advances ESP by four
+with wrapping arithmetic, preserves unknown flags, and stops before MOV ESP,EBP.
 GameSocketParserSelectorDiagnosticPreparationProjection records the five
 diagnostic argument pushes at BD326A..BD3280. It derives ESP from the
 count-consumption lineage but requires fresh ESI and an independent DWORD

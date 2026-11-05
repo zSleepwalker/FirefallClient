@@ -359,6 +359,7 @@ NetworkIoErrorCallbackLoopGateChecks.Run(Check);
 NetworkIoErrorCallbackPostLoopByteGateChecks.Run(Check);
 NetworkIoErrorCallbackExitPopChecks.Run(Check);
 NetworkIoErrorCallbackExitCallReturnChecks.Run(Check);
+NetworkIoErrorCallbackExitEbxRestoreChecks.Run(Check);
 CapacityFinalCalleeCommonTraversalSlotCleanupLifecycleChecks.Run(Check);
 CapacityFinalCalleeCommonTraversalCleanupEpilogueLifecycleChecks.Run(Check);
 CapacityFinalCalleeLargeRightRootSuccessorLifecycleChecks.Run(Check);
