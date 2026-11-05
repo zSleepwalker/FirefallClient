@@ -12881,6 +12881,19 @@ AlternateFieldSelection `60337689-4713-49e7-bbaa-0732a1b58309` active.
 DescriptorPaired owner briefly added checks outside its owned pair;
 instructed to move them and remove residual edits. Do not stage the
 existing PairedFieldWritesChecks until restored and reviewed.
+Update: existing PairedFieldWritesChecks restored without residual diff.
+PairedTag, LargeSizeFields, DescriptorMask revision, and DescriptorPaired
+released/reviewed/registered; runner3419 exit0 validates all four and the
+new indexed-root anchor FFE..903B. Corrected a clean missing-read fixture
+to omit its unreached descriptor reads. AlternateFieldSelection revision
+corrects entry VA to 16C9BA8; not registered yet. FieldDescentStep released,
+not reviewed/registered yet. DescriptorFallbackMask returned for bypass
+admission and clean mismatch fixes; do not stage that owned pair.
+Current active GPT-6 Luna successors: FieldClearTail
+`764f2868-9d0b-4c11-bf14-71c46598a2af`, IndexedRootMask
+`dbf9c628-fc1f-4e3c-98a0-32d6a7d43ebd`, LargeSizeAlternateLifecycle
+`0d586979-cfe6-4eee-966f-ef0c41e44c16`, ConditionalFieldStore
+`0ab54b83-b9d8-4d47-a8f9-c9b258e25853`.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional

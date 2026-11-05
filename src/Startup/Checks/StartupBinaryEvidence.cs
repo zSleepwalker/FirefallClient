@@ -409,6 +409,13 @@ internal static class StartupBinaryEvidence
             Matches(0x12C8FDD, "3B15D8ADED018955FC8B55F40F8287FEFFFF8B4DFCC701000000008B1DD8ADED01")
             && RawCodeRangeMaps(0x12C8FDD, 33)
             && RelativeConditionalBranchTargets(0x12C8FE9, 0x0F, 0x82, 0x12C8E76));
+        check("Binary indexed-root update retains three fresh index loads before its variable mask",
+            Matches(0x12C8FFE, "8B4DEC85C90F84EFFEFFFF8B561C3B3495F8AEED018B55F475238B5E1C89049DF8AEED0185C075328B45F88B4E1CD3E0F7D02105CCADED01E9B7FEFFFF")
+            && RawCodeRangeMaps(0x12C8FFE, 61)
+            && RelativeConditionalBranchTargets(0x12C9003, 0x0F, 0x84, 0x12C8EF8)
+            && ShortConditionalBranchTargets(0x12C9016, 0x75, 0x12C903B)
+            && ShortConditionalBranchTargets(0x12C9024, 0x75, 0x12C9058)
+            && RelativeBranchTargets(0x12C9036, 0xE9, 0x12C8EF2));
         check("Binary pinned-sample raw code [0xBE6325,0xBE6352) maps to VA 0x00FE6F25 and preserves its JNZ target",
             imageBase == 0x400000
             && Matches(0xBE6325, "8B4E0853578B7E108D04CDFFFFFFFF4921460C037E0C8BC7C1E80323C88B46048D1C8D00000000833C0300751C")

@@ -604,6 +604,17 @@ size boundary. It carries ESI across the size-call bypass, requires a fresh
 ESI capture after an opaque call, and independently captures EBP/EBX.
 Contaminated descriptor destinations retain their native effects but do not
 count as admitted successful routes.
+`CapacityFinalCalleePairedTagLifecycleProjection` preserves both ordered
+stores through a blocked tag continuation and independently captures tag
+registers and memory. `CapacityFinalCalleeDescriptorPairedLifecycleProjection`
+carries EAX/EBP only across comparison bypasses; opaque call returns require
+independent registers before either store is admitted.
+`CapacityFinalCalleeDescriptorMaskLifecycleProjection` carries the initial
+frame-minus-10 value as ECX across the no-call equality route, not the scaled
+descriptor address or the later comparison reload. Its mask reads remain fresh.
+`CapacityFinalCalleeLargeSizeFieldsProjection` reconstructs the bounded
+raw `12C8F76..12C8FA8` gates, frame write, and paired stores without inferring
+ownership. It preserves earlier effects on each missing-read stop.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
