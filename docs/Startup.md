@@ -363,6 +363,8 @@ PE import names identify cell VA `0x1AC4424` as `std::_Xbad_alloc`, `0x1AC45C0` 
 
 `UnreliableReceiveMarkerCallbackProjection` covers `[BE5B16,BE5B25)` under a nonzero selector in `1..3`. Retained SI is directly zero-extended and pushed before reading DWORD[payload+8]. The payload+4 DWORD is then read/pushed before the indirect target at loaded-pointer+4. ECX is payload+8's address. Missing later captures retain the length push; only normal call return reaches `BE5B25`.
 
+`UnreliableReceiveCallbackScalarProjection` covers `[BE5B25,BE5B32)`. The independent BYTE[frame+8] reload replaces CL without fixing unknown ECX upper bits, then EDX receives captured prior callback EAX. Only normal return from opaque raw `BD58E0` permits the four-byte cleanup. A missing EAX capture preserves the earlier frame-byte read and known CL.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves

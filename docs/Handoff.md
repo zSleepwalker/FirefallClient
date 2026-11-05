@@ -12073,3 +12073,11 @@ compare, optional diagnostic, then independently reloaded receiver+14 target:
 Luna `b095b705-1b54-4806-9358-1cda3678b243` owns presence/diagnostic gate,
 `655aabf2-006a-449d-9354-eb28abce343a` owns four-push direct callback,
 `516a7cd2-4c67-4ca8-8011-d0a0b5a96b86` traces normal continuation `BE5B64`.
+
+Pushed marker callback as `96e17d6`. Unreliable scalar callback
+reviewed/registered and passes. Sole evidence writer now
+`5d883aa3-81c2-494e-bfcb-96064f234a19` owns zero-marker presence/direct
+callback anchors, preserving completed pending marker/scalar anchors.
+BD58E0 prior-art trace found XOR core already modeled; narrower read-only
+owner `148e6c4c-2cf8-429b-b5a4-00170c286e0a` verifies its diagnostic guard
+and post-call reloads before any new native-boundary projection is assigned.
