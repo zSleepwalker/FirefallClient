@@ -458,6 +458,13 @@ indirect call through encoded PE VA `1AC427C` when that bit is clear.
 The call at raw `12C9452` occurs after the restores when the bit is set;
 its register outputs remain unresolved. This is not a whole-callee contract.
 
+`FrameHandoffCapacityRepeatFillJoinProjection` links the first completed
+REP/fresh-frame8 reload or exact zero-count bypass to the fresh frame4
+fill join. The REP route derives EDI from the independent reload; the
+bypass requires an independent EDI capture. Both validate frame identity
+before the fill read and retain completed store descriptors when a later
+reload is missing.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves

@@ -12568,6 +12568,14 @@ active pattern-local CS0136 collisions. FillFinalLifecycle owner
 owner `5791c8ee-66b2-4029-bb10-ea1ad86d1aa4`. Successors own only their
 production/check pairs; coordinator owns registration/docs/evidence/Git.
 
+Verified three released lifecycle pairs and native exit anchor; pushed
+99121d0. RepeatFillJoin reviewed/registered; fixture EDX corrected to
+0x3100 (entryEBX0x3000 + helperEAX0x100), pinned offline runner passed.
+AboveRepeat revision requested: optional repeat identities must not become
+prerequisites; propagate REP unreached capture flags. Owner retains pair.
+FirstFillLifecycle successor `834265e9-1dda-45c5-8fad-64d6c4758ea2`
+owns SecondTransferLifecycle-to-RepeatFillJoin bounded composition.
+
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
 indirect callback, then fresh receiver+4C DEC and receiver+48 zero/INC.
