@@ -7368,6 +7368,9 @@ internal static class StartupBinaryEvidence
             Matches(0xBBDDF9, "807D0800"));
         check("Binary dispatcher frame and receiver clears precede the argument-zero branch",
             Matches(0xBBDDFD, "C745FC00000000C64664000F84BC000000"));
+        check("Binary dispatcher argument-zero bypass and signed selector branch retain their distinct destinations",
+            Matches(0xBBDE08, "0F84BC000000833D9085E601017F14516A00")
+            && Matches(0xBBDECA, "8B86A8000000"));
         check("Binary nonzero parser dispatches through a fresh stack-local vtable before preserve-one resize",
             Matches(0xBD31C5, "8D4C24348B442434FF500C6A01508D4C243C")
             && RelativeBranchTargets(0xBD31D7, 0xE8, 0x12CBCB0)

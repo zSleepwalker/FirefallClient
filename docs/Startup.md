@@ -5,6 +5,11 @@ as a fresh stack PUSH, a distinct indirect import return, and a counter INC
 using independently captured post-call EBX and DWORD values. Its next comparison
 is byte-sized (`80 7D 08 00` at raw BBDDF9), with a fresh EBP and argument byte;
 earlier counter writes do not supply that read even when addresses alias.
+After frame/receiver clears, JZ at raw BBDE08 selects BBDECA for argument zero
+or BBDE0E otherwise. The latter compares fresh DWORD[VA1E68590] with one;
+JG at BBDE15 uses signed greater-than, selecting BBDE2B or BBDE17.
+The non-taken path projects independent fresh ESP/ECX into PUSH ECX and PUSH 0,
+stopping at BBDE1A before the next diagnostic argument preparation.
 
 The parser diagnostic cleanup continuation reconstructs the slot-four indirect
 call return, fresh stack read at ESP+48, segment-relative FS:[0] restoration,

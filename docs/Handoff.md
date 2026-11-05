@@ -34,6 +34,14 @@ cookie ancestor regressions, and the full independent binary-anchor suite.
 This dispatcher subset is ready for persistence. Parser runner4350 remains
 active separately; parser suffix acceptance is still pending.
 
+Dispatcher fallback continuation through argument-zero JZ, selector DWORD CMP,
+signed JG, and the two-PUSH non-taken prefix passed runner4356 with zero failures,
+including all earlier dispatcher suffix suites and the full binary oracle.
+Constructor, constant qualification, nullable-read scalar comparison, and an
+invalid ancestor-property reference were corrected without changing byte semantics.
+Checkpoint 480a0d2 is pushed; this next dispatcher batch is ready to persist.
+Parser runner4350 still uses the older suffix replay implementation.
+
 ClientApi/WinHTTP details are in [ClientApiWinHttp.md](ClientApiWinHttp.md).
 
 ## Latest continuation navigation (November 4)
