@@ -13104,6 +13104,10 @@ forcleanunequal917C boundedexit admissionfalse; revisionpending. Released
 pendingreview: MaskCommon186f2043, SuccessorCommon2619c7e3, LargeFirstTest3580642a.
 NewLunaassignments LargeBacklinkaceca25f raw91B9..91C5; CommonRootb9b75b1a
 raw92C8..92D0. Coordinatorfreshbytesavailable, anchorsnotyetadded.
+Checkpoint0d9d51d pushedLargeThreshold. RevisedLargeRoot reviewedregistered;
+runner3686 exit0. SuccessorLifecycle returnedowner: wronglyrejecting
+downstreamECXoncleanframeequal9190; opaqueadmissionignoredgatecontamination.
+DO NOTregister/stageuntilrevisionreviewed. LargeRootThresholddee191fb active.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
