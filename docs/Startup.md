@@ -405,6 +405,8 @@ The reliable masked-length callback's validated entry also admits the zero-resul
 
 `UnreliableReceiveHighCountResultProjection` admits forwarding only after the exact at-or-above-threshold result and matching receiver identity. Receiver+4 is independently reloaded for forwarding; its value need not equal the prior result-store input. Partial forwarding retains completed result stores and its own earlier pushes/cleanup.
 
+`UnreliableReceiveHighCountReturnProjection` enters the shared frame handoff only after an unflagged completed suffix, carrying the counter receiver and an explicit frame capture. `HighCountObjectHelperEntryProjection` passes a local frame-0C address to opaque `BE6B30`, then independently captures its returned EAX address and loaded DWORD. Zero branches to `BE6458`; nonzero stops before the additional read at `BE6456`.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves

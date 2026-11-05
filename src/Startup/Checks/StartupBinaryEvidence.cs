@@ -13742,5 +13742,54 @@ internal static class StartupBinaryEvidence
                 "FF4F4C7509C7474800000000EB03FF4748")
             && ShortConditionalBranchTargets(0xBE5C01, 0x75, 0xBE5C0C)
             && ShortConditionalBranchTargets(0xBE5C0A, 0xEB, 0xBE5C0F));
+
+        const uint rawStartupCommonCallbackFirstHelperFileOffset = 0xBE64A0;
+        const uint rawStartupCommonCallbackFirstHelperEndFileOffset = 0xBE64C5;
+        const int startupCommonCallbackFirstHelperLength =
+            (int)(rawStartupCommonCallbackFirstHelperEndFileOffset
+                - rawStartupCommonCallbackFirstHelperFileOffset);
+        const uint startupCommonCallbackFirstHelperCodeVirtualAddress =
+            rawStartupCommonCallbackFirstHelperFileOffset + 0x400C00;
+        check("Binary pinned-sample FirefallClient.exe SHA256 97362D668FF64778193A64759265E4AE90842043C4A15B627DF9902FD9135445 raw [0xBE64A0,0xBE64C5) maps by raw+0x400C00 to code VA [0xFE70A0,0xFE70C5); reads [ESI+0x0C] and [ESI+0x10], adds them, tests AL&3, and JNZ at raw 0xBE64B0 targets raw 0xBE64C5; LEA ECX+4 then SHR 2 is compared with [ESI+8], and JA at raw 0xBE64BB also targets raw 0xBE64C5; other route pushes ECX, moves ESI to ECX, and CALL at raw 0xBE64C0 targets raw 0xBE6B50 with normal return at raw 0xBE64C5",
+            startupCommonCallbackFirstHelperLength == 0x25
+            && startupCommonCallbackFirstHelperCodeVirtualAddress == 0xFE70A0
+            && startupCommonCallbackFirstHelperCodeVirtualAddress
+                + startupCommonCallbackFirstHelperLength == 0xFE70C5
+            && RawCodeRangeMaps(rawStartupCommonCallbackFirstHelperFileOffset,
+                startupCommonCallbackFirstHelperLength)
+            && VirtualAddressToFileOffset(startupCommonCallbackFirstHelperCodeVirtualAddress)
+                == rawStartupCommonCallbackFirstHelperFileOffset
+            && VirtualAddressToFileOffset(startupCommonCallbackFirstHelperCodeVirtualAddress
+                + startupCommonCallbackFirstHelperLength)
+                == rawStartupCommonCallbackFirstHelperEndFileOffset
+            && Matches(rawStartupCommonCallbackFirstHelperFileOffset,
+                "558BEC568BF18B460C8B4E1003C1A80375138D4104C1E8023946087708518BCEE88B060000")
+            && ShortConditionalBranchTargets(0xBE64B0, 0x75, 0xBE64C5)
+            && ShortConditionalBranchTargets(0xBE64BB, 0x77, 0xBE64C5)
+            && RelativeBranchTargets(0xBE64C0, 0xE8, 0xBE6B50));
+
+        const uint rawStartupCommonCallbackObjectHelperFileOffset = 0xBE6440;
+        const uint rawStartupCommonCallbackObjectHelperEndFileOffset = 0xBE6458;
+        const int startupCommonCallbackObjectHelperLength =
+            (int)(rawStartupCommonCallbackObjectHelperEndFileOffset
+                - rawStartupCommonCallbackObjectHelperFileOffset);
+        const uint startupCommonCallbackObjectHelperCodeVirtualAddress =
+            rawStartupCommonCallbackObjectHelperFileOffset + 0x400C00;
+        check("Binary pinned-sample FirefallClient.exe SHA256 97362D668FF64778193A64759265E4AE90842043C4A15B627DF9902FD9135445 raw [0xBE6440,0xBE6458) maps by raw+0x400C00 to code VA [0xFE7040,0xFE7058); prologue reserves 0x0C bytes, saves ESI, passes frame-0x0C to CALL at raw 0xBE644B targeting raw 0xBE6B30; normal return is raw 0xBE6450, followed by MOV ESI,[EAX], TEST ESI,ESI, JZ at raw 0xBE6454 to raw 0xBE6458, otherwise MOV ESI,[ESI] at raw 0xBE6456",
+            startupCommonCallbackObjectHelperLength == 0x18
+            && startupCommonCallbackObjectHelperCodeVirtualAddress == 0xFE7040
+            && startupCommonCallbackObjectHelperCodeVirtualAddress
+                + startupCommonCallbackObjectHelperLength == 0xFE7058
+            && RawCodeRangeMaps(rawStartupCommonCallbackObjectHelperFileOffset,
+                startupCommonCallbackObjectHelperLength)
+            && VirtualAddressToFileOffset(startupCommonCallbackObjectHelperCodeVirtualAddress)
+                == rawStartupCommonCallbackObjectHelperFileOffset
+            && VirtualAddressToFileOffset(startupCommonCallbackObjectHelperCodeVirtualAddress
+                + startupCommonCallbackObjectHelperLength)
+                == rawStartupCommonCallbackObjectHelperEndFileOffset
+            && Matches(rawStartupCommonCallbackObjectHelperFileOffset,
+                "558BEC83EC0C8D45F45650E8E00600008B3085F674028B36")
+            && RelativeBranchTargets(0xBE644B, 0xE8, 0xBE6B30)
+            && ShortConditionalBranchTargets(0xBE6454, 0x74, 0xBE6458));
     }
 }
