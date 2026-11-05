@@ -1145,6 +1145,10 @@ earlier bit-3 AND result; the second byte remains unread.
 NetworkDispatcherEntryCallPreparationProjection preserves first-entry
 TEST flags through zero-entry argument pushes or a fresh nonzero vptr
 read. It stops before reading either indirect target or entering its call.
+CapacityFinalCalleeCommonNodeIndexedOuterEqualityRingCleanupEpilogueLifecycleProjection
+joins the root ring/counter path to the shared bit-1 epilogue. A zero
+counter requires explicit normal cleanup-call return; pending calls
+preserve DEC flags and do not count as completed epilogues.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
