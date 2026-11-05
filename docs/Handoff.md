@@ -13734,6 +13734,29 @@ excluding exactly clock/context/receive-result/error-queue draft pairs.
 Temporary target removed. Lunaf73ce3f5 fresh indexed nonzero-child gap
 analysis successor; Lunae942587e composing error-state queue-call
 handoff into generic QueueAppendAcquisition without duplicating helper.
+Reviewed node epilogue and receive anchors committed/pushed20d6b88.
+Coordinator fresh IDA reconfirmed full raw12CE31041byte acquisition
+prefix; existing StartupBinaryEvidence12383+ already fingerprints it,
+so no duplicate evidence check added. D7/3130 parser boundary pops
+also rechecked, remaining unentered by the context dispatch projection.
+Context80ed released and independently ran builds/checks despite explicit
+coordinator-only restriction; not accepted as validation. Full EOF review
+requested preservation of parent flags at missing fresh context and parent
+bypasses, explicit read-not-committed metadata and ordered parent/child
+memory effects, retained parent bounded exits, and wrapped buffer fixture.
+Owner revising only its pair; no coordinator registration/validation yet.
+Clock a151 revised pair full EOF reviewed; coordinator corrected reached
+saved-stack store and dispatcher push committed metadata (logical
+projection, not native execution). Receive18953 full EOF reviewed;
+coordinator separated known import-cell VA from unknown concrete target
+and added read-not-committed/clean BOOL2 checks. Owner had independently
+built/tested despite restriction; only coordinator result authoritative.
+Both registered; runner4140exit0 excludes exact context/error-queue/
+indexed-equality draft pairs. Temporary target removed. Successors:
+Lunaedb557e8 rawBBDDB0 maintenance-entry gap; Lunad2a8e493 receive
+success call-preparation at BD2EEB. f73 report identified composition
+seam only (windows already modeled); Lunac0437db7 implementing indexed
+nonzero-child equality bridge into common dual-threshold ring tail.
 SmallBinEpilogue released and full EOF reviewed: owner6d052038 revising
 wrong parent type, nullable value-plan access, missing successor-unused
 forwarding, child read/write effect markers and dirty-ring admission.

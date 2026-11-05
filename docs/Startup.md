@@ -1051,6 +1051,13 @@ The zero-counter path requires a separately observed normal helper return;
 the nonzero path enters directly. Pending calls preserve preceding flags,
 while normal opaque returns invalidate them. Unused captures spoil clean
 admission without erasing an observed bounded child return.
+NetworkIoCompletionClockGateProjection models the predequeue unsigned
+500-unit clock gate, with independent global, field and saved-stack reads.
+Its cached clock target is not reread from the IAT, and dispatcher calls
+remain opaque. GameSocketReceiveResultGateProjection models the separate
+receive-result BOOL/error-996 branch and dynamic slot-0x20 callback,
+stopping before success preparation or common cleanup. The error import
+is identified as WSOCK32 ordinal 111, not a named API.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
