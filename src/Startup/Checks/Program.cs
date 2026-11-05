@@ -348,6 +348,7 @@ NetworkDispatcherFrameResetChecks.Run(Check);
 NetworkDispatcherReturnTransferChecks.Run(Check);
 GameSocketParserStoredByteSelectorGateChecks.Run(Check);
 GameSocketParserSelectorDiagnosticPreparationChecks.Run(Check);
+GameSocketParserSelectorDiagnosticReturnCleanupChecks.Run(Check);
 NetworkIoErrorCallbackReturnChecks.Run(Check);
 NetworkIoErrorCallbackLoopGateChecks.Run(Check);
 NetworkIoErrorCallbackPostLoopByteGateChecks.Run(Check);

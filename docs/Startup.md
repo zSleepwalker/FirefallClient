@@ -1246,6 +1246,10 @@ diagnostic argument pushes at BD326A..BD3280. It derives ESP from the
 count-consumption lineage but requires fresh ESI and an independent DWORD
 at ESI+110 for the fifth push, preserving the first four pushes if either
 capture is missing. The call at BD3281 remains unentered.
+GameSocketParserSelectorDiagnosticReturnCleanupProjection records an explicit
+opaque-call return observation and requires fresh post-call ESP for ADD ESP,14h
+at BD3286. Normal return invalidates earlier arithmetic flags; the ADD derives
+all six flags and stops before the DWORD increment at BD3289.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

@@ -14075,6 +14075,13 @@ committed push; missing fifth-push captures retain four stores and ESP-10.
 Luna1d4a3554 owns explicit diagnostic call return and fresh post-call
 ESP ADD14 through3289. Luna de803c52 remains on IOCP post-call POP EBX.
 Current draft exclusions ExitEbxRestore and SelectorDiagnosticReturnCleanup.
+Parser diagnostic return/cleanup 1d4a3554 full EOF reviewed, accepted4284
+exit0. Fixed nullable-flag assertions, retained instruction flags on pending/
+non-normal observations, and distinguished supplied-unused return observation
+from an admitted return. Fresh post-call ESP is never inferred from arguments.
+Luna4ba66bb2 owns fresh post-call ESI/DWORD INC at3289 and JMP328F to3473;
+provided bytes require no runtime or callee-semantic assumptions.
+Draft exclusions now ExitEbxRestore and SelectorDiagnosticCounterContinuation.
 
 The user's finish-current-tasks-and-stop request supersedes earlier
 continuous-dispatch instructions. All current assignments are now released,
