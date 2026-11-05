@@ -563,6 +563,10 @@ internal static class StartupBinaryEvidence
         check("Binary leaf clear reloads the frame independently before storing zero",
             Matches(0x12C921D, "8B4DFCC70100000000")
             && RawCodeRangeMaps(0x12C921D, 9));
+        check("Binary saved index comparison survives the independent absolute EBX reload",
+            Matches(0x12C9231, "8B5A1C3B149DF8AEED018B1DD8ADED017520")
+            && RawCodeRangeMaps(0x12C9231, 18)
+            && ShortConditionalBranchTargets(0x12C9241, 0x75, 0x12C9263));
         check("Binary pinned-sample raw code [0xBE6325,0xBE6352) maps to VA 0x00FE6F25 and preserves its JNZ target",
             imageBase == 0x400000
             && Matches(0xBE6325, "8B4E0853578B7E108D04CDFFFFFFFF4921460C037E0C8BC7C1E80323C88B46048D1C8D00000000833C0300751C")

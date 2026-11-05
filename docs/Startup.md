@@ -820,6 +820,10 @@ NodeSelectionLeafThreshold uses the saved frame EDX, not the selected LEA
 or EAX, for the global threshold comparison. Its EBP handoff is gated by
 the completed child CMP. LeafThresholdClear reloads EBP-4 independently
 of the preceding saved EDX store and retains the threshold CMP flags.
+CommonSizeIndexed keeps the shifted size index separate from original EDI
+and stops at the opaque9304 call or bounded930A/9354 exits. SavedIndexGate
+uses fresh EDX+1C to address the independent indexed CMP operand, then
+reloads global EBX without changing that CMP's JNZ decision.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
