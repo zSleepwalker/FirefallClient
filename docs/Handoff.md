@@ -13314,6 +13314,17 @@ knownoperandfields/events andwrongallcountfixture93C0expectation(zero93AC).
 Index61070b0frevisionrequested: unusedEBPdirtybypass,missingEBPnotclean,
 exactsuccessgate. RightThresholdLifecycle8434ba08-db92-4e0c-9c6a-56fef51e864b
 active. SelfRingf2642355-27b7-46f5-a916-224994bac926active.
+bcbdc6dpushed. SelfRingpairreviewedEOFregisterednativeanchor;
+firstattempt/commitpropertiesadded. runner3939blockedactiveRightThreshold
+LifecycleConvert68/70;owner8434notified. NoSelfRingcommituntilrunnerpasses.
+FreshMaskSelfRingLifecycle d07c1ab6-97a5-4934-a8db-a959fdb018e3active;
+IndexedCount2aae7323-5023-4168-9750-095f8ff5aa44active;
+CleanupCounter ffef4c55-478c-412e-80fb-b816e80e48feactive.
+Cleanup942F18bytesFF0DE8ADED01750AB9C8ADED01E85FE4FFFF,
+boundbeforeCALL943C orTEST9441;DECpreservesincomingCF.
+HighSizeIndexrevisionreviewedremainingEOF/checks;registered.
+SelfRing+Indexrunner3940exit0 afterRightLifecycleownerfixedConvertbuild.
+Indexdirtybypass/missingEBPnotclean/fullBSRsuccessgate now enforced.
 8948188B4A1085C974123B0DD8ADED010F82D8FBFFFF8948108941188B4A1485C974123B0DD8ADED010F82BFFBFFFF894814894118.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,

@@ -904,6 +904,12 @@ DWORD and preserves either known operand when the other is missing. FreshMaskGat
 reads its separate global before SHL/TEST/JNZ; known shift operands remain
 visible independently during partial stops. Counts are masked to five bits,
 and TEST replaces the shift flags before selecting93AC or93C0.
+HighSizeIndexLifecycle derives the BSR input from the exact ceiling handoff
+and reuses original EDI for the later shift, bounding the composed index to31.
+Zero/above-ceiling bypasses leave a supplied late EBP explicitly unused;
+missing EBP cannot admit clean completion. SelfRingTail preserves its committed
+global OR store during partial local-store stops, then records four separate
+ring writes before the unentered942F jump.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
