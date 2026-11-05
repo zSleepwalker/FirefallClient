@@ -946,6 +946,10 @@ into the fresh global gate, rejecting dirty parent handoffs. TagTraversalLifecyc
 derives a single iteration from the unequal tag edge. RingCleanupLifecycle
 admits an independent counter decrement only after both non-borrowing thresholds
 and all five ring stores; its incoming carry is necessarily clear.
+RightFieldStoresLifecycle derives the paired stores' ECX from the fresh field
+and preserves the threshold's typed flags. ZeroSlotStoresLifecycle carries the
+CMP operands into the four-store tail, separating bounded exits from clean
+completion when late pointer captures remain unused.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

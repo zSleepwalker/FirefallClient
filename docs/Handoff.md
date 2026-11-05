@@ -13388,6 +13388,14 @@ owner77c21735 notified. ActiveZeroSlotStores4b114dc5,
 TraversalZeroSlot20c1b0ca, NodeSelfRingd39cb3eb; RightFieldStorescf07ebfd.
 runner4004exit0 validates registered four-pair batch. RightFieldStores and
 ZeroSlotStores now released awaiting full review/integration.
+75c8f21 pushed. RightFieldStores/ZeroSlotStores fully reviewed/registered;
+fixed dirty-global clean-exit fixture and0FFF-1000 AFfalse. Added aggregate
+rightflags and exact2storegates; zero-slot exactclean excludes unusedpointers.
+runner4039 blocked activeZeroCleanupchecks273Plan.Instructions;ownerd6a035e8
+notified. SelfRingCleanup77c21735 returnedafterEOFreview for exactadmission
+(not merelyChildJumpReached), missingcounterDECnotexecuted, unusedcounter
+missingpointerfixture. RightFieldTagea554b43 active onboth92BDparentroutes.
+runner4041exit0 validates two registered store lifecycle pairs.
 8948188B4A1085C974123B0DD8ADED010F82D8FBFFFF8948108941188B4A1485C974123B0DD8ADED010F82BFFBFFFF894814894118.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,

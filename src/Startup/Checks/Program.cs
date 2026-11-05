@@ -278,6 +278,8 @@ CapacityFinalCalleeCommonZeroSlotStoreTailChecks.Run(Check);
 CapacityFinalCalleeCommonTagTraversalLifecycleChecks.Run(Check);
 CapacityFinalCalleeCommonNodeFreshMaskLifecycleChecks.Run(Check);
 CapacityFinalCalleeCommonRingCleanupLifecycleChecks.Run(Check);
+CapacityFinalCalleeLargeRightFieldStoresLifecycleChecks.Run(Check);
+CapacityFinalCalleeCommonZeroSlotStoresLifecycleChecks.Run(Check);
 FrameHandoffCapacityAboveBranchLifecycleChecks.Run(Check);
 FrameHandoffCapacitySecondBranchLifecycleChecks.Run(Check);
 FrameHandoffCapacityFinalCallGateChecks.Run(Check);
