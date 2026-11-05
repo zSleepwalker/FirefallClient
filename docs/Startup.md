@@ -409,6 +409,8 @@ The reliable masked-length callback's validated entry also admits the zero-resul
 
 `FrameHandoffHelperEntryProjection` preserves independent receiver+0C/+10 reads, wrapping sum and low-bit gate, then compares receiver+8 unsigned against `(receiver10+4)>>2` with DWORD wrap before the shift. Both bypass branches join `BE64C5`; otherwise receiver10 is pushed and opaque `BE6B50` called. Missing reads preserve earlier captures and stop at their instruction, while missing/nonreturn call evidence stops at `BE64C0`. No receiver writes occur in this window.
 
+`FrameHandoffHelperSlotProjection` models the `BE64C5` continuation's mask write to receiver+0C separately from its fresh reload. Independent receiver+8/+10/+4 and indexed-slot reads determine the zero fallthrough at `BE64F2` or nonzero branch to `BE650E`. `UnreliableReceiveHighCountLifecycleProjection` composes successful result forwarding through callback/counter/shared return; counter receiver mismatch and unreached callback captures block counter entry before writes.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves

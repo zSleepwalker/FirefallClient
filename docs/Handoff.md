@@ -12233,6 +12233,28 @@ Full high-count lifecycle composition owner
 `8f935e49-06a8-407d-9b82-b6ac2e929234` owns new Lifecycle pair.
 All are GPT-6 Luna; coordinator retains Program/docs/evidence ownership.
 
+Latest pushed HEAD `0b0f9a0` includes corrected helper entry;
+`f42c604` includes object-helper entry, high-count shared return, and helper
+entry immutable anchors. Continuation evidence sole writer is now
+`28d19084-76d5-4b58-af52-c32d0748126d`; await release before staging.
+Capacity trace `4b7ad275-30b9-45f6-a83d-5f04b1d0380b` reported an apparent
+mapped-VA query rather than flat raw BE6B50. Coordinator requested raw-only
+byte/disassembly correction; its SEH/receiver+2C report is not accepted
+evidence and must not drive implementation.
+
+Corrected raw-only capacity trace now verified: BE6B50 seeds ESI=1,
+reads receiver+8 into EDX, copies nonzero EDX to ESI and joins BE6B70.
+Seed implementation owner `77e7efa5-3d4e-44a0-b45c-56e6fbdd07b5`;
+its new CapacitySeed pair is not yet reviewed. Discard earlier SEH trace.
+Slot gate and full high-count lifecycle reviewed/registered/passing.
+Coordinator corrected indexed address fixture (base 5 + index*4 = 9,
+not receiver+9), removed unreached fixture captures, and made lifecycle
+callback admission reject all unreached flags explicitly.
+Continuation anchors released and verified. ObjectHelperReturn author
+is refining missing register/read capture flags; do not stage its pair.
+Read-only empty-slot continuation owner
+`544c0b47-1d4f-4237-9c9a-ff767051e92e` starts BE64F2.
+
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
 indirect callback, then fresh receiver+4C DEC and receiver+48 zero/INC.
