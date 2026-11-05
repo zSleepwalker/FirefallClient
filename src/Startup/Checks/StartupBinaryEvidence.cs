@@ -14016,5 +14016,71 @@ internal static class StartupBinaryEvidence
             && Matches(0xBE6BC4, "FF152444AC01")
             && ReadUInt32(0xBE6BC6) == 0x01AC4424
             && 0xBE6BC4 + 6 == rawStartupCommonCallbackFrameHelperCallResultSuffixEndFileOffset);
+
+        const uint rawStartupCommonCallbackFrameHelperFirstTransferFileOffset = 0xBE6BCA;
+        const uint rawStartupCommonCallbackFrameHelperFirstTransferEndFileOffset = 0xBE6BFD;
+        const int startupCommonCallbackFrameHelperFirstTransferLength =
+            (int)(rawStartupCommonCallbackFrameHelperFirstTransferEndFileOffset
+                - rawStartupCommonCallbackFrameHelperFirstTransferFileOffset);
+        const uint startupCommonCallbackFrameHelperFirstTransferCodeVirtualAddress =
+            rawStartupCommonCallbackFrameHelperFirstTransferFileOffset + 0x400C00;
+        check("Binary pinned-sample FirefallClient.exe SHA256 97362D668FF64778193A64759265E4AE90842043C4A15B627DF9902FD9135445 raw [0xBE6BCA,0xBE6BFD) maps by raw+0x400C00 to code VA [0xFE77CA,0xFE77FD); first transfer immutable PE anchor",
+            startupCommonCallbackFrameHelperFirstTransferLength == 0x33
+            && startupCommonCallbackFrameHelperFirstTransferCodeVirtualAddress == 0xFE77CA
+            && startupCommonCallbackFrameHelperFirstTransferCodeVirtualAddress
+                + startupCommonCallbackFrameHelperFirstTransferLength == 0xFE77FD
+            && RawCodeRangeMaps(rawStartupCommonCallbackFrameHelperFirstTransferFileOffset,
+                startupCommonCallbackFrameHelperFirstTransferLength)
+            && VirtualAddressToFileOffset(startupCommonCallbackFrameHelperFirstTransferCodeVirtualAddress)
+                == rawStartupCommonCallbackFrameHelperFirstTransferFileOffset
+            && VirtualAddressToFileOffset(startupCommonCallbackFrameHelperFirstTransferCodeVirtualAddress
+                + startupCommonCallbackFrameHelperFirstTransferLength)
+                == rawStartupCommonCallbackFrameHelperFirstTransferEndFileOffset
+            && Matches(rawStartupCommonCallbackFrameHelperFirstTransferFileOffset,
+                "8B4B048D04BD000000008945F48D14088B4308C1E0022BC203C1C1F8028D3C85000000008B45FC0345F4575250FF159C48AC01"));
+
+        const uint rawStartupCommonCallbackFrameHelperFirstReturnJoinFileOffset = 0xBE6BFD;
+        const uint rawStartupCommonCallbackFrameHelperFirstReturnJoinEndFileOffset = 0xBE6C10;
+        const int startupCommonCallbackFrameHelperFirstReturnJoinLength =
+            (int)(rawStartupCommonCallbackFrameHelperFirstReturnJoinEndFileOffset
+                - rawStartupCommonCallbackFrameHelperFirstReturnJoinFileOffset);
+        const uint startupCommonCallbackFrameHelperFirstReturnJoinCodeVirtualAddress =
+            rawStartupCommonCallbackFrameHelperFirstReturnJoinFileOffset + 0x400C00;
+        check("Binary pinned-sample FirefallClient.exe SHA256 97362D668FF64778193A64759265E4AE90842043C4A15B627DF9902FD9135445 raw [0xBE6BFD,0xBE6C10) maps by raw+0x400C00 to code VA [0xFE77FD,0xFE7810); first return-join immutable PE anchor",
+            startupCommonCallbackFrameHelperFirstReturnJoinLength == 0x13
+            && startupCommonCallbackFrameHelperFirstReturnJoinCodeVirtualAddress == 0xFE77FD
+            && startupCommonCallbackFrameHelperFirstReturnJoinCodeVirtualAddress
+                + startupCommonCallbackFrameHelperFirstReturnJoinLength == 0xFE7810
+            && RawCodeRangeMaps(rawStartupCommonCallbackFrameHelperFirstReturnJoinFileOffset,
+                startupCommonCallbackFrameHelperFirstReturnJoinLength)
+            && VirtualAddressToFileOffset(startupCommonCallbackFrameHelperFirstReturnJoinCodeVirtualAddress)
+                == rawStartupCommonCallbackFrameHelperFirstReturnJoinFileOffset
+            && VirtualAddressToFileOffset(startupCommonCallbackFrameHelperFirstReturnJoinCodeVirtualAddress
+                + startupCommonCallbackFrameHelperFirstReturnJoinLength)
+                == rawStartupCommonCallbackFrameHelperFirstReturnJoinEndFileOffset
+            && Matches(rawStartupCommonCallbackFrameHelperFirstReturnJoinFileOffset,
+                "8B4B0483C40C8D14078B7DF88955F03BFE7747"));
+
+        const uint rawStartupCommonCallbackFrameHelperSecondPrefixFileOffset = 0xBE6C10;
+        const uint rawStartupCommonCallbackFrameHelperSecondPrefixEndFileOffset = 0xBE6C34;
+        const int startupCommonCallbackFrameHelperSecondPrefixLength =
+            (int)(rawStartupCommonCallbackFrameHelperSecondPrefixEndFileOffset
+                - rawStartupCommonCallbackFrameHelperSecondPrefixFileOffset);
+        const uint startupCommonCallbackFrameHelperSecondPrefixCodeVirtualAddress =
+            rawStartupCommonCallbackFrameHelperSecondPrefixFileOffset + 0x400C00;
+        check("Binary pinned-sample FirefallClient.exe SHA256 97362D668FF64778193A64759265E4AE90842043C4A15B627DF9902FD9135445 raw [0xBE6C10,0xBE6C34) maps by raw+0x400C00 to code VA [0xFE7810,0xFE7834); second prefix immutable PE anchor",
+            startupCommonCallbackFrameHelperSecondPrefixLength == 0x24
+            && startupCommonCallbackFrameHelperSecondPrefixCodeVirtualAddress == 0xFE7810
+            && startupCommonCallbackFrameHelperSecondPrefixCodeVirtualAddress
+                + startupCommonCallbackFrameHelperSecondPrefixLength == 0xFE7834
+            && RawCodeRangeMaps(rawStartupCommonCallbackFrameHelperSecondPrefixFileOffset,
+                startupCommonCallbackFrameHelperSecondPrefixLength)
+            && VirtualAddressToFileOffset(startupCommonCallbackFrameHelperSecondPrefixCodeVirtualAddress)
+                == rawStartupCommonCallbackFrameHelperSecondPrefixFileOffset
+            && VirtualAddressToFileOffset(startupCommonCallbackFrameHelperSecondPrefixCodeVirtualAddress
+                + startupCommonCallbackFrameHelperSecondPrefixLength)
+                == rawStartupCommonCallbackFrameHelperSecondPrefixEndFileOffset
+            && Matches(rawStartupCommonCallbackFrameHelperSecondPrefixFileOffset,
+                "8D04BD000000008BD6C1F8022BD78955F48D1C8500000000A19C48AC015351FF75F0FFD0"));
     }
 }

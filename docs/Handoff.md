@@ -12417,6 +12417,15 @@ unreached flags but omitted that property. TransferLifecycle owner
 Return EntryEDI/ESI remain independent post-call captures, not assumed
 preserved from the first call's inputs.
 
+PrefixCall reviewed/registered/passing; transfer immutable anchors reviewed
+and passing. HelperLifecycle production reviewed; author `2340766a`
+refining fixtures (null IncomingEcx wrongly expected unreached; final
+formed ECX/slot offset must follow wrapping sum, not fixed fixture values).
+SecondReturnGate owner `c70f8a09-aeeb-4378-af21-0d95a310950a`
+owns only C34..C41 read/cleanup/LEA/TEST/JZ pair. No REP effects.
+LoopPrefix owner `1095361c-cf6e-428e-bfd7-b69bd3af1de9` owns
+single-iteration-to-prefix-call composition. Reject doubling/failure routes.
+
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
 indirect callback, then fresh receiver+4C DEC and receiver+48 zero/INC.
