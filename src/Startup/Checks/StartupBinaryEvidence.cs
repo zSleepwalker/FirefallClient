@@ -7308,6 +7308,11 @@ internal static class StartupBinaryEvidence
         check("Binary dispatcher lock-result gate increments the fresh counter and compares a byte argument before clears",
             Matches(0xBBDDEB, "85C0750753FF157842AC01FF4330807D0800C745FC00000000C6466400")
             && Matches(0xBBDE08, "0F84BC000000"));
+        check("Binary dispatcher count gate reloads storage after the signed logging threshold and tests its first element",
+            Matches(0xBBDE0E, "833D9085E601017F14516A00683C4FBB016A01B98085E601E8054270008B86A800000033DB2B86A4000000C1F80285C074438B86A40000008B3C9885FF751957683B020000687F71B501687E71B501FF15A05EC10183C4108B078BCF"));
+        check("Binary receive helper return pushes fresh count before the packet-call boundary",
+            Matches(0xBD2F1E, "50FF7424148BCE")
+            && RelativeBranchTargets(0xBD2F25, 0xE8, 0xBD3030));
         check("Binary nonzero parser dispatches through a fresh stack-local vtable before preserve-one resize",
             Matches(0xBD31C5, "8D4C24348B442434FF500C6A01508D4C243C")
             && RelativeBranchTargets(0xBD31D7, 0xE8, 0x12CBCB0)

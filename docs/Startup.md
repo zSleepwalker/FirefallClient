@@ -1089,6 +1089,10 @@ joins the exact five committed ring stores to the independent cleanup
 counter read and DEC/JNZ gate. The zero path stops before its cleanup
 call, while the nonzero destination remains unentered; neither path
 claims epilogue completion.
+GameSocketReceivePacketCallPreparationProjection observes a normal
+sender-helper return before pushing its independent result and freshly
+read stack count. It stops before the fixed packet call at raw BD2F25;
+packet execution, reposting and return code remain outside the contract.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

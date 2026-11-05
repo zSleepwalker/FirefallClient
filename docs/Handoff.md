@@ -13845,6 +13845,20 @@ write. Registered runner4160exit0 exact parser/queueattempt/packetdraft
 exclusions; target removed. Luna22cc287e cleanup CALL and shared
 epilogue successor. bf8 declined external sample; coordinator freshly
 read BBDE0E92bytes and requested same-task contract mapping.
+Equality cleanup committed/pushed5d65e24 latestreviewedsubset4160.
+Parser5b75 fullEOF reviewed revision requested pending/false return
+flags preserve atCD, missingvptr stopC9, metadataactualcapturedstates,
+rdata401400mapping fixture, wrappedlocal24 fixture, mergedmemorytrace
+and unsupportedcallerentry3150. No registration/run untilrevision.
+Fresh dispatcher92bytes and packet-call17bytes now central binary
+anchors; runner4162exit0 exact parser/queueattempt/packet/cleanup-
+epilogue draft exclusions, target removed. Anchors await nextcodecommit.
+Packet978 fullEOF reviewed coordinatorretained nested996 parentbound
+via ExactBoundedCompletion and removed pendinghelper unusedEAX/ESP
+from observedcallmetadata. Registered4164exit0 exact parser/queue-
+attempt/cleanup-epilogue/dispatchercollection exclusions; target removed.
+Luna8be9d338 bounded postpacket/repost analysis successor. e64f8abd
+dispatcher collection implementation frombf8 suppliedfreshcontract.
 SmallBinEpilogue released and full EOF reviewed: owner6d052038 revising
 wrong parent type, nullable value-plan access, missing successor-unused
 forwarding, child read/write effect markers and dirty-ring admission.
