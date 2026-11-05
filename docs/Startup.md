@@ -1176,6 +1176,10 @@ GameSocketReceiveBufferStatusGateProjection independently loads the
 operation base, writes status 0x80 and rereads the operation field. Its
 four historical-route/reload-outcome combinations retain correct register
 lineage, with new register observations required after the F7F diagnostic.
+NetworkDispatcherCellReturnAddressGateProjection captures new registers
+after the opaque cell return, stores its EAX observation and compares the
+two wrapped LEA addresses. It stops before either the equal destination
+or the fence fallthrough, without carrying registers across the call.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
