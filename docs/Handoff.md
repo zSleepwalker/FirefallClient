@@ -13003,6 +13003,12 @@ IndexedGuarded revised/registered; corrected missingglobal store214 and
 conditionalzero +14 fixture. PairedFinal reviewed/registered; corrected
 200-300=FFFFFF00 fixture. Runner3582 exit0, including epilogue byte anchor.
 GuardedFinal36ec0348-84d5-4100-acc6-d96f856ccfb8 active.
+Checkpointaaa0a34 pushed. Fresh IDA confirms only recorded inboundxref
+to90CA is8F1B (morefalse);90CA CMPEDX,global1EDADDC/JNZ90F6.
+Equal90D2..90F6 writes independently verified/anchored, runner3585 exit0.
+AlternateRootGatec67b323e and AlternateRootWrites1db37e55 active.
+Epilogue revision returned for explicit TESTflags, exactcleanadmission,
+missingstackread events, and entryEBP fixture defaults. Native target untouched.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional

@@ -451,6 +451,15 @@ internal static class StartupBinaryEvidence
             Matches(0x12C9441, "F60584AFED01025F5E5B740B6888AFED01FF157C42AC018BE55DC3")
             && RawCodeRangeMaps(0x12C9441, 27)
             && ShortConditionalBranchTargets(0x12C944B, 0x74, 0x12C9458));
+        check("Binary alternate root compare and equal-path writes have distinct bounded exits",
+            Matches(0x12C90CA, "3B15DCADED0175248B0DD0ADED0103CF8935DCADED018BC1890DD0ADED0183C801894604890C31E94B030000")
+            && RawCodeRangeMaps(0x12C90CA, 44)
+            && ShortConditionalBranchTargets(0x12C90D0, 0x75, 0x12C90F6)
+            && RelativeBranchTargets(0x12C90F1, 0xE9, 0x12C9441));
+        check("Binary alternate aligned-size gate stores its shifted value before the unsigned branch",
+            Matches(0x12C90F6, "83E1F88BC103F9C1E8038945FC83F8200F838F000000")
+            && RawCodeRangeMaps(0x12C90F6, 22)
+            && RelativeConditionalBranchTargets(0x12C9106, 0x0F, 0x83, 0x12C919B));
         check("Binary pinned-sample raw code [0xBE6325,0xBE6352) maps to VA 0x00FE6F25 and preserves its JNZ target",
             imageBase == 0x400000
             && Matches(0xBE6325, "8B4E0853578B7E108D04CDFFFFFFFF4921460C037E0C8BC7C1E80323C88B46048D1C8D00000000833C0300751C")
