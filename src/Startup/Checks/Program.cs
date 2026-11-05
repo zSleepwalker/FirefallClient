@@ -29,6 +29,10 @@ UnreliableReceiveJoinedHeaderChecks.Run(Check);
 ReliableReceiveOccupiedSlotChecks.Run(Check);
 UnreliableReceiveMarkerCallbackChecks.Run(Check);
 UnreliableReceiveCallbackScalarChecks.Run(Check);
+UnreliableReceiveResidueJoinChecks.Run(Check);
+ReliableReceiveEmptyPublicationChecks.Run(Check);
+UnreliableReceiveCallbackPresenceChecks.Run(Check);
+UnreliableReceiveDirectCallbackChecks.Run(Check);
 PayloadGrowthZeroFillChecks.Run(Check);
 
 void Check(string name, bool condition)

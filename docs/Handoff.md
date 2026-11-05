@@ -12081,3 +12081,9 @@ callback anchors, preserving completed pending marker/scalar anchors.
 BD58E0 prior-art trace found XOR core already modeled; narrower read-only
 owner `148e6c4c-2cf8-429b-b5a4-00170c286e0a` verifies its diagnostic guard
 and post-call reloads before any new native-boundary projection is assigned.
+
+Pushed unreliable scalar handoff as `9b30dff`. Residue-join composition,
+reliable empty-publication composition, unreliable callback presence/direct
+code now reviewed, registered, passing the pinned runner.
+Luna `7ae3b8a7-9123-49a0-9b8b-ad68491ad34c` composes presence gate and
+independently reloaded direct callback target, without forcing target equality.

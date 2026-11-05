@@ -365,6 +365,14 @@ PE import names identify cell VA `0x1AC4424` as `std::_Xbad_alloc`, `0x1AC45C0` 
 
 `UnreliableReceiveCallbackScalarProjection` covers `[BE5B25,BE5B32)`. The independent BYTE[frame+8] reload replaces CL without fixing unknown ECX upper bits, then EDX receives captured prior callback EAX. Only normal return from opaque raw `BD58E0` permits the four-byte cleanup. A missing EAX capture preserves the earlier frame-byte read and known CL.
 
+`UnreliableReceiveResidueJoinProjection` composes residue handoff, optional counter continuation, and joined-header preparation. A clean early JBE bypasses the counter; a normally returning helper requires it, including matching retained ESI and receiver. Reloaded payload WORDs remain independent of earlier captured words.
+
+`ReliableReceiveEmptyPublicationProjection` composes only the zero-slot, clean zero-header branch through independent frame+8 publication. A normal nonzero-header callback stops at its result boundary instead; an otherwise matching branch destination cannot bypass forbidden captures or missing prerequisites.
+
+`UnreliableReceiveCallbackPresenceProjection` covers `[BE5B32,BE5B52)` for zero marker. A nonzero receiver+14 DWORD skips the diagnostic. Zero pushes `0`, `2CA`, `1B58C06`, `1B58C07` through absolute cell `1C15EA0`; normal return gates cleanup 16. This first target check does not fix a later target reload.
+
+`UnreliableReceiveDirectCallbackProjection` covers `[BE5B52,BE5B64)`. It pushes zero, zero-extended SI, independent DWORD[payload+4], and the payload+8 address, then independently reloads receiver+14 and calls EAX. Missing later captures preserve preceding pushes; target zero is not guarded in this window.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves
