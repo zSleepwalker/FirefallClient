@@ -423,6 +423,11 @@ internal static class StartupBinaryEvidence
             && ShortConditionalBranchTargets(0x12C9046, 0x75, 0x12C904D)
             && ShortBranchTargets(0x12C904B, 0xEB, 0x12C9050)
             && RelativeConditionalBranchTargets(0x12C9052, 0x0F, 0x84, 0x12C8EF2));
+        check("Binary guarded field store reloads ECX only after the unsigned EAX gate and write",
+            Matches(0x12C9058, "3B05D8ADED010F8212FEFFFF8948188B4E1085C97412")
+            && RawCodeRangeMaps(0x12C9058, 22)
+            && RelativeConditionalBranchTargets(0x12C905E, 0x0F, 0x82, 0x12C8E76)
+            && ShortConditionalBranchTargets(0x12C906C, 0x74, 0x12C9080));
         check("Binary pinned-sample raw code [0xBE6325,0xBE6352) maps to VA 0x00FE6F25 and preserves its JNZ target",
             imageBase == 0x400000
             && Matches(0xBE6325, "8B4E0853578B7E108D04CDFFFFFFFF4921460C037E0C8BC7C1E80323C88B46048D1C8D00000000833C0300751C")

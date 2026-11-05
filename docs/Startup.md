@@ -635,6 +635,15 @@ tests the retained EAX value to select raw `12C8EF2` or `12C9058`.
 clean equality route at raw `12C8FA8`. Other large-size destinations remain
 bounded; the alternate reads are fresh even when the prior frame write
 aliases their addresses.
+`CapacityFinalCalleeIndexedRootMaskProjection` retains the fresh frame-C
+read before the unequal branch, three independent index loads, and the
+indexed write before its optional mask update. Missing reads stop at their
+own instruction; zero, unequal, nonzero-store, and mask routes remain
+bounded at raw `12C8EF8`, `12C903B`, `12C9058`, and `12C8EF2`.
+`CapacityFinalCalleeDescentClearLifecycleProjection` joins only a clean FDD
+terminal, carrying the original frame-derived EDX into the clear tail.
+FC5 loopbacks stay single-step; contaminated captures preserve effects
+without admitting the continuation.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

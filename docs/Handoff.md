@@ -12929,6 +12929,17 @@ fixture. IndexedRootMask remains with owner: missing reads must stop at
 their own MOV, not its following instruction; additional revision requested.
 SuccessorFieldEvidence `8ad76929-7dfc-451d-91a2-d7e1c2620b5c` active
 read-only trace9058; other three successor lifecycle agents remain active.
+Checkpoint05d33e8 pushed. IndexedRootMask revision reviewed and registered;
+missing-read boundaries FFE/9009/9013/9018/9026/9029 corrected. DescentClear
+reviewed and registered; missing-read fixtures with supplied later values
+correctly expect contamination. Runner3471 exit0. Fresh9058..906E native
+bytes independently verified in IDA and added as offline anchor.
+SelectionDescent released, awaits review; IndexedConditional remains owner.
+New GPT-6 Luna owners: GuardedFieldStore694121fe-c4b9-4ba5-b005-3f0da024e721;
+ClearIndexed1c307112-11c7-4f0b-a4e1-e64186ca8373;
+SuccessorPairedStores6580ea95-4d08-4c5d-a612-20481a8792e5.
+Do not stage active files. Native906E..908B evidence returned, not yet
+independently verified/anchored; guarded store successor JZ goes9080.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
