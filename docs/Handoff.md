@@ -12964,6 +12964,11 @@ comparison consumer; cleanbelow has no unreached nestedflags.
 SelectionClear production reviewed, checks returned to40cf3884 for
 cleanroute defaults and impossible missingglobal write assertion.
 FinalStoreEvidence6c5d2238-4d93-48cc-ad5b-d7cd84830198 active raw9097.
+Checkpoint68a17d1 pushed. SecondFieldTest and ClearIndexed released,
+reviewed/registered; added explicit raw-stop guards for three ClearIndexed
+bounded destinations. Runner3535 exit0. GuardedSuccessor owner
+7cc29746-105b-4353-84ce-fbda4fe61842 active (joins906E or9080 paths).
+Agents must not run builds/tests; coordinator is sole runner.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional

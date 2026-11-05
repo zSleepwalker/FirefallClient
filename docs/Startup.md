@@ -660,6 +660,10 @@ clean unequal root comparison at `12C903B`, retaining frame-derived ECX.
 The conditional EBX and EAX remain independent captures; derived ESI is
 supplied only when its comparison consumer is reached. Other root exits
 stay bounded and reject conditional captures.
+`CapacityFinalCalleeSecondFieldTestProjection` models the direct `12C9080`
+entry without the preceding stores. `CapacityFinalCalleeClearIndexedLifecycleProjection`
+joins only a clean field-clear completion at FFE to indexed reads; fresh
+frame and global captures remain independent from the clear-tail writes.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
