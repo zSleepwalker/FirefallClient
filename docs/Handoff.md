@@ -13469,6 +13469,22 @@ ordinary full runner4090exit0 includes both. Their checks now preserve partial
 instruction execution, correct global read addresses, nullable pre-OR flags
 and exact child execution admission. Lunaa416dd97 owns newTraversalCleanupEpilogue
 pair;6ebaf007 indexedstores remains active. Small-bin evidence609ae0b3 pending.
+Both reviewed pairs committed/pushedac26569 (7files2084insertions).
+Latest authoritative ordinary full check run is runner4090exit0.
+Fresh read-only IDA get_bytes at raw012C92F6 length94 confirmed the
+indexed LEA/CMP, small-bin mask, OR/link stores, alternate threshold/link
+stores through exclusive9354. Both link tails JMP9441;9354 is entered
+only by the preceding size-gate JNB, not sequentially from the small-bin
+window. Luna916e56e5 owns RightRootIndexedMask pair (exactparent92F6
+into existingIndexedMask helper, no repeated size/mask gate).
+Luna4aebc45d owns NodeMaskIndexed pair (exactnonzero93C0 into count/tag).
+No runtime execution or IDB changes. Evidence609ae0b3 released.
+IndexedTraversalSlotStores full EOF and released revision reviewed,
+registered, runner4092exit0. Only the three named unreviewed NodeMaskIndexed,
+TraversalCleanupEpilogue, and RightRootIndexedMask drafts excluded by a
+session-only MSBuild target, removed immediately afterward. Fixed forwarding
+APIs, distinct flag-record comparison, CMP110-100=10h fixture, and dirty
+zero-child admission; added nonzero-child missing/equal/diff checks.
 8948188B4A1085C974123B0DD8ADED010F82D8FBFFFF8948108941188B4A1485C974123B0DD8ADED010F82BFFBFFFF894814894118.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,

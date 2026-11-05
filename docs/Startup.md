@@ -990,6 +990,10 @@ the four-store traversal route, distinguishing reached instruction attempts
 from execution when operands are missing. RightRootSuccessorLifecycle carries
 consumed EDI into the root-equal global store/jump or the root-unequal
 SHR-by-three size gate, without entering either helper's selected destination.
+IndexedTraversalSlotStoresLifecycle extends the indexed count/tag zero-child
+route through the four link stores and its cleanup jump. The child-slot
+address supplies ECX, while the original loaded indexed pointer supplies EDX;
+neither the indexed-slot address nor the captured zero child is substituted.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
