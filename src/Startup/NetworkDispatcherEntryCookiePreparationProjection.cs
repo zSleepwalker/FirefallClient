@@ -115,7 +115,9 @@ public static class NetworkDispatcherEntryCookiePreparationProjection
             suppliedParent.FreshEntryESI,
             suppliedParent.FreshEntryEDI);
         NetworkDispatcherEntryRegisterSavePlan parent =
-            NetworkDispatcherEntryRegisterSaveProjection.Project(immutableParentCapture);
+            NetworkDispatcherEntryRegisterSaveProjection.Project(
+                immutableParentCapture,
+                reprojectedFramePrefix);
 
         if (!parent.ExactRegisterSavesProjected
             || parent.EntryEBP is not uint entryEBP

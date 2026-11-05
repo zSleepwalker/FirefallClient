@@ -7360,6 +7360,14 @@ internal static class StartupBinaryEvidence
             Matches(0xBBDDB0, "558BEC6AFF68183CA40164A1000000005083EC0C535657A10050DC0133C550"));
         check("Binary parser slot-zero call returns before a distinct post-call address and locked operation",
             Matches(0xBD34CB, "8B068BCEFF108D4608F00FC1184B75078B068BCEFF5004"));
+        check("Binary parser second-call epilogue restores FS and pops four registers before resetting the frame",
+            Matches(0xBD34E2, "8B4C244864890D00000000595F5E5B8BE55DC20800CC"));
+        check("Binary dispatcher fallback pushes EBX and calls the distinct import before incrementing its counter",
+            Matches(0xBBDDEF, "53FF157842AC01FF4330"));
+        check("Binary dispatcher fallback comparison reads one argument byte, not a DWORD",
+            Matches(0xBBDDF9, "807D0800"));
+        check("Binary dispatcher frame and receiver clears precede the argument-zero branch",
+            Matches(0xBBDDFD, "C745FC00000000C64664000F84BC000000"));
         check("Binary nonzero parser dispatches through a fresh stack-local vtable before preserve-one resize",
             Matches(0xBD31C5, "8D4C24348B442434FF500C6A01508D4C243C")
             && RelativeBranchTargets(0xBD31D7, 0xE8, 0x12CBCB0)

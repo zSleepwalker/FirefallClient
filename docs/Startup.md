@@ -1,5 +1,18 @@
 # Process startup (partial)
 
+The current dispatcher entry continuation reconstructs the zero-result fallback
+as a fresh stack PUSH, a distinct indirect import return, and a counter INC
+using independently captured post-call EBX and DWORD values. Its next comparison
+is byte-sized (`80 7D 08 00` at raw BBDDF9), with a fresh EBP and argument byte;
+earlier counter writes do not supply that read even when addresses alias.
+
+The parser diagnostic cleanup continuation reconstructs the slot-four indirect
+call return, fresh stack read at ESP+48, segment-relative FS:[0] restoration,
+and four independent POPs at raw BD34ED..BD34F0. The bounded frame-reset suffix
+uses fresh EBP and a separate POP EBP stack read before RET8. These are offline
+value-only projections: missing captures stop the relevant instruction, opaque
+returns invalidate flags/register knowledge, and no target is executed.
+
 The PE entry RVA `0x136B9B0` translates to **raw file offset `0x136ADB0`** using the `.text` section mapping. IDA's raw-file loader did not automatically mark this actual entry as a function; its preexisting `nullsub_112` at raw `0x136B9B0` is **not** the PE entry. A new function was defined at the translated offset.
 
 The entry thunk at `0x136ADB0` calls `0x136B4A4` to initialize the MSVC security cookie (with a corresponding inverted cookie), then jumps to `0x136ADBA`. The latter acquires the CRT startup lock via thread identity and interlocked compare/exchange, runs initializer ranges, optionally invokes the dynamic TLS callback, skips the executable name and whitespace in the command line (respecting quotes), calls the application's entry through `0x2E9630`, then follows the CRT exit/cleanup path. The raw-image decompilation misleadingly labels the passed `0x400000` **image base** as a function; it is not a call into the `MZ` header.

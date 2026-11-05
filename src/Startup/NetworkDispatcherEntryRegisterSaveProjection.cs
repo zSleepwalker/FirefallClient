@@ -89,6 +89,13 @@ public static class NetworkDispatcherEntryRegisterSaveProjection
     {
         NetworkDispatcherEntryFramePrefixPlan reprojectedParent =
             NetworkDispatcherEntryFramePrefixProjection.Project(capture.ParentCapture);
+        return Project(capture, reprojectedParent);
+    }
+
+    internal static NetworkDispatcherEntryRegisterSavePlan Project(
+        NetworkDispatcherEntryRegisterSaveCapture capture,
+        NetworkDispatcherEntryFramePrefixPlan reprojectedParent)
+    {
         bool parentPlanMatches = ParentPlansEqual(capture.ParentPlan, reprojectedParent);
 
         if (!parentPlanMatches)

@@ -1,5 +1,39 @@
 # Reverse-engineering handoff
 
+## Current dispatcher/parser suffix review
+
+Reviewed standalone pairs now cover parser slot-four return, fresh E2 stack
+read and segment-relative FS restoration, four independent epilogue POPs,
+and dispatcher fallback PUSH/import return/fresh-EBX counter INC.
+Coordinator corrected a missing check-method brace after the FS suite
+extraction, a supplied-unused counter fixture, and rejected-counter flag
+preservation. Independent IDA bytes at raw BD34E2 (22 bytes) and BBDDEF
+(10 bytes) match new offline binary anchors.
+
+Subsequent full runners remained expensive and were stopped by exact shell/PID.
+The source-backed performance changes share a coordinator-reprojected frame
+prefix inside cookie/register-save projection and cache immutable second-XADD
+branch predicates; no validation predicate is removed. Focused runner4350 uses
+the existing check project with a session-only entry point for all ten reviewed
+suffix suites, changed-ancestor regressions, and full independent binary anchors.
+It has progressed through dispatcher counter checks; completion is pending.
+
+Parser frame reset, logical RET8, dispatcher byte argument compare and clear
+stores have full EOF review and registrations. Corrected invalid frame-plan
+Reads/Pops references, undefined fixture helper, missing clean/bounded
+conjunction, and projection-constant qualification. Newly released dispatcher
+zero branch (48c8db27) and parser skip-slot-four FS restore (930b4775) remain
+unreviewed. Active GPT-6 Luna successors are dispatcher selector compare
+(aa64755f) and parser preserved-DEC-flags register POPs (98ed87fc).
+Exclude these four unreviewed/active pairs in focused validation.
+Latest pushed checkpoint remains d51b86b until validation succeeds.
+
+Dispatcher-only runner4352 completed with zero failures using an isolated
+session output directory: all five fallback suffix suites, register-save and
+cookie ancestor regressions, and the full independent binary-anchor suite.
+This dispatcher subset is ready for persistence. Parser runner4350 remains
+active separately; parser suffix acceptance is still pending.
+
 ClientApi/WinHTTP details are in [ClientApiWinHttp.md](ClientApiWinHttp.md).
 
 ## Latest continuation navigation (November 4)
@@ -14240,6 +14274,18 @@ exit0 (noexclusions atvalidationstart). New Luna545f307e owns slot4freshtarget/
 opaquereturn DF..E2; Lunac41bb602 owns zeroTEST fallbackPUSH atEF with fresh
 postcallESP/EBX, stoppingF0 noABIlineage. Currentexclusions SecondVirtualCallReturn/
 EntryFallbackPush. No running coordinatorvalidation.
+Slot4return545f307e fullEOF reviewed registered; fallbackpushc41bb602 revised
+pair fullEOF reviewed standalonechecks restored acceptedReturnedTestBranch
+diffempty. Corrected FlagsBeforePush metadata and actualprecallEBX/ESI fixtures,
+coordinator fixed crossflagstypecomparison. runner4334 built/run stillongoing.
+FSrestorea2625474 initially editedwrongexistingchecks, corrected standalonepair
+fullEOF reviewed coordinatorfixed branchancestorlevel. Fallbackimport23850f43
+fullEOF reviewed noissues. Bothregistered AFTER4334build require nextcombined.
+dfbf162c sameperformancefollowup caches acceptedSecondXaddBranch immutable
+Ordered/ExactClean properties; threepreviousnodesalreadycached. Pendingrelease.
+Luna581fd123 owns fourfresh epiloguePOP ED..F1; Lunafb28d384 owns ONLYfallback
+counter INC F6..F9 requiring freshpostfallbackEBX and independentDWORD.
+Currentexclusions SecondCallRegisterPops/FallbackCounter. HEADd51b86b.
 
 The user's finish-current-tasks-and-stop request supersedes earlier
 continuous-dispatch instructions. All current assignments are now released,
