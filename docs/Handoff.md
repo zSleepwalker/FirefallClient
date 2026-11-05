@@ -12639,6 +12639,35 @@ PrefixLifecycle `f588296e-5df4-421c-b0c8-0d513c34d416` active.
 AboveBranch and SecondBranch released but NOT yet reviewed/registered.
 FirstValidation `259bb22c-6493-4dbf-985a-776c814b6ce4` active.
 
+LoopOverflow/PrefixCall pushed46d67be. FirstValidation now released;
+agent ran checks despite prohibition, coordinator must review/register
+and validate independently. ValidationLifecycle successor
+`c3748d39-6a7b-4e86-9ae5-f36ad7e35382` active, owns prefix-call-to-first
+validation composition. Latest canonical runner passed before this release.
+
+FirstValidation, PrefixLifecycle and ValidationLifecycle reviewed/registered;
+validation terminal admission corrected to require clear unreached-read
+flags. AboveBranch and SecondBranch reviewed/registered but fixture runner
+failures returned to their owners for capture/route corrections.
+Continuation trace `410e1359-078c-4942-914d-cf96e5b11bb5` active;
+EntryValidation pair `1f97c2b4-c4b3-421c-a124-0ffc0ae23dec` active.
+No sample execution or IDB changes; latest pushedHEAD46d67be.
+
+Coordinator offline runner passed after branch fixture corrections and
+EntryValidation review/registration. Six released production/check pairs
+are ready for checkpoint: FirstValidation, PrefixLifecycle,
+ValidationLifecycle, EntryValidation, AboveBranch and SecondBranch.
+Nonreturn fixture explicitly supplies shared-repeat captures rather than
+asserting flags for absent values. Wrapped above fixture retains exact
+no-call EDI/ESI/EBP continuity and wrapped receiver+4 address 3.
+New immutable native anchor pins raw12C8DA7..12C8DED, 70 bytes, with
+distinct branches to12C8EF8,12C8E45,12C8E3A and opaque cell1AC42A8.
+AlignmentDispatch pair owner `c71aebe7-aa41-4e5d-8a6a-aba6d0cf5039`
+active, do not stage until release. Read-only successors:
+first-return dispatch `707d1845-46a5-492a-b20f-5d30cb0e1634`,
+tag branch `f24535df-8be7-4ffc-b03a-58467db22f0a`,
+computed-zero branch `9f44de5f-cfaa-4185-86f7-bf23450ff31f`.
+
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
 indirect callback, then fresh receiver+4C DEC and receiver+48 zero/INC.

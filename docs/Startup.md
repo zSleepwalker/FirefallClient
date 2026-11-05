@@ -514,6 +514,26 @@ reached-but-not-taken guard from an earlier exit.
 subtraction, uses the prior mask-test flags without a new global read,
 and exposes outgoing ESI only when the opaque call is bypassed.
 
+`CapacityFinalCalleeFirstValidationProjection` pins the ordered global
+and `[ESI+4]` reads, unsigned comparison, and low-two-bit comparison,
+including defined CMP/AND flags without defining AND's auxiliary carry.
+`CapacityFinalCalleePrefixLifecycleProjection` derives the prefix mask
+from the entry TEST; `CapacityFinalCalleeValidationLifecycleProjection`
+derives bypass ESI and requires independent ESI after the opaque call.
+Terminal validation branches with supplied unreached reads are retained
+as partial evidence, not admitted as a clean continuation.
+`CapacityFinalCalleeEntryValidationProjection` connects the entry/prefix
+lifecycle to this validation without admitting validation captures on the
+zero-entry RET path. Nonzero validation receives the exact derived prefix
+capture, while post-call ESI remains independently captured.
+
+`FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
+return-gate capture only from a clean above-capacity lifecycle.
+`FrameHandoffCapacitySecondBranchLifecycleProjection` forwards only an
+admitted second-transfer return gate into the first/fill/final chain.
+Both retain earlier writes and pushes when downstream evidence is missing
+or unreached; supplied later captures cannot manufacture successful admission.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves
