@@ -510,6 +510,18 @@ internal static class StartupBinaryEvidence
             Matches(0x12C91A8, "8B4A083BCB894DEC8B4DF00F82BDFCFFFF")
             && RawCodeRangeMaps(0x12C91A8, 17)
             && RelativeConditionalBranchTargets(0x12C91B3, 0x0F, 0x82, 0x12C8E76));
+        check("Binary large backlink gate reloads its frame before the independent field comparison",
+            Matches(0x12C91B9, "8B5DEC39530C0F85B1FCFFFF")
+            && RawCodeRangeMaps(0x12C91B9, 12)
+            && RelativeConditionalBranchTargets(0x12C91BF, 0x0F, 0x85, 0x12C8E76));
+        check("Binary large first field test stores an address before testing the fresh value",
+            Matches(0x12C91D6, "8B42148D4A14894DFC85C0750D")
+            && RawCodeRangeMaps(0x12C91D6, 13)
+            && ShortConditionalBranchTargets(0x12C91E1, 0x75, 0x12C91F0));
+        check("Binary common root gate compares ESI with an independent global",
+            Matches(0x12C92C8, "3B35DCADED01751C")
+            && RawCodeRangeMaps(0x12C92C8, 8)
+            && ShortConditionalBranchTargets(0x12C92CE, 0x75, 0x12C92EC));
         check("Binary pinned-sample raw code [0xBE6325,0xBE6352) maps to VA 0x00FE6F25 and preserves its JNZ target",
             imageBase == 0x400000
             && Matches(0xBE6325, "8B4E0853578B7E108D04CDFFFFFFFF4921460C037E0C8BC7C1E80323C88B46048D1C8D00000000833C0300751C")

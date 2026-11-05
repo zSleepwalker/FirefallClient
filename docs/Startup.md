@@ -759,6 +759,11 @@ or 0x12C91B9 from that earlier unsigned comparison, not the reloaded ECX.
 The large-frame root gate requires both independent EDX-relative reloads
 before its EBP-10 store. Missing prerequisites stop at their own instruction;
 the final JZ selects raw 0x12C91D6 on equality and raw 0x12C91A8 otherwise.
+The final-mask lifecycle carries the preceding CMP flags only into reached
+zero-count shifts and admits a clean bounded unequal exit at raw 0x12C917C.
+The large first-field test independently reloads EDX+14, stores the
+LEA-derived address at EBP-4, then tests the fresh value. Its zero and
+nonzero destinations are bounded at raw 0x12C91E3 and 0x12C91F0.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

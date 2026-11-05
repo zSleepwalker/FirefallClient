@@ -184,6 +184,8 @@ CapacityFinalCalleeCommonTailTagWritesChecks.Run(Check);
 CapacityFinalCalleeIndexedFinalLifecycleChecks.Run(Check);
 CapacityFinalCalleeLargeFrameThresholdProjectionChecks.Run(Check);
 CapacityFinalCalleeLargeFrameRootGateChecks.Run(Check);
+CapacityFinalCalleeFinalMaskLifecycleChecks.Run(Check);
+CapacityFinalCalleeLargeFrameFirstFieldTestChecks.Run(Check);
 FrameHandoffCapacityAboveBranchLifecycleChecks.Run(Check);
 FrameHandoffCapacitySecondBranchLifecycleChecks.Run(Check);
 FrameHandoffCapacityFinalCallGateChecks.Run(Check);
