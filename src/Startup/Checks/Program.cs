@@ -66,6 +66,8 @@ FrameHandoffCapacitySeedChecks.Run(Check);
 HighCountObjectHelperLifecycleChecks.Run(Check);
 FrameHandoffEmptySlotCallChecks.Run(Check);
 FrameHandoffSlotPublicationChecks.Run(Check);
+FrameHandoffFinalWriteReturnChecks.Run(Check);
+FrameHandoffCapacityLoopChecks.Run(Check);
 PayloadGrowthZeroFillChecks.Run(Check);
 
 void Check(string name, bool condition)

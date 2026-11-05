@@ -419,6 +419,8 @@ The reliable masked-length callback's validated entry also admits the zero-resul
 
 `FrameHandoffEmptySlotCallProjection` preserves the push-0x10/direct-call path and zero-result indirect call through cell `1AC4424`, whose returned ECX is independently captured rather than assumed zero. Missing direct EAX stops at the copy instruction before cleanup/test. `FrameHandoffSlotPublicationProjection` separates the `6508` indexed store from the `650E` fresh-base read, then masks EDI, forms ECX and pops EDI/EBX before the test at `651C`; its EBX input is the byte offset computed by the preceding slot projection.
 
+`FrameHandoffFinalWriteReturnProjection` tests ECX, conditionally reads a pointer at frame+8 and then its pointee DWORD before writing to ECX, and independently increments receiver+10 with DWORD wrap before RET4. `FrameHandoffCapacityLoopProjection` projects one iteration only: CMP of wrapped ESI-EDX against one governs the zero-difference branch, followed by the unsigned ESI/eight exit or unsigned `(0FFFFFFF-ESI)<ESI` failure gate; otherwise ESI doubles and selects the loop entry.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves

@@ -12316,6 +12316,20 @@ New SlotCallPublication composition owner
 identity: publicationEBX is slot.FirstSlotByteOffset, not arraybase;
 publicationEDI is wrapping receiver10+freshreceiverC;ESIreceiver.
 
+Latest pushed HEAD `f4e8ac7` includes EmptySlotCall/SlotPublication pairs.
+Evidence sole writer `fd86aba2-b88d-404f-851d-acd2f8389948` adds final
+tail and capacity loop anchors; await release before staging.
+Read-only capacity prefix trace
+`1dce1408-cf28-42f6-8eec-786e46037db3` startsBE6B91 stopsBE6BCA.
+
+FinalWriteReturn and CapacityLoop pairs reviewed/registered/passing.
+CapacityLoop selecteddestination70 differs from exclusivewindow91
+on doubling route intentionally; this is a single iteration, not a loop
+runner. Publication→final return composition owner
+`d88a3db0-045b-4012-bec7-0b04199a70a0` owns new PublicationReturn pair;
+must validate formedECX/receiverESI before finaleffects and reject all
+publication unreached flags.
+
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
 indirect callback, then fresh receiver+4C DEC and receiver+48 zero/INC.
