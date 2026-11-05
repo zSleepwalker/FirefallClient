@@ -16,6 +16,8 @@ PayloadGrowthPublicationChecks.Run(Check);
 ReliableReceiveSlotGateChecks.Run(Check);
 ReliableReceiveForwardingCallerChecks.Run(Check);
 ReliableReceiveRecordWordChecks.Run(Check);
+ReliableReceiveRecycleReturnChecks.Run(Check);
+ReliableReceiveEmptySlotCallbackChecks.Run(Check);
 PayloadGrowthZeroFillChecks.Run(Check);
 
 void Check(string name, bool condition)

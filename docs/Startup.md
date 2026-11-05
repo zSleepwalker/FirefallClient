@@ -339,6 +339,10 @@ PE import names identify cell VA `0x1AC4424` as `std::_Xbad_alloc`, `0x1AC45C0` 
 
 `SingletonTeardownWalkerProjectionRules` records the surrounding list walker at raw `0x12C3AF0`: after any returning entry diagnostic, capture the initial global head, clear byte VA `0x1E4B096`, and set guard byte VA `0x1E4B095`. A nonnull head receives one slot-eight dispatch, followed by an independent global-head capture. A null initial or later head selects the final guard clear; a nonnull later head stops at the repeat boundary. The walker itself reads no next link and supplies no explicit dispatch arguments. This is not a virtual-callback or complete-shutdown simulation.
 
+`ReliableReceiveRecycleReturnProjection` covers `[0xBE52C7,0xBE52DF)` and `[0xBE5375,0xBE538D)`. Counter DWORD[EAX+20] is incremented before the independent global read at VA `1DFFF84`. That global supplies ECX for the payload-push call to raw `BD5C60`. Only normal helper return permits AL=1, register restoration, and RET 4. Full EAX remains unknown unless independently captured at helper return; only its low byte is replaced.
+
+`ReliableReceiveEmptySlotCallbackProjection` covers `[0xBE538D,0xBE53A2)`. MOV BX/SHR BX/AND BL select header bits 12/13; zero branches to `BE53E9`. Otherwise DWORD[payload+8] supplies the base of an indirect target read at +C, while ECX is the address payload+8. No stack arguments are explicitly pushed. Target/address zero is a captured scalar, not a null guard or validity guarantee.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves

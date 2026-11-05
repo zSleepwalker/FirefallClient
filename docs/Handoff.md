@@ -11999,3 +11999,15 @@ Sole new immutable writer `ba5ec568-ab49-4f95-b274-dd246e2a7570` owns
 callback/recycle windows. Luna `3914df5b-f54d-4f0a-9fec-cf5b1d7dbec7`
 owns unreliable residue handoff code/checks `[BE5AC2,BE5AE4)`;
 `7bceee3d-3184-4192-a2ee-802fac9b966d` traces its normal continuation.
+
+Pushed record WORD code as `a49dbb8`. Paired recycle and empty-slot callback
+code/checks now reviewed, registered, passing. Corrected recycle check helper
+discarding receiver/payload fixture arguments. Empty-slot author had
+substituted different header instructions; corrected to verified MOV BX,
+SHR BX, AND BL bytes. Fixed later-normal-with-missing-target fixture and
+DWORD raw-to-VA wrap expected `400BFF`, not `3FFFFF`.
+Active code successors: `25c92ef6-5cc7-427c-94b6-6bac6298a09e`
+forwarding-to-return composition; `028ba578-4400-4fcc-866b-40781a947369`
+callback-result diagnostic; `facf7d53-325f-4a74-8f97-063ac1df3eae`
+masked-length callback; `259158f9-28fb-4f03-ad44-790eadfd311c`
+independent frame+8 slot publication suffix.
