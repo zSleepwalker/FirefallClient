@@ -13187,6 +13187,12 @@ aa31831 pushedleaflifecycles. SizeIndexedrevision/SavedIndexreviewedand
 registeredrunner3774 exit0; coordinator exactparentgate/FlagsAtStop/fix
 fixtureCapture.EntryECX. ActiveSavedFrameIndexed447fdb8f. Releasedpending
 CommonMaskGate d9251db4 andSavedCommonRoot2442abbe notyetreviewedregistered.
+22be2f4 pushedSizeIndexed/SavedIndex. CommonMask/SavedCommonRootreviewed
+registeredrunner3781 exit0. FixedSavedCommonRoot entry92BDvscompleted92C8
+constant gating; renamedCommonTailCompletedBoundaryRawFileOffset.
+ActiveSavedFrameIndexed447fdb8f/IndexedMaskb08596d5/MaskOr09333b8d/
+RingWrites8f4a7db1. Verified931B..9323 0BCF890DC8ADED01 OR+globalstore.
+9323..9334 89720889700C89460889560CE90D010000 fourwrites/JMP9441.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional

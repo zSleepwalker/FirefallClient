@@ -824,6 +824,10 @@ CommonSizeIndexed keeps the shifted size index separate from original EDI
 and stops at the opaque9304 call or bounded930A/9354 exits. SavedIndexGate
 uses fresh EDX+1C to address the independent indexed CMP operand, then
 reloads global EBX without changing that CMP's JNZ decision.
+CommonMaskSelection bounds the shifted mask TEST before either later path,
+with zero-count SHL preserving incoming flags. SavedFrameCommonRoot enters
+the root CMP only after the common tag stores complete at92C8, not at their
+entry92BD; independent global captures never replace prior writes.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
