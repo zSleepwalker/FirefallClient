@@ -1093,6 +1093,11 @@ GameSocketReceivePacketCallPreparationProjection observes a normal
 sender-helper return before pushing its independent result and freshly
 read stack count. It stops before the fixed packet call at raw BD2F25;
 packet execution, reposting and return code remain outside the contract.
+GameSocketParserLocalSizeDispatchProjection observes the fresh local
+vtable and slot-C target after constructor return. It derives the resize
+receiver from an independently captured post-getter ESP, not the earlier
+local address, and stops before the resize call. Pending or nonnormal
+getter observations preserve the incoming flags at the call boundary.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

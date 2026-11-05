@@ -314,6 +314,7 @@ GameSocketCompletionErrorQueueAcquisitionChecks.Run(Check);
 GameSocketReceiveSenderPreparationChecks.Run(Check);
 CapacityFinalCalleeCommonNodeIndexedEqualityRingCleanupLifecycleChecks.Run(Check);
 GameSocketReceivePacketCallPreparationChecks.Run(Check);
+GameSocketParserLocalSizeDispatchChecks.Run(Check);
 CapacityFinalCalleeCommonTraversalSlotCleanupLifecycleChecks.Run(Check);
 CapacityFinalCalleeCommonTraversalCleanupEpilogueLifecycleChecks.Run(Check);
 CapacityFinalCalleeLargeRightRootSuccessorLifecycleChecks.Run(Check);

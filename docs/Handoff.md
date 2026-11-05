@@ -13859,6 +13859,19 @@ from observedcallmetadata. Registered4164exit0 exact parser/queue-
 attempt/cleanup-epilogue/dispatchercollection exclusions; target removed.
 Luna8be9d338 bounded postpacket/repost analysis successor. e64f8abd
 dispatcher collection implementation frombf8 suppliedfreshcontract.
+Packet preparation and dispatcher native anchors committed/pushed
+72bcc36; latestsubset4164exit0, target absent. Queue attemptf5b fullEOF
+review revision requested parentreprojection, actualcompletion vs
+missingcapture, dirtyunusedclean separation, pendingdiagnosticTEST
+flags andcallstop, CMPXCHG8B preserves5nonZF afterORnewnode,
+missingCAS flags plus addressed uncommittedreadmetadata.
+Parser5b75 revision reviewed; coordinator removed contradictory
+captured/unused EAX fixture. Registered4166exit0 exact queueattempt/
+cleanup-epilogue/collection exclusions targetremoved. FreshIDA
+BD31D7 64bytes resize-return pointer seam and BD2F2A58bytes stack-
+prep seam captured. Luna16e4874a parser successor analysis and
+28c6d216 postpacket stackprep implementation;8be9 reportconsumed
+freshsampledirectreadcorrect thencoordinatorIDAconfirmed.
 SmallBinEpilogue released and full EOF reviewed: owner6d052038 revising
 wrong parent type, nullable value-plan access, missing successor-unused
 forwarding, child read/write effect markers and dirty-ring admission.
