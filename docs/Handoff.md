@@ -13142,6 +13142,15 @@ LargePairedField. Correctedpairedfixturesfirstmustzero forsecondentry;
 belowfixturemustomitchildcaptures. Addedlastflagsretention andfirststore
 attemptedstate. NewactiveLunaBacklinkSuccessor04efd91f, RootPaired53fc6086;
 CommonRootSize622437f8 andFinalMaskCommonRoot824532cd stillactive.
+ee29d52 pushedlargepairs. CommonRootSize/FinalMaskCommonRoot reviewed,
+registeredrunner3737 exit0. Correctedunusedrootcapturecleanadmission and
+childCMPfixtureupstreammustbeequal. FreshIDAanchors nodefield91F0,
+reload9205, savedframe9226, indexedaddress92F6 added. ActiveLuna
+nodefields04d32a23, nodereloade2f9549b, savedframe2fe74a65,
+indexedaddressa6157ab5 plusBacklinkSuccessor04efd91f/RootPaired53fc6086.
+Verifiedunassignedraw920B..9226 bytes3B15D8ADED018955FC8B55F40F8259FCFFFF8B4DFCC70100000000:
+CMPentryEDX/freshVA1EDADD8; storeEDXatEBP-4; freshEBP-CreloadEDX;
+JB9217->8E76usesearlierCMPflags; otherwisefreshEBP-4->ECX then[ECX]=0.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional

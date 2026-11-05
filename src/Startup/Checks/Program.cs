@@ -203,6 +203,8 @@ CapacityFinalCalleeLargeRootFirstFieldLifecycleChecks.Run(Check);
 CapacityFinalCalleeLargeSuccessorWritesChecks.Run(Check);
 CapacityFinalCalleeLargeThresholdBacklinkLifecycleChecks.Run(Check);
 CapacityFinalCalleeLargePairedFieldTestLifecycleChecks.Run(Check);
+CapacityFinalCalleeCommonRootSizeLifecycleChecks.Run(Check);
+CapacityFinalCalleeFinalMaskCommonRootLifecycleChecks.Run(Check);
 FrameHandoffCapacityAboveBranchLifecycleChecks.Run(Check);
 FrameHandoffCapacitySecondBranchLifecycleChecks.Run(Check);
 FrameHandoffCapacityFinalCallGateChecks.Run(Check);

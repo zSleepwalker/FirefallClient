@@ -793,6 +793,10 @@ the second read is missing. LargeThresholdBacklink independently reloads
 the frame despite its preceding store. LargeSuccessorWrites retains the
 fresh CMP operand when EDX is absent, records a reached first store when
 EBX is missing, and preserves two distinct aliased writes on equality.
+CommonRootSize preserves the parent CMP when caller EDI is missing and
+enters the size gate only on root inequality. FinalMaskCommonRoot retains
+three writes before its independent root read; unused root captures on
+the bounded917C path prevent clean admission.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

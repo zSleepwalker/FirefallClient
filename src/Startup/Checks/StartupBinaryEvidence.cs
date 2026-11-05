@@ -539,6 +539,23 @@ internal static class StartupBinaryEvidence
             Matches(0x12C92EC, "8BCFC1E90383F920735E")
             && RawCodeRangeMaps(0x12C92EC, 10)
             && ShortConditionalBranchTargets(0x12C92F4, 0x73, 0x12C9354));
+        check("Binary large node selection keeps its fresh frame load and address-only LEAs",
+            Matches(0x12C91F0, "8B55FC837814008D48147509837810008D48107406")
+            && RawCodeRangeMaps(0x12C91F0, 21)
+            && ShortConditionalBranchTargets(0x12C91FA, 0x75, 0x12C9205)
+            && ShortConditionalBranchTargets(0x12C9203, 0x74, 0x12C920B));
+        check("Binary large node reload jumps back to the next field comparison",
+            Matches(0x12C9205, "8B018BD1EBE8")
+            && RawCodeRangeMaps(0x12C9205, 6)
+            && ShortConditionalBranchTargets(0x12C9209, 0xEB, 0x12C91F3));
+        check("Binary large saved frame tests its fresh ECX before the common tail branch",
+            Matches(0x12C9226, "8B4DF085C90F848C000000")
+            && RawCodeRangeMaps(0x12C9226, 11)
+            && RelativeConditionalBranchTargets(0x12C922B, 0x0F, 0x84, 0x12C92BD));
+        check("Binary common indexed address gate bounds the opaque call edge",
+            Matches(0x12C92F6, "8D14CDF0ADED018BC283FF107306FF15244AAC01")
+            && RawCodeRangeMaps(0x12C92F6, 20)
+            && ShortConditionalBranchTargets(0x12C9302, 0x73, 0x12C930A));
         check("Binary pinned-sample raw code [0xBE6325,0xBE6352) maps to VA 0x00FE6F25 and preserves its JNZ target",
             imageBase == 0x400000
             && Matches(0xBE6325, "8B4E0853578B7E108D04CDFFFFFFFF4921460C037E0C8BC7C1E80323C88B46048D1C8D00000000833C0300751C")
