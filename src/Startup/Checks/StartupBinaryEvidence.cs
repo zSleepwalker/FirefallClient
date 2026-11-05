@@ -499,6 +499,17 @@ internal static class StartupBinaryEvidence
             Matches(0x12C9190, "89410C894808E922010000")
             && RawCodeRangeMaps(0x12C9190, 11)
             && RelativeBranchTargets(0x12C9196, 0xE9, 0x12C92BD));
+        check("Binary common tail tags the retained value before two ordered stores",
+            Matches(0x12C92BD, "8BC783C801894604893C37")
+            && RawCodeRangeMaps(0x12C92BD, 11));
+        check("Binary large frame root stores the fresh plus-18 value before comparison",
+            Matches(0x12C919B, "8B420C8B4A18894DF03BC2742E")
+            && RawCodeRangeMaps(0x12C919B, 13)
+            && ShortConditionalBranchTargets(0x12C91A6, 0x74, 0x12C91D6));
+        check("Binary large frame threshold retains CMP flags across the frame reload",
+            Matches(0x12C91A8, "8B4A083BCB894DEC8B4DF00F82BDFCFFFF")
+            && RawCodeRangeMaps(0x12C91A8, 17)
+            && RelativeConditionalBranchTargets(0x12C91B3, 0x0F, 0x82, 0x12C8E76));
         check("Binary pinned-sample raw code [0xBE6325,0xBE6352) maps to VA 0x00FE6F25 and preserves its JNZ target",
             imageBase == 0x400000
             && Matches(0xBE6325, "8B4E0853578B7E108D04CDFFFFFFFF4921460C037E0C8BC7C1E80323C88B46048D1C8D00000000833C0300751C")

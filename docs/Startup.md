@@ -743,6 +743,12 @@ before the opaque call at raw 0x12C918A. The separate successor-write
 projection preserves both MOV events even when their addresses alias,
 then stops at raw 0x12C92BD. The backlink-final lifecycle enters the final
 frame comparison only through the earlier clean raw 0x12C9160 bypass.
+The shifted-indexed lifecycle preserves two distinct EBP-4 captures on its
+clean equality handoff. The indexed-backlink lifecycle carries the fresh
+EBP-10 value into ECX while retaining the preceding local store. Both
+compositions reject downstream evidence on their bounded bypass routes.
+The common-tail tag-write projection retains its OR result and flags if
+ESI is missing, and keeps both stores ordered even at aliased addresses.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
