@@ -13457,6 +13457,12 @@ flag-preservation predicate. runner4086exit0 validates it excluding three
 named unreviewed drafts; temporary target removed. Fullrunner4084 blocked
 in-flight TraversalSlotCleanup revision syntax. RightRootSuccessor returned
 for nullable aggregate flags, exact execution admission and enum/check fixes.
+NodeCleanupEpilogue committed/pushedd2ea18c (5files801insertions).
+IndexedTraversalZeroSlot fullEOF reviewed/registered; count30 fixture corrected
+to derivedcount10 (not4). runner4088exit0 validates it excluding three named
+active/revision draft pairs; temporary target removed. Luna6ebaf007 owns its
+derived indexed-pointer four-store successor. RightRootSuccessor and
+TraversalSlotCleanup owners released revisions pending focused rereview.
 8948188B4A1085C974123B0DD8ADED010F82D8FBFFFF8948108941188B4A1485C974123B0DD8ADED010F82BFFBFFFF894814894118.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,

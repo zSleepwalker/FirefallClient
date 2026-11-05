@@ -981,6 +981,10 @@ NodeCleanupEpilogueLifecycle adds the same bounded epilogue to the exact
 initialized-node/self-ring cleanup path. It retains node and counter evidence,
 keeps zero-counter and nonzero-mask bypasses distinct, and preserves DEC flags
 when the internal TEST read is attempted without a captured byte.
+IndexedTraversalZeroSlotLifecycle derives the threshold ECX from the indexed
+traversal's child-slot LEA. It rejects dirty zero-child handoffs before the
+threshold read, retains fresh child/global observations even when they alias,
+and stops before either threshold destination.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
