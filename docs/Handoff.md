@@ -13308,6 +13308,12 @@ RightFieldThreshold9c333e8a-56ec-4b03-8b01-a48a8a21d578.
 Node/rightgatecoordinatorrunner3931exit0afterIndexownerfixedbuild.
 HighSizeIndex61070b0f/FreshMask9426568f/RightThreshold9c333e8a
 releasedpendingfullreview/register. SelfRingf2642355 active.
+7e4b494pushed. RightThreshold/FreshMaskpairsreviewedthroughEOF,
+registered/nativeanchorsrunner3936exit0. FixedFreshMaskpartialshift
+knownoperandfields/events andwrongallcountfixture93C0expectation(zero93AC).
+Index61070b0frevisionrequested: unusedEBPdirtybypass,missingEBPnotclean,
+exactsuccessgate. RightThresholdLifecycle8434ba08-db92-4e0c-9c6a-56fef51e864b
+active. SelfRingf2642355-27b7-46f5-a916-224994bac926active.
 8948188B4A1085C974123B0DD8ADED010F82D8FBFFFF8948108941188B4A1485C974123B0DD8ADED010F82BFFBFFFF894814894118.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
