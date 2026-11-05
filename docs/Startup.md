@@ -764,6 +764,11 @@ zero-count shifts and admits a clean bounded unequal exit at raw 0x12C917C.
 The large first-field test independently reloads EDX+14, stores the
 LEA-derived address at EBP-4, then tests the fresh value. Its zero and
 nonzero destinations are bounded at raw 0x12C91E3 and 0x12C91F0.
+The successor-write lifecycle admits both clean gate equalities while
+keeping contaminated opaque exits bounded. Mask-common and successor-common
+lifecycles preserve all earlier writes when later caller registers are
+missing; aliasing does not collapse their ordered write events. Mask-common
+also retains shift/NOT flags when the fresh global read is missing.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
