@@ -1058,6 +1058,12 @@ remain opaque. GameSocketReceiveResultGateProjection models the separate
 receive-result BOOL/error-996 branch and dynamic slot-0x20 callback,
 stopping before success preparation or common cleanup. The error import
 is identified as WSOCK32 ordinal 111, not a named API.
+GameSocketDatagramContextDispatchProjection continues the exact clean
+sender-binding tail using a fresh context DWORD, not the earlier admission
+classification. It records wrapped parser arguments and opaque parser
+return observations. The nonzero path independently reads the high-water
+DWORD before its unsigned compare and optional original-count store;
+all three endpoints stop before native pops or return instructions.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

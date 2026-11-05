@@ -13757,6 +13757,14 @@ Lunaedb557e8 rawBBDDB0 maintenance-entry gap; Lunad2a8e493 receive
 success call-preparation at BD2EEB. f73 report identified composition
 seam only (windows already modeled); Lunac0437db7 implementing indexed
 nonzero-child equality bridge into common dual-threshold ring tail.
+Receive-result and clock gates committed/pushed4464627.
+Context80ed revision reviewed; coordinator added typed six-field parent
+flag conversion, replaced incompatible cross-record flag comparisons,
+and prevented missing parent captures being labeled bounded completion
+merely because StopAtRaw is non-null. runner4142 compile failure was
+remaining incompatible check comparison; fixed. runner4144exit0 exact
+error-queue/indexed-equality exclusions, target removed. Context registered,
+ready commit. Lunabaa646b0 nonzero-parser-entry bounded prior-art gap next.
 SmallBinEpilogue released and full EOF reviewed: owner6d052038 revising
 wrong parent type, nullable value-plan access, missing successor-unused
 forwarding, child read/write effect markers and dirty-ring admission.
