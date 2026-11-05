@@ -12288,6 +12288,14 @@ loop trace `55cfa08f-a6f3-495a-adaa-48bc4b0af2c8` starts BE6B70, stops
 BE6B91/failure branch and verifies exact compare operands before any
 loop implementation.
 
+Latest pushed HEAD `e022868` includes CapacitySeed and EntrySlot pairs.
+Seed/call/publication anchors released, reviewed; coordinator clarified
+6508 is the reload before write and 651C window includes POP EDI/EBX.
+No active evidence writer. ObjectHelperLifecycle author correcting
+flagged-zero-bridge admission and prereq identity gating; do not stage.
+Final frame-helper tail read-only owner
+`d1e7e2cf-b347-49d3-89dd-c60ae19b0400` starts651C through actualRET4.
+
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
 indirect callback, then fresh receiver+4C DEC and receiver+48 zero/INC.
