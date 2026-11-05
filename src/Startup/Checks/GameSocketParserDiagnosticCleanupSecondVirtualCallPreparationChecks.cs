@@ -147,6 +147,9 @@ internal static class GameSocketParserDiagnosticCleanupSecondVirtualCallPreparat
             && !successful.Slot4TargetRead
             && !successful.ParentInstructionsReplayed
             && successful.Capture == replay.Capture
+            && replay.ParentPlan.Capture == replay.Capture.ParentCapture
+            && replay.ParentPlan.ParentPlan.Capture
+                == replay.Capture.ParentCapture.ParentCapture
             && successful.ParentPlan.Capture == replay.ParentPlan.Capture
             && successful.ParentPlan.Instructions.SequenceEqual(
                 replay.ParentPlan.Instructions)

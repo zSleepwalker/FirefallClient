@@ -9,7 +9,10 @@ New reviewed coverage now includes:
   (`BBDE2B..BBDE3D`, stop before `BBDE3E` JZ), plus both immediate
   branch projections:
   - nonzero path `BBDE40..BBDE49` (stop before `BBDE4B` JNZ),
-  - zero path `BBDE3E` taken to `BBDE83` (stop before `BBDE86` indirect CALL).
+  - zero path `BBDE3E` taken to `BBDE83` (stop before `BBDE86` indirect CALL),
+  - nonzero-path opaque call boundaries at `BBDE5D` and `BBDE6C` with explicit
+    normal-return stops at `BBDE63` / `BBDE6F`,
+  - zero-path post-call window `BBDE8C..BBDE96` (stop before `BBDE97` JZ).
 - **Parser first-branch**: FS restore (`BD34E2..BD34EC`), register POP chain
   (`BD34ED..BD34F0`), and frame/RET8 suffix (`BD34F1..BD34F6`).
 - **Binary anchors**: independent first-branch chain anchors added to
@@ -30,6 +33,12 @@ Focused validations passed with zero failures:
 - dispatcher preparation/return/call-target prefix + zero/nonzero branch checks
   + binary anchors;
 - parser first-branch FS/POPs/frame-return + binary anchors.
+
+Current dispatcher continuation tasks:
+
+- nonzero fallthrough continuation from `BBDE63`;
+- zero-path branch boundary at `BBDE97` (both outcomes);
+- nonzero target continuation from `BBDE6F`.
 
 Normal second-call parser suffixes remain runtime-pending and are currently
 left out of `Program.cs` registration until practical focused execution

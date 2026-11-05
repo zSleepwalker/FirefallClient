@@ -16,8 +16,11 @@ at BBDE26, bounded return at BBDE2B, and call-target arithmetic
 Current bounded branch coverage includes:
 - JZ not-taken path `BBDE40..BBDE49`, stop before `BBDE4B` JNZ.
 - JZ taken path to `BBDE83`, stop before indirect CALL `BBDE86`.
-The next unresolved dispatcher continuation is the `BBDE4B` JNZ split and the
-`BBDE86` indirect-call return boundary.
+- Nonzero-path call boundaries at `BBDE5D` and `BBDE6C`, each with explicit
+  normal-return stop at `BBDE63`/`BBDE6F`.
+- Zero-path post-call continuation `BBDE8C..BBDE96`, stop before `BBDE97` JZ.
+The next unresolved dispatcher continuation is the `BBDE97` split and follow-on
+continuations from `BBDE63` and `BBDE6F`.
 
 The parser diagnostic cleanup continuation now includes both first-branch
 (`BD34E2..BD34F6`) and second-branch epilogue families. First-branch FS restore,

@@ -39,6 +39,9 @@ public readonly record struct GameSocketParserDiagnosticCleanupSecondXaddBranchI
 
 public sealed class GameSocketParserDiagnosticCleanupSecondXaddBranchPlan
 {
+    private readonly System.Lazy<bool> _orderedSemanticPrefixPreserved;
+    private readonly System.Lazy<bool> _exactCleanCompletion;
+
     internal GameSocketParserDiagnosticCleanupSecondXaddBranchPlan(
         GameSocketParserDiagnosticCleanupSecondXaddBranchCapture capture,
         GameSocketParserDiagnosticCleanupSecondXaddPlan parentPlan,
@@ -65,6 +68,9 @@ public sealed class GameSocketParserDiagnosticCleanupSecondXaddBranchPlan
         FlagsAtStop = flagsAtStop;
         LastReachedRawFileOffset = lastReachedRawFileOffset;
         StopBeforeRawFileOffset = stopBeforeRawFileOffset;
+        _orderedSemanticPrefixPreserved = new(
+            ComputeOrderedSemanticPrefixPreserved);
+        _exactCleanCompletion = new(ComputeExactCleanCompletion);
     }
 
     public GameSocketParserDiagnosticCleanupSecondXaddBranchCapture Capture { get; }
@@ -103,7 +109,9 @@ public sealed class GameSocketParserDiagnosticCleanupSecondXaddBranchPlan
                 && StopBeforeRawFileOffset == BranchTargetRawFileOffset
             : ParentPlan.ExactBoundedCompletion
                 && StopBeforeRawFileOffset == ParentPlan.StopBeforeRawFileOffset;
-    public bool ExactCleanCompletion =>
+    public bool ExactCleanCompletion => _exactCleanCompletion.Value;
+
+    private bool ComputeExactCleanCompletion() =>
         ParentAdmitted
         && ParentPlan.ExactCleanCompletion
         && (Outcome is GameSocketParserDiagnosticCleanupSecondXaddBranchOutcome
@@ -210,6 +218,9 @@ public sealed class GameSocketParserDiagnosticCleanupSecondXaddBranchPlan
             && instruction.ESI == ESIValue
             && instruction.StackPointer is null);
     public bool OrderedSemanticPrefixPreserved =>
+        _orderedSemanticPrefixPreserved.Value;
+
+    private bool ComputeOrderedSemanticPrefixPreserved() =>
         ParentPlan.OrderedSemanticPrefixPreserved
         && ReprojectedParentMatches()
         && Reads.SequenceEqual(ParentPlan.Reads)

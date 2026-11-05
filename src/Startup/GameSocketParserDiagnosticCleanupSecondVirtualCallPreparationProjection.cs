@@ -298,6 +298,18 @@ public static class GameSocketParserDiagnosticCleanupSecondVirtualCallPreparatio
         GameSocketParserDiagnosticCleanupSecondXaddBranchPlan parentPlan =
             GameSocketParserDiagnosticCleanupSecondXaddBranchProjection.Project(
                 capture.ParentCapture);
+        return ProjectCore(capture, parentPlan);
+    }
+
+    internal static GameSocketParserDiagnosticCleanupSecondVirtualCallPreparationPlan ProjectCore(
+        GameSocketParserDiagnosticCleanupSecondVirtualCallPreparationCapture capture,
+        GameSocketParserDiagnosticCleanupSecondXaddBranchPlan parentPlan)
+    {
+        ArgumentNullException.ThrowIfNull(parentPlan);
+        if (parentPlan.Capture != capture.ParentCapture)
+            throw new InvalidOperationException(
+                "The trusted XADD-branch plan must match the captured parent.");
+
         var instructions =
             ImmutableArray.CreateBuilder<GameSocketParserDiagnosticCleanupSecondVirtualCallPreparationInstruction>();
         bool parentBranchAdmitted =
