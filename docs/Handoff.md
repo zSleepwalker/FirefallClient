@@ -13485,6 +13485,35 @@ TraversalCleanupEpilogue, and RightRootIndexedMask drafts excluded by a
 session-only MSBuild target, removed immediately afterward. Fixed forwarding
 APIs, distinct flag-record comparison, CMP110-100=10h fixture, and dirty
 zero-child admission; added nonzero-child missing/equal/diff checks.
+IndexedTraversalSlotStores committed/pushed5edab6f (5files942insertions).
+Luna2f7a0ff6 owns its exact942F fresh-counter successor pair.
+NodeMaskIndexed full EOF reviewed, returned to4aebc45d for outcome/size
+fixtures, distinct flag conversions, clean zero bypass, and preserving
+attempted/committed memory effects. TraversalCleanupEpilogue full EOF
+reviewed, returned toa416dd97 for qualified plan constants, actual RET
+completion rather than a stop-range proxy, ordered combined memory effects,
+and unknown flags after observed normal return even with missing post-call EBP.
+RightRootIndexedMask full EOF reviewed; owner916e56e5 revising clean
+parent bypasses, exact bounded completion, internal entry predicates,
+and combined interleaved effects. Luna74cb6271 analyzes only the next
+small-bin route contracts: zero931B OR/global/four stores versus
+nonzero9334 fresh successor/threshold/four alternate stores, stop9441/8E76.
+TraversalCleanupEpilogue revision runner4094 compile failed (9CS1061:
+nonexistent parent ZeroPathFallthroughEntered/DirectCallReached/CalleeEntered);
+owner correcting its own accesses to the actual nullable counter plan.
+Temporary exclusion target removed. Registration pending successful validation.
+NodeMaskIndexed released revision reviewed and all its registered checks
+passed runner4096. The same subset run compiled but failed two traversal
+epilogue fixture groups: missing-pop and opaque-call cases incorrectly
+asserted unused capture provided when their fixture arguments were null.
+Owner fixing exact fixture assertions. Target removed; no commit yet.
+NodeMaskIndexed and TraversalCleanupEpilogue revisions reviewed/registered
+runner4098exit0. Excluded only three exact unreviewed draft pairs
+IndexedTraversalSlotCleanup, RightRootIndexedMask, and NodeIndexedTraversal;
+session-only target removed. Node classifier verified00FFFF00index31,
+00BFFF00index30. Epilogue fixture arguments now actually provide the
+asserted unused call-status/post-call-EBP observations. Both pairs ready
+for explicit staging and push. Luna42775d37 owns NodeIndexedTraversal.
 8948188B4A1085C974123B0DD8ADED010F82D8FBFFFF8948108941188B4A1485C974123B0DD8ADED010F82BFFBFFFF894814894118.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,

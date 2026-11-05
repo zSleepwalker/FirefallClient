@@ -994,6 +994,13 @@ IndexedTraversalSlotStoresLifecycle extends the indexed count/tag zero-child
 route through the four link stores and its cleanup jump. The child-slot
 address supplies ECX, while the original loaded indexed pointer supplies EDX;
 neither the indexed-slot address nor the captured zero child is substituted.
+NodeMaskIndexedLifecycle connects the nonzero node-mask branch to independent
+indexed and tag reads using the initialized node's index and slot. It also
+preserves the zero-mask bounded exit and partial write/read observations.
+TraversalCleanupEpilogueLifecycle joins the exact nonzero counter handoff to
+the gated epilogue, retaining ordered effects and nullable stack captures.
+Completion requires the observed RET boundary; a normally returning opaque
+call makes all arithmetic flags unknown even if a later capture is missing.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
