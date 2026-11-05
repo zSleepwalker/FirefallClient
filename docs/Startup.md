@@ -804,6 +804,11 @@ NodeFieldSelection preserves a separate fresh saved EDX while inspecting
 EAX+14 and, only after zero, EAX+10. LEAs preserve each CMP's flags.
 CommonIndexedAddress forms the address without reading it and stops at
 the opaque9304 call instruction or the clean930A branch.
+BacklinkSuccessor derives late EBX from the independently reloaded frame
+only after child equality reaches the first store. SavedFrameCommon enters
+the tag stores only on the zero frame path. LeafThreshold preserves the
+independent global CMP operands and its flags across the saved EDX store
+and a fresh EBP-C reload; that reload cannot change the earlier JB decision.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

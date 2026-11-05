@@ -556,6 +556,10 @@ internal static class StartupBinaryEvidence
             Matches(0x12C92F6, "8D14CDF0ADED018BC283FF107306FF15244AAC01")
             && RawCodeRangeMaps(0x12C92F6, 20)
             && ShortConditionalBranchTargets(0x12C9302, 0x73, 0x12C930A));
+        check("Binary large leaf threshold retains CMP flags across its saved store and fresh reload",
+            Matches(0x12C920B, "3B15D8ADED018955FC8B55F40F8259FCFFFF")
+            && RawCodeRangeMaps(0x12C920B, 18)
+            && RelativeConditionalBranchTargets(0x12C9217, 0x0F, 0x82, 0x12C8E76));
         check("Binary pinned-sample raw code [0xBE6325,0xBE6352) maps to VA 0x00FE6F25 and preserves its JNZ target",
             imageBase == 0x400000
             && Matches(0xBE6325, "8B4E0853578B7E108D04CDFFFFFFFF4921460C037E0C8BC7C1E80323C88B46048D1C8D00000000833C0300751C")

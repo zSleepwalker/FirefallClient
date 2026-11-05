@@ -13162,6 +13162,12 @@ registered runner3745 exit0; correctedfirstnonzerofixtureEAX100/field80000001.
 NewLunaNodeSelectionReload d2922569. PendingRootPaired53fc6086,
 BacklinkSuccessor04efd91f revision; activeLeafThresholda7cda27f/
 SavedFrameCommonb702abbf. Keepallpendinguntrackedfilesunstaged.
+2f0beab pushednode/indexgates. Runner3747 exit0 additionallyregistered
+BacklinkSuccessor (ownChecks restored), SavedFrameCommon, LeafThreshold.
+LeafCMPentryEDXcapturedindependentlyevenmissingglobal; FlagsAtStopadded.
+RootPaired53fc6086 returnedtocomposeexistingPairedFieldhelper ratherthan
+duplicate dispatch. NewactiveLunaLeafClear855c45bf/SizeIndexed2b4e01ab;
+NodeSelectionReloadd2922569 remainsactive. Leafthresholdnativeanchoradded.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
