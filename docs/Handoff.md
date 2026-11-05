@@ -13660,6 +13660,20 @@ senderPUSH operand, preciseaddress/effect/flags/stopmetadata, cleanvsbounded.
 Errord5e621 incorrectly wrote literalnewsrc/newChecks paths and ran tests;
 owner moving onlynamedpair toactualsrcStartup/Checks, no further tests.
 IOCP pair ready explicitcommit/push; no sample execution or IDB mutation.
+IOCPpass committed/pushed4c09a8d. Lunaba0ef56a owns read-only maintenance
+gate contractBBC8B0..DB (separate predequeueclock500 gate). Fresh coordinator
+IDA disasmBD3030 independently confirms sendergateactualentryBD307B,
+CALL308B/3092/30A3/30B0 and clear30B5. No inference from target symbol
+GameSocket_TryEnableConnectedSend beyond opaque return/predicateAL.
+Activeowners ba0analysis,4b051senderrevision,d5errorpathmove,2d2nodeepilogue.
+Errorstate d5 moved pair to actualsrc/Checks, fullEOF reviewed. Revision
+requested raw-vs-VA queue target naming, missingatomic/freshreadattempts,
+ordered memory effects, normalopaquequeue flags unknown and bounded-vs-clean
+dirtyskip. No registration yet. Coordinator added sender/error exactbyte
+anchors; awaiting next offline runner. Latest pushedHEAD4c09a8d.
+runner4130exit0 freshsender/errorcallbackanchors validated with exactly
+three unreviewedpairs excluded. Target removed; reviewedcode includes
+IOCPpass and nodecleanup. Operational notes/anchors ready explicitcommit.
 SmallBinEpilogue released and full EOF reviewed: owner6d052038 revising
 wrong parent type, nullable value-plan access, missing successor-unused
 forwarding, child read/write effect markers and dirty-ring admission.

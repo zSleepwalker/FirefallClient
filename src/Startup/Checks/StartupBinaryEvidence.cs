@@ -7273,6 +7273,19 @@ internal static class StartupBinaryEvidence
             && Matches(0xBBC9A5, "8B4DFC83C410837DF4008B017405FF5018EB03FF501C")
             && Matches(0xBBC9BB, "8B45F88B75F04783FF640F8C25FFFFFF")
             && Matches(0xBBC9CB, "8B45DC807804008B45D80F84D5FEFFFF"));
+        check("Binary optional sender binding selects token three or two before clearing its flag",
+            Matches(0xBD307B, "80BE5A020000007438538D8E30020000")
+            && RelativeBranchTargets(0xBD308B, 0xE8, 0x483640)
+            && RelativeBranchTargets(0xBD3092, 0xE8, 0xBD4A20)
+            && Matches(0xBD3097, "84C074046A03EB0B6A0A8BCE")
+            && RelativeBranchTargets(0xBD30A3, 0xE8, 0xBD49F0)
+            && Matches(0xBD30A8, "6A028D8E60020000")
+            && RelativeBranchTargets(0xBD30B0, 0xE8, 0x12CE310)
+            && Matches(0xBD30B5, "C6865A02000000"));
+        check("Binary completion-error continuation attempts atomic state ten before queueing token two",
+            Matches(0xBD2DEB, "BA0A0000008D8E2401000033C0F00FB11185C0750C")
+            && Matches(0xBD2E00, "8B86080100008986280100006A028D8E60020000")
+            && RelativeBranchTargets(0xBD2E14, 0xE8, 0x12CE310));
         check("Binary Network and GameSocket shutdown ownership and distinct WinHTTP close helpers are fingerprinted",
             ReadUInt32(VirtualAddressToFileOffset(0x1C734B4)) == 0x00FBD900
             && ReadUInt32(VirtualAddressToFileOffset(0x1C734B4) + 8) == 0x00FBE540
