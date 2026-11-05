@@ -12268,6 +12268,26 @@ Object-helper entry/return composition owner
 `c6cf04d5-1a2b-4d2d-925d-8b607473291e` owns new ObjectHelperLifecycle pair,
 including independent DWORD reload at BE6456 on the nonzero branch.
 
+Latest pushed HEAD `af31dbd` includes object-helper indexed return.
+Seed author is adding the native BE6B5F frame-14 receiver store and
+correcting mapping wording; do not stage CapacitySeed pair yet.
+Empty-slot trace completed: F2 call prefix joins6508 with direct nonzero
+ECX or independently captured ECX after indirect call (not assumed zero).
+6508 reloads receiver4 and writes indexed slot;650E freshly reloads4
+and reads indexed slot, then masks EDI3 and forms ECX.
+EmptySlotCall pair owner `2c02fa0e-8c5f-45c4-be5f-3c1dd1f3fe90`;
+SlotPublication pair owner `3cf19304-4cb6-43cb-bc63-a3ca911add8b`.
+Sole evidence writer `2d663193-e14e-4c28-ba5a-a47270a58ec9` adds seed,
+call-prefix, publication anchors. Await release before staging evidence.
+
+EntrySlot and CapacitySeed pairs released, reviewed/registered/passing.
+Coordinator fixed identity-mismatch fixture that simultaneously required
+receiver capture both reached and unreached. Capacity seed now includes
+native frame-14 store and true PE raw+400C00 mapping. New read-only
+loop trace `55cfa08f-a6f3-495a-adaa-48bc4b0af2c8` starts BE6B70, stops
+BE6B91/failure branch and verifies exact compare operands before any
+loop implementation.
+
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
 indirect callback, then fresh receiver+4C DEC and receiver+48 zero/INC.

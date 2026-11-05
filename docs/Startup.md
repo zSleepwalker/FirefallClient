@@ -413,6 +413,8 @@ The reliable masked-length callback's validated entry also admits the zero-resul
 
 `HighCountObjectHelperReturnProjection` models `BE6458..BE6477`: independent reads at helper-EAX+8 and retained-ESI+8/+4, wrapping decrement and masked index, indexed DWORD reload, then full-EAX address arithmetic and plain RET. Missing register prerequisites mark supplied dependent reads unreached; zero register bases remain captured values, not absence.
 
+`FrameHandoffHelperEntrySlotProjection` admits the three exact unflagged `BE64C5` entry routes and checks receiver identity before slot reads/writes, without equating independent reload values. `FrameHandoffCapacitySeedProjection` records the receiver store at frame-14 before the receiver+8 read, seeds ESI with one, and replaces that seed only for a nonzero read before the `BE6B70` join.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves
