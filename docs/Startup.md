@@ -481,6 +481,15 @@ with ordered TEST/pop/gated-call/epilogue captures. Encoded data operands
 are PE VAs, separate from raw instruction offsets; restored values are
 not promised as outputs of the subsequent opaque call.
 
+`FrameHandoffCapacityFirstFillLifecycleProjection` derives its return-gate
+plan from the admitted second-transfer lifecycle, so supplied later plans
+cannot bypass a failed call. `FrameHandoffCapacityAboveFinalLifecycleProjection`
+composes the above return/REP route through RET4, validating EBX and ESI
+continuity only on the final no-call bypass and propagating unreached gate
+captures. The final callee's raw `12C8D60..12C8D78` entry anchor confirms
+zero ECX jumps directly to the epilogue after frame allocation, bypassing
+the global mask read and EBX/ESI/EDI saves; nonzero behavior remains bounded.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves

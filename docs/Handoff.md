@@ -12591,6 +12591,15 @@ RepeatFillJoin-to-FillFinal without inventing missing ESI continuity.
 Entry trace owner `e9182693-1628-40dd-afc8-9d433bdf345a` owns read-only
 bounded raw12C8D60 entry/ECXzero path evidence, not files.
 
+FillFinal and CalleeExit pushed4841023. FirstFill and AboveFinal reviewed,
+registered and pinned offline runner passed. AboveFinal missing-gate flags
+propagated; nullable check fixed; incomplete-REP fixture uses nonzero ESI.
+Native 24-byte callee entry anchor verified with IDA and offline PE.
+Entry projection owner `f0bd6ba2-4ebc-4ebe-b5c8-d3d6c503f673` active.
+AboveBranchLifecycle owner `bb922be1-e409-4817-85a5-0972327641b3` active.
+FirstFinal owner notified to fix mismatched fixture parameter names;
+its files remain unregistered. All agents use GPT-6 Luna.
+
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
 indirect callback, then fresh receiver+4C DEC and receiver+48 zero/INC.
