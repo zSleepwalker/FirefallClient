@@ -812,6 +812,10 @@ and a fresh EBP-C reload; that reload cannot change the earlier JB decision.
 NodeSelectionReload derives the node read address from the selected LEA,
 not the previously captured field value. Aliased node reads remain fresh,
 and the backward jump to91F3 is a bounded exit rather than another iteration.
+RootPairedField composes the existing paired helper, retaining both frame
+stores and the last completed root CMP or child TEST. LeafClearStore reads
+fresh EBP-4 before writing literal zero; missing read data stops at921D,
+and captured zero remains a valid write address.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
