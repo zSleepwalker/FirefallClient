@@ -977,6 +977,10 @@ fresh tag read at raw `0x012C93D8`. ZeroCleanupEpilogueLifecycle joins the
 four-store cleanup's exact nonzero branch to the existing epilogue; missing
 entry registers and later observations remain explicit, and a normal opaque
 call return invalidates all six arithmetic flags.
+NodeCleanupEpilogueLifecycle adds the same bounded epilogue to the exact
+initialized-node/self-ring cleanup path. It retains node and counter evidence,
+keeps zero-counter and nonzero-mask bypasses distinct, and preserves DEC flags
+when the internal TEST read is attempted without a captured byte.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

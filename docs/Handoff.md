@@ -13450,6 +13450,13 @@ runner4080exit0 validates both registered pairs excluding four named unreviewed
 drafts via temporaryMSBuildtarget removed afterward. Fullrunner4078 blocked
 activeRightRootSuccessor compile errors; owner notified. NewLuna289a5a10 owns
 IndexedTraversalZeroSlot exactcleanzerochild945C into derived-slot threshold.
+Two pairs above committed/pushed6903078 (7files2086insertions).
+NodeCleanupEpilogue fullEOF reviewed/registered; corrected required lateEBP
+captures for indexed paths, dirty-zero bounded-exit fixture, and missingTEST
+flag-preservation predicate. runner4086exit0 validates it excluding three
+named unreviewed drafts; temporary target removed. Fullrunner4084 blocked
+in-flight TraversalSlotCleanup revision syntax. RightRootSuccessor returned
+for nullable aggregate flags, exact execution admission and enum/check fixes.
 8948188B4A1085C974123B0DD8ADED010F82D8FBFFFF8948108941188B4A1485C974123B0DD8ADED010F82BFFBFFFF894814894118.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
