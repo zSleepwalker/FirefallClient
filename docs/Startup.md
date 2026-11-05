@@ -1188,6 +1188,10 @@ GameSocketParserCountConsumptionStoresProjection records a fresh stack
 DWORD RMW, pointer increment, count subtraction and two further stores.
 The final flags come from a separate fresh byte comparison, not from the
 earlier arithmetic; the next JZ remains outside the projection.
+NetworkIoErrorCallbackPreparationProjection extends the actual
+missing-dispatch-key parent boundary with a fresh key reload, error
+argument push and independent vptr load. It stops before reading slot
+0x20 or calling its target and retains the error CMP flags.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

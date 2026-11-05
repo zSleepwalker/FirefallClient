@@ -13998,6 +13998,10 @@ Parserconsumption382fullEOFaccepted4240exit0 afterwrappedESP13address
 FFFFFFFFfixturefix;0632bd36Luna nextstored-byte/EBX2/1branchgateanalysis.
 290callbackrevisionreleasedreview;872cleanupreleasedreviewpending.
 b059repostrevisionpendingcorrectLEA40S24 andexplicit9pushvaluechecks.
+IOCP290revisionaccepted4242exit0 nullEBPstatefixed +dirty97Dflags preserved
+and6errorCMPfixtures/aliasedPUSH-vptrfreshreads.68be8ee2Luna nextslot20
+target/normalreturnJMP986->9BB analysis; no target identity assumed.
+b059repostrevisionreleasedreview;872cleanupreleasedreviewpending.
 SmallBinEpilogue released and full EOF reviewed: owner6d052038 revising
 wrong parent type, nullable value-plan access, missing successor-unused
 forwarding, child read/write effect markers and dirty-ring admission.
