@@ -13535,6 +13535,16 @@ IndexedTraversalSlotCleanup revised pair reviewed/registered runner4102exit0,
 excluding only NodeIndexedTraversal and RightRootSmallBinRing unreviewed
 drafts. Target removed. Fixed parent enum, explicit capture nesting, aliased
 global read address1EDADD8, and added partial instruction execution cases.
+IndexedTraversalSlotCleanup committed/pushed84f3532 (5files1262insertions).
+Luna89c4b333 owns its exact nonzero9441 epilogue successor pair.
+Active Luna42775d37 NodeIndexedTraversal and1590a54d SmallBinRings
+remain exclusive draft owners. Latest authoritative ordinary full check
+runner4090; latest reviewed-subset runner4102exit0. No exclusion target remains.
+NodeIndexedTraversal full EOF reviewed/registered runner4104exit0;
+EntryRawFileOffset corrected to upstream node entry, separate iteration
+entry93E4. Excluded only IndexedCleanupEpilogue and RightRootSmallBinRing
+unreviewed drafts; target removed. Both other pairs full EOF reviewed and
+returned for exact fixture/API corrections to their exclusive owners.
 8948188B4A1085C974123B0DD8ADED010F82D8FBFFFF8948108941188B4A1485C974123B0DD8ADED010F82BFFBFFFF894814894118.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,

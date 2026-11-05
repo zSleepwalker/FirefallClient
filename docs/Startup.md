@@ -1010,6 +1010,10 @@ IndexedTraversalSlotCleanupLifecycle appends the independent counter
 read/DEC/write/JNZ to the exact indexed four-store handoff. Earlier missing
 indexed, compare, child-read, and store operands remain reached attempts,
 not executed instructions; the cleanup branch destinations stay unentered.
+NodeIndexedTraversalLifecycle extends the exact nonzero indexed-mask/tag
+unequal handoff through one traversal iteration. EBX comes from the completed
+tag shift, EDX from the fresh indexed pointer, and EDI from the original size.
+It does not reread the tag or enter another iteration at the loop boundary.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
