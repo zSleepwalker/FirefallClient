@@ -13991,6 +13991,9 @@ Cell3f9accepted4236exit0 aftermissingStateuintoverload andcompacthexparser
 fix;missingcaptureexactfalseassertionsadded. f453publicationanalysisactive.
 38243970Lunaparser3249three-storepairactivefrom7aae21bytecontract.
 852ringrevisionpendingwrapped941CaddressfreshEAX+C expected4notroot300C.
+Secondring852revisionaccepted4238exit0 includesdistinctfreshEAX4000/root3000
+andwrappedfirstaddress4 fixtures;872bc2e2Luna secondringcleanupcounterpair.
+Latestcoordinatornormalfullrun4110 remains;reviewedsubset4238exit0.
 SmallBinEpilogue released and full EOF reviewed: owner6d052038 revising
 wrong parent type, nullable value-plan access, missing successor-unused
 forwarding, child read/write effect markers and dirty-ring admission.

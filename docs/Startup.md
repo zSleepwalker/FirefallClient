@@ -1180,6 +1180,10 @@ NetworkDispatcherCellReturnAddressGateProjection captures new registers
 after the opaque cell return, stores its EAX observation and compares the
 two wrapped LEA addresses. It stops before either the equal destination
 or the fence fallthrough, without carrying registers across the call.
+CapacityFinalCalleeCommonNodeIndexedSecondEqualityRingLifecycleProjection
+joins a clean second-pass equality to the shared dual-threshold ring
+helper. The fresh EAX link and original root ESI remain distinct through
+all five stores, with threshold bypasses retaining their bounded exits.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
