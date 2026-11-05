@@ -611,6 +611,10 @@ internal static class StartupBinaryEvidence
             Matches(0x12C9343, "89720889700C89460889560CE9ED000000")
             && RawCodeRangeMaps(0x12C9343, 17)
             && RelativeBranchTargets(0x12C934F, 0xE9, 0x12C9441));
+        check("Binary backlink store precedes an independent next-field read and zero gate",
+            Matches(0x12C9288, "8948188B4A1085C97412")
+            && RawCodeRangeMaps(0x12C9288, 10)
+            && ShortConditionalBranchTargets(0x12C9290, 0x74, 0x12C92A4));
         check("Binary pinned-sample raw code [0xBE6325,0xBE6352) maps to VA 0x00FE6F25 and preserves its JNZ target",
             imageBase == 0x400000
             && Matches(0xBE6325, "8B4E0853578B7E108D04CDFFFFFFFF4921460C037E0C8BC7C1E80323C88B46048D1C8D00000000833C0300751C")

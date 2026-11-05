@@ -869,6 +869,9 @@ SuccessorRing derives EAX from the fresh successor read and retains EDX,
 admitting the alternate ring only at the exact not-below9343 edge.
 PostStoreZero bounds9278's TEST/JZ, distinguishing a missing EAX from captured
 zero and preserving the selected92BD or927C destination without entering it.
+BacklinkNextField retains the9288 store attempt or commitment before independently
+reading [EDX+10]. Its TEST uses the fresh value even when the address aliases
+the preceding write, and stops before9292 or92A4.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
