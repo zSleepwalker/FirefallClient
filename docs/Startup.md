@@ -1252,6 +1252,11 @@ NetworkIoErrorCallbackExitReturnTransferProjection captures an independent
 runtime target DWORD at the reset ESP for the near RET at BBC9E7. Successful
 transfer advances ESP by four and has no raw-file stop address; the target
 remains unentered and unvalidated.
+NetworkDispatcherEntryFramePrefixProjection admits a clean pending dispatcher
+call from the immutable clock-gate capture without rewriting its return status.
+Fresh entry ESP/EBP and a segment-relative FS:[0] DWORD supply four stack
+pushes and SUB ESP,0Ch. It stops before PUSH EBX at BBDDC4; rejected callers
+retain their actual endpoint and leave entry captures unused.
 GameSocketParserSelectorDiagnosticPreparationProjection records the five
 diagnostic argument pushes at BD326A..BD3280. It derives ESP from the
 count-consumption lineage but requires fresh ESI and an independent DWORD

@@ -14172,6 +14172,14 @@ Luna1a4c728c owns freshslot0 target/explicit opaque return at34CF through
 34D1; no post-call register or ABI preservation admitted.
 Entry frame499a0c50 remains under same-owner revision.
 Current exclusions DispatcherEntryFramePrefix/DiagnosticCleanupVirtualCallReturn.
+Entry frame499a0c50 revision full EOF reviewed, accepted4316exit0. Original
+caller return/outcome/bounds now preserved; child captures distinguish unused/
+missing. Coordinator fixed missingFS state ordering and flags capture lifetime:
+entry flags are captured before SUB overwrite, not retroactively unused.
+Rejected child FlagsAtStop forwards actual caller flags separately.
+Luna4b901018 owns fresh EBX/ESI/EDI PUSH C4..C6 stoppingC7 before cookie
+global read. Luna1a4c728c remains on parser indirect-call return.
+Current exclusions DispatcherEntryRegisterSave/DiagnosticCleanupVirtualCallReturn.
 
 The user's finish-current-tasks-and-stop request supersedes earlier
 continuous-dispatch instructions. All current assignments are now released,
