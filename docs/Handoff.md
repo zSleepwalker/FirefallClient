@@ -14143,6 +14143,22 @@ Luna6342e9e5 owns JNZ34C97517 selecting34E2 or34CB; Luna1ec57241
 identifies one next genuine IOCP gap read-only, prioritizing8B0.
 Current draft exclusion only DiagnosticCleanupXaddBranch.
 Newest ordinary full baseline4308exit0 supersedes4302.
+IOCP gap analyst1ec57241 consumed:8B0 clock prefix already exists separately;
+next genuine gap dispatcher entryBBDDB0..BBDDEB before modeled lockgate.
+Coordinator freshIDA59byte window:
+558BEC6AFF68183CA40164A1000000005083EC0C535657A10050DC0133C5508D45F4
+64A3000000008BF18D5E6CC645EC0153895DE8FF158442AC01.
+Luna499a0c50 owns bounded entry frame/FS-read prefixB0..C4 only, fresh
+entry ESP/EBP/flags and FSoffset0DWORD; no caller ABI/register assumptions.
+Clock dispatcher-call pending admission must remain distinct from normal return.
+Current draft exclusions DiagnosticCleanupXaddBranch/DispatcherEntryFramePrefix.
+XADD branch6342e9e5 full EOF reviewed and accepted4310exit0. Corrected
+ancestor API levels and nonexistent cleanup-prefixed destination capture names;
+ancestor reads/effects live in register parent, RMW evidence remains separate.
+Lunac8e8de45 owns freshvptr MOV EAX,[ESI] / MOVECX,ESI through34CF,
+only fallthrough34CB admitted; slot0 target/call remains unentered.
+Luna499a0c50 remains on dispatcher entry frame prefix.
+Current exclusions DispatcherEntryFramePrefix/DiagnosticCleanupVirtualCallPreparation.
 
 The user's finish-current-tasks-and-stop request supersedes earlier
 continuous-dispatch instructions. All current assignments are now released,

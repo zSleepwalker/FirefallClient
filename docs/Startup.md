@@ -1289,6 +1289,10 @@ DWORD capture for LOCK XADD [EAX],ECX. It projects the wrapping sum with
 FFFFFFFF, places the old DWORD in ECX, and derives ADD32 flags. This is a
 bounded logical read-modify-write, not a concurrency simulation, and stops
 before JNZ at BD34C9.
+GameSocketParserDiagnosticCleanupXaddBranchProjection preserves the captured
+RMW result and ADD32 flags. JNZ selects BD34E2 unless the old DWORD was 1,
+in which case its zero result selects the fallthrough at BD34CB. Neither
+destination is executed by this projection.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
