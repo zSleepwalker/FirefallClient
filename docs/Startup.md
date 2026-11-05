@@ -915,6 +915,10 @@ field observation, retaining parent TEST flags until the independent CMP
 executes. IndexedCountClassification retains its fresh indexed DWORD before
 the31 comparison; the equal path clears EAX without assuming its incoming value,
 while the alternate path shifts ECX and subtracts it from19h.
+CleanupCounterGate records the independent global counter read and decrement
+write, preserving incoming CF even when the counter observation is missing.
+The nonzero branch stops before9441; the zero path sets ECX to the address
+immediate and stops before the943C call, whose callee is never entered.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
