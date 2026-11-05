@@ -843,6 +843,10 @@ CommonRingWrites preserves all four ordered link stores, including aliasing
 and independently captured attempted operands, before the bounded9441 jump.
 LargeMaskAndStore reads and updates VA1EDADCC independently, retaining known
 global data when EAX is missing and stopping before the common tail at92BD.
+SavedIndexStoreLifecycle admits only the exact equality9243 edge, retaining
+original EDX but independently reloading the child index at the same address.
+The child EAX remains an explicit capture and a missing value preserves the
+attempted store and prior CMP flags without advancing to TEST.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

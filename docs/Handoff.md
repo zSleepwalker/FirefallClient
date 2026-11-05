@@ -13217,6 +13217,9 @@ impossiblesuppliedderivedmask). NewMaskSuccessor6fc12aac active.
 registeredrunner3803 exit0. NewOrRingae589e82 active. IndexStore11dcf839
 releasednotyetreviewed; SavedMaskShiftfed83fef/MaskSelectionOr9cca38e5
 samepair revisions active. MaskSuccessor6fc12aac active.
+70ad363 pushedRing/MaskAnd. IndexStoreLifecycle11dcf839 reviewedregistered
+runner3809 exit0. SavedMaskShift/MaskSelectionOrrevisionsreleasedpending
+review; MaskSuccessor6fc12aac/OrRingae589e82 active.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
