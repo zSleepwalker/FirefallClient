@@ -13009,6 +13009,13 @@ Equal90D2..90F6 writes independently verified/anchored, runner3585 exit0.
 AlternateRootGatec67b323e and AlternateRootWrites1db37e55 active.
 Epilogue revision returned for explicit TESTflags, exactcleanadmission,
 missingstackread events, and entryEBP fixture defaults. Native target untouched.
+Checkpoint6e66a29 pushed. RootGate revision reviewed: bothcleanbranches
+admitted, corrected80000000-1 CFfalse/PFtrue. RootWrites, revisedEpilogue,
+AlternateTagWrites and GuardedFinal reviewed/registered, runner3600 exit0.
+Corrected epiloguemissingEBX fixture to actuallysupplylatecalltarget;
+GuardedFinal firststore318, successorbacklink218, originalECXcomparison.
+Active AlternateAlignedSizef8794379, AlternateEpilogue21f02020,
+AlternateRootLifecycle59405ba5. Allnewpairs only; coordinatorownsrunner/docs.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional

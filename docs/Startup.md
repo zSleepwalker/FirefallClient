@@ -688,6 +688,13 @@ EDI-derived stores, stopping at the `12C9441` epilogue entry.
 conditional nonzero path, leaving the root's direct table-write path bounded.
 `CapacityFinalCalleePairedFinalLifecycleProjection` carries the successor's
 fresh second-field value into the final guard, preserving all ordered stores.
+`CapacityFinalCalleeGuardedFinalLifecycleProjection` extends both selected
+second-field routes through that final guard. The alternate tag/write
+lifecycle retains independent reads at an aliased address.
+The alternate root gate at `12C90CA` and equal-path writes at `12C90D2`
+remain separate bounded projections. The gated epilogue at `12C9441`
+records independent stack reads, preserves TEST flags across POPs, and
+requires fresh post-call EBP rather than assuming opaque-call preservation.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
