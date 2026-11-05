@@ -1262,6 +1262,10 @@ GameSocketParserDiagnosticDestinationBranchGateProjection uses only the
 comparison carry flag: JAE selects raw BD31F8 for unsigned values at least 2;
 otherwise the short jump selects BD34AD. Both paths preserve registers and
 flags and stop before executing their selected target.
+GameSocketParserDiagnosticCleanupStackPrefixProjection records the DWORD
+store of FFFFFFFF at derived ESP+50, then independently reads ESP+3C into
+ESI and applies TEST ESI,ESI. Missing input retains the committed store;
+successful TEST leaves AF unknown and stops before JZ at BD34BB.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

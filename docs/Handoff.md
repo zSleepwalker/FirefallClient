@@ -14104,6 +14104,12 @@ Fresh31F8: 8A028AC80FB6D8C0E90480E103C1EB06884C2412...
 Lunade7a0eb4 owns34AD ESP50 store / freshESP3C loadESI / TEST through34BB;
 only short-jump-selected34AD admitted, no JZ/release semantics yet.
 Exclusions ExitEbxRestore/DiagnosticCleanupStackPrefix. de803c52 still active.
+Cleanup stack prefixde7a0eb4 full EOF reviewed and accepted4296exit0.
+Corrected fixture pre-ADD ESP and wrapped resulting addresses, capture nesting;
+added explicit alternate31F8 rejection with supplied-zero capture unused.
+Lunaad52e1c0 owns JZ34BB7425: TESTZFset selects34E2 otherwise34BD.
+No target/atomic/release instruction admitted; all TEST flags remain intact.
+Current exclusions ExitEbxRestore/DiagnosticCleanupZeroBranch.
 
 The user's finish-current-tasks-and-stop request supersedes earlier
 continuous-dispatch instructions. All current assignments are now released,
