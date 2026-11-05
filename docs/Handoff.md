@@ -13252,6 +13252,10 @@ registeredrunner3845exit0. ZeroMaskfixturecount9incorrectlyexpectedzero:
 changedto32; retainedindependentaliasframeA5 notpriorzerostore.
 SuccessorRingrevisionexactgateandESIclean fixed; addedmissingprerequisitechecks.
 ActiveBacklinkNexta3628316 andPostStoreZeroc3ea8a36 only.
+8c6abdapushed. PostStoreZeroreviewedregistered runner3853exit0.
+ActiveFieldStoreZero7ccf33c0-c608-4c60-8eec-2fb75e17e37d,
+HighSizeEntry10c754f1-cca5-45f5-8720-977c73d36d7b and
+BacklinkNexta3628316-561d-4163-874a-857d15e41ce2.
 8948188B4A1085C974123B0DD8ADED010F82D8FBFFFF8948108941188B4A1485C974123B0DD8ADED010F82BFFBFFFF894814894118.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,

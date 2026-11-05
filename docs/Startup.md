@@ -867,6 +867,8 @@ SavedIndexedZeroMask keeps both reloads independent of the preceding zero
 store, restoring the parent TEST flags when the masked SHL count is zero.
 SuccessorRing derives EAX from the fresh successor read and retains EDX,
 admitting the alternate ring only at the exact not-below9343 edge.
+PostStoreZero bounds9278's TEST/JZ, distinguishing a missing EAX from captured
+zero and preserving the selected92BD or927C destination without entering it.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

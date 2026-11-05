@@ -243,6 +243,7 @@ CapacityFinalCalleeLargeIndexedFieldStoreLifecycleProjectionChecks.Run(Check);
 CapacityFinalCalleeLargeRejectFieldLifecycleProjectionChecks.Run(Check);
 CapacityFinalCalleeLargeSavedIndexedZeroMaskLifecycleChecks.Run(Check);
 CapacityFinalCalleeCommonSuccessorRingLifecycleProjectionChecks.Run(Check);
+CapacityFinalCalleeLargePostStoreZeroGateChecks.Run(Check);
 FrameHandoffCapacityAboveBranchLifecycleChecks.Run(Check);
 FrameHandoffCapacitySecondBranchLifecycleChecks.Run(Check);
 FrameHandoffCapacityFinalCallGateChecks.Run(Check);
