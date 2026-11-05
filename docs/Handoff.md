@@ -12576,6 +12576,13 @@ prerequisites; propagate REP unreached capture flags. Owner retains pair.
 FirstFillLifecycle successor `834265e9-1dda-45c5-8fad-64d6c4758ea2`
 owns SecondTransferLifecycle-to-RepeatFillJoin bounded composition.
 
+AboveRepeat revised/reviewed/registered; optional identity cross-checks
+and REP unreached flag propagation corrected, pinned offline runner passed.
+AboveFinalLifecycle successor `cad06a4e-850b-4749-bfa6-cd2031f48e4b`
+owns above repeat-to-final tail, checking EBX/ESI continuity only on the
+final no-call bypass. Active FillFinalLifecycle, CalleeExit and
+FirstFillLifecycle files remain unregistered/unreviewed.
+
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
 indirect callback, then fresh receiver+4C DEC and receiver+48 zero/INC.

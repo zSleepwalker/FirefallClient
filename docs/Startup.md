@@ -465,6 +465,12 @@ bypass requires an independent EDI capture. Both validate frame identity
 before the fill read and retain completed store descriptors when a later
 reload is missing.
 
+`FrameHandoffCapacityAboveRepeatProjection` admits shared REP only from the
+exact nonzero above-return gate, deriving count/start and treating optional
+identity captures as cross-checks rather than missing prerequisites. Its
+zero branch rejects repeat-only captures; missing DF and incomplete REP
+retain partial effects and cannot admit the final join.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves
