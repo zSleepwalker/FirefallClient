@@ -12908,6 +12908,14 @@ Runner3426 exit0 validates registered AlternateFieldSelection and
 FieldDescentStep after active-owner compile corrections. Released pending
 review: FieldClearTail revision, IndexedRootMask, ConditionalFieldStore,
 LargeSizeAlternateLifecycle, and DescriptorFallbackMask revision.
+Checkpoint67dbe54 pushed. FieldClearTail and DescriptorFallbackMask
+revisions reviewed/registered; runner3439 exit0. Corrected fallback
+wrap fixture EBP8-minus14h=FFFFFFF4. Pending released pairs still unregistered:
+IndexedRootMask, ConditionalFieldStore, LargeSizeAlternateLifecycle.
+Active Luna successors SelectionDescentLifecycle
+`c992401e-6115-45c4-a1dc-fdac62b80194`, DescentClearLifecycle
+`3ad41ab3-4c3a-4170-b734-b21675df996c`, IndexedConditionalLifecycle
+`0312d7c5-45f5-40be-909a-12eb98209e35`. They own only their new pairs.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional

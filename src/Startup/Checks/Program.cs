@@ -133,6 +133,8 @@ CapacityFinalCalleeDescriptorMaskLifecycleChecks.Run(Check);
 CapacityFinalCalleeDescriptorPairedLifecycleChecks.Run(Check);
 CapacityFinalCalleeAlternateFieldSelectionChecks.Run(Check);
 CapacityFinalCalleeFieldDescentStepChecks.Run(Check);
+CapacityFinalCalleeFieldClearTailChecks.Run(Check);
+CapacityFinalCalleeDescriptorFallbackMaskLifecycleChecks.Run(Check);
 FrameHandoffCapacityAboveBranchLifecycleChecks.Run(Check);
 FrameHandoffCapacitySecondBranchLifecycleChecks.Run(Check);
 FrameHandoffCapacityFinalCallGateChecks.Run(Check);

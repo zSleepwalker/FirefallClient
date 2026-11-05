@@ -621,6 +621,13 @@ or `12C8FFE`, retaining the first write when the second read is missing.
 `CapacityFinalCalleeFieldDescentStepProjection` performs one bounded descent
 step only. The selected pointer is freshly reloaded after its comparison,
 and the loopback to `12C8FC5` is recorded without executing another iteration.
+`CapacityFinalCalleeFieldClearTailProjection` retains the original CMP flags
+across the frame store and EDX reload. Both the later frame read and the global
+reload after the zero store remain independent, even at aliased addresses.
+`CapacityFinalCalleeDescriptorFallbackMaskLifecycleProjection` models the
+distinct raw `12C8EB8` opaque call before the mask window. It requires captured
+post-call registers, rejects call-only captures on bypasses, and admits only
+clean mask destinations.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
