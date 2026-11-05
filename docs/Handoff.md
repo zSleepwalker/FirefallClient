@@ -13955,6 +13955,9 @@ enumcompare fix ParentPlan.ParentPlan.Outcome; targetremoved.
 Luna7d0f44a2rootindexedunequalfirstuncomposedgapanalysis.
 Luna89d6166bsecondbyteCMP16scalarpair, Luna04a8ba6apostvtablecountpair.
 1844SEHrevisionreleasedcompletion/parenttracependingreview.
+1844SEHrevision reviewed4212exit0 exact3draft exclusions targetremoved;
+actualcompletionseparate frompendingchildcaptures, combinedparenttrace.
+Luna1f644c4aRET4boundedtransferpair successor explicitfreshreturntarget.
 SmallBinEpilogue released and full EOF reviewed: owner6d052038 revising
 wrong parent type, nullable value-plan access, missing successor-unused
 forwarding, child read/write effect markers and dirty-ring admission.
