@@ -12359,6 +12359,16 @@ owns CapacityCall pair. Sole evidence writer
 `4940b18d-783c-40f4-9512-5fd0221f7b51` adds prefix/call anchors;
 await release before staging.
 
+Latest pushed HEAD `55f1a66` includes three helper compositions.
+Prefix/call anchors released and reviewed, no active evidence writer.
+CapacityPrefix author refining read-attempt/captured distinction and
+explicitreceiverCreadaddress; do notstagepairyet.
+Post-call trace consumed only through firstopaquehandoff:
+Transfer pair owner `77f0d27f-d500-4023-bebe-7f31ab6d036d` implements
+BE6BCA..FD. Return-join read-only owner
+`83375c4c-050c-44eb-9a8f-5d1c1467a78f` tracesFD..BE6C10.
+Do not use broad latercall/zero-fill report before bounded verification.
+
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
 indirect callback, then fresh receiver+4C DEC and receiver+48 zero/INC.
