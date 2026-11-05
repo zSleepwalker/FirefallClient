@@ -1020,6 +1020,10 @@ and independent stack/call observations. RightRootSmallBinRingLifecycle
 extends the mask branches through their OR/ring or successor-threshold/ring
 tails, deriving inherited ESI and preserving independent fresh thresholds.
 Neither ring tail enters the selected epilogue or abort destination.
+NodeIndexedTraversalZeroSlotLifecycle connects only the clean zero-child
+branch to a fresh threshold CMP/JB. The LEA child-slot address supplies ECX,
+missing threshold data preserves the prior TEST flags, and unused child data
+blocks admission without erasing the already selected bounded exit.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

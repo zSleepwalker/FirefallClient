@@ -13556,6 +13556,22 @@ count19, null stack captures on clean zero bypass, actual unused post-call
 EBP input, and wrap/missing-pop checks. Small-bin corrected capture nesting,
 missing inherited ESI stops in parent92C2, aliased fixture values, internal
 entry, and selected below-threshold destination fallback.
+Both pairs committed/pushedc4e7fe4 (7files2595insertions).
+Luna6d052038 owns SmallBinEpilogue direct ring-JMP9441 continuation
+(no cleanup-counter DEC on either small-bin route). Luna73bc7518
+continues NodeTraversalZeroSlot. Luna550c6a47 analyzes one unfinished
+native seam outside the allocator lifecycle chain to broaden new work;
+read-only, no repository edits. Latest reviewed subset runner4106exit0,
+ordinary full runner4090exit0. No temporary exclusion target remains.
+Actual node-zero pair names include NodeIndexedTraversalZeroSlotLifecycle
+(owner73bc7518), not the requested shorter NodeTraversalZeroSlot spelling.
+Full EOF reviewed/registered. Wrapped slot8 below fixture corrected to
+threshold9 (8 is not below1). Ordinary full runner4110exit0 after removal
+of the temporary target; supersedes runner4090 as latest full validation.
+Fresh IDA read rawBBC860 length395 independently confirmed IOCP worker
+bytes; Luna9ed77d9d owns NetworkIoCompletionPass projection/check pair
+outside the allocator chain. Cached imports and empty/fallback/dispatch
+semantics must be resolved from native evidence before assigning names.
 8948188B4A1085C974123B0DD8ADED010F82D8FBFFFF8948108941188B4A1485C974123B0DD8ADED010F82BFFBFFFF894814894118.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
