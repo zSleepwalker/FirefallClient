@@ -12426,6 +12426,13 @@ owns only C34..C41 read/cleanup/LEA/TEST/JZ pair. No REP effects.
 LoopPrefix owner `1095361c-cf6e-428e-bfd7-b69bd3af1de9` owns
 single-iteration-to-prefix-call composition. Reject doubling/failure routes.
 
+HelperLifecycle fixture refinement reviewed; HelperLifecycle,
+TransferLifecycle and SecondTransfer pairs registered/passing.
+PrefixTransfer owner `7fc27eed-eff7-4bd3-9ded-7e8f0374e3d8`
+owns prefix-call-to-first-transfer composition. Zero bypass has no call,
+so EDI must match shifted prefix value; call routes retain independently
+captured post-call EDI. No assumption that frame reloads equal prior stores.
+
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
 indirect callback, then fresh receiver+4C DEC and receiver+48 zero/INC.

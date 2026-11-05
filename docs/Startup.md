@@ -429,6 +429,8 @@ The reliable masked-length callback's validated entry also admits the zero-resul
 
 `FrameHandoffCapacityPrefixCallProjection` derives zero bypass, guarded indirect entry or direct scaled-push entry from the prefix, rejects conflicting route captures and validates the frame identity before call effects. Completed prefix stores and pushes remain visible when a later call is blocked.
 
+`FrameHandoffHelperLifecycleProjection` composes the three admitted entry routes through the full frame continuation, validating receiver identity before slot effects. `FrameHandoffCapacityTransferLifecycleProjection` validates receiver/frame identities before the first transfer return reads, but retains independent post-call EDI/ESI and opaque EAX captures. `FrameHandoffCapacitySecondTransferProjection` models `BE6C10..BE6C34`, including signed scaling, the frame-C store, independent call-cell/frame-10 reads and ordered pushes before the opaque call.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves
