@@ -14096,6 +14096,14 @@ DWORDs. Selector3 reprojection now explicit, final rerun4292.
 Lunab0f46ecd owns JAE3480 (CFclear selects31F8), otherwise JMP3486
 selects34AD. No target instruction or new memory capture is admitted.
 Current exclusions ExitEbxRestore and DestinationBranchGate.
+Destination branch b0f46ecd full EOF reviewed, accepted4294exit0. Corrected
+capture-level comparison, destination-modeled metadata, guarded known CF,
+and added distinct pending/null and non-normal/false ancestor fixtures.
+Coordinator freshIDA34AD: C7442450FFFFFFFF8B74243C85F67425...
+Fresh31F8: 8A028AC80FB6D8C0E90480E103C1EB06884C2412...
+Lunade7a0eb4 owns34AD ESP50 store / freshESP3C loadESI / TEST through34BB;
+only short-jump-selected34AD admitted, no JZ/release semantics yet.
+Exclusions ExitEbxRestore/DiagnosticCleanupStackPrefix. de803c52 still active.
 
 The user's finish-current-tasks-and-stop request supersedes earlier
 continuous-dispatch instructions. All current assignments are now released,

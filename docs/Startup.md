@@ -1258,6 +1258,10 @@ GameSocketParserDiagnosticDestinationPrefixProjection captures fresh post-call
 EBP and independent DWORDs at EBP+C and derived ESP+14. CMP with 2 replaces
 arithmetic flags; MOV EDI,56Eh and MOV EDX preserve them. It stops before
 JAE at raw BD3480 and retains the committed EDI load if the EDX read is missing.
+GameSocketParserDiagnosticDestinationBranchGateProjection uses only the
+comparison carry flag: JAE selects raw BD31F8 for unsigned values at least 2;
+otherwise the short jump selects BD34AD. Both paths preserve registers and
+flags and stop before executing their selected target.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
