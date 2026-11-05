@@ -14017,6 +14017,18 @@ Repost committed/pushed51d47af; no successor assigned after stop request.
 
 ### Paused after completing current tasks
 
+Resume update: the user resumed after PR #1 merged. Fetched local main and
+origin/main both c622f4c; main remains occupied by the main checkout, which
+was not accessed. This worktree's reverse-engineering branch fast-forwarded
+to c622f4c. The pause below is historical, superseded by the resume request.
+Dispatcher final preparation172 full EOF reviewed, registered and accepted
+4258exit0. Both parent routes, missing captures and fresh argument aliases
+are covered; stop BBDEB0 before target read/call.
+Luna4f6a5fb4 implements the returned IOCP signed loop gate from790 analysis;
+Luna9b5e83fa analyzes dispatcher final import return through SEH store.
+Raw BBC9BB is a local reload/counter gate, not by itself evidence of a
+timeout-reset store; earlier timeout semantics need separate evidence.
+
 The user's finish-current-tasks-and-stop request supersedes earlier
 continuous-dispatch instructions. All current assignments are now released,
 reviewed through EOF, registered and accepted. Do not start successors

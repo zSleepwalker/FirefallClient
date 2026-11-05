@@ -341,6 +341,7 @@ NetworkIoErrorCallbackPreparationChecks.Run(Check);
 GameSocketReceiveRepostCallPreparationChecks.Run(Check);
 CapacityFinalCalleeCommonNodeIndexedSecondEqualityCleanupLifecycleChecks.Run(Check);
 NetworkDispatcherFencedPublicationChecks.Run(Check);
+NetworkDispatcherFinalCallPreparationChecks.Run(Check);
 GameSocketParserStoredByteSelectorGateChecks.Run(Check);
 NetworkIoErrorCallbackReturnChecks.Run(Check);
 CapacityFinalCalleeCommonTraversalSlotCleanupLifecycleChecks.Run(Check);

@@ -1204,6 +1204,10 @@ NetworkDispatcherFencedPublicationProjection records both fence/store
 routes, an independent field reload, byte publication and fresh counter
 DEC. It preserves incoming CF and stops before the next PUSH at BBDEAD;
 skipped-but-supplied captures prevent clean completion.
+NetworkDispatcherFinalCallPreparationProjection derives the final local
+argument address from the proven post-cell EBP, independently reads its
+DWORD and pushes it using a fresh ESP. It stops before the indirect call
+at raw BBDEB0; neither target identity nor call behavior is inferred.
 GameSocketParserStoredByteSelectorGateProjection derives EBX from the
 first header byte and selects BD3294 or BD326A using the fresh stack-byte
 JZ and ordered selector comparisons. Neither destination is entered.
