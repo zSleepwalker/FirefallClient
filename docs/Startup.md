@@ -707,6 +707,9 @@ The root-size lifecycle follows only the unequal root branch, while the
 root-epilogue lifecycle follows only completed root writes. The second
 frame gate at `12C9122` uses an independently captured frame value and
 stops before its own opaque call when equal.
+The shifted-frame gate at `12C912D` reloads `[EBP-4]` independently,
+shifts with DWORD wrapping, and keeps undefined shift flags absent.
+Equality bypasses the opaque call at `12C9137`.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

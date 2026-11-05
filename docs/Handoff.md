@@ -13040,6 +13040,11 @@ RootEpilogue revision reviewed/registered; cleanunequal fixtures corrected
 to omitunusedrootwrite/epiloguecaptures. SecondFrameGate reviewed/registered;
 runner3624 exit0 including RootSize and nativeanchor. AlignedFrame released
 after evidenceconversion, reviewpending. ShiftedFrameGatefe4204d7 active.
+Checkpoint1ebc132 pushed. ShiftedFrameGate reviewed/registered/anchored;
+corrected missingfresh unreachedECX flag and7FFFFFFF-80000000 CFtrue.
+Runner3626 exit0. AlignedFrame returnedfor>=20 contaminatedadmission and
+explicitcleanhandoff. Active PairedFrameGate1ba9590b and
+SecondShiftedf46ea4ff; existingcompiledactivepairs mustnotbestaged.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
