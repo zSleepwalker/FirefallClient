@@ -12433,6 +12433,46 @@ owns prefix-call-to-first-transfer composition. Zero bypass has no call,
 so EDI must match shifted prefix value; call routes retain independently
 captured post-call EDI. No assumption that frame reloads equal prior stores.
 
+Latest reviewed code pushed `0f02297`. No evidence writer active.
+AboveTransfer owner `2495e4e5-1616-4958-a1f6-9db4c399e6d7`
+owns bounded C57..C6D pair. Coordinator raw IDA trace:
+`8D3CB5000000008BC783E0FC50A19C48AC015152FFD0`.
+LEA EDI=ESI*4, MOV/AND EAX, PUSH EAX happens BEFORE call-cell
+DWORD load. Then PUSH ECX/EDX, CALL EAX, normal C6D.
+Next C6D..C8F bytes (trace only):
+`8B43048B55F48D0C072BD103D0C1FA028D1C95000000005351FF75FCFF159C48AC01`.
+Fresh receiver4 EAX, independent frame-C EDX, ECX=EDI+EAX,
+SUB/ADD/SAR EDX2, EBX=EDX*4, PUSH EBX/ECX/fresh frame-4,
+indirect call cell1AC489C. Do not assume incoming EDI/EBX preserved
+across opaque call without conditional identity capture.
+
+DF trace `86b86726` verified helper has no CLD/STD/POPF; calls opaque.
+Second REP is at CA0, not C9E (C9E XOR EAX). Direction requires
+capture; no ABI-clear assumption. RepeatStore owner
+`b7d4d10f-3c9f-42bf-a6b0-12a2ed562f02` owns C41..C4A pair,
+compressed directional write descriptor only; completion independently
+captured, no unbounded array. SecondReturnGate production/checks reviewed,
+registered; serial validation blocked by active LoopPrefix CS7036 at line125,
+owner notified. Author had run builds/tests despite no-test instruction.
+SecondTransferLifecycle owner `81f5c642-0db0-4b10-ab5a-3065d40ff9d1`
+owns second call/return composition; post-call EBX independent.
+Evidence writer `dde6ad0e-9ef9-4fc0-bc98-21d519b0cea6`
+exclusively owns return-gate/repeat/above-prefix immutable anchors.
+
+SecondReturnGate/SecondTransferLifecycle/PrefixTransfer/AboveTransfer/
+RepeatStore reviewed, registered and passing. Corrected repeat XOR bytes
+from author's equivalent-but-not-native `31C0` to actual `33C0`.
+Corrected second-lifecycle fixture: missing return read is ReturnBlocked,
+even when its partial child also flags later EAX capture.
+Evidence author initially used raw C34/C41/C57 instead of FULL BE6Cxx;
+coordinator rejected; corrected anchors now pass. Await formal release
+before staging evidence file.
+LoopPrefix refinement active: call-frame mismatch belongs after prefix
+stores, not an early prefix-identity gate. Nullable check errors addressed.
+FillJoin owner `84d394c4-71ab-406f-a003-ea805137b3e1` owns C4A..C57.
+GateRepeat owner `23ecce24-7bd7-4188-adcf-1c038f18b8a8` owns
+second-return-gate-to-directional-REP composition.
+
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
 indirect callback, then fresh receiver+4C DEC and receiver+48 zero/INC.

@@ -431,6 +431,10 @@ The reliable masked-length callback's validated entry also admits the zero-resul
 
 `FrameHandoffHelperLifecycleProjection` composes the three admitted entry routes through the full frame continuation, validating receiver identity before slot effects. `FrameHandoffCapacityTransferLifecycleProjection` validates receiver/frame identities before the first transfer return reads, but retains independent post-call EDI/ESI and opaque EAX captures. `FrameHandoffCapacitySecondTransferProjection` models `BE6C10..BE6C34`, including signed scaling, the frame-C store, independent call-cell/frame-10 reads and ordered pushes before the opaque call.
 
+`FrameHandoffCapacitySecondReturnGateProjection` preserves the fresh frame-C read before cleanup12 and the independently captured post-call EBX/EAX addition. Its lifecycle composition validates EBP without assuming EBX preservation. `FrameHandoffCapacityPrefixTransferProjection` requires clean prefix-call admission, retaining independent post-call EDI on call routes and deriving it on the zero bypass. `FrameHandoffCapacityAboveTransferProjection` preserves the first push before the call-cell load at `BE6C64`.
+
+`FrameHandoffCapacityRepeatStoreProjection` represents `BE6C41..BE6C4A` with one compressed zero-store descriptor, explicitly captured DF and normal REP completion. It does not assume forward direction or enumerate writes; a missing fresh frame-8 reload retains completed REP effects.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves
