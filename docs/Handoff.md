@@ -14002,6 +14002,14 @@ IOCP290revisionaccepted4242exit0 nullEBPstatefixed +dirty97Dflags preserved
 and6errorCMPfixtures/aliasedPUSH-vptrfreshreads.68be8ee2Luna nextslot20
 target/normalreturnJMP986->9BB analysis; no target identity assumed.
 b059repostrevisionreleasedreview;872cleanupreleasedreviewpending.
+IOCP preparation committed/pushed184d605. Repost revised pair accepted
+4246exit0: exact nine values, final LEA entryESP+24, ADD18 flag fixtures,
+and postdiagnostic cleanup ESP retained before missing ESI/EBX.
+Coordinator corrected missing-register fixture ESP6010, not7010.
+User requests finishing current tasks, notes, commit and stop. No further
+successors will be assigned. Current remaining pairs: second-equality
+cleanup872, fenced publicationd8c, parser selectorf01701d6 and IOCP return
+46c00f13; the last two were assigned before the stop request.
 SmallBinEpilogue released and full EOF reviewed: owner6d052038 revising
 wrong parent type, nullable value-plan access, missing successor-unused
 forwarding, child read/write effect markers and dirty-ring admission.

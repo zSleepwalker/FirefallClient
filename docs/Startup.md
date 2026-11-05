@@ -1192,6 +1192,10 @@ NetworkIoErrorCallbackPreparationProjection extends the actual
 missing-dispatch-key parent boundary with a fresh key reload, error
 argument push and independent vptr load. It stops before reading slot
 0x20 or calling its target and retains the error CMP flags.
+GameSocketReceiveRepostCallPreparationProjection records nine ordered
+argument pushes and three independent fresh reads before the repost
+import boundary. The last stack-address argument is entry ESP + 0x24,
+not + 0x18; missing captures retain reached EAX/ESP and arithmetic flags.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
