@@ -7333,6 +7333,10 @@ internal static class StartupBinaryEvidence
             Matches(0xBBDE6F, "8B86A8000000432B86A4000000C1F8023BD872BD8D5E6CFF15244DAC01"));
         check("Binary indexed traversal loopback doubles its rolling index before fresh child and tag reads",
             Matches(0x12C93E4, "8BC303DBC1E81F83C0048D0C828B0185C074658BD08B420483E0F83BC775E1"));
+        check("Binary parser caller count compares the admitted scalar as a full DWORD",
+            Matches(0xBD323B, "0FB7F88B450C3BF80F873F020000"));
+        check("Binary dispatcher cell return stores EAX before comparing two LEA-derived addresses",
+            Matches(0xBBDE8C, "8945F08D4E688D45F03BC1740B"));
         check("Binary nonzero parser dispatches through a fresh stack-local vtable before preserve-one resize",
             Matches(0xBD31C5, "8D4C24348B442434FF500C6A01508D4C243C")
             && RelativeBranchTargets(0xBD31D7, 0xE8, 0x12CBCB0)

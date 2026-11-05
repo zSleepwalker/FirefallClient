@@ -1170,6 +1170,12 @@ adds exactly one loopback pass, deriving its node and doubled index from
 the first pass and retaining the original size operand. Each child and
 tag read remains fresh; equality, zero and another loopback are bounded
 without entering a third pass.
+GameSocketParserCallerCountGateProjection compares the admitted scalar
+against an independently captured caller DWORD using a full-width CMP/JA.
+GameSocketReceiveBufferStatusGateProjection independently loads the
+operation base, writes status 0x80 and rereads the operation field. Its
+four historical-route/reload-outcome combinations retain correct register
+lineage, with new register observations required after the F7F diagnostic.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
