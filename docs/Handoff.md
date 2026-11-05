@@ -14035,6 +14035,11 @@ Luna60bcf28d implements next post-loop byte gate fromfd4a supplied-byte
 analysis:9CB local-24, CMPBYTE+4, local-28, JZ8B0/9DB. No byte meaning
 or receiver identity is established. Dispatcher26a FSstorepair released
 pending full review; correct exclusive endpointC0, notBF.
+IOCP loop committed/pushed16554fd. Dispatcher26a full EOF accepted4264exit0
+after fixture fixes: ImmutableArray.Length, supplied-unused postcall EBP,
+and comparison with the actual incomplete parent bound rather than true.
+Luna74d87c14 owns four independent stack POP observations C0..C3, boundedC4.
+Luna60bc post-loop byte pair remains active; no sample/IDB changes.
 
 The user's finish-current-tasks-and-stop request supersedes earlier
 continuous-dispatch instructions. All current assignments are now released,

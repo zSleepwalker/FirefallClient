@@ -1208,6 +1208,10 @@ NetworkDispatcherFinalCallPreparationProjection derives the final local
 argument address from the proven post-cell EBP, independently reads its
 DWORD and pushes it using a fresh ESP. It stops before the indirect call
 at raw BBDEB0; neither target identity nor call behavior is inferred.
+NetworkDispatcherFinalReturnSehStoreProjection independently captures the
+target and normal return, then a fresh post-call EBP/local DWORD. It records
+the DWORD store to FS segment offset zero and stops before BBDEC0 POP;
+no linear address, callee identity, or ABI is inferred.
 GameSocketParserStoredByteSelectorGateProjection derives EBX from the
 first header byte and selects BD3294 or BD326A using the fresh stack-byte
 JZ and ordered selector comparisons. Neither destination is entered.
