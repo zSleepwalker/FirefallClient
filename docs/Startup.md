@@ -890,6 +890,10 @@ HighSizeBitScan models the936F BSR, committed9374 frame store, masked SHR,
 and final index LEA through9384. Zero BSR leaves its destination undefined
 and prevents further projection. The actual AND and final LEA begin at
 raw012C937E and012C9381; the subsequent store remains outside this helper.
+NextThresholdStoresLifecycle admits the exact929E threshold fallthrough
+before its two directional stores. Parent CMP flags survive both MOVs,
+including a missing store-address stop; the independent global observation
+remains ordered before writes. A bypassed late EAX capture is explicitly unused.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

@@ -13289,6 +13289,15 @@ bytes894E1C8D1C8DF8AEED01BA01000000C7461400000000C7461000000000.
 NewLunaHighSizeIndexLifecycle16326e63-6160-4fd2-9753-343da40e4b12
 andRightFieldGate26dbd5ac-a166-43f3-b6d5-1e61305fbb9d active.
 RightField92A4..92ABbytes8B4A1485C97412; freshreadnotstoreforwarding.
+8091229pushed. NextThresholdStores522aff77pairreviewedregistered;
+addedorderedmemory/partialstorechecksrunner3926exit0.
+Analysis-onlyreverse-engineeragentsdeclinedimplementation(noedits):
+16326e63,26dbd5ac,c5f71505. ImplementationLunageneral-purposeowners:
+HighSizeIndex61070b0f-e66b-4540-8c38-8564693b5e1a;
+RightField32087092-9d87-472e-a1e6-54eba24e3c04;
+IndexedNode467c28fd-0de2-45c7-922f-c86108307e4e.
+FreshIDA93A1disasmconfirmedMOVglobalVA1EDADCC/SHLEDXCL/TEST/
+JNZ93C0else93AC; zeroOR/store/selfringJMP942F at93BE.
 8948188B4A1085C974123B0DD8ADED010F82D8FBFFFF8948108941188B4A1485C974123B0DD8ADED010F82BFFBFFFF894814894118.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
