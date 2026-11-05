@@ -48,6 +48,9 @@ ReliableReceiveLengthPublicationChecks.Run(Check);
 UnreliableReceiveCallbackRecycleJoinChecks.Run(Check);
 PayloadXorReturnChecks.Run(Check);
 UnreliableReceiveZeroForwardReturnChecks.Run(Check);
+UnreliableReceiveHighCountForwardChecks.Run(Check);
+UnreliableReceiveHighCountCallbackChecks.Run(Check);
+UnreliableReceiveHighCountCounterChecks.Run(Check);
 PayloadGrowthZeroFillChecks.Run(Check);
 
 void Check(string name, bool condition)

@@ -395,6 +395,10 @@ The reliable masked-length callback's validated entry also admits the zero-resul
 
 `PayloadXorReturnProjection` covers `[BD594E,BD5954)`: restores ESI/EBX, resets ESP from EBP, restores EBP, and returns without immediate cleanup or an EAX write. Optional captured EAX is preserved, not interpreted as the input pointer. `UnreliableReceiveZeroForwardReturnProjection` admits the zero-AL return only after the exact normally returned forwarding outcome, never the nonzero-ESI branch at the same end offset.
 
+`UnreliableReceiveHighCountForwardProjection` preserves six forwarding pushes, normal-call gates, an independent receiver+8 reload, cleanup 24, and wrapped object+1C increment before `BE6440`. `UnreliableReceiveHighCountCallbackProjection` dereferences that helper's independent EAX, skips the callback only for a zero first loaded DWORD, otherwise reads a second DWORD, pushes 1, and reads/calls its +8 target.
+
+`UnreliableReceiveHighCountCounterProjection` uses a fresh receiver+4C reload after those calls. DEC wraps; post-DEC zero writes receiver+48 without reading it, while nonzero independently reads/increments receiver+48. Missing later captures retain the completed DEC. An unreached receiver+48 capture on the zero path is flagged even though both visible writes are projected.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves

@@ -12166,6 +12166,18 @@ entry/table setup; `fc326a45-be57-48fe-a6e4-6d46fb626554` composes result
 stores/below-threshold shared return. No active evidence writer after
 `bedcbd43-2e18-4b05-b95c-e64c9eaa5a8d` released.
 
+Pushed accumulated immutable anchors, XOR return, zero-forward return join as
+`f363e70`. High-count forwarding/callback/counter pairs now reviewed,
+registered, and pass the pinned runner. Coordinator corrected first-call
+missing/nonreturn stops to `BE5BDB` and a wrap fixture: `FFFFFFB4+4C=0`.
+High-count callback/counter composition owner
+`d52247b7-0faa-49cc-8d79-cabaa1d5ae55` must reject flagged zero-path
+receiver+48 captures before admitting the join.
+Sole evidence writer `4dc1f0ab-5cfc-4b73-9601-2db1bc7f4e69` pins suffixes.
+Read-only helper/prior-art traces: BE64A0 owner
+`a686b2f8-a5a5-46e2-8ef3-09286a0d317a`; BE6440 owner
+`b1f34702-0c12-4d52-9bae-1d0834046999`.
+
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
 indirect callback, then fresh receiver+4C DEC and receiver+48 zero/INC.
