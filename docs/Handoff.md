@@ -13236,6 +13236,11 @@ e903d81 pushedmaskbatch. OrRing/SavedMaskAnd/IndexedRejectreviewedregistered
 runner3819 exit0. FixedOrRingaliasfixturelastwrite valuechildEDX01EDADC0
 notparentORoperand1111. IndexedReject FlagsAtStopadded.
 ActiveIndexedField6d3902da/EaxThresholdfd457a5f/IndexRejectLifecyclead27c350.
+2b4fdb6pushed. IndexedField/EaxThresholdreviewedregistered runner3825exit0.
+Fixed sameCMP independentoperand retention, fieldborrowAF andbadplanproperty.
+ActiveAlternateRing5932b12c/FieldStoref2c47f97/SavedZeroMask3a3c19f7/
+IndexRejectLifecyclead27c350. Raw9288..92BDfresh53bytes
+8948188B4A1085C974123B0DD8ADED010F82D8FBFFFF8948108941188B4A1485C974123B0DD8ADED010F82BFFBFFFF894814894118.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional

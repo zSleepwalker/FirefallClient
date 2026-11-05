@@ -855,6 +855,10 @@ OrRing retains the global OR write before any later missing ring operand.
 SavedMaskAnd passes the NOT result into the independent global update,
 preserving shift flags until AND completes. IndexedReject bounds the register
 CMP/JB at9263 without projecting the following field access.
+IndexedFieldGate bounds the fresh [ECX+10] comparison at926B and preserves the
+independent EDX operand when the memory evidence is missing. EaxGlobalThreshold
+bounds927C's comparison against the separately captured absolute global.
+Neither projection enters the selected store or rejection destination.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

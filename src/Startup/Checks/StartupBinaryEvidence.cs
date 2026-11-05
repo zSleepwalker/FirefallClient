@@ -597,6 +597,16 @@ internal static class StartupBinaryEvidence
             Matches(0x12C9263, "3BCB0F820BFCFFFF")
             && RawCodeRangeMaps(0x12C9263, 8)
             && RelativeConditionalBranchTargets(0x12C9265, 0x0F, 0x82, 0x12C8E76));
+        check("Binary indexed field selects one of two stores before testing EAX",
+            Matches(0x12C926B, "3951107505894110EB0389411485C07441")
+            && RawCodeRangeMaps(0x12C926B, 17)
+            && ShortConditionalBranchTargets(0x12C926E, 0x75, 0x12C9275)
+            && ShortConditionalBranchTargets(0x12C9273, 0xEB, 0x12C9278)
+            && ShortConditionalBranchTargets(0x12C927A, 0x74, 0x12C92BD));
+        check("Binary large EAX threshold branches unsigned-below before the backlink store",
+            Matches(0x12C927C, "3B05D8ADED010F82EEFBFFFF")
+            && RawCodeRangeMaps(0x12C927C, 12)
+            && RelativeConditionalBranchTargets(0x12C9282, 0x0F, 0x82, 0x12C8E76));
         check("Binary pinned-sample raw code [0xBE6325,0xBE6352) maps to VA 0x00FE6F25 and preserves its JNZ target",
             imageBase == 0x400000
             && Matches(0xBE6325, "8B4E0853578B7E108D04CDFFFFFFFF4921460C037E0C8BC7C1E80323C88B46048D1C8D00000000833C0300751C")
