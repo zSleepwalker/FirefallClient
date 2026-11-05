@@ -561,6 +561,24 @@ successful bounded destinations rather than failed calls.
 addition, logical EAX shift, ordered frame stores and fresh memory reads.
 The common `12C8E76` destination is an opaque indirect call, not a proven
 nonreturning terminal.
+`CapacityFinalCalleeFrameComparisonCallProjection` keeps the subsequent
+`[EBP-4]` comparison as a fresh reload and models its optional indirect call
+separately from the call at `12C8E76`.
+`CapacityFinalCalleeTagEqualityLifecycleProjection` derives the equality
+continuation registers from the admitted AL-bit path. Clean other tag
+destinations remain admitted bounded routes only when no continuation-only
+captures were supplied.
+`CapacityFinalCalleeSizeComparisonCallProjection` masks a fresh `[ESI+4]`
+DWORD and shifts an independently captured EAX before comparison. No prior
+shift result is reused across unresolved calls.
+`CapacityFinalCalleeAlignmentNonzeroLifecycleProjection` derives the
+nonzero-route EAX/EDI/ESI/EBP locally but requires independent EBX evidence.
+Each route validates its own final writes and registers, rather than imposing
+the two-write prelude's register values on later three-write branches.
+`CapacityFinalCalleeTagEqualityExitLifecycleProjection` admits the exit only
+from the clean capacity branch at `12C9441`, retaining independent exit reads
+and opaque-call outputs. Any supplied optional exit capture on another route
+is marked unreached, including an otherwise empty capture.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

@@ -356,6 +356,24 @@ internal static class StartupBinaryEvidence
         check("Binary shared validation-branch destination is an opaque indirect call, not a proven terminal",
             Matches(0x12C8E76, "FF15244AAC01")
             && RawCodeRangeMaps(0x12C8E76, 6));
+        check("Binary post-validation frame comparison retains its fresh reload and optional opaque call",
+            Matches(0x12C8E7C, "3B75FC7506FF15244AAC01")
+            && RawCodeRangeMaps(0x12C8E7C, 11)
+            && ShortConditionalBranchTargets(0x12C8E7F, 0x75, 0x12C8E87));
+        check("Binary masked-size comparison retains its independent reload and shift before the optional call",
+            Matches(0x12C8E87, "8B4E0483E1F8C1E0033BC87406FF15244AAC01")
+            && RawCodeRangeMaps(0x12C8E87, 19)
+            && ShortConditionalBranchTargets(0x12C8E92, 0x74, 0x12C8E9A));
+        check("Binary descriptor-reload anchor preserves a fresh frame read after its known write",
+            Matches(0x12C8E9A, "8B4DF08D04CDF0ADED018945F08B45FC3B45F0740F3BC3720539700C7406")
+            && RawCodeRangeMaps(0x12C8E9A, 30)
+            && ShortConditionalBranchTargets(0x12C8EAD, 0x74, 0x12C8EBE)
+            && ShortConditionalBranchTargets(0x12C8EB1, 0x72, 0x12C8EB8)
+            && ShortConditionalBranchTargets(0x12C8EB6, 0x74, 0x12C8EBE));
+        check("Binary frame-mask update retains the fresh source and variable-count shift before its global write",
+            Matches(0x12C8EBE, "8B45EC3B45FC750F8B45F8D3E0F7D02105C8ADED01EB23")
+            && RawCodeRangeMaps(0x12C8EBE, 23)
+            && ShortConditionalBranchTargets(0x12C8EC4, 0x75, 0x12C8ED5));
         check("Binary pinned-sample raw code [0xBE6325,0xBE6352) maps to VA 0x00FE6F25 and preserves its JNZ target",
             imageBase == 0x400000
             && Matches(0xBE6325, "8B4E0853578B7E108D04CDFFFFFFFF4921460C037E0C8BC7C1E80323C88B46048D1C8D00000000833C0300751C")

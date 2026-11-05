@@ -12749,6 +12749,87 @@ Active successors: AlignmentNonzeroLifecycle
 `4da05d36-3e1c-4c17-b7bf-d39cbbb8bf8d` (corrected after agent queried
 mapped VA instead of raw IDA EA; only direct raw addresses are authoritative).
 
+Canonical runner3335 passed all registered checks; seven pairs and anchors
+checkpointed/pushed9a3fbe9. Active TagEqualityLifecycle is released but
+not yet reviewed/registered. AlignmentNonzeroLifecycle active.
+New FrameComparisonCall owner `5d175f79-1d10-4737-bcd4-9bdd82646acb`
+models verified raw12C8E7C..12C8E87 bytes3B75FC7506FF15244AAC01:
+fresh[EBP-4] compareESI, JNZ skips opaque cell1AC4A24 call atE81.
+Coordinator independently verified11bytes and added pending immutableanchor.
+PriorE76 call and optionalE81 call use same cell but are separate events;
+neither nonreturn nor registerpreservation is proven.
+
+FrameComparisonCall and revised TagEqualityLifecycle reviewed/registered.
+Latest runner3339 blocked by active AlignmentNonzero wrong constantname at594;
+owner informed. New TagEqualityExitLifecycle
+`3519701b-7ab4-44a6-b9b2-1fde02775cbf` active on only clean capacity
+exit9441; preserves other bounded destinations without inventing laterF71
+continuation. Latest pushed checkpoint9a3fbe9 remains authoritative.
+
+Next standalone SizeComparisonCall owner
+`f961de7e-a4a5-45dd-8d34-1a4be28662fa` active on verified
+raw12C8E87..12C8E9A19bytes: fresh[ESI+4] maskFFFFFFF8, independent
+entryEAX SHL3, CMP, equality skips optional opaque cell1AC4A24 callE94.
+Earlier calls may alter EAX; no shift-result continuity assumed.
+Runner3344 still blocked by active AlignmentNonzero nullable check
+accesses235,242,244,246; owner informed. FrameComparisonCall and
+TagEqualityLifecycle pending canonical validation/checkpoint; registrations
+already present. Both pending frame/size immutableanchors need runner too.
+
+Runner3345 compiled; onlyFrameComparisonCall fresh-read fixture group fails,
+owner has correction. TagEqualityLifecycle registeredchecks pass.
+AlignmentNonzero released/reviewed but returned for production admissionbug:
+sharedprelude required terminal2writes/alignedEDI, incorrectly rejecting
+cleancomputedzero/call paths with3writes and changedEDI. Owner must move
+terminal checks into route-specific guards. Not registered until revision.
+TagEqualityExit and SizeComparisonCall remain active. Latestpush9a3fbe9.
+
+Next unassigned native scalar window beginsraw12C8E9A:
+19bytes8B4DF08D04CDF0ADED018945F08B45FC3B45F0 throughEAD.
+Fresh[EBP-10]->ECX; LEA EAX=PEVA1EDADF0+ECX*8 (not memoryread),
+storeEAX[EBP-10]; fresh[EBP-4]->EAX; CMP EAX,fresh[EBP-10].
+The last read remains independent despite known precedingwrite.
+Coordinator observed disasm nextJZ EAD->EBE, but no complete successor
+anchor/pair yet; don't claim whole continuation from these19bytes alone.
+
+FrameComparison fixture revised; SizeComparison standalone and
+AlignmentNonzero admission revision reviewed/registered. TagEqualityExit
+returned to reject any supplied optional ExitCapture on noncapacity routes,
+even all-null struct; its active rename blocked runner3351 atline83.
+New FrameSizeLifecycle owner `94bfd6b4-d5df-4e35-b6c1-18aa7b4b3391`
+active; requires independent EAX always and post-call ESI/ESP after framecall,
+deriving only skip-route continuity.
+Four reviewed pendingpairs: FrameComparison, TagEqualityLifecycle,
+SizeComparison, AlignmentNonzero; latestpushed9a3fbe9.
+
+Runner3355 compiled and onlyfailed AlignmentNonzero's normalcall/
+contamination fixture group; owner correcting call guard/fixture. Other
+pending FrameComparison/SizeComparison/TagEquality checks passed.
+DescriptorReload owner `f78b2ff5-14ce-49c6-ac76-da3e31a9de49` active
+on full30bytes raw12C8E9A..12C8EB8, coordinator immutableanchor added.
+FreshCMP[EBP-10] must remain independent of prior LEA/store; four routes
+endEB8/EBE without incorporating next opaquecall.
+
+Canonical runner3358 passed all registeredpairs including revised
+TagEqualityExit. AlignmentNonzero owner's final callguard fix appears on
+disk but await explicit release before staging its files. Pending reviewed
+checkpoint is FrameComparison, TagEqualityLifecycle, SizeComparison,
+AlignmentNonzero and TagEqualityExit plus frame/size/descriptoranchors.
+New FrameMaskUpdate owner `00078532-a7f3-4135-b8ba-78b764236cb5`
+active on raw12C8EBE..12C8ED5 23bytes. Fresh[EBP-14] vsfresh[EBP-4],
+mismatchED5; equality fresh[EBP-8], SHL entryCL&31, NOT, freshglobal
+PEVA1EDADC8 ANDwrite thenJMP EF8. No reuseframe8=1 or priorCL across
+opaqueEB8call. FrameSize and DescriptorReload remain active.
+
+Coordinator additional unassigned window raw12C8ED5..12C8EE9:
+20bytes3B45F0740F3BC372053970087406FF15244AAC01.
+Fresh[EBP-10] compareentryEAX equalityEE9; unsignedEAX<entryEBX
+toEE3 opaque cell1AC4A24call; otherwise fresh[EAX+8] compareentryESI
+equalityEE9, inequalitycallEE3. Normalcapturedreturn endsEE9.
+FollowingEE9 freshlyreloads[EBP-4] toECX thenwrites[ECX+C]=EAX and
+[EAX+8]=ECX, freshglobal1EDADD8->EBX atEF2 before tagrouteEF8.
+This is observed disasm only beyondEE9; don't inferpointerownership.
+
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
 indirect callback, then fresh receiver+4C DEC and receiver+48 zero/INC.
