@@ -12330,6 +12330,24 @@ runner. Publication→final return composition owner
 must validate formedECX/receiverESI before finaleffects and reject all
 publication unreached flags.
 
+Latest pushed HEAD `cade0fe` includes FinalWriteReturn/CapacityLoop.
+CapacitySeedLoop one-iteration composition owner
+`ddf47521-7de6-4afd-8d4c-57479a11b973` owns pair only. Remaining active:
+SlotCallPublication88078855, PublicationReturnd88a3db0,
+evidencefd86aba2, capacityprefixtrace1dce1408. Use exact full IDs above;
+wait for their notifications, do not poll or duplicate their scopes.
+
+Final/loop evidence released and reviewed. Coordinator corrected final
+tail VA range +10 error: raw651C..652F mapsFE711C..FE712F, not
+FE712C..FE713F. Pinned runner passes. No active evidence writer.
+Capacity prefix trace completed: independentreceiverCread, ESI-=EDX,
+frame-8shiftedCstore andframe-4zero, zero/unsigned3FFFFFFFguard before
+scaledpush/call; directreturncleanup4 beforeframe-4EAXstore/test.
+Prefix implementation owner `5e030654-4305-43f5-9905-4601430e25c4`
+owns new CapacityPrefix pair only throughbeforecallB5.
+Post-call read-onlytrace owner
+`ee9585e1-6267-4b8b-ae63-c552c9250ed8` startsBE6BCA.
+
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
 indirect callback, then fresh receiver+4C DEC and receiver+48 zero/INC.

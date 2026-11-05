@@ -60,6 +60,13 @@ internal static class StartupBinaryEvidence
                 && offset + 2 + (sbyte)instruction[1] == target;
         }
 
+        bool ShortBranchTargets(long offset, byte opcode, long target)
+        {
+            byte[] instruction = ReadAt(offset, 2);
+            return instruction[0] == opcode
+                && offset + 2 + (sbyte)instruction[1] == target;
+        }
+
         bool RawCodeRangeMaps(long rawOffset, int length)
         {
             if (length <= 0)
@@ -13909,5 +13916,54 @@ internal static class StartupBinaryEvidence
                 "8B4604890C038B460483E7038B04188D0CB85F5B")
             && ShortConditionalBranchTargets(0xBE64F0, 0x75, 0xBE650E)
             && Matches(rawStartupCommonCallbackFrameHelperIndexedSlotEndFileOffset, "85C9"));
+
+        const uint rawStartupCommonCallbackFrameHelperFinalTailFileOffset = 0xBE651C;
+        const uint rawStartupCommonCallbackFrameHelperFinalTailEndFileOffset = 0xBE652F;
+        const int startupCommonCallbackFrameHelperFinalTailLength =
+            (int)(rawStartupCommonCallbackFrameHelperFinalTailEndFileOffset
+                - rawStartupCommonCallbackFrameHelperFinalTailFileOffset);
+        const uint startupCommonCallbackFrameHelperFinalTailCodeVirtualAddress =
+            rawStartupCommonCallbackFrameHelperFinalTailFileOffset + 0x400C00;
+        check("Binary pinned-sample FirefallClient.exe SHA256 97362D668FF64778193A64759265E4AE90842043C4A15B627DF9902FD9135445 raw [0xBE651C,0xBE652F) maps by raw+0x400C00 to code VA [0xFE711C,0xFE712F); TEST ECX,ECX gates the two optional reads (frame+8, then the pointee) and [ECX] write; INC [ESI+0x10] follows, then POP ESI/EBP and RET 4; JZ at raw 0xBE651E targets 0xBE6527",
+            startupCommonCallbackFrameHelperFinalTailLength == 0x13
+            && startupCommonCallbackFrameHelperFinalTailCodeVirtualAddress == 0xFE711C
+            && startupCommonCallbackFrameHelperFinalTailCodeVirtualAddress
+                + startupCommonCallbackFrameHelperFinalTailLength == 0xFE712F
+            && RawCodeRangeMaps(rawStartupCommonCallbackFrameHelperFinalTailFileOffset,
+                startupCommonCallbackFrameHelperFinalTailLength)
+            && VirtualAddressToFileOffset(startupCommonCallbackFrameHelperFinalTailCodeVirtualAddress)
+                == rawStartupCommonCallbackFrameHelperFinalTailFileOffset
+            && VirtualAddressToFileOffset(startupCommonCallbackFrameHelperFinalTailCodeVirtualAddress
+                + startupCommonCallbackFrameHelperFinalTailLength)
+                == rawStartupCommonCallbackFrameHelperFinalTailEndFileOffset
+            && Matches(rawStartupCommonCallbackFrameHelperFinalTailFileOffset,
+                "85C974078B45088B008901FF46105E5DC20400")
+            && ShortConditionalBranchTargets(0xBE651E, 0x74, 0xBE6527));
+
+        const uint rawStartupCommonCallbackFrameHelperCapacityLoopFileOffset = 0xBE6B70;
+        const uint rawStartupCommonCallbackFrameHelperCapacityLoopEndFileOffset = 0xBE6B91;
+        const int startupCommonCallbackFrameHelperCapacityLoopLength =
+            (int)(rawStartupCommonCallbackFrameHelperCapacityLoopEndFileOffset
+                - rawStartupCommonCallbackFrameHelperCapacityLoopFileOffset);
+        const uint startupCommonCallbackFrameHelperCapacityLoopCodeVirtualAddress =
+            rawStartupCommonCallbackFrameHelperCapacityLoopFileOffset + 0x400C00;
+        check("Binary pinned-sample FirefallClient.exe SHA256 97362D668FF64778193A64759265E4AE90842043C4A15B627DF9902FD9135445 raw [0xBE6B70,0xBE6B91) maps by raw+0x400C00 to code VA [0xFE7770,0xFE7791); CMP EAX,1 governs the first JB at raw 0xBE6B77 to 0xBE6B7E; JNB at 0xBE6B7C targets 0xBE6B91, near JB at 0xBE6B87 targets 0xBE6CC0, and JMP at 0xBE6B8F returns to 0xBE6B70",
+            startupCommonCallbackFrameHelperCapacityLoopLength == 0x21
+            && startupCommonCallbackFrameHelperCapacityLoopCodeVirtualAddress == 0xFE7770
+            && startupCommonCallbackFrameHelperCapacityLoopCodeVirtualAddress
+                + startupCommonCallbackFrameHelperCapacityLoopLength == 0xFE7791
+            && RawCodeRangeMaps(rawStartupCommonCallbackFrameHelperCapacityLoopFileOffset,
+                startupCommonCallbackFrameHelperCapacityLoopLength)
+            && VirtualAddressToFileOffset(startupCommonCallbackFrameHelperCapacityLoopCodeVirtualAddress)
+                == rawStartupCommonCallbackFrameHelperCapacityLoopFileOffset
+            && VirtualAddressToFileOffset(startupCommonCallbackFrameHelperCapacityLoopCodeVirtualAddress
+                + startupCommonCallbackFrameHelperCapacityLoopLength)
+                == rawStartupCommonCallbackFrameHelperCapacityLoopEndFileOffset
+            && Matches(rawStartupCommonCallbackFrameHelperCapacityLoopFileOffset,
+                "8BC62BC283F801720583FE087313B8FFFFFF0F2BC63BC60F823301000003F6EBDF")
+            && ShortConditionalBranchTargets(0xBE6B77, 0x72, 0xBE6B7E)
+            && ShortConditionalBranchTargets(0xBE6B7C, 0x73, 0xBE6B91)
+            && RelativeConditionalBranchTargets(0xBE6B87, 0x0F, 0x82, 0xBE6CC0)
+            && ShortBranchTargets(0xBE6B8F, 0xEB, 0xBE6B70));
     }
 }
