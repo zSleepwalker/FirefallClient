@@ -13174,6 +13174,15 @@ handoffs registeredrunner3754 exit0. FreshNodeLeafThreshold57204d65 active.
 runner3757 exit0; LeafClearmissingreadstopcorrected921D, nullabletuplefix.
 ActiveLeafThresholdClear354d104b andNodeLeaf57204d65.
 CommonSizeIndexed2b4e01ab productionreleased; matchingchecksrequested.
+663e6ff pushedRootPaired/LeafClear. NodeLeafThreshold/LeafThresholdClear
+reviewedregisteredrunner3760 exit0. NodechildEBPconsumer-gatedonfreshglobal.
+CommonSizeIndexedreturnedtomoveembeddedfixturesintoactualChecksfile.
+ActiveSavedCommonRoot2442abbe/CommonMaskGate d9251db4/SavedIndex1d937ffe.
+FreshIDA930A..931B BF01000000D3E78B0DC8ADED0185F97519:
+MOVEDI1, SHL byentryCL, freshVA1EDADC8, TEST, JNZ9334 else931B.
+FreshIDA9231..9243 8B5A1C3B149DF8AEED018B1DD8ADED017520:
+freshEDX+1C index, freshVA1EDAEF8+index*4 CMPEDX, independentglobal
+VA1EDADD8 reloadEBX, JNZ9263 else9243; previousCMPflagsretained.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional

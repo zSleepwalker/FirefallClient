@@ -816,6 +816,10 @@ RootPairedField composes the existing paired helper, retaining both frame
 stores and the last completed root CMP or child TEST. LeafClearStore reads
 fresh EBP-4 before writing literal zero; missing read data stops at921D,
 and captured zero remains a valid write address.
+NodeSelectionLeafThreshold uses the saved frame EDX, not the selected LEA
+or EAX, for the global threshold comparison. Its EBP handoff is gated by
+the completed child CMP. LeafThresholdClear reloads EBP-4 independently
+of the preceding saved EDX store and retains the threshold CMP flags.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
