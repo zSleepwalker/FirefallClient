@@ -836,6 +836,9 @@ CommonMaskOrStore writes only the OR result to VA1EDADC8 without rereading
 that global. SavedIndexedStoreGate performs a new EDX+1C read before the
 indexed EAX store; missing EAX retains the attempted store address but cannot
 reach TEST or JNZ, and both zero and nonzero destinations remain bounded.
+CommonSuccessorThreshold compares the freshly loaded EDX+8 DWORD against
+an independent VA1EDADD8 capture, exposing unsigned JB and all CMP flags
+without entering either rejection or later writes.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

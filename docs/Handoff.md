@@ -13208,6 +13208,11 @@ ActiveSuccessorThreshold a12d0ee7/SavedMaskShift fed83fef/MaskAnd becd34ae/
 MaskSelectionOr9cca38e5/IndexStore11dcf839.
 Fresh925B..9263 2105CCADED01EB5A ANDfreshglobalVA1EDADCC withEAX
 readmodifywrite thenshortJMP92BD. Neverentercommon tail.
+e925772 pushednativeanchors. CommonSuccessorThresholdreviewedregistered
+runner3801 exit0 FlagsAtStop/unusedfirstcaptureadded. SavedMaskShiftreturned
+correctmissingfreshstops9251/9254 andpreserveearlyECX/evidencemapping.
+MaskSelectionOrreturnedactualhelpercomposition (duplicateddispatch and
+impossiblesuppliedderivedmask). NewMaskSuccessor6fc12aac active.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
