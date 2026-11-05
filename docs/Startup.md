@@ -1108,6 +1108,10 @@ nonzero acquisition to one generic append attempt. It keeps tag and tail
 reads independent, compares returned EAX before EDX, and stops at retry
 or pre-publication success. CMPXCHG8B changes only ZF; the preceding OR
 provides the preserved non-ZF flags. No retry or publication is executed.
+GameSocketReceivePostPacketStackPreparationProjection observes fresh
+post-packet registers and an independent operation read before the
+three stack stores. The nonzero destination and zero-path diagnostic
+call remain unentered; this is preparation evidence, not a full repost.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

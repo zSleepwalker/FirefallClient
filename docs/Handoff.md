@@ -13889,6 +13889,13 @@ parserpointerdraft exclusions targetremoved. Registered. Lunae6b11c36
 success-only publication successor. Parserpointer16e4 reportconsumed
 samehash/directbytesconfirmed; Luna12b78516 boundedpointeradapter.
 Outer5ab confirmsseparateouterequal9403 admissiongap, nochildreplay.
+Queue attempt committed/pushedb2cd7f0. Postpacket28c6 fullEOF reviewed
+coordinatorcorrected dirtyancestorfixture expectedEEBnotF25; owner
+correctlydecoded storesF3F/F43 (earlierassignmentoffbyone). Registered
+4180exit0 exactcollection/pointer/publication/outerdraft exclusions;
+targetremoved. Lunac498c9e4 bounded F64 receive-request setup successor.
+Dispatcher e64 revision requested fullEOF enum/flagsconversion,
+parentbound metadata/capturestates/fixtureindices/noAddPushfallback.
 SmallBinEpilogue released and full EOF reviewed: owner6d052038 revising
 wrong parent type, nullable value-plan access, missing successor-unused
 forwarding, child read/write effect markers and dirty-ring admission.
