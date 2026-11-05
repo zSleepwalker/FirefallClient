@@ -1244,6 +1244,10 @@ only after normal return and stops before POP EBX at BBC9E3.
 NetworkIoErrorCallbackExitEbxRestoreProjection uses fresh post-call ESP and
 an independent saved-EBX DWORD for POP EBX at BBC9E3. It advances ESP by four
 with wrapping arithmetic, preserves unknown flags, and stops before MOV ESP,EBP.
+NetworkIoErrorCallbackExitFrameResetProjection requires fresh post-call EBP
+for MOV ESP,EBP and independently captures the saved DWORD for POP EBP.
+It distinguishes the frame-reset source from restored EBP and stops before
+RET at BBC9E7; missing saved input retains the completed frame reset.
 GameSocketParserSelectorDiagnosticPreparationProjection records the five
 diagnostic argument pushes at BD326A..BD3280. It derives ESP from the
 count-consumption lineage but requires fresh ESI and an independent DWORD
@@ -1272,6 +1276,10 @@ successful TEST leaves AF unknown and stops before JZ at BD34BB.
 GameSocketParserDiagnosticCleanupZeroBranchProjection preserves the TEST
 flags and selects BD34E2 for zero ESI or BD34BD otherwise. It adds no
 memory effects and executes neither selected target.
+GameSocketParserDiagnosticCleanupRegisterPreparationProjection derives
+EBX and ECX as FFFFFFFF from OR EBX,-1 and MOV ECX,EBX without requiring
+the prior EBX value. LEA EAX,[ESI+4] wraps without dereferencing memory.
+The prefix preserves ESP and stops before LOCK XADD at BD34C5.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

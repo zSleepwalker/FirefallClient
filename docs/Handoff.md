@@ -14122,6 +14122,17 @@ Fresh restored EBX remains independent when its read aliases prior POP.
 Luna6d2c79dd owns fresh post-call EBP MOVESP,EBP / independentSavedEBP
 POP throughE7; no RET admitted. Luna99ee3bf6 owns parser register prefix.
 Current exclusions ExitFrameReset/DiagnosticCleanupRegisterPreparation.
+Parser registers99ee3bf6 and IOCP frame6d2c79dd full EOF reviewed, accepted
+ordinary full4302exit0 with all draft exclusions removed. Parser agent ran a
+prohibited build; coordinator forced nonincremental/nonshared full validation,
+did not rely on that agent build, and reiterated no-build rules to successors.
+Frame fixture capture nesting and named arguments corrected before validation.
+Coordinator freshIDA34C5 F00FC10875178B068BCEFF108D4608F0; E7 C3.
+Lunae0c61ca8 owns captured locked XADD DWORD[EAX],ECX through34C9;
+logical RMW only, no concurrency/native-atomic claims. Luna637b2743 owns
+fresh runtime-target RET E7 transfer with wrapping ESP+4, no target entry.
+Current draft exclusions DiagnosticCleanupXadd/ExitReturnTransfer.
+Newest ordinary full baseline4302exit0 supersedes4274.
 
 The user's finish-current-tasks-and-stop request supersedes earlier
 continuous-dispatch instructions. All current assignments are now released,
