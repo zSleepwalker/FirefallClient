@@ -13933,6 +13933,11 @@ Targetremoved. Luna0826939aoutercleanupsharedepilogue successor.
 7362outererroranalysisfresh19bytesconfirmedSEHstackepilogue19..29
 notEAXconsumer;VA correctedFD3A19; Luna1844031dcodepair.
 c24receiverevision wrapDWORDpushaddresses/missingparentbound/ADDtests.
+Receivec24 revisedfixtures reviewed4204exit0 after4202invalidnested
+ExactBoundedproperty/nullableenumSequenceEqualcoordinatorfix. Targetremoved.
+Lunac22f5b92nextF88bufferstatusstore/freshCMPanalysis.
+Allcoordinatorbuilds nowforce noincremental UseSharedCompilation=false
+whileactiveSDKglobs/exclusions change; nofullordinaryrun yet.
 SmallBinEpilogue released and full EOF reviewed: owner6d052038 revising
 wrong parent type, nullable value-plan access, missing successor-unused
 forwarding, child read/write effect markers and dirty-ring admission.

@@ -1133,6 +1133,11 @@ CapacityFinalCalleeCommonNodeIndexedOuterEqualityRingCleanupLifecycleProjection
 admits the fresh counter decrement only after validating the root
 equality path's five ordered stores. It preserves carry and stops before
 the nonzero shared epilogue or zero-path cleanup call.
+GameSocketReceiveOperationReloadGateProjection models the direct
+continuation and the earlier diagnostic's explicitly observed normal
+return. Fresh post-call registers and an independent operation reload
+drive the stack store and TEST; it stops before the next diagnostic
+call or the nonzero destination, without claiming a repost.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
