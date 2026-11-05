@@ -507,6 +507,13 @@ The separate callee-prefix and first-validation anchors pin the mask-gated
 call at `12C8D82` and the fresh global/ESI4 reads and unsigned/tag branches
 at `12C8D88..12C8DA7`.
 
+`FrameHandoffCapacityLoopOverflowProjection` admits the overflow call from
+only an exact taken JB in one bounded loop iteration, distinguishing a
+reached-but-not-taken guard from an earlier exit.
+`CapacityFinalCalleePrefixCallProjection` derives pre-call ESI with wrapping
+subtraction, uses the prior mask-test flags without a new global read,
+and exposes outgoing ESI only when the opaque call is bypassed.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves

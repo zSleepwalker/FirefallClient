@@ -12632,6 +12632,13 @@ returned for compile alignment fixes; SecondBranch active literal type
 correction requested. Entry/FirstFinal/Overflow and anchors awaiting
 shared compilation before commit. No active files staged.
 
+Entry/FirstFinal/OverflowTail and three new anchors verified/pushed82a2f6d.
+LoopOverflow and PrefixCall reviewed/registered and pinned runner passed;
+loop fixtures corrected for absent captures and reached-not-taken guard.
+PrefixLifecycle `f588296e-5df4-421c-b0c8-0d513c34d416` active.
+AboveBranch and SecondBranch released but NOT yet reviewed/registered.
+FirstValidation `259bb22c-6493-4dbf-985a-776c814b6ce4` active.
+
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
 indirect callback, then fresh receiver+4C DEC and receiver+48 zero/INC.

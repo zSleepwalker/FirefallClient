@@ -101,6 +101,8 @@ FrameHandoffCapacityAboveFinalLifecycleChecks.Run(Check);
 FrameHandoffCapacityFirstFinalLifecycleChecks.Run(Check);
 CapacityFinalCalleeEntryChecks.Run(Check);
 FrameHandoffCapacityOverflowTailChecks.Run(Check);
+FrameHandoffCapacityLoopOverflowChecks.Run(Check);
+CapacityFinalCalleePrefixCallChecks.Run(Check);
 FrameHandoffCapacityFinalCallGateChecks.Run(Check);
 FrameHandoffCapacitySharedRepeatChecks.Run(Check);
 FrameHandoffHelperLifecycleChecks.Run(Check);
