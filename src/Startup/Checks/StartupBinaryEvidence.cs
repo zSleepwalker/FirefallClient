@@ -301,6 +301,12 @@ internal static class StartupBinaryEvidence
             && Matches(0xBE6CB1, "017708895F045F5E5B8BE55DC20400")
             && RawCodeRangeMaps(0xBE6CB1, 15)
             && VirtualAddressToFileOffset(0x00FE78B1) == 0xBE6CB1);
+        check("Binary immutable final-callee exit anchor restores registers before its gated indirect call",
+            imageBase == 0x400000
+            && Matches(0x12C9441, "F60584AFED01025F5E5B740B6888AFED01FF157C42AC018BE55DC3")
+            && RawCodeRangeMaps(0x12C9441, 27)
+            && VirtualAddressToFileOffset(0x016CA041) == 0x12C9441
+            && ShortConditionalBranchTargets(0x12C944B, 0x74, 0x12C9458));
         check("Binary pinned-sample raw code [0xBE6325,0xBE6352) maps to VA 0x00FE6F25 and preserves its JNZ target",
             imageBase == 0x400000
             && Matches(0xBE6325, "8B4E0853578B7E108D04CDFFFFFFFF4921460C037E0C8BC7C1E80323C88B46048D1C8D00000000833C0300751C")

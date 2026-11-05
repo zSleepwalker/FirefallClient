@@ -12535,6 +12535,39 @@ EDI independent. FillSharedRepeat owner
 composition. All future composition scopes preserve independent reloads
 and require explicit DF/completion captures. No evidence writer active.
 
+Latest pushed HEAD `d098627`; canonical pinned offline runner passed all
+registered checks. Active compositions: AboveLifecycle5094e5ec,
+FinalLifecycledaed1d32, FillSharedRepeat3d5bfa78 (own new pairs only).
+Read-only final callee trace owner `1b9437d8-0d61-43a8-b37d-a8f83832a562`
+examines raw12C8D60 normal-return EDI/ESI/EBX preservation; no ownership
+semantics inferred. Continue fresh Luna successors after releases.
+Potential next scopes: compose AboveReturnGate with SharedRepeat,
+compose GateRepeat into FillJoin (zero gate bypass leaves incoming EDI
+independent; nonzero completed repeat uses fresh frame-8 EDI), then
+join-through-FinalLifecycle. Keep exact branch/outcome and unreached
+admission rather than stop-offset-only gates. Do not revisit completed
+committed pairs unnecessarily.
+
+FinalLifecycle pair reviewed/registered; wrapping fixture corrected to
+match frame-14-derived EDI on no-call bypass. Validation currently blocked
+by active AboveLifecycle CS0136 local-name collisions; owner notified.
+AboveRepeat owner `6e127817-efd8-4412-be6f-c4cf5fd8cb98` owns
+above return gate/shared-REP composition. Final callee trace reports
+local saves/pops but indirect call after pops at raw12C9452 unresolved;
+same-task refinement requested for exact exit gate/bytes and raw-EA wording.
+Do not replace independent post-call capture policy from this partial trace.
+Refinement confirmed: raw12C9441 TEST encoded-VA1EDAF84 byte mask02;
+pops9448..944A preserve flags; JZ944B skips post-pop indirectcall9452.
+Exact 27-byte exit anchor added to StartupBinaryEvidence. FinalLifecycle,
+AboveLifecycle and FillSharedRepeat pairs reviewed/registered, awaiting
+serial validation while active successor files compile. AboveLifecycle
+fixture property references corrected to ReturnGateSuccessAdmission.
+RepeatFillJoin owner `36ef45fb-9d9c-41f8-b17d-54c629d5fe61` notified of
+active pattern-local CS0136 collisions. FillFinalLifecycle owner
+`9f6cf4a4-e205-4175-b6ef-11f5d81a60cd`; bounded final callee exit projection
+owner `5791c8ee-66b2-4029-bb10-ea1ad86d1aa4`. Successors own only their
+production/check pairs; coordinator owns registration/docs/evidence/Git.
+
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
 indirect callback, then fresh receiver+4C DEC and receiver+48 zero/INC.

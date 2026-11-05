@@ -441,6 +441,23 @@ The reliable masked-length callback's validated entry also admits the zero-resul
 
 `FrameHandoffCapacitySharedRepeatProjection` models the separate `BE6C9E..BE6CA2` compressed directional zero store without a subsequent frame-8 reload. `FrameHandoffCapacityFinalCallGateProjection` independently reloads frame-14 and receiver4 before the optional direct call, exposing outgoing EDI only on the no-call bypass. `FrameHandoffCapacityFinalReturnProjection` preserves the ordered receiver8 ADD, receiver4 overwrite and RET4 without claiming a full EAX result.
 
+`FrameHandoffCapacityFinalLifecycleProjection` admits the return tail only
+after the exact clean final-gate outcome. It validates the shared frame and
+the no-call EDI identity before the receiver8 read; opaque-call register
+captures remain independent. `FrameHandoffCapacityAboveLifecycleProjection`
+preserves both calls and the return gate's cleanup-before-LEA ordering,
+requiring normal call boundaries and a matching frame for the final reload.
+`FrameHandoffCapacityFillSharedRepeatProjection` derives repeat count and
+start from the fill join's moves, retaining zero bypass, unresolved DF,
+explicit normal completion, and partial plans without claiming stores.
+
+The final direct callee at raw `12C8D60` does not establish unconditional
+register preservation. Its exit window `12C9441..12C945C` tests mask `0x02` of the
+byte at encoded PE VA `1EDAF84`, restores EDI/ESI/EBX, then branches over an
+indirect call through encoded PE VA `1AC427C` when that bit is clear.
+The call at raw `12C9452` occurs after the restores when the bit is set;
+its register outputs remain unresolved. This is not a whole-callee contract.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves
