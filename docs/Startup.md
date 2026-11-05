@@ -1266,6 +1266,9 @@ GameSocketParserDiagnosticCleanupStackPrefixProjection records the DWORD
 store of FFFFFFFF at derived ESP+50, then independently reads ESP+3C into
 ESI and applies TEST ESI,ESI. Missing input retains the committed store;
 successful TEST leaves AF unknown and stops before JZ at BD34BB.
+GameSocketParserDiagnosticCleanupZeroBranchProjection preserves the TEST
+flags and selects BD34E2 for zero ESI or BD34BD otherwise. It adds no
+memory effects and executes neither selected target.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

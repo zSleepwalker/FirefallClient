@@ -14110,6 +14110,12 @@ added explicit alternate31F8 rejection with supplied-zero capture unused.
 Lunaad52e1c0 owns JZ34BB7425: TESTZFset selects34E2 otherwise34BD.
 No target/atomic/release instruction admitted; all TEST flags remain intact.
 Current exclusions ExitEbxRestore/DiagnosticCleanupZeroBranch.
+Cleanup zero branchad52e1c0 full EOF reviewed, accepted4298exit0 after
+correcting own read-count assertion (ancestor reads live in effect prefix).
+Luna99ee3bf6 owns OR EBX,-1 / LEA EAX,[ESI4] / MOVECX,EBX through34C5;
+LOCKXADD remains unentered. No prior EBX capture needed for absorbing OR.
+IOCP EBXde803c52 released; coordinator review pending, not yet accepted.
+Current exclusions ExitEbxRestore/DiagnosticCleanupRegisterPreparation.
 
 The user's finish-current-tasks-and-stop request supersedes earlier
 continuous-dispatch instructions. All current assignments are now released,
