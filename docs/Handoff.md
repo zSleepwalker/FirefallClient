@@ -12923,6 +12923,12 @@ read gate at9013 (beforebranch), missingframe8stop9026, entryVA16C9BFE.
 LargeSizeAlternate owner revising two impossible fixtures that attempted
 to join completedpairedFF8 into alternateFA8; require actual equalityroute.
 Do not register or stage those pairs until revised/reviewed.
+Checkpointee18558 pushed. LargeSizeAlternate revision reviewed/registered;
+runner3452 exit0 after removing an unreached EBX from a clean missing-read
+fixture. IndexedRootMask remains with owner: missing reads must stop at
+their own MOV, not its following instruction; additional revision requested.
+SuccessorFieldEvidence `8ad76929-7dfc-451d-91a2-d7e1c2620b5c` active
+read-only trace9058; other three successor lifecycle agents remain active.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional

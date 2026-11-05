@@ -631,6 +631,10 @@ clean mask destinations.
 `CapacityFinalCalleeConditionalFieldStoreProjection` uses an unsigned gate
 before its fresh field comparison, writes exactly one selected field, and
 tests the retained EAX value to select raw `12C8EF2` or `12C9058`.
+`CapacityFinalCalleeLargeSizeAlternateLifecycleProjection` joins only the
+clean equality route at raw `12C8FA8`. Other large-size destinations remain
+bounded; the alternate reads are fresh even when the prior frame write
+aliases their addresses.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
