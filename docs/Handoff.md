@@ -14028,6 +14028,13 @@ Luna4f6a5fb4 implements the returned IOCP signed loop gate from790 analysis;
 Luna9b5e83fa analyzes dispatcher final import return through SEH store.
 Raw BBC9BB is a local reload/counter gate, not by itself evidence of a
 timeout-reset store; earlier timeout semantics need separate evidence.
+IOCP loop4f6 revised full EOF accepted4260exit0; rejected dirty97D bounds
+forwarded only on nonadmission, while all admitted missing captures remain
+incomplete. Both signed destinations8F0/9CB are unentered.
+Luna60bcf28d implements next post-loop byte gate fromfd4a supplied-byte
+analysis:9CB local-24, CMPBYTE+4, local-28, JZ8B0/9DB. No byte meaning
+or receiver identity is established. Dispatcher26a FSstorepair released
+pending full review; correct exclusive endpointC0, notBF.
 
 The user's finish-current-tasks-and-stop request supersedes earlier
 continuous-dispatch instructions. All current assignments are now released,

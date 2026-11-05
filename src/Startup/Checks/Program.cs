@@ -344,6 +344,7 @@ NetworkDispatcherFencedPublicationChecks.Run(Check);
 NetworkDispatcherFinalCallPreparationChecks.Run(Check);
 GameSocketParserStoredByteSelectorGateChecks.Run(Check);
 NetworkIoErrorCallbackReturnChecks.Run(Check);
+NetworkIoErrorCallbackLoopGateChecks.Run(Check);
 CapacityFinalCalleeCommonTraversalSlotCleanupLifecycleChecks.Run(Check);
 CapacityFinalCalleeCommonTraversalCleanupEpilogueLifecycleChecks.Run(Check);
 CapacityFinalCalleeLargeRightRootSuccessorLifecycleChecks.Run(Check);

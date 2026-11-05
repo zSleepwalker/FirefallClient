@@ -1215,6 +1215,10 @@ NetworkIoErrorCallbackReturnProjection captures the indirect slot-0x20
 target independently and requires an explicit normal return before the
 BBC986 jump to BBC9BB. Missing or pending captures do not inherit the
 parent's completed boundary; no callback identity or ABI is inferred.
+NetworkIoErrorCallbackLoopGateProjection uses fresh post-call EBP/EDI and
+independent local loads before INC/CMP and the signed JL. It preserves
+unknown CF through INC, then computes the full comparison flags and stops
+before raw BBC8F0 or BBC9CB.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
