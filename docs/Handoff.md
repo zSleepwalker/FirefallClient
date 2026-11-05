@@ -12307,6 +12307,15 @@ CapacityLoop one-iteration owner `02839568-aecc-49e8-ba1e-6a242928f9f7`.
 Loop CMP(EAX,1), not SUB carry, admits zero-difference growth route;
 failure gate is unsigned(0FFFFFFF-ESI)<ESI. No frame argument read.
 
+Latest pushed HEAD `50999bc` includes strict ObjectHelperLifecycle.
+EmptySlotCall/SlotPublication pairs released, reviewed/registered/passing.
+Coordinator fixed still-unmodified PUSH evidence to6A10, absentcapture
+fixtureflags, and wrap addressfixtureFFFFFFFC+FFFFFFFE=FFFFFFFA.
+New SlotCallPublication composition owner
+`88078855-a11b-4710-8f94-0cb8e38a6287` owns pair only. Critical native
+identity: publicationEBX is slot.FirstSlotByteOffset, not arraybase;
+publicationEDI is wrapping receiver10+freshreceiverC;ESIreceiver.
+
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional
 indirect callback, then fresh receiver+4C DEC and receiver+48 zero/INC.

@@ -417,6 +417,8 @@ The reliable masked-length callback's validated entry also admits the zero-resul
 
 `HighCountObjectHelperLifecycleProjection` joins the helper entry and indexed return, independently loading `[first loaded DWORD]` at `BE6456` only on the nonzero route. The zero route supplies retained ESI zero and rejects any nonzero-only bridge capture before tail effects. Optional return register identity captures are checked only after entry/bridge prerequisites; the composed EAX/ESI values come from the entry and bridge.
 
+`FrameHandoffEmptySlotCallProjection` preserves the push-0x10/direct-call path and zero-result indirect call through cell `1AC4424`, whose returned ECX is independently captured rather than assumed zero. Missing direct EAX stops at the copy instruction before cleanup/test. `FrameHandoffSlotPublicationProjection` separates the `6508` indexed store from the `650E` fresh-base read, then masks EDI, forms ECX and pops EDI/EBX before the test at `651C`; its EBX input is the byte offset computed by the preceding slot projection.
+
 ## Sorted adapter-address MD5 (offline projection)
 
 `src\Startup\NativeAlgorithms\NativeAdapterAddressFingerprint.cs` saves
