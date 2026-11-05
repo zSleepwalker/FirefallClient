@@ -1157,6 +1157,10 @@ GameSocketParserSecondByteScalarGateProjection forms the 11-bit scalar
 from an independent second byte and compares its adjusted low word
 against 0x56E. All 2,048 values preserve the selected JA or fallthrough
 boundary; this does not establish semantic length or parser acceptance.
+GameSocketCompletionErrorReturnProjection adds an independent captured
+return target and RET4 stack adjustment to the error epilogue. It records
+only a bounded logical transfer, without entering that target or inferring
+an EAX result.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
