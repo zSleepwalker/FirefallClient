@@ -14090,6 +14090,12 @@ Coordinator fresh IDA reconfirmed3289 FF86EC000000 E9DF010000 and read
 Lunaf6623fcc owns CMP[ freshEBP+C],2 / MOVEDI56E / MOVEDX[derivedESP14]
 through3480, stopping before JAE. New captures cannot infer post-call EBP.
 Lunade803c52 remains active; exclusions ExitEbxRestore/DestinationPrefix.
+Destination prefixf6623fcc full EOF reviewed, accepted4290exit0; corrected
+nullable flag assertions and decoupled selector fixtures from comparison
+DWORDs. Selector3 reprojection now explicit, final rerun4292.
+Lunab0f46ecd owns JAE3480 (CFclear selects31F8), otherwise JMP3486
+selects34AD. No target instruction or new memory capture is admitted.
+Current exclusions ExitEbxRestore and DestinationBranchGate.
 
 The user's finish-current-tasks-and-stop request supersedes earlier
 continuous-dispatch instructions. All current assignments are now released,

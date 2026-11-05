@@ -1254,6 +1254,10 @@ GameSocketParserSelectorDiagnosticCounterContinuationProjection requires
 fresh post-call ESI and an independent DWORD at ESI+EC. Its wrapping INC
 preserves CF from the preceding ADD, leaves ESP unchanged, and follows the
 unconditional jump to raw BD3473 (code VA FD4073) without entering that target.
+GameSocketParserDiagnosticDestinationPrefixProjection captures fresh post-call
+EBP and independent DWORDs at EBP+C and derived ESP+14. CMP with 2 replaces
+arithmetic flags; MOV EDI,56Eh and MOV EDX preserve them. It stops before
+JAE at raw BD3480 and retains the committed EDI load if the EDX read is missing.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
