@@ -13994,6 +13994,10 @@ fix;missingcaptureexactfalseassertionsadded. f453publicationanalysisactive.
 Secondring852revisionaccepted4238exit0 includesdistinctfreshEAX4000/root3000
 andwrappedfirstaddress4 fixtures;872bc2e2Luna secondringcleanupcounterpair.
 Latestcoordinatornormalfullrun4110 remains;reviewedsubset4238exit0.
+Parserconsumption382fullEOFaccepted4240exit0 afterwrappedESP13address
+FFFFFFFFfixturefix;0632bd36Luna nextstored-byte/EBX2/1branchgateanalysis.
+290callbackrevisionreleasedreview;872cleanupreleasedreviewpending.
+b059repostrevisionpendingcorrectLEA40S24 andexplicit9pushvaluechecks.
 SmallBinEpilogue released and full EOF reviewed: owner6d052038 revising
 wrong parent type, nullable value-plan access, missing successor-unused
 forwarding, child read/write effect markers and dirty-ring admission.

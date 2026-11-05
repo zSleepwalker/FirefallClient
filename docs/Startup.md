@@ -1184,6 +1184,10 @@ CapacityFinalCalleeCommonNodeIndexedSecondEqualityRingLifecycleProjection
 joins a clean second-pass equality to the shared dual-threshold ring
 helper. The fresh EAX link and original root ESI remain distinct through
 all five stores, with threshold bypasses retaining their bounded exits.
+GameSocketParserCountConsumptionStoresProjection records a fresh stack
+DWORD RMW, pointer increment, count subtraction and two further stores.
+The final flags come from a separate fresh byte comparison, not from the
+earlier arithmetic; the next JZ remains outside the projection.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

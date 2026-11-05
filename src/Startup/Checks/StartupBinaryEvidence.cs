@@ -7337,6 +7337,10 @@ internal static class StartupBinaryEvidence
             Matches(0xBD323B, "0FB7F88B450C3BF80F873F020000"));
         check("Binary dispatcher cell return stores EAX before comparing two LEA-derived addresses",
             Matches(0xBBDE8C, "8945F08D4E688D45F03BC1740B"));
+        check("Binary parser consumption updates two stack fields and the caller count around a byte comparison",
+            Matches(0xBD3249, "017C241483C2022BC789542420807C24130089450C"));
+        check("Binary receive repost prepares nine stack arguments before its indirect call",
+            Matches(0xBD2FBA, "8B86F40D00006A00FF74241C83C01853508D44242C508D442434506A018D44244050FFB618010000FF15544DAC01"));
         check("Binary nonzero parser dispatches through a fresh stack-local vtable before preserve-one resize",
             Matches(0xBD31C5, "8D4C24348B442434FF500C6A01508D4C243C")
             && RelativeBranchTargets(0xBD31D7, 0xE8, 0x12CBCB0)
