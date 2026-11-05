@@ -1064,6 +1064,11 @@ classification. It records wrapped parser arguments and opaque parser
 return observations. The nonzero path independently reads the high-water
 DWORD before its unsigned compare and optional original-count store;
 all three endpoints stop before native pops or return instructions.
+CapacityFinalCalleeCommonNodeIndexedEqualityRingLifecycleProjection
+joins only the nonzero child's exact masked-equality fallthrough to the
+existing dual-threshold ring tail. It preserves distinct outer equality,
+zero-child and loop-back exits, inherits the child-derived EDX, and retains
+fresh threshold reads before the five stores. Completion stops before DEC.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

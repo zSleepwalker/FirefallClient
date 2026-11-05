@@ -13780,6 +13780,40 @@ runner4146exit0 exact queue/equality/sender-preparation/lock-gate exclusions,
 temporary target removed. Luna c1ed7441 implementing bounded sender
 preparation through first direct helper call; Luna866546f9 dispatcher
 post-first-call lock-result gate through byte-argument branch endpoints.
+Fresh sender/dispatcher anchors committed/pushedd0389f0.
+Latest coordinator subset4146exit0; ordinary full4110. Active Luna
+e942 queue-acquisition, c043 indexed-equality, c1ed sender-preparation,
+866 dispatcher-lock, baa nonzero-parser-entry analysis. No temp target.
+e942 queue composition released (owner focused checks despite restriction);
+full EOF review requested actual reached child-capture states, top stop/
+flags/bounded metadata and accurate already-returned rejected parent
+observations. c043 equality bridge released; full EOF review requested
+flags helper/type qualification, clean versus dirty bounded threshold
+branches, and corrected last-two-write fixture mislabeled as reads.
+Both owners revising pair only; not registered or coordinator-validated.
+baa fresh parser entry found existing header-size predicate (no duplicate
+decoder needed); Luna6985bd93 tracing constructor12CB830/local vtable
+to indirect BD31CD slot+0xC, bounded provenance/prior-art gap only.
+Dispatcher866 release EOF review found raw/VA delta subtracted from
+already-raw labels, pending-call flag/stop errors, invented fallback
+capture and zero-branch stop at wrong destination. Owner revising only
+pair; not registered/validated. 6985 fresh constructor/slot report:
+initialvptrVA1C80CC4, static slotC VA16CC5C0/raw12CB9C0 conditional
+after opaque resize; no guaranteed post-constructor forwarding.
+Luna5b751be3 implementing bounded fresh-local getter dispatch at BD31C5.
+Coordinator fresh IDA C523bytes shows ESP+34 (not EBP) local address;
+after getter two pushes, resize ECX derives fresh post-getter ESP+34.
+Sent corrected independent ESP captures/ordering; resize stopD7 unentered.
+Parser-local fresh IDA fingerprints added and runner4148exit0 excludes
+the five exact active composition/preparation/dispatch pairs; temporary
+target removed. c043 equality revision and c1ed sender-preparation first
+release now await coordinator review. No registrations for these drafts.
+c043 equality revision reviewed; coordinator fixed named argument colon
+and missing EntryEDI API reference to iteration.Capture.EntryEDI.
+runner4150 compile failure corrected; runner4152exit0 with exact queue/
+sender/dispatcher/parser-local exclusions. Registered equality bridge,
+temporary target removed. Lunae745d466 composing five-store equality
+ring into fresh DEC/JNZ cleanup gate, no helper-call/epilogue yet.
 SmallBinEpilogue released and full EOF reviewed: owner6d052038 revising
 wrong parent type, nullable value-plan access, missing successor-unused
 forwarding, child read/write effect markers and dirty-ring admission.

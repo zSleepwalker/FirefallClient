@@ -7308,6 +7308,10 @@ internal static class StartupBinaryEvidence
         check("Binary dispatcher lock-result gate increments the fresh counter and compares a byte argument before clears",
             Matches(0xBBDDEB, "85C0750753FF157842AC01FF4330807D0800C745FC00000000C6466400")
             && Matches(0xBBDE08, "0F84BC000000"));
+        check("Binary nonzero parser dispatches through a fresh stack-local vtable before preserve-one resize",
+            Matches(0xBD31C5, "8D4C24348B442434FF500C6A01508D4C243C")
+            && RelativeBranchTargets(0xBD31D7, 0xE8, 0x12CBCB0)
+            && ReadUInt32(0x187F8D0) == 0x016CC5C0);
         check("Binary Network and GameSocket shutdown ownership and distinct WinHTTP close helpers are fingerprinted",
             ReadUInt32(VirtualAddressToFileOffset(0x1C734B4)) == 0x00FBD900
             && ReadUInt32(VirtualAddressToFileOffset(0x1C734B4) + 8) == 0x00FBE540

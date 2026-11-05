@@ -308,6 +308,7 @@ CapacityFinalCalleeCommonNodeIndexedCleanupEpilogueLifecycleChecks.Run(Check);
 GameSocketReceiveResultGateChecks.Run(Check);
 NetworkIoCompletionClockGateChecks.Run(Check);
 GameSocketDatagramContextDispatchChecks.Run(Check);
+CapacityFinalCalleeCommonNodeIndexedEqualityRingLifecycleChecks.Run(Check);
 CapacityFinalCalleeCommonTraversalSlotCleanupLifecycleChecks.Run(Check);
 CapacityFinalCalleeCommonTraversalCleanupEpilogueLifecycleChecks.Run(Check);
 CapacityFinalCalleeLargeRightRootSuccessorLifecycleChecks.Run(Check);
