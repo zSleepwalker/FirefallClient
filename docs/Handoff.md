@@ -14165,6 +14165,13 @@ Reviewed-subset4312exit0 verifies these against the authorized sample bytes.
 Entry frame499a0c50 full EOF review found forced caller-return rewriting and
 missing unused-capture metadata; same owner revises before admission. No
 entry-frame code is accepted or registered yet. c8e8de45 remains active.
+Virtual-call preparationc8e8de45 full EOF reviewed, accepted4314exit0.
+Corrected alternate-ancestor API level; added actual aliased earlier-store
+regression with different fresh vptr value instead of equal-value pseudo-alias.
+Luna1a4c728c owns freshslot0 target/explicit opaque return at34CF through
+34D1; no post-call register or ABI preservation admitted.
+Entry frame499a0c50 remains under same-owner revision.
+Current exclusions DispatcherEntryFramePrefix/DiagnosticCleanupVirtualCallReturn.
 
 The user's finish-current-tasks-and-stop request supersedes earlier
 continuous-dispatch instructions. All current assignments are now released,

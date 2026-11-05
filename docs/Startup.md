@@ -1293,6 +1293,10 @@ GameSocketParserDiagnosticCleanupXaddBranchProjection preserves the captured
 RMW result and ADD32 flags. JNZ selects BD34E2 unless the old DWORD was 1,
 in which case its zero result selects the fallthrough at BD34CB. Neither
 destination is executed by this projection.
+GameSocketParserDiagnosticCleanupVirtualCallPreparationProjection reads a
+fresh DWORD at derived ESI into EAX and sets ECX to ESI. The read remains
+independent of earlier aliased stores; missing input preserves prior registers
+and flags. It stops before the indirect slot-zero call at BD34CF.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.
