@@ -256,6 +256,21 @@ internal static class StartupBinaryEvidence
             && Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(stream))
                 == "97362D668FF64778193A64759265E4AE90842043C4A15B627DF9902FD9135445");
         stream.Position = 0;
+        check("Binary immutable PE anchor raw [0xBE6C34,0xBE6C41) maps to VA 0x00FE7834",
+            imageBase == 0x400000
+            && Matches(0xBE6C34, "8B4DF483C40C8D140385C97409")
+            && RawCodeRangeMaps(0xBE6C34, 13)
+            && VirtualAddressToFileOffset(0x00FE7834) == 0xBE6C34);
+        check("Binary immutable PE anchor raw [0xBE6C41,0xBE6C4A) maps to VA 0x00FE7841",
+            imageBase == 0x400000
+            && Matches(0xBE6C41, "33C08BFAF3AB8B7DF8")
+            && RawCodeRangeMaps(0xBE6C41, 9)
+            && VirtualAddressToFileOffset(0x00FE7841) == 0xBE6C41);
+        check("Binary immutable PE anchor raw [0xBE6C57,0xBE6C6D) maps to VA 0x00FE7857",
+            imageBase == 0x400000
+            && Matches(0xBE6C57, "8D3CB5000000008BC783E0FC50A19C48AC015152FFD0")
+            && RawCodeRangeMaps(0xBE6C57, 22)
+            && VirtualAddressToFileOffset(0x00FE7857) == 0xBE6C57);
         check("Binary pinned-sample raw code [0xBE6325,0xBE6352) maps to VA 0x00FE6F25 and preserves its JNZ target",
             imageBase == 0x400000
             && Matches(0xBE6325, "8B4E0853578B7E108D04CDFFFFFFFF4921460C037E0C8BC7C1E80323C88B46048D1C8D00000000833C0300751C")
