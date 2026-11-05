@@ -12969,6 +12969,12 @@ reviewed/registered; added explicit raw-stop guards for three ClearIndexed
 bounded destinations. Runner3535 exit0. GuardedSuccessor owner
 7cc29746-105b-4353-84ce-fbda4fe61842 active (joins906E or9080 paths).
 Agents must not run builds/tests; coordinator is sole runner.
+Checkpointba15a08 pushed. SelectionClear revised fixtures reviewed and
+registered; runner3541 exit0. Raw908B..90A2 final paired-tail bytes
+independently verified and anchored offline. FinalPairedTail owner
+029583e5-8db7-4c21-bf09-c7158ff1641d active; IndexedGuarded
+9d594cf2-c440-426b-ad82-f5a4c9245edf active. ConditionalGuarded977381be
+and GuardedSuccessor7cc29746 still active. No main-checkout access.
 
 High-count trace `[BE5BC4,BE5C0F)` verified independent receiver+8 reload,
 cleanup24 before indirect-object+1C INC, BE6440 return dereference, optional

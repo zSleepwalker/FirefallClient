@@ -664,6 +664,10 @@ stay bounded and reject conditional captures.
 entry without the preceding stores. `CapacityFinalCalleeClearIndexedLifecycleProjection`
 joins only a clean field-clear completion at FFE to indexed reads; fresh
 frame and global captures remain independent from the clear-tail writes.
+`CapacityFinalCalleeSelectionClearLifecycleProjection` admits clear-tail
+execution only after a clean terminal selection/descent at FDD. FFE
+bypasses and FC5 loopbacks remain bounded and cannot consume clear-tail
+captures; missing reads preserve only effects reached before the stop.
 
 `FrameHandoffCapacityAboveBranchLifecycleProjection` derives its tail
 return-gate capture only from a clean above-capacity lifecycle.

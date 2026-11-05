@@ -433,6 +433,11 @@ internal static class StartupBinaryEvidence
             && RawCodeRangeMaps(0x12C906E, 29)
             && RelativeConditionalBranchTargets(0x12C9074, 0x0F, 0x82, 0x12C8E76)
             && RelativeConditionalBranchTargets(0x12C9085, 0x0F, 0x84, 0x12C8EF2));
+        check("Binary final paired tail guards ECX then stores two fields before the EF2 jump",
+            Matches(0x12C908B, "3B0DD8ADED010F82DFFDFFFF894814894118E950FEFFFF")
+            && RawCodeRangeMaps(0x12C908B, 23)
+            && RelativeConditionalBranchTargets(0x12C9091, 0x0F, 0x82, 0x12C8E76)
+            && RelativeBranchTargets(0x12C909D, 0xE9, 0x12C8EF2));
         check("Binary pinned-sample raw code [0xBE6325,0xBE6352) maps to VA 0x00FE6F25 and preserves its JNZ target",
             imageBase == 0x400000
             && Matches(0xBE6325, "8B4E0853578B7E108D04CDFFFFFFFF4921460C037E0C8BC7C1E80323C88B46048D1C8D00000000833C0300751C")
