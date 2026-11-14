@@ -72,7 +72,16 @@ active assignments. Singleton teardown and source-initialization copy are
 complete; current active scopes are tagged-pool replenishment and adjacent
 drain identity. Callback publication and composite container semantic identity remain
 parked. UI lifecycle, arithmetic/import regressions, and immutable backing-slot
-projection code/checks are committed.
+projection code/checks are committed. Tagged-pool replenishment now also has a composed projection
+through its initial loop gate and at most one entered iteration's repeat
+decision; it reuses the bounded stage projections and does not model a whole
+loop. Its focused checks run with
+`dotnet run --project src\Startup\Checks\Startup.Checks.csproj -- --shader-pool-replenishment`;
+the epilogue bytes at raw `0x12CE1F5` are additionally pinned in
+`StartupBinaryEvidence`. No runtime behavior, allocator/push effects, later
+iterations, or termination are established. The active handoff remains static
+and IDA-backed, not REA Evidence: the REA IDA provider is still
+unavailable/unconfigured, and no configuration was changed.
 The separate helper at raw `0x12CC2B0` now has a distinct projection and full
 `0x31`-byte sample anchor; its owner/vtable identity remains unresolved, and
 the prior bounded scans found no direct pointer/caller binding. Do not broaden

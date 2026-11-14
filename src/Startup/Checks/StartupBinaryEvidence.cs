@@ -12440,6 +12440,10 @@ internal static class StartupBinaryEvidence
         check("Binary pool replenishment loop increments EBX and re-reads live bound +0x20 with unsigned JB back to address formation at 0x12CE1B4",
             Matches(0x12CE1EC, "8B4DD0433B5F2072BF")
             && ShortConditionalBranchTargets(0x12CE1F3, 0x72, 0x12CE1B4));
+        check("Binary replenishment epilogue begins immediately after the bounded repeat-decision window and pins the cookie-check call and normal RET bytes",
+            RawCodeRangeMaps(0x12CE1F5, 0x11)
+            && Matches(0x12CE1F5, "8B4DFC5F5E33CD5BE894CA09008BE55DC3")
+            && RelativeBranchTargets(0x12CE1FD, 0xE8, 0x136AC96));
 
         const uint rawQueueInitializerFileOffset = 0x12CE210;
         const uint queueInitializerCodeVirtualAddress = rawQueueInitializerFileOffset + 0x400C00;
