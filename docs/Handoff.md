@@ -73,6 +73,15 @@ complete; current active scopes are tagged-pool replenishment and adjacent
 drain identity. Callback publication and composite container semantic identity remain
 parked. UI lifecycle, arithmetic/import regressions, and immutable backing-slot
 projection code/checks are committed.
+The separate helper at raw `0x12CC2B0` now has a distinct projection and full
+`0x31`-byte sample anchor; its owner/vtable identity remains unresolved, and
+the prior bounded scans found no direct pointer/caller binding. Do not broaden
+that search without new evidence. A temporary REA 6.9.0 native-provider probe
+reached the active IDA MCP but failed result normalization (`asm.lines` shape
+and missing `ok` field); its partial Evidence is not complete. Direct IDA
+disassembly and byte reads corroborate the helper. The resident REA MCP still
+reports the IDA provider as unconfigured; no persistent REA registration was
+changed.
 The traceback fallback's state-0 unwind map is decoded and has no restore action.
 VM-frame insertion/removal is a bounded unresolved stop, not an ongoing scan.
 Normal native CRT return selects `exit(status)`.

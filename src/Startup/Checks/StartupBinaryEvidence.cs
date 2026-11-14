@@ -12193,6 +12193,10 @@ internal static class StartupBinaryEvidence
             && ShortConditionalBranchTargets(0x12CC271, 0x75, 0x12CC260)
             && Matches(0x12CC273, "8BCF5F5EE9E4CAFFFF")
             && RelativeBranchTargets(0x12CC277, 0xE9, 0x12C8D60));
+        check("Binary helper at raw 0x12CC2B0 matches its full 0x31-byte captured window",
+            Matches(0x12CC2B0,
+                "56578BF98D4F08E82418000085C074138BC8E899CAFFFF8D4F08E81118000085C075ED8BCFE886CAFFFF8BC75F5EC20400")
+            && RawCodeRangeMaps(0x12CC2B0, 0x31));
         check("Binary buffer copy-constructor stores its vptr, zeros +4/+8/+0x0C, resizes with preserve zero and the requested size, then gates copying on backing",
             Matches(0x12CB860, "C706C40CC801C7460400000000C74608000000006A00FF750CC645FC01C7460C00000000")
             && Matches(0x12CB884, "E827040000")

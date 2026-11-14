@@ -494,6 +494,7 @@ SharedTextPoolSingletonChecks.Run(Check);
 UiShaderSourcePoolTeardownChecks.Run(Check);
 UiShaderSourcePoolSingletonDestructorChecks.Run(Check);
 UiShaderSourcePoolDrainChecks.Run(Check);
+StartupHelper12CC2B0Checks.Run(Check);
 UiShaderSourcePoolPopChecks.Run(Check);
 UiShaderSourcePoolPushChecks.Run(Check);
 UiShaderSourcePoolAcquisitionChecks.Run(Check);
