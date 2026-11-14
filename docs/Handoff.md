@@ -82,6 +82,13 @@ the epilogue bytes at raw `0x12CE1F5` are additionally pinned in
 iterations, or termination are established. The active handoff remains static
 and IDA-backed, not REA Evidence: the REA IDA provider is still
 unavailable/unconfigured, and no configuration was changed.
+On November 14, the reconfigured REA MCP reported Ghidra 12.2 available and
+opened the SHA-matched PE, but its first function query timed out after 330
+seconds. A retry with a 1,200-second runtime startup limit reported Java heap
+space exhaustion. A separate REA CLI attempt with a process-local 6G requested
+heap and 1,200-second startup limit also timed out; its effective heap maximum
+was not reported. Neither attempt produced function Evidence. The CLI did not
+reuse the MCP session; no persistent configuration or binary was changed.
 The separate helper at raw `0x12CC2B0` now has a distinct projection and full
 `0x31`-byte sample anchor; its owner/vtable identity remains unresolved, and
 the prior bounded scans found no direct pointer/caller binding. Do not broaden
