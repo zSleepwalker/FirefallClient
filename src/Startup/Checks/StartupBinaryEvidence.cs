@@ -12193,6 +12193,10 @@ internal static class StartupBinaryEvidence
             && ShortConditionalBranchTargets(0x12CC271, 0x75, 0x12CC260)
             && Matches(0x12CC273, "8BCF5F5EE9E4CAFFFF")
             && RelativeBranchTargets(0x12CC277, 0xE9, 0x12C8D60));
+        check("Binary helper at raw 0x12CC2B0 matches its full 0x31-byte captured window",
+            Matches(0x12CC2B0,
+                "56578BF98D4F08E82418000085C074138BC8E899CAFFFF8D4F08E81118000085C075ED8BCFE886CAFFFF8BC75F5EC20400")
+            && RawCodeRangeMaps(0x12CC2B0, 0x31));
         check("Binary buffer copy-constructor stores its vptr, zeros +4/+8/+0x0C, resizes with preserve zero and the requested size, then gates copying on backing",
             Matches(0x12CB860, "C706C40CC801C7460400000000C74608000000006A00FF750CC645FC01C7460C00000000")
             && Matches(0x12CB884, "E827040000")
@@ -12436,6 +12440,10 @@ internal static class StartupBinaryEvidence
         check("Binary pool replenishment loop increments EBX and re-reads live bound +0x20 with unsigned JB back to address formation at 0x12CE1B4",
             Matches(0x12CE1EC, "8B4DD0433B5F2072BF")
             && ShortConditionalBranchTargets(0x12CE1F3, 0x72, 0x12CE1B4));
+        check("Binary replenishment epilogue begins immediately after the bounded repeat-decision window and pins the cookie-check call and normal RET bytes",
+            RawCodeRangeMaps(0x12CE1F5, 0x11)
+            && Matches(0x12CE1F5, "8B4DFC5F5E33CD5BE894CA09008BE55DC3")
+            && RelativeBranchTargets(0x12CE1FD, 0xE8, 0x136AC96));
 
         const uint rawQueueInitializerFileOffset = 0x12CE210;
         const uint queueInitializerCodeVirtualAddress = rawQueueInitializerFileOffset + 0x400C00;

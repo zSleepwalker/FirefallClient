@@ -410,7 +410,7 @@ the empty-destination branch when the connection state is below 2 and calls
 `MatrixConnection_BeginConnection` (`0x494CA0`) on the Login-owned object at
 `Login+0x1C`, without host/port validation for an absent URL. This reaches the
 state-2 oracle-ticket path described in
-[`MatrixConnection.md`](MatrixConnection.md#oracle-ticket-request).
+[`MatrixConnection.md`](MatrixConnectionTransport.md#oracle-ticket-request).
 
 An empty argument does not necessarily clear an older preference: the begin
 routine updates connection `+0xBA0` only for nonempty input, and the oracle

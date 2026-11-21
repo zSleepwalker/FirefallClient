@@ -1,6 +1,16 @@
 using Firefall.Reconstruction.Startup;
 
 int failures = 0;
+if (args.Length == 1 && args[0] == "--shader-pool-replenishment")
+{
+    UiShaderSourcePoolReplenishmentChecks.Run(Check);
+    UiShaderSourcePoolReplenishmentResultChecks.Run(Check);
+    UiShaderSourcePoolReplenishmentAlignmentChecks.Run(Check);
+    UiShaderSourcePoolReplenishmentIterationChecks.Run(Check);
+    UiShaderSourcePoolReplenishmentContinuationChecks.Run(Check);
+    return failures == 0 ? 0 : 1;
+}
+
 PayloadWordGrowthGateChecks.Run(Check);
 PayloadWordSlotIndexChecks.Run(Check);
 PayloadWordSlotAllocationChecks.Run(Check);
@@ -494,6 +504,7 @@ SharedTextPoolSingletonChecks.Run(Check);
 UiShaderSourcePoolTeardownChecks.Run(Check);
 UiShaderSourcePoolSingletonDestructorChecks.Run(Check);
 UiShaderSourcePoolDrainChecks.Run(Check);
+StartupHelper12CC2B0Checks.Run(Check);
 UiShaderSourcePoolPopChecks.Run(Check);
 UiShaderSourcePoolPushChecks.Run(Check);
 UiShaderSourcePoolAcquisitionChecks.Run(Check);
@@ -501,6 +512,7 @@ UiShaderSourcePoolReplenishmentChecks.Run(Check);
 UiShaderSourcePoolReplenishmentResultChecks.Run(Check);
 UiShaderSourcePoolReplenishmentAlignmentChecks.Run(Check);
 UiShaderSourcePoolReplenishmentIterationChecks.Run(Check);
+UiShaderSourcePoolReplenishmentContinuationChecks.Run(Check);
 SingletonTeardownWalkerChecks.Run(Check);
 UiShaderSourceBackingAlignmentChecks.Run(Check);
 UiShaderSourcePoolControlChecks.Run(Check);
